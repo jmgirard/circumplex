@@ -1,11 +1,11 @@
 # M92: Teach the boundary regime the structure vignette's own example is in
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
-- **Branch/PR:** —
+- **Branch/PR:** `m92-boundary-regime-guidance`
 
 ## Goal
 
@@ -74,9 +74,16 @@ label test checks the contract rather than the function's source text.
       any of the three.
 - [ ] AC6 Two pre-existing passages are reconciled. (a) The paragraph reading
       the estimated angles no longer describes them as landing near their
-      theoretical positions; a test pins the two figures its new wording rests
-      on — the largest theory-to-estimate gap and the arc the eight estimates
-      span — so prose and table cannot drift. (b) The bullet matched by the
+      theoretical positions, and its final wording is quoted verbatim in AC4's
+      ledger for the review gate to read against the printed table. A test pins
+      the figures the new wording rests on — the smallest and largest of the
+      eight gaps between circularly adjacent estimates (estimates sorted around
+      the circle, wrap-around gap included), and the largest departure of an
+      estimated angle from its theoretical position with PA held as the fixed
+      reference at 90° — and asserts the estimates' circular order matches the
+      scale order, the claim the old bullet got right. The prose does not name
+      which pair of scales carries the widest gap (the two widest are within 2°
+      of each other). (b) The bullet matched by the
       text "**Boundary solutions are common at realistic sample sizes.**" is
       reduced to a pointer into the new subsection, and every fact it asserted
       appears in AC4's ledger.
@@ -103,8 +110,9 @@ label test checks the contract rather than the function's source text.
       marker tests (`tests/testthat/test-cpm_api.R:555-610`) still pass, and
       no user-visible output changes.
 - [ ] T2 Write the tests first and watch each fail: catalog-vs-subsection label
-      sweep (scoped extraction), demo-chunk marker-set equality, the two angle
-      figures, the roxygen heading string. Break one guarded line per test.
+      sweep (scoped extraction), demo-chunk marker-set equality, the angle
+      figures and ordering, the roxygen heading string. Break one guarded line
+      per test.
 - [ ] T3 Draft the subsection — marker glossary, the on-page reading of the
       displayed fit (NO ζ̂ = 1.000 and its zero-width interval, the printed
       Heywood note, the ill-conditioning warning), and the per-family interval
@@ -128,6 +136,9 @@ label test checks the contract rather than the function's source text.
 - 2026-08-16: plan gate chose an internal label catalog over enumerating labels from `deparse()`, because the deparse probe breaks under a behaviour-preserving refactor; the alternative of also printing markers on the bootstrap path lost as an inference-caution design change, not teaching, and became a candidate row; falsified by the catalog forcing a user-visible output change.
 - 2026-08-16: plan gate chose qualitative guidance anchored on printed output over quoting the validation-simulation figures, because those files do not ship and a reader cannot trace them (the M77 precedent); falsified by the simulation paper publishing them citably.
 - 2026-08-16: step 2 chose docs guidance over a new runtime diagnostic, because the runtime already names fired markers at `summary()` and the gap the candidate row records is teaching, not detection; falsified by a user report that the printed notes are missed rather than misunderstood.
+
+- 2026-08-16: branch cut, status in-progress.
+- 2026-08-16: amendment gate — AC6(a) rewording taken (user approved): pinned quantities become the eight circular adjacent-estimate gaps (min/max), the largest theory departure *with PA named as the fixed reference at 90°*, and an ordering assertion; the paragraph's final wording is ledgered for the gate to read. Rationale correction: the retired "arc the eight estimates span" figure was not vacuous but redundant — it is 360 minus the largest gap (281.3°) and its linear reading depends on where the wrap falls. Fresh-context [O] audit of the amended wording ran in full mode and returned five findings, all folded in before writing.
 
 ## Decisions
 
