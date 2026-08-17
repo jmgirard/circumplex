@@ -87,21 +87,28 @@ on a real ggplot2 coordinate system.
   statistics (`chisq`, `pvalue`, `rmsea`, `cfi`) are `NA` together, and
   each surface’s warning names that shared reason; `df` and `srmr` still
   report. The standard-error surface additionally applies the same
-  criterion to the raw fitted matrix, which one of its internal arms
-  inverts, so its refusals nest the scaling surface’s: a matrix
+  criterion to the raw fitted matrix, which one internal arm of its
+  computation — the uncorrected normal-theory pricing kept only as a
+  diagnostic tie to lavaan’s own standard errors — inverts. A matrix
   degenerate only in the raw metric (wildly unequal fitted variances
-  over a well-conditioned correlation structure) yields `NA` standard
-  errors beside validly scaled fit statistics, never the reverse, and on
-  a unit-diagonal fitted matrix the two surfaces agree exactly.
-  Previously the two surfaces disagreed at the numerical margin —
-  whichever internal [`solve()`](https://rdrr.io/r/base/solve.html)
-  failed first refused with an incidental label — so a sufficiently
-  degenerate fitted matrix could yield `NA` corrected standard errors
-  beside silently scaled fit statistics derived from the same matrix.
-  The failure-reason vocabulary is now shared across both surfaces, and
-  the reported literals change as follows. On
-  `details$se_correction_failed` alone: a nonpositive fitted variance
-  reports `"singular"` where it previously reported
+  over a well-conditioned correlation structure) refuses that internal
+  arm alone: the reported standard errors and scaled fit statistics all
+  compute, with no warning, and the internal refusal is recorded
+  silently in `details$naive_reason` (a new `details` field, `NULL`
+  whenever that arm computed) under the same reason vocabulary. Under
+  the shared criterion the two surfaces’ user-facing refusals therefore
+  agree exactly, and on a unit-diagonal fitted matrix the two metrics
+  coincide; each surface retains its own refusals outside the criterion
+  (such as the saturated-model door, which touches only the fit
+  statistics). Previously the two surfaces disagreed at the numerical
+  margin — whichever internal
+  [`solve()`](https://rdrr.io/r/base/solve.html) failed first refused
+  with an incidental label — so a sufficiently degenerate fitted matrix
+  could yield `NA` corrected standard errors beside silently scaled fit
+  statistics derived from the same matrix. The failure-reason vocabulary
+  is now shared across both surfaces, and the reported literals change
+  as follows. On `details$se_correction_failed` alone: a nonpositive
+  fitted variance reports `"singular"` where it previously reported
   `"nonpositive_diagonal"`, and a positive-infinite one reports
   `"infinite_diagonal"` rather than `"unidentified"`. On
   `details$se_correction_failed` and `details$fit_scaling_failed` alike:

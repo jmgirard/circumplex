@@ -118,12 +118,17 @@ are `NA` – notably the shared degeneracy criterion's two literals
 (smallest eigenvalue relative to largest at or below
 `sqrt(p * .Machine$double.eps / 1e-6)`, evaluated on
 [`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the fitted covariance
-matrix and, for this surface only, on the raw matrix as well):
-`"indefinite"` for a decisively negative smallest eigenvalue (below
-`-lambda_max * sqrt(p * .Machine$double.eps)`), a statement about the
-model, and `"ill_conditioned"` for roundoff-level negativity,
+matrix): `"indefinite"` for a decisively negative smallest eigenvalue
+(below `-lambda_max * sqrt(p * .Machine$double.eps)`), a statement about
+the model, and `"ill_conditioned"` for roundoff-level negativity,
 singularity, or ill-conditioning, a numerical caution – which also sets
-`fit_scaling_failed` when the correlation form is what tripped it –
+`fit_scaling_failed` when the shared criterion is what tripped it –
+`naive_reason`, `NULL` unless the internal uncorrected arm (the
+diagnostic tie to lavaan's own standard errors) was refused while every
+reported number computed, whether by the same criterion evaluated on the
+raw fitted matrix or by that arm's own pricing (`"singular"`,
+`"unidentified"`, `"indefinite"`); it carries the same reason vocabulary
+and is deliberately silent – no warning or printed note accompanies it –
 `fit_uncorrected`, the six fit statistics as lavaan reports them before
 the correlation-metric scaling, `scaling_factor`, the two
 Satorra-Bentler factors (`model` and `baseline`), and
@@ -249,21 +254,30 @@ standard errors and the four scaled statistics go `NA` together (each
 with its own warning naming that reason) rather than one surface
 refusing while the other silently scales. The standard-error surface
 additionally applies the same criterion to the raw fitted matrix, which
-one of its internal arms inverts, so its refusals nest the scaling
-surface's: whatever refuses the scaled statistics also refuses the
-standard errors with the same reason – when its two arms would label one
-matrix differently, the correlation-metric arm's literal is the one
-reported, which is what keeps the two surfaces in exact agreement –
-while a matrix degenerate only in the raw metric (wildly unequal fitted
-variances over a well-conditioned correlation structure) returns `NA`
-standard errors beside validly scaled fit statistics – never the
-reverse. On a unit-diagonal fitted matrix the two metrics coincide.
-Separately, a saturated model (`df = 0`) is refused as `"saturated"`
-before any scaling arithmetic runs – a refusal that touches only the
-four scaled statistics; the corrected standard errors still compute. (A
-`df = 0` fit is reachable today only at the internal helpers' documented
-contract boundary: `axes_reliability()` itself refuses the three-item
-maps that could saturate.) `df` and `srmr` still report.
+one internal arm of its computation – the uncorrected normal-theory
+pricing, kept only as a diagnostic tie to lavaan's own standard errors –
+inverts. A matrix degenerate only in the raw metric (wildly unequal
+fitted variances over a well-conditioned correlation structure) refuses
+that internal arm alone: the reported standard errors and scaled fit
+statistics all compute – `details$se_correction_failed` and
+`details$fit_scaling_failed` are both `NULL`, and no warning or note
+fires, because every reported number is present and priced in the metric
+the criterion cleared – and the internal refusal is recorded, silently,
+in `details$naive_reason` under the same reason vocabulary. Under the
+shared criterion the two surfaces' user-facing refusals therefore agree
+exactly: whatever the criterion refuses for the scaled statistics it
+refuses for the standard errors with the same reason, and nothing the
+raw metric alone refuses touches either. (Each surface retains its own
+refusals outside the criterion – the saturated-model door below touches
+only the fit statistics, and either surface's internal computation can
+still refuse on its own.) On a unit-diagonal fitted matrix the two
+metrics coincide. Separately, a saturated model (`df = 0`) is refused as
+`"saturated"` before any scaling arithmetic runs – a refusal that
+touches only the four scaled statistics; the corrected standard errors
+still compute. (A `df = 0` fit is reachable today only at the internal
+helpers' documented contract boundary: `axes_reliability()` itself
+refuses the three-item maps that could saturate.) `df` and `srmr` still
+report.
 
 If you cross-check against lavaan, match the variant. The scaled
 `chisq`, `pvalue`, `rmsea` and `cfi` here are built with the definitions
