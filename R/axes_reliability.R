@@ -742,7 +742,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' coincide. Separately, a saturated model (`df = 0`) is refused as
 #' `"saturated"` before any scaling arithmetic runs -- a refusal that
 #' touches only the four scaled statistics; the corrected standard errors
-#' still compute. `df` and `srmr` still report.
+#' still compute. (A `df = 0` fit is reachable today only at the internal
+#' helpers' documented contract boundary: `axes_reliability()` itself
+#' refuses the three-item maps that could saturate.) `df` and `srmr` still
+#' report.
 #'
 #' If you cross-check against lavaan, match the variant. The scaled `chisq`,
 #' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls

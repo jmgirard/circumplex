@@ -305,12 +305,14 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #
 # THE CRITERION: the smallest eigenvalue of the priced matrix, relative to its
 # largest, must exceed sqrt(p * eps / tau) (tau below); at or below that the
-# matrix is refused. One inequality carries three cases -- indefinite
-# (lambda_min <= 0 < lambda_max), exactly singular (lambda_min = 0), and
-# ill-conditioned (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4 at
-# p = 24) -- and since M90 the refusal's literal says which happened:
-# "indefinite" where the negativity is decisive, "ill_conditioned" otherwise;
-# the partition and its rationale live at axes_sigma_degenerate() below.
+# matrix is refused. One inequality carries three spectral cases -- a
+# negative smallest eigenvalue (lambda_min <= 0 < lambda_max), exact
+# singularity (lambda_min = 0), and mere ill-conditioning
+# (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4 at p = 24) --
+# and since M90 the refusal's LITERAL is decided by depth, not by case:
+# "indefinite" only where the negativity is decisive, "ill_conditioned" for
+# everything else including roundoff-level negativity; the partition and
+# its rationale live at axes_sigma_degenerate() below.
 #
 # WHICH MATRIX (M89 re-cut, RR18): each consumer prices the matrix it actually
 # computes with. Every quantity the scaling surface computes -- and every

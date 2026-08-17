@@ -1608,7 +1608,7 @@ test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 
 })
 
 
-test_that("M90 AC5: the cval backstop is not reached by criterion-accepted draws; the known negative-cval matrix is refused upstream", {
+test_that("M90 AC5: criterion-accepted draws from the most cancellable recorded family never reach the backstop", {
   # Smoke tier of the recorded AC5 search (work log: 30,000 accepted draws
   # spanning p in {3, 8, 24} + adversarial hill-climbs, 0 reaches, nearest
   # miss cval = +1.2e-5 at p = 3 / df = 1 -- the one map family whose cval
@@ -1633,12 +1633,14 @@ test_that("M90 AC5: the cval backstop is not reached by criterion-accepted draws
     expect_true(got$scale > 0, label = sprintf("accepted draw %d cval > 0", i))
   }
   expect_gt(n_acc, 100L)  # the smoke family actually exercised acceptance
+})
 
-  # The upstream guard fires on the strongest known candidate: exemplar B is
-  # the one matrix measured to produce cval < 0 in doubles (true cval
-  # +0.0556, RR18), and the degeneracy criterion -- not the backstop --
-  # is what refuses it. Asserted at the criterion itself, so the refusal's
-  # identity is pinned, not inferred from a shared literal.
+
+test_that("M90 AC5: the one recorded negative-cval matrix is refused by the criterion, not the backstop", {
+  # Exemplar B is the one matrix on record measured to compute cval < 0 in
+  # doubles (true cval +0.0556, RR18), and the degeneracy criterion -- not
+  # the backstop -- is what refuses it. Asserted at the criterion itself, so
+  # the refusal's identity is pinned, not inferred from a shared literal.
   fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
   skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
   fx <- readRDS(fp)
@@ -1654,7 +1656,7 @@ test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRI
   # the door it is really refused at and lands in the final backstop. The
   # unmocked path is pinned by the smoke test above (accepted draws never
   # get here) and by the exemplar-B criterion assertion; this test pins the
-  # literal the backstop itself emits — a literal the recorded search found
+  # literal the backstop itself emits -- a literal the recorded search found
   # no accepted input reaching (never "unreachable"; see the backstop
   # comment). Under the stub the backstop is the only remaining site in this
   # function that can emit this literal, so the assertion is site-exclusive.

@@ -246,8 +246,11 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   #     sum((1 - rho^2)^2) / baseline_df over finite rho (sigma passed the
   #     finiteness gate above), so cb is finite and >= 0, with equality only
   #     if every |rho| = 1, a matrix the degeneracy criterion refuses first.
-  #     baseline_df > 0 whenever this line runs: p(p - 1)/2 = 0 only at
-  #     p = 1, where q >= 1 forces df <= 0, refused above.
+  #     baseline_df > 0 whenever this line runs: the baseline_df guard pins
+  #     baseline_df = p(p - 1)/2, which is 0 only at p = 1 -- where the
+  #     information matrix (q x q from a single moment, rank <= 1 < q) is
+  #     singular, so acov's solve refuses "unidentified" before this line
+  #     (measured at the M90 round-2 review).
   #   cval <= 0 and !is.finite(cval): tr(U Gamma) >= 0 in exact arithmetic
   #     (U is the psd projection residual of V, Gamma_R is psd) and df is
   #     nonzero past the saturation guard, so a nonpositive or non-finite cval here

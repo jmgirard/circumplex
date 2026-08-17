@@ -5,13 +5,20 @@
 # 0 times; min cval +1.2e-5 (p = 3, df = 1), +0.813 (p = 8), +0.956 (p = 24).
 # Runtime ~6 minutes. Re-run from the repo root with:
 #   Rscript devel/m90-ac5-search/ac5-search.R
+#
+# Reach detection, post-relabel (M90 review round 2): the recorded run
+# happened before the backstop's relabel, when the branch's literal was
+# "indefinite" and unambiguous. Since the relabel the branch says
+# "ill_conditioned" -- but on a draw accept() has already cleared, the
+# criterion cannot be the source of that literal, so on ACCEPTED draws
+# "ill_conditioned" identifies the backstop exactly; "unidentified" is a
+# distinct upstream door and is counted separately.
 # Families per p: Wishart correlation draws at three concentration levels
 # (conditioning spread), spectrum-surgery near-floor draws (lambda-ratio
 # pinned just above the refusal floor), and an adversarial hill-climb that
 # perturbs the minimum-cval draw toward smaller cval. A draw "reaches" the
-# branch iff the criterion accepts it and axes_scaling_factor() returns
-# reason "indefinite" (pre-relabel HEAD: with the criterion already passed,
-# that literal is emitted ONLY by the cval/cb branch).
+# branch iff the criterion accepts it and axes_scaling_factor() still
+# refuses with the backstop's literal (see the reach-detection note above).
 suppressMessages(devtools::load_all(quiet = TRUE))
 set.seed(20260816)
 
@@ -65,8 +72,8 @@ for (m in maps) {
     r <- sf(S)
     if (is.null(r$reason)) {
       if (r$scale < min_cval) { min_cval <- r$scale; min_S <- S }
-    } else if (r$reason == "indefinite") {
-      n_reach <- n_reach + 1L
+    } else if (r$reason == "ill_conditioned") {
+      n_reach <- n_reach + 1L   # backstop: accept() already cleared the criterion
     }
   }
 
@@ -80,8 +87,8 @@ for (m in maps) {
     r <- sf(S2)
     if (is.null(r$reason) && r$scale < min_cval) {
       min_cval <- r$scale; S <- S2; hc <- hc + 1L
-    } else if (!is.null(r$reason) && r$reason == "indefinite") {
-      n_reach <- n_reach + 1L
+    } else if (!is.null(r$reason) && r$reason == "ill_conditioned") {
+      n_reach <- n_reach + 1L   # backstop (see above)
     }
   }
   cat(sprintf(

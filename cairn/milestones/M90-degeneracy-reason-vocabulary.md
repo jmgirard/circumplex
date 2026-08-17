@@ -42,13 +42,13 @@ RR18 asks for its constant to be calibrated against the oracle first.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (BC4, narrowed)** — `axes_scaling_factor()` refuses `df == 0` with the literal
+- [x] **AC1 (BC4, narrowed)** — `axes_scaling_factor()` refuses `df == 0` with the literal
       `"saturated"`, after the two df-consistency guards and before any matrix computation; the
       deterministic p = 3 construction (S = {1,.5,.3;.5,1,.4;.3,.4,1}, scales A/A/B, `fit_zeta1 =
       TRUE`, df = 0) returns `"saturated"`; the guard's position upstream of the `cval` division —
       asserted by code order and the construction's literal, not a claim over all paths — makes
       `df` nonzero wherever `cval` is computed.
-- [ ] **AC2 (BC5, anchors restated)** — Within the refusal region the criterion returns
+- [x] **AC2 (BC5, anchors restated)** — Within the refusal region the criterion returns
       `"indefinite"` iff λmin < −λmax·sqrt(p·ε), else `"ill_conditioned"`; the comment beside the
       partition states its rationale as a convergence-noise band (fitted-matrix entries carry
       optimizer error ~sqrt(ε), so eigenvalues within ~λmax·sqrt(p·ε) of zero are not confident
@@ -57,10 +57,10 @@ RR18 asks for its constant to be calibrated against the oracle first.
       the M89 nestedness-grid indefinite probe (`dd %*% sigma %*% dd`, cov2cor, p = 24, λmin =
       −0.5) returns `"indefinite"` on both surfaces; the near-singular probe (cov2cor, p = 24, λmin
       = −9.32e-16) returns `"ill_conditioned"` on both.
-- [ ] **AC3 (BC6)** — The `cval ≤ 0` (or non-finite) refusal at the end of `axes_scaling_factor()`
+- [x] **AC3 (BC6)** — The `cval ≤ 0` (or non-finite) refusal at the end of `axes_scaling_factor()`
       no longer returns `"indefinite"`; it returns `"ill_conditioned"`, with the tr(UΓ) ≥ 0
       rationale recorded in a comment beside it.
-- [ ] **AC4 (procedure-based)** — A repo-wide grep for each pre-M90 refusal literal
+- [x] **AC4 (procedure-based)** — A repo-wide grep for each pre-M90 refusal literal
       (`"indefinite"`, `"ill_conditioned"`, `"saturated"`) over `R/`, `man/`, `NEWS.md`,
       `vignettes/` enumerates the doc surfaces; every hit either already describes the post-M90
       vocabulary or is updated here — including the inline comments at
@@ -68,7 +68,7 @@ RR18 asks for its constant to be calibrated against the oracle first.
       falsified (measured: `"indefinite"`), the roxygen enumerations, `man/axes_reliability.Rd`,
       and NEWS. Documented: the three printed-output changes — AC1's `"saturated"`, AC2's
       partition, AC3's relabel (GP4).
-- [ ] **AC5 (amended at review round 1)** — The `cval ≤ 0` branch's four-arm predicate is
+- [x] **AC5 (amended at review round 1)** — The `cval ≤ 0` branch's four-arm predicate is
       dispositioned arm by arm on recorded evidence (recorded in this file's work log). The two
       `cb` arms are settled by argument in the comment (cb = Σ(1−ρ²)²/baseline_df ≥ 0, equality
       only at |ρ| = 1, refused upstream; baseline_df > 0 wherever the line runs). For the two
@@ -85,14 +85,14 @@ RR18 asks for its constant to be calibrated against the oracle first.
       `"ill_conditioned"` (the mock is the upstream criterion, never the branch's condition; the
       test claims only the emitted literal, never that any unmocked input reaches the branch —
       M62). AC3's comment covers all four arms.
-- [ ] **AC6 (probe family widened)** — At p = 24 and at least one of p ∈ {8, 12}, tests construct
+- [x] **AC6 (probe family widened)** — At p = 24 and at least one of p ∈ {8, 12}, tests construct
       matrices with λmin just inside and just outside −λmax·sqrt(p·ε) (factors ≈ 0.5 and ≈ 2,
       computed per p), at two λmax scales (≈ 1, ≈ 1e3) and two construction forms (rank-one
       negative perturbation; eigen-recomposition Q diag(λ) Qᵀ), asserting the literal flips across
       the boundary in every cell; the drop-p, squared-p, and drop-λmax partition mutants each
       verifiably redden. p = 3 excluded deliberately: there the ×2 factor no longer separates the
       squared-p mutant.
-- [ ] **AC7 (reworded at the replan)** — Whenever both of `axes_corrected_se()`'s arms refuse, the
+- [x] **AC7 (reworded at the replan)** — Whenever both of `axes_corrected_se()`'s arms refuse, the
       reported literal is the one its cov2cor arm produces — requiring the arm order at
       `R/axes_corrected_se.R:264-268` inverted (cov2cor first) and the raw-matrix finiteness check
       `!all(is.finite(sigma))` hoisted ahead of both arms (mirroring
@@ -169,6 +169,8 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - 2026-08-16: correction — the T3+T4 work-log line's measured numbers were false: the d44 probe measures λmin −0.3819 raw / −38.25 cov2cor and the dd grid probe −0.1407 raw / −0.5000 cov2cor (the −0.56/−48 came from an ad-hoc reproduction with wrong population parameters; found by the diff lens, re-measured with the test file's own probe).
 
 - 2026-08-16: amendment return: AC5 — "either a test reaches the branch on an unmocked input — AC1's guard and the degeneracy criterion both live — and asserts \"ill_conditioned\", or the recorded search … finds no reaching input, the branch is marked a defensive backstop (not \"unreachable\"), and three tests pin the disposition: a seeded smoke tier re-runs the family with the smallest cval that search recorded (p = 3 / df = 1, min +1.2e-5), asserting every accepted draw computes with cval > 0; the upstream criterion — not the backstop — is asserted to refuse the one matrix on record (RR18 exemplar B) measured to compute cval < 0 in doubles, pinned at the criterion itself; and a mocked-criterion test asserts the backstop's own literal is \"ill_conditioned\" (the mock is the upstream criterion, never the branch's condition — M62)". Amended text audited by a fresh [O] reader (PASS with 4 wording repairs, all applied: disjunct made disjoint, both superlatives replaced by citations, mock kind corrected); user approved the amendment at the round-1 gate.
+
+- 2026-08-16: review round 2 — delta reviewer's 7 findings all fixed same-round (search-script detector, false p=1 argument, NEWS/roxygen qualifiers, comment homonymy, test-block split, fresh check); all 7 AC boxes ticked against recorded evidence; suite 8257/0 on the final tree.
 
 ## Decisions
 
@@ -247,3 +249,43 @@ ranked by the reviewers). Dispositions:
 - DISSOLVED on measurement: F15 (AC2's near-singular anchor "mislabeled
   cov2cor" — the probe is unit-diagonal, `cov2cor()` of it is identical,
   label accurate; clarifying assertion added to the test).
+
+### Round 2 (2026-08-16)
+
+The round-1 fixes plus the audited AC5 amendment landed (commit f832c982
+and the round-2 delta). A fresh [O] reviewer over the fix delta returned 7
+findings, all fixed in the delta's follow-up: (R1) the committed search
+script's reach detector still read the pre-relabel literal, so a re-run
+could never fire — detector corrected to the post-relabel identity
+("ill_conditioned" on an accepted draw = the backstop, since the criterion
+already returned NULL); (R2) the cb-arm p = 1 argument was false (q = 3,
+df = −2 passes the df guards; what actually refuses p = 1 is the singular
+information matrix, "unidentified", measured) — comment corrected; (R3)
+NEWS qualifier said "two literals" where the claim is about two CHANGES,
+and implied unreachability — reworded; (R4) the roxygen `"saturated"`
+guarantee lacked the boundary caveat NEWS carries — added; (R5) THE
+CRITERION comment's case names collided with the literals — reworded to
+"decided by depth, not by case"; (R6) AC5 says three tests, delta had two
+blocks — smoke tier and exemplar-B pin split into their own `test_that`
+blocks; (R7) check evidence predated the delta — full `devtools::check()`
+re-run on the final tree (below). The reviewer verified clean: the wiring
+test genuinely lands on the cval arm (cval = −0.2160593 measured under the
+mock), is site-exclusive and mutation-sensitive; the one-warning test
+reddens on hoist-revert; the corrected numbers (−0.3819 raw / −38.25
+cov2cor) reproduce; roxygen/Rd threshold text matches the code verbatim.
+
+Evidence closing the held criteria:
+- **AC3** ✓ — relabel + four-arm comment in source; the wiring test pins
+  the branch's literal, and the relabel-revert mutant reddens exactly that
+  test (hash-verified apply/restore).
+- **AC4** ✓ — the missed THE CRITERION block updated; grep procedure
+  re-run over `R/`, `NEWS.md`, `vignettes/`: zero surfaces describing the
+  pre-M90 semantics remain (`man/` regenerates from the roxygen).
+- **AC5 (amended)** ✓ — all three named tests exist as their own blocks
+  and pass; the search record, corrected script (devel/m90-ac5-search/),
+  backstop marking, and cb-arm argument (corrected per R2) are in place.
+
+Final tree: suite 8257 pass / 0 fail; `document()` 0 link warnings, Rd in
+sync, no DESCRIPTION drift; `pkgdown::check_pkgdown()` no problems;
+`cairn_validate` all checks pass; full `devtools::check()` on this tree —
+see the gate presentation.

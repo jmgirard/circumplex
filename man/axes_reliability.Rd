@@ -232,7 +232,10 @@ never the reverse. On a unit-diagonal fitted matrix the two metrics
 coincide. Separately, a saturated model (\code{df = 0}) is refused as
 \code{"saturated"} before any scaling arithmetic runs -- a refusal that
 touches only the four scaled statistics; the corrected standard errors
-still compute. \code{df} and \code{srmr} still report.
+still compute. (A \code{df = 0} fit is reachable today only at the internal
+helpers' documented contract boundary: \code{axes_reliability()} itself
+refuses the three-item maps that could saturate.) \code{df} and \code{srmr} still
+report.
 
 If you cross-check against lavaan, match the variant. The scaled \code{chisq},
 \code{pvalue}, \code{rmsea} and \code{cfi} here are built with the definitions lavaan calls
