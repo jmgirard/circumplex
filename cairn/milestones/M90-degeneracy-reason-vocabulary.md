@@ -287,5 +287,7 @@ Evidence closing the held criteria:
 
 Final tree: suite 8257 pass / 0 fail; `document()` 0 link warnings, Rd in
 sync, no DESCRIPTION drift; `pkgdown::check_pkgdown()` no problems;
-`cairn_validate` all checks pass; full `devtools::check()` on this tree —
-see the gate presentation.
+`cairn_validate` all checks pass; full `devtools::check(args =
+"--no-manual")` on this tree, committed and clean when it ran: 0 errors /
+0 warnings / 0 notes (7m15s). PDF manual: no TeX on this machine
+(environment fact); the branch's R/man additions are verified pure ASCII.
