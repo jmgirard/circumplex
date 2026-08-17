@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-17 (M92 post-merge: boundary-regime vignette guidance shipped after two review rounds, M87 terminal row pruned, three lessons folded into existing families, none retired; all checks green. M7 stays parked on the maintainer's CRAN submission handoff.)_
+_Last hygiene check: 2026-08-17 (second pass: all mechanical checks green; audit found master's R-CMD-check Windows job red since the M65 FIML merge (PR #91, 2026-07-27) — five `test-axes-fiml.R` EM-convergence failures, awaiting triage. M7 stays parked on the maintainer's CRAN submission handoff, now also gated by that red.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
