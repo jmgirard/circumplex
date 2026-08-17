@@ -674,9 +674,15 @@ test_that("M65-D4: the EM cap is a backstop, not a routine limit", {
   mat <- fx$mat
   mat[21:nrow(mat), fx$cols[[1]]] <- NA_real_
   expect_true(axes_fiml_h1(as.data.frame(mat))$converged)
-  # ... and the constant is load-bearing rather than decorative -- but WHERE it
-  # is load-bearing turns out to depend on the lavaan installed, so the probe
-  # below asserts a different thing on each and never nothing on either.
+  # ... and the constant is load-bearing rather than decorative: at the plain
+  # EM this package now pins (see axes_fiml_em_args), this cell measurably
+  # stalls at lavaan's default cap of 500 and converges with room at the raised
+  # cap, on every platform and lavaan generation alike. This assertion was
+  # version-conditional while the package rode lavaan 0.7's SQUAREM default
+  # (which reached tolerance inside 500 here on macOS/Linux but stalled at any
+  # cap on Windows -- the CI failure the acceleration pin exists to fix); with
+  # the acceleration pinned off, the M65-D4 measurement is the behavior
+  # everywhere, so it is asserted unconditionally.
   expect_gt(axes_fiml_em_iter_max, 500L)
   stalled <- FALSE
   withCallingHandlers(
@@ -690,16 +696,26 @@ test_that("M65-D4: the EM cap is a backstop, not a routine limit", {
       invokeRestart("muffleWarning")
     }
   )
-  # lavaan 0.7 accelerates the h1 EM (SQUAREM by default); 0.6 iterates plainly.
-  # On 0.6 the default cap of 500 refuses this estimable cell, which is the
-  # measurement M65-D4 rests on. On 0.7 the acceleration reaches tolerance well
-  # inside 500 and the cap is doing nothing here -- so assert that, rather than
-  # asserting a 0.6 fact on a 0.7 machine or quietly skipping. The cap is
-  # retained on both: it costs nothing when the EM exits on tolerance, and 0.7's
-  # acceleration is not uniformly faster (it fails to converge at all on the
-  # near-singular cell the M60 re-assertion used to build).
-  accelerated <- "acceleration" %in% names(lavaan::lavOptions()$em.h1.args)
-  expect_identical(stalled, !accelerated)
+  expect_true(stalled)
+})
+
+test_that("the h1 EM runs unaccelerated wherever lavaan offers acceleration", {
+  skip_if_not_installed("lavaan")
+  # Regression test for the Windows CI failure (red since the FIML feature
+  # merged): lavaan 0.7 defaults its saturated-stage EM to SQUAREM
+  # acceleration, whose convergence on thinly-covered cells is
+  # platform-sensitive -- the 20/300 cell above converged under acceleration on
+  # macOS and Linux but stalled at ANY cap on Windows, so FIML refused data it
+  # is documented to estimate, on one platform only. The 50000 cap and every
+  # measurement justifying it (M65-D4) were made under the plain EM, so the
+  # args pin acceleration off wherever the option exists; lavaan 0.6 has no
+  # such option and iterates plainly already.
+  args <- axes_fiml_em_args(500L)
+  if ("em.h1.args" %in% names(lavaan::lavOptions())) {
+    expect_identical(args$em.h1.args$acceleration, "none")
+  } else {
+    expect_named(args, "em.h1.iter.max")
+  }
 })
 
 test_that("M65-D5: the EM cap is spelled for the lavaan actually installed", {
