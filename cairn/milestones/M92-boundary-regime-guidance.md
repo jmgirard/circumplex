@@ -105,7 +105,7 @@ label test checks the contract rather than the function's source text.
 
 ## Tasks
 
-- [ ] T1 Add the internal marker-label catalog in `R/cpm_fit.R` and have
+- [x] T1 Add the internal marker-label catalog in `R/cpm_fit.R` and have
       `cpm_boundary_markers()` (`R/cpm_fit.R:1416`) index it; the existing
       marker tests (`tests/testthat/test-cpm_api.R:555-610`) still pass, and
       no user-visible output changes.
@@ -139,6 +139,8 @@ label test checks the contract rather than the function's source text.
 
 - 2026-08-16: branch cut, status in-progress.
 - 2026-08-16: amendment gate — AC6(a) rewording taken (user approved): pinned quantities become the eight circular adjacent-estimate gaps (min/max), the largest theory departure *with PA named as the fixed reference at 90°*, and an ordering assertion; the paragraph's final wording is ledgered for the gate to read. Rationale correction: the retired "arc the eight estimates span" figure was not vacuous but redundant — it is 360 minus the largest gap (281.3°) and its linear reading depends on where the wrap falls. Fresh-context [O] audit of the amended wording ran in full mode and returned five findings, all folded in before writing.
+
+- 2026-08-16: T1 done — `cpm_marker_labels()` catalog added, `cpm_boundary_markers()` indexes it; full `devtools::test()` clean (8300 pass, 0 fail), no user-visible output change. Tests-first guards for AC1/AC2/AC6/AC7 written (`tests/testthat/test-cpm-boundary-guidance.R`); three fail for the intended reason (section, demo chunk and roxygen pointer do not exist yet), the angle-figure guard already passes against the displayed fit. Two defects in the first draft of those guards were found by running them: the reference field is numeric not integer, and the ordering assertion compared circular order linearly, failing on where the wrap falls rather than on disordered scales.
 
 ## Decisions
 
