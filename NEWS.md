@@ -818,7 +818,9 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   concrete next steps. `?summary.circumplex_cpm` points at it. The section on
   reading the estimated angles is also corrected: it now says that one scale
   is held fixed to identify the configuration, and describes the spacing the
-  printed table actually shows rather than calling the departures minor. and `?norms` now say precisely
+  printed table actually shows rather than calling the departures minor.
+
+* The "Using Circumplex Instruments" vignette and `?norms` now say precisely
   what the bundled normative statistics are, instead of implying that a
   normative sample stands in for a population. The standardizing section
   characterizes the shipped samples from the instrument objects themselves —

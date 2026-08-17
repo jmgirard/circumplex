@@ -1,6 +1,6 @@
 # M92: Teach the boundary regime the structure vignette's own example is in
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -113,7 +113,7 @@ label test checks the contract rather than the function's source text.
       sweep (scoped extraction), demo-chunk marker-set equality, the angle
       figures and ordering, the roxygen heading string. Break one guarded line
       per test.
-- [x] T3 Draft the subsection — marker glossary, the on-page reading of the
+- [ ] T3 Draft the subsection — marker glossary, the on-page reading of the
       displayed fit (NO ζ̂ = 1.000 and its zero-width interval, the printed
       Heywood note, the ill-conditioning warning), and the per-family interval
       implications with their explicit not-measured statements.
@@ -122,8 +122,8 @@ label test checks the contract rather than the function's source text.
       dependency) and write the action ladder from what it prints.
 - [x] T5 Reconcile the angle-reading paragraph and the "Boundary solutions are
       common" bullet against the new subsection.
-- [x] T6 Author the claims ledger in this file, sentence by sentence.
-- [x] T7 Roxygen pointer + `document()`; NEWS entry; full check with vignettes
+- [ ] T6 Author the claims ledger in this file, sentence by sentence.
+- [ ] T7 Roxygen pointer + `document()`; NEWS entry; full check with vignettes
       rebuilt; grep the built vignette for scaffolding.
 
 ## Work log
@@ -148,6 +148,7 @@ label test checks the contract rather than the function's source text.
 - 2026-08-16: the claims ledger lives in `## Decisions`, not a plan-owned section: the plan-owned body stood at 128 of 150 lines and the ledger runs ~50.
 - 2026-08-16: noted for the review gate, not fixed here: the vignette cites Gurtman & Pincus (2000) but `cairn/references/` holds no page for it, and no other surface cites it. Pre-existing; this milestone narrowed the claim resting on it rather than extending it.
 - 2026-08-16: T7 done — `document()` clean with no unresolved links, `devtools::check(args = "--no-manual")` 0/0/0 with vignettes rebuilt and the test suite run inside check, `pkgdown::check_pkgdown()` clean, `cairn_validate` all green. Rendered vignette grepped: no tool-call scaffolding, the ill-conditioning warning and the fired-marker list both present in the output the reader sees. Status → review.
+- 2026-08-16: review returned the milestone to `in-progress` (defect return 1). AC4 fails — the ledger folds list bullets into their introducing sentence and its tail is off by one, so several sentences have no row and row 36 certifies none. AC6(a) fails — the angle paragraph's final wording is quoted nowhere in this file. Four prose claims are wrong or overgeneral against `devel/cpm-marker-validation.md` (the angle-marker superlative, the family ranking, the zeta = 0.97 provenance, the NA-SE/illcond identity), the beta bullet mixes truth-conditional with marker-conditional evidence, the demo chunk hand-rolls what `cpm_simulate()` exports, the angle pins use a relative tolerance that admits ~4% drift, and the AC7 guard skips under check. The NEWS splice was fixed at the gate.
 
 ## Decisions
 
@@ -226,4 +227,37 @@ constraint being relaxed.
 - **AC6** — (a) guard asserts, against the vignette's own executed `cpm` chunk, reference PA fixed at 90°, largest departure 65.8° at LM, the eight circular adjacent gaps min 18.8° / max 78.7°, and the estimated circular order a rotation of the theoretical order; the paragraph's wording is ledgered. Teeth shown by refitting the example on a 400-row subset (8 failures). (b) the bullet is now three lines pointing at the new subsection; its general-factor claim is carried forward into the section and ledgered (row 6).
 - **AC7** — `?summary.circumplex_cpm` names the section (1 match in `man/summary.circumplex_cpm.Rd`); guard asserts the named heading exists in the vignette, teeth shown by removing the pointer (5 failures). NEWS.md has one Documentation entry. Full check result recorded below.
 
+
 ### Consistency gate
+
+`cairn_validate` exit 0, 16 checks pass. `document()` no diff, zero unresolved-link warnings. `pkgdown::check_pkgdown()` clean. `devtools::check(args = "--no-manual")` 0/0/0 with vignettes rebuilt (run at c096027e; the return below changes content, so it is re-run at re-review). No DESIGN principle changed, so no impact report. CI on PR #120 was still pending at the return.
+
+### Gate outcome: returned to `in-progress`
+
+Two acceptance criteria fail as written, and the prose carries four confirmed precision defects against its own cited source. Criteria are not reinterpreted: AC4 and AC6 are unticked.
+
+**AC failures (verified at review).**
+- **AC4 fails.** The ledger is not the sentence-by-sentence walk the criterion requires: list-bullet runs are folded into the sentence that introduces them (so "*Angles* are affected less." and "NO's zero-width interval above arises by a different route…" have no row of their own), and the tail is off by one — rows 34/35/36 map to units 33/34/nothing, so row 36's `exempt | cross-reference` verdict certifies no sentence. Verified by re-walking against the splitter's 36 units.
+- **AC6(a) fails.** The criterion requires the angle paragraph's final wording quoted verbatim in the ledger; `grep` for "one scale is held fixed to identify" in this file returns 0 matches.
+
+**Confirmed prose defects (each checked against `devel/cpm-marker-validation.md`, not taken on the reviewer's word).**
+- F2: "The marker that tracked angle mis-coverage most closely was the small-weight one, not the Heywood one" is false — the per-marker table gives ill-conditioned Hessian .859/.914 against small weight .890/.936, so illcond is worse on both the level and the fired-quiet gap. The ledger's row-17 anchor compared small weight against Heywood only and never checked illcond.
+- F3: "Communality indices are the most affected / Angles are affected less" is a per-marker pattern stated as a family ranking. On the `any marker` row — what `summary()` actually gates on — angles degrade more (.892/.938, gap .046) than zeta (.920/.947, gap .027).
+- F4: the zeta = 0.97 single-configuration provenance ("Honest nulls and caveats" 2) covers heywood and illcond as well as multimodal, but the section discloses it for multimodal alone.
+- F6: "the same condition the ill-conditioning marker reports" overstates a nested relation — NA-CI rate given illcond is .78, not 1.00.
+- F5: the beta bullet mixes a truth-conditional bootstrap result (DESIGN M4, population beta near zero) into a list introduced as what a *fired marker* tells you; the marker-conditional beta columns (.919/.941 small weight) are never mentioned.
+
+**Confirmed test/code defects.**
+- F7: the demo chunk hand-rolls a Cholesky draw where the package exports `cpm_simulate()` (`R/cpm_fit.R:1848`), which draws from `Phat` by a low-rank factor form that is PSD by construction — `chol()` needs strict positive definiteness, which a Heywood boundary threatens. A teaching vignette showing a manual workaround for an exported function is a reuse defect.
+- F10: the angle pins are far looser than intended — testthat 3e `tolerance` is relative, so `expect_equal(max(gaps), 78.7, tolerance = 0.05)` passes at 82.0 (verified by running it). The guard tolerates ~4% drift in the figures the prose quotes.
+- F13: the AC7 roxygen guard skips under `R CMD check` (`man/` is absent from an installed package), so it only ever runs under `devtools::test()`.
+- F1: the NEWS entry was spliced over the head of the existing Documentation bullet, deleting its subject and fusing two entries. **Fixed at the gate** — the NEWS diff against master is now purely additive (0 deleted lines).
+
+**Logged, not actioned at the gate.**
+- F14 (the summary-printing rule omits the N = 50000 upper gate), F15 (chi-square is itself a fit index, so the two ladder lists overlap), F16 (row 7's anchor omits the df-adjustment line), F17 (the ledger's `inherited` verdict is not one AC4 permits), F18 (asymmetric bracket escape), F19 (filename adjacent to `test-cpm_boundary.R`), F20 (section extractor could truncate on a stray `# ` line; nothing currently trips it), F11 (the demo test's second loop is subsumed by the first test), F12 (`data()` leaks `jz2017` to the global env).
+- Blame lens: the "little practical impact on SSM profiles" claim was dropped rather than replaced, and the new sentence points the other way. Not a defect — the claim rested on an unverifiable citation and the practical question is answered downstream by the pre-existing "A poor CPM fit does not make SSM output uncomputable" paragraph — but the retirement should be recorded rather than silent.
+- Blame + prior-review lenses both flagged the mid-milestone `git checkout --` data loss as a repeat of a standing lesson. Recovered, no shipped defect.
+- Gurtman & Pincus (2000) has no `cairn/references/` page and is cited nowhere else. Pre-existing; this milestone narrowed rather than extended the claim resting on it. Needs a candidate row.
+- Prior-review lens: no archived review finding bears on these files; the GitHub inline-comment probe returned empty, so that surface was skipped.
+
+Clean on inspection: the `cpm_marker_labels()` refactor is behavior-preserving (`lab[["key"]]` drops names, conditions and order untouched); no angle-convention violation; the angle paragraph's arithmetic is right (gaps 18.770/78.695, largest departure 65.77 at LM, cyclic order preserved); the N = 2000/50000 thresholds match D-010; no D-entry is contradicted.
