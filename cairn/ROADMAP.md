@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-17 (second pass: all mechanical checks green; audit found master's R-CMD-check Windows job red since the M65 FIML merge — resolved same day by the windows-fiml-em hotfix (PR #121, squash 3dad6bd1): lavaan 0.7's SQUAREM-accelerated saturated EM was platform-fragile, now pinned unaccelerated. M7 stays parked on the maintainer's CRAN submission handoff, no longer CI-gated.)_
+_Last hygiene check: 2026-08-17 (third pass: windows-fiml-em hotfix merged and master's full matrix green; GitHub Actions bumped to newest (dca81c9d), all workflows green. New byte budgets measured over: ROADMAP 63,303 b vs < 24,000, LESSONS 63,662 b vs < 20,000 — trim pending the user's call. M7 stays parked on the CRAN submission handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
