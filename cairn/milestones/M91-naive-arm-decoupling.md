@@ -1,6 +1,6 @@
 # M91: Stop NA-ing computable numbers when only the raw arm refuses
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M90
 - **Driving RR:** —
@@ -97,7 +97,7 @@ candidate row.
 - [x] **T4** — The print-method regime (AC4) and its regression.
 - [x] **T5** — AC3's grep sweep: roxygen rewrite, sibling comments, D-044
       annotation, `devtools::document()`, NEWS.
-- [ ] **T6** — Full `devtools::check()`.
+- [x] **T6** — Full `devtools::check()`.
 
 ## Work log
 
@@ -111,6 +111,8 @@ candidate row.
 - 2026-08-16: T4 — AC4 regression added (end-to-end seam injection through summary()): no failure note, the calibrated-SE claim and both-sides opening print, every SE-carrying component row renders its number, and nothing printed names the naive arm. No print-method code change needed: the note keys on `se_correction_failed`, NULL in this regime by T2. File green.
 
 - 2026-08-16: T5 — AC3 sweep run over R/, man/, NEWS.md, vignettes/: 6 hits enumerated (roxygen contract passage + man mirror, NEWS entry, and the three comments T2 had already rewritten); the roxygen contract and @return details doc rewritten, the details assembly comment updated, NEWS's M89 entry corrected in place (unreleased dev line) naming `details$naive_reason`, D-044's unit-refusal clause given the dated superseding annotation (D-023 precedent), `devtools::document()` clean (axes_reliability.Rd regenerated, no link warnings). Post-sweep re-grep: only M91-correct text remains. Suite FAIL 0 / PASS 8300.
+
+- 2026-08-16: T6 — full `devtools::check(args = "--no-manual")`: 0 errors / 0 warnings / 0 notes. All tasks done; status → review.
 
 - 2026-08-16: routed from the M90 review (diff-lens F11): the partition's convergence-noise rationale is derived in the correlation metric but the criterion also runs on the SE helper's raw arm; a raw-arm-only "indefinite" was not empirically reachable at M90, and this milestone's decoupling reopens that surface — address the rationale's scope (or the raw arm's own band) when restructuring the arms.
 
