@@ -117,9 +117,9 @@ label test checks the contract rather than the function's source text.
       displayed fit (NO ζ̂ = 1.000 and its zero-width interval, the printed
       Heywood note, the ill-conditioning warning), and the per-family interval
       implications with their explicit not-measured statements.
-- [x] T4 Add the seeded analytic-path demonstration chunk (base-R `chol` +
-      `rnorm` draw from the fitted implied matrix at N = 2500 — no new
-      dependency) and write the action ladder from what it prints.
+- [x] T4 Add the seeded analytic-path demonstration chunk (`cpm_simulate()`
+      draw from the fitted structure at N = 2500 — no new dependency) and
+      write the action ladder from what it prints.
 - [x] T5 Reconcile the angle-reading paragraph and the "Boundary solutions are
       common" bullet against the new subsection.
 - [x] T6 Author the claims ledger in this file, sentence by sentence.
@@ -153,22 +153,25 @@ label test checks the contract rather than the function's source text.
 - 2026-08-17: the demo chunk now calls the exported `cpm_simulate()` instead of a hand-rolled `chol(Phat)` draw. That changed the draw: the demo fires one marker (small correlation-function weight) rather than three, and its analytic intervals are present rather than NA, so the two sentences reading NA intervals were removed and replaced by what this fit actually shows — a population boundary that produced no Heywood case in this sample. Prose follows output, not the reverse.
 - 2026-08-17: guards hardened — absolute degree tolerances (testthat's `tolerance` is relative; the old pin passed at 82.0 against 78.7, verified), the roxygen guard reads `tools::Rd_db()` when `man/` is absent so it no longer skips under check, the demo assertion is aimed at the paragraph that reads the demo and also asserts no unfired marker is named there, and `run_chunks()` cleans up what `data()` writes to the global environment.
 - 2026-08-17: ledger rebuilt with a splitter that breaks at bullet and numbered-list starts: 45 units, 45 rows, no `inherited` verdict. AC6(a)'s paragraph is now quoted verbatim beside its measured figures. Full suite 8329 pass / 0 fail; `check(args = "--no-manual")` 0/0/0 with vignettes rebuilt; rendered vignette clean of scaffolding. Status → review.
+- 2026-08-17: review round 2 — all nine round-1 fixes verified genuine by a fresh reviewer that re-derived each against the sources; blame and prior-review lenses clean. Eighteen further findings; no acceptance criterion failed, so no return. Actioned: the zeta ranking (near-tied optima sits between ill-conditioning and Heywood, not below both), NA standard errors described as communality-specific when they take all three families at once, RMSEA listed as interpretable against DESIGN's own reading of chi-square/RMSEA at field N, "communality fixed at exactly one" (the fitted value is one to eleven decimals), a near-tied-optima firing count quoted from a non-shipping source against this milestone's own plan-gate decision, a stale "those two markers" back-reference, the section's opening claims unguarded, the reference scale pinned by index but not by name, four ledger anchors short of their sentences, the stale round-1 evidence block, T4's retired implementation text, and the test filename. Rejected: nothing.
+- 2026-08-17: **correction, superseding the 2026-08-17 note that justified the `cpm_simulate()` switch on positive-definiteness grounds.** That justification was false: `Phat`'s minimum eigenvalue is 0.123 and `chol()` succeeds on it, so the Heywood boundary did not threaten the Cholesky. The switch stands on reuse grounds alone — the package exports the function the vignette was hand-rolling. Found by the round-2 reviewer; the earlier line stays as written per the append-only rule.
+- 2026-08-17: CI caught what local runs could not — the `test-coverage` job failed 4 of 4 vignette guards because covr installs the package without vignettes, so neither the source tree nor `inst/doc` held the .Rmd and the helper's `stop()` fired. The helper now skips there with a stated reason; the guards still bite under `devtools::test()` (source tree) and `R CMD check` (inst/doc), which is where they are meant to. Verified by driving the helper against two nonexistent paths and observing a skip, not an error.
 
 ## Decisions
 
-### 2026-08-16: claims ledger for *When a fit sits at a boundary* (AC4, rebuilt after the first review return)
+### 2026-08-17: claims ledger for *When a fit sits at a boundary* (AC4, rebuilt after review round 2)
 
-Home note: the ledger lives here rather than in a plan-owned section because the plan-owned body stood at 128 of its 150 lines; `## Decisions` is milestone-local, append-only and cap-exempt, and review reads it here.
+Home note: the ledger lives here rather than in a plan-owned section because the plan-owned body stood at 128 of its 150 lines; `## Decisions` is milestone-local, append-only and cap-exempt, and review reads it here. Supersedes the round-1 and round-2 ledgers above and below it in git history.
 
-Built by walking the section with `scratchpad/sentences2.R`, which breaks blocks at blank lines, bullet starts and numbered-list starts before sentence-splitting, so a list item is never folded into the sentence that introduces it. The first ledger did fold them, and its tail was off by one — the defect the first review return named. 45 units; every one has a row. Verdicts: `on-page` (shown by a chunk the reader runs), `derived` (from the named artifact, which states the claim), `exempt` (framing, instruction, list marker, or no factual claim).
+Built by walking the section with `scratchpad/sentences2.R`, which breaks blocks at blank lines, bullet starts and numbered-list starts before sentence-splitting, so a list item is never folded into the sentence that introduces it. 47 units; every one has a row. Verdicts: `on-page` (shown by a chunk the reader runs), `derived` (from the named artifact, which states the claim), `exempt` (framing, instruction, list marker, or no factual claim).
 
 | # | verdict | anchor |
 |---|---|---|
-| 1 | exempt | framing |
-| 2 | on-page | chunk `cpm`: NO row Zeta 1.000 [1.000, 1.000]; Diagnostics note |
-| 3 | exempt | restates 2 |
-| 4 | on-page | chunk `cpm`: both endpoints equal the estimate to 12 dp (measured 2026-08-16); percentile endpoints entail the middle 95% and no more |
-| 5 | on-page | chunk `cpm` emits `CPM Hessian is ill-conditioned (condition number 1.83e+14)`; present in the rendered vignette |
+| 1 | exempt | framing; the "including in the fit above" fact it echoes is pinned by the opening-claims guard (Heywood fired, NO interval zero-width) |
+| 2 | on-page | chunk `cpm`: NO row Zeta 1.000 [1.000, 1.000]; Diagnostics note. Guarded. |
+| 3 | exempt | interpretive maxim about zero-width intervals; asserts no fact beyond row 2 |
+| 4 | on-page | chunk `cpm`: both endpoints identical (guarded by `expect_identical`); percentile endpoints entail the middle 95% and no more |
+| 5 | on-page | chunk `cpm` raises `CPM Hessian is ill-conditioned`; guarded by the warning-identity assertion |
 | 6 | derived | the bullet AC6(b) reduced, shipped vignette text carried forward |
 | 7 | derived | `R/cpm_fit.R` `cpm_marker_labels()` — five entries |
 | 8 | derived | `R/cpm_oop.R:59-64` printed note wording (zeta > 0.995) |
@@ -178,58 +181,60 @@ Built by walking the section with `scratchpad/sentences2.R`, which breaks blocks
 | 12 | derived | `R/cpm_oop.R:78-83` printed note |
 | 13 | derived | `R/cpm_oop.R:232-252` (both N gates) and `cpm_diagnostic_lines()` |
 | 14 | exempt | instruction |
-| 15 | on-page | chunk `boundary_demo`: fired set is exactly `small correlation-function weight` |
-| 16 | on-page | chunk `boundary_demo`: no Heywood note printed, drawn from `Phat` whose NO communality is 1.000 to 12 dp |
+| 15 | on-page | chunk `boundary_demo`: fired set is exactly `small correlation-function weight`. Guarded, including that no unfired label is named there. |
+| 16 | on-page | chunk `boundary_demo`: no Heywood note printed, drawn from `Phat` whose NO communality sits at the boundary |
 | 17 | exempt | maxim, no factual claim |
 | 18 | derived | `devel/cpm-marker-validation.md`, "Provenance" |
 | 19 | derived | same: cormat path, analytic Wald, coverage outcomes only |
-| 20 | derived | same, per-marker table (Heywood zeta .836/.936; ill-cond .757/.936) and the mechanism paragraph (NA SEs; negative variances clamped) |
-| 21 | on-page | chunk `cpm` (percentile interval), contrasted with row 20's analytic mechanisms |
-| 22 | derived | same, `any marker` row: angle .892/.938 (gap .046) vs zeta .920/.947 (gap .027) |
-| 23 | derived | same table: angle gaps ill-cond .055, small weight .046, Heywood .014 |
-| 24 | derived | same table: beta small weight .919/.941, any marker .920/.941 — smallest gap of the three |
-| 25 | derived | `cairn/DESIGN.md`, M4 coverage record: beta ~.77 at boundary truths, flat in N |
-| 26 | derived | same: "structural rather than small-sample" |
-| 27 | exempt | framing |
-| 28 | derived | `devel/cpm-marker-validation.md` measures coverage only |
-| 29 | derived | same, "Provenance" |
-| 30 | derived | same, "Per-marker verdicts": removed harmonic is a predictive null (.948/.910) |
-| 31 | derived | same, "Honest nulls and caveats" 2 (heywood/illcond/multimodal from the zeta = 0.97 config) and the 114 multimodal firings |
-| 32 | exempt | instruction |
-| 33 | exempt | heading |
-| 34 | exempt | list marker |
-| 35 | exempt | instruction |
-| 36 | exempt | maxim, no factual claim |
-| 37 | exempt | list marker |
-| 38 | derived | `R/cpm_fit.R:1576-1577`: `"quasi-circumplex"` is the default and least constrained variant |
-| 39 | derived | `R/cpm_fit.R` signature: `ci_method = "bootstrap"` is available on the raw-data path only |
-| 40 | exempt | list marker |
-| 41 | exempt | instruction |
-| 42 | exempt | maxim, no factual claim |
-| 43 | exempt | list marker |
-| 44 | derived | interpretable list: bias unmeasured (row 28); fit indices and residuals computed identically regardless of markers (`R/cpm_oop.R` summary); "marked fits covered less well across the board" from the `any marker` row, all three families |
-| 45 | derived | not-interpretable list: rows 20-21 for missing/zero-width intervals; the shipped chi-square caution above and `cairn/DESIGN.md`'s KS record |
+| 20 | derived | same, per-marker table: zeta fired ill-cond .757, near-tied .815, Heywood .836, all against .93+ quiet |
+| 21 | derived | same, mechanism paragraph: NA SEs arrive "all three families at once"; negative variances clamped to zero |
+| 22 | on-page | chunk `cpm` (percentile interval), contrasted with row 21's analytic mechanisms |
+| 23 | derived | same, `any marker` row: angle .892/.938 (gap .046) vs zeta .920/.947 (gap .027) |
+| 24 | derived | same table: angle gaps ill-cond .055, small weight .046, Heywood .014 |
+| 25 | derived | same table: beta small weight .919/.941, any marker .920/.941 — smallest gap of the three |
+| 26 | derived | `cairn/DESIGN.md`, M4 coverage record: beta ~.77 at boundary truths, flat in N |
+| 27 | derived | same: "structural rather than small-sample" |
+| 28 | exempt | framing |
+| 29 | derived | `devel/cpm-marker-validation.md` measures coverage only |
+| 30 | derived | same, "Provenance" |
+| 31 | derived | same, "Per-marker verdicts": removed harmonic is a predictive null (.948/.910) |
+| 32 | derived | same, "Honest nulls and caveats" 2 (heywood/illcond/multimodal from the zeta = 0.97 config); the firing count is not quoted |
+| 33 | exempt | instruction |
+| 34 | exempt | heading |
+| 35 | exempt | list marker |
+| 36 | exempt | instruction |
+| 37 | exempt | maxim, no factual claim |
+| 38 | exempt | list marker |
+| 39 | derived | `R/cpm_fit.R:1576-1577` for the default and least-constrained variant; the attribution rule that follows is a methodological inference from it, asserted as reasoning rather than as measurement |
+| 40 | derived | `R/cpm_fit.R` signature: `ci_method = "bootstrap"` is available on the raw-data path only |
+| 41 | exempt | list marker |
+| 42 | exempt | instruction |
+| 43 | exempt | maxim, no factual claim |
+| 44 | exempt | list marker |
+| 45 | derived | bias unmeasured (row 29); fit indices and residuals computed identically whether or not a marker fires (`R/cpm_oop.R` summary path), which is what the sentence claims — it directs interpretation to the section's own earlier caution rather than blessing any index; "covered less well across all three families" from the `any marker` row |
+| 46 | derived | rows 21-22 for missing and zero-width parameter intervals |
+| 47 | on-page | chunk `boundary_demo` prints `RMSEA = 0 [0, 0]`; chi-square 2.229 on df 10 |
 
 **AC6(a) — the angle paragraph's final wording, verbatim:**
 
 > - **The estimated angles.** Compare them with the theoretical angles, but read the comparison carefully: one scale is held fixed to identify the configuration (PA here, at 90°), so every other scale's departure is measured from that anchor and a different anchor would redistribute them. Two things are worth separating. The *ordering* around the circle is preserved — the estimated angles run through the octants in the same cyclic order the instrument assigns them. The *spacing* is not: the gaps between circularly adjacent estimates run from under 20° to nearly 80° against a theoretical 45°, and the largest departure from a theoretical position is about 66°. Departures from perfect structure are common in well-validated circumplex instruments (Gurtman & Pincus, 2000), and the model comparison below quantifies what this pattern costs: it is why forcing equal spacing fits these data poorly.
 
-Measured against the printed table (chunk `cpm`, 2026-08-16): circularly adjacent gaps 18.770 to 78.695 degrees, largest departure 65.77 at LM, estimated cyclic order a rotation of the theoretical order, PA fixed at 90. The sentence about departures being common in well-validated instruments is the surviving half of the shipped claim this paragraph replaced; the retired half — that such departures have "little practical impact on SSM profiles" — was dropped rather than restated, because the citation behind it has no `references/` page and the practical question is answered downstream by the shipped paragraph beginning "A poor CPM fit does not make SSM output uncomputable".
+Measured against the printed table (chunk `cpm`, 2026-08-16): circularly adjacent gaps 18.770 to 78.695 degrees, largest departure 65.77 at LM, estimated cyclic order a rotation of the theoretical order, PA fixed at 90 and pinned by name. The sentence about departures being common in well-validated instruments is the surviving half of the shipped claim this paragraph replaced; the retired half — that such departures have "little practical impact on SSM profiles" — was dropped rather than restated, because the citation behind it has no `references/` page and the practical question is answered downstream by the shipped paragraph beginning "A poor CPM fit does not make SSM output uncomputable".
 
-Claims repaired during the walks rather than shipped: an "every bootstrap resample" inference the two percentile endpoints do not license; a zeta paragraph reading the on-page zero-width interval as the analytic clamping mechanism; a ladder step with the constraint direction backwards; the angle-marker superlative (ill-conditioning, not small weight, is the strongest angle signal); a family ranking true only of two markers; the zeta = 0.97 provenance disclosed for one marker instead of three; an "NA standard errors" paragraph that the switch to `cpm_simulate()` made false.
+Claims repaired across the three walks rather than shipped: an "every bootstrap resample" inference the two percentile endpoints do not license; a zeta paragraph reading the on-page zero-width interval as the analytic clamping mechanism; a ladder step with the constraint direction backwards; the angle-marker superlative (ill-conditioning, not small weight); a family ranking true only of some markers; the zeta = 0.97 provenance disclosed for one marker instead of three; an "NA standard errors" paragraph the switch to `cpm_simulate()` made false; a zeta ordering that put Heywood ahead of near-tied optima when the table has it the other way; NA standard errors described as communality-specific when they take all three families at once; RMSEA listed as interpretable against DESIGN's own reading of it; "communality fixed at exactly one" when the fitted value is one only to eleven decimal places; and a near-tied-optima firing count quoted from a source that does not ship.
 
 ## Review
 
-### Evidence
+### Evidence (round 2, 2026-08-17)
 
-- **AC1** — `cpm_marker_labels()` returns 5 labels; a scoped extraction of the subsection (heading to next same-level heading, fenced code excluded) contains all 5. Guard `test-cpm-boundary-guidance.R` passes; teeth shown at implement by deleting one label's bullet (2 failures, restored to 0).
-- **AC2** — the section's `boundary_demo` chunk is executed by the guard, which reproduces the fit from the chunk source and asserts the fired set equals `Heywood communality`, `small correlation-function weight`, `ill-conditioned Hessian`; each fired label is also asserted present in the section text. Rendered vignette contains the printed line "near a parameter boundary or weakly identified".
-- **AC3** — the "What a fired marker does and does not tell you" paragraph scopes the record to analytic intervals from a correlation matrix and to coverage rather than bias, then states an interval consequence for each of the three families; a following paragraph names four things the record does not support (no bias measurement; analytic path only, so unvalidated on the bootstrap default; removed-harmonic a predictive null; near-tied optima thin evidence from one configuration).
-- **AC4** — ledger in `## Decisions` carries 36 rows against the 36 sentence units the section splits into, each with a verdict and anchor. Three claims were repaired during the walk rather than ledgered as written; the ledger records which.
-- **AC5** — four numbered steps (locate / re-fit / report / keep using what holds), the last a closed list of what stays and what does not. None of the four restates the shipped "Prefer the bootstrap (the raw-data default) when you have raw data" sentence, which remains in its original paragraph.
-- **AC6** — (a) guard asserts, against the vignette's own executed `cpm` chunk, reference PA fixed at 90°, largest departure 65.8° at LM, the eight circular adjacent gaps min 18.8° / max 78.7°, and the estimated circular order a rotation of the theoretical order; the paragraph's wording is ledgered. Teeth shown by refitting the example on a 400-row subset (8 failures). (b) the bullet is now three lines pointing at the new subsection; its general-factor claim is carried forward into the section and ledgered (row 6).
-- **AC7** — `?summary.circumplex_cpm` names the section (1 match in `man/summary.circumplex_cpm.Rd`); guard asserts the named heading exists in the vignette, teeth shown by removing the pointer (5 failures). NEWS.md has one Documentation entry. Full check result recorded below.
-
+- **AC1** — `cpm_marker_labels()` returns 5 labels; a scoped extraction of the subsection contains all 5. Guard passes; teeth shown at implement by deleting one label's bullet (2 failures, restored to 0).
+- **AC2** — the guard evaluates the section's `boundary_demo` chunk as written and asserts the fired set is exactly `small correlation-function weight`, that the paragraph reading the demo names it, and that the same paragraph names no marker this fit did not fire. The rendered vignette carries the printed line "near a parameter boundary or weakly identified".
+- **AC3** — the per-family paragraph scopes the record to analytic intervals from a correlation matrix and to coverage rather than bias, states an interval consequence for each of the three families, and is followed by four things the record does not support (no bias measurement; analytic path only; removed-harmonic a predictive null; the single provoking configuration behind three of the five markers).
+- **AC4** — ledger rebuilt at 47 rows against the section's 47 sentence units, verdicts confined to the three the criterion allows. An independent reviewer re-walked the section and got 47 units aligning row for row.
+- **AC5** — four numbered steps, the last a closed list of what stays usable and what does not, none of them restating the shipped bootstrap-preference sentence.
+- **AC6** — (a) guards assert, against the vignette's own executed chunk, the reference scale by name (PA) fixed at 90°, largest departure 65.77° at LM, adjacent circular gaps 18.77°/78.70°, and the estimated order a rotation of the theoretical order; the paragraph is quoted verbatim in the ledger and confirmed byte-identical to the vignette by an independent reviewer. (b) the bullet is a three-line pointer; its general-factor claim is carried into the section as ledger row 6.
+- **AC7** — `?summary.circumplex_cpm` names the section; the guard reads `man/` in the source tree and `tools::Rd_db()` in an installed one, so it no longer skips under check. NEWS has one Documentation entry and the NEWS diff is purely additive. Full check result below.
+- **Opening-claims guard (new this round)** — the section's premise is now pinned: the displayed fit fires Heywood, NO's ζ is 1 to within 1e-6 with identical interval endpoints, and the chunk raises the ill-conditioning warning, asserted by message rather than as a bare failure.
 
 ### Consistency gate
 

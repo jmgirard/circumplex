@@ -13,12 +13,14 @@ vignette_path <- function() {
                 package = "circumplex")
   )
   hit <- candidates[nzchar(candidates) & file.exists(candidates)]
-  if (length(hit) == 0L) {
-    stop(
-      "evaluating-circumplex-structure.Rmd found in neither the source tree ",
-      "nor inst/doc; the boundary-guidance guards cannot run"
-    )
-  }
+  # Some builds install the package without vignettes -- covr does, which is
+  # why these guards skipped rather than errored there. They run under
+  # devtools::test() (source tree) and under R CMD check (inst/doc), which is
+  # where they are meant to bite.
+  skip_if(
+    length(hit) == 0L,
+    "vignette source unavailable in this build (installed without vignettes)"
+  )
   hit[[1]]
 }
 
@@ -70,11 +72,18 @@ run_chunks <- function(labels) {
   pre <- ls(globalenv())
   on.exit(rm(list = setdiff(ls(globalenv()), pre), envir = globalenv()))
   env <- new.env(parent = globalenv())
+  warned <- character(0)
   for (label in labels) {
     utils::capture.output(
-      suppressWarnings(eval(parse(text = vignette_chunk(label)), envir = env))
+      warned <- c(warned, capture_warnings(
+        eval(parse(text = vignette_chunk(label)), envir = env)
+      ))
     )
   }
+  # The chunks are slow (the displayed fit bootstraps 500 times), so the
+  # warnings they raise ride along with the environment rather than costing a
+  # second evaluation.
+  attr(env, "warnings") <- warned
   env
 }
 
@@ -109,6 +118,27 @@ test_that("the demonstration fit fires exactly the markers the section names", {
   }
 })
 
+test_that("the displayed fit still shows what the section's opening reads", {
+  # The section opens by reading this fit: a Heywood case at NO with a
+  # zero-width interval, and an ill-conditioning warning from the same chunk.
+  # Without these pins the whole premise could go stale silently.
+  env <- run_chunks("cpm")
+  fit <- get("cpm", envir = env)
+  expect_true(isTRUE(fit$details$heywood))
+  expect_true("Heywood communality" %in% cpm_boundary_markers(fit))
+
+  no <- which(as.character(fit$results$Scale) == "NO")
+  expect_length(no, 1L)
+  expect_lt(abs(fit$results$Zeta[[no]] - 1), 1e-6)
+  expect_identical(fit$results$Zeta_lci[[no]], fit$results$Zeta_uci[[no]])
+
+  # The warning the prose says the chunk emits, asserted as the condition it
+  # is rather than as a bare failure.
+  expect_true(
+    any(grepl("Hessian is ill-conditioned", attr(env, "warnings"), fixed = TRUE))
+  )
+})
+
 test_that("the angle paragraph's pinned figures and ordering still hold", {
   # The displayed fit's point estimates do not depend on the bootstrap (the
   # analytic and bootstrap fits agree to 0 on Angle, checked 2026-08-16), but
@@ -117,14 +147,20 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
   res <- get("cpm", envir = env)$results
 
   # PA is the fixed reference, so every departure below is measured from it.
-  expect_equal(get("cpm", envir = env)$details$reference, 1)
+  # The prose names PA specifically, so the scale name is pinned, not just the
+  # index.
+  fit <- get("cpm", envir = env)
+  expect_equal(fit$details$reference, 1)
+  expect_identical(as.character(fit$details$scales[[fit$details$reference]]), "PA")
   expect_equal(res$Angle[[1]], 90, tolerance = 1e-8)
 
   # Absolute tolerances, in degrees: testthat's `tolerance` is relative, so
   # expect_equal(78.7, tolerance = 0.05) would pass at 82.0 -- four degrees of
-  # silent drift in a figure the prose quotes.
+  # silent drift in a figure the prose quotes. Pinned against the measured
+  # values rather than the prose's rounded ones, so the margin is the whole
+  # tolerance rather than whatever rounding left over.
   dev <- ((res$Angle - res$Angle_theory + 180) %% 360) - 180
-  expect_lt(abs(max(abs(dev)) - 65.8), 0.05)
+  expect_lt(abs(max(abs(dev)) - 65.77), 0.05)
   expect_identical(as.character(res$Scale[[which.max(abs(dev))]]), "LM")
 
   # Eight circularly adjacent gaps, wrap-around included, against a
@@ -132,8 +168,8 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
   sorted <- sort(res$Angle %% 360)
   gaps <- c(diff(sorted), 360 - (sorted[[length(sorted)]] - sorted[[1]]))
   expect_length(gaps, 8L)
-  expect_lt(abs(min(gaps) - 18.8), 0.05)
-  expect_lt(abs(max(gaps) - 78.7), 0.05)
+  expect_lt(abs(min(gaps) - 18.77), 0.05)
+  expect_lt(abs(max(gaps) - 78.70), 0.05)
 
   # The claim the old bullet got right: the circumplex ordering is preserved.
   # Order around a circle has no first element, so the estimated sequence need

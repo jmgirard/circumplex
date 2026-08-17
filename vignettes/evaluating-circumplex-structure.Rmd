@@ -184,8 +184,8 @@ summary(demo)
 
 One marker fires here — a **small correlation-function weight** — and
 `summary()` names it. Notice what did *not* happen:
-the population this sample was drawn from has NO's communality fixed at
-exactly one, yet this draw produced no Heywood case. A boundary in the
+the population this sample was drawn from carries NO's communality at the
+boundary, yet this draw produced no Heywood case. A boundary in the
 population does not guarantee a boundary in every sample from it, any more
 than a quiet fit guarantees there is no boundary behind the data.
 
@@ -195,17 +195,20 @@ narrower than the markers are. It covered *analytic* (Wald) intervals fitted
 from a correlation matrix, and it measured interval **coverage** — how often
 an interval contained the truth — not bias in the point estimates.
 
-- *Communality indices* take the worst of it **when a Heywood or an
-  ill-conditioning marker fires** — those two fits' $\zeta$ intervals covered
-  well below nominal — and they fail in two ways that are visible rather than
-  hidden: the standard errors can come back missing altogether, or the
-  interval can collapse to zero width because a negative asymptotic variance
-  was clamped at zero. NO's zero-width interval above arrives by a third
-  route — it is a percentile interval whose resamples sat on the boundary —
-  but it reaches the reader the same way, as an interval with no usable width.
+- *Communality indices* take the worst of it **when an ill-conditioning, a
+  Heywood, or a near-tied-optima marker fires** — all three covered $\zeta$
+  well below nominal, ill-conditioning worst of them. Two failure modes show up in the
+  output rather than hiding in it: the analytic standard errors can come back
+  missing, which happens for the angles and the weights at the same time
+  because one singular curvature matrix takes all three families down
+  together, or an interval can collapse to zero width because a negative
+  asymptotic variance was clamped at zero. NO's zero-width interval above
+  arrives by a third route — it is a percentile interval whose resamples sat
+  on the boundary — but it reaches the reader the same way, as an interval
+  with no usable width.
 - *Angles.* Taking all marker-firing fits together, angle intervals actually
   degraded somewhat *more* than communality intervals did, so the ranking
-  above belongs to those two markers rather than to the parameter families in
+  above belongs to those markers rather than to the parameter families in
   general. The strongest single angle signal was the ill-conditioning marker,
   with the small-weight marker next and the Heywood marker weakest of the
   three.
@@ -229,8 +232,8 @@ is kept because it names a real feature of the solution, not because it
 forecasts trouble. And the numbers behind **Heywood communality**,
 **ill-conditioned Hessian** and **competing near-tied optima** come almost
 entirely from one deliberately provoking configuration, where those markers
-fire often enough to measure; near-tied optima fired only a hundred-odd times
-even there. Read them as what happens where those markers fire, not as how
+fire often enough to measure, and near-tied optima fired only rarely even
+there. Read them as what happens where those markers fire, not as how
 often they fire.
 
 **What to do when one fires.**
@@ -249,16 +252,19 @@ often they fire.
    scales sat at the boundary, and that their intervals are degenerate or
    missing. An angle or communality reported without its diagnostic note is a
    number stripped of its own caveat.
-4. *Keep using what still holds.* These remain interpretable: the point
-   estimates, as the solution the model actually fitted (their bias in this
-   regime is unmeasured, so read them as estimates, not to the digit); the
-   descriptive fit indices (RMSEA, SRMR, CFI and TLI) and the residual
-   summary, which still locate where the model misses; and intervals that came
-   back with ordinary width, read with
-   whatever caution `summary()` prints beside them — in validation, marked
-   fits covered less well than unmarked ones across the board. These do not:
-   an interval that is missing or zero-width, and the chi-square $p$ value at
-   field sample sizes, for the reason given above.
+4. *Keep using what still holds.* These remain usable: the point estimates,
+   as the solution the model actually fitted (their bias in this regime is
+   unmeasured, so read them as estimates, not to the digit); the fit indices
+   and the residual summary, which a boundary changes the behaviour of the
+   *intervals* around, not the computation of — read them with the caution
+   given earlier in this section, which is about field sample sizes rather
+   than about markers; and parameter intervals that came back with ordinary
+   width, read knowing that marked fits covered less well than unmarked ones
+   across all three families. This does not: a parameter interval that is
+   missing or zero-width. (The demonstration fit above prints
+   `RMSEA = 0 [0, 0]`, which is not that failure — it is a fit statistic at
+   its own floor, because the refit recovers almost exactly the structure it
+   was simulated from.)
 
 ### Comparing model variants
 
