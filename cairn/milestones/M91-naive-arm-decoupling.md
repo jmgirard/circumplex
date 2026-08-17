@@ -1,11 +1,11 @@
 # M91: Stop NA-ing computable numbers when only the raw arm refuses
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M90
 - **Driving RR:** —
 - **Principles touched:** GP2, GP4
-- **Branch/PR:** —
+- **Branch/PR:** m91-naive-arm-decoupling
 
 ## Goal
 
@@ -102,6 +102,8 @@ candidate row.
 ## Work log
 
 - 2026-08-16: created by /milestone-plan at the M90 replan gate — RR18 rec 7 split out of M90 on the size tripwire. Criteria audited in the same full-mode pass ([O] fresh-context reader, round 2): its blocker on AC2's "grid unchanged" wording and its one-exemplar note on AC1 are repaired in this file's wording; AC3/AC4/AC5 passed as written.
+
+- 2026-08-16: /milestone-implement session start — status in-progress, branch m91-naive-arm-decoupling cut from pushed master (408c5cef).
 
 - 2026-08-16: routed from the M90 review (diff-lens F11): the partition's convergence-noise rationale is derived in the correlation metric but the criterion also runs on the SE helper's raw arm; a raw-arm-only "indefinite" was not empirically reachable at M90, and this milestone's decoupling reopens that surface — address the rationale's scope (or the raw arm's own band) when restructuring the arms.
 

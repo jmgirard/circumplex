@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M88 | Fence the norms-audit walk helpers M87 kept | done | — | normal | milestones/archive/M88-norms-audit-walk-helper-tests.md |
 | M89 | Price the degeneracy criterion in the metric the reported numbers live in | done | — | normal | milestones/archive/M89-fitted-matrix-degeneracy-criterion.md |
 | M90 | Say which degeneracy happened, and stop saying it when it did not | done | M89 | normal | milestones/archive/M90-degeneracy-reason-vocabulary.md |
-| M91 | Stop NA-ing computable numbers when only the raw arm refuses | planned | M90 | normal | milestones/M91-naive-arm-decoupling.md |
+| M91 | Stop NA-ing computable numbers when only the raw arm refuses | in-progress | M90 | normal | milestones/M91-naive-arm-decoupling.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
