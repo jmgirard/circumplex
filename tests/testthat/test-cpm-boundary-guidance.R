@@ -52,12 +52,28 @@ vignette_chunk <- function(label,
   lines[seq.int(hit + 1L, end - 1L)]
 }
 
+# The paragraph introduced by a given opening phrase, so an assertion can be
+# aimed at the sentences that read a particular chunk rather than at the whole
+# section (where a label named in the glossary would satisfy it vacuously).
+section_paragraph <- function(opening, section = boundary_section_text()) {
+  paras <- strsplit(section, "\n[[:space:]]*\n")[[1]]
+  hit <- paras[grepl(opening, paras, fixed = TRUE)]
+  expect_length(hit, 1L)
+  hit[[1]]
+}
+
 # Chunks share one environment when the vignette is knitted, so a chunk that
-# builds on an earlier one is run after it here too.
+# builds on an earlier one is run after it here too. `data()` writes to the
+# global environment whatever envir the surrounding call uses, so anything it
+# creates is removed again on exit.
 run_chunks <- function(labels) {
+  pre <- ls(globalenv())
+  on.exit(rm(list = setdiff(ls(globalenv()), pre), envir = globalenv()))
   env <- new.env(parent = globalenv())
   for (label in labels) {
-    suppressWarnings(eval(parse(text = vignette_chunk(label)), envir = env))
+    utils::capture.output(
+      suppressWarnings(eval(parse(text = vignette_chunk(label)), envir = env))
+    )
   }
   env
 }
@@ -80,14 +96,16 @@ test_that("the demonstration fit fires exactly the markers the section names", {
   fired <- cpm_boundary_markers(get("demo", envir = env))
   # The prose reads this fit; the set it names is pinned here so a change to
   # either side fails rather than silently disagreeing.
-  expect_setequal(
-    fired,
-    c("Heywood communality", "small correlation-function weight",
-      "ill-conditioned Hessian")
-  )
-  section <- boundary_section_text()
+  expect_setequal(fired, "small correlation-function weight")
+  # Aimed at the paragraph that reads the demo, not the whole section -- the
+  # glossary names every label, so a section-wide search would pass vacuously.
+  para <- section_paragraph("One marker fires here")
   for (lab in fired) {
-    expect_true(grepl(lab, section, fixed = TRUE), info = lab)
+    expect_true(grepl(lab, para, fixed = TRUE), info = lab)
+  }
+  # ...and the paragraph must not name a marker this fit did not fire.
+  for (lab in setdiff(cpm_marker_labels(), fired)) {
+    expect_false(grepl(lab, para, fixed = TRUE), info = lab)
   }
 })
 
@@ -102,8 +120,11 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
   expect_equal(get("cpm", envir = env)$details$reference, 1)
   expect_equal(res$Angle[[1]], 90, tolerance = 1e-8)
 
+  # Absolute tolerances, in degrees: testthat's `tolerance` is relative, so
+  # expect_equal(78.7, tolerance = 0.05) would pass at 82.0 -- four degrees of
+  # silent drift in a figure the prose quotes.
   dev <- ((res$Angle - res$Angle_theory + 180) %% 360) - 180
-  expect_equal(max(abs(dev)), 65.8, tolerance = 0.05)
+  expect_lt(abs(max(abs(dev)) - 65.8), 0.05)
   expect_identical(as.character(res$Scale[[which.max(abs(dev))]]), "LM")
 
   # Eight circularly adjacent gaps, wrap-around included, against a
@@ -111,8 +132,8 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
   sorted <- sort(res$Angle %% 360)
   gaps <- c(diff(sorted), 360 - (sorted[[length(sorted)]] - sorted[[1]]))
   expect_length(gaps, 8L)
-  expect_equal(min(gaps), 18.8, tolerance = 0.05)
-  expect_equal(max(gaps), 78.7, tolerance = 0.05)
+  expect_lt(abs(min(gaps) - 18.8), 0.05)
+  expect_lt(abs(max(gaps) - 78.7), 0.05)
 
   # The claim the old bullet got right: the circumplex ordering is preserved.
   # Order around a circle has no first element, so the estimated sequence need
@@ -132,9 +153,18 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
 })
 
 test_that("the summary help page points at the boundary section", {
+  # man/ exists in the source tree but not in an installed package, where the
+  # help text lives in the Rd database instead. Reading whichever is present
+  # keeps this guard live under R CMD check rather than skipping there.
   rd <- test_path("..", "..", "man", "summary.circumplex_cpm.Rd")
-  skip_if_not(file.exists(rd), "man/ not present in this build")
-  txt <- paste(readLines(rd, warn = FALSE), collapse = " ")
+  txt <- if (file.exists(rd)) {
+    paste(readLines(rd, warn = FALSE), collapse = " ")
+  } else {
+    db <- tools::Rd_db("circumplex")
+    entry <- db[["summary.circumplex_cpm.Rd"]]
+    expect_false(is.null(entry))
+    paste(as.character(entry), collapse = " ")
+  }
   heading <- sub("^#+ ", "", boundary_heading)
   expect_true(
     grepl(heading, txt, fixed = TRUE),

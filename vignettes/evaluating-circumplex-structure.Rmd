@@ -139,7 +139,7 @@ data.
 The fit above is one of these fits, and it says so. Its `# Diagnostics` block
 prints a note that a communality index reached its upper boundary, and the
 results table shows which one: the NO scale's communality index is 1.000, with
-a confidence interval of [1.000, 1.000\]. A zero-width interval is not a
+a confidence interval of [1.000, 1.000]. A zero-width interval is not a
 precise estimate — it is an absent one. Both endpoints equal the estimate,
 which is to say that at least the middle 95% of the retained bootstrap
 resamples also sat on the boundary, leaving the percentile interval no width
@@ -166,30 +166,28 @@ fired:
 - **competing near-tied optima** — the search found more than one solution of
   nearly equal fit, so the reported one may not be uniquely determined.
 
-`summary()` prints that list when the intervals are analytic and the sample is
-large enough for the list to be the operative caution; below $N = 2000$ it
-prints an unconditional caution instead, and on the bootstrap path it prints
-the individual diagnostic notes rather than the list. To see the list itself,
-we simulate a larger sample from the structure just estimated. Note what that
-means: the population we draw from has NO's communality fixed at exactly one,
-so the boundary is built into it. The point of this fit is the printed
-vocabulary, not evidence about sample size.
+`summary()` prints that list when the intervals are analytic and $N$ falls
+between 2000 and 50000; below 2000 it prints an unconditional caution instead,
+above 50000 neither, and on the bootstrap path it prints the individual
+diagnostic notes rather than the list. To see the list itself, we simulate a
+larger sample from the structure just estimated with `cpm_simulate()`, then
+refit it.
 
 ```{r boundary_demo}
 set.seed(2026)
-P <- cpm$matrices$Phat # the correlation structure estimated above
-sim <- matrix(rnorm(2500 * 8), nrow = 2500) %*% chol(P)
-colnames(sim) <- colnames(cpm$matrices$R)
+sim <- cpm_simulate(cpm, n = 2500) # draws from the structure estimated above
 demo <- cpm_fit(
   cormat = cor(sim), scales = colnames(sim), angles = octants(), n = 2500
 )
 summary(demo)
 ```
 
-That fit shows something else worth seeing: every one of its analytic
-intervals came back `NA`. The standard errors are undefined when the curvature
-matrix is too close to singular to invert, which is the same condition the
-ill-conditioning marker reports.
+One marker fires here — a **small correlation-function weight** — and
+`summary()` names it. Notice what did *not* happen:
+the population this sample was drawn from has NO's communality fixed at
+exactly one, yet this draw produced no Heywood case. A boundary in the
+population does not guarantee a boundary in every sample from it, any more
+than a quiet fit guarantees there is no boundary behind the data.
 
 **What a fired marker does and does not tell you.** The package's validation
 simulations measured what these markers predict, and the measurement is
@@ -197,21 +195,29 @@ narrower than the markers are. It covered *analytic* (Wald) intervals fitted
 from a correlation matrix, and it measured interval **coverage** — how often
 an interval contained the truth — not bias in the point estimates.
 
-- *Communality indices* are the most affected, and in two ways that are
-  visible rather than hidden: the standard errors can come back missing
-  altogether, or the interval can collapse to zero width because a negative
-  asymptotic variance was clamped at zero. Fits carrying a Heywood or an
-  ill-conditioning marker covered $\zeta$ noticeably less often than unmarked
-  fits. NO's zero-width interval above arises by a different route — it is a
-  percentile interval whose resamples sat on the boundary — but it reaches the
-  reader the same way, as an interval with no usable width.
-- *Angles* are affected less. The marker that tracked angle mis-coverage most
-  closely was the small-weight one, not the Heywood one.
-- *Correlation-function weights* carry a separate and structural problem: in
-  the package's bootstrap validation, percentile intervals for a weight whose
-  population value sits near zero under-covered at every sample size studied,
-  and the shortfall did not shrink as $n$ grew. That is a property of
-  percentile intervals at a boundary, not a small-sample artifact.
+- *Communality indices* take the worst of it **when a Heywood or an
+  ill-conditioning marker fires** — those two fits' $\zeta$ intervals covered
+  well below nominal — and they fail in two ways that are visible rather than
+  hidden: the standard errors can come back missing altogether, or the
+  interval can collapse to zero width because a negative asymptotic variance
+  was clamped at zero. NO's zero-width interval above arrives by a third
+  route — it is a percentile interval whose resamples sat on the boundary —
+  but it reaches the reader the same way, as an interval with no usable width.
+- *Angles.* Taking all marker-firing fits together, angle intervals actually
+  degraded somewhat *more* than communality intervals did, so the ranking
+  above belongs to those two markers rather than to the parameter families in
+  general. The strongest single angle signal was the ill-conditioning marker,
+  with the small-weight marker next and the Heywood marker weakest of the
+  three.
+- *Correlation-function weights* moved least: marker-firing fits covered
+  $\beta$ only slightly less often than quiet ones, so a fired marker tells
+  you least here. The real $\beta$ problem is a different one and does not
+  depend on any marker — in the package's bootstrap validation, percentile
+  intervals for a weight whose *population* value sits near zero under-covered
+  at every sample size studied, and the shortfall did not shrink as $n$ grew.
+  That is a property of percentile intervals at a boundary, not a small-sample
+  artifact, and it is about where the truth sits, not about what the fit
+  flagged.
 
 Four things the record does *not* support, and which no reading of these
 markers should assume. Nothing was measured about bias in the point estimates.
@@ -220,8 +226,12 @@ validated as predictors on the bootstrap path this vignette uses by default.
 The **boundary harmonic removed** marker showed no evidence of predicting
 mis-coverage at all — fits carrying it covered as well as fits without it; it
 is kept because it names a real feature of the solution, not because it
-forecasts trouble. And **competing near-tied optima** rests on thin evidence
-from a single provoking configuration.
+forecasts trouble. And the numbers behind **Heywood communality**,
+**ill-conditioned Hessian** and **competing near-tied optima** come almost
+entirely from one deliberately provoking configuration, where those markers
+fire often enough to measure; near-tied optima fired only a hundred-odd times
+even there. Read them as what happens where those markers fire, not as how
+often they fire.
 
 **What to do when one fires.**
 
@@ -241,9 +251,10 @@ from a single provoking configuration.
    number stripped of its own caveat.
 4. *Keep using what still holds.* These remain interpretable: the point
    estimates, as the solution the model actually fitted (their bias in this
-   regime is unmeasured, so read them as estimates, not to the digit); the fit
-   indices and the residual summary, which still locate where the model
-   misses; and intervals that came back with ordinary width, read with
+   regime is unmeasured, so read them as estimates, not to the digit); the
+   descriptive fit indices (RMSEA, SRMR, CFI and TLI) and the residual
+   summary, which still locate where the model misses; and intervals that came
+   back with ordinary width, read with
    whatever caution `summary()` prints beside them — in validation, marked
    fits covered less well than unmarked ones across the board. These do not:
    an interval that is missing or zero-width, and the chi-square $p$ value at
