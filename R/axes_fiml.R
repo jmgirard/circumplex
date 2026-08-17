@@ -63,10 +63,23 @@ axes_fiml_em_iter_max <- 50000L
 # and lavaan's own default applies -- the EM then stalls sooner on thin data and
 # the refusals below fire, which is a conservative failure rather than a wrong
 # number.
+#
+# Acceleration is pinned OFF wherever lavaan offers it (the 0.7 nested
+# spelling; 0.6 has no such option and iterates plainly already). lavaan 0.7
+# defaults the saturated-stage EM to SQUAREM acceleration, whose convergence
+# on thinly-covered cells proved platform-sensitive: the 20/300-coverage cell
+# the M65-D4 tests ride converged under acceleration on macOS and Linux but
+# stalled at ANY cap on Windows, so FIML refused data it is documented to
+# estimate, on one platform only. The 50000 cap and every measurement above
+# were made under the plain EM, so the pin restores the calibrated regime
+# rather than adding a new one; the cost on healthy data is nil (0.1-0.3 s
+# either way, measured above), and at thin cells the plain iterate sits in the
+# same EM-tolerance neighborhood as the accelerated one (max moment difference
+# 1.9e-3 on the 20/300 cell, measured 2026-08-17).
 axes_fiml_em_args <- function(cap = axes_fiml_em_iter_max) {
   opts <- names(lavaan::lavOptions())
   if ("em.h1.args" %in% opts) {
-    list(em.h1.args = list(max_iter = cap))
+    list(em.h1.args = list(max_iter = cap, acceleration = "none"))
   } else if ("em.h1.iter.max" %in% opts) {
     list(em.h1.iter.max = cap)
   } else {
