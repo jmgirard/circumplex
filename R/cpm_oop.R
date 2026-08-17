@@ -147,7 +147,9 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
 #' boundary or weak-identification marker (Heywood communality, removed
 #' harmonic, small correlation-function weight, ill-conditioning, or competing
 #' near-tied optima), the regime where they mis-covered even at large N (see
-#' [cpm_fit()]).
+#' [cpm_fit()]). The vignette section *When a fit sits at a boundary*
+#' (`vignette("evaluating-circumplex-structure")`) glosses each marker and
+#' gives the interpretation and next steps when one fires.
 #'
 #' @param object A `circumplex_cpm` object.
 #' @param digits The number of decimal places to display (default = 3).

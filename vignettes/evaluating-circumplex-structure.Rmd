@@ -67,13 +67,19 @@ summary(cpm)
 
 Two parts of this output matter most for evaluating structure:
 
-- **The estimated angles.** Compare them with the theoretical angles: the
-  IIP-SC octants land near — but not exactly on — their theoretical
-  positions, so the circumplex ordering is preserved while the *spacing* is
-  not perfectly equal. This is the typical result for well-validated
-  circumplex instruments: minor deviations from perfect structure are
-  common and have little practical impact on SSM profiles (Gurtman &
-  Pincus, 2000).
+- **The estimated angles.** Compare them with the theoretical angles, but
+  read the comparison carefully: one scale is held fixed to identify the
+  configuration (PA here, at 90°), so every other scale's departure is
+  measured from that anchor and a different anchor would redistribute them.
+  Two things are worth separating. The *ordering* around the circle is
+  preserved — the estimated angles run through the octants in the same
+  cyclic order the instrument assigns them. The *spacing* is not: the gaps
+  between circularly adjacent estimates run from under 20° to nearly 80°
+  against a theoretical 45°, and the largest departure from a theoretical
+  position is about 66°. Departures from perfect structure are common in
+  well-validated circumplex instruments (Gurtman & Pincus, 2000), and the
+  model comparison below quantifies what this pattern costs: it is why
+  forcing equal spacing fits these data poorly.
 - **The communality indices.** Scales with low $\zeta$ are poorly
   described by the circle; a profile peak at such a scale's angle means
   less than the same peak at a well-explained scale's angle.
@@ -111,13 +117,9 @@ the index's small-sample behavior as much as the model's fit.
 Two further cautions are circumplex-specific, both from this package's own
 validation simulations:
 
-- **Boundary solutions are common at realistic sample sizes.** When octant
-  scales share a strong general factor (as interpersonal problem scales
-  do), fitted solutions frequently sit at or near a parameter boundary — a
-  communality estimate at 1 (a "Heywood" case), or a harmonic weight at 0.
-  `cpm_fit()` flags these in its diagnostics. They are usually a property
-  of the estimator meeting real data at finite $n$, not a data-entry error,
-  but they matter for inference (next point).
+- **Boundary solutions are common at realistic sample sizes**, including in
+  the fit above. What that means and what to do about it is the subject of
+  the next subsection, *When a fit sits at a boundary*.
 - **Do not lean hard on the chi-square p value.** In simulations at
   field-typical sample sizes with octant-like population structures, the
   test statistic did not follow its nominal chi-square reference
@@ -131,6 +133,108 @@ below $N = 2000$, and up to very large $N$ when a boundary marker is
 present: in validation, analytic intervals mis-covered in exactly those
 regimes. Prefer the bootstrap (the raw-data default) when you have raw
 data.
+
+### When a fit sits at a boundary
+
+The fit above is one of these fits, and it says so. Its `# Diagnostics` block
+prints a note that a communality index reached its upper boundary, and the
+results table shows which one: the NO scale's communality index is 1.000, with
+a confidence interval of [1.000, 1.000\]. A zero-width interval is not a
+precise estimate — it is an absent one. Every bootstrap resample landed on the
+same boundary, so the percentile interval has no width left to report. The same
+chunk also emits a warning that the fit's Hessian is ill-conditioned, a second
+signal from the same regime. When octant scales share a strong general factor,
+as interpersonal problem scales do, fitted solutions frequently sit at or near
+a parameter boundary; this is the estimator meeting real data at finite $n$,
+not a data-entry error.
+
+`cpm_fit()` records five such markers, and `summary()` names the ones that
+fired:
+
+- **Heywood communality** — a communality index estimated at its upper
+  boundary ($\hat\zeta > 0.995$): the circle accounts for that scale
+  essentially completely.
+- **boundary harmonic removed** — a correlation-function weight sat at zero
+  and was dropped from the model, with the degrees of freedom adjusted.
+- **small correlation-function weight** — the smallest weight is below 0.10,
+  near enough to zero to matter for inference.
+- **ill-conditioned Hessian** — the curvature matrix the analytic standard
+  errors are computed from is close to singular; angles may be clustered or
+  parameters weakly determined.
+- **competing near-tied optima** — the search found more than one solution of
+  nearly equal fit, so the reported one may not be uniquely determined.
+
+`summary()` prints that list when the intervals are analytic and the sample is
+large enough for the list to be the operative caution; below $N = 2000$ it
+prints an unconditional caution instead, and on the bootstrap path it prints
+the individual diagnostic notes rather than the list. To see the list itself,
+we simulate a larger sample from the structure just estimated. Note what that
+means: the population we draw from has NO's communality fixed at exactly one,
+so the boundary is built into it. The point of this fit is the printed
+vocabulary, not evidence about sample size.
+
+```{r boundary_demo}
+set.seed(2026)
+P <- cpm$matrices$Phat # the correlation structure estimated above
+sim <- matrix(rnorm(2500 * 8), nrow = 2500) %*% chol(P)
+colnames(sim) <- colnames(cpm$matrices$R)
+demo <- cpm_fit(
+  cormat = cor(sim), scales = colnames(sim), angles = octants(), n = 2500
+)
+summary(demo)
+```
+
+**What a fired marker does and does not tell you.** The package's validation
+simulations measured what these markers predict, and the measurement is
+narrower than the markers are. It covered *analytic* (Wald) intervals fitted
+from a correlation matrix, and it measured interval **coverage** — how often
+an interval contained the truth — not bias in the point estimates.
+
+- *Communality indices* are the most affected, and in two ways that are
+  visible rather than hidden: the standard errors can come back missing
+  altogether, or the interval can collapse to zero width, as NO's did above.
+  Fits carrying a Heywood or an ill-conditioning marker covered $\zeta$
+  noticeably less often than unmarked fits.
+- *Angles* are affected less. The marker that tracked angle mis-coverage most
+  closely was the small-weight one, not the Heywood one.
+- *Correlation-function weights* carry a separate and structural problem: in
+  the package's bootstrap validation, percentile intervals for a weight whose
+  population value sits near zero under-covered at every sample size studied,
+  and the shortfall did not shrink as $n$ grew. That is a property of
+  percentile intervals at a boundary, not a small-sample artifact.
+
+Four things the record does *not* support, and which no reading of these
+markers should assume. Nothing was measured about bias in the point estimates.
+The marker study fitted analytic intervals only, so the markers are not
+validated as predictors on the bootstrap path this vignette uses by default.
+The **boundary harmonic removed** marker showed no evidence of predicting
+mis-coverage at all — fits carrying it covered as well as fits without it; it
+is kept because it names a real feature of the solution, not because it
+forecasts trouble. And **competing near-tied optima** rests on thin evidence
+from a single provoking configuration.
+
+**What to do when one fires.**
+
+1. *Locate it.* Read the results table beside the note and find the scale or
+   weight sitting at the boundary, as NO is above. A marker with no identified
+   owner is not yet a diagnosis.
+2. *Re-fit to find out what the boundary is about.* Compare the default fit
+   against the constrained variants in the next subsection. A boundary that
+   disappears when a constraint is relaxed is telling you about the model you
+   imposed; one that survives is telling you about the data. If you fitted
+   from a correlation matrix, refitting from raw data also buys you bootstrap
+   intervals in place of analytic ones.
+3. *Report it.* Quote the marker alongside the estimate it belongs to: which
+   scales sat at the boundary, and that their intervals are degenerate or
+   missing. An angle or communality reported without its diagnostic note is a
+   number stripped of its own caveat.
+4. *Keep using what still holds.* These remain interpretable: the point
+   estimates, as the solution the model actually fitted (their bias in this
+   regime is unmeasured, so read them as estimates, not to the digit); the fit
+   indices and the residual summary, which still locate where the model
+   misses; and any interval that came back with ordinary width. These do not:
+   an interval that is missing or zero-width, and the chi-square $p$ value at
+   field sample sizes, for the reason given above.
 
 ### Comparing model variants
 

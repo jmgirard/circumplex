@@ -31,7 +31,10 @@ boundary_section_text <- function(lines = readLines(vignette_path(), warn = FALS
   start <- which(trimws(lines) == boundary_heading)
   expect_length(start, 1L)
   rest <- lines[seq.int(start + 1L, length(lines))]
-  ends <- which(grepl("^#{1,3} ", rest))
+  # A chunk's R comments also begin a line with "# ", so only headings outside
+  # fenced code end the section.
+  fenced <- cumsum(grepl("^```", rest)) %% 2L == 1L | grepl("^```", rest)
+  ends <- which(grepl("^#{1,3} ", rest) & !fenced)
   stop_at <- if (length(ends) > 0L) ends[[1]] - 1L else length(rest)
   paste(rest[seq_len(stop_at)], collapse = "\n")
 }
@@ -49,11 +52,13 @@ vignette_chunk <- function(label,
   lines[seq.int(hit + 1L, end - 1L)]
 }
 
-run_chunk <- function(label) {
+# Chunks share one environment when the vignette is knitted, so a chunk that
+# builds on an earlier one is run after it here too.
+run_chunks <- function(labels) {
   env <- new.env(parent = globalenv())
-  suppressWarnings(
-    eval(parse(text = vignette_chunk(label)), envir = env)
-  )
+  for (label in labels) {
+    suppressWarnings(eval(parse(text = vignette_chunk(label)), envir = env))
+  }
   env
 }
 
@@ -70,7 +75,7 @@ test_that("the boundary section names every marker label the package prints", {
 })
 
 test_that("the demonstration fit fires exactly the markers the section names", {
-  env <- run_chunk("boundary_demo")
+  env <- run_chunks(c("cpm", "boundary_demo"))
   expect_true(exists("demo", envir = env, inherits = FALSE))
   fired <- cpm_boundary_markers(get("demo", envir = env))
   # The prose reads this fit; the set it names is pinned here so a change to
@@ -90,7 +95,7 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
   # The displayed fit's point estimates do not depend on the bootstrap (the
   # analytic and bootstrap fits agree to 0 on Angle, checked 2026-08-16), but
   # the chunk is evaluated as written so a change to the example is caught.
-  env <- run_chunk("cpm")
+  env <- run_chunks("cpm")
   res <- get("cpm", envir = env)$results
 
   # PA is the fixed reference, so every departure below is measured from it.
