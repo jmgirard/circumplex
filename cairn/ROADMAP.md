@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-16 (M89 post-merge: criterion moved to the correlation metric with the τ floor, D-044 recorded, RB18/RR18 pair archived, M84 terminal row pruned for the F3 τ-calibration candidate row; all checks green. M90 is now unblocked; M7 stays parked on the maintainer's CRAN submission handoff.)_
+_Last hygiene check: 2026-08-16 (M90 post-merge: refusal-vocabulary split shipped, M85 terminal row pruned at the replan, one LESSONS line added; all checks green. M91 is now unblocked; M7 stays parked on the maintainer's CRAN submission handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -13,7 +13,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M87 | Retire the norms-audit abort apparatus for a manifest check | done | — | normal | milestones/archive/M87-norms-audit-apparatus-retirement.md |
 | M88 | Fence the norms-audit walk helpers M87 kept | done | — | normal | milestones/archive/M88-norms-audit-walk-helper-tests.md |
 | M89 | Price the degeneracy criterion in the metric the reported numbers live in | done | — | normal | milestones/archive/M89-fitted-matrix-degeneracy-criterion.md |
-| M90 | Say which degeneracy happened, and stop saying it when it did not | in-progress | M89 | normal | milestones/M90-degeneracy-reason-vocabulary.md |
+| M90 | Say which degeneracy happened, and stop saying it when it did not | done | M89 | normal | milestones/archive/M90-degeneracy-reason-vocabulary.md |
 | M91 | Stop NA-ing computable numbers when only the raw arm refuses | planned | M90 | normal | milestones/M91-naive-arm-decoupling.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
