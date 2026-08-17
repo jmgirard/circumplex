@@ -80,8 +80,8 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   internal `solve()` failed first refused with an incidental label — so a
   sufficiently degenerate fitted matrix could yield `NA` corrected standard
   errors beside silently scaled fit statistics derived from the same matrix.
-  The failure-reason vocabulary is now shared across both surfaces, and four
-  reported literals change. On `details$se_correction_failed` alone: a
+  The failure-reason vocabulary is now shared across both surfaces, and the
+  reported literals change as follows. On `details$se_correction_failed` alone: a
   nonpositive fitted variance reports `"singular"` where it previously
   reported `"nonpositive_diagonal"`, and a positive-infinite one reports
   `"infinite_diagonal"` rather than `"unidentified"`. On
@@ -106,7 +106,12 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   standard-error surface's two internal arms would label one matrix
   differently, the reported literal is the correlation-metric arm's — the
   same arm the fit-scaling surface prices — so the two surfaces never name
-  the same matrix differently.
+  the same matrix differently. Two of these literals are reachable today
+  only at the internal helpers' documented contract boundary, not through
+  any `axes_reliability()` call: `"saturated"` needs a three-item map, which
+  `axes_reliability()` refuses, and the backstop's relabel has never been
+  observed to fire (a 30,000-draw search found no reaching input); they are
+  recorded for code that branches on the documented `details` reason fields.
 
 * `axes_reliability()` objects now report `details$n_moments`, the number of
   distinct analyzed moments p\* = p(p+1)/2, and `details$baseline`, the

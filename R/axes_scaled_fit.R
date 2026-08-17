@@ -246,9 +246,11 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   #     sum((1 - rho^2)^2) / baseline_df over finite rho (sigma passed the
   #     finiteness gate above), so cb is finite and >= 0, with equality only
   #     if every |rho| = 1, a matrix the degeneracy criterion refuses first.
+  #     baseline_df > 0 whenever this line runs: p(p - 1)/2 = 0 only at
+  #     p = 1, where q >= 1 forces df <= 0, refused above.
   #   cval <= 0 and !is.finite(cval): tr(U Gamma) >= 0 in exact arithmetic
-  #     (U is the psd projection residual of V, Gamma_R is psd) and df > 0
-  #     past the saturation guard, so a nonpositive or non-finite cval here
+  #     (U is the psd projection residual of V, Gamma_R is psd) and df is
+  #     nonzero past the saturation guard, so a nonpositive or non-finite cval here
   #     is double-precision cancellation, never evidence about the user's
   #     model -- which is why this door stopped saying "indefinite" at M90.
   #     The criterion's tau floor caps the cancellation error a computed

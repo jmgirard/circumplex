@@ -721,8 +721,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' accuracy target: past that floor the corrected standard errors could carry
 #' relative error above it -- is refused by both surfaces, and the refusal
 #' says which degeneracy happened: `"indefinite"` when the smallest
-#' eigenvalue is decisively negative (beyond the fit's own numerical noise
-#' band, so it is a statement about the model), `"ill_conditioned"` for
+#' eigenvalue is decisively negative (below
+#' `-lambda_max * sqrt(p * .Machine$double.eps)` -- beyond the fit's own
+#' numerical noise band, so it is a statement about the model),
+#' `"ill_conditioned"` for
 #' roundoff-level negativity, exact singularity, or mere ill-conditioning (a
 #' numerical caution). Either way the corrected standard errors and the four
 #' scaled statistics go `NA` together (each with its own warning naming that
@@ -737,8 +739,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' unequal fitted variances over a well-conditioned correlation structure)
 #' returns `NA` standard errors beside validly scaled fit statistics --
 #' never the reverse. On a unit-diagonal fitted matrix the two metrics
-#' coincide. A saturated model (`df = 0`) is refused as `"saturated"`
-#' before any scaling arithmetic runs. `df` and `srmr` still report.
+#' coincide. Separately, a saturated model (`df = 0`) is refused as
+#' `"saturated"` before any scaling arithmetic runs -- a refusal that
+#' touches only the four scaled statistics; the corrected standard errors
+#' still compute. `df` and `srmr` still report.
 #'
 #' If you cross-check against lavaan, match the variant. The scaled `chisq`,
 #' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls
@@ -1014,7 +1018,8 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   (smallest eigenvalue relative to largest at or below
 #'   `sqrt(p * .Machine$double.eps / 1e-6)`, evaluated on `cov2cor()` of the
 #'   fitted covariance matrix and, for this surface only, on the raw matrix
-#'   as well): `"indefinite"` for a decisively negative eigenvalue, a
+#'   as well): `"indefinite"` for a decisively negative smallest eigenvalue
+#'   (below `-lambda_max * sqrt(p * .Machine$double.eps)`), a
 #'   statement about the model, and `"ill_conditioned"` for roundoff-level
 #'   negativity, singularity, or ill-conditioning, a numerical caution --
 #'   which also sets `fit_scaling_failed` when the correlation form

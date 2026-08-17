@@ -1646,6 +1646,55 @@ test_that("M90 AC5: the cval backstop is not reached by criterion-accepted draws
 })
 
 
+test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRING only; the criterion is mocked away)", {
+  # This mock proves the branch's wiring, never the condition that selects
+  # it (the M62 mock doctrine): the degeneracy criterion is stubbed to
+  # accept everything, so exemplar B -- whose double-precision cval is
+  # negative (-0.216) while its exact value is +0.0556 (RR18) -- flows past
+  # the door it is really refused at and lands in the final backstop. The
+  # unmocked path is pinned by the smoke test above (accepted draws never
+  # get here) and by the exemplar-B criterion assertion; this test pins the
+  # literal the backstop itself emits — a literal the recorded search found
+  # no accepted input reaching (never "unreachable"; see the backstop
+  # comment). Under the stub the backstop is the only remaining site in this
+  # function that can emit this literal, so the assertion is site-exclusive.
+  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
+  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fx <- readRDS(fp)
+  testthat::local_mocked_bindings(
+    axes_sigma_degenerate = function(sigma) NULL
+  )
+  expect_warning(
+    got <- axes_scaling_factor(fx$S, rownames(fx$S), as.numeric(fx$ia),
+                               c("A", "B", "C"),
+                               fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                               df = 1, baseline_df = 3),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "ill_conditioned")
+  expect_identical(got$scale, NA_real_)
+})
+
+
+test_that("M90 AC7: an NA fitted diagonal refuses with exactly ONE warning on the SE surface (the hoist is load-bearing)", {
+  # The finiteness hoist exists so cov2cor() never runs on an NA/NaN
+  # diagonal: cov2cor() emits its own warning there, and the M71 contract is
+  # exactly one warning per refusal. Reverting the hoist alone would leave
+  # every literal correct and double the warning -- only this count sees it.
+  # (The sibling surface's count is pinned in its own test above.)
+  pp <- probe_octant()
+  sig <- pp$sigma
+  sig[4L, 4L] <- NA_real_
+  w <- testthat::capture_warnings(
+    got <- axes_corrected_se(sig, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_length(w, 1L)
+  expect_match(w, "could not be computed", fixed = TRUE)
+  expect_identical(got$reason, "singular")
+})
+
+
 test_that("AC3: tau is a named constant, and the floored criterion accepts all three probe-map fits", {
   skip_if_not_installed("lavaan")
   # The accuracy target is a named constant beside the criterion, not an
@@ -1785,6 +1834,9 @@ test_that("M90 AC2: within the refusal region, deep negativity says 'indefinite'
   sing <- pp$sigma
   sing[2L, ] <- sing[1L, ]
   sing[, 2L] <- sing[, 1L]
+  # The probe is unit-diagonal, so its cov2cor form is the same matrix --
+  # this call IS the criterion's cov2cor-metric evaluation, as AC2 labels it.
+  expect_true(isTRUE(all.equal(stats::cov2cor(sing), sing)))
   evS <- eigen(sing, symmetric = TRUE, only.values = TRUE)$values
   expect_lt(abs(evS[p]), 1e-13)
   expect_identical(axes_sigma_degenerate(sing), "ill_conditioned")
@@ -1857,8 +1909,8 @@ test_that("the non-inflation (indefinite) form is refused by both surfaces with 
   expect_true(all(is.finite(raw$naive)))
 
   # Both consumers refuse it under the stated criterion, naming the shared
-  # literal. The matrix is DEEPLY indefinite (lambda_min = -0.56 raw, -48 in
-  # the correlation metric -- measured, far past the noise band), so since
+  # literal. The matrix is DEEPLY indefinite (lambda_min = -0.382 raw, -38.3
+  # in the correlation metric -- measured, far past the noise band), so since
   # M90's partition the criterion says "indefinite" for the honest reason;
   # before M89 both fell to an emergent "indefinite"/NaN door, and between
   # M89 and M90 the criterion hid the model defect under "ill_conditioned".

@@ -269,7 +269,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # cov2cor even though the signs do not), so the two arms can label one
   # matrix differently; without this precedence the raw arm's label would
   # leak out and break the same-literal half of M89's nestedness contract.
-  # The finiteness hoist above this comment exists for that order: the raw
+  # The finiteness hoist just below exists for that order: the raw
   # matrix is checked finite before cov2cor() runs on it, because cov2cor()
   # of an NA/NaN diagonal emits its own warning and the M71 contract is
   # exactly one warning per refusal (the same trap the sibling documents at
@@ -305,10 +305,12 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #
 # THE CRITERION: the smallest eigenvalue of the priced matrix, relative to its
 # largest, must exceed sqrt(p * eps / tau) (tau below); at or below that the
-# matrix is refused as "ill_conditioned". One inequality carries three cases:
-# indefinite (lambda_min <= 0 < lambda_max), exactly singular (lambda_min = 0),
-# and ill-conditioned (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4
-# at p = 24).
+# matrix is refused. One inequality carries three cases -- indefinite
+# (lambda_min <= 0 < lambda_max), exactly singular (lambda_min = 0), and
+# ill-conditioned (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4 at
+# p = 24) -- and since M90 the refusal's literal says which happened:
+# "indefinite" where the negativity is decisive, "ill_conditioned" otherwise;
+# the partition and its rationale live at axes_sigma_degenerate() below.
 #
 # WHICH MATRIX (M89 re-cut, RR18): each consumer prices the matrix it actually
 # computes with. Every quantity the scaling surface computes -- and every
