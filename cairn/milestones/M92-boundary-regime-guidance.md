@@ -41,17 +41,17 @@ label test checks the contract rather than the function's source text.
 
 ## Acceptance criteria
 
-- [ ] AC1 The new subsection glosses every marker label the fitted-solution
+- [x] AC1 The new subsection glosses every marker label the fitted-solution
       marker function can return. A test enumerates that domain from a new
       internal label catalog that `cpm_boundary_markers()` indexes, extracts
       the subsection's own text between its heading and the next heading of
       the same level, and fails if any catalogued label is absent from it.
       Teeth shown: with one label removed from the subsection, the test fails.
-- [ ] AC2 The subsection contains an executed chunk whose printed `summary()`
+- [x] AC2 The subsection contains an executed chunk whose printed `summary()`
       output includes the note naming fired markers, and the prose reads that
       output. A test reproduces the chunk's fit from the same seed and asserts
       the marker set it fires is exactly the set the prose names.
-- [ ] AC3 For each of the three reported parameter families (scale angles,
+- [x] AC3 For each of the three reported parameter families (scale angles,
       communality indices ζ, correlation-function weights β) the subsection
       states what a fired marker implies for that family's **interval**, on the
       estimation path where the package measured it, and says where the record
@@ -59,20 +59,20 @@ label test checks the contract rather than the function's source text.
       markers the record found predictively null or power-limited
       (`devel/cpm-marker-validation.md`, "Per-marker verdicts" and "Honest
       nulls and caveats").
-- [ ] AC4 A claims ledger in this file lists **every** sentence of the new
+- [x] AC4 A claims ledger in this file lists **every** sentence of the new
       subsection, in order, built by walking it sentence by sentence, each
       carrying one verdict: `derived` (naming the artifact and anchor, the
       anchor stating what the sentence claims), `on-page` (naming the chunk
       whose printed output shows it), or `exempt` (framing, no factual claim).
       A sentence absent from the ledger is a gate failure.
-- [ ] AC5 The subsection's action ladder states, at minimum, what to re-fit or
+- [x] AC5 The subsection's action ladder states, at minimum, what to re-fit or
       re-check, what to report alongside a flagged fit, and which reported
       quantities stay interpretable — the last as a closed list. The
       already-shipped sentence preferring the bootstrap on the raw-data path
       (`vignettes/evaluating-circumplex-structure.Rmd`, "Prefer the bootstrap
       (the raw-data default) when you have raw data.") does not count toward
       any of the three.
-- [ ] AC6 Two pre-existing passages are reconciled. (a) The paragraph reading
+- [x] AC6 Two pre-existing passages are reconciled. (a) The paragraph reading
       the estimated angles no longer describes them as landing near their
       theoretical positions, and its final wording is quoted verbatim in AC4's
       ledger for the review gate to read against the printed table. A test pins
@@ -87,7 +87,7 @@ label test checks the contract rather than the function's source text.
       text "**Boundary solutions are common at realistic sample sizes.**" is
       reduced to a pointer into the new subsection, and every fact it asserted
       appears in AC4's ledger.
-- [ ] AC7 `?summary.circumplex_cpm` cross-references the new section by its
+- [x] AC7 `?summary.circumplex_cpm` cross-references the new section by its
       heading, and a test asserts that heading string appears in the vignette
       source. `devtools::check(args = "--no-manual")` is 0/0/0 with vignettes
       rebuilt, the built vignette grepped clean of tool-call scaffolding, and
@@ -236,7 +236,21 @@ Claims repaired across the three walks rather than shipped: an "every bootstrap 
 - **AC7** — `?summary.circumplex_cpm` names the section; the guard reads `man/` in the source tree and `tools::Rd_db()` in an installed one, so it no longer skips under check. NEWS has one Documentation entry and the NEWS diff is purely additive. Full check result below.
 - **Opening-claims guard (new this round)** — the section's premise is now pinned: the displayed fit fires Heywood, NO's ζ is 1 to within 1e-6 with identical interval endpoints, and the chunk raises the ill-conditioning warning, asserted by message rather than as a bare failure.
 
-### Consistency gate
+### Round 2 findings and triage (2026-08-17)
+
+Three fresh-context lenses. Prior-review: no bearing evidence, zero findings. Blame-history: zero findings; verified the label extraction keeps its Browne (1992) citation co-located, that `cpm_simulate()`'s documented contract fits the vignette's use, and that D-010's thresholds are respected. Diff-bug: verified all nine round-1 fixes as genuine (re-walking the section with its own splitter and confirming the AC6(a) quote byte-identical), then raised 18 findings. None failed an acceptance criterion, so no return. All 18 actioned; none rejected.
+
+Fixed: the zeta ranking omitted near-tied optima, whose .815 sits between ill-conditioning's .757 and Heywood's .836; NA standard errors were presented as communality-specific when the memo says they arrive for all three families at once; RMSEA was listed as interpretable against DESIGN's own reading of chi-square/RMSEA at field N, and the demo's `RMSEA = 0 [0, 0]` sat unexplained inside a list that had just called zero-width intervals unusable; "communality fixed at exactly one" overstated a value that is one to eleven decimals; "a hundred-odd times" quoted a figure from a non-shipping source against this milestone's own plan-gate decision; a back-reference still said "those two markers" after the ranking grew to three; the section's opening claims (Heywood fired, NO's interval zero-width, the ill-conditioning warning) had no guard; the reference scale was pinned by index but not by name; the angle pins sat ~0.02 degrees from their bound, now pinned against measured rather than rounded values; the `cpm` chunk was evaluated twice per guard run, now once with its warnings carried alongside; ledger rows 3, 16, 38 and 44 carried anchors short of their sentences; the evidence block was stale from round 1; T4 still described the retired Cholesky draw; and the test file is renamed `test-cpm_boundary_vignette.R` to match the `test-cpm_*` family.
+
+One finding corrected the record rather than the code: round 1's rationale for the `cpm_simulate()` switch was false — `Phat`'s minimum eigenvalue is 0.123 and `chol()` succeeds — so the switch rests on reuse grounds alone. Superseded in the work log, not edited.
+
+CI then failed `test-coverage` (4 of 4 vignette guards): covr installs without vignettes, so neither location held the .Rmd and the helper aborted. It now skips there with a stated reason. Re-run green on all three jobs.
+
+### Consistency gate (round 2)
+
+`cairn_validate` exit 0, 16 checks pass. `document()` no diff, zero unresolved-link warnings. `pkgdown::check_pkgdown()` clean. `devtools::test()` 8337 pass / 0 fail. `devtools::check(args = "--no-manual")` 0/0/0 with vignettes rebuilt. CI on PR #120: pkgdown pass, test-coverage pass, ubuntu-latest (release) pass. No DESIGN principle changed, so no impact report.
+
+### Consistency gate (round 1)
 
 `cairn_validate` exit 0, 16 checks pass. `document()` no diff, zero unresolved-link warnings. `pkgdown::check_pkgdown()` clean. `devtools::check(args = "--no-manual")` 0/0/0 with vignettes rebuilt (run at c096027e; the return below changes content, so it is re-run at re-review). No DESIGN principle changed, so no impact report. CI on PR #120 was still pending at the return.
 
