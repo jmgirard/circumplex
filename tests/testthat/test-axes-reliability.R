@@ -3190,3 +3190,44 @@ test_that("M91 AC5: a raw-metric-only degeneracy through the assembly seam NAs n
   expect_true(is.finite(res$fit$rmsea))
   expect_true(is.finite(res$fit$cfi))
 })
+
+
+test_that("M91 AC4: the printed SE-failure note stays silent in the raw-arm-only regime", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  pop <- axes_population_cor(oct, 3L, .35, .10, .08)
+  sigma <- pop$sigma
+  inames <- sprintf("i%02d", seq_len(nrow(sigma)))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, pop$scale)
+
+  # The same raw-arm-only injection as the AC5 test above: degenerate raw,
+  # clean in the correlation metric, reaching print() end-to-end.
+  bad <- sigma
+  bad[4L, 4L] <- bad[4L, 4L] * 1e10
+  local_mocked_bindings(axes_fitted_cov = function(fit) bad)
+  res <- suppressMessages(
+    axes_reliability(cormat = sigma, items = items, angles = oct, n = 600L)
+  )
+  # The precondition, asserted so this test cannot silently drift into the
+  # unit-refusal regime and pass vacuously: only the raw arm refused.
+  expect_null(res$details$se_correction_failed)
+  expect_identical(res$details$naive_reason, "ill_conditioned")
+
+  out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+
+  # The failure note does not print (M91 AC4)...
+  expect_no_match(out, "standard errors could not be computed", fixed = TRUE)
+  # ...the notes that assert properties of PRESENT numbers do print: the
+  # calibrated-SE claim and the both-sides opening (SE and fit halves live)...
+  expect_match(out, "are calibrated", fixed = TRUE)
+  expect_match(out, "both sides of that mismatch", fixed = TRUE)
+  # ...and the components table shows the corrected SEs themselves: every
+  # SE-carrying row renders its number, none renders NA (the epsilon row is
+  # structurally SE-less on every path).
+  se_rows <- res$components$Symbol != "epsilon"
+  fmt <- format(round(res$components$SE[se_rows], 3), nsmall = 3)
+  for (v in fmt) expect_match(out, v, fixed = TRUE)
+  # naive_reason is deliberately silent (M91-D1): nothing printed names it.
+  expect_no_match(out, "naive", fixed = TRUE)
+})

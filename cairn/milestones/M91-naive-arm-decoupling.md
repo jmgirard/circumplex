@@ -94,7 +94,7 @@ candidate row.
       `naive_reason`; the `naive_reason` routing decision recorded.
 - [x] **T3** — The post-M90 nestedness grid re-expected per AC2, plus the
       assembly-seam injection test (AC5).
-- [ ] **T4** — The print-method regime (AC4) and its regression.
+- [x] **T4** — The print-method regime (AC4) and its regression.
 - [ ] **T5** — AC3's grep sweep: roxygen rewrite, sibling comments, D-044
       annotation, `devtools::document()`, NEWS.
 - [ ] **T6** — Full `devtools::check()`.
@@ -107,6 +107,8 @@ candidate row.
 - 2026-08-16: T1 — the two AC1 regressions (counterexample-A congruence at the helper; huge-finite single variance, the non-rescaling member) written and confirmed red against post-M90 code: unit refusal with warning, no naive_reason field. AC1's "end-to-end" numeric pin sits at the helper where the 1e-9 comparison is clean; the through-`axes_reliability()` assertion is T3's assembly-seam test (AC5).
 
 - 2026-08-16: T2+T3 (one checkpoint; the suite is green only with both) — decoupled return shipped in `axes_corrected_se()` (`naive_reason` beside `reason`; raw-arm criterion trip or pricing failure NAs `naive` alone, silently; cov2cor-arm refusals unchanged as unit refusals), `details$naive_reason` wired through `axes_reliability()`; M91-D1/M91-D2 recorded; nestedness grid, counterexample-A scaling test, AC10 shape pin and the assembly-seam injection test re-expected (the M89 AC2 assembly test is now the AC5 test); the Wc citation range in axes_scaled_fit.R re-anchored (176-184) after comment growth; F11 rationale rescope at axes_sigma_degenerate(). Full suite FAIL 0 / PASS 8291.
+
+- 2026-08-16: T4 — AC4 regression added (end-to-end seam injection through summary()): no failure note, the calibrated-SE claim and both-sides opening print, every SE-carrying component row renders its number, and nothing printed names the naive arm. No print-method code change needed: the note keys on `se_correction_failed`, NULL in this regime by T2. File green.
 
 - 2026-08-16: routed from the M90 review (diff-lens F11): the partition's convergence-noise rationale is derived in the correlation metric but the criterion also runs on the SE helper's raw arm; a raw-arm-only "indefinite" was not empirically reachable at M90, and this milestone's decoupling reopens that surface — address the rationale's scope (or the raw arm's own band) when restructuring the arms.
 
