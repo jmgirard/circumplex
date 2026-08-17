@@ -193,7 +193,7 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # A = (Delta'V Delta)^-1 -- the same information matrix axes_se_pricing()
   # builds -- and B_st = 2 tr(Wc_s Sigma Wc_t Sigma), where Wc is W with the
   # covariance-to-correlation Jacobian folded in exactly as it is there
-  # (R/axes_corrected_se.R:171-179): off the diagonal W is unchanged, and the
+  # (R/axes_corrected_se.R:176-184): off the diagonal W is unchanged, and the
   # diagonal absorbs the standardization because a sample correlation's diagonal
   # does not vary at all.
   #

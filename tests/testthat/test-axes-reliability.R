@@ -3116,9 +3116,12 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
   expect_true(any(grepl("standard errors could not be computed", w)))
   expect_true(any(grepl("scaled fit statistics could not be computed", w)))
 
-  # Both failure fields carry the shared literal.
+  # Both failure fields carry the shared literal; on a unit refusal like this
+  # one the one reason speaks for all three vectors, so the raw arm's own
+  # field stays NULL (M91).
   expect_identical(res$details$se_correction_failed, "ill_conditioned")
   expect_identical(res$details$fit_scaling_failed, "ill_conditioned")
+  expect_null(res$details$naive_reason)
 
   # The corrected component SEs are all NA together...
   expect_true(all(is.na(res$components$SE)))
@@ -3142,7 +3145,7 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
 })
 
 
-test_that("M89 AC2: a raw-metric-only degeneracy NAs the SEs alone; the scaled fit computes", {
+test_that("M91 AC5: a raw-metric-only degeneracy through the assembly seam NAs nothing reported", {
   skip_if_not_installed("lavaan")
   oct <- octants()
   pop <- axes_population_cor(oct, 3L, .35, .10, .08)
@@ -3151,12 +3154,15 @@ test_that("M89 AC2: a raw-metric-only degeneracy NAs the SEs alone; the scaled f
   dimnames(sigma) <- list(inames, inames)
   items <- split(inames, pop$scale)
 
-  # The nested contract at the assembly: a diagonal inflation is degenerate in
-  # the raw metric only -- cov2cor() of it is the same correlation matrix --
-  # so the SE helper (whose naive arm inverts the raw matrix) refuses while
-  # the scaling surface prices it exactly. Before the M89 re-cut both surfaces
-  # refused this shape: NA fit statistics on numbers computable to full
-  # precision (RR18).
+  # The decoupled state end-to-end (M91; RR18 rec 7): a diagonal inflation is
+  # degenerate in the raw metric only -- its correlation form stays clean --
+  # so the one thing it touches is the SE helper's internal `naive` arm, the
+  # arm that inverts the raw matrix and is never user-reported. Injected at
+  # the one seam both consumers read (axes_fitted_cov), as in the test above.
+  # This IS the M89 AC2 assembly test, re-expected: between M89 and M91 this
+  # shape NA'd all three SE vectors as a unit with a warning (which that
+  # criterion pinned here under its own name); before the M89 re-cut it NA'd
+  # the scaled fit statistics too.
   bad <- sigma
   bad[4L, 4L] <- bad[4L, 4L] * 1e10
   local_mocked_bindings(axes_fitted_cov = function(fit) bad)
@@ -3167,18 +3173,63 @@ test_that("M89 AC2: a raw-metric-only degeneracy NAs the SEs alone; the scaled f
     )
   )
 
-  # One warning, from the SE surface alone, naming the conditioning literal.
-  expect_length(grep("ill_conditioned", w, fixed = TRUE), 1L)
-  expect_true(any(grepl("standard errors could not be computed", w)))
-  expect_false(any(grepl("scaled fit statistics could not be computed", w)))
+  # No warning at all: every user-reported quantity computes (M91-D1).
+  expect_length(w, 0L)
 
-  expect_identical(res$details$se_correction_failed, "ill_conditioned")
+  # Both user-facing failure fields are NULL; the raw-arm refusal is carried,
+  # silently, in details$naive_reason under the shared vocabulary (M91-D2).
+  expect_null(res$details$se_correction_failed)
   expect_null(res$details$fit_scaling_failed)
+  expect_identical(res$details$naive_reason, "ill_conditioned")
 
-  # The SEs are NA as a unit; the four scaled statistics compute.
-  expect_true(all(is.na(res$components$SE)))
+  # The corrected SEs and the four scaled statistics all compute. The epsilon
+  # row's SE is structurally NA on every path (no single reported item-error
+  # SE), so the assertion is over the component rows that carry one.
+  se_rows <- res$components$Symbol != "epsilon"
+  expect_true(all(is.finite(res$components$SE[se_rows])))
   expect_true(is.finite(res$fit$chisq))
   expect_true(is.finite(res$fit$pvalue))
   expect_true(is.finite(res$fit$rmsea))
   expect_true(is.finite(res$fit$cfi))
+})
+
+
+test_that("M91 AC4: the printed SE-failure note stays silent in the raw-arm-only regime", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  pop <- axes_population_cor(oct, 3L, .35, .10, .08)
+  sigma <- pop$sigma
+  inames <- sprintf("i%02d", seq_len(nrow(sigma)))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, pop$scale)
+
+  # The same raw-arm-only injection as the AC5 test above: degenerate raw,
+  # clean in the correlation metric, reaching print() end-to-end.
+  bad <- sigma
+  bad[4L, 4L] <- bad[4L, 4L] * 1e10
+  local_mocked_bindings(axes_fitted_cov = function(fit) bad)
+  res <- suppressMessages(
+    axes_reliability(cormat = sigma, items = items, angles = oct, n = 600L)
+  )
+  # The precondition, asserted so this test cannot silently drift into the
+  # unit-refusal regime and pass vacuously: only the raw arm refused.
+  expect_null(res$details$se_correction_failed)
+  expect_identical(res$details$naive_reason, "ill_conditioned")
+
+  out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+
+  # The failure note does not print (M91 AC4)...
+  expect_no_match(out, "standard errors could not be computed", fixed = TRUE)
+  # ...the notes that assert properties of PRESENT numbers do print: the
+  # calibrated-SE claim and the both-sides opening (SE and fit halves live)...
+  expect_match(out, "are calibrated", fixed = TRUE)
+  expect_match(out, "both sides of that mismatch", fixed = TRUE)
+  # ...and the components table shows the corrected SEs themselves: every
+  # SE-carrying row renders its number, none renders NA (the epsilon row is
+  # structurally SE-less on every path).
+  se_rows <- res$components$Symbol != "epsilon"
+  fmt <- format(round(res$components$SE[se_rows], 3), nsmall = 3)
+  for (v in fmt) expect_match(out, v, fixed = TRUE)
+  # naive_reason is deliberately silent (M91-D1): nothing printed names it.
+  expect_no_match(out, "naive", fixed = TRUE)
 })

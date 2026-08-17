@@ -1155,7 +1155,7 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
 })
 
 
-test_that("AC10: every non-success return NAs all three vectors together", {
+test_that("AC10: a reported-vector failure NAs all three vectors together (raw-arm-only refusals decoupled at M91)", {
   # Runtime half -- always runs, including under R CMD check. This is the
   # load-bearing assertion; the source enumeration below is a completeness aid.
   pp <- probe_pop()
@@ -1168,7 +1168,11 @@ test_that("AC10: every non-success return NAs all three vectors together", {
   )
   # The pre-M69 singular path must NA fiml_ratio too, not just its two elders.
   expect_true(all(is.na(got$fiml_ratio)))
-  expect_named(got, c("naive", "corrected", "fiml_ratio", "reason"))
+  # Since M91 the return carries `naive_reason` beside `reason`; on a unit
+  # refusal like this one it is NULL -- the one reason speaks for all three.
+  expect_named(got, c("naive", "corrected", "fiml_ratio", "reason",
+                      "naive_reason"))
+  expect_null(got$naive_reason)
 })
 
 
@@ -1260,4 +1264,85 @@ test_that("the corrected SEs refuse as 'unidentified' when the model's derivativ
                            n = 600, fit_zeta1 = FALSE, fit_zeta2 = FALSE)
   expect_null(ctl$reason)
   expect_true(all(is.finite(ctl$corrected)))
+})
+
+
+# ---- M91 AC1: a raw-arm-only degeneracy NAs `naive` alone --------------------
+#
+# The `naive` arm is the one place the raw Sigma-hat is inverted (the lavaan
+# tie, D-037); `corrected` and `fiml_ratio` are functions of cov2cor(Sigma-hat)
+# alone. Until M91 the three vectors refused as a UNIT, so a matrix degenerate
+# only in the raw metric NA'd two vectors priced exactly (RR18 rec 7, the
+# retained cost M89's Deviations table records). Since M91 that state
+# decouples: `reason` stays NULL (nothing user-reported failed), the raw-arm
+# refusal is carried in `naive_reason`, and no warning fires -- the refused
+# quantity is never user-reported (M91-D1).
+
+test_that("M91 AC1: a pure diagonal rescaling NAs only `naive`; corrected and fiml_ratio match the unscaled matrix's", {
+  pp <- probe_pop()
+  p <- nrow(pp$sigma)
+
+  # The passing control, and it passes for the claim's reason: the SAME
+  # correlation structure with no rescaling computes all three vectors.
+  base <- axes_corrected_se(pp$sigma, pp$names, pp$item_angle, pp$scale,
+                            n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  expect_null(base$reason)
+  expect_null(base$naive_reason)
+  expect_true(all(is.finite(base$naive)))
+
+  # M89's counterexample-A construction (its review's O1): the congruence
+  # D S D with one huge scale factor. cov2cor() of it is IDENTICAL to the
+  # unscaled matrix -- the estimand is exactly invariant -- while kappa(raw)
+  # explodes past the criterion's floor.
+  D <- diag(c(1e4, rep(1, p - 1L)))
+  Sr <- D %*% pp$sigma %*% D
+  Sr <- (Sr + t(Sr)) / 2
+  dimnames(Sr) <- dimnames(pp$sigma)
+
+  # The split is real on this matrix, and in the stated direction: degenerate
+  # raw, clean in the correlation metric. WHICH failure, never bare failure.
+  expect_identical(axes_sigma_degenerate(Sr), "ill_conditioned")
+  expect_null(axes_sigma_degenerate(stats::cov2cor(Sr)))
+
+  # No warning: every user-reported quantity computes (M91-D1).
+  expect_no_warning(
+    got <- axes_corrected_se(Sr, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_null(got$reason)
+  expect_identical(got$naive_reason, "ill_conditioned")
+  expect_named(got$naive, names(base$naive))
+  expect_true(all(is.na(got$naive)))
+
+  # AC1's numeric pin: the reported vectors are the unscaled matrix's to
+  # within 1e-9 RELATIVE, not merely finite.
+  expect_true(all(is.finite(got$corrected)))
+  expect_true(all(is.finite(got$fiml_ratio)))
+  expect_lt(max(abs(got$corrected / base$corrected - 1)), 1e-9)
+  expect_lt(max(abs(got$fiml_ratio / base$fiml_ratio - 1)), 1e-9)
+})
+
+
+test_that("M91 AC1: the non-rescaling raw-degenerate member reaches the same decoupled state", {
+  # The huge-but-finite single variance (the M71 inflation route): inflating
+  # ONE diagonal entry is not a congruence -- cov2cor() genuinely moves (the
+  # inflated item's correlations shrink toward zero) -- so this exercises a
+  # raw-degenerate matrix whose correlation form is a DIFFERENT clean matrix,
+  # and the diagonal-rescaling exemplar above does not stand in for it.
+  pp <- probe_pop()
+  sig <- pp$sigma
+  sig[4L, 4L] <- sig[4L, 4L] * 1e10
+
+  expect_identical(axes_sigma_degenerate(sig), "ill_conditioned")
+  expect_null(axes_sigma_degenerate(stats::cov2cor(sig)))
+
+  expect_no_warning(
+    got <- axes_corrected_se(sig, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_null(got$reason)
+  expect_identical(got$naive_reason, "ill_conditioned")
+  expect_true(all(is.na(got$naive)))
+  expect_true(all(is.finite(got$corrected)))
+  expect_true(all(is.finite(got$fiml_ratio)))
 })

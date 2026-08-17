@@ -1349,11 +1349,14 @@ test_that("AC1: a +Inf fitted diagonal refuses instead of scaling a corrupted ma
 # (axes_sigma_degenerate(), R/axes_corrected_se.R) on the matrix each actually
 # computes with: cov2cor(Sigma-hat) at the scaling surface, and BOTH
 # cov2cor(Sigma-hat) and the raw Sigma-hat at the SE helper, whose `naive` arm
-# is the one place the raw matrix is inverted (D-037). The refusals are
-# therefore NESTED, not identical: every matrix the scaling surface refuses for
-# degeneracy is refused by the SE helper with the same literal, while a
-# raw-metric-only degeneracy (a diagonal inflation) is refused by the SE helper
-# alone. Before M89's RR18 re-cut both surfaces priced the raw matrix, refusing
+# is the one place the raw matrix is inverted (D-037). Every matrix the
+# scaling surface refuses for degeneracy is refused by the SE helper's
+# REPORTED vectors with the same literal, while a raw-metric-only degeneracy
+# (a diagonal inflation) touches the SE helper's `naive` arm alone -- since
+# M91 that NAs `naive` with the literal in `naive_reason` and leaves `reason`
+# NULL and the reported vectors computed (RR18 rec 7); between M89 and M91 it
+# refused all three vectors as a unit. Before M89's RR18 re-cut both surfaces
+# priced the raw matrix, refusing
 # NA on quantities they price exactly -- cov2cor() of an inflated matrix is the
 # same correlation matrix at every magnitude (RR18 measured corrected/fiml_ratio
 # invariant to <= 6.4e-16 across eight decades of inflation).
@@ -1367,7 +1370,7 @@ m89_reasons <- function(sig, pp, df, baseline_df, fit_zeta1 = TRUE) {
                         fit_zeta1 = fit_zeta1, fit_zeta2 = FALSE,
                         df = df, baseline_df = baseline_df)
   )
-  list(se = se$reason, sf = sf$reason)
+  list(se = se$reason, se_naive = se$naive_reason, sf = sf$reason)
 }
 
 # The AC8 grid is fixed by the criterion, not chosen here: both diagonal
@@ -1422,13 +1425,20 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
 
     # The split is real on this map, and in the stated direction: the SE
     # helper computes at k = 0 (the passing control, shown to pass for the
-    # claim's reason -- the same matrix uninflated) and refuses the extreme
-    # inflation on its RAW arm with the criterion's conditioning literal.
-    expect_null(m89_reasons(pp$sigma, pp, df, bdf, m$zeta1)$se,
-                label = sprintf("p %d k 0: SE helper computes", p))
+    # claim's reason -- the same matrix uninflated, naive_reason NULL) and
+    # at the extreme inflation its RAW arm alone refuses (M91): `reason`
+    # stays NULL -- the reported vectors compute -- with the criterion's
+    # conditioning literal carried in `naive_reason`.
+    r0 <- m89_reasons(pp$sigma, pp, df, bdf, m$zeta1)
+    expect_null(r0$se, label = sprintf("p %d k 0: SE helper computes", p))
+    expect_null(r0$se_naive,
+                label = sprintf("p %d k 0: SE helper naive arm computes", p))
     sig <- pp$sigma
     sig[m$pos[1L], m$pos[1L]] <- sig[m$pos[1L], m$pos[1L]] * 1e16
-    expect_identical(m89_reasons(sig, pp, df, bdf, m$zeta1)$se,
+    r16 <- m89_reasons(sig, pp, df, bdf, m$zeta1)
+    expect_null(r16$se,
+                label = sprintf("p %d k 16: SE helper reported vectors", p))
+    expect_identical(r16$se_naive,
                      "ill_conditioned",
                      label = sprintf("p %d k 16: SE helper raw arm", p))
 
@@ -1563,18 +1573,25 @@ test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at t
   expect_null(got$reason)
   expect_lt(abs(got$scale - base$scale) / abs(base$scale), 1e-9)
 
-  # The SE helper refuses the same matrix -- its naive arm inverts the raw
-  # Sigma-hat, whose conditioning the rescaling did destroy -- with the
-  # criterion's conditioning literal. The passing control (the unscaled fitted
-  # matrix) computes, so the refusal marks the raw arm's criterion firing.
+  # The SE helper's RAW arm refuses the same matrix -- its naive arm inverts
+  # the raw Sigma-hat, whose conditioning the rescaling did destroy -- but
+  # since M91 that refusal touches `naive` alone: `reason` stays NULL, the
+  # reported vectors compute, and the raw arm's conditioning literal is
+  # carried in `naive_reason`. The passing control (the unscaled fitted
+  # matrix) computes with naive_reason NULL, so the naive_reason below marks
+  # the raw arm's criterion firing and nothing else about this input.
   se0 <- axes_corrected_se(ff$sigma, pp$names, pp$item_angle, pp$scale,
                            n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
   expect_null(se0$reason)
-  se <- suppressWarnings(
-    axes_corrected_se(Sa, pp$names, pp$item_angle, pp$scale,
-                      n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  expect_null(se0$naive_reason)
+  expect_no_warning(
+    se <- axes_corrected_se(Sa, pp$names, pp$item_angle, pp$scale,
+                            n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
   )
-  expect_identical(se$reason, "ill_conditioned")
+  expect_null(se$reason)
+  expect_identical(se$naive_reason, "ill_conditioned")
+  expect_true(all(is.na(se$naive)))
+  expect_true(all(is.finite(se$corrected)))
 })
 
 

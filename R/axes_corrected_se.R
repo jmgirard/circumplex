@@ -131,10 +131,15 @@ axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
 # N/(N-1) -- 0.17% at n = 600, 1% at n = 100. Returning the ratio makes the
 # same-matrix invariant a property of this function, testable once.
 #
-# `reason` is NULL on success, or a string naming why all three vectors are NA.
-# They are NA together and never fall back to each other: relabelling the
-# uncorrected number as corrected is the one failure a user could not detect.
-# One pricing of the whole sandwich at one matrix. Called twice by
+# `reason` is NULL unless a failure touched the REPORTED vectors (`corrected`
+# and `fiml_ratio`, both functions of cov2cor(Sigma-hat)); when it is set,
+# all three vectors are NA under that one reason. A failure confined to the
+# raw metric -- the `naive` arm is the one place the raw matrix is inverted
+# -- NAs `naive` alone and is carried in `naive_reason` instead, with
+# `reason` NULL (M91; RR18 rec 7). The vectors never fall back to each
+# other: relabelling the uncorrected number as corrected is the one failure
+# a user could not detect. One pricing of the whole sandwich at one matrix.
+# Called twice by
 # axes_corrected_se() -- once at the raw Sigma-hat, once at cov2cor(Sigma-hat)
 # -- because the two returned quantities are defined at different matrices and
 # the duplicated linear algebra is 24x24 with q ~ 28, i.e. free.
@@ -214,14 +219,21 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 
   d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
                       fit_zeta1, fit_zeta2)
+  # The one definition of the all-NA component vector, shared by the unit
+  # refusals below and the decoupled naive-only refusal at the bottom.
+  empty <- stats::setNames(rep(NA_real_, d$n_comp), d$components)
+  # A unit refusal: something touching the REPORTED vectors failed, so one
+  # reason speaks for all three and `naive_reason` is deliberately NULL --
+  # never a second label beside it. Every na_out() call sits ahead of the
+  # raw arm below, so no determined raw-arm refusal is ever discarded here.
   na_out <- function(reason) {
-    empty <- stats::setNames(rep(NA_real_, d$n_comp), d$components)
     warning(
       "The corrected component standard errors could not be computed (",
       reason, "); they are reported as NA.",
       call. = FALSE
     )
-    list(naive = empty, corrected = empty, fiml_ratio = empty, reason = reason)
+    list(naive = empty, corrected = empty, fiml_ratio = empty, reason = reason,
+         naive_reason = NULL)
   }
 
   # Refused BEFORE cov2cor() runs, which is what makes this reachable at all:
@@ -258,17 +270,26 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # whichever solve() call happens to give up first on this platform's LAPACK.
   # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) (the
   # corrected arm, and the only matrix anything user-reported depends on) and
-  # the raw realigned Sigma-hat (the `naive` arm below inverts it). Either arm
-  # tripping refuses all three vectors as a unit -- the retained cost recorded
-  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M91's.
+  # the raw realigned Sigma-hat (the `naive` arm below inverts it). The two
+  # arms no longer refuse as a unit (M91; RR18 rec 7): the cov2cor arm
+  # tripping refuses all three vectors under `reason` -- relabelling one arm's
+  # number as the other's stays the undetectable failure -- while a failure
+  # confined to the raw metric NAs `naive` alone, its literal carried in
+  # `naive_reason` with `reason` NULL, because `corrected` and `fiml_ratio`
+  # are functions of cov2cor(Sigma-hat) the raw metric's conditioning says
+  # nothing about (RR18 measured them invariant to <= 6.4e-16 across eight
+  # decades of diagonal inflation).
   #
-  # ORDER (M90 AC7): the cov2cor arm is consulted FIRST, so whenever both
-  # arms refuse, the literal reported is the cov2cor arm's -- the arm
+  # ORDER (M90 AC7, restated under the M91 decoupling): the cov2cor arm is
+  # consulted FIRST and short-circuits, so whenever both arms would refuse,
+  # the literal reported is the cov2cor arm's -- the arm
   # axes_scaling_factor() also prices. M90's indefinite/ill_conditioned
   # partition is not congruence-invariant (the eigenvalue RATIO moves under
   # cov2cor even though the signs do not), so the two arms can label one
-  # matrix differently; without this precedence the raw arm's label would
-  # leak out and break the same-literal half of M89's nestedness contract.
+  # matrix differently; this precedence is what keeps the reported `reason`
+  # in pointwise literal agreement with the scaling surface (M89's
+  # nestedness contract). The raw arm's own label surfaces only in
+  # `naive_reason`, and only when the cov2cor arm is clean.
   # The finiteness hoist just below exists for that order: the raw
   # matrix is checked finite before cov2cor() runs on it, because cov2cor()
   # of an NA/NaN diagonal emits its own warning and the M71 contract is
@@ -277,21 +298,37 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # refusal across the arms' boundary).
   if (!all(is.finite(sigma))) return(na_out("singular"))
   degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
-  if (is.null(degenerate)) {
-    degenerate <- axes_sigma_degenerate(sigma)
-  }
   if (!is.null(degenerate)) return(na_out(degenerate))
 
-  raw <- axes_se_pricing(sigma, d, n)
-  if (is.character(raw)) return(na_out(raw))
+  # The whole cov2cor arm -- criterion above, pricing here -- resolves before
+  # the raw arm runs: a matrix destined for a unit refusal never pays for a
+  # raw sandwich whose result would be dropped, and by the time the raw arm
+  # can record a refusal no na_out() exit remains to discard it.
   std <- axes_se_pricing(stats::cov2cor(sigma), d, n)
   if (is.character(std)) return(na_out(std))
 
+  # The raw arm, decoupled (M91): a criterion trip or a pricing failure here
+  # touches `naive` alone. No warning is emitted for it -- the refused
+  # quantity is never user-reported (it exists as the lavaan tie, D-037) and
+  # every reported number is present and correct; the refusal is carried in
+  # `naive_reason` (surfaced as details$naive_reason; M91-D1) under the same
+  # vocabulary every other refusal uses (M91-D2).
+  naive_reason <- axes_sigma_degenerate(sigma)
+  raw <- NULL
+  if (is.null(naive_reason)) {
+    raw <- axes_se_pricing(sigma, d, n)
+    if (is.character(raw)) {
+      naive_reason <- raw
+      raw <- NULL
+    }
+  }
+
   list(
-    naive = stats::setNames(raw$naive, d$components),
+    naive = if (is.null(raw)) empty else stats::setNames(raw$naive, d$components),
     corrected = stats::setNames(std$corrected, d$components),
     fiml_ratio = stats::setNames(std$corrected / std$naive, d$components),
-    reason = NULL
+    reason = NULL,
+    naive_reason = naive_reason
   )
 }
 
@@ -320,10 +357,15 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # alone, so that surface evaluates the criterion on cov2cor(Sigma-hat). The SE
 # helper evaluates it on BOTH cov2cor(Sigma-hat) and the raw Sigma-hat: its
 # `naive` arm is the one place the raw matrix is inverted (the lavaan tie,
-# D-037), and its three vectors refuse as a unit. The two surfaces' refusals
-# are therefore NESTED -- whatever the scaling surface refuses, the SE helper
-# refuses with the same literal, exactly so on a unit diagonal where the two
-# metrics coincide. Pricing the raw matrix everywhere, as the first cut did,
+# D-037). A cov2cor-arm trip refuses all three of its vectors under `reason`;
+# a raw-arm-only trip NAs `naive` alone, carried in `naive_reason` (M91;
+# RR18 rec 7). Under THIS CRITERION the two surfaces' reported refusals
+# therefore agree exactly -- whatever the criterion refuses at the scaling
+# surface, the SE helper's `reason` names with the same literal, and nothing
+# the raw metric alone refuses touches either surface's reported numbers.
+# (Each surface keeps its own non-criterion refusals -- the SE helper's
+# pricing backstops, the scaling surface's df doors -- which were never part
+# of the nestedness contract.) Pricing the raw matrix everywhere, as the first cut did,
 # refused pure diagonal rescalings the estimand is exactly invariant under:
 # RR18 measured corrected/fiml_ratio invariant to <= 6.4e-16 across eight
 # decades of diagonal inflation that move kappa(raw) to 2.1e8. No
@@ -367,7 +409,7 @@ axes_degeneracy_tau <- 1e-6
 # fit's own noise can produce: lambda_min < -lambda_max * sqrt(p * eps).
 # RATIONALE for that band (RR18 BC5's constant; M90 AC2 demands the rationale
 # stated here): the priced matrix's entries are not exact -- they are
-# optimizer output rounded through cov2cor(), carrying entrywise relative
+# optimizer output, carrying entrywise relative
 # error no smaller than order sqrt(eps) (an iterative fit stopped on a
 # relative objective tolerance `tol` leaves the implied moments with errors
 # of order sqrt(tol) near a quadratic optimum, and sqrt(tol) >= sqrt(eps) for
@@ -379,7 +421,11 @@ axes_degeneracy_tau <- 1e-6
 # error, and is refused as "ill_conditioned" (a numerical caution), never
 # reported as a defect of the user's model. The claim is one-directional:
 # within the band, indefiniteness cannot be asserted; beyond it, "indefinite"
-# is the best available reading of a decisively negative eigenvalue. Changing
+# is the best available reading of a decisively negative eigenvalue. The
+# argument rests on the optimizer's error alone, not on cov2cor() rounding,
+# so it covers every matrix this criterion is evaluated on: the two
+# correlation-metric call sites AND the SE helper's raw arm, where since M91
+# a trip labels only `naive_reason` (M91-D2, closing M90 review F11). Changing
 # this constant is an escalation (RB, no-oracle), never a silent edit.
 axes_sigma_degenerate <- function(sigma) {
   if (!all(is.finite(sigma))) return("singular")
