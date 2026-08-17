@@ -1126,6 +1126,21 @@ on a real ggplot2 coordinate system.
 
 ### Bug fixes
 
+- `axes_reliability(missing = "fiml")` no longer refuses, on Windows
+  only, data it estimates on other platforms. The saturated-stage EM
+  that estimates the standardizing moments now always runs
+  unaccelerated: lavaan 0.7 defaults that stage to SQUAREM acceleration,
+  whose convergence on items with very few observed responses proved
+  platform-sensitive — an item observed 20 times out of 300 estimated
+  cleanly on macOS and Linux but stalled at any iteration cap on
+  Windows, so the same data raised “The saturated (EM) stage did not
+  converge” on one platform and not the others. The package’s iteration
+  cap was calibrated under the unaccelerated EM, so this restores the
+  measured regime rather than adding a new one. Estimates on data with
+  such thinly-observed items may shift within the EM’s own convergence
+  tolerance (differences on the order of 1e-3 in the estimated moments);
+  healthy data is unaffected in both value and speed.
+
 - [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)’s
   refusal of an off-metric normative sample now names the offending
   scales for every instrument. On the seven instruments whose normative
