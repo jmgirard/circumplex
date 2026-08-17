@@ -13,7 +13,11 @@ shows a boundary or weak-identification marker (Heywood communality,
 removed harmonic, small correlation-function weight, ill-conditioning,
 or competing near-tied optima), the regime where they mis-covered even
 at large N (see
-[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)).
+[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)). The
+vignette section *When a fit sits at a boundary*
+([`vignette("evaluating-circumplex-structure")`](http://circumplex.jmgirard.com/articles/evaluating-circumplex-structure.md))
+glosses each marker and gives the interpretation and next steps when one
+fires.
 
 ## Usage
 
