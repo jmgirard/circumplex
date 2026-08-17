@@ -99,15 +99,43 @@ on a real ggplot2 coordinate system.
   degenerate fitted matrix could yield `NA` corrected standard errors
   beside silently scaled fit statistics derived from the same matrix.
   The failure-reason vocabulary is now shared across both surfaces, and
-  four reported literals change. On `details$se_correction_failed`
-  alone: a nonpositive fitted variance reports `"singular"` where it
-  previously reported `"nonpositive_diagonal"`, and a positive-infinite
-  one reports `"infinite_diagonal"` rather than `"unidentified"`. On
+  the reported literals change as follows. On
+  `details$se_correction_failed` alone: a nonpositive fitted variance
+  reports `"singular"` where it previously reported
+  `"nonpositive_diagonal"`, and a positive-infinite one reports
+  `"infinite_diagonal"` rather than `"unidentified"`. On
   `details$se_correction_failed` and `details$fit_scaling_failed` alike:
   an exactly singular fitted matrix reports `"ill_conditioned"` where
   both previously reported `"singular"`, and an indefinite one reports
-  `"ill_conditioned"` where both previously reported `"indefinite"`.
-  Code that branches on any of these reason strings needs updating.
+  `"indefinite"` deliberately or `"ill_conditioned"` at the numerical
+  margin, per the refusal-vocabulary split in the next entry. Code that
+  branches on any of these reason strings needs updating.
+
+- [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)‘s
+  refusal reasons now say which degeneracy happened. Within the
+  degeneracy criterion’s refusal region, a fitted correlation structure
+  whose smallest eigenvalue is decisively negative — beyond the fit’s
+  own numerical noise band — reports `"indefinite"`, a statement about
+  the model; roundoff-level negativity, exact singularity, and mere
+  ill-conditioning report `"ill_conditioned"`, a numerical caution. A
+  saturated model (zero degrees of freedom) is refused as `"saturated"`
+  before any scaling arithmetic runs, where it previously surfaced as
+  `"indefinite"` through an internal division by zero; and the final
+  nonpositive-scaling-factor backstop likewise reports
+  `"ill_conditioned"` rather than `"indefinite"`, an indefiniteness it
+  cannot diagnose. When the standard-error surface’s two internal arms
+  would label one matrix differently, the reported literal is the
+  correlation-metric arm’s — the same arm the fit-scaling surface prices
+  — so the two surfaces never name the same matrix differently. Two of
+  these changes are visible today only at the internal helpers’
+  documented contract boundary, not through any
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  call: `"saturated"` needs a three-item map, which
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  refuses, and the backstop’s relabel has not been observed to fire (a
+  30,000-draw search found no reaching input — recorded as not-reached,
+  not as unreachable); they are documented for code that branches on the
+  `details` reason fields.
 
 - [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
   objects now report `details$n_moments`, the number of distinct
