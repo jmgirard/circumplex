@@ -5,7 +5,7 @@
 - **Depends on:** M90
 - **Driving RR:** —
 - **Principles touched:** GP2, GP4
-- **Branch/PR:** m91-naive-arm-decoupling
+- **Branch/PR:** m91-naive-arm-decoupling · https://github.com/jmgirard/circumplex/pull/119
 
 ## Goal
 
@@ -40,7 +40,7 @@ candidate row.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (RR18 rec 7)** — When the raw arm trips the degeneracy criterion
+- [x] **AC1 (RR18 rec 7)** — When the raw arm trips the degeneracy criterion
       and the cov2cor arm does not, `axes_corrected_se()` reports `corrected`
       and `fiml_ratio` computed from the cov2cor arm, NAs only `naive`, and
       `reason` (hence `details$se_correction_failed`) is NULL; the raw-arm
@@ -52,12 +52,12 @@ candidate row.
       non-rescaling member of the raw-degenerate family (a huge-but-finite
       single variance, the M71 inflation route) the same decoupled state is
       asserted, so one exemplar does not stand in for the family.
-- [ ] **AC2** — When the cov2cor arm trips, all three vectors are NA with one
+- [x] **AC2** — When the cov2cor arm trips, all three vectors are NA with one
       reason, exactly as before — pinned by re-running the post-M90
       nestedness grid with its raw-arm-only cells re-expected under AC1
       (reason NULL, `naive_reason` set) and its cov2cor-arm cells unchanged
       (all three vectors NA with one reason).
-- [ ] **AC3 (procedure-based)** — A repo-wide grep for the unit-refusal
+- [x] **AC3 (procedure-based)** — A repo-wide grep for the unit-refusal
       contract's phrases ("as a unit", "all three vectors", "never the
       reverse", "three vectors refuse") over `R/`, `man/`, `NEWS.md`, and
       `vignettes/` enumerates the surfaces documenting the old contract;
@@ -68,11 +68,11 @@ candidate row.
       regenerated man pages; a NEWS entry; and a dated annotation on D-044's
       "three vectors refuse as a unit" sentence (the repo's D-entry
       annotation precedent).
-- [ ] **AC4 (GP4)** — The printed SE-failure note
+- [x] **AC4 (GP4)** — The printed SE-failure note
       (`R/axes_reliability_oop.R:284-290`) does not print in the
       raw-arm-only regime; a regression asserts the printed output there
       shows the corrected SEs.
-- [ ] **AC5** — The raw-arm-only state is reached end-to-end through the
+- [x] **AC5** — The raw-arm-only state is reached end-to-end through the
       assembly seam: a test injects a matrix degenerate in the raw metric and
       clean in cov2cor via the fitted-matrix seam and asserts the decoupled
       return surfaces through `axes_reliability()`'s details.
@@ -123,3 +123,14 @@ candidate row.
 
 
 ## Review
+
+Reviewed 2026-08-16 on branch m91-naive-arm-decoupling (PR #119), fresh runs this session.
+
+- **AC1 evidence:** fresh `test_file(test-axes-corrected-se.R)`: "M91 AC1: a pure diagonal rescaling NAs only `naive`..." 14 passed / 0 failed (asserts reason NULL, naive_reason "ill_conditioned", naive all-NA, corrected and fiml_ratio within 1e-9 relative of the unscaled matrix's, no warning); "M91 AC1: the non-rescaling raw-degenerate member..." 8/0 (the M71 inflated-variance route, decoupled state asserted). Red-first confirmed at T1 (work log). Routing decision recorded as M91-D1. → ticked.
+- **AC2 evidence:** fresh `test_file(test-axes-scaled-fit.R)`: "AC8: scaling-surface degeneracy refusals nest inside the SE helper's, same literal" 132/0 — inflation cells re-expected (reason NULL + naive_reason set at k=16, both arms compute at k=0), indefinite and near-singular (cov2cor-arm) cells unchanged as unit refusals with one literal; "M90 AC7" arm-precedence probe 4/0; "AC2: the non-finite diagonal doors" 4/0. test-axes-reliability.R "M89 AC6" (cov2cor-arm unit refusal through assembly, naive_reason NULL there) 17/0. → ticked.
+- **AC3 evidence:** fresh repo-wide grep for "as a unit" / "all three vectors" / "never the reverse" / "three vectors refuse" over R/, man/, NEWS.md, vignettes/: 3 hits remain, all M91-authored text correctly describing the new contract (R/axes_corrected_se.R:136,268,269); the pre-M91 surfaces (roxygen contract passage + regenerated man/axes_reliability.Rd, NEWS degeneracy entry, sibling comments) all updated at T2/T5, and D-044's "three vectors refuse as a unit" sentence carries the dated superseding annotation (T5 commit). → ticked.
+- **AC4 evidence:** fresh `test_file(test-axes-reliability.R)`: "M91 AC4: the printed SE-failure note stays silent in the raw-arm-only regime" 9/0 — end-to-end seam injection; asserts no failure note, calibrated-SE claim and both-sides opening print, every SE-carrying component row's formatted SE rendered, nothing printed names the naive arm. → ticked.
+- **AC5 evidence:** fresh `test_file(test-axes-reliability.R)`: "M91 AC5: a raw-metric-only degeneracy through the assembly seam NAs nothing reported" 9/0 — `local_mocked_bindings(axes_fitted_cov=...)` injection, decoupled return asserted through `axes_reliability()`'s details (se_correction_failed NULL, naive_reason "ill_conditioned", zero warnings, all reported statistics finite). → ticked.
+- **Full suite (fresh this step):** `devtools::test()` FAIL 0 / WARN 5 (pre-existing lavaan noise) / SKIP 3 / PASS 8300.
+- **Driving RR:** — (none; no projection-vs-outcome pairs owed).
+- **Consistency gate:** `cairn_validate` exit 0, all checks pass (47 advisory work-log WARNs, all pre-existing M7 legacy lines). No principle changed → `cairn_impact` skipped. Toolchain slot: `document()` no diff (man/NAMESPACE clean in git status) and zero `resolve link` lines at cli.width 500; README.Rmd present, README.md unchanged by this branch; `pkgdown::check_pkgdown()` "No problems found"; NEWS entry present (T5); no new top-level files. Full `devtools::check(--no-manual)` 0 errors / 0 warnings / 0 notes at T6 (commit 08fe1ae2's tree; only cairn/*.md tracking edits since — code-identical).
