@@ -1,6 +1,6 @@
 # M94: Print the fired-marker list on the bootstrap path
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
