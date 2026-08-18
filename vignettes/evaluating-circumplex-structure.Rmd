@@ -170,9 +170,9 @@ fired:
 only within a sample-size window. On the bootstrap path — as in the fit
 displayed above — it prints as a descriptive note at every sample size,
 alongside a statement that what has been measured about the markers covers
-analytic intervals only (and not every marker was measured, as the next
-passage details), so they are not validated as predictors of the bootstrap
-intervals they accompany. When the intervals are analytic the list instead
+analytic intervals only (and not every marker was measured — *What a fired
+marker does and does not tell you*, below, has the particulars), so they are
+not validated as predictors of the bootstrap intervals they accompany. When the intervals are analytic the list instead
 arrives inside a coverage caution printed when $N$ falls between 2000 and
 50000; below 2000 an unconditional caution prints without the list, and
 above 50000 neither prints. To see that caution-embedded form, we simulate

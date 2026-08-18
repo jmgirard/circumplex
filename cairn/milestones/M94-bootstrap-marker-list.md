@@ -43,16 +43,21 @@ help page, and vignette prose, all reaching package users.
 ## Acceptance criteria
 
 - [ ] AC1: On a `circumplex_cpm` fit with `ci_method = "bootstrap"`,
-      `summary()` prints in its `# Diagnostics` section one line naming every
-      fired marker by its `cpm_marker_labels()` label, at every sample size
-      (no N gate). Tested on two bootstrap fits running unskipped on CI and
-      CRAN (small `boots`): one with N < 2000 whose asserted fired set has
-      ≥2 markers (exercising the join) and one with N ≥ 2000 firing exactly
-      one; each test asserts the fired set via `cpm_boundary_markers()`
-      first, then asserts the marker line itself (not the whole section) with
-      its fixed label prefix, naming each fired label and no unfired one,
-      using only code-composed phrases (the prefix and `cpm_marker_labels()`
-      values, never data-borne strings such as scale names).
+      `summary()` prints in its `# Diagnostics` section one note whose
+      opening sentence — a single sentence, wrapped only at whole-label
+      boundaries — names every fired marker by its `cpm_marker_labels()`
+      label, at every sample size (no N gate); the caveat sentences that
+      follow it are AC2's, not part of this count. Tested on two bootstrap
+      fits running unskipped on CI and CRAN (small `boots`): one with
+      N < 2000 whose asserted fired set has ≥2 markers (exercising the join)
+      and one with N ≥ 2000 firing exactly one; each test asserts the fired
+      set via `cpm_boundary_markers()` first, then asserts the marker
+      sentence (not the whole section) with its fixed label prefix, naming
+      each fired label and no unfired one, and asserts each fired label
+      intact in the raw un-normalized output (the whole-label-wrap check);
+      asserted phrases are code-composed (the prefix and
+      `cpm_marker_labels()` values, never data-borne strings such as scale
+      names).
 - [ ] AC2 (amended 2026-08-18, review round 1 F1): The marker note block
       (the label sentence plus its caveat, as distinct from the whole
       `summary()` output) states its own validation limit: its fixed caveat
@@ -133,6 +138,9 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: amendment return: AC2 — "The marker note block (the label sentence plus its caveat, as distinct from the whole `summary()` output) states its own validation limit: its fixed caveat text — pinned exactly by test — says that what has been measured about the markers covers analytic intervals only and not every marker was measured, and that they are not validated as predictors of the bootstrap intervals shown, without asserting any individual marker to be a validated predictor; the note block contains none of "mis-cover", "near a parameter boundary", "no effect", "does not affect". On a bootstrap fit with no fired markers (fired set asserted via `cpm_boundary_markers()` first), `summary()` prints no marker note." Audited by a fresh [O] reader (one repair round: note-block definition, fit-property empty case, "not every marker was measured"; confirm pass no blocking findings); adopted at the mini gate.
 - 2026-08-18: return-round fixes — F2: the note now opens `# Diagnostics` when no diagnostic line fires (condition includes the note); F3: new `m94_expect_note_in_diagnostics()` asserts header presence, order, and no intervening section header on both AC1 fixtures (the N≥2000 fixture additionally asserts 0 diagnostic lines, making it the F2 case by construction); F1: the amended caveat landed on all five surfaces (code, test pin, roxygen/Rd, vignette, NEWS) with a guard assertion banning the retired "validated as interval predictors" phrase from the vignette paragraph; F4: locus topic sentence now scopes the analytic window; F6: NEWS sentence rewrapped and moved after the percentile sentence; F7: label-boundary line packing replaces strwrap (verified in the regenerated snapshot: the label renders unbroken); F9: "reminder" dropped. Mutation probe: reverting the header condition reddened the N≥2000 test on the header assertions. All three touched test files green (44/43/160); document() 0 resolve-link lines.
 - 2026-08-18: process slip, recorded honestly — the header-condition mutation probe ran against UNCOMMITTED code and its `git checkout --` restore discarded the return-round edits to R/cpm_oop.R (the M82 lesson exactly); re-applied from the session record and re-verified green. Also: `snapshot_accept()` after a desc-filtered `test_file()` run pruned other tests' snapshots from _snaps/cpm_api.md — restored and re-accepted from a full-file run.
+
+- 2026-08-18: amendment return: AC1 — "one note whose opening sentence — a single sentence, wrapped only at whole-label boundaries — names every fired marker by its `cpm_marker_labels()` label, at every sample size (no N gate); the caveat sentences that follow it are AC2's, not part of this count […] asserts each fired label intact in the raw un-normalized output (the whole-label-wrap check)". Round-2 finding 6: the round-1 F7 label-safe wrap made AC1's "one line" stale. Adopted at the mini gate; the fresh-reader audit passed it with two repairs, both applied (the raw-label assertion added to both AC1 tests so the wrap promise is verified, and the AC1/AC2 sentence partition stated). First amendment return on AC1.
+- 2026-08-18: round-2 fix batch — the doubled blank line when the note opens Diagnostics (finding 1; conditional separator), a byte pin of the header seam plus a no-triple-newline assertion (finding 3), packer width harmonized at 70 content chars (finding 4), NEWS caveat completed to all three clauses (finding 2), vignette forward pointer named instead of "next passage" (finding 5). Rejected: finding 7 (cross-surface phrasing drift — content verified identical, registers differ by design) and finding 8 (apostrophe convention — style nitpick).
 
 ## Decisions
 

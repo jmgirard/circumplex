@@ -247,14 +247,18 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
     lines <- "Note: boundary/weak-identification markers fired:"
     for (item in items) {
       cand <- paste(lines[length(lines)], item)
-      if (nchar(cand) <= 72) {
+      if (nchar(cand) <= 70) {
         lines[length(lines)] <- cand
       } else {
         lines <- c(lines, item)
       }
     }
     cat(
-      "\n", paste0("  ", lines, collapse = "\n"), "\n",
+      # The blank separator line is owed only after printed diagnostic lines;
+      # when the note opens the section itself, the header's own "\n\n"
+      # already provides the single blank line every other render shows.
+      if (length(diag_lines) > 0) "\n" else "",
+      paste0("  ", lines, collapse = "\n"), "\n",
       "  What has been measured about these markers covers analytic ",
       "intervals\n  only, and not every marker was measured; they are not ",
       "validated as\n  predictors of the bootstrap intervals shown here ",

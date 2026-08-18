@@ -143,6 +143,10 @@ m94_expect_note_in_diagnostics <- function(out) {
   expect_gt(start, hdr)
   between <- substr(out, hdr + nchar("# Diagnostics"), start - 1L)
   expect_false(grepl("\n# ", between, fixed = TRUE))
+  # Byte-level spacing pin (round-2 finding 1/3): exactly one blank line
+  # everywhere — never a doubled one — so the seam between the header (or a
+  # preceding diagnostic line) and the note renders like every other section.
+  expect_false(grepl("\n\n\n", out, fixed = TRUE))
 }
 
 test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2000", {
@@ -166,6 +170,10 @@ test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2
   for (lab in setdiff(unname(cpm_marker_labels()), fired)) {
     expect_false(grepl(lab, block, fixed = TRUE))
   }
+  # Raw-output (un-normalized) check: no fired label is split by the wrap.
+  for (lab in fired) {
+    expect_match(out, lab, fixed = TRUE)
+  }
   expect_match(out, m94_caveat_raw, fixed = TRUE)
 })
 
@@ -180,6 +188,10 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
   # the note must still open the Diagnostics section (round-1 F2).
   expect_identical(length(cpm_diagnostic_lines(big$details)), 0L)
   m94_expect_note_in_diagnostics(out)
+  # Byte pin of the note-opens-the-section seam: header, one blank line, note.
+  expect_match(out,
+               "# Diagnostics\n\n  Note: boundary/weak-identification",
+               fixed = TRUE)
   block <- m94_marker_block(out)
   expect_false(is.na(block))
   norm <- gsub("\\s+", " ", block)
@@ -188,6 +200,10 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
     fixed = TRUE)
   for (lab in setdiff(unname(cpm_marker_labels()), fired)) {
     expect_false(grepl(lab, block, fixed = TRUE))
+  }
+  # Raw-output (un-normalized) check: no fired label is split by the wrap.
+  for (lab in fired) {
+    expect_match(out, lab, fixed = TRUE)
   }
   expect_match(out, m94_caveat_raw, fixed = TRUE)
 })
