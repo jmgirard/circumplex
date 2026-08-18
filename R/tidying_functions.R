@@ -54,9 +54,8 @@ ipsatize <- function(data, items, na.rm = TRUE,
 
 #' Score circumplex scales from item responses
 #'
-#' Calculate mean scores on circumplex scales from item responses by using a set
-#' of scoring instructions, which may be loaded from the package or created as a
-#' custom data frame.
+#' Calculate mean scores on circumplex scales from item responses by using the
+#' scoring instructions stored in an instrument object from the package.
 #'
 #' @param data Required. A data frame or matrix containing at least
 #'   circumplex scales.

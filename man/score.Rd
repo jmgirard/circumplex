@@ -46,9 +46,8 @@ A data frame that matches \code{.data} except that new variables are
 appended that contain mean scores on each variable included in \code{key}.
 }
 \description{
-Calculate mean scores on circumplex scales from item responses by using a set
-of scoring instructions, which may be loaded from the package or created as a
-custom data frame.
+Calculate mean scores on circumplex scales from item responses by using the
+scoring instructions stored in an instrument object from the package.
 }
 \examples{
 data("raw_iipsc")
