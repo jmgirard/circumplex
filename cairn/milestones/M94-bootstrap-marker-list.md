@@ -53,13 +53,17 @@ help page, and vignette prose, all reaching package users.
       its fixed label prefix, naming each fired label and no unfired one,
       using only code-composed phrases (the prefix and `cpm_marker_labels()`
       values, never data-borne strings such as scale names).
-- [ ] AC2: The marker line states its own validation limit: its fixed text —
-      pinned exactly by test — says the markers were validated as interval
-      predictors on the analytic path only and were not studied on the
-      bootstrap path; the marker line contains none of "mis-cover", "near a
-      parameter boundary", "no effect", "does not affect" (asserted on the
-      line, not the whole output). On a bootstrap fit whose fired set the
-      test asserts is `character(0)`, `summary()` prints no marker line.
+- [ ] AC2 (amended 2026-08-18, review round 1 F1): The marker note block
+      (the label sentence plus its caveat, as distinct from the whole
+      `summary()` output) states its own validation limit: its fixed caveat
+      text — pinned exactly by test — says that what has been measured about
+      the markers covers analytic intervals only and not every marker was
+      measured, and that they are not validated as predictors of the
+      bootstrap intervals shown, without asserting any individual marker to
+      be a validated predictor; the note block contains none of "mis-cover",
+      "near a parameter boundary", "no effect", "does not affect". On a
+      bootstrap fit with no fired markers (fired set asserted via
+      `cpm_boundary_markers()` first), `summary()` prints no marker note.
 - [ ] AC3: The analytic path and `print()` are unchanged: analytic-path
       `summary()` output is byte-identical to the merge-base commit's output
       for four fits — clean N ≥ 2000, marker-firing N ≥ 2000, N < 2000, and
@@ -126,6 +130,9 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: T5 done — `devtools::check(args = "--no-manual")` clean, 0 errors / 0 warnings / 0 notes (32m47s); suite 0 fail / 8380 pass (5 pre-existing lavaan warnings from untouched SEM tests). Mutation probes per the M13-family lesson: restoring the retired locus wording reddened the new guard on all three assertions, and forcing the note onto the analytic path reddened the once-per-label fence with each fired label counted twice; both files restored byte-identical (git diff empty).
 - 2026-08-18: all tasks done; status review.
 - 2026-08-18: review round 1 returned the milestone (defect return 1 of this milestone): AC1 fails — the note prints outside `# Diagnostics` when no diagnostic line fires (diff-bug F2, reproduced on the N=2500 fixture) and the AC1 tests cannot see it (F3); AC2 needs a gated wording amendment — its mandated "validated as interval predictors" overclaims the record for the removed and multimodal markers (F1). Also queued: F4 vignette topic sentence, F6 NEWS wrap/flow, F7 label-splitting wrap, F9 "reminder" direction; rejected F5 (deliberate local-only print fence) and F8 (repo RNG convention). Status back to in-progress.
+- 2026-08-18: amendment return: AC2 — "The marker note block (the label sentence plus its caveat, as distinct from the whole `summary()` output) states its own validation limit: its fixed caveat text — pinned exactly by test — says that what has been measured about the markers covers analytic intervals only and not every marker was measured, and that they are not validated as predictors of the bootstrap intervals shown, without asserting any individual marker to be a validated predictor; the note block contains none of "mis-cover", "near a parameter boundary", "no effect", "does not affect". On a bootstrap fit with no fired markers (fired set asserted via `cpm_boundary_markers()` first), `summary()` prints no marker note." Audited by a fresh [O] reader (one repair round: note-block definition, fit-property empty case, "not every marker was measured"; confirm pass no blocking findings); adopted at the mini gate.
+- 2026-08-18: return-round fixes — F2: the note now opens `# Diagnostics` when no diagnostic line fires (condition includes the note); F3: new `m94_expect_note_in_diagnostics()` asserts header presence, order, and no intervening section header on both AC1 fixtures (the N≥2000 fixture additionally asserts 0 diagnostic lines, making it the F2 case by construction); F1: the amended caveat landed on all five surfaces (code, test pin, roxygen/Rd, vignette, NEWS) with a guard assertion banning the retired "validated as interval predictors" phrase from the vignette paragraph; F4: locus topic sentence now scopes the analytic window; F6: NEWS sentence rewrapped and moved after the percentile sentence; F7: label-boundary line packing replaces strwrap (verified in the regenerated snapshot: the label renders unbroken); F9: "reminder" dropped. Mutation probe: reverting the header condition reddened the N≥2000 test on the header assertions. All three touched test files green (44/43/160); document() 0 resolve-link lines.
+- 2026-08-18: process slip, recorded honestly — the header-condition mutation probe ran against UNCOMMITTED code and its `git checkout --` restore discarded the return-round edits to R/cpm_oop.R (the M82 lesson exactly); re-applied from the session record and re-verified green. Also: `snapshot_accept()` after a desc-filtered `test_file()` run pruned other tests' snapshots from _snaps/cpm_api.md — restored and re-accepted from a full-file run.
 
 ## Decisions
 

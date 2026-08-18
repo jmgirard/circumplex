@@ -130,8 +130,11 @@ test_that("the marker-list locus paragraph states the shipped printing behavior"
   norm <- gsub("\\s+", " ", para)
   expect_match(norm, "descriptive note at every sample size", fixed = TRUE)
   expect_match(norm,
-               "validated as interval predictors on the analytic path only",
+               "what has been measured about the markers covers analytic intervals only",
                fixed = TRUE)
+  # The round-1 F1 overclaim (a positive per-marker validation claim) must
+  # not return on this surface.
+  expect_false(grepl("validated as interval predictors", norm, fixed = TRUE))
 })
 
 test_that("the displayed fit still shows what the section's opening reads", {

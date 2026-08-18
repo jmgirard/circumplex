@@ -188,10 +188,11 @@
       
         Note: 1 of 100 bootstrap resamples were excluded (0 degenerate, 1 non-convergent); the intervals are based on 99 replicates and are conditional on estimability.
       
-        Note: boundary/weak-identification markers fired: small
-        correlation-function weight.
-        Markers are validated as interval predictors on the analytic path only;
-        they were not studied on the bootstrap path (see the vignette section
-        'When a fit sits at a boundary').
+        Note: boundary/weak-identification markers fired:
+        small correlation-function weight.
+        What has been measured about these markers covers analytic intervals
+        only, and not every marker was measured; they are not validated as
+        predictors of the bootstrap intervals shown here (see the vignette
+        section 'When a fit sits at a boundary').
       
 

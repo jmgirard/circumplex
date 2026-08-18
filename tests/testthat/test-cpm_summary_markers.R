@@ -125,10 +125,25 @@ m94_marker_block <- function(out) {
 }
 
 m94_caveat_raw <- paste0(
-  "  Markers are validated as interval predictors on the analytic path only;\n",
-  "  they were not studied on the bootstrap path (see the vignette section\n",
-  "  'When a fit sits at a boundary')."
+  "  What has been measured about these markers covers analytic intervals\n",
+  "  only, and not every marker was measured; they are not validated as\n",
+  "  predictors of the bootstrap intervals shown here (see the vignette\n",
+  "  section 'When a fit sits at a boundary')."
 )
+
+# The note must sit inside the `# Diagnostics` section — including on fits
+# where no diagnostic line fires and the note is the section's only content
+# (review round 1, F2/F3): the header must precede the note with no other
+# section header between them.
+m94_expect_note_in_diagnostics <- function(out) {
+  hdr <- regexpr("# Diagnostics", out, fixed = TRUE)
+  start <- regexpr("Note: boundary/weak-identification markers fired:",
+                   out, fixed = TRUE)
+  expect_gt(hdr, 0)
+  expect_gt(start, hdr)
+  between <- substr(out, hdr + nchar("# Diagnostics"), start - 1L)
+  expect_false(grepl("\n# ", between, fixed = TRUE))
+}
 
 test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2000", {
   jz <- m94_boot_jz()
@@ -139,6 +154,7 @@ test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2
                             "small correlation-function weight",
                             "ill-conditioned Hessian"))
   out <- paste(capture.output(summary(jz)), collapse = "\n")
+  m94_expect_note_in_diagnostics(out)
   block <- m94_marker_block(out)
   expect_false(is.na(block))
   norm <- gsub("\\s+", " ", block)
@@ -160,6 +176,10 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
   fired <- cpm_boundary_markers(big)
   expect_identical(fired, "small correlation-function weight")
   out <- paste(capture.output(summary(big)), collapse = "\n")
+  # This fixture fires no diagnostic *line*, so it is exactly the case where
+  # the note must still open the Diagnostics section (round-1 F2).
+  expect_identical(length(cpm_diagnostic_lines(big$details)), 0L)
+  m94_expect_note_in_diagnostics(out)
   block <- m94_marker_block(out)
   expect_false(is.na(block))
   norm <- gsub("\\s+", " ", block)
