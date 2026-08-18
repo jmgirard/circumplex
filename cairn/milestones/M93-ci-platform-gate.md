@@ -1,6 +1,6 @@
 # M93: Close the CI platform gate
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -97,11 +97,11 @@ package relies on it.
       consumes its output; delete the inline M51 conditional it replaces.
       Lesson guard: count jobs in the PR's own live run via `gh run view` —
       never trust a bare green status (M7-family lesson).
-- [ ] **T3** — Record the classifier demonstrations: one invocation per
+- [x] **T3** — Record the classifier demonstrations: one invocation per
       branch (non-escalating list → single job; escalating list →
       three-platform; push event → five-config), exact commands and outputs
       kept for review evidence.
-- [ ] **T4** — Append the master-matrix check to `cairn/PROFILE.md`'s
+- [x] **T4** — Append the master-matrix check to `cairn/PROFILE.md`'s
       consistency-gate slot (PROFILE is at 100 of 120 lines — stay terse).
 
 ## Work log
@@ -116,6 +116,9 @@ package relies on it.
 
 - 2026-08-17: T1 done — `tools/ci-matrix.R` written (config literals + escalation set as data, glob entries stored verbatim as `dir/**`); all seven branches exercised: push → 5 configs, escalating PR lists (`tools/check-ci-deps.R`; `R/utils.R`) → 3 platforms, non-escalating list (`.github/workflows/pkgdown.yaml` + `cairn/ROADMAP.md`) → single job, and empty list / missing file / unknown event / missing arg each exit 1. `^tools$` already Rbuildignored, so T1's ignore clause was a no-op.
 - 2026-08-17: T2 done — `R-CMD-check.yaml` gains a `matrix` setup job (changed files via `gh api pulls/N/files --paginate`, classification via `Rscript tools/ci-matrix.R`, output through `$GITHUB_OUTPUT` with the command substitution in its own assignment so a classifier error fails the step); the M51 inline conditional deleted; grep confirms zero `"os":`-style config literals remain in the YAML (the setup job's own `runs-on: ubuntu-latest` is a runner declaration, not a matrix config literal — noted so AC3's read does not stumble); YAML parses (`yaml::read_yaml`). Live-run job count lands with the PR (AC1 evidence at review).
+- 2026-08-17: T3 done — reproduction commands for the AC2 demonstration: `printf '.github/workflows/pkgdown.yaml\ncairn/ROADMAP.md\n' > f.txt; Rscript tools/ci-matrix.R pull_request f.txt` → `[{"os":"ubuntu-latest","r":"release"}]`; escalating twin: `printf 'R/utils.R\n' > f.txt; Rscript tools/ci-matrix.R pull_request f.txt` → the 3-platform array; `Rscript tools/ci-matrix.R push` → the 5-config array. Review re-runs these fresh (AC2).
+- 2026-08-17: T4 done — PROFILE.md consistency-gate gains the master-matrix watch line (105/120 lines after the add); the branch name is written `<default>`, detected per tracking-rules, never hardcoded.
+- 2026-08-17: all tasks done; `devtools::test()` clean (FAIL 0 / PASS 8338; 5 WARNs are known lavaan marker/EM noise, none from this branch — it touches no package code); status → review; branch pushed. PR creation left to /milestone-review (its URL slot), whose PR run is AC1's live evidence.
 
 ## Decisions
 
