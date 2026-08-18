@@ -1,11 +1,11 @@
 # M95: Stop running the suite twice on every pull request
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m95-ci-trigger-economy
 
 ## Goal
 
@@ -84,7 +84,7 @@ consumer of the package reads either.
 
 ## Tasks
 
-- [ ] T1: Delete `.github/workflows/pr-commands.yaml`; confirm no reference
+- [x] T1: Delete `.github/workflows/pr-commands.yaml`; confirm no reference
       survives (`tools/check-ci-deps.R` lists only the other three workflows).
 - [ ] T2: Edit `.github/workflows/test-coverage.yaml` — remove the
       `pull_request:` trigger block, simplify `fail_ci_if_error` to `true`, and
@@ -102,6 +102,7 @@ consumer of the package reads either.
 - 2026-08-18: plan gate chose a static parse of the `on:` mapping over a live `gh run list` demonstration on this milestone's own PR, because the reduced criteria audit found the live check bound acceptance to external CI state on an internal-tier milestone; falsified by a PR-triggered coverage run appearing despite a clean static parse.
 - 2026-08-18: reduced criteria audit ([O], fresh context) returned three findings — a live-CI universal in the PR-runs-no-coverage criterion, a merge-blocking dependence on a green master run in the profile-watch criterion, and an exemption registry over a `coverage|covr|codecov` keyword sweep the reader measured at 1381 hits, almost all the unrelated statistical sense of "coverage". All three had one clear answer and were fixed before the criteria were written; the same reader caught that `grep -c "pull_request"` cannot return 0 because line 75 carries the string as a value, which became AC2's parse-the-mapping wording and T2's `fail_ci_if_error` simplification.
 - 2026-08-18: measured on 2026-08-18 from runs 32184165512 (coverage, pull_request, 27 min) and 32184165497 (R-CMD-check, pull_request, escalated, 38 min); the last recorded figures were 13.0 and 14.5 min on 2026-07-25 (D-029), so the coverage job has roughly doubled as the FIML suite landed. Suite runtime measured locally the same day at 580 s under `NOT_CRAN=true`, 48% of it `test-axes-fiml.R` and 28% the single M65-D3 fixture-staleness test — recorded for the parked replicate-count question, not acted on here.
+- 2026-08-18: T1 — deleted `.github/workflows/pr-commands.yaml`; `grep -rn "pr-commands"` over the tree returns only M95's own record, and `tools/check-ci-deps.R`'s `policy` list never named it, so no checker loses a target. No R code changed, so the profile's `devtools::test()` is deferred to T5 where AC6's full `check()` covers every change at once.
 - 2026-08-18: checker-regress shape considered and not fired — the consistency-gate watch reads GitHub run conclusions, which are external state, not the repo-internal artifacts the shape is defined over.
 
 ## Decisions
