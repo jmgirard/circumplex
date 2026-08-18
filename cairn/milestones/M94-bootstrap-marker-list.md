@@ -1,6 +1,6 @@
 # M94: Print the fired-marker list on the bootstrap path
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -42,7 +42,7 @@ help page, and vignette prose, all reaching package users.
 
 ## Acceptance criteria
 
-- [ ] AC1: On a `circumplex_cpm` fit with `ci_method = "bootstrap"`,
+- [x] AC1: On a `circumplex_cpm` fit with `ci_method = "bootstrap"`,
       `summary()` prints in its `# Diagnostics` section one note whose
       opening sentence — a single sentence, wrapped only at whole-label
       boundaries — names every fired marker by its `cpm_marker_labels()`
@@ -58,7 +58,7 @@ help page, and vignette prose, all reaching package users.
       asserted phrases are code-composed (the prefix and
       `cpm_marker_labels()` values, never data-borne strings such as scale
       names).
-- [ ] AC2 (amended 2026-08-18, review round 1 F1): The marker note block
+- [x] AC2 (amended 2026-08-18, review round 1 F1): The marker note block
       (the label sentence plus its caveat, as distinct from the whole
       `summary()` output) states its own validation limit: its fixed caveat
       text — pinned exactly by test — says that what has been measured about
@@ -69,7 +69,7 @@ help page, and vignette prose, all reaching package users.
       "near a parameter boundary", "no effect", "does not affect". On a
       bootstrap fit with no fired markers (fired set asserted via
       `cpm_boundary_markers()` first), `summary()` prints no marker note.
-- [ ] AC3: The analytic path and `print()` are unchanged: analytic-path
+- [x] AC3: The analytic path and `print()` are unchanged: analytic-path
       `summary()` output is byte-identical to the merge-base commit's output
       for four fits — clean N ≥ 2000, marker-firing N ≥ 2000, N < 2000, and
       free-scaling N ≥ 2000 — with the capture regenerable at review from the
@@ -77,7 +77,7 @@ help page, and vignette prose, all reaching package users.
       marker-firing fit the fired-label set appears exactly once in
       `summary()` output; `print()` output on a bootstrap marker-firing fit
       is byte-identical to merge-base.
-- [ ] AC4: The three surfaces this milestone updates agree with the new
+- [x] AC4: The three surfaces this milestone updates agree with the new
       behavior: (a) the `summary.circumplex_cpm` roxygen describes the
       bootstrap marker line and `devtools::document()` runs warning-free;
       (b) the vignette locus paragraph (anchor "`summary()` prints that list
@@ -89,7 +89,7 @@ help page, and vignette prose, all reaching package users.
       over `R/`, `man/`, `vignettes/`, `tests/testthat/` is reviewed for
       further printing-locus claims and its result recorded in the work log
       (non-load-bearing).
-- [ ] AC5: The r-package profile's verify commands are clean:
+- [x] AC5: The r-package profile's verify commands are clean:
       `devtools::test()` all passing and
       `devtools::check(args = "--no-manual")` at 0 errors / 0 warnings /
       0 notes.
@@ -163,3 +163,14 @@ Lens results: [S] blame-history — 0 findings (D-010 block byte-untouched; mark
 - **F8 — rejected**: the `.Random.seed` rm-on-exit pattern matches the repo's existing convention (test-cpm_api.R:630); suite-wide RNG-hygiene reform is out of this milestone's scope.
 
 Return: defect return 1 of this milestone (floor: F2 demonstrates AC1 failing inside its domain) plus a pending amendment return on AC2 (F1). No criterion ticked this round. A fresh full-suite run was in flight when the return fired; its greenness is not in dispute — F3 is why it cannot arbitrate AC1.
+
+Round 2 — 2026-08-18, after the return-round fixes (06c19932) and the in-round fix batch (efc42a1c). Lenses: [S] blame-history — no findings, no assertions weakened; [S] prior-PR-comments — no prior-review evidence contradicted, all round-1 fixes independently verified including byte-diffing the amended caveat across the five surfaces; [O] diff-bug — all seven round-1 actioned findings VERIFIED-FIXED (F1 initially partial on NEWS), 8 new candidates: findings 1–5 fixed in-round (seam spacing conditional + byte pin + no-triple-newline assertion, mutation-verified reddening on the reverted condition; NEWS caveat completed; packer width 70; named forward pointer), finding 6 became the AC1 amendment return (adopted at the mini gate, fresh-reader audit passed with two repairs applied — raw-label wrap assertions and the AC1/AC2 sentence partition), findings 7–8 rejected (phrasing-register drift with verified-identical content; apostrophe style).
+
+Acceptance-criterion evidence (all fresh this round):
+- AC1: test-cpm_summary_markers.R 51/0 under NOT_CRAN — both fixtures assert fired sets (`{Heywood, small-beta, illcond}` at N=1166; `{small-beta}` at N=2500 with 0 diagnostic lines), the marker sentence with prefix, no unfired label, each fired label intact in raw output, and the Diagnostics-section placement with the seam byte pin. Ticked.
+- AC2: exact caveat pin (`m94_caveat_raw`), banned-phrase absences on the note block, empty-set fixture asserts `character(0)` then absence — in the same 51/0. Ticked.
+- AC3: fence snapshots byte-unchanged since capture commit 46647e68 (`git diff` empty, reviewer-confirmed); four analytic regimes + bootstrap print() snapshots pass; once-per-label test green; `_snaps/cpm_api.md` additions-only. Ticked.
+- AC4: `document()` fresh — no diff, 0 `resolve link` lines; vignette locus paragraph + guard test 43/0 (fails on retired wording, mutation-verified in the T5 probe); grep sweep recorded in the T4 work-log line. Ticked.
+- AC5: `devtools::test()` 0 fail / 8395 pass (5 pre-existing lavaan warnings, 3 standard skips); `devtools::check(--no-manual)` 0 errors / 0 warnings / 0 notes (11m49s, post-fix round). Ticked.
+
+Consistency gate round 2: `cairn_validate` all checks passed; `pkgdown::check_pkgdown()` no problems (after the Rd rewording); README untouched; NEWS entry complete; master matrix latest push run success (M93 merge). No Driving RR — projection-vs-outcome no-ops.
