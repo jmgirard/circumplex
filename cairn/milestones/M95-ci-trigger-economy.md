@@ -1,6 +1,6 @@
 # M95: Stop running the suite twice on every pull request
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -93,7 +93,7 @@ consumer of the package reads either.
       correct the test-doctrine Codecov-annotates-the-PR sentence and the
       stock-`usethis`-pair sentence that no longer describes this repo.
 - [x] T4: Run AC5's grep over the three named files; fix any surviving claim.
-- [ ] T5: Run `tools/check-ci-deps.R` and the full `devtools::check()`.
+- [x] T5: Run `tools/check-ci-deps.R` and the full `devtools::check()`.
 
 ## Work log
 
@@ -106,6 +106,8 @@ consumer of the package reads either.
 - 2026-08-18: T2 — removed the `pull_request` trigger from `test-coverage.yaml`, simplified `fail_ci_if_error` to a bare `true`, and gave the file a header stating what now triggers it and what the PR side does and does not lose. AC2 verified by parsing the `on:` mapping with `yaml::read_yaml()` — one key, `push`; the same parse reads `fail_ci_if_error` as logical `TRUE`. AC3's byte-unchanged half verified by extracting the `push` block from `git show master:` and from the working tree and hashing both: 51dce08235cd5670b78bae7a367c6857 on each side.
 - 2026-08-18: T3 — `cairn/PROFILE.md` gains a master coverage watch beside M93's matrix watch (AC4), and the test-doctrine slot's stranded claims are corrected: it described the CI as the stock usethis pair, which neither workflow has been since M93, and said Codecov annotates the PR, which `codecov.yml`'s `comment: false` already made wrong before this milestone. File at 117 lines against the 120 cap.
 - 2026-08-18: T4 — AC5's sweep over the three named files returns two hits, both in the `test-coverage.yaml` header, both stating what the PR side lost rather than claiming it still runs there; `annotates` no longer occurs in any of the three. `cairn_validate` all green.
+- 2026-08-18: T5 — `tools/check-ci-deps.R` exits 0 (allowlists in sync with the 14 DESCRIPTION Suggests). `devtools::check(args = "--no-manual")` is Status: OK — 0 errors, 0 warnings, 0 notes over the whole log, testthat running 535s and vignettes re-building in 38s, tree clean afterward. `--no-manual` is CLAUDE.md's documented check command, so the PDF-manual step is deliberately out rather than silently skipped.
+- 2026-08-18: all tasks done, status to review. AC boxes left unticked: review ticks them against its own fresh evidence.
 - 2026-08-18: checker-regress shape considered and not fired — the consistency-gate watch reads GitHub run conclusions, which are external state, not the repo-internal artifacts the shape is defined over.
 
 ## Decisions
