@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2, GP5
-- **Branch/PR:** `m94-bootstrap-marker-list`
+- **Branch/PR:** `m94-bootstrap-marker-list` / [PR #123](https://github.com/jmgirard/circumplex/pull/123)
 
 ## Goal
 
