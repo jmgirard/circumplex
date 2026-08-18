@@ -35,18 +35,30 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # ubuntu-latest (24.04) ships no system R (actions/runner-images#10130),
+      # so the classifier needs its own R install.
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # Both the new and (for renames) old path of every changed file, so a
+      # file moved out of an escalating directory still escalates.
       - name: List the PR's changed files
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
         run: |
-          gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
-            --paginate --jq '.[].filename' > changed-files.txt
+          gh api "repos/$REPO/pulls/$PR/files" \
+            --paginate --jq '.[] | .filename, (.previous_filename // empty)' > changed-files.txt
 
       - name: Classify the run
         id: classify
+        env:
+          EVENT: ${{ github.event_name }}
         run: |
-          config=$(Rscript tools/ci-matrix.R "${{ github.event_name }}" changed-files.txt)
+          config=$(Rscript tools/ci-matrix.R "$EVENT" changed-files.txt)
           echo "config=$config" >> "$GITHUB_OUTPUT"
 
   R-CMD-check:

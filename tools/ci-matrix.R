@@ -65,11 +65,17 @@ keys <- if (event == "push") {
   if (!file.exists(path)) stop("changed-files file not found: ", path)
   files <- readLines(path, warn = FALSE)
   files <- files[nzchar(files)]
-  # An empty list means the diff computation failed upstream (paths-ignore
-  # already filters PRs with no relevant files): fail, never assume plain.
+  # An empty list usually means the diff computation failed upstream
+  # (paths-ignore already filters PRs with no relevant files; a PR whose
+  # head equals its base is the benign case): fail, never assume plain.
   if (length(files) == 0L) stop("changed-files list is empty")
+  # The pulls/N/files API silently truncates at 3000 files, so a list this
+  # long may be missing the one member that escalates: refuse to classify.
+  if (length(files) >= 3000L) stop("changed-files list at the API cap")
   if (escalates(files)) MATRICES$escalated else MATRICES$plain
 } else {
+  # Deliberately fail-closed: adding a trigger to the workflow (merge_group,
+  # workflow_dispatch, ...) requires giving it a matrix here first.
   stop("unknown event: ", event)
 }
 
