@@ -221,6 +221,29 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
     for (line in diag_lines) cat(line)
   }
 
+  # Bootstrap-path fired-marker note (M94): without it the marker vocabulary
+  # the vignette teaches prints only inside the analytic caution below, which
+  # a bootstrap fit never reaches. Descriptive, at every N: the coverage
+  # record behind the analytic caution measured analytic intervals only, so
+  # this note states that limit rather than claiming an interval consequence.
+  if (identical(d$ci_method, "bootstrap")) {
+    markers <- cpm_boundary_markers(object)
+    if (length(markers) > 0) {
+      sentence <- paste0(
+        "Note: boundary/weak-identification markers fired: ",
+        paste(markers, collapse = "; "), "."
+      )
+      cat(
+        "\n", paste0("  ", strwrap(sentence, width = 74), collapse = "\n"),
+        "\n",
+        "  Markers are validated as interval predictors on the analytic ",
+        "path only;\n  they were not studied on the bootstrap path (see ",
+        "the vignette section\n  'When a fit sits at a boundary').\n",
+        sep = ""
+      )
+    }
+  }
+
   # N-conditional analytic-CI caution (design sec. 5.2), calibrated by the B6
   # coverage oracle: unconditional below cpm_analytic_ci_n_caution;
   # boundary-marker-conditional below cpm_analytic_ci_n_boundary_caution

@@ -98,11 +98,11 @@ help page, and vignette prose, all reaching package users.
 - [x] **T1** — Capture the merge-base baselines and write the byte-identity
       fences (four analytic `summary()` fits + bootstrap `print()`),
       recording the regeneration procedure in the test file.
-- [ ] **T2** — Write the bootstrap marker-line tests (red first): the two
+- [x] **T2** — Write the bootstrap marker-line tests (red first): the two
       CI-runnable fits with fired-set assertions, marker-line prefix/label
       assertions, the exact-text pin, the negative-phrase assertions, and the
       empty-set absence case.
-- [ ] **T3** — Implement the marker line in `summary.circumplex_cpm`
+- [x] **T3** — Implement the marker line in `summary.circumplex_cpm`
       (bootstrap branch, after the diagnostics block at
       `R/cpm_oop.R:218-222`); T1/T2 green.
 - [ ] **T4** — Update the roxygen (`R/cpm_oop.R:138-152`) and `document()`;
@@ -120,6 +120,7 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: plan gate chose the bootstrap-summary()-only locus over all-paths or print() printing because it matches the candidate exactly and leaves D-010's coverage-validated caution untouched; falsified by evidence that analytic sub-2000 or print() readers miss the marker vocabulary.
 - 2026-08-18: plan gate chose a minimal vignette correction over reworking the demo around the jz2017 bootstrap fit because the candidate scopes this as a printed-output change, not teaching; falsified by evidence readers misread the boundary section after the change.
 - 2026-08-18: T1 done — tests/testthat/test-cpm_summary_markers.R fences the four analytic summary() regimes and bootstrap print() as merge-base snapshots (_snaps/cpm_summary_markers.md; regeneration procedure in the file header), plus the once-per-label assertion on the analytic marker-firing fit; fixtures probed empirically (jz2017 boots=25 fires 3 markers at N=1166; the n=2500 cpm_simulate refit fires exactly small-beta; the clean n=800 draw at 0.15 smallest-beta truth fires none, margins 0.14 vs 0.10 and 7.7e3 vs 1e8); full suite 0 fail / 8349 pass. Implementation gate chose the Note-style line wording (shown verbatim in chat) over the terse "Boundary markers:" prefix for consistency with the neighboring Diagnostics notes; falsified by user feedback the note reads as clutter.
+- 2026-08-18: T2+T3 done — four marker-note tests written and run red first (every failure verified to be the note-absent assertion, `is.na(block)` TRUE at test-cpm_summary_markers.R:143 and downstream matches, never another cause), then the note implemented in summary.circumplex_cpm's bootstrap branch (R/cpm_oop.R, after the diagnostics block; strwrap on the variable sentence, literal caveat lines). All 37 file tests green including the untouched AC3 fences; full suite 0 fail / 8375 pass; the one legitimate snapshot change is the new note appended to test-cpm_api.R:636's local-only bootstrap summary render (print() snapshot byte-untouched), accepted and diff-verified.
 
 ## Decisions
 

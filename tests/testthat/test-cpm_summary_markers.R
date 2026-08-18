@@ -110,6 +110,88 @@ test_that("an analytic marker-firing fit names each fired label exactly once", {
   }
 })
 
+# ---- AC1/AC2: the bootstrap fired-marker note -------------------------------
+
+# The note's variable sentence is wrapped at emission time, so label and
+# prefix assertions run on the whitespace-normalized block; the fixed caveat
+# lines are additionally pinned raw (they are literals in the code).
+m94_marker_block <- function(out) {
+  start_pat <- "Note: boundary/weak-identification markers fired:"
+  end_pat <- "'When a fit sits at a boundary')."
+  start <- regexpr(start_pat, out, fixed = TRUE)
+  end <- regexpr(end_pat, out, fixed = TRUE)
+  if (start < 0 || end < 0) return(NA_character_)
+  substr(out, start, end + nchar(end_pat) - 1L)
+}
+
+m94_caveat_raw <- paste0(
+  "  Markers are validated as interval predictors on the analytic path only;\n",
+  "  they were not studied on the bootstrap path (see the vignette section\n",
+  "  'When a fit sits at a boundary')."
+)
+
+test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2000", {
+  jz <- m94_boot_jz()
+  expect_identical(jz$details$ci_method, "bootstrap")
+  expect_lt(jz$details$N, 2000)
+  fired <- cpm_boundary_markers(jz)
+  expect_identical(fired, c("Heywood communality",
+                            "small correlation-function weight",
+                            "ill-conditioned Hessian"))
+  out <- paste(capture.output(summary(jz)), collapse = "\n")
+  block <- m94_marker_block(out)
+  expect_false(is.na(block))
+  norm <- gsub("\\s+", " ", block)
+  # The full variable sentence, labels joined "; " in cpm_boundary_markers()
+  # order — asserting the "; " join and every fired label at once.
+  expect_match(norm, paste0(
+    "Note: boundary/weak-identification markers fired: ",
+    paste(fired, collapse = "; "), "."), fixed = TRUE)
+  for (lab in setdiff(unname(cpm_marker_labels()), fired)) {
+    expect_false(grepl(lab, block, fixed = TRUE))
+  }
+  expect_match(out, m94_caveat_raw, fixed = TRUE)
+})
+
+test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N >= 2000", {
+  big <- m94_boot_big()
+  expect_identical(big$details$ci_method, "bootstrap")
+  expect_gte(big$details$N, 2000)
+  fired <- cpm_boundary_markers(big)
+  expect_identical(fired, "small correlation-function weight")
+  out <- paste(capture.output(summary(big)), collapse = "\n")
+  block <- m94_marker_block(out)
+  expect_false(is.na(block))
+  norm <- gsub("\\s+", " ", block)
+  expect_match(norm, paste0(
+    "Note: boundary/weak-identification markers fired: ", fired, "."),
+    fixed = TRUE)
+  for (lab in setdiff(unname(cpm_marker_labels()), fired)) {
+    expect_false(grepl(lab, block, fixed = TRUE))
+  }
+  expect_match(out, m94_caveat_raw, fixed = TRUE)
+})
+
+test_that("the marker note claims no interval consequence (banned phrases absent)", {
+  jz <- m94_boot_jz()
+  out <- paste(capture.output(summary(jz)), collapse = "\n")
+  block <- m94_marker_block(out)
+  expect_false(is.na(block))
+  for (p in c("mis-cover", "near a parameter boundary",
+              "no effect", "does not affect")) {
+    expect_false(grepl(p, block, fixed = TRUE))
+  }
+})
+
+test_that("a bootstrap fit with no fired marker prints no marker note", {
+  cl <- m94_boot_clean()
+  expect_identical(cl$details$ci_method, "bootstrap")
+  expect_identical(cpm_boundary_markers(cl), character(0))
+  out <- paste(capture.output(summary(cl)), collapse = "\n")
+  expect_false(grepl("boundary/weak-identification markers fired",
+                     out, fixed = TRUE))
+})
+
 # ---- AC3: bootstrap print() byte-identical to merge-base --------------------
 
 test_that("print() on a bootstrap marker-firing fit is byte-identical to merge-base", {
