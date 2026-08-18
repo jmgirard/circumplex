@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m95-ci-trigger-economy
+- **Branch/PR:** m95-ci-trigger-economy · https://github.com/jmgirard/circumplex/pull/124
 
 ## Goal
 
