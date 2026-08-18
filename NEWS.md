@@ -273,7 +273,11 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   mis-covered. Percentile bootstrap intervals were confirmed as the better
   default but are themselves conservative-liberal in spots (notably for
   near-boundary correlation-function weights); improving them is planned
-  follow-up work.
+  follow-up work. On the bootstrap path, `summary()` also lists any fired
+  markers in a descriptive note at every sample size, stating that what has
+  been measured about the markers covers analytic intervals only — not every
+  marker was measured, and none is validated as a predictor of the bootstrap
+  intervals shown.
 
 * New `fit_structure()` function evaluates whether a set of scales forms a
   circumplex using the exploratory criteria of Acton & Revelle (2004). Four

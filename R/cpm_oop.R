@@ -149,7 +149,12 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
 #' near-tied optima), the regime where they mis-covered even at large N (see
 #' [cpm_fit()]). The vignette section *When a fit sits at a boundary*
 #' (`vignette("evaluating-circumplex-structure")`) glosses each marker and
-#' gives the interpretation and next steps when one fires.
+#' gives the interpretation and next steps when one fires. When the
+#' confidence intervals are bootstrap, any fired markers are instead listed
+#' in a descriptive note at every sample size; the note also states that
+#' what has been measured about the markers covers analytic intervals only
+#' (and not every marker was measured), so they are not validated as
+#' predictors of the bootstrap intervals.
 #'
 #' @param object A `circumplex_cpm` object.
 #' @param digits The number of decimal places to display (default = 3).
@@ -215,10 +220,51 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
     sep = ""
   )
 
+  # Bootstrap-path fired-marker note (M94): without it the marker vocabulary
+  # the vignette teaches prints only inside the analytic caution below, which
+  # a bootstrap fit never reaches. Descriptive, at every N: the marker study
+  # measured analytic intervals only (and not every marker), so the note
+  # states that limit rather than claiming an interval consequence. The note
+  # belongs to the Diagnostics section, so it also opens the section when no
+  # diagnostic line fires.
+  boot_markers <- if (identical(d$ci_method, "bootstrap")) {
+    cpm_boundary_markers(object)
+  } else {
+    character(0)
+  }
+
   diag_lines <- cpm_diagnostic_lines(d)
-  if (length(diag_lines) > 0) {
+  if (length(diag_lines) > 0 || length(boot_markers) > 0) {
     cat("\n# Diagnostics\n\n")
     for (line in diag_lines) cat(line)
+  }
+
+  if (length(boot_markers) > 0) {
+    # Wrap the label sentence at whole-label boundaries only: a marker label
+    # is taught as a unit, so it must never break across lines.
+    items <- paste0(boot_markers, ";")
+    items[length(items)] <- sub(";$", ".", items[length(items)])
+    lines <- "Note: boundary/weak-identification markers fired:"
+    for (item in items) {
+      cand <- paste(lines[length(lines)], item)
+      if (nchar(cand) <= 70) {
+        lines[length(lines)] <- cand
+      } else {
+        lines <- c(lines, item)
+      }
+    }
+    cat(
+      # The blank separator line is owed only after printed diagnostic lines;
+      # when the note opens the section itself, the header's own "\n\n"
+      # already provides the single blank line every other render shows.
+      if (length(diag_lines) > 0) "\n" else "",
+      paste0("  ", lines, collapse = "\n"), "\n",
+      "  What has been measured about these markers covers analytic ",
+      "intervals\n  only, and not every marker was measured; they are not ",
+      "validated as\n  predictors of the bootstrap intervals shown here ",
+      "(see the vignette\n  section 'When a fit sits at a boundary').\n",
+      sep = ""
+    )
   }
 
   # N-conditional analytic-CI caution (design sec. 5.2), calibrated by the B6
