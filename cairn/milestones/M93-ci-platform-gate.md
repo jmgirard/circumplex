@@ -49,7 +49,7 @@ package relies on it.
 
 ## Acceptance criteria
 
-- [ ] AC1 — `tools/ci-matrix.R` declares the PR-escalation path set, whose
+- [x] AC1 — `tools/ci-matrix.R` declares the PR-escalation path set, whose
       membership, read from that file, is exactly {`R/**`, `src/**`,
       `tests/**`, `vignettes/**`, `data/**`, `inst/**`, `DESCRIPTION`,
       `NAMESPACE`, `.github/workflows/R-CMD-check.yaml`,
@@ -132,7 +132,24 @@ Reviewed 2026-08-17. PR [#122](https://github.com/jmgirard/circumplex/pull/122).
 - **AC2** ✔ — fresh local invocation: `Rscript tools/ci-matrix.R pull_request <file>` on `{.github/workflows/pkgdown.yaml, cairn/ROADMAP.md}` emitted exactly `[{"os":"ubuntu-latest","r":"release"}]` (re-run after the review fixes, identical); workflow read: PR runs route through `steps.classify` → `tools/ci-matrix.R`, and the five-config matrix is reachable only via the script's `push` branch, which only the push event selects.
 - **AC3** ✔ — per-literal grep across both files: macos-latest 1/0 (script/workflow), windows-latest 1/0, `"devel"` 1/0, oldrel-1 1/0; the five os/R pairs live solely in the script's `CONFIGS`, each once; matrices are composed from `MATRICES`' key lists. Interpretation recorded (also flagged by the diff reviewer): the setup job's `runs-on: ubuntu-latest` is a runner declaration carrying no R version — not an os/R config literal — and the bare string `ubuntu-latest` recurring across three *distinct* pair-literals in `CONFIGS` is three configs, not repetition of one.
 - **AC4** ✔ — PROFILE.md consistency-gate slot carries the master-matrix watch line (committed after the step-1 catch-up); executed fresh: `gh run list --workflow=R-CMD-check.yaml --branch=master --event=push --limit=1` → run 32055131323, `completed`/`success`.
-- **AC1** — set membership read fresh from `tools/ci-matrix.R`: exactly the eleven pinned entries, in order. Live-run half: pending the PR's green run; evidence line added below when it lands.
+- **AC1** ✔ — set membership read fresh from `tools/ci-matrix.R`: exactly the eleven pinned entries, in order. Live half: PR #122 (diff touches `.github/workflows/R-CMD-check.yaml` and `tools/ci-matrix.R`, both set members) → run 32096235315 concluded `success` with jobs `matrix`, `windows-latest (release)`, `macos-latest (release)`, `ubuntu-latest (release)` — all three platform jobs listed, counted from `gh run view --json jobs`, not a bare green.
+
+### Review findings and triage
+
+Three fresh-context lenses ([O] diff-bug, [S] blame-history, [S] prior-review-record). Prior-review lens: "no prior-review evidence" (archived CI reviews cover other mechanisms; PR-comments probe returned `[]`), zero findings. Dispositions (fixed items landed in b013fdfa before the approval marker):
+
+- O1 (fixed) — matrix job ran `Rscript` on bare `ubuntu-latest`, which no longer ships R: confirmed live (`Rscript: command not found`, first PR run red); `r-lib/actions/setup-r@v2` added. The failure was loud, not silent — fail-closed held.
+- O3 (fixed) — `pulls/N/files` reports only new paths, so a rename out of `R/` under-escalated; jq now also emits `previous_filename`.
+- O4 (fixed) — the files API truncates at 3000 entries, a fail-open the script could not see; classifier now refuses lists at the cap.
+- O6 (fixed) — `${{ }}` interpolations moved to `env:` indirection (not exploitable today; standard hardening).
+- O7 (fixed, by comment) — unknown events fail closed by design; comment now says new workflow triggers must be given a matrix first.
+- O10 (fixed, by comment) — empty-list comment now names the benign head-equals-base case.
+- O2 (rejected, premise absent) — "skipped downstream = mergeable under required status checks": master has no branch protection, and the failed matrix job reddens the run and `gh pr checks` (demonstrated by the first red run); the enforcement question itself is S1.
+- O5 / S2 (rejected as pre-existing, residual recorded) — a PR can edit `tools/ci-matrix.R` to declassify itself; inherent to `pull_request`-event workflows (pre-M93 a PR could equally rewrite the inline matrix or workflow); single-operator repo, external PRs enter through `/hotfix` adoption with human review.
+- O8 (recorded) — AC3's `runs-on: ubuntu-latest` interpretation logged in the AC3 evidence line.
+- O9 (resolved by evidence) — "AC1 unsigned until a live run shows three jobs": satisfied by run 32096235315.
+- S1 (to the gate) — master has no branch protection, so no GitHub-native mechanism blocks a red merge; today's gate is the cairn review process (green `gh pr checks` before merge + the merge guard). Disposition put to the maintainer at the approval gate.
+- S3 (rejected, style) — job id `matrix` beside the `strategy.matrix` context reads confusingly; the comment block above the job orients, and a rename churns `needs` references for cosmetic gain.
 
 ### Consistency gate
 
