@@ -166,12 +166,16 @@ fired:
 - **competing near-tied optima** — the search found more than one solution of
   nearly equal fit, so the reported one may not be uniquely determined.
 
-`summary()` prints that list when the intervals are analytic and $N$ falls
-between 2000 and 50000; below 2000 it prints an unconditional caution instead,
-above 50000 neither, and on the bootstrap path it prints the individual
-diagnostic notes rather than the list. To see the list itself, we simulate a
-larger sample from the structure just estimated with `cpm_simulate()`, then
-refit it.
+`summary()` prints that list when any marker fires. On the bootstrap path —
+as in the fit displayed above — it prints as a descriptive note at every
+sample size, paired with a reminder that the markers were validated as
+interval predictors on the analytic path only and were not studied on the
+bootstrap path. When the intervals are analytic the list instead arrives
+inside a coverage caution printed when $N$ falls between 2000 and 50000;
+below 2000 an unconditional caution prints instead, and above 50000 neither.
+To see that caution-embedded form, we simulate a larger sample from the
+structure just estimated with `cpm_simulate()`, then refit it on the
+correlation-matrix path, where the intervals are analytic.
 
 ```{r boundary_demo}
 set.seed(2026)

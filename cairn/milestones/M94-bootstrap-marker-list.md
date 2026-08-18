@@ -105,7 +105,7 @@ help page, and vignette prose, all reaching package users.
 - [x] **T3** — Implement the marker line in `summary.circumplex_cpm`
       (bootstrap branch, after the diagnostics block at
       `R/cpm_oop.R:218-222`); T1/T2 green.
-- [ ] **T4** — Update the roxygen (`R/cpm_oop.R:138-152`) and `document()`;
+- [x] **T4** — Update the roxygen (`R/cpm_oop.R:138-152`) and `document()`;
       rewrite the vignette locus paragraph keeping its anchor; add the
       guard-test assertion; run the supplementary grep sweep and log its
       result.
@@ -121,6 +121,7 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: plan gate chose a minimal vignette correction over reworking the demo around the jz2017 bootstrap fit because the candidate scopes this as a printed-output change, not teaching; falsified by evidence readers misread the boundary section after the change.
 - 2026-08-18: T1 done — tests/testthat/test-cpm_summary_markers.R fences the four analytic summary() regimes and bootstrap print() as merge-base snapshots (_snaps/cpm_summary_markers.md; regeneration procedure in the file header), plus the once-per-label assertion on the analytic marker-firing fit; fixtures probed empirically (jz2017 boots=25 fires 3 markers at N=1166; the n=2500 cpm_simulate refit fires exactly small-beta; the clean n=800 draw at 0.15 smallest-beta truth fires none, margins 0.14 vs 0.10 and 7.7e3 vs 1e8); full suite 0 fail / 8349 pass. Implementation gate chose the Note-style line wording (shown verbatim in chat) over the terse "Boundary markers:" prefix for consistency with the neighboring Diagnostics notes; falsified by user feedback the note reads as clutter.
 - 2026-08-18: T2+T3 done — four marker-note tests written and run red first (every failure verified to be the note-absent assertion, `is.na(block)` TRUE at test-cpm_summary_markers.R:143 and downstream matches, never another cause), then the note implemented in summary.circumplex_cpm's bootstrap branch (R/cpm_oop.R, after the diagnostics block; strwrap on the variable sentence, literal caveat lines). All 37 file tests green including the untouched AC3 fences; full suite 0 fail / 8375 pass; the one legitimate snapshot change is the new note appended to test-cpm_api.R:636's local-only bootstrap summary render (print() snapshot byte-untouched), accepted and diff-verified.
+- 2026-08-18: T4 done — roxygen gains the bootstrap-note sentence (document() warning-free, only man/summary.circumplex_cpm.Rd changed); the vignette locus paragraph rewritten keeping the "`summary()` prints that list when" anchor; the guard test gains the locus-paragraph assertion (fails on the retired "rather than the list" wording; whitespace-normalized matching per the M67 lesson) — 42 guard passes. Supplementary sweep result: `grep -rni marker` over R/, man/, vignettes/, tests/testthat/ reviewed; printing-locus claims existed only on the three updated surfaces — R/cpm_fit.R's catalog comments and R/ssm_ci_oop.R's SSM-side "Boundary markers:" printer state no cpm locus claim, and the "What a fired marker does and does not tell you" measurement-scope prose stays true. Full suite 0 fail / 8380 pass.
 
 ## Decisions
 

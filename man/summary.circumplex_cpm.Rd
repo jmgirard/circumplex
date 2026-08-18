@@ -29,5 +29,9 @@ harmonic, small correlation-function weight, ill-conditioning, or competing
 near-tied optima), the regime where they mis-covered even at large N (see
 \code{\link[=cpm_fit]{cpm_fit()}}). The vignette section \emph{When a fit sits at a boundary}
 (\code{vignette("evaluating-circumplex-structure")}) glosses each marker and
-gives the interpretation and next steps when one fires.
+gives the interpretation and next steps when one fires. When the
+confidence intervals are bootstrap, any fired markers are instead listed
+in a descriptive note at every sample size; the note also states that the
+markers were validated as interval predictors on the analytic path only
+and were not studied on the bootstrap path.
 }

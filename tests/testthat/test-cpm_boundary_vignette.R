@@ -118,6 +118,22 @@ test_that("the demonstration fit fires exactly the markers the section names", {
   }
 })
 
+test_that("the marker-list locus paragraph states the shipped printing behavior", {
+  # M94 moved the fired-marker list onto the bootstrap path; the paragraph
+  # that says where the list prints must say so, and the pre-M94 claim (the
+  # bootstrap path shows "the individual diagnostic notes rather than the
+  # list") must be gone.
+  para <- section_paragraph("`summary()` prints that list when")
+  expect_false(grepl("rather than the list", para, fixed = TRUE))
+  # Source-wrapped prose: assert on the whitespace-normalized paragraph so a
+  # re-wrap cannot fail these for a non-reason.
+  norm <- gsub("\\s+", " ", para)
+  expect_match(norm, "descriptive note at every sample size", fixed = TRUE)
+  expect_match(norm,
+               "validated as interval predictors on the analytic path only",
+               fixed = TRUE)
+})
+
 test_that("the displayed fit still shows what the section's opening reads", {
   # The section opens by reading this fit: a Heywood case at NO with a
   # zero-width interval, and an ill-conditioning warning from the same chunk.

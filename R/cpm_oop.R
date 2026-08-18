@@ -149,7 +149,11 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
 #' near-tied optima), the regime where they mis-covered even at large N (see
 #' [cpm_fit()]). The vignette section *When a fit sits at a boundary*
 #' (`vignette("evaluating-circumplex-structure")`) glosses each marker and
-#' gives the interpretation and next steps when one fires.
+#' gives the interpretation and next steps when one fires. When the
+#' confidence intervals are bootstrap, any fired markers are instead listed
+#' in a descriptive note at every sample size; the note also states that the
+#' markers were validated as interval predictors on the analytic path only
+#' and were not studied on the bootstrap path.
 #'
 #' @param object A `circumplex_cpm` object.
 #' @param digits The number of decimal places to display (default = 3).
