@@ -1,11 +1,11 @@
 # M93: Close the CI platform gate
 
-- **Status:** planned
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m93-ci-platform-gate` / [PR #122](https://github.com/jmgirard/circumplex/pull/122)
 
 ## Goal
 
@@ -49,7 +49,7 @@ package relies on it.
 
 ## Acceptance criteria
 
-- [ ] AC1 — `tools/ci-matrix.R` declares the PR-escalation path set, whose
+- [x] AC1 — `tools/ci-matrix.R` declares the PR-escalation path set, whose
       membership, read from that file, is exactly {`R/**`, `src/**`,
       `tests/**`, `vignettes/**`, `data/**`, `inst/**`, `DESCRIPTION`,
       `NAMESPACE`, `.github/workflows/R-CMD-check.yaml`,
@@ -57,7 +57,7 @@ package relies on it.
       diff touches a member of that set runs the three-platform release
       matrix (windows-latest, macos-latest, ubuntu-latest, all R release),
       with all three jobs listed in that run.
-- [ ] AC2 — `tools/ci-matrix.R`, invoked locally on a file list containing no
+- [x] AC2 — `tools/ci-matrix.R`, invoked locally on a file list containing no
       escalation-set member (exact command and file-list argument recorded in
       review evidence), emits exactly the single
       `{os: ubuntu-latest, r: release}` matrix; and the workflow's
@@ -66,11 +66,11 @@ package relies on it.
       matrix only on push to master. (The local invocation evidences the
       classifier's output; the single-job branch of the workflow wiring rests
       on the file read — the end-to-end live link is AC1's escalated run.)
-- [ ] AC3 — Each os/R-version config literal appears exactly once across
+- [x] AC3 — Each os/R-version config literal appears exactly once across
       `R-CMD-check.yaml` and `tools/ci-matrix.R` combined; the single-job,
       escalated-PR, and push matrices are composed from those literals rather
       than repeated — verified by a read of both files.
-- [ ] AC4 — `cairn/PROFILE.md`'s consistency-gate slot directs
+- [x] AC4 — `cairn/PROFILE.md`'s consistency-gate slot directs
       `/milestone-review` to check the most recent completed
       `R-CMD-check.yaml` run for the default branch's push trigger
       (`gh run list --workflow=R-CMD-check.yaml --branch=<default>
@@ -86,22 +86,22 @@ package relies on it.
 
 ## Tasks
 
-- [ ] **T1** — Write `tools/ci-matrix.R` (base R only): event name +
+- [x] **T1** — Write `tools/ci-matrix.R` (base R only): event name +
       changed-file list in, matrix JSON out, from single-sourced config
       literals; escalation set declared as data at the top; unreadable or
       missing input stops with an error (fail closed, never a silent smaller
       matrix). Add to `.Rbuildignore` if `tools/` is not already covered.
-- [ ] **T2** — Rework `R-CMD-check.yaml`: setup job computes the PR's changed
+- [x] **T2** — Rework `R-CMD-check.yaml`: setup job computes the PR's changed
       files against its merge base (git/gh built-ins, no third-party
       changed-files action), calls the classifier, and the check job's matrix
       consumes its output; delete the inline M51 conditional it replaces.
       Lesson guard: count jobs in the PR's own live run via `gh run view` —
       never trust a bare green status (M7-family lesson).
-- [ ] **T3** — Record the classifier demonstrations: one invocation per
+- [x] **T3** — Record the classifier demonstrations: one invocation per
       branch (non-escalating list → single job; escalating list →
       three-platform; push event → five-config), exact commands and outputs
       kept for review evidence.
-- [ ] **T4** — Append the master-matrix check to `cairn/PROFILE.md`'s
+- [x] **T4** — Append the master-matrix check to `cairn/PROFILE.md`'s
       consistency-gate slot (PROFILE is at 100 of 120 lines — stay terse).
 
 ## Work log
@@ -114,6 +114,43 @@ package relies on it.
 - 2026-08-17: plan chose an in-repo classifier script + setup job over a separate paths-triggered workflow (config duplication, required-check naming) and over a third-party changed-files action (new supply-chain dependency); decisive: a live non-escalated PR run is impossible pre-merge, so the non-escalated branch needs a locally invocable classifier; falsified by the setup job's changed-file computation misclassifying a real PR.
 - 2026-08-17: plan gate chose the package+CI escalation path set over escalating every triggering PR because doc-tooling PRs would pay three platform jobs for changes the check does not exercise; falsified by a platform red introduced through a non-escalating path.
 
+- 2026-08-17: T1 done — `tools/ci-matrix.R` written (config literals + escalation set as data, glob entries stored verbatim as `dir/**`); all seven branches exercised: push → 5 configs, escalating PR lists (`tools/check-ci-deps.R`; `R/utils.R`) → 3 platforms, non-escalating list (`.github/workflows/pkgdown.yaml` + `cairn/ROADMAP.md`) → single job, and empty list / missing file / unknown event / missing arg each exit 1. `^tools$` already Rbuildignored, so T1's ignore clause was a no-op.
+- 2026-08-17: T2 done — `R-CMD-check.yaml` gains a `matrix` setup job (changed files via `gh api pulls/N/files --paginate`, classification via `Rscript tools/ci-matrix.R`, output through `$GITHUB_OUTPUT` with the command substitution in its own assignment so a classifier error fails the step); the M51 inline conditional deleted; grep confirms zero `"os":`-style config literals remain in the YAML (the setup job's own `runs-on: ubuntu-latest` is a runner declaration, not a matrix config literal — noted so AC3's read does not stumble); YAML parses (`yaml::read_yaml`). Live-run job count lands with the PR (AC1 evidence at review).
+- 2026-08-17: T3 done — reproduction commands for the AC2 demonstration: `printf '.github/workflows/pkgdown.yaml\ncairn/ROADMAP.md\n' > f.txt; Rscript tools/ci-matrix.R pull_request f.txt` → `[{"os":"ubuntu-latest","r":"release"}]`; escalating twin: `printf 'R/utils.R\n' > f.txt; Rscript tools/ci-matrix.R pull_request f.txt` → the 3-platform array; `Rscript tools/ci-matrix.R push` → the 5-config array. Review re-runs these fresh (AC2).
+- 2026-08-17: T4 done — PROFILE.md consistency-gate gains the master-matrix watch line (105/120 lines after the add); the branch name is written `<default>`, detected per tracking-rules, never hardcoded.
+- 2026-08-17: all tasks done; `devtools::test()` clean (FAIL 0 / PASS 8338; 5 WARNs are known lavaan marker/EM noise, none from this branch — it touches no package code); status → review; branch pushed. PR creation left to /milestone-review (its URL slot), whose PR run is AC1's live evidence.
+- 2026-08-17: catch-up (review step 1) — T4's `cairn/PROFILE.md` edit was made but never staged; the completion commit shipped without it. Committed now on the branch before any evidence gathering; the T4 tick predates its artifact landing by one commit (the batched-edit-verification lesson, hit live).
+
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-17. PR [#122](https://github.com/jmgirard/circumplex/pull/122).
+
+### Acceptance-criterion evidence
+
+- **AC2** ✔ — fresh local invocation: `Rscript tools/ci-matrix.R pull_request <file>` on `{.github/workflows/pkgdown.yaml, cairn/ROADMAP.md}` emitted exactly `[{"os":"ubuntu-latest","r":"release"}]` (re-run after the review fixes, identical); workflow read: PR runs route through `steps.classify` → `tools/ci-matrix.R`, and the five-config matrix is reachable only via the script's `push` branch, which only the push event selects.
+- **AC3** ✔ — per-literal grep across both files: macos-latest 1/0 (script/workflow), windows-latest 1/0, `"devel"` 1/0, oldrel-1 1/0; the five os/R pairs live solely in the script's `CONFIGS`, each once; matrices are composed from `MATRICES`' key lists. Interpretation recorded (also flagged by the diff reviewer): the setup job's `runs-on: ubuntu-latest` is a runner declaration carrying no R version — not an os/R config literal — and the bare string `ubuntu-latest` recurring across three *distinct* pair-literals in `CONFIGS` is three configs, not repetition of one.
+- **AC4** ✔ — PROFILE.md consistency-gate slot carries the master-matrix watch line (committed after the step-1 catch-up); executed fresh: `gh run list --workflow=R-CMD-check.yaml --branch=master --event=push --limit=1` → run 32055131323, `completed`/`success`.
+- **AC1** ✔ — set membership read fresh from `tools/ci-matrix.R`: exactly the eleven pinned entries, in order. Live half: PR #122 (diff touches `.github/workflows/R-CMD-check.yaml` and `tools/ci-matrix.R`, both set members) → run 32096235315 concluded `success` with jobs `matrix`, `windows-latest (release)`, `macos-latest (release)`, `ubuntu-latest (release)` — all three platform jobs listed, counted from `gh run view --json jobs`, not a bare green.
+
+### Review findings and triage
+
+Three fresh-context lenses ([O] diff-bug, [S] blame-history, [S] prior-review-record). Prior-review lens: "no prior-review evidence" (archived CI reviews cover other mechanisms; PR-comments probe returned `[]`), zero findings. Dispositions (fixed items landed in b013fdfa before the approval marker):
+
+- O1 (fixed) — matrix job ran `Rscript` on bare `ubuntu-latest`, which no longer ships R: confirmed live (`Rscript: command not found`, first PR run red); `r-lib/actions/setup-r@v2` added. The failure was loud, not silent — fail-closed held.
+- O3 (fixed) — `pulls/N/files` reports only new paths, so a rename out of `R/` under-escalated; jq now also emits `previous_filename`.
+- O4 (fixed) — the files API truncates at 3000 entries, a fail-open the script could not see; classifier now refuses lists at the cap.
+- O6 (fixed) — `${{ }}` interpolations moved to `env:` indirection (not exploitable today; standard hardening).
+- O7 (fixed, by comment) — unknown events fail closed by design; comment now says new workflow triggers must be given a matrix first.
+- O10 (fixed, by comment) — empty-list comment now names the benign head-equals-base case.
+- O2 (rejected, premise absent) — "skipped downstream = mergeable under required status checks": master has no branch protection, and the failed matrix job reddens the run and `gh pr checks` (demonstrated by the first red run); the enforcement question itself is S1.
+- O5 / S2 (rejected as pre-existing, residual recorded) — a PR can edit `tools/ci-matrix.R` to declassify itself; inherent to `pull_request`-event workflows (pre-M93 a PR could equally rewrite the inline matrix or workflow); single-operator repo, external PRs enter through `/hotfix` adoption with human review.
+- O8 (recorded) — AC3's `runs-on: ubuntu-latest` interpretation logged in the AC3 evidence line.
+- O9 (resolved by evidence) — "AC1 unsigned until a live run shows three jobs": satisfied by run 32096235315.
+- S1 (to the gate) — master has no branch protection, so no GitHub-native mechanism blocks a red merge; today's gate is the cairn review process (green `gh pr checks` before merge + the merge guard). Disposition put to the maintainer at the approval gate.
+- S3 (rejected, style) — job id `matrix` beside the `strategy.matrix` context reads confusingly; the comment block above the job orients, and a rename churns `needs` references for cosmetic gain.
+
+### Consistency gate
+
+`cairn_validate` exit 0, all checks pass (47 advisory WARNs are pre-existing M7 legacy work-log wrapping). Toolchain slot: `document()` no diff, 0 `resolve link` lines; generated files untouched; README untouched; `pkgdown::check_pkgdown()` no problems; NEWS deliberately untouched (internal-tier CI/process change, no user-visible behavior); no new top-level files (`^tools$` pre-existing in .Rbuildignore); full local `devtools::check(args="--no-manual")`: 0 errors / 0 warnings / 0 notes, 8m11s.

@@ -29,6 +29,10 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
 - NEWS.md has an entry for this milestone's user-visible changes (no milestone numbers in user-facing text).
 - New top-level files have `.Rbuildignore` entries (check `check()` NOTEs).
 - Full check at review: `Rscript -e 'devtools::check()'` clean (0 errors, 0 warnings; justify NOTEs).
+- Master matrix watch: the most recent completed `R-CMD-check.yaml` run for the
+  default branch's push trigger (`gh run list --workflow=R-CMD-check.yaml
+  --branch=<default> --event=push`) concluded success; a red or absent run is a
+  gate failure (M93).
 
 ## test-doctrine
 R-mechanical test expectations layered on the universal "What gets a test"
