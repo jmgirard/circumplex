@@ -270,7 +270,10 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   boundary or weakly identified (Heywood case, removed harmonic, very small
   correlation-function weight, ill-conditioning, or competing near-tied
   optima — the caution names which), the regime where they measurably
-  mis-covered. Percentile bootstrap intervals were confirmed as the better
+  mis-covered. On the bootstrap path, `summary()` lists any fired markers in
+  a descriptive note at every sample size, stating that the markers were
+  validated as interval predictors on the analytic path only and were not
+  studied on the bootstrap path. Percentile bootstrap intervals were confirmed as the better
   default but are themselves conservative-liberal in spots (notably for
   near-boundary correlation-function weights); improving them is planned
   follow-up work.

@@ -1,6 +1,6 @@
 # M94: Print the fired-marker list on the bootstrap path
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -109,7 +109,7 @@ help page, and vignette prose, all reaching package users.
       rewrite the vignette locus paragraph keeping its anchor; add the
       guard-test assertion; run the supplementary grep sweep and log its
       result.
-- [ ] **T5** — Full profile verify: `devtools::test()` and
+- [x] **T5** — Full profile verify: `devtools::test()` and
       `devtools::check(args = "--no-manual")` clean.
 
 ## Work log
@@ -122,6 +122,9 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: T1 done — tests/testthat/test-cpm_summary_markers.R fences the four analytic summary() regimes and bootstrap print() as merge-base snapshots (_snaps/cpm_summary_markers.md; regeneration procedure in the file header), plus the once-per-label assertion on the analytic marker-firing fit; fixtures probed empirically (jz2017 boots=25 fires 3 markers at N=1166; the n=2500 cpm_simulate refit fires exactly small-beta; the clean n=800 draw at 0.15 smallest-beta truth fires none, margins 0.14 vs 0.10 and 7.7e3 vs 1e8); full suite 0 fail / 8349 pass. Implementation gate chose the Note-style line wording (shown verbatim in chat) over the terse "Boundary markers:" prefix for consistency with the neighboring Diagnostics notes; falsified by user feedback the note reads as clutter.
 - 2026-08-18: T2+T3 done — four marker-note tests written and run red first (every failure verified to be the note-absent assertion, `is.na(block)` TRUE at test-cpm_summary_markers.R:143 and downstream matches, never another cause), then the note implemented in summary.circumplex_cpm's bootstrap branch (R/cpm_oop.R, after the diagnostics block; strwrap on the variable sentence, literal caveat lines). All 37 file tests green including the untouched AC3 fences; full suite 0 fail / 8375 pass; the one legitimate snapshot change is the new note appended to test-cpm_api.R:636's local-only bootstrap summary render (print() snapshot byte-untouched), accepted and diff-verified.
 - 2026-08-18: T4 done — roxygen gains the bootstrap-note sentence (document() warning-free, only man/summary.circumplex_cpm.Rd changed); the vignette locus paragraph rewritten keeping the "`summary()` prints that list when" anchor; the guard test gains the locus-paragraph assertion (fails on the retired "rather than the list" wording; whitespace-normalized matching per the M67 lesson) — 42 guard passes. Supplementary sweep result: `grep -rni marker` over R/, man/, vignettes/, tests/testthat/ reviewed; printing-locus claims existed only on the three updated surfaces — R/cpm_fit.R's catalog comments and R/ssm_ci_oop.R's SSM-side "Boundary markers:" printer state no cpm locus claim, and the "What a fired marker does and does not tell you" measurement-scope prose stays true. Full suite 0 fail / 8380 pass.
+- 2026-08-18: minor amendment — discovered sub-task: NEWS.md's unreleased 2.0.0 cpm_fit block describes the analytic marker caution, so one sentence describing the bootstrap note is added beside it (backed by the AC1/AC2 tests per "What gets a test"); the plan's Out item about NEWS referred to the historical M92 note, which stays untouched.
+- 2026-08-18: T5 done — `devtools::check(args = "--no-manual")` clean, 0 errors / 0 warnings / 0 notes (32m47s); suite 0 fail / 8380 pass (5 pre-existing lavaan warnings from untouched SEM tests). Mutation probes per the M13-family lesson: restoring the retired locus wording reddened the new guard on all three assertions, and forcing the note onto the analytic path reddened the once-per-label fence with each fired label counted twice; both files restored byte-identical (git diff empty).
+- 2026-08-18: all tasks done; status review.
 
 ## Decisions
 
