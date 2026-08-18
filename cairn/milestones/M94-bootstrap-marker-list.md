@@ -1,6 +1,6 @@
 # M94: Print the fired-marker list on the bootstrap path
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -125,7 +125,26 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: minor amendment — discovered sub-task: NEWS.md's unreleased 2.0.0 cpm_fit block describes the analytic marker caution, so one sentence describing the bootstrap note is added beside it (backed by the AC1/AC2 tests per "What gets a test"); the plan's Out item about NEWS referred to the historical M92 note, which stays untouched.
 - 2026-08-18: T5 done — `devtools::check(args = "--no-manual")` clean, 0 errors / 0 warnings / 0 notes (32m47s); suite 0 fail / 8380 pass (5 pre-existing lavaan warnings from untouched SEM tests). Mutation probes per the M13-family lesson: restoring the retired locus wording reddened the new guard on all three assertions, and forcing the note onto the analytic path reddened the once-per-label fence with each fired label counted twice; both files restored byte-identical (git diff empty).
 - 2026-08-18: all tasks done; status review.
+- 2026-08-18: review round 1 returned the milestone (defect return 1 of this milestone): AC1 fails — the note prints outside `# Diagnostics` when no diagnostic line fires (diff-bug F2, reproduced on the N=2500 fixture) and the AC1 tests cannot see it (F3); AC2 needs a gated wording amendment — its mandated "validated as interval predictors" overclaims the record for the removed and multimodal markers (F1). Also queued: F4 vignette topic sentence, F6 NEWS wrap/flow, F7 label-splitting wrap, F9 "reminder" direction; rejected F5 (deliberate local-only print fence) and F8 (repo RNG convention). Status back to in-progress.
 
 ## Decisions
 
 ## Review
+
+Round 1 — 2026-08-18, PR [#123](https://github.com/jmgirard/circumplex/pull/123). Three fresh-context lenses.
+
+Consistency gate (all by command): `cairn_validate` all checks passed; `document()` no diff, 0 `resolve link` lines (cli.width 500); `pkgdown::check_pkgdown()` no problems; README predates the branch (last touched 2026-05-24); NEWS entry present, no milestone numbers; no new top-level files; `check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes (this session, 32m47s); master matrix watch: latest master push run = M93 merge, success (run 32100586209, 2026-08-18).
+
+Lens results: [S] blame-history — 0 findings (D-010 block byte-untouched; marker machinery unmodified; the one behavioral reversal is the milestone's purpose, guarded). [S] prior-PR-comments — no prior-review evidence contradicted (M92's archived findings all stand; PR-thread probe empty). [O] diff-bug — 9 ranked findings:
+
+- **F2 — defect return, AC1 fails as written**: the note prints outside `# Diagnostics` whenever no diagnostic line fires — the header at R/cpm_oop.R sits inside `if (length(diag_lines) > 0)` and the new block outside it. Independently reproduced on the milestone's own N = 2500 fixture: 0 diagnostic lines, no header, note present. Disposition: fix in the return round (header condition includes the note).
+- **F3 — fix with F2**: `m94_marker_block()` slices the note out of the capture, so no assertion pins its section; the AC1 tests pass while AC1 is unmet. Disposition: add header-presence and position assertions.
+- **F1 — amendment return on AC2**: the mandated sentence "Markers are validated as interval predictors on the analytic path only" over-states the record — the removed-harmonic marker showed no predictive evidence at all, and multimodality was not separately measured; the pre-M94 prose was deliberately negative-only. The overclaim is embedded in AC2's own wording, so the repair routes through the gated criterion-amendment protocol; all five surfaces (code, test pin, roxygen/Rd, vignette, NEWS) re-word together.
+- **F4 — fix now**: the vignette topic sentence "prints that list when any marker fires" is false in two analytic regimes the same paragraph then describes.
+- **F6 — fix now**: the NEWS insertion leaves a 93-char line and splits the prior sentence mid-flow.
+- **F7 — fix now**: `strwrap(width = 74)` splits marker labels mid-phrase ("small / correlation-function weight"); repack at label boundaries.
+- **F9 — fix now**: "a reminder" points at material that appears after the paragraph.
+- **F5 — rejected**: the `print()` fence running only locally is the plan's deliberate BLAS accommodation (AC3 names no CI requirement; AC1 does and its tests are CI-run).
+- **F8 — rejected**: the `.Random.seed` rm-on-exit pattern matches the repo's existing convention (test-cpm_api.R:630); suite-wide RNG-hygiene reform is out of this milestone's scope.
+
+Return: defect return 1 of this milestone (floor: F2 demonstrates AC1 failing inside its domain) plus a pending amendment return on AC2 (F1). No criterion ticked this round. A fresh full-suite run was in flight when the return fired; its greenness is not in dispute — F3 is why it cannot arbitrate AC1.

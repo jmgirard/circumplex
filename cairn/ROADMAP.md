@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M92 | Teach the boundary regime the structure vignette's own example is in | done | — | normal | milestones/archive/M92-boundary-regime-guidance.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M93 | Close the CI platform gate | done | — | normal | milestones/archive/M93-ci-platform-gate.md |
-| M94 | Print the fired-marker list on the bootstrap path | review | — | normal | milestones/M94-bootstrap-marker-list.md |
+| M94 | Print the fired-marker list on the bootstrap path | in-progress | — | normal | milestones/M94-bootstrap-marker-list.md |
 
 ## Candidates
 
