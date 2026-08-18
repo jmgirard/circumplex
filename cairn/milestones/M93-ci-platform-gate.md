@@ -1,11 +1,11 @@
 # M93: Close the CI platform gate
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m93-ci-platform-gate`
 
 ## Goal
 
@@ -86,7 +86,7 @@ package relies on it.
 
 ## Tasks
 
-- [ ] **T1** — Write `tools/ci-matrix.R` (base R only): event name +
+- [x] **T1** — Write `tools/ci-matrix.R` (base R only): event name +
       changed-file list in, matrix JSON out, from single-sourced config
       literals; escalation set declared as data at the top; unreadable or
       missing input stops with an error (fail closed, never a silent smaller
@@ -113,6 +113,8 @@ package relies on it.
 - 2026-08-17: plan gate chose leaving `tools/check-ci-deps.R` untouched over extending it because widening a shipped checker is the checker-regress shape and single-sourcing removes the drift class; falsified by a matrix-wiring drift single-sourcing failed to prevent.
 - 2026-08-17: plan chose an in-repo classifier script + setup job over a separate paths-triggered workflow (config duplication, required-check naming) and over a third-party changed-files action (new supply-chain dependency); decisive: a live non-escalated PR run is impossible pre-merge, so the non-escalated branch needs a locally invocable classifier; falsified by the setup job's changed-file computation misclassifying a real PR.
 - 2026-08-17: plan gate chose the package+CI escalation path set over escalating every triggering PR because doc-tooling PRs would pay three platform jobs for changes the check does not exercise; falsified by a platform red introduced through a non-escalating path.
+
+- 2026-08-17: T1 done — `tools/ci-matrix.R` written (config literals + escalation set as data, glob entries stored verbatim as `dir/**`); all seven branches exercised: push → 5 configs, escalating PR lists (`tools/check-ci-deps.R`; `R/utils.R`) → 3 platforms, non-escalating list (`.github/workflows/pkgdown.yaml` + `cairn/ROADMAP.md`) → single job, and empty list / missing file / unknown event / missing arg each exit 1. `^tools$` already Rbuildignored, so T1's ignore clause was a no-op.
 
 ## Decisions
 
