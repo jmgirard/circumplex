@@ -23,7 +23,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Every os/R config literal lives in tools/ci-matrix.R, nowhere in this
+  # file (cairn M93). Push -> full five-config matrix; PR touching the
+  # script's escalation set -> the three release platforms; other PR -> the
+  # single ubuntu-release job (M51's economy). A failure here fails the run:
+  # there is no fallback matrix.
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      config: ${{ steps.classify.outputs.config }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: List the PR's changed files
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+            --paginate --jq '.[].filename' > changed-files.txt
+
+      - name: Classify the run
+        id: classify
+        run: |
+          config=$(Rscript tools/ci-matrix.R "${{ github.event_name }}" changed-files.txt)
+          echo "config=$config" >> "$GITHUB_OUTPUT"
+
   R-CMD-check:
+    needs: matrix
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
@@ -31,11 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # On pull_request run a single fast Ubuntu/release job; the full
-        # platform/version matrix runs on push to main/master (see M51).
-        config: ${{ github.event_name == 'pull_request'
-          && fromJSON('[{"os":"ubuntu-latest","r":"release"}]')
-          || fromJSON('[{"os":"macos-latest","r":"release"},{"os":"windows-latest","r":"release"},{"os":"ubuntu-latest","r":"devel","http-user-agent":"release"},{"os":"ubuntu-latest","r":"release"},{"os":"ubuntu-latest","r":"oldrel-1"}]') }}
+        config: ${{ fromJSON(needs.matrix.outputs.config) }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

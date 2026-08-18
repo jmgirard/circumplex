@@ -91,7 +91,7 @@ package relies on it.
       literals; escalation set declared as data at the top; unreadable or
       missing input stops with an error (fail closed, never a silent smaller
       matrix). Add to `.Rbuildignore` if `tools/` is not already covered.
-- [ ] **T2** — Rework `R-CMD-check.yaml`: setup job computes the PR's changed
+- [x] **T2** — Rework `R-CMD-check.yaml`: setup job computes the PR's changed
       files against its merge base (git/gh built-ins, no third-party
       changed-files action), calls the classifier, and the check job's matrix
       consumes its output; delete the inline M51 conditional it replaces.
@@ -115,6 +115,7 @@ package relies on it.
 - 2026-08-17: plan gate chose the package+CI escalation path set over escalating every triggering PR because doc-tooling PRs would pay three platform jobs for changes the check does not exercise; falsified by a platform red introduced through a non-escalating path.
 
 - 2026-08-17: T1 done — `tools/ci-matrix.R` written (config literals + escalation set as data, glob entries stored verbatim as `dir/**`); all seven branches exercised: push → 5 configs, escalating PR lists (`tools/check-ci-deps.R`; `R/utils.R`) → 3 platforms, non-escalating list (`.github/workflows/pkgdown.yaml` + `cairn/ROADMAP.md`) → single job, and empty list / missing file / unknown event / missing arg each exit 1. `^tools$` already Rbuildignored, so T1's ignore clause was a no-op.
+- 2026-08-17: T2 done — `R-CMD-check.yaml` gains a `matrix` setup job (changed files via `gh api pulls/N/files --paginate`, classification via `Rscript tools/ci-matrix.R`, output through `$GITHUB_OUTPUT` with the command substitution in its own assignment so a classifier error fails the step); the M51 inline conditional deleted; grep confirms zero `"os":`-style config literals remain in the YAML (the setup job's own `runs-on: ubuntu-latest` is a runner declaration, not a matrix config literal — noted so AC3's read does not stumble); YAML parses (`yaml::read_yaml`). Live-run job count lands with the PR (AC1 evidence at review).
 
 ## Decisions
 
