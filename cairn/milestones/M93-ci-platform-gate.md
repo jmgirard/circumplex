@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m93-ci-platform-gate`
+- **Branch/PR:** `m93-ci-platform-gate` / [PR #122](https://github.com/jmgirard/circumplex/pull/122)
 
 ## Goal
 
@@ -57,7 +57,7 @@ package relies on it.
       diff touches a member of that set runs the three-platform release
       matrix (windows-latest, macos-latest, ubuntu-latest, all R release),
       with all three jobs listed in that run.
-- [ ] AC2 — `tools/ci-matrix.R`, invoked locally on a file list containing no
+- [x] AC2 — `tools/ci-matrix.R`, invoked locally on a file list containing no
       escalation-set member (exact command and file-list argument recorded in
       review evidence), emits exactly the single
       `{os: ubuntu-latest, r: release}` matrix; and the workflow's
@@ -66,11 +66,11 @@ package relies on it.
       matrix only on push to master. (The local invocation evidences the
       classifier's output; the single-job branch of the workflow wiring rests
       on the file read — the end-to-end live link is AC1's escalated run.)
-- [ ] AC3 — Each os/R-version config literal appears exactly once across
+- [x] AC3 — Each os/R-version config literal appears exactly once across
       `R-CMD-check.yaml` and `tools/ci-matrix.R` combined; the single-job,
       escalated-PR, and push matrices are composed from those literals rather
       than repeated — verified by a read of both files.
-- [ ] AC4 — `cairn/PROFILE.md`'s consistency-gate slot directs
+- [x] AC4 — `cairn/PROFILE.md`'s consistency-gate slot directs
       `/milestone-review` to check the most recent completed
       `R-CMD-check.yaml` run for the default branch's push trigger
       (`gh run list --workflow=R-CMD-check.yaml --branch=<default>
@@ -124,3 +124,16 @@ package relies on it.
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-17. PR [#122](https://github.com/jmgirard/circumplex/pull/122).
+
+### Acceptance-criterion evidence
+
+- **AC2** ✔ — fresh local invocation: `Rscript tools/ci-matrix.R pull_request <file>` on `{.github/workflows/pkgdown.yaml, cairn/ROADMAP.md}` emitted exactly `[{"os":"ubuntu-latest","r":"release"}]` (re-run after the review fixes, identical); workflow read: PR runs route through `steps.classify` → `tools/ci-matrix.R`, and the five-config matrix is reachable only via the script's `push` branch, which only the push event selects.
+- **AC3** ✔ — per-literal grep across both files: macos-latest 1/0 (script/workflow), windows-latest 1/0, `"devel"` 1/0, oldrel-1 1/0; the five os/R pairs live solely in the script's `CONFIGS`, each once; matrices are composed from `MATRICES`' key lists. Interpretation recorded (also flagged by the diff reviewer): the setup job's `runs-on: ubuntu-latest` is a runner declaration carrying no R version — not an os/R config literal — and the bare string `ubuntu-latest` recurring across three *distinct* pair-literals in `CONFIGS` is three configs, not repetition of one.
+- **AC4** ✔ — PROFILE.md consistency-gate slot carries the master-matrix watch line (committed after the step-1 catch-up); executed fresh: `gh run list --workflow=R-CMD-check.yaml --branch=master --event=push --limit=1` → run 32055131323, `completed`/`success`.
+- **AC1** — set membership read fresh from `tools/ci-matrix.R`: exactly the eleven pinned entries, in order. Live-run half: pending the PR's green run; evidence line added below when it lands.
+
+### Consistency gate
+
+`cairn_validate` exit 0, all checks pass (47 advisory WARNs are pre-existing M7 legacy work-log wrapping). Toolchain slot: `document()` no diff, 0 `resolve link` lines; generated files untouched; README untouched; `pkgdown::check_pkgdown()` no problems; NEWS deliberately untouched (internal-tier CI/process change, no user-visible behavior); no new top-level files (`^tools$` pre-existing in .Rbuildignore); full local `devtools::check(args="--no-manual")`: 0 errors / 0 warnings / 0 notes, 8m11s.
