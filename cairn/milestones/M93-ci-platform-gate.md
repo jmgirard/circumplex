@@ -119,6 +119,7 @@ package relies on it.
 - 2026-08-17: T3 done — reproduction commands for the AC2 demonstration: `printf '.github/workflows/pkgdown.yaml\ncairn/ROADMAP.md\n' > f.txt; Rscript tools/ci-matrix.R pull_request f.txt` → `[{"os":"ubuntu-latest","r":"release"}]`; escalating twin: `printf 'R/utils.R\n' > f.txt; Rscript tools/ci-matrix.R pull_request f.txt` → the 3-platform array; `Rscript tools/ci-matrix.R push` → the 5-config array. Review re-runs these fresh (AC2).
 - 2026-08-17: T4 done — PROFILE.md consistency-gate gains the master-matrix watch line (105/120 lines after the add); the branch name is written `<default>`, detected per tracking-rules, never hardcoded.
 - 2026-08-17: all tasks done; `devtools::test()` clean (FAIL 0 / PASS 8338; 5 WARNs are known lavaan marker/EM noise, none from this branch — it touches no package code); status → review; branch pushed. PR creation left to /milestone-review (its URL slot), whose PR run is AC1's live evidence.
+- 2026-08-17: catch-up (review step 1) — T4's `cairn/PROFILE.md` edit was made but never staged; the completion commit shipped without it. Committed now on the branch before any evidence gathering; the T4 tick predates its artifact landing by one commit (the batched-edit-verification lesson, hit live).
 
 ## Decisions
 
