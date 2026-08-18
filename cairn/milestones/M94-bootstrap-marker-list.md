@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2, GP5
-- **Branch/PR:** —
+- **Branch/PR:** `m94-bootstrap-marker-list`
 
 ## Goal
 
@@ -95,7 +95,7 @@ help page, and vignette prose, all reaching package users.
 
 ## Tasks
 
-- [ ] **T1** — Capture the merge-base baselines and write the byte-identity
+- [x] **T1** — Capture the merge-base baselines and write the byte-identity
       fences (four analytic `summary()` fits + bootstrap `print()`),
       recording the regeneration procedure in the test file.
 - [ ] **T2** — Write the bootstrap marker-line tests (red first): the two
@@ -119,6 +119,7 @@ help page, and vignette prose, all reaching package users.
 - 2026-08-18: plan gate chose a caveat-carrying marker line over a bare list because the record validates the markers on the analytic path only (GP2/GP5); falsified by a bootstrap-path marker-coverage measurement showing the caveat wrong or misleading.
 - 2026-08-18: plan gate chose the bootstrap-summary()-only locus over all-paths or print() printing because it matches the candidate exactly and leaves D-010's coverage-validated caution untouched; falsified by evidence that analytic sub-2000 or print() readers miss the marker vocabulary.
 - 2026-08-18: plan gate chose a minimal vignette correction over reworking the demo around the jz2017 bootstrap fit because the candidate scopes this as a printed-output change, not teaching; falsified by evidence readers misread the boundary section after the change.
+- 2026-08-18: T1 done — tests/testthat/test-cpm_summary_markers.R fences the four analytic summary() regimes and bootstrap print() as merge-base snapshots (_snaps/cpm_summary_markers.md; regeneration procedure in the file header), plus the once-per-label assertion on the analytic marker-firing fit; fixtures probed empirically (jz2017 boots=25 fires 3 markers at N=1166; the n=2500 cpm_simulate refit fires exactly small-beta; the clean n=800 draw at 0.15 smallest-beta truth fires none, margins 0.14 vs 0.10 and 7.7e3 vs 1e8); full suite 0 fail / 8349 pass. Implementation gate chose the Note-style line wording (shown verbatim in chat) over the terse "Boundary markers:" prefix for consistency with the neighboring Diagnostics notes; falsified by user feedback the note reads as clutter.
 
 ## Decisions
 
