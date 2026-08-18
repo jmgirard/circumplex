@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-17 (third pass: windows-fiml-em hotfix merged and master's full matrix green; GitHub Actions bumped to newest (dca81c9d); byte budgets enforced — ROADMAP and LESSONS compressed to their budgets, graduated rows to tombstones with archives holding the histories, every open remainder and promotion condition preserved. M7 stays parked on the CRAN submission handoff.)_
+_Last hygiene check: 2026-08-17 (M93 done pass: CI platform gate shipped and archived; M88 terminal row pruned to the retention cap; branch-protection candidate added from the M93 review; M7 stays parked on the CRAN submission handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,17 +9,17 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M88 | Fence the norms-audit walk helpers M87 kept | done | — | normal | milestones/archive/M88-norms-audit-walk-helper-tests.md |
 | M89 | Price the degeneracy criterion in the metric the reported numbers live in | done | — | normal | milestones/archive/M89-fitted-matrix-degeneracy-criterion.md |
 | M90 | Say which degeneracy happened, and stop saying it when it did not | done | M89 | normal | milestones/archive/M90-degeneracy-reason-vocabulary.md |
 | M91 | Stop NA-ing computable numbers when only the raw arm refuses | done | M90 | normal | milestones/archive/M91-naive-arm-decoupling.md |
 | M92 | Teach the boundary regime the structure vignette's own example is in | done | — | normal | milestones/archive/M92-boundary-regime-guidance.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M93 | Close the CI platform gate | review | — | normal | milestones/M93-ci-platform-gate.md |
+| M93 | Close the CI platform gate | done | — | normal | milestones/archive/M93-ci-platform-gate.md |
 
 ## Candidates
 
 _Candidates carry no milestone ID — an `M<NN>` is assigned only at planning time. Legacy milestone/decision IDs (≤ M6) remain valid citations into `cairn/legacy/`; M7 is the first cairn-era ID. Struck rows are tombstones: their histories live in the named milestone archives and git._
+- **Master has no GitHub-native branch protection** (M93 review, blame-history F1): no required status checks, so a red matrix blocks merges only through the cairn process gate (green `gh pr checks` + the merge guard), not through GitHub itself. Chosen at the M93 approval gate as a candidate over enabling now. Promote on a manual-merge slip, or fold into the next CI-touching milestone; enabling is one `gh api` settings call requiring Jeff's authorization.
 - ~~The PR check gate is structurally blind to the platforms the release must pass on~~ **graduated 2026-08-17 → M93** (prevention: code-touching PRs escalate to the three-platform release matrix; detection: the review gate checks master's latest push-run matrix; promotion clause fired by the 2026-08-17 platform-only red, PR #121). Open remainder: the third remedy — an automated alert (issue-on-failure) on master's matrix — stays parked; promote on a master red outliving a review cycle unnoticed.
 - **Is τ = 1e-6 the right accuracy floor for near-duplicate-item designs reachable through `cormat`?** (M89 round-3 review, F3 at 68): one item pair at r = 0.9999 fits cleanly, reaches κ(cov2cor(Σ̂)) = 3.3e4, and is refused, though the double-precision error there (p·κ²·ε ≈ 6e-6) sits far below any statistical use of an SE. The refusal is loud, and a near-duplicate pair is arguably a design defect — but τ's calibration is purely numerical, no statistical argument prices the refusal region, and no test exercises κ ∈ [1.4e4, 1.4e7]. D-044 records the choice. Promote on a user report of a refused real dataset, or into any milestone reopening the criterion's calibration.
 - ~~The norms-audit roster builder's remaining unnamed and undiscriminated shapes~~ **graduated 2026-08-15 → M86** (all six M84 review findings; histories in the M84/M86 archives). Open remainder, parked at the M87 plan gate: **whether the audit script's ~225-line argument-guard surface should shrink at all** — `validate_batch()`, `validate_roster()` and `roster_from_objects()` in `data-raw/audit-norms.R` are called only by the test suite and the run block, though `validate_batch()` still protects the one human-reached path (a hand-edit of `AUDIT_BATCH` when instrument 16 is added). Promote on evidence no maintainer path reaches the roster-side guards, or when a later milestone opens that file anyway.
