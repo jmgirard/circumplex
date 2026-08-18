@@ -17,7 +17,11 @@ at large N (see
 vignette section *When a fit sits at a boundary*
 ([`vignette("evaluating-circumplex-structure")`](http://circumplex.jmgirard.com/articles/evaluating-circumplex-structure.md))
 glosses each marker and gives the interpretation and next steps when one
-fires.
+fires. When the confidence intervals are bootstrap, any fired markers
+are instead listed in a descriptive note at every sample size; the note
+also states that what has been measured about the markers covers
+analytic intervals only (and not every marker was measured), so they are
+not validated as predictors of the bootstrap intervals.
 
 ## Usage
 

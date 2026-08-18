@@ -119,6 +119,13 @@ summary(cpm)
 #> 
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a Heywood-type solution).
 #>   Note: 11 of 500 bootstrap resamples were excluded (0 degenerate, 11 non-convergent); the intervals are based on 489 replicates and are conditional on estimability.
+#> 
+#>   Note: boundary/weak-identification markers fired: Heywood communality;
+#>   small correlation-function weight; ill-conditioned Hessian.
+#>   What has been measured about these markers covers analytic intervals
+#>   only, and not every marker was measured; they are not validated as
+#>   predictors of the bootstrap intervals shown here (see the vignette
+#>   section 'When a fit sits at a boundary').
 ```
 
 Two parts of this output matter most for evaluating structure:
@@ -234,13 +241,21 @@ fired:
   determined.
 
 [`summary()`](https://rdrr.io/r/base/summary.html) prints that list when
-the intervals are analytic and $`N`$ falls between 2000 and 50000; below
-2000 it prints an unconditional caution instead, above 50000 neither,
-and on the bootstrap path it prints the individual diagnostic notes
-rather than the list. To see the list itself, we simulate a larger
-sample from the structure just estimated with
+markers fire, though on the analytic path only within a sample-size
+window. On the bootstrap path — as in the fit displayed above — it
+prints as a descriptive note at every sample size, alongside a statement
+that what has been measured about the markers covers analytic intervals
+only (and not every marker was measured — *What a fired marker does and
+does not tell you*, below, has the particulars), so they are not
+validated as predictors of the bootstrap intervals they accompany. When
+the intervals are analytic the list instead arrives inside a coverage
+caution printed when $`N`$ falls between 2000 and 50000; below 2000 an
+unconditional caution prints without the list, and above 50000 neither
+prints. To see that caution-embedded form, we simulate a larger sample
+from the structure just estimated with
 [`cpm_simulate()`](http://circumplex.jmgirard.com/reference/cpm_simulate.md),
-then refit it.
+then refit it on the correlation-matrix path, where the intervals are
+analytic.
 
 ``` r
 

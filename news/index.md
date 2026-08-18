@@ -338,7 +338,12 @@ on a real ggplot2 coordinate system.
   bootstrap intervals were confirmed as the better default but are
   themselves conservative-liberal in spots (notably for near-boundary
   correlation-function weights); improving them is planned follow-up
-  work.
+  work. On the bootstrap path,
+  [`summary()`](https://rdrr.io/r/base/summary.html) also lists any
+  fired markers in a descriptive note at every sample size, stating that
+  what has been measured about the markers covers analytic intervals
+  only — not every marker was measured, and none is validated as a
+  predictor of the bootstrap intervals shown.
 
 - New
   [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
