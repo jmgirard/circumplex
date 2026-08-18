@@ -89,10 +89,10 @@ consumer of the package reads either.
 - [x] T2: Edit `.github/workflows/test-coverage.yaml` — remove the
       `pull_request:` trigger block, simplify `fail_ci_if_error` to `true`, and
       update the workflow's header comment to state what now triggers it.
-- [ ] T3: Edit `cairn/PROFILE.md` — add the consistency-gate watch bullet;
+- [x] T3: Edit `cairn/PROFILE.md` — add the consistency-gate watch bullet;
       correct the test-doctrine Codecov-annotates-the-PR sentence and the
       stock-`usethis`-pair sentence that no longer describes this repo.
-- [ ] T4: Run AC5's grep over the three named files; fix any surviving claim.
+- [x] T4: Run AC5's grep over the three named files; fix any surviving claim.
 - [ ] T5: Run `tools/check-ci-deps.R` and the full `devtools::check()`.
 
 ## Work log
@@ -104,6 +104,8 @@ consumer of the package reads either.
 - 2026-08-18: measured on 2026-08-18 from runs 32184165512 (coverage, pull_request, 27 min) and 32184165497 (R-CMD-check, pull_request, escalated, 38 min); the last recorded figures were 13.0 and 14.5 min on 2026-07-25 (D-029), so the coverage job has roughly doubled as the FIML suite landed. Suite runtime measured locally the same day at 580 s under `NOT_CRAN=true`, 48% of it `test-axes-fiml.R` and 28% the single M65-D3 fixture-staleness test — recorded for the parked replicate-count question, not acted on here.
 - 2026-08-18: T1 — deleted `.github/workflows/pr-commands.yaml`; `grep -rn "pr-commands"` over the tree returns only M95's own record, and `tools/check-ci-deps.R`'s `policy` list never named it, so no checker loses a target. No R code changed, so the profile's `devtools::test()` is deferred to T5 where AC6's full `check()` covers every change at once.
 - 2026-08-18: T2 — removed the `pull_request` trigger from `test-coverage.yaml`, simplified `fail_ci_if_error` to a bare `true`, and gave the file a header stating what now triggers it and what the PR side does and does not lose. AC2 verified by parsing the `on:` mapping with `yaml::read_yaml()` — one key, `push`; the same parse reads `fail_ci_if_error` as logical `TRUE`. AC3's byte-unchanged half verified by extracting the `push` block from `git show master:` and from the working tree and hashing both: 51dce08235cd5670b78bae7a367c6857 on each side.
+- 2026-08-18: T3 — `cairn/PROFILE.md` gains a master coverage watch beside M93's matrix watch (AC4), and the test-doctrine slot's stranded claims are corrected: it described the CI as the stock usethis pair, which neither workflow has been since M93, and said Codecov annotates the PR, which `codecov.yml`'s `comment: false` already made wrong before this milestone. File at 117 lines against the 120 cap.
+- 2026-08-18: T4 — AC5's sweep over the three named files returns two hits, both in the `test-coverage.yaml` header, both stating what the PR side lost rather than claiming it still runs there; `annotates` no longer occurs in any of the three. `cairn_validate` all green.
 - 2026-08-18: checker-regress shape considered and not fired — the consistency-gate watch reads GitHub run conclusions, which are external state, not the repo-internal artifacts the shape is defined over.
 
 ## Decisions
