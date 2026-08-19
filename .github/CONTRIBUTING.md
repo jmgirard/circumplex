@@ -1,8 +1,8 @@
 # Contributing to circumplex
 
-This outlines how to propose a change to circumplex. For more detailed
-info about contributing to this, and other tidyverse packages, please see the
-[**development contributing guide**](https://rstd.io/tidy-contrib).
+This outlines how to propose a change to circumplex. The package is maintained
+by one person, so the surest route to a merged change is to agree on the
+problem before you write the fix.
 
 ### Fixing typos
 
@@ -14,10 +14,14 @@ the GitHub web interface, so long as the changes are made in the _source_ file.
 
 ### Prerequisites
 
-Before you make a substantial pull request, you should always file an issue and
-make sure someone from the team agrees that it’s a problem. If you’ve found a
-bug, create an associated issue and illustrate the bug with a minimal 
-[reprex](https://www.tidyverse.org/help/#reprex).
+Before you make a substantial pull request, please raise it first, so we can
+agree the change is wanted before you spend time on it:
+
+*  A bug → open an
+   [issue](https://github.com/jmgirard/circumplex/issues) illustrating it with a
+   minimal [reprex](https://reprex.tidyverse.org/).
+*  A feature idea, or a question about how something works → open a
+   [discussion](https://github.com/jmgirard/circumplex/discussions).
 
 ### Pull request process
 
@@ -43,6 +47,3 @@ GitHub username, and links to relevant issue(s)/PR(s).
 Please note that the circumplex project is released with a
 [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this
 project you agree to abide by its terms.
-
-### See tidyverse [development contributing guide](https://rstd.io/tidy-contrib)
-for further details.

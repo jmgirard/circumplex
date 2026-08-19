@@ -92,7 +92,7 @@ GitHub renders them, and act on what they say.
 
 ## Tasks
 
-- [ ] **T1** — CONTRIBUTING.md: rewrite the framing (L3-5, L47-48) and the
+- [x] **T1** — CONTRIBUTING.md: rewrite the framing (L3-5, L47-48) and the
       "someone from the team agrees" prerequisite (L17-18) for a
       solo-maintainer, non-tidyverse package.
 - [ ] **T2** — CONTRIBUTING.md: rewrite the PR-process section — replace the
@@ -122,6 +122,7 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: plan gate chose a full rewrite over a minimal edit of the false claims alone, because the audit showed a minimal edit leaves the stale claim standing in paraphrase (a "check the CI services listed in the README" rewrite passes every literal grep); falsified by the rewrite introducing a new inaccuracy the greps cannot see.
 - 2026-08-19: plan chose deleting the dead `.Rbuildignore` entries over exempting `.Rbuildignore` from AC4's sweep, because the entries name files that do not exist and cannot return; falsified by either pattern turning out to still match something `R CMD build` needs excluded.
 - 2026-08-19: implement session started; branch `m97-contributor-docs-refresh` cut from pushed master (908b65e0), tree clean.
+- 2026-08-19: T1 — CONTRIBUTING.md framing, prerequisites, and closing section rewritten: the tidy-contrib pointers (L3-5, L47-48) removed, the "someone from the team" prerequisite replaced by an issue-for-bugs / discussion-for-features split (Discussions is enabled and in live use, 2 threads), and the reprex link repointed from `www.tidyverse.org/help/#reprex` to `reprex.tidyverse.org` (AC5's sole permitted exception).
 
 ## Decisions
 
