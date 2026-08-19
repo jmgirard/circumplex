@@ -137,7 +137,7 @@ is the only place that environment reports at all.
 - [x] T7: Harden the alert body — idempotent label creation that cannot abort the job, a label probe that cannot invert on a pipeline, a `concurrency:` group, and the unused `contents:` grant and its false checkout comments removed.
 - [x] T8: Repair the audits' own defects — effective (job-over-workflow) permissions precedence, watched-workflow `name:` equality, the zero-jobs crash, a dry-run fixture where a GitHub call fails; name both scripts in the profile's consistency-gate slot.
 
-- [ ] T9: Delete the source scanner from `tools/check-master-red-alert.R`,
+- [x] T9: Delete the source scanner from `tools/check-master-red-alert.R`,
       including its "and nothing else" output line; build AC3(a)'s `env:`
       comparison and AC1's exact `if:`, one-job, `on:`-exclusivity and sibling
       `name:` checks in its place.
@@ -176,6 +176,7 @@ is the only place that environment reports at all.
 - 2026-08-18: amendment return: AC3 — "the issue text the alert produces is fixed boilerplate plus `workflow_run` payload values and nothing else, decided by two bounded checks together"
 - 2026-08-18: descope chosen by Jeff at the second return, over a third audit-hardening pass and over a Fable escalation: the deliverable is the workflow, not the audit script. AC1 and AC3 narrowed (the source-scanning guarantee deleted outright, not widened), the Scope In bullet narrowed to match, T9/T10 added, Coverage remapped AC3 → T9 and AC1 → T1+T9. F5 is fixed as a real production bug; F4 and F6-F14 are won't-fix by that same call — logged in Review, and F4 means a dropped `--label` on the search or the create is caught by nothing.
 - 2026-08-18: the amended wording was audited by a fresh-context [O] reader that did not author it, before it was written to the file. It returned three defects, all adopted: AC3(b) quantified over one capture site where the body reaches `gh` at three (the returned F2 shape, one branch over); AC3 as first drafted tied nothing to the payload at all, since the dry run supplies the values itself, which also stranded the Scope bullet — hence clause (a) over the `env:` mapping; and AC1 had silently dropped the `on:`-exclusivity, sibling `name:` equality and one-job checks the existing audit already performs.
+- 2026-08-18: T9 — the source scanner is deleted from `tools/check-master-red-alert.R` (the `${{ }}` site walk, the reported-region composition refusal, the variable resolver and the site classifier), along with the output line claiming the body "interpolates 4 workflow_run payload field(s) and nothing else", the sentence the milestone falsified twice. In its place AC3(a) compares the parsed `env:` mapping against the six expected expressions whole, and AC1's `if:` is now compared whole rather than probed for three substrings. Both fire: `&&` -> `||` is caught, and so is `ALERT_HEAD_SHA` repointed to `${{ github.sha }}` — the mutation that would report the wrong SHA while every downstream check stayed green. The header carries a do-not-reinstate note explaining why scanning was descoped.
 
 ## Review
 

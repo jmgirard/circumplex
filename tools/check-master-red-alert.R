@@ -65,25 +65,23 @@ if (length(jobs) != 1L) {
 }
 job <- jobs[[1L]]
 
-# The gate is one `if:` expression. Each condition is asserted on the parsed
-# value with whitespace collapsed, so re-wrapping the expression cannot break
-# the audit and dropping a condition cannot pass it.
-cond <- gsub("[[:space:]]+", " ", paste(as.character(job[["if"]]), collapse = " "))
-required <- c(
-  "failure conclusion" =
-    "github.event.workflow_run.conclusion == 'failure'",
-  "push event" =
-    "github.event.workflow_run.event == 'push'",
-  "default branch" =
-    "github.event.workflow_run.head_branch == github.event.repository.default_branch"
+# The gate is one `if:` expression, compared WHOLE. Testing for the three
+# conditions as three independent substrings (the earlier shape) passed a
+# `&&` -> `||` mutation, which would alert on every push run of either
+# workflow, green ones and pull-request runs included. Whitespace is collapsed
+# so re-wrapping the YAML cannot break the audit, and nothing else about the
+# expression is left to interpretation.
+EXPECTED_IF <- paste(
+  "github.event.workflow_run.conclusion == 'failure' &&",
+  "github.event.workflow_run.event == 'push' &&",
+  "github.event.workflow_run.head_branch == github.event.repository.default_branch"
 )
-missing_cond <- required[!vapply(
-  required, function(x) grepl(x, cond, fixed = TRUE), logical(1L)
-)]
-if (length(missing_cond)) {
+cond <- trimws(gsub("[[:space:]]+", " ",
+                    paste(as.character(job[["if"]]), collapse = " ")))
+if (!identical(cond, EXPECTED_IF)) {
   problems <- c(problems, sprintf(
-    "%s: the job's `if:` does not require %s (found `%s`).",
-    PATH, paste(names(missing_cond), collapse = ", "), cond
+    "%s: the job's `if:` must be exactly `%s`; found `%s`.",
+    PATH, EXPECTED_IF, cond
   ))
 }
 
@@ -154,187 +152,44 @@ if (!is.list(conc) || !grepl("workflow_run", paste(conc$group, collapse = ""))) 
   ))
 }
 
-# ---- AC3: every value reaching the issue body comes from the payload -------
+# ---- AC3(a): the values are tied to the workflow_run payload ---------------
 
-# The point of this section is that the issue text is REPORTED, never
-# composed: a reader acting on the issue must be able to trust that the run
-# URL and SHA name the run that actually failed. So it enumerates every
-# interpolation site in the workflow and in its shell body, resolves each one,
-# and requires that the sites reaching the body resolve to workflow_run
-# payload fields and nothing else.
+# This is the ONLY place the issue's values are tied to the payload, and it is
+# the whole of what this script promises about them. The dry run
+# (tools/master-red-alert-dryrun.R) decides AC3(b) — that what actually
+# reaches `gh` is boilerplate plus those values — by comparing captured
+# output; it supplies the values itself, so it cannot see this binding.
+#
+# An earlier form of this section SCANNED the shell body for composed values.
+# It was falsified twice at review, each time by a shell construct it did not
+# know (command substitution; then composition at the `gh` call site, and
+# re-assignment of the body after its heredoc). Proving a negative over an
+# open-ended grammar is not a check, and the guarantee was deliberately
+# descoped rather than widened a third time. Do not reinstate it.
 
-# The alert is the one step carrying a shell body; locating it by content
-# rather than by position keeps this audit pointed at the right step if a
-# setup step is ever added ahead of it.
 runs <- vapply(job$steps, function(s) is.character(s$run), logical(1L))
 if (sum(runs) != 1L) {
   stop(sprintf("%s: expected exactly one step with a `run:` body; found %d.",
                PATH, sum(runs)), call. = FALSE)
 }
 step <- job$steps[[which(runs)]]
+
+EXPECTED_ENV <- c(
+  ALERT_WORKFLOW   = "${{ github.event.workflow_run.name }}",
+  ALERT_RUN_URL    = "${{ github.event.workflow_run.html_url }}",
+  ALERT_HEAD_SHA   = "${{ github.event.workflow_run.head_sha }}",
+  ALERT_CONCLUSION = "${{ github.event.workflow_run.conclusion }}",
+  GH_TOKEN         = "${{ secrets.GITHUB_TOKEN }}",
+  GH_REPO          = "${{ github.repository }}"
+)
 script <- strsplit(step$run, "\n", fixed = TRUE)[[1L]]
 env <- vapply(step$env, as.character, character(1L))
-
-PAYLOAD_RE <- "^(github\\.event|context\\.payload)\\.workflow_run\\."
-
-# --- interpolation sites of the form ${{ }} -------------------------------
-# These are checked by SITE, not by value: comparing the set of expressions
-# against the set in `env:` (the earlier shape of this check) let the same
-# expression pass anywhere else in the file, including inside the shell body.
-# The site that matters is the `run:` block — an expression there is
-# substituted into the script before bash ever sees it, which is the standard
-# Actions script-injection shape. Elsewhere in the file (`env:`,
-# `concurrency:`, `if:`) an expression is evaluated by Actions itself and
-# reaches no shell.
-indent_of <- function(lines) nchar(sub("[^ ].*$", "", lines))
-block_after <- function(key_line) {
-  if (is.na(key_line)) return(integer(0L))
-  after <- seq.int(key_line + 1L, length(raw))
-  deeper <- indent_of(raw[after]) > indent_of(raw[key_line]) | !nzchar(raw[after])
-  after[seq_len(match(FALSE, deeper, nomatch = length(after) + 1L) - 1L)]
-}
-
-run_key <- grep("^\\s*run:\\s*\\|", raw)[1L]
-run_block <- block_after(run_key)
-in_run <- intersect(grep("\\$\\{\\{", raw), run_block)
-if (length(in_run)) {
+if (!identical(env[order(names(env))], EXPECTED_ENV[order(names(EXPECTED_ENV))])) {
   problems <- c(problems, sprintf(
-    "%s: `${{ }}` expression(s) inside the `run:` body, at line(s) %s. Every value the shell reads must arrive through `env:`, where this audit can resolve it; interpolating one straight into the script is the Actions script-injection shape.",
-    PATH, paste(in_run, collapse = ", ")
-  ))
-}
-
-# Any `context.payload.*` read (a github-script residue) must be a
-# workflow_run path too.
-ctx <- unlist(regmatches(raw, gregexpr("context\\.payload\\.[A-Za-z0-9_.]+", raw)))
-bad_ctx <- ctx[!grepl(PAYLOAD_RE, ctx)]
-if (length(bad_ctx)) {
-  problems <- c(problems, sprintf(
-    "%s: `context.payload` reads outside the workflow_run payload: %s.",
-    PATH, paste(unique(bad_ctx), collapse = ", ")
-  ))
-}
-
-# --- the regions that reach the issue -------------------------------------
-# Two of them: the `BODY=` heredoc, and the `TITLE=` assignment. The title is
-# not decoration — it is the dedupe key, and it is what a create call carries.
-# Scanning only the heredoc (the earlier shape) left a composed title
-# unaudited.
-heredoc_region <- function(var) {
-  open <- grep(sprintf("^\\s*%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?", var), script)
-  if (length(open) != 1L) {
-    problems <<- c(problems, sprintf(
-      "%s: expected exactly one `%s=` heredoc in the shell body; found %d.",
-      PATH, var, length(open)
-    ))
-    return(character(0L))
-  }
-  delim <- sub(sprintf("^\\s*%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?.*$", var), "\\1",
-               script[open])
-  close <- open + which(script[-seq_len(open)] == delim)[1L]
-  if (is.na(close)) {
-    problems <<- c(problems, sprintf(
-      "%s: the `%s=` heredoc is never closed by a bare `%s` line.",
-      PATH, var, delim
-    ))
-    return(character(0L))
-  }
-  script[seq.int(open + 1L, close - 1L)]
-}
-
-body_region <- heredoc_region("BODY")
-title_region <- grep("^\\s*TITLE=", script, value = TRUE)
-if (length(title_region) != 1L) {
-  problems <- c(problems, sprintf(
-    "%s: expected exactly one `TITLE=` assignment in the shell body; found %d.",
-    PATH, length(title_region)
-  ))
-}
-reported <- c(body_region, title_region)
-
-# Nothing reaching the issue may be produced rather than interpolated. A
-# command substitution or a parameter expansion carrying a default is a value
-# this scan cannot resolve and the payload did not supply, so it is refused
-# outright rather than enumerated.
-composed <- grep("\\$\\(|`|\\$\\{[A-Za-z_][A-Za-z0-9_]*[^A-Za-z0-9_}]",
-                 reported, value = TRUE)
-composed <- composed[!grepl("^\\s*\\\\`", composed)]
-composed <- composed[grepl("\\$\\(|\\$\\{[A-Za-z_][A-Za-z0-9_]*[^A-Za-z0-9_}]", composed) |
-                       grepl("[^\\\\]`", composed)]
-if (length(composed)) {
-  problems <- c(problems, sprintf(
-    "%s: the issue title or body composes value(s) rather than reporting them, at: %s. Command substitution, backticks and defaulted expansions cannot resolve to a workflow_run field.",
-    PATH, paste(trimws(composed), collapse = " | ")
-  ))
-}
-
-# Assignments may be nested inside an `if`, so leading whitespace is part of
-# the shape rather than a reason to miss one.
-assigned <- sub("^\\s*([A-Za-z_][A-Za-z0-9_]*)=.*$", "\\1",
-                grep("^\\s*[A-Za-z_][A-Za-z0-9_]*=", script, value = TRUE))
-
-vars_in <- function(lines) {
-  hits <- unlist(regmatches(
-    lines, gregexpr("\\$\\{?[A-Za-z_][A-Za-z0-9_]*\\}?", lines)
-  ))
-  unique(gsub("^\\$\\{?|\\}$", "", hits))
-}
-
-# Resolve a shell variable to the set of payload expressions behind it,
-# following local assignments (TITLE and BODY are built from env vars, so a
-# value smuggled in through a local would still be caught here). Returns NA
-# for a name that resolves to neither.
-resolve <- function(name, seen = character(0L)) {
-  if (name %in% seen) return(character(0L))
-  if (name %in% names(env)) {
-    expr <- trimws(gsub("^\\$\\{\\{|\\}\\}$", "", env[[name]]))
-    return(if (grepl(PAYLOAD_RE, expr)) expr else NA_character_)
-  }
-  if (name %in% assigned) {
-    rhs <- grep(sprintf("^\\s*%s=", name), script, value = TRUE)
-    inner <- setdiff(vars_in(rhs), name)
-    if (!length(inner)) return(character(0L))
-    return(unlist(lapply(inner, resolve, seen = c(seen, name))))
-  }
-  NA_character_
-}
-
-# Every site in the reported regions must resolve to the payload.
-reported_vars <- vars_in(reported)
-resolved <- lapply(reported_vars, resolve)
-names(resolved) <- reported_vars
-unresolved <- reported_vars[vapply(resolved, anyNA, logical(1L))]
-if (length(unresolved)) {
-  problems <- c(problems, sprintf(
-    "%s: value(s) substituted into the issue title or body that do not come from the workflow_run payload: %s.",
-    PATH, paste(unresolved, collapse = ", ")
-  ))
-}
-
-# Every site in the REST of the shell body is enumerated too, and each must be
-# classifiable — an env value, a variable the script assigns, or one of the
-# shell's own. An unknown name means the scan has stopped seeing the body it
-# claims to cover.
-# `jq --arg <name>` declares a name inside the filter, not in the shell.
-jq_args <- unlist(regmatches(
-  script, gregexpr("(?<=--arg )[A-Za-z_][A-Za-z0-9_]*", script, perl = TRUE)
-))
-other_vars <- setdiff(vars_in(script), c(reported_vars, jq_args))
-unknown <- other_vars[!(other_vars %in% names(env) | other_vars %in% assigned)]
-if (length(unknown)) {
-  problems <- c(problems, sprintf(
-    "%s: unclassifiable substitution(s) in the shell body: %s. Every site must be an `env:` value, a variable the body assigns, or a declared local.",
-    PATH, paste(unknown, collapse = ", ")
-  ))
-}
-
-paths <- unique(stats::na.omit(unlist(resolved)))
-fields <- sub(PAYLOAD_RE, "", paths)
-REQUIRED_FIELDS <- c("name", "html_url", "head_sha", "conclusion")
-if (!all(REQUIRED_FIELDS %in% fields)) {
-  problems <- c(problems, sprintf(
-    "%s: the issue must name the failing workflow, run URL, head SHA and conclusion; payload fields it interpolates: %s. An empty or short enumeration fails rather than passing vacuously.",
-    PATH, if (length(fields)) paste(fields, collapse = ", ") else "none"
+    "%s: the step's `env:` mapping must be exactly %s. Found: %s. This mapping is the only thing tying the issue's values to the workflow_run payload — a changed expression here reports the wrong run, and nothing downstream can tell.",
+    PATH,
+    paste(sprintf("%s=%s", names(EXPECTED_ENV), EXPECTED_ENV), collapse = "; "),
+    if (length(env)) paste(sprintf("%s=%s", names(env), env), collapse = "; ") else "nothing"
   ))
 }
 
@@ -392,7 +247,6 @@ if (length(problems)) {
 }
 
 cat(sprintf(
-  "%s: watches %s; fires only on a failed push run of the default branch; grants issues: write and no other write scope.\nIssue body interpolates %d workflow_run payload field(s) and nothing else: %s.\n",
-  PATH, paste(WATCHED, collapse = " + "),
-  length(fields), paste(sort(fields), collapse = ", ")
+  "%s: watches %s; fires only on a failed push run of the default branch; grants issues: write and no other write scope; carries the four workflow_run payload fields through `env:` and installs nothing.\n",
+  PATH, paste(WATCHED, collapse = " + ")
 ))
