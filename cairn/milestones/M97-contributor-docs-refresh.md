@@ -73,12 +73,18 @@ GitHub renders them, and act on what they say.
       documented GET retry (`curl -sL -o /dev/null -w '%{http_code}' -A <browser
       UA>`) whose own code must be 2xx/3xx. Any URL not reaching 2xx/3xx on
       either probe is repaired or removed. Statuses recorded in the work log.
-- [ ] **AC7** — `.github/CODE_OF_CONDUCT.md` is Contributor Covenant 2.1 from
-      `https://www.contributor-covenant.org/version/2/1/code_of_conduct.md`
-      (its SHA-256 recorded in the work log), differing from that source only on
-      the `[INSERT CONTACT METHOD]` line, which carries the `cre` email in
-      `DESCRIPTION`'s `Authors@R` (`me@jmgirard.com`). Verified by that diff and
-      by `grep -F` for the address (≥1 match).
+- [x] **AC7** — `.github/CODE_OF_CONDUCT.md` is Contributor Covenant 2.1 as
+      bundled by usethis 3.2.1 (template SHA-256
+      `e45d34f51a88827f03e9bc868aabb872ccae96434a8c14c469a44147825a499a`), with
+      template line 62's `{{{ contact }}}` placeholder replaced by the `cre`
+      email in `DESCRIPTION`'s `Authors@R` (`me@jmgirard.com`). Verified by
+      `shasum -a 256 .github/CODE_OF_CONDUCT.md` equalling
+      `4828e2a242cad5e7d7f0f0c47eefe57ff0e66273ba6db3f90f227bb6ab1b87f4`, and,
+      where usethis 3.2.1 is installed, by `diff` against the template showing
+      exactly `62c62` with no additions or deletions. The substitution is
+      length-preserving (15 characters either way) so the template's hard wrap
+      is unchanged, and template line 62's trailing space is preserved
+      byte-for-byte.
 
 ## Coverage
 
@@ -105,7 +111,7 @@ GitHub renders them, and act on what they say.
       L32) and framing; keep reprex.
 - [x] **T5** — ISSUE_TEMPLATE.md: replace the stale question venues (L1) and
       help links (L3).
-- [ ] **T6** — CODE_OF_CONDUCT.md: replace with Contributor Covenant 2.1;
+- [x] **T6** — CODE_OF_CONDUCT.md: replace with Contributor Covenant 2.1;
       enforcement contact = DESCRIPTION's `cre` email.
 - [ ] **T7** — Delete the two dead `.Rbuildignore` entries (L8, L13); confirm
       `devtools::check()` is unaffected.
@@ -127,6 +133,8 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: T3 — "Generated files" section added after "Fixing typos"; AC2 probes green (all six strings >=1 match: `R/RcppExports.R` 1, `src/RcppExports.cpp` 1, `man/*.Rd` 1, `NAMESPACE` 2, `devtools::document()` 1, `Rcpp::compileAttributes()` 1). README.md/README.Rmd added as a third generated pair from PROFILE.md's consistency-gate slot.
 - 2026-08-19: T4 — SUPPORT.md rewritten around this repo's own venues (Discussions for questions, Issues for bugs). AC3 probe green: the only `github.com/<owner>/circumplex` URLs are `jmgirard/...discussions` and `jmgirard/...issues`, and the issue-search link's origin-plus-path string-equals DESCRIPTION's `BugReports:` value with no query. The wrong-repo link (`github.com/tidyverse/circumplex/issues`) and the four tidyverse help venues are gone; the stale `help.github.com` qualifier link was repointed to `docs.github.com`.
 - 2026-08-19: T5 — ISSUE_TEMPLATE.md's question venues (StackOverflow, community.rstudio.com) replaced by this repo's Discussions; the tidyverse help pointer dropped and the reprex link repointed to `reprex.tidyverse.org`.
+- 2026-08-19: **amendment (substantive), AC7** — the pinned source `https://www.contributor-covenant.org/version/2/1/code_of_conduct.md` returns HTTP 404 (a 3449-byte "Page not found" page), making AC7 unsatisfiable as planned. Amended at a mini gate to the usethis 3.2.1 bundled template, which Jeff confirms is where these files originally came from; the upstream raw markdown was rejected as the pin because it carries a Hugo TOML front-matter block and unwrapped lines, so a shipped copy would differ from it on nearly every line. Amended wording was audited first by a fresh-context [O] reader that did not author it, returning four findings, all applied: the normative reference was machine-local (deliverable SHA now the primary check, template SHA inline as provenance); "the placeholder carries the email" was backwards; the `grep -F` probe was location-free and was dropped; and "exactly one changed line" silently rode two coincidences now named in the criterion (both strings are 15 characters, and template line 62 is the file's only line ending in a trailing space).
+- 2026-08-19: T6 — CODE_OF_CONDUCT.md replaced (Contributor Covenant 1.0.0, 1396 bytes, no enforcement contact → 2.1 with `me@jmgirard.com`). AC7 verified independently in-session: template SHA-256 `e45d34f5…a499a`, deliverable SHA-256 `4828e2a2…1b87f4`, `diff` output exactly `62c62`, line 62's trailing space present in `od -c`, and the text's own 2.1 attribution at line 118.
 
 ## Decisions
 
