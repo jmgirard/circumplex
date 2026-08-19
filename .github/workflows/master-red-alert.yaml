@@ -59,9 +59,11 @@ jobs:
           TITLE="master is red: ${ALERT_WORKFLOW}"
 
           # Every value below is a workflow_run payload field carried in via
-          # the step `env:` above — nothing here is composed from anything
-          # else. tools/check-master-red-alert.R enumerates these sites and
-          # fails if one of them resolves to something other than the payload.
+          # the step `env:` above. What checks that: check-master-red-alert.R
+          # compares that `env:` block against the payload expressions, and
+          # master-red-alert-dryrun.R compares the text this body hands to `gh`
+          # against a committed template. Nothing scans this source — see the
+          # audit script's header for why that was descoped.
           BODY="$(cat <<EOF
           A push run of \`${ALERT_WORKFLOW}\` on the default branch concluded \`${ALERT_CONCLUSION}\`.
 
@@ -113,7 +115,8 @@ jobs:
             # per push on the issue it already has.
             EXISTING="$(gh issue list --state open --label "$LABEL" --json number,title |
               jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')" ||
-              EXISTING=""
+              EXISTING=""   # a failed search reads as "no match": this posts a
+                            # duplicate rather than staying silent, deliberately
 
             if [ -n "$EXISTING" ]; then
               gh issue comment "$EXISTING" --body "$BODY"

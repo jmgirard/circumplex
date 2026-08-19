@@ -174,6 +174,15 @@ if (sum(runs) != 1L) {
 }
 step <- job$steps[[which(runs)]]
 
+# A step-level `if:` would silence the alert entirely while every check below
+# still passed — the job-level gate AC1 pins says nothing about the step.
+if (!is.null(step[["if"]])) {
+  problems <- c(problems, sprintf(
+    "%s: the alert step carries its own `if:` (`%s`). The gate belongs on the job; a step-level condition can disable the alert with nothing else noticing.",
+    PATH, paste(as.character(step[["if"]]), collapse = " ")
+  ))
+}
+
 EXPECTED_ENV <- c(
   ALERT_WORKFLOW   = "${{ github.event.workflow_run.name }}",
   ALERT_RUN_URL    = "${{ github.event.workflow_run.html_url }}",

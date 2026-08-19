@@ -75,7 +75,13 @@ EXPECTED_TITLE <- sprintf("master is red: %s", payload[["ALERT_WORKFLOW"]])
 # path was invisible while the stub could only succeed.
 STUB <- '#!/bin/sh
 printf "%s\\n" "$1 $2" >> "$STUB_LOG"
-{ printf "== %s\\n" "$1 $2"; printf "%s\\n" "$@"; } >> "$STUB_ARGS"
+# Each call has its argument vector written to its OWN file, NUL-separated. An earlier
+# form appended every call to one file behind a `== <subcommand>` header line
+# — in-band framing a multi-line --body could forge, truncating its own capture
+# and hiding whatever followed. Nothing the alert writes is a delimiter here.
+STUB_SEQ=$(( $(cat "$STUB_N" 2>/dev/null || echo 0) + 1 ))
+printf "%s" "$STUB_SEQ" > "$STUB_N"
+printf "%s\\0" "$1 $2" "$@" > "$STUB_ARGS_DIR/call-$STUB_SEQ"
 if [ "$1 $2" = "${STUB_FAIL:-}" ]; then
   echo "stubbed failure: $1 $2" >&2
   exit 1
@@ -172,25 +178,27 @@ for (i in seq_along(vals)) {
   }
 }
 
-# Split the recorded argument file into one block per call. The stub writes a
-# `== <subcommand>` header, then one argument per line.
-calls_from <- function(args) {
-  starts <- grep("^== ", args)
-  lapply(seq_along(starts), function(i) {
-    to <- if (i < length(starts)) starts[i + 1L] - 1L else length(args)
-    list(sub("^== ", "", args[starts[i]]),
-         argv = args[seq.int(starts[i] + 1L, to)])
+# Read the recorded calls back: one file per call, NUL-separated fields, the
+# first being the subcommand. No text the alert produces can be mistaken for
+# framing.
+calls_from <- function(dir) {
+  files <- list.files(dir, pattern = "^call-", full.names = TRUE)
+  files <- files[order(as.integer(sub("^.*call-", "", files)))]
+  lapply(files, function(f) {
+    bytes <- readBin(f, "raw", file.size(f))
+    fields <- vapply(split(bytes, cumsum(c(0L, head(bytes, -1L) == as.raw(0)))),
+                     function(b) rawToChar(b[b != as.raw(0)]), character(1L),
+                     USE.NAMES = FALSE)
+    list(fields[1L], argv = fields[-1L])
   })
 }
 
-# `--body` is the last argument of every issue-producing call, so its
-# multi-line value runs to the end of the block; `--title` takes the one line
-# after it.
+# Each argument is its own recorded field, so a flag's value is simply the
+# next one — independent of argument order and of what the value contains.
 flag_value <- function(argv, flag) {
   at <- which(argv == flag)
-  if (!length(at)) return(NULL)
-  if (flag == "--body") paste(argv[seq.int(at[1L] + 1L, length(argv))], collapse = "\n")
-  else argv[at[1L] + 1L]
+  if (!length(at) || at[1L] >= length(argv)) return(NULL)
+  argv[at[1L] + 1L]
 }
 
 to_template <- function(text) {
@@ -212,8 +220,9 @@ run_fixture <- function(fx) {
   writeLines(fx$issues, file.path(dir, "issues.json"))
 
   log <- file.path(dir, "calls.log")
-  args <- file.path(dir, "calls.args")
-  file.create(log, args)
+  args_dir <- file.path(dir, "calls")
+  dir.create(args_dir)
+  file.create(log)
 
   # `env` is invoked directly rather than through system2()'s own `env=`
   # argument, which builds an unquoted command line.
@@ -221,7 +230,8 @@ run_fixture <- function(fx) {
     paste0(names(payload), "=", unname(payload)),
     paste0("PATH=", bin, ":", Sys.getenv("PATH")),
     paste0("STUB_LOG=", log),
-    paste0("STUB_ARGS=", args),
+    paste0("STUB_ARGS_DIR=", args_dir),
+    paste0("STUB_N=", file.path(dir, "calls.n")),
     paste0("STUB_LABELS=", file.path(dir, "labels.txt")),
     paste0("STUB_ISSUES=", file.path(dir, "issues.json")),
     paste0("STUB_FAIL=", if (is.null(fx$fail)) "" else fx$fail)
@@ -235,7 +245,7 @@ run_fixture <- function(fx) {
     status = attr(status, "status"),
     output = status,
     calls = readLines(log, warn = FALSE),
-    args = readLines(args, warn = FALSE)
+    recorded = calls_from(args_dir)
   )
 }
 
@@ -295,8 +305,9 @@ for (fx in fixtures) {
   wanted <- payload[c("ALERT_WORKFLOW", "ALERT_RUN_URL", "ALERT_HEAD_SHA",
                       "ALERT_CONCLUSION")]
   if (n_create == 1L) wanted <- c(wanted, EXPECTED_TITLE)
+  all_args <- unlist(lapply(res$recorded, function(c) c$argv))
   absent <- wanted[!vapply(
-    wanted, function(v) any(grepl(v, res$args, fixed = TRUE)), logical(1L)
+    wanted, function(v) any(grepl(v, all_args, fixed = TRUE)), logical(1L)
   )]
   if (length(absent)) {
     problems <- c(problems, sprintf(
@@ -305,7 +316,7 @@ for (fx in fixtures) {
     ))
     next
   }
-  if (n_comment == 1L && !any(grepl("^42$", res$args))) {
+  if (n_comment == 1L && !any(all_args == "42")) {
     problems <- c(problems, sprintf(
       "fixture '%s': the comment did not target the matching issue 42.", fx$name
     ))
@@ -316,7 +327,7 @@ for (fx in fixtures) {
   # title and body that reduce to the committed templates once the payload
   # values are replaced by their field names.
   produced <- Filter(function(c) c[[1L]] %in% c("issue create", "issue comment"),
-                     calls_from(res$args))
+                     res$recorded)
   if (!length(produced)) {
     problems <- c(problems, sprintf(
       "fixture '%s': no issue create or comment was recorded, so there is no issue text to check.",
@@ -340,6 +351,18 @@ for (fx in fixtures) {
     if (length(missing_vals)) {
       bad <- c(bad, sprintf("`%s`'s body is missing payload value(s) %s",
                             call[[1L]], paste(missing_vals, collapse = ", ")))
+      next
+    }
+    # The field-name markers must not already occur in the raw capture, or
+    # the substitution is not injective and a hardcoded `<name>` in the body
+    # would reduce to the template while the issue printed the placeholder.
+    planted <- FIELD_OF[vapply(
+      FIELD_OF, function(m) grepl(m, paste(title_txt, body_txt), fixed = TRUE),
+      logical(1L)
+    )]
+    if (length(planted)) {
+      bad <- c(bad, sprintf("`%s` already contains the field marker(s) %s, so the capture cannot be normalized",
+                            call[[1L]], paste(planted, collapse = ", ")))
       next
     }
     if (!identical(to_template(body_txt), EXPECTED_BODY_TEMPLATE)) {
