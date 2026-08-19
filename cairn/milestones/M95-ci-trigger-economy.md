@@ -143,3 +143,27 @@ Three fresh-context lenses, none having seen the implementation.
 
 - **[S] prior-PR-comments** — no prior-review evidence. No archived `## Review` finding across the CI milestones bears on these files, and the existence probe `gh api .../pulls/comments?per_page=1` returned `[]`, so the per-PR thread walk was skipped per the probe gate. Clean no-op, as the standing M33 lesson predicts for this repo.
 - **[S] blame-history** — no findings. Established that the `pull_request` trigger and the `fail_ci_if_error` conditional both date to commit 302cf928 (2024-10-27, pre-cairn), not to any deliberate cairn-era decision; that `paths-ignore` on that trigger was M51's work, so removing the trigger retires part of M51's addition while continuing M51's own CI-economy purpose; that `pr-commands.yaml` was never deliberately retained or restored; that M93's PR-blocking matrix gate is untouched and never depended on the coverage workflow; and that the removed "Codecov annotates the PR" sentence was already wrong when written in 0b417270, since `codecov.yml` has carried `comment: false` since before cairn. It independently confirmed the M59 and M92 citations in the new comment and PROFILE prose against those milestones' archives.
+
+- **[O] diff-bug** — 14 findings, ranked. It verified AC1, AC2, AC3 and AC6 independently, confirmed master carries no branch protection (so removing the PR trigger leaves no required check hanging), and found nothing against D-015, D-029, the statistical invariants, or any IP/GP.
+
+Triage (every finding logged; verified against the artifacts, not against the reviewer's account of them):
+
+| # | Finding | Disposition |
+|---|---|---|
+| F1 | The coverage gate blocks the only fix for the condition it detects — a red master run fails the next review gate, and CLAUDE.md forbids implementing on the default branch | fix now: name the `/hotfix` escape in the bullet |
+| F2 | A *cancelled* run is `completed` and not `success`, and this repo cancels master coverage runs in practice | fix now — **verified**: run 32187677266 concluded `cancelled` 2026-08-18T21:25:56Z, the second-newest master coverage run, under `cancel-in-progress: true` against a ~26 min job |
+| F3 | The header calls covr "the slower of the two (27 min against the check job's 38 min)" — 27 < 38, so its own numbers say the opposite | fix now: my error |
+| F4 | `PROFILE.md` says "covr is a diagnostic, never a gate" twenty lines from a bullet making a red covr run a gate failure | fix now: my error, distinguish percentage from conclusion |
+| F5 | The plan-gate audit's merge-blocking finding "was not actually fixed" | reject: conflates criterion with deliverable — the criterion was fixed, the deliverable's gate is what the plan gate chose; substance rides F1/F2 |
+| F6 | "Nothing was lost on the PR side by stopping" is contradicted six lines later | fix now: my error, narrow to *reporting* |
+| F7 | "a red or **absent** run is a gate failure" — `paths-ignore` means tracking-only pushes create no run, and runs age out at ~90 days | fix now: fold into F2's wording |
+| F8 | "this is the only gate its environment reaches" drops the "next" the workflow header carries — the run read at review predates the branch under review | fix now: my error |
+| F9 | The M92 signal is largely spent — its remedy made the vignette guards *skip* under covr, so that axis now skips rather than catches | fix now: soften; M59's optimizer perturbation still stands |
+| F10 | The literal `true` is a trap for M96 adding a trigger here | reject: M96 adds a separate workflow file watching via `workflow_run`; it adds no trigger to this file |
+| F11 | AC2's recorded method returns NULL by key name (`on` parses as boolean) | reject as already handled: self-caught during review and recorded in AC2's evidence line above |
+| F12 | AC5's "the complete set of files carrying a claim" is false — `.github/CONTRIBUTING.md` tells contributors to check build status, and README carries a `test-coverage` badge | **amendment return** — see below |
+| F13 | `.github/CONTRIBUTING.md` recommends `styler`, whose only in-repo mechanism this diff deletes; line 25 still names Travis and AppVeyor | fix now (styler half, newly stranded by this diff); Travis/AppVeyor half is pre-existing → candidate row |
+| F14 | `codecov.yml:36` commits a Codecov upload token in plaintext while the workflow also passes `secrets.CODECOV_TOKEN` | out of diff, pre-existing since M12 (7480a67a) — maintainer's call at the gate; recommend rotate + drop |
+
+**Amendment return on AC5.** The criterion asserts the three files it greps are "the complete set of files carrying a claim about when the coverage workflow runs or what it annotates". That is an author-recall enumeration claiming completeness, and it is false: `.github/CONTRIBUTING.md:25` tells contributors to "Look at the ... build status before and after making changes". The finding falsifies the criterion outside its own procedure's domain, and the only repair available to it widens a recalled enumeration — the widening test. The repair is therefore to narrow the promise to what the procedure actually swept, not to lengthen the file list.
+
