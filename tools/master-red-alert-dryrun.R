@@ -12,6 +12,7 @@
 #   1. marker label present, no open issue  -> exactly one issue created
 #   2. marker label present, matching issue -> exactly one comment, no issue
 #   3. marker label absent, no open issue   -> label created BEFORE the search
+#   4. marker label absent, the create FAILS -> the alert still posts, unlabeled
 #
 # `jq` is NOT stubbed: the body pipes the issue list through it, so the real
 # filter is exercised. It is preinstalled on GitHub-hosted runners.
@@ -53,9 +54,16 @@ EXPECTED_TITLE <- sprintf("master is red: %s", payload[["ALERT_WORKFLOW"]])
 # call's full argument vector for inspection, and answers the two read calls
 # from fixture files. Anything it is not taught to answer is a hard failure,
 # so a body that starts calling something new cannot pass unnoticed.
+# $STUB_FAIL names a subcommand the stub should fail, so a fixture can ask
+# what happens when GitHub refuses a call. Every failure mode of the label
+# path was invisible while the stub could only succeed.
 STUB <- '#!/bin/sh
 printf "%s\\n" "$1 $2" >> "$STUB_LOG"
 { printf "== %s\\n" "$1 $2"; printf "%s\\n" "$@"; } >> "$STUB_ARGS"
+if [ "$1 $2" = "${STUB_FAIL:-}" ]; then
+  echo "stubbed failure: $1 $2" >&2
+  exit 1
+fi
 case "$1 $2" in
   "label list")   cat "$STUB_LABELS" ;;
   "label create") : ;;
@@ -85,6 +93,17 @@ fixtures <- list(
     labels = c("bug"),
     issues = "[]",
     expect_calls = c("label list", "label create", "issue list", "issue create")
+  ),
+  # The alert exists for the moment master is broken, so a refused label call
+  # must not cost the alert. `gh label create` is the realistic refusal: it
+  # errors on an existing label without `--force`, which two racing alert runs
+  # can produce on the repo\'s first-ever failure.
+  list(
+    name = "label create refused",
+    labels = c("bug"),
+    issues = "[]",
+    fail = "label create",
+    expect_calls = c("label list", "label create", "issue create")
   )
 )
 
@@ -111,7 +130,8 @@ run_fixture <- function(fx) {
     paste0("STUB_LOG=", log),
     paste0("STUB_ARGS=", args),
     paste0("STUB_LABELS=", file.path(dir, "labels.txt")),
-    paste0("STUB_ISSUES=", file.path(dir, "issues.json"))
+    paste0("STUB_ISSUES=", file.path(dir, "issues.json")),
+    paste0("STUB_FAIL=", if (is.null(fx$fail)) "" else fx$fail)
   )
   status <- system2(
     "/usr/bin/env",
@@ -165,7 +185,7 @@ for (fx in fixtures) {
 
   # On the label-absent path the create must precede the search, not merely
   # appear somewhere in the run.
-  if ("label create" %in% fx$expect_calls) {
+  if (all(c("label create", "issue list") %in% fx$expect_calls)) {
     if (which(res$calls == "label create")[1L] >
         which(res$calls == "issue list")[1L]) {
       problems <- c(problems, sprintf(

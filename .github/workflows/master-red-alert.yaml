@@ -94,21 +94,33 @@ jobs:
           #   * `--force` on the create, which updates instead of erroring when
           #     the label already exists. Two alert runs racing on the repo's
           #     first-ever failure would otherwise abort the loser.
+          LABEL_OK=1
           LABELS="$(gh label list --limit 200 --json name --jq '.[].name')"
           if [[ $'\n'"$LABELS"$'\n' != *$'\n'"$LABEL"$'\n'* ]]; then
             gh label create "$LABEL" --color 'B60205' --force \
-              --description 'A push run of a watched workflow failed on the default branch'
+              --description 'A push run of a watched workflow failed on the default branch' ||
+              LABEL_OK=0
           fi
 
-          # Dedupe is per watched workflow: the title carries the workflow
-          # name, so a red R-CMD-check and a red test-coverage get one issue
-          # each, while a red that persists across pushes gets one comment
-          # per push on the issue it already has.
-          EXISTING="$(gh issue list --state open --label "$LABEL" --json number,title |
-            jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')"
+          if [ "$LABEL_OK" = 1 ]; then
+            # Dedupe is per watched workflow: the title carries the workflow
+            # name, so a red R-CMD-check and a red test-coverage get one issue
+            # each, while a red that persists across pushes gets one comment
+            # per push on the issue it already has.
+            EXISTING="$(gh issue list --state open --label "$LABEL" --json number,title |
+              jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')"
 
-          if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" --body "$BODY"
+            if [ -n "$EXISTING" ]; then
+              gh issue comment "$EXISTING" --body "$BODY"
+            else
+              gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
+            fi
           else
-            gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
+            # The label could not be created, so it does not exist: a search
+            # filtered on it would return empty, and `gh issue create --label`
+            # would refuse an unknown label and take the alert down with it.
+            # Telling someone master is red matters more than deduping, so
+            # post unlabeled and say plainly that this one will not dedupe.
+            echo "::warning::could not create the $LABEL label; posting an unlabeled alert that later failures will not dedupe against"
+            gh issue create --title "$TITLE" --body "$BODY"
           fi

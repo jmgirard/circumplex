@@ -60,9 +60,8 @@ if (length(trigger_name) != 1L) {
 
 jobs <- doc$jobs
 if (length(jobs) != 1L) {
-  problems <- c(problems, sprintf(
-    "%s: expected exactly one job; found %d.", PATH, length(jobs)
-  ))
+  stop(sprintf("%s: expected exactly one job; found %d.", PATH, length(jobs)),
+       call. = FALSE)
 }
 job <- jobs[[1L]]
 
@@ -88,10 +87,41 @@ if (length(missing_cond)) {
   ))
 }
 
+# `on.workflow_run.workflows` matches each watched workflow's `name:` value,
+# not its filename. The two coincide here only because both siblings set
+# `name:` to their own filename; give one a human-readable name and this alert
+# silently stops firing forever, with nothing else to notice it. So the names
+# are read out of the watched files themselves.
+for (w in WATCHED) {
+  wf <- file.path(".github/workflows", w)
+  if (!file.exists(wf)) {
+    problems <- c(problems, sprintf(
+      "%s: watched workflow %s does not exist.", PATH, wf
+    ))
+    next
+  }
+  declared <- yaml::read_yaml(wf)$name
+  if (!identical(as.character(declared), w)) {
+    problems <- c(problems, sprintf(
+      "%s: `on.workflow_run.workflows` matches a workflow's `name:`, not its filename, and %s declares `name: %s`. Either restore `name: %s` there or list the declared name here.",
+      PATH, wf, if (is.null(declared)) "nothing" else as.character(declared), w
+    ))
+  }
+}
+
 # ---- AC2: permissions ------------------------------------------------------
 
-perms <- doc$permissions
-if (is.null(perms)) perms <- job$permissions
+# GitHub's precedence: a job-level `permissions:` block REPLACES the
+# workflow-level one rather than merging with it, so the job-level mapping is
+# the effective one wherever it exists. Reading workflow-level first (the
+# earlier shape) let a job-level `contents: write` pass unseen.
+perms <- if (!is.null(job$permissions)) job$permissions else doc$permissions
+if (!is.null(job$permissions) && !is.null(doc$permissions)) {
+  problems <- c(problems, sprintf(
+    "%s: `permissions:` is declared at both the workflow and the job level. The job-level block replaces the workflow-level one, so the two disagreeing is a trap; declare it once.",
+    PATH
+  ))
+}
 if (!is.list(perms) || !length(perms)) {
   problems <- c(problems, sprintf(
     "%s: no `permissions:` mapping at the workflow or job level. Without one the job inherits the repository default, which may be write-all.",
@@ -106,6 +136,22 @@ if (!is.list(perms) || !length(perms)) {
       PATH, if (length(writes)) paste(writes, collapse = ", ") else "none"
     ))
   }
+}
+
+# --- serialization (not a criterion; a guard on T7's fix) ------------------
+# Two pushes reddening the same workflow in quick succession would otherwise
+# race: both search, neither finds, both create.
+conc <- doc$concurrency
+if (!is.list(conc) || !grepl("workflow_run", paste(conc$group, collapse = ""))) {
+  problems <- c(problems, sprintf(
+    "%s: needs a `concurrency:` block keyed on the watched workflow, so two alerts for the same workflow serialize instead of racing to create.",
+    PATH
+  ))
+} else if (!identical(conc[["cancel-in-progress"]], FALSE)) {
+  problems <- c(problems, sprintf(
+    "%s: `concurrency.cancel-in-progress` must be false — a queued alert still needs to post; cancelling it loses the alert.",
+    PATH
+  ))
 }
 
 # ---- AC3: every value reaching the issue body comes from the payload -------
@@ -175,7 +221,7 @@ if (length(bad_ctx)) {
 # Scanning only the heredoc (the earlier shape) left a composed title
 # unaudited.
 heredoc_region <- function(var) {
-  open <- grep(sprintf("^%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?", var), script)
+  open <- grep(sprintf("^\\s*%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?", var), script)
   if (length(open) != 1L) {
     problems <<- c(problems, sprintf(
       "%s: expected exactly one `%s=` heredoc in the shell body; found %d.",
@@ -183,7 +229,7 @@ heredoc_region <- function(var) {
     ))
     return(character(0L))
   }
-  delim <- sub(sprintf("^%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?.*$", var), "\\1",
+  delim <- sub(sprintf("^\\s*%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?.*$", var), "\\1",
                script[open])
   close <- open + which(script[-seq_len(open)] == delim)[1L]
   if (is.na(close)) {
@@ -197,7 +243,7 @@ heredoc_region <- function(var) {
 }
 
 body_region <- heredoc_region("BODY")
-title_region <- grep("^TITLE=", script, value = TRUE)
+title_region <- grep("^\\s*TITLE=", script, value = TRUE)
 if (length(title_region) != 1L) {
   problems <- c(problems, sprintf(
     "%s: expected exactly one `TITLE=` assignment in the shell body; found %d.",
@@ -222,8 +268,10 @@ if (length(composed)) {
   ))
 }
 
-assigned <- sub("^([A-Za-z_][A-Za-z0-9_]*)=.*$", "\\1",
-                grep("^[A-Za-z_][A-Za-z0-9_]*=", script, value = TRUE))
+# Assignments may be nested inside an `if`, so leading whitespace is part of
+# the shape rather than a reason to miss one.
+assigned <- sub("^\\s*([A-Za-z_][A-Za-z0-9_]*)=.*$", "\\1",
+                grep("^\\s*[A-Za-z_][A-Za-z0-9_]*=", script, value = TRUE))
 
 vars_in <- function(lines) {
   hits <- unlist(regmatches(
@@ -243,7 +291,7 @@ resolve <- function(name, seen = character(0L)) {
     return(if (grepl(PAYLOAD_RE, expr)) expr else NA_character_)
   }
   if (name %in% assigned) {
-    rhs <- grep(sprintf("^%s=", name), script, value = TRUE)
+    rhs <- grep(sprintf("^\\s*%s=", name), script, value = TRUE)
     inner <- setdiff(vars_in(rhs), name)
     if (!length(inner)) return(character(0L))
     return(unlist(lapply(inner, resolve, seen = c(seen, name))))
