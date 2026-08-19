@@ -13,9 +13,25 @@
 #   2. marker label present, matching issue -> exactly one comment, no issue
 #   3. marker label absent, no open issue   -> label created BEFORE the search
 #   4. marker label absent, the create FAILS -> the alert still posts, unlabeled
+#   5. the label LIST fails                 -> the alert still posts, unlabeled
+#
+# It also decides AC3(b): for every `gh issue create` and `gh issue comment`
+# the stub records, in every fixture, the `--title` and `--body` it was handed
+# are captured, each synthetic payload value is replaced by its field name,
+# and the result must equal the committed template below. That is a
+# comparison over what the alert PRODUCES; the binding of those values to the
+# workflow_run payload is decided separately, by the `env:` check in
+# tools/check-master-red-alert.R.
 #
 # `jq` is NOT stubbed: the body pipes the issue list through it, so the real
 # filter is exercised. It is preinstalled on GitHub-hosted runners.
+#
+# What this harness does NOT decide: the stub dispatches on the gh subcommand
+# alone and ignores flags, so it cannot see whether a call's `--label` or
+# `--state` filter is right — a dropped `--label` on the search or the create
+# would break deduping and pass here. It also decides the text produced under
+# THIS environment, so a construct expanding to nothing locally and to text on
+# a runner is out of reach. Both are accepted at internal tier (cairn M96).
 #
 # Not part of the built package (`^tools$` is in .Rbuildignore).
 
@@ -104,8 +120,85 @@ fixtures <- list(
     issues = "[]",
     fail = "label create",
     expect_calls = c("label list", "label create", "issue create")
+  ),
+  # The read call can be refused too — a token scope, a transient 5xx. Before
+  # this fixture the body aborted here under `set -e` and posted nothing.
+  list(
+    name = "label list refused",
+    labels = c("bug"),
+    issues = "[]",
+    fail = "label list",
+    expect_calls = c("label list", "issue create")
   )
 )
+
+# The expected issue text, with each payload value standing as its field name.
+# Committed once as a reviewed expectation — NEVER regenerate it from a
+# capture that failed, which would make this check decide nothing.
+EXPECTED_TITLE_TEMPLATE <- "master is red: <name>"
+EXPECTED_BODY_TEMPLATE <- paste(
+  "A push run of `<name>` on the default branch concluded `<conclusion>`.",
+  "",
+  "| field | value |",
+  "|---|---|",
+  "| workflow | `<name>` |",
+  "| run | <html_url> |",
+  "| head SHA | `<head_sha>` |",
+  "| conclusion | `<conclusion>` |",
+  "",
+  "Close this issue once that workflow is green on the default branch",
+  "again; nothing closes it automatically.",
+  sep = "\n"
+)
+
+# Field names for the four payload values, longest value first so that
+# replacing one can never leave a fragment of another behind.
+FIELD_OF <- c(
+  ALERT_WORKFLOW = "<name>", ALERT_RUN_URL = "<html_url>",
+  ALERT_HEAD_SHA = "<head_sha>", ALERT_CONCLUSION = "<conclusion>"
+)
+
+# The four synthetic values must be non-empty and substrings neither of one
+# another nor of the boilerplate, or replacing them by field name would be
+# ill-defined — and an ill-defined normalization can hide exactly what this
+# check is for.
+vals <- payload[names(FIELD_OF)]
+if (any(!nzchar(vals))) stop("synthetic payload values must be non-empty.", call. = FALSE)
+for (i in seq_along(vals)) {
+  others <- c(vals[-i], EXPECTED_BODY_TEMPLATE, EXPECTED_TITLE_TEMPLATE)
+  if (any(grepl(vals[[i]], others, fixed = TRUE))) {
+    stop(sprintf("synthetic value %s occurs inside another value or the template; pick a distinct one.",
+                 names(vals)[[i]]), call. = FALSE)
+  }
+}
+
+# Split the recorded argument file into one block per call. The stub writes a
+# `== <subcommand>` header, then one argument per line.
+calls_from <- function(args) {
+  starts <- grep("^== ", args)
+  lapply(seq_along(starts), function(i) {
+    to <- if (i < length(starts)) starts[i + 1L] - 1L else length(args)
+    list(sub("^== ", "", args[starts[i]]),
+         argv = args[seq.int(starts[i] + 1L, to)])
+  })
+}
+
+# `--body` is the last argument of every issue-producing call, so its
+# multi-line value runs to the end of the block; `--title` takes the one line
+# after it.
+flag_value <- function(argv, flag) {
+  at <- which(argv == flag)
+  if (!length(at)) return(NULL)
+  if (flag == "--body") paste(argv[seq.int(at[1L] + 1L, length(argv))], collapse = "\n")
+  else argv[at[1L] + 1L]
+}
+
+to_template <- function(text) {
+  for (nm in names(FIELD_OF)) {
+    text <- gsub(payload[[nm]], FIELD_OF[[nm]], text, fixed = TRUE)
+  }
+  text
+}
 
 run_fixture <- function(fx) {
   dir <- tempfile("m96-dryrun-")
@@ -219,8 +312,59 @@ for (fx in fixtures) {
     next
   }
 
-  report <- c(report, sprintf("  ok  %-36s %s", fx$name,
-                              paste(res$calls, collapse = " -> ")))
+  # AC3(b): every call that produces issue text, in this fixture, must carry a
+  # title and body that reduce to the committed templates once the payload
+  # values are replaced by their field names.
+  produced <- Filter(function(c) c[[1L]] %in% c("issue create", "issue comment"),
+                     calls_from(res$args))
+  if (!length(produced)) {
+    problems <- c(problems, sprintf(
+      "fixture '%s': no issue create or comment was recorded, so there is no issue text to check.",
+      fx$name
+    ))
+    next
+  }
+  bad <- character(0L)
+  for (call in produced) {
+    body_txt <- flag_value(call$argv, "--body")
+    title_txt <- flag_value(call$argv, "--title")
+    if (is.null(body_txt)) {
+      bad <- c(bad, sprintf("`%s` carries no --body", call[[1L]]))
+      next
+    }
+    missing_vals <- names(FIELD_OF)[!vapply(
+      names(FIELD_OF),
+      function(nm) grepl(payload[[nm]], body_txt, fixed = TRUE),
+      logical(1L)
+    )]
+    if (length(missing_vals)) {
+      bad <- c(bad, sprintf("`%s`'s body is missing payload value(s) %s",
+                            call[[1L]], paste(missing_vals, collapse = ", ")))
+      next
+    }
+    if (!identical(to_template(body_txt), EXPECTED_BODY_TEMPLATE)) {
+      bad <- c(bad, sprintf(
+        "`%s`'s body does not reduce to the committed template. Reduced to:\n      %s",
+        call[[1L]], gsub("\n", "\n      ", to_template(body_txt))
+      ))
+      next
+    }
+    if (!is.null(title_txt) &&
+        !identical(to_template(title_txt), EXPECTED_TITLE_TEMPLATE)) {
+      bad <- c(bad, sprintf("`%s`'s title reduces to \"%s\", not the committed \"%s\"",
+                            call[[1L]], to_template(title_txt),
+                            EXPECTED_TITLE_TEMPLATE))
+    }
+  }
+  if (length(bad)) {
+    problems <- c(problems, sprintf("fixture '%s': %s.", fx$name,
+                                    paste(bad, collapse = "; ")))
+    next
+  }
+
+  report <- c(report, sprintf("  ok  %-36s %-52s issue text: %d call(s) reduce to the template",
+                              fx$name, paste(res$calls, collapse = " -> "),
+                              length(produced)))
 }
 
 if (length(problems)) {

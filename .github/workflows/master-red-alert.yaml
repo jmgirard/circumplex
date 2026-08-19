@@ -94,9 +94,13 @@ jobs:
           #   * `--force` on the create, which updates instead of erroring when
           #     the label already exists. Two alert runs racing on the repo's
           #     first-ever failure would otherwise abort the loser.
+          # Every GitHub call below is allowed to fail without taking the
+          # alert down with it: this job runs only when master is already
+          # broken, so an abort here means the failure goes unannounced. The
+          # label is a convenience for deduping; the issue is the point.
           LABEL_OK=1
-          LABELS="$(gh label list --limit 200 --json name --jq '.[].name')"
-          if [[ $'\n'"$LABELS"$'\n' != *$'\n'"$LABEL"$'\n'* ]]; then
+          LABELS="$(gh label list --limit 200 --json name --jq '.[].name')" || LABEL_OK=0
+          if [ "$LABEL_OK" = 1 ] && [[ $'\n'"$LABELS"$'\n' != *$'\n'"$LABEL"$'\n'* ]]; then
             gh label create "$LABEL" --color 'B60205' --force \
               --description 'A push run of a watched workflow failed on the default branch' ||
               LABEL_OK=0
@@ -108,7 +112,8 @@ jobs:
             # each, while a red that persists across pushes gets one comment
             # per push on the issue it already has.
             EXISTING="$(gh issue list --state open --label "$LABEL" --json number,title |
-              jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')"
+              jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')" ||
+              EXISTING=""
 
             if [ -n "$EXISTING" ]; then
               gh issue comment "$EXISTING" --body "$BODY"
@@ -116,11 +121,12 @@ jobs:
               gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
             fi
           else
-            # The label could not be created, so it does not exist: a search
-            # filtered on it would return empty, and `gh issue create --label`
-            # would refuse an unknown label and take the alert down with it.
-            # Telling someone master is red matters more than deduping, so
-            # post unlabeled and say plainly that this one will not dedupe.
-            echo "::warning::could not create the $LABEL label; posting an unlabeled alert that later failures will not dedupe against"
+            # The label is unavailable — either listing it or creating it
+            # failed — so it may not exist: a search filtered on it would
+            # return empty, and `gh issue create --label` would refuse an
+            # unknown label and take the alert down with it. Telling someone
+            # master is red matters more than deduping, so post unlabeled and
+            # say plainly that this one will not dedupe.
+            echo "::warning::could not use the $LABEL label; posting an unlabeled alert that later failures will not dedupe against"
             gh issue create --title "$TITLE" --body "$BODY"
           fi
