@@ -1,6 +1,6 @@
 # M97: Make the contributor docs describe this repo
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -146,6 +146,7 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: **amendment (substantive), AC6** — running the criterion exposed `.github/CODE_OF_CONDUCT.md:121`, `[Mozilla's code of conduct enforcement ladder][https://github.com/mozilla/inclusion].`: reference-link syntax with no matching definition, malformed verbatim in the upstream Contributor Covenant 2.1 text and unmodifiable under AC7's byte pin, so it renders as plain text rather than a link. Amended at a mini gate after a fresh-context [O] reader audited the proposed wording and refuted the first draft of it: adding `]` to the strip list fixes nothing, because the token ends in `.` not `]` and a single ordered pass leaves `...inclusion]`. Adopted instead: a repeated strip (`sed 's/[]>).,]*$//'`), a named exemption for line 121 with its manually probed 200 on the record, `--max-time 20` on both probes, and an explicit resolution of the latent AC6/AC7 conflict (a failing URL in the vendored file is raised as a decision, never silently edited).
 - 2026-08-19: T8 — AC4 sweep green: all seven literals show >=1 pre-change match against master 908b65e0 (Travis 2, AppVeyor 1, styler 1, style.tidyverse.org 1, tidy-contrib 1, tidyverse/circumplex 1, community.rstudio.com 2) and 0 post-change, so the instrument discriminates rather than passing vacuously. AC5 green: the four files' hosts are github.com (7), www.contributor-covenant.org (4), reprex.tidyverse.org (3, the permitted exception), cran.r-project.org (3), docs.github.com (1); no banned host, and the only tidyverse mentions are the three reprex links. AC6 green: all 12 URLs returned 200 on HEAD, no GET fallback needed. A first AC5 run reported a false "(none)" because zsh does not word-split unquoted parameters, so the grep read no file at all — re-run against explicit paths (the M95-family lesson, a check passing by not checking).
 - 2026-08-19: T8 — one genuine link rot repaired en route: CONTRIBUTING.md's roxygen2 Markdown-syntax link (`cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html`) returned 404 and was repointed to `https://roxygen2.r-lib.org/articles/rd-formatting.html` (200). Tail bytes of all four rewritten files clean (each ends in a single newline, no leaked scaffolding; M34). `pkgdown::check_pkgdown()`: no problems found.
+- 2026-08-19: all eight tasks done; `devtools::test()` clean (FAIL 0 | WARN 5 | SKIP 3 | PASS 8395; the five warnings are lavaan-emitted and pre-existing), `pkgdown::check_pkgdown()` no problems, `cairn_validate` all checks passed. Status → review.
 
 ## Decisions
 
