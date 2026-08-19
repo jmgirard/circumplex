@@ -61,7 +61,7 @@
 
 <div id="contributing-to-circumplex" class="section level1">
 
-<p>This outlines how to propose a change to circumplex. For more detailed info about contributing to this, and other tidyverse packages, please see the <a href="https://rstd.io/tidy-contrib" class="external-link"><strong>development contributing guide</strong></a>.</p>
+<p>This outlines how to propose a change to circumplex. The package is maintained by one person, so the surest route to a merged change is to agree on the problem before you write the fix.</p>
 <div class="section level3">
 <h3 id="fixing-typos">Fixing typos<a class="anchor" aria-label="anchor" href="#fixing-typos"></a></h3>
 <p>Small typos or grammatical errors in documentation may be edited directly using the GitHub web interface, so long as the changes are made in the <em>source</em> file.</p>
@@ -69,26 +69,35 @@
 <li>NO: you edit an <code>.Rd</code> file below <code>man/</code>.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="generated-files">Generated files<a class="anchor" aria-label="anchor" href="#generated-files"></a></h3>
+<p>Some files in this repository are generated, and a hand edit to one is overwritten the next time it is rebuilt. Never edit these directly — change the source and regenerate:</p>
+<ul><li>
+<code>man/*.Rd</code> and <code>NAMESPACE</code> — regenerate with <code>devtools::document()</code> after changing a roxygen comment.<br></li>
+<li>
+<code>R/RcppExports.R</code> and <code>src/RcppExports.cpp</code> — regenerate with <code><a href="https://rdrr.io/pkg/Rcpp/man/compileAttributes.html" class="external-link">Rcpp::compileAttributes()</a></code> after changing anything below <code>src/</code>.<br></li>
+<li>
+<code>README.md</code> — knitted from <code>README.Rmd</code> by <code>devtools::build_readme()</code>.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a></h3>
-<p>Before you make a substantial pull request, you should always file an issue and make sure someone from the team agrees that it’s a problem. If you’ve found a bug, create an associated issue and illustrate the bug with a minimal <a href="https://www.tidyverse.org/help/#reprex" class="external-link">reprex</a>.</p>
-</div>
+<p>Before you make a substantial pull request, please raise it first, so we can agree the change is wanted before you spend time on it:</p>
+<ul><li>A bug → open an <a href="https://github.com/jmgirard/circumplex/issues" class="external-link">issue</a> illustrating it with a minimal <a href="https://reprex.tidyverse.org/" class="external-link">reprex</a>.</li>
+<li>A feature idea, or a question about how something works → open a <a href="https://github.com/jmgirard/circumplex/discussions" class="external-link">discussion</a>.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="pull-request-process">Pull request process<a class="anchor" aria-label="anchor" href="#pull-request-process"></a></h3>
 <ul><li>We recommend that you create a Git branch for each pull request (PR).<br></li>
-<li>Look at the Travis and AppVeyor build status before and after making changes. The <code>README</code> should contain badges for any continuous integration services used by the package.<br></li>
-<li>New code should follow the tidyverse <a href="https://style.tidyverse.org" class="external-link">style guide</a>. You can use the <a href="https://CRAN.R-project.org/package=styler" class="external-link">styler</a> package to apply these styles, but please don’t restyle code that has nothing to do with your PR.<br></li>
-<li>We use <a href="https://cran.r-project.org/package=roxygen2" class="external-link">roxygen2</a>, with <a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html" class="external-link">Markdown syntax</a>, for documentation.<br></li>
+<li>Pull requests are checked by GitHub Actions: <code>R-CMD-check.yaml</code> runs <code>R CMD check</code>, and <code>pkgdown.yaml</code> rebuilds the documentation site. How wide the check matrix goes depends on which paths your PR touches — <code>tools/ci-matrix.R</code> holds that rule and the platform list. A PR touching only tracking files, <code>man/</code>, or <code>README.md</code> may not trigger a check run at all. Please make sure whatever does run is green before and after your changes.<br></li>
+<li>
+<code>README.md</code> carries badges for these workflows. Note that the coverage badge tracks <code>master</code>, not your PR.<br></li>
+<li>New code should match existing code style. This package keeps to base-R style with few dependencies (its numeric core is C++ via Rcpp), and no automatic formatter is run over it, so follow the conventions of the file you are editing, and please don’t restyle code that has nothing to do with your PR.<br></li>
+<li>We use <a href="https://cran.r-project.org/package=roxygen2" class="external-link">roxygen2</a>, with <a href="https://roxygen2.r-lib.org/articles/rd-formatting.html" class="external-link">Markdown syntax</a>, for documentation.<br></li>
 <li>We use <a href="https://cran.r-project.org/package=testthat" class="external-link">testthat</a>. Contributions with test cases included are easier to accept.<br></li>
-<li>For user-facing changes, add a bullet to the top of <code>NEWS.md</code> below the current development version header describing the changes made followed by your GitHub username, and links to relevant issue(s)/PR(s).</li>
+<li>For user-facing changes, add a bullet at the top of <code>NEWS.md</code> — under the development-version heading if one is open, otherwise above the most recent release heading — describing the change, followed by your GitHub username and links to the relevant issue(s)/PR(s).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a></h3>
 <p>Please note that the circumplex project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project you agree to abide by its terms.</p>
-</div>
-<div class="section level3">
-<h3 id="see-tidyverse-development-contributing-guide">See tidyverse <a href="https://rstd.io/tidy-contrib" class="external-link">development contributing guide</a>
-<a class="anchor" aria-label="anchor" href="#see-tidyverse-development-contributing-guide"></a></h3>
-<p>for further details.</p>
 </div>
 </div>
 
