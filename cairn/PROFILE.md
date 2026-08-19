@@ -29,23 +29,23 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
 - NEWS.md has an entry for this milestone's user-visible changes (no milestone numbers in user-facing text).
 - New top-level files have `.Rbuildignore` entries (check `check()` NOTEs).
 - Full check at review: `Rscript -e 'devtools::check()'` clean (0 errors, 0 warnings; justify NOTEs).
-- Master matrix watch: the most recent completed `R-CMD-check.yaml` run for the
-  default branch's push trigger (`gh run list --workflow=R-CMD-check.yaml
-  --branch=<default> --event=push`) concluded success; a red or absent run is a
-  gate failure (M93).
-- Master coverage watch: the newest `test-coverage.yaml` run for the default
-  branch's push trigger (`gh run list --workflow=test-coverage.yaml
-  --branch=<default> --event=push`) that concluded success OR failure concluded
-  success; a red one is a gate failure (M95). Newest *verdict*, not newest
-  completed: `cancel-in-progress` lets a later push cancel an earlier run, and
-  `cancelled` is completed without being a verdict (run 32187677266). No
-  qualifying run is likewise no verdict, not a failure — `paths-ignore` means
-  tracking-only merges produce none; say so at the gate. A red one is cleared
-  via `/hotfix` (gate-lite skips this slot), so this cannot deadlock against
-  "never implement on the default branch". It reads one milestone LATE — the
-  newest master run predates the branch under review — so it catches a
-  covr-only regression at the NEXT gate. The environment is still distinct —
-  `covr` instruments the code and perturbs optimizer results (M59).
+- Master watches (`gh run list --workflow=<file> --branch=<default> --event=push`):
+  the newest push run of `R-CMD-check.yaml` on the default branch must have
+  concluded success — red OR ABSENT is a gate failure (M93). The newest
+  `test-coverage.yaml` run that concluded success or failure must also be a
+  success (M95); there alone, an absent run is no verdict rather than a failure
+  (`paths-ignore` — say so at the gate). Both read the newest *verdict*, not the
+  newest completed: `cancelled` is completed without being one (run 32187677266).
+  A red is cleared via `/hotfix` (gate-lite skips this slot), so this cannot
+  deadlock against "never implement on the default branch". The coverage watch
+  reads one milestone LATE, catching a covr-only regression at the NEXT gate;
+  `covr` perturbs optimizer results, so its environment is distinct (M59).
+  Cross-check any RED answer: on 2026-08-18 this returned a ten-day-stale red
+  set while the same query without `--event` showed green (M96).
+- Master-red alert audits (M96): `Rscript tools/check-master-red-alert.R` and
+  `Rscript tools/master-red-alert-dryrun.R` both exit clean — nothing else runs
+  them, and the alert workflow fires only when master is already broken. They
+  need `yaml` and `jq` (neither a package dependency), and say so if absent.
 
 ## test-doctrine
 R-mechanical test expectations layered on the universal "What gets a test"

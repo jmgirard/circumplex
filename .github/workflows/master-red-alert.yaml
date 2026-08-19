@@ -1,0 +1,135 @@
+# Open a GitHub issue when a push run of the checked workflows concludes
+# failure on the default branch (cairn M96).
+#
+# Why a separate workflow rather than a failure step inside each watched
+# workflow: the issue logic lives in one place, and this workflow cannot
+# redden the run it is reporting on.
+#
+# `workflow_run` runs the version of THIS file that is on the default branch —
+# so nothing here fires from a pull request, and changes to it take effect only
+# after they merge. Nothing is checked out: the whole alert is this file's own
+# `run:` body, which is why there is no `contents:` grant below.
+on:
+  workflow_run:
+    workflows:
+      - R-CMD-check.yaml
+      - test-coverage.yaml
+    types:
+      - completed
+
+name: master-red-alert.yaml
+
+# Labels are issue-scoped, so `issues: write` covers every call the body
+# makes. Naming a `permissions:` block at all drops every other scope to none.
+permissions:
+  issues: write
+
+# Serialize alerts per watched workflow (never cancel one — a queued alert
+# still needs to post). Without this, two pushes that redden the same workflow
+# in quick succession can both search before either creates, and both open an
+# issue with the same title.
+concurrency:
+  group: master-red-alert-${{ github.event.workflow_run.name }}
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    # Three conditions, all read from the workflow_run payload: the run
+    # failed, it was a push run (pull-request runs are already visible to
+    # whoever opened the PR), and it was on the default branch.
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update the master-red issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ALERT_WORKFLOW: ${{ github.event.workflow_run.name }}
+          ALERT_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          ALERT_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          ALERT_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          LABEL='master-red'
+          TITLE="master is red: ${ALERT_WORKFLOW}"
+
+          # Every value below is a workflow_run payload field carried in via
+          # the step `env:` above. What checks that: check-master-red-alert.R
+          # compares that `env:` block against the payload expressions, and
+          # master-red-alert-dryrun.R compares the text this body hands to `gh`
+          # against a committed template. Nothing scans this source — see the
+          # audit script's header for why that was descoped.
+          BODY="$(cat <<EOF
+          A push run of \`${ALERT_WORKFLOW}\` on the default branch concluded \`${ALERT_CONCLUSION}\`.
+
+          | field | value |
+          |---|---|
+          | workflow | \`${ALERT_WORKFLOW}\` |
+          | run | ${ALERT_RUN_URL} |
+          | head SHA | \`${ALERT_HEAD_SHA}\` |
+          | conclusion | \`${ALERT_CONCLUSION}\` |
+
+          Close this issue once that workflow is green on the default branch
+          again; nothing closes it automatically.
+          EOF
+          )"
+
+          # Create the marker label if it is absent, BEFORE searching on it: a
+          # search filtered on a label that does not exist returns empty, so a
+          # missing label would silently defeat the dedupe below and open a
+          # fresh issue on every failed push.
+          #
+          # Three things here are deliberate, and all three exist because this
+          # job runs under `set -euo pipefail` — an abort anywhere in it means
+          # no alert at all, in exactly the case the alert is for:
+          #   * `--limit 200`, because `gh label list` returns 30 by default,
+          #     and a repo past 30 labels would stop finding the marker;
+          #   * a `case` over a captured string rather than a `... | grep -q`
+          #     pipeline, because `grep -q` exits at the first match and can
+          #     leave the producer with EPIPE, which `pipefail` then reports as
+          #     a failed pipeline — reading as "absent" when it is present;
+          #   * `--force` on the create, which updates instead of erroring when
+          #     the label already exists. Two alert runs racing on the repo's
+          #     first-ever failure would otherwise abort the loser.
+          # Every GitHub call below is allowed to fail without taking the
+          # alert down with it: this job runs only when master is already
+          # broken, so an abort here means the failure goes unannounced. The
+          # label is a convenience for deduping; the issue is the point.
+          LABEL_OK=1
+          LABELS="$(gh label list --limit 200 --json name --jq '.[].name')" || LABEL_OK=0
+          if [ "$LABEL_OK" = 1 ] && [[ $'\n'"$LABELS"$'\n' != *$'\n'"$LABEL"$'\n'* ]]; then
+            gh label create "$LABEL" --color 'B60205' --force \
+              --description 'A push run of a watched workflow failed on the default branch' ||
+              LABEL_OK=0
+          fi
+
+          if [ "$LABEL_OK" = 1 ]; then
+            # Dedupe is per watched workflow: the title carries the workflow
+            # name, so a red R-CMD-check and a red test-coverage get one issue
+            # each, while a red that persists across pushes gets one comment
+            # per push on the issue it already has.
+            EXISTING="$(gh issue list --state open --label "$LABEL" --json number,title |
+              jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')" ||
+              EXISTING=""   # a failed search reads as "no match": this posts a
+                            # duplicate rather than staying silent, deliberately
+
+            if [ -n "$EXISTING" ]; then
+              gh issue comment "$EXISTING" --body "$BODY"
+            else
+              gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
+            fi
+          else
+            # The label is unavailable — either listing it or creating it
+            # failed — so it may not exist: a search filtered on it would
+            # return empty, and `gh issue create --label` would refuse an
+            # unknown label and take the alert down with it. Telling someone
+            # master is red matters more than deduping, so post unlabeled and
+            # say plainly that this one will not dedupe.
+            echo "::warning::could not use the $LABEL label; posting an unlabeled alert that later failures will not dedupe against"
+            gh issue create --title "$TITLE" --body "$BODY"
+          fi

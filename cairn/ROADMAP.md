@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M93 | Close the CI platform gate | done | — | normal | milestones/archive/M93-ci-platform-gate.md |
 | M94 | Print the fired-marker list on the bootstrap path | done | — | normal | milestones/archive/M94-bootstrap-marker-list.md |
 | M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
-| M96 | Say something when master goes red | planned | M95 | normal | milestones/M96-master-red-alert.md |
+| M96 | Say something when master goes red | review | M95 | normal | milestones/M96-master-red-alert.md |
 
 ## Candidates
 
