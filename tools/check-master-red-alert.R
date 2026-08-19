@@ -108,6 +108,120 @@ if (!is.list(perms) || !length(perms)) {
   }
 }
 
+# ---- AC3: every value reaching the issue body comes from the payload -------
+
+# The point of this section is that the issue text is REPORTED, never
+# composed: a reader acting on the issue must be able to trust that the run
+# URL and SHA name the run that actually failed. So it enumerates every
+# interpolation site in the workflow and in its shell body, resolves each one,
+# and requires that the sites reaching the body resolve to workflow_run
+# payload fields and nothing else.
+
+step <- job$steps[[1L]]
+script <- strsplit(step$run, "\n", fixed = TRUE)[[1L]]
+env <- vapply(step$env, as.character, character(1L))
+
+PAYLOAD_RE <- "^(github\\.event|context\\.payload)\\.workflow_run\\."
+
+# Sites of the form ${{ ... }}. All of them live in the step's `env:` mapping;
+# one appearing anywhere else would be a value the shell body cannot see this
+# audit resolve.
+expr_sites <- regmatches(raw, gregexpr("\\$\\{\\{[^}]*\\}\\}", raw))
+expr_sites <- unlist(expr_sites)
+expr_values <- trimws(gsub("^\\$\\{\\{|\\}\\}$", "", expr_sites))
+stray <- setdiff(expr_values, trimws(gsub("^\\$\\{\\{|\\}\\}$", "", env)))
+if (length(stray)) {
+  problems <- c(problems, sprintf(
+    "%s: `${{ }}` expressions outside the step's `env:` mapping: %s. Every interpolated value must be named in `env:` so this audit can resolve it.",
+    PATH, paste(stray, collapse = ", ")
+  ))
+}
+
+# Any `context.payload.*` read (a github-script residue) must be a
+# workflow_run path too.
+ctx <- unlist(regmatches(raw, gregexpr("context\\.payload\\.[A-Za-z0-9_.]+", raw)))
+bad_ctx <- ctx[!grepl(PAYLOAD_RE, ctx)]
+if (length(bad_ctx)) {
+  problems <- c(problems, sprintf(
+    "%s: `context.payload` reads outside the workflow_run payload: %s.",
+    PATH, paste(unique(bad_ctx), collapse = ", ")
+  ))
+}
+
+# The issue body is the heredoc opened on the `BODY=` line; it ends at the
+# line that is exactly its delimiter.
+body_open <- grep("^BODY=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?", script)
+if (length(body_open) != 1L) {
+  problems <- c(problems, sprintf(
+    "%s: expected exactly one `BODY=` heredoc in the shell body; found %d.",
+    PATH, length(body_open)
+  ))
+  body_region <- character(0L)
+} else {
+  delim <- sub("^BODY=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?.*$", "\\1",
+               script[body_open])
+  body_close <- body_open + which(script[-seq_len(body_open)] == delim)[1L]
+  if (is.na(body_close)) {
+    problems <- c(problems, sprintf(
+      "%s: the `BODY=` heredoc is never closed by a bare `%s` line.",
+      PATH, delim
+    ))
+    body_region <- character(0L)
+  } else {
+    body_region <- script[seq.int(body_open + 1L, body_close - 1L)]
+  }
+}
+
+assigned <- sub("^([A-Za-z_][A-Za-z0-9_]*)=.*$", "\\1",
+                grep("^[A-Za-z_][A-Za-z0-9_]*=", script, value = TRUE))
+
+vars_in <- function(lines) {
+  hits <- unlist(regmatches(
+    lines, gregexpr("\\$\\{?[A-Za-z_][A-Za-z0-9_]*\\}?", lines)
+  ))
+  unique(gsub("^\\$\\{?|\\}$", "", hits))
+}
+
+# Resolve a shell variable to the set of payload expressions behind it,
+# following local assignments (TITLE and BODY are built from env vars, so a
+# value smuggled in through a local would still be caught here). Returns NA
+# for a name that resolves to neither.
+resolve <- function(name, seen = character(0L)) {
+  if (name %in% seen) return(character(0L))
+  if (name %in% names(env)) {
+    expr <- trimws(gsub("^\\$\\{\\{|\\}\\}$", "", env[[name]]))
+    return(if (grepl(PAYLOAD_RE, expr)) expr else NA_character_)
+  }
+  if (name %in% assigned) {
+    rhs <- grep(sprintf("^%s=", name), script, value = TRUE)
+    inner <- setdiff(vars_in(rhs), name)
+    if (!length(inner)) return(character(0L))
+    return(unlist(lapply(inner, resolve, seen = c(seen, name))))
+  }
+  NA_character_
+}
+
+body_vars <- vars_in(body_region)
+resolved <- lapply(body_vars, resolve)
+names(resolved) <- body_vars
+unresolved <- body_vars[vapply(resolved, function(x) anyNA(x), logical(1L))]
+if (length(unresolved)) {
+  problems <- c(problems, sprintf(
+    "%s: value(s) substituted into the issue body that do not come from the workflow_run payload: %s.",
+    PATH, paste(unresolved, collapse = ", ")
+  ))
+}
+
+paths <- unique(stats::na.omit(unlist(resolved)))
+fields <- sub(PAYLOAD_RE, "", paths)
+REQUIRED_FIELDS <- c("name", "html_url", "head_sha", "conclusion")
+if (!all(REQUIRED_FIELDS %in% fields)) {
+  problems <- c(problems, sprintf(
+    "%s: the issue body must name the failing workflow, run URL, head SHA and conclusion; payload fields it interpolates: %s. An empty or short enumeration fails rather than passing vacuously.",
+    PATH, if (length(fields)) paste(fields, collapse = ", ") else "none"
+  ))
+}
+
 # ---- report ----------------------------------------------------------------
 
 if (length(problems)) {
@@ -119,6 +233,7 @@ if (length(problems)) {
 }
 
 cat(sprintf(
-  "%s: watches %s; fires only on a failed push run of the default branch; grants issues: write and no other write scope.\n",
-  PATH, paste(WATCHED, collapse = " + ")
+  "%s: watches %s; fires only on a failed push run of the default branch; grants issues: write and no other write scope.\nIssue body interpolates %d workflow_run payload field(s) and nothing else: %s.\n",
+  PATH, paste(WATCHED, collapse = " + "),
+  length(fields), paste(sort(fields), collapse = ", ")
 ))

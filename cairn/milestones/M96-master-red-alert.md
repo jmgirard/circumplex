@@ -97,7 +97,7 @@ is the only place that environment reports at all.
 - [x] T1: Author `.github/workflows/master-red-alert.yaml` — the
       `workflow_run` trigger over the two workflows, the failure/push/default-
       branch `if:`, and `permissions: issues: write`.
-- [ ] T2: Write the issue body template, interpolating only `workflow_run`
+- [x] T2: Write the issue body template, interpolating only `workflow_run`
       payload fields; run AC3's scan over both the template and the script body
       and check every site it returns.
 - [ ] T3: Extract the open-or-comment logic into a script body the milestone
@@ -119,6 +119,7 @@ is the only place that environment reports at all.
 - 2026-08-18: widening `tools/check-ci-deps.R` to glob `.github/workflows/` considered and left out — it is the checker-regress shape M93's plan gate already declined once for that script, and AC6's per-file grep gets this milestone what it needs without widening the checker's promise.
 - 2026-08-18: implement gate chose bash + `gh` for the alert body over `actions/github-script`, because no Node is installed on the maintainer machine and AC4 requires exercising the body locally; marker label `master-red`; the dry-run harness lands as a standalone `tools/` script, matching `tools/check-ci-deps.R`, not inside the test suite.
 - 2026-08-18: T1 — `.github/workflows/master-red-alert.yaml` authored: `workflow_run` over the two watched workflows, an `if:` requiring failure + push + default branch, `permissions: issues: write` (plus `contents: read` for checkout, no second write scope). `tools/check-master-red-alert.R` parses the file for AC1/AC2; each of its three assertions confirmed to fire against a mutated copy (dropped workflow, dropped push condition, added `contents: write`).
+- 2026-08-18: T2 — issue body written as a table over the four payload fields, all carried in through the step `env:`. The AC3 scan lands in `tools/check-master-red-alert.R`: it enumerates every `${{ }}` site, every `context.payload.*` read, and every shell `$VAR` in the body heredoc, resolves each through the env map and local assignments, and requires the four named fields; it reports 4 fields and nothing else. Confirmed to fire against three mutations (body citing `GH_REPO`, body dropping the head-SHA row, run URL recomposed from `github.server_url`).
 
 ## Decisions
 

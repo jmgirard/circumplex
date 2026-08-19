@@ -49,3 +49,24 @@ jobs:
 
           LABEL='master-red'
           TITLE="master is red: ${ALERT_WORKFLOW}"
+
+          # Every value below is a workflow_run payload field carried in via
+          # the step `env:` above — nothing here is composed from anything
+          # else. tools/check-master-red-alert.R enumerates these sites and
+          # fails if one of them resolves to something other than the payload.
+          BODY="$(cat <<EOF
+          A push run of \`${ALERT_WORKFLOW}\` on the default branch concluded \`${ALERT_CONCLUSION}\`.
+
+          | field | value |
+          |---|---|
+          | workflow | \`${ALERT_WORKFLOW}\` |
+          | run | ${ALERT_RUN_URL} |
+          | head SHA | \`${ALERT_HEAD_SHA}\` |
+          | conclusion | \`${ALERT_CONCLUSION}\` |
+
+          Close this issue once that workflow is green on the default branch
+          again; nothing closes it automatically.
+          EOF
+          )"
+
+          gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
