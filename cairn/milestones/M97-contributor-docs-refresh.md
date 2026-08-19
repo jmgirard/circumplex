@@ -35,24 +35,24 @@ GitHub renders them, and act on what they say.
 
 ## Acceptance criteria
 
-- [ ] **AC1** — `.github/CONTRIBUTING.md`'s pull-request section names
+- [x] **AC1** — `.github/CONTRIBUTING.md`'s pull-request section names
       `R-CMD-check.yaml` (the workflow that gates PRs) and states CLAUDE.md's
       "match existing code style" rule in place of an external style guide.
       Verified by `grep -F` over the PR-process section for `R-CMD-check.yaml`
       and for `match existing code style` (each ≥1 match), and by confirming
       `R-CMD-check.yaml` is present in `ls .github/workflows/`.
-- [ ] **AC2** — `.github/CONTRIBUTING.md` names all four generated-file paths
+- [x] **AC2** — `.github/CONTRIBUTING.md` names all four generated-file paths
       CLAUDE.md forbids hand-editing (`R/RcppExports.R`, `src/RcppExports.cpp`,
       `man/*.Rd`, `NAMESPACE`) and both regeneration commands
       (`devtools::document()`, `Rcpp::compileAttributes()`). Verified by
       `grep -F` for each of the six strings over that file, each ≥1 match.
-- [ ] **AC3** — `.github/SUPPORT.md` carries no `github.com/<owner>/circumplex`
+- [x] **AC3** — `.github/SUPPORT.md` carries no `github.com/<owner>/circumplex`
       URL whose owner is not `jmgirard`, and its issue-search link's
       origin-plus-path equals `DESCRIPTION`'s `BugReports:` value (a query
       string is permitted). Verified by
       `grep -Eo 'https://github\.com/[^/]+/circumplex[^ )>]*'` over the file and
       comparing each match against that field.
-- [ ] **AC4** — A case-insensitive `grep -Fin -e` sweep for seven retired
+- [x] **AC4** — A case-insensitive `grep -Fin -e` sweep for seven retired
       literals (`Travis`, `AppVeyor`, `styler`, `style.tidyverse.org`,
       `tidy-contrib`, `tidyverse/circumplex`, `community.rstudio.com`) over the
       file list `git ls-files` produces — excluding `NEWS.md` (release history)
@@ -60,19 +60,26 @@ GitHub renders them, and act on what they say.
       there) — returns **no match**. Recorded per literal both before and after
       the change: each literal must show ≥1 pre-change match, and a literal
       showing none invalidates the sweep rather than passing it.
-- [ ] **AC5** — No URL in the four `.github/` files has a host in
+- [x] **AC5** — No URL in the four `.github/` files has a host in
       {`tidyverse.org` and its subdomains, `rstudio.com` and its subdomains,
       `posit.co`, `rstd.io`}, the sole exception being `reprex.tidyverse.org`
       (the reprex package's own documentation), and no bare hostname from that
       same list appears as link text. Verified by enumerating with
       `grep -Eo '(https?://)?[a-z0-9.-]+\.(org|com|io)[^ )>]*'` over exactly
       those four files and extracting each host.
-- [ ] **AC6** — Every http(s) URL enumerated by AC5 (trailing `>`, `)`, `.`, `,`
-      stripped) resolved 2xx/3xx on its recorded probe:
-      `curl -sIL -o /dev/null -w '%{http_code}'`, and on a 403/405/429 a
-      documented GET retry (`curl -sL -o /dev/null -w '%{http_code}' -A <browser
-      UA>`) whose own code must be 2xx/3xx. Any URL not reaching 2xx/3xx on
-      either probe is repaired or removed. Statuses recorded in the work log.
+- [x] **AC6** — Every http(s) URL enumerated by AC5 (trailing `>`, `)`, `]`,
+      `.`, `,` stripped repeatedly until none remain, i.e. `sed 's/[]>).,]*$//'`)
+      resolved 2xx/3xx on its recorded probe:
+      `curl -sIL -o /dev/null -w '%{http_code}' --max-time 20`, and on a
+      403/405/429 a documented GET retry (same with `-L` and a browser UA) whose
+      own code must be 2xx/3xx. Any URL not reaching 2xx/3xx is repaired or
+      removed, except in `.github/CODE_OF_CONDUCT.md`, where AC7's byte-equality
+      pin governs: a failing URL there is recorded and raised as a decision,
+      never silently edited. Exempt from the probe: that file's line 121, whose
+      `[text][url]` reference-link syntax is malformed verbatim upstream and
+      renders as plain text rather than a link; its target
+      `https://github.com/mozilla/inclusion` is recorded as manually probed
+      (200). Statuses recorded in the work log.
 - [x] **AC7** — `.github/CODE_OF_CONDUCT.md` is Contributor Covenant 2.1 as
       bundled by usethis 3.2.1 (template SHA-256
       `e45d34f51a88827f03e9bc868aabb872ccae96434a8c14c469a44147825a499a`), with
@@ -115,7 +122,7 @@ GitHub renders them, and act on what they say.
       enforcement contact = DESCRIPTION's `cre` email.
 - [x] **T7** — Delete the two dead `.Rbuildignore` entries (L8, L13); confirm
       `devtools::check()` is unaffected.
-- [ ] **T8** — Run and log the AC4 pre/post sweep, the AC5 host enumeration, and
+- [x] **T8** — Run and log the AC4 pre/post sweep, the AC5 host enumeration, and
       the AC6 status probes; check tail bytes of every rewritten file
       (`tail -6 f | od -c`, M34 lesson); confirm `pkgdown::check_pkgdown()`
       passes.
@@ -136,6 +143,9 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: **amendment (substantive), AC7** — the pinned source `https://www.contributor-covenant.org/version/2/1/code_of_conduct.md` returns HTTP 404 (a 3449-byte "Page not found" page), making AC7 unsatisfiable as planned. Amended at a mini gate to the usethis 3.2.1 bundled template, which Jeff confirms is where these files originally came from; the upstream raw markdown was rejected as the pin because it carries a Hugo TOML front-matter block and unwrapped lines, so a shipped copy would differ from it on nearly every line. Amended wording was audited first by a fresh-context [O] reader that did not author it, returning four findings, all applied: the normative reference was machine-local (deliverable SHA now the primary check, template SHA inline as provenance); "the placeholder carries the email" was backwards; the `grep -F` probe was location-free and was dropped; and "exactly one changed line" silently rode two coincidences now named in the criterion (both strings are 15 characters, and template line 62 is the file's only line ending in a trailing space).
 - 2026-08-19: T6 — CODE_OF_CONDUCT.md replaced (Contributor Covenant 1.0.0, 1396 bytes, no enforcement contact → 2.1 with `me@jmgirard.com`). AC7 verified independently in-session: template SHA-256 `e45d34f5…a499a`, deliverable SHA-256 `4828e2a2…1b87f4`, `diff` output exactly `62c62`, line 62's trailing space present in `od -c`, and the text's own 2.1 attribution at line 118.
 - 2026-08-19: T7 — the two dead `.Rbuildignore` entries deleted. Both verified dead first: no top-level file matches either pattern, and `.travis.yml`/`CONDUCT.md` were last touched in the pre-cairn Travis era (a95585ab, 34592d96, d685b51a). `R CMD build` succeeds afterwards and the tarball still excludes `.github`, `cairn`, `tools` and `devel`.
+- 2026-08-19: **amendment (substantive), AC6** — running the criterion exposed `.github/CODE_OF_CONDUCT.md:121`, `[Mozilla's code of conduct enforcement ladder][https://github.com/mozilla/inclusion].`: reference-link syntax with no matching definition, malformed verbatim in the upstream Contributor Covenant 2.1 text and unmodifiable under AC7's byte pin, so it renders as plain text rather than a link. Amended at a mini gate after a fresh-context [O] reader audited the proposed wording and refuted the first draft of it: adding `]` to the strip list fixes nothing, because the token ends in `.` not `]` and a single ordered pass leaves `...inclusion]`. Adopted instead: a repeated strip (`sed 's/[]>).,]*$//'`), a named exemption for line 121 with its manually probed 200 on the record, `--max-time 20` on both probes, and an explicit resolution of the latent AC6/AC7 conflict (a failing URL in the vendored file is raised as a decision, never silently edited).
+- 2026-08-19: T8 — AC4 sweep green: all seven literals show >=1 pre-change match against master 908b65e0 (Travis 2, AppVeyor 1, styler 1, style.tidyverse.org 1, tidy-contrib 1, tidyverse/circumplex 1, community.rstudio.com 2) and 0 post-change, so the instrument discriminates rather than passing vacuously. AC5 green: the four files' hosts are github.com (7), www.contributor-covenant.org (4), reprex.tidyverse.org (3, the permitted exception), cran.r-project.org (3), docs.github.com (1); no banned host, and the only tidyverse mentions are the three reprex links. AC6 green: all 12 URLs returned 200 on HEAD, no GET fallback needed. A first AC5 run reported a false "(none)" because zsh does not word-split unquoted parameters, so the grep read no file at all — re-run against explicit paths (the M95-family lesson, a check passing by not checking).
+- 2026-08-19: T8 — one genuine link rot repaired en route: CONTRIBUTING.md's roxygen2 Markdown-syntax link (`cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html`) returned 404 and was repointed to `https://roxygen2.r-lib.org/articles/rd-formatting.html` (200). Tail bytes of all four rewritten files clean (each ends in a single newline, no leaked scaffolding; M34). `pkgdown::check_pkgdown()`: no problems found.
 
 ## Decisions
 

@@ -50,7 +50,7 @@ minimal dependencies and no automatic formatter is run over it, so follow the
 conventions of the file you are editing, and please don't restyle code that has
 nothing to do with your PR.  
 *  We use [roxygen2](https://cran.r-project.org/package=roxygen2), with
-[Markdown syntax](https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html), 
+[Markdown syntax](https://roxygen2.r-lib.org/articles/rd-formatting.html), 
 for documentation.  
 *  We use [testthat](https://cran.r-project.org/package=testthat). Contributions
 with test cases included are easier to accept.  
