@@ -12,6 +12,18 @@ the GitHub web interface, so long as the changes are made in the _source_ file.
 *  YES: you edit a roxygen comment in a `.R` file below `R/`.
 *  NO: you edit an `.Rd` file below `man/`.
 
+### Generated files
+
+Some files in this repository are generated, and a hand edit to one is
+overwritten the next time it is rebuilt. Never edit these directly — change the
+source and regenerate:
+
+*  `man/*.Rd` and `NAMESPACE` — regenerate with `devtools::document()` after
+changing a roxygen comment.  
+*  `R/RcppExports.R` and `src/RcppExports.cpp` — regenerate with
+`Rcpp::compileAttributes()` after changing anything below `src/`.  
+*  `README.md` — knitted from `README.Rmd` by `devtools::build_readme()`.  
+
 ### Prerequisites
 
 Before you make a substantial pull request, please raise it first, so we can
