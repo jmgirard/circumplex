@@ -222,6 +222,29 @@ if (!all(REQUIRED_FIELDS %in% fields)) {
   ))
 }
 
+# ---- AC5: the label is created before it is searched on --------------------
+
+# `gh issue list --label X` on a label that does not exist returns an empty
+# list rather than an error, so an uncreated label reads as "no open issue"
+# and every failed push opens a new one.
+label_create <- grep("gh label create", script, fixed = TRUE)
+label_probe <- grep("gh label list", script, fixed = TRUE)
+search <- grep("gh issue list", script, fixed = TRUE)
+
+if (!length(label_create) || !length(label_probe)) {
+  problems <- c(problems, sprintf(
+    "%s: the shell body must probe for the marker label (`gh label list`) and create it when absent (`gh label create`).",
+    PATH
+  ))
+} else if (!length(search)) {
+  problems <- c(problems, sprintf("%s: no dedupe search (`gh issue list`).", PATH))
+} else if (max(label_create) > min(search)) {
+  problems <- c(problems, sprintf(
+    "%s: the label is created at line %d of the shell body, after the dedupe search at line %d. A search on a nonexistent label returns empty and would defeat the dedupe.",
+    PATH, max(label_create), min(search)
+  ))
+}
+
 # ---- report ----------------------------------------------------------------
 
 if (length(problems)) {

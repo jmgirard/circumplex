@@ -69,4 +69,24 @@ jobs:
           EOF
           )"
 
-          gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
+          # Create the marker label if it is absent, BEFORE searching on it: a
+          # search filtered on a label that does not exist returns empty, so a
+          # missing label would silently defeat the dedupe below and open a
+          # fresh issue on every failed push.
+          if ! gh label list --json name --jq '.[].name' | grep -qx "$LABEL"; then
+            gh label create "$LABEL" --color 'B60205' \
+              --description 'A push run of a watched workflow failed on the default branch'
+          fi
+
+          # Dedupe is per watched workflow: the title carries the workflow
+          # name, so a red R-CMD-check and a red test-coverage get one issue
+          # each, while a red that persists across pushes gets one comment
+          # per push on the issue it already has.
+          EXISTING="$(gh issue list --state open --label "$LABEL" --json number,title |
+            jq -r --arg t "$TITLE" '[.[] | select(.title == $t) | .number] | first // empty')"
+
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "$BODY"
+          else
+            gh issue create --title "$TITLE" --label "$LABEL" --body "$BODY"
+          fi

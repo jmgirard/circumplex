@@ -104,7 +104,7 @@ is the only place that environment reports at all.
       can exercise locally, and run it against three fixtures — no existing
       issue, a matching open issue, and an absent marker label — with the
       GitHub calls stubbed and the stub recording every call.
-- [ ] T4: Add the create-label-if-absent step ahead of the dedupe search.
+- [x] T4: Add the create-label-if-absent step ahead of the dedupe search.
 - [ ] T5: Grep the new file for the four dependency-install keys; run
       `tools/check-ci-deps.R` as a regression guard and the profile's verify
       slot.
@@ -120,6 +120,8 @@ is the only place that environment reports at all.
 - 2026-08-18: implement gate chose bash + `gh` for the alert body over `actions/github-script`, because no Node is installed on the maintainer machine and AC4 requires exercising the body locally; marker label `master-red`; the dry-run harness lands as a standalone `tools/` script, matching `tools/check-ci-deps.R`, not inside the test suite.
 - 2026-08-18: T1 — `.github/workflows/master-red-alert.yaml` authored: `workflow_run` over the two watched workflows, an `if:` requiring failure + push + default branch, `permissions: issues: write` (plus `contents: read` for checkout, no second write scope). `tools/check-master-red-alert.R` parses the file for AC1/AC2; each of its three assertions confirmed to fire against a mutated copy (dropped workflow, dropped push condition, added `contents: write`).
 - 2026-08-18: T2 — issue body written as a table over the four payload fields, all carried in through the step `env:`. The AC3 scan lands in `tools/check-master-red-alert.R`: it enumerates every `${{ }}` site, every `context.payload.*` read, and every shell `$VAR` in the body heredoc, resolves each through the env map and local assignments, and requires the four named fields; it reports 4 fields and nothing else. Confirmed to fire against three mutations (body citing `GH_REPO`, body dropping the head-SHA row, run URL recomposed from `github.server_url`).
+- 2026-08-18: minor amendment — T4 taken before T3 (task reorder only, no scope or criterion change): the dry-run harness T3 builds must exercise a finished shell body, including the label path T4 adds, so the whole body (label probe/create, dedupe search, create-or-comment) landed at T4 and T3 exercises it.
+- 2026-08-18: T4 — the shell body now probes `gh label list` and creates `master-red` when absent, ahead of the `gh issue list` dedupe search; dedupe is per watched workflow via the title. AC5's ordering check added to `tools/check-master-red-alert.R`; confirmed to fire against a copy with the label block moved below the search.
 
 ## Decisions
 
