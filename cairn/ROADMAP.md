@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-18 (M95/M96 plan pass: CI trigger economy and the master-red alert planned; the M93 alert-remedy candidate row graduated to M96 by user override; the branch-protection row left standing on its own condition.)_
+_Last hygiene check: 2026-08-18 (M95 done pass: coverage off the PR trigger and the dead pr-commands workflow retired; two new candidate rows from its review; M90 terminal row pruned to the retention cap; one new lesson + one family extension.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M90 | Say which degeneracy happened, and stop saying it when it did not | done | M89 | normal | milestones/archive/M90-degeneracy-reason-vocabulary.md |
 | M91 | Stop NA-ing computable numbers when only the raw arm refuses | done | M90 | normal | milestones/archive/M91-naive-arm-decoupling.md |
 | M92 | Teach the boundary regime the structure vignette's own example is in | done | — | normal | milestones/archive/M92-boundary-regime-guidance.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M93 | Close the CI platform gate | done | — | normal | milestones/archive/M93-ci-platform-gate.md |
 | M94 | Print the fired-marker list on the bootstrap path | done | — | normal | milestones/archive/M94-bootstrap-marker-list.md |
-| M95 | Stop running the suite twice on every pull request | review | — | normal | milestones/M95-ci-trigger-economy.md |
+| M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
 | M96 | Say something when master goes red | planned | M95 | normal | milestones/M96-master-red-alert.md |
 
 ## Candidates
