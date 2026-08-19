@@ -31,17 +31,17 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
 - Full check at review: `Rscript -e 'devtools::check()'` clean (0 errors, 0 warnings; justify NOTEs).
 - Master watches (`gh run list --workflow=<file> --branch=<default> --event=push`):
   the newest push run of `R-CMD-check.yaml` on the default branch must have
-  concluded success — red or absent is a gate failure (M93) — and so must the
-  newest `test-coverage.yaml` run that concluded success OR failure (M95).
-  Newest *verdict*, not newest completed: `cancelled` is completed without
-  being one (run 32187677266), and no qualifying run is likewise no verdict
-  rather than a failure (`paths-ignore` — say so at the gate). A red is cleared
-  via `/hotfix` (gate-lite skips this slot), so this cannot deadlock against
-  "never implement on the default branch". The coverage watch reads one
-  milestone LATE, catching a covr-only regression at the NEXT gate; `covr`
-  perturbs optimizer results, so its environment is distinct (M59). Cross-check any RED answer: on 2026-08-18
-  this returned a ten-day-stale red set while the same query without `--event`
-  showed green (M96).
+  concluded success — red OR ABSENT is a gate failure (M93). The newest
+  `test-coverage.yaml` run that concluded success or failure must also be a
+  success (M95); there alone, an absent run is no verdict rather than a failure
+  (`paths-ignore` — say so at the gate). Both read the newest *verdict*, not the
+  newest completed: `cancelled` is completed without being one (run 32187677266).
+  A red is cleared via `/hotfix` (gate-lite skips this slot), so this cannot
+  deadlock against "never implement on the default branch". The coverage watch
+  reads one milestone LATE, catching a covr-only regression at the NEXT gate;
+  `covr` perturbs optimizer results, so its environment is distinct (M59).
+  Cross-check any RED answer: on 2026-08-18 this returned a ten-day-stale red
+  set while the same query without `--event` showed green (M96).
 - Master-red alert audits (M96): `Rscript tools/check-master-red-alert.R` and
   `Rscript tools/master-red-alert-dryrun.R` both exit clean — nothing else runs
   them, and the alert workflow fires only when master is already broken. They
