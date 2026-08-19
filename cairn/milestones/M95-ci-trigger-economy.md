@@ -51,20 +51,20 @@ consumer of the package reads either.
 
 ## Acceptance criteria
 
-- [ ] AC1: `.github/workflows/pr-commands.yaml` is absent, and a repo-wide
+- [x] AC1: `.github/workflows/pr-commands.yaml` is absent, and a repo-wide
       `grep -rn "pr-commands" . --exclude-dir=.git` returns matches only inside
       `cairn/` records this milestone authored.
-- [ ] AC2: `.github/workflows/test-coverage.yaml`'s `on:` mapping has exactly
+- [x] AC2: `.github/workflows/test-coverage.yaml`'s `on:` mapping has exactly
       one key, `push` — read by parsing the `on:` block's keys, not by grepping
       the file, since `pull_request` also occurs at line 75 as a value.
-- [ ] AC3: that file's `push` block's `branches` and `paths-ignore` values are
+- [x] AC3: that file's `push` block's `branches` and `paths-ignore` values are
       byte-unchanged against the merge base (`git diff` shows no line inside
       the block), and `fail_ci_if_error` reads `true` with no event conditional.
-- [ ] AC4: `cairn/PROFILE.md`'s consistency-gate slot contains a
+- [x] AC4: `cairn/PROFILE.md`'s consistency-gate slot contains a
       `test-coverage.yaml` watch bullet naming `--workflow=test-coverage.yaml
       --branch=<default> --event=push`, parallel in form to the existing
       `R-CMD-check.yaml` bullet.
-- [ ] AC5: `grep -rn "pull_request\|the PR\|annotates" cairn/PROFILE.md
+- [x] AC5: `grep -rn "pull_request\|the PR\|annotates" cairn/PROFILE.md
       .github/workflows/test-coverage.yaml codecov.yml` — the complete set of
       files carrying a claim about when the coverage workflow runs or what it
       annotates — returns no text stating that it runs on, or annotates, pull
@@ -111,8 +111,35 @@ consumer of the package reads either.
 - 2026-08-18: PR #124 CI green — matrix 37s, pkgdown 4m34s, ubuntu-latest release 27m19s (run 32196729867); `gh run list --workflow=test-coverage.yaml --event=pull_request --branch=m95-ci-trigger-economy` returns nothing, so the trigger change is confirmed live as well as by AC2's parse.
 - 2026-08-18: payoff restated against that measurement — the plain single-ubuntu check job is 27m19s and the coverage job was 27m, and the two ran in PARALLEL, so this milestone saves ~27 min of runner time per PR and does NOT shorten the wall-clock wait. The plan's framing of the coverage job as "the slower of the two" holds only against a three-platform escalation (38 min), not against a plain PR.
 - 2026-08-18: the first CI watch used `timeout 1800 gh pr checks --watch`; macOS ships no `timeout`, so the command failed and a trailing `echo` reported success — caught by re-reading the authoritative `gh run list` state. Candidate LESSONS line for review's hygiene pass.
+- 2026-08-18: review in progress — AC1-AC5 verified with fresh evidence and ticked; consistency gate green (cairn_validate, document() no-diff, check_pkgdown, both master watches). Two of three review lenses reported, both with no findings. AC6 and the [O] diff-bug lens still outstanding at this checkpoint.
 - 2026-08-18: checker-regress shape considered and not fired — the consistency-gate watch reads GitHub run conclusions, which are external state, not the repo-internal artifacts the shape is defined over.
 
 ## Decisions
 
 ## Review
+
+Fresh evidence, 2026-08-18, branch m95-ci-trigger-economy at 37348919 against origin/master.
+
+- **AC1** ✔ `.github/workflows/pr-commands.yaml` absent from the tree; `grep -rn "pr-commands" . --exclude-dir=.git` returns hits in one file only, `cairn/milestones/M95-ci-trigger-economy.md` — this milestone's own record.
+- **AC2** ✔ `yaml::read_yaml()` on the workflow: the trigger key parses as the logical `TRUE` (YAML 1.1 reads bare `on` as boolean), and its mapping has exactly one key, `push` (n = 1). A first attempt indexed `d[["on"]]`, got NULL and reported "n = 0" — vacuous, and re-run before it was recorded.
+- **AC3** ✔ The `push` block extracted from `git show origin/master:` and from the working tree hashes to 51dce08235cd5670b78bae7a367c6857 on both sides. `fail_ci_if_error: true` at line 90; `github.event_name` occurs 0 times in the file.
+- **AC4** ✔ `cairn/PROFILE.md:36` carries the Master coverage watch bullet naming `gh run list --workflow=test-coverage.yaml --branch=<default> --event=push`, parallel in form to M93's matrix bullet at line 32. The command run as written returns `status=completed conclusion=success` for run 32189244160.
+- **AC5** ✔ The sweep over the three named files returns two hits, both in the `test-coverage.yaml` header (lines 9 and 14), both stating what the PR side lost; neither claims the workflow runs on or annotates pull requests. `annotates` occurs in none of the three.
+
+### Consistency gate
+
+- `cairn_validate` — all checks passed (47 advisory work-log-format warnings, pre-existing across M7 and others, never gate failures).
+- `devtools::document()` — no diff, `git status` clean afterward; 0 lines matching `resolve link` at `cli.width = 500`.
+- `pkgdown::check_pkgdown()` — no problems found.
+- README.md in sync with README.Rmd; neither is touched by the diff.
+- NEWS entry — not owed: the diff touches no `R/`, `src/`, `man/`, `NAMESPACE` or `DESCRIPTION` surface.
+- `.Rbuildignore` — no top-level files added.
+- Master matrix watch (M93) — latest master push run of `R-CMD-check.yaml` concluded success (run 32189244110).
+- Master coverage watch (M95's own, first exercise) — latest master push run of `test-coverage.yaml` concluded success (run 32189244160).
+
+### Independent review
+
+Three fresh-context lenses, none having seen the implementation.
+
+- **[S] prior-PR-comments** — no prior-review evidence. No archived `## Review` finding across the CI milestones bears on these files, and the existence probe `gh api .../pulls/comments?per_page=1` returned `[]`, so the per-PR thread walk was skipped per the probe gate. Clean no-op, as the standing M33 lesson predicts for this repo.
+- **[S] blame-history** — no findings. Established that the `pull_request` trigger and the `fail_ci_if_error` conditional both date to commit 302cf928 (2024-10-27, pre-cairn), not to any deliberate cairn-era decision; that `paths-ignore` on that trigger was M51's work, so removing the trigger retires part of M51's addition while continuing M51's own CI-economy purpose; that `pr-commands.yaml` was never deliberately retained or restored; that M93's PR-blocking matrix gate is untouched and never depended on the coverage workflow; and that the removed "Codecov annotates the PR" sentence was already wrong when written in 0b417270, since `codecov.yml` has carried `comment: false` since before cairn. It independently confirmed the M59 and M92 citations in the new comment and PROFILE prose against those milestones' archives.
