@@ -1,6 +1,6 @@
 # M95: Stop running the suite twice on every pull request
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -64,11 +64,10 @@ consumer of the package reads either.
       `test-coverage.yaml` watch bullet naming `--workflow=test-coverage.yaml
       --branch=<default> --event=push`, parallel in form to the existing
       `R-CMD-check.yaml` bullet.
-- [x] AC5: `grep -rn "pull_request\|the PR\|annotates" cairn/PROFILE.md
-      .github/workflows/test-coverage.yaml codecov.yml` — the complete set of
-      files carrying a claim about when the coverage workflow runs or what it
-      annotates — returns no text stating that it runs on, or annotates, pull
-      requests.
+- [ ] AC5: `grep -rn "pull_request\|the PR\|annotates" cairn/PROFILE.md
+      .github/workflows/test-coverage.yaml codecov.yml` returns no text stating
+      that the coverage workflow runs on, or annotates, pull requests. (Scope is
+      these three files; the criterion claims nothing about other surfaces.)
 - [ ] AC6: `Rscript tools/check-ci-deps.R` exits clean, and
       `Rscript -e 'devtools::check(args = "--no-manual")'` is clean (0 errors,
       0 warnings; NOTEs justified).
@@ -112,6 +111,12 @@ consumer of the package reads either.
 - 2026-08-18: payoff restated against that measurement — the plain single-ubuntu check job is 27m19s and the coverage job was 27m, and the two ran in PARALLEL, so this milestone saves ~27 min of runner time per PR and does NOT shorten the wall-clock wait. The plan's framing of the coverage job as "the slower of the two" holds only against a three-platform escalation (38 min), not against a plain PR.
 - 2026-08-18: the first CI watch used `timeout 1800 gh pr checks --watch`; macOS ships no `timeout`, so the command failed and a trailing `echo` reported success — caught by re-reading the authoritative `gh run list` state. Candidate LESSONS line for review's hygiene pass.
 - 2026-08-18: review in progress — AC1-AC5 verified with fresh evidence and ticked; consistency gate green (cairn_validate, document() no-diff, check_pkgdown, both master watches). Two of three review lenses reported, both with no findings. AC6 and the [O] diff-bug lens still outstanding at this checkpoint.
+- 2026-08-18: amendment return: AC5 — "`grep -rn \"pull_request\|the PR\|annotates\" cairn/PROFILE.md .github/workflows/test-coverage.yaml codecov.yml` returns no text stating that the coverage workflow runs on, or annotates, pull requests. (Scope is these three files; the criterion claims nothing about other surfaces.)" — the original claimed the three files were the complete set carrying such a claim, which `.github/CONTRIBUTING.md:25` falsifies; narrowed rather than widened per the widening test, at the maintainer's selection. AC5 unticked pending re-verification.
+- 2026-08-18: the amended wording went to a fresh-context [O] reader in reduced mode before being written. It passed proportionality and found the promise itself bounded, but caught a false justification clause in the proposed parenthetical — `codecov.yml` receives no edit on this branch and `.github/CONTRIBUTING.md` does — so the clause was replaced by the reader's own repair, a plain scope disclaimer. First and only defect return on this milestone; the thrash rule does not fire.
+- 2026-08-18: fix-now work from the review gate — F3/F6 (the header called covr "the slower of the two" then cited 27 vs 38, and claimed nothing was lost six lines before saying what was): rewritten to state the two ran in PARALLEL, so the saving is runner minutes not wall clock, and to narrow the no-loss claim to REPORTING. F2/F7: the watch now reads the newest run concluding success or failure, not the newest completed, since `cancelled` is completed without being a verdict, and an absent run is no verdict rather than a failure. F1: the bullet names `/hotfix` as the way to clear a red one, so it cannot deadlock against the never-implement-on-master rule. F8: it says the watch reads one milestone LATE. F4: the test-doctrine line now separates the coverage NUMBER (never a gate) from the JOB's pass/fail (which does gate). F9: the M92 citation is softened in both places to the instrumentation, since M92's own remedy made the vignette guards skip.
+- 2026-08-18: F13 rescoped after checking the file — `.github/CONTRIBUTING.md` never referenced the deleted workflow's `/style` or `/document` commands, so its `styler` advice is not stranded by this diff and the "only in-repo mechanism" premise was about the automation rather than about what the guide promises. No edit made; both the Travis/AppVeyor line and the styler advice go to a candidate row as pre-existing. F14 (plaintext Codecov token, out of diff since M12) likewise to a candidate row, rotation being Jeff's to do.
+- 2026-08-18: `cairn/PROFILE.md` hit its 120-line cap during these fixes and was compressed within the two slots this milestone wrote, never by trimming pre-existing content; now 119.
+- 2026-08-18: re-verified after the fixes — AC5 (amended) one hit, stating what the PR side lost; AC2 one key `push`; AC3 push block still 51dce08235cd5670b78bae7a367c6857 and `fail_ci_if_error: true`; AC4 bullet still names its command.
 - 2026-08-18: checker-regress shape considered and not fired — the consistency-gate watch reads GitHub run conclusions, which are external state, not the repo-internal artifacts the shape is defined over.
 
 ## Decisions
