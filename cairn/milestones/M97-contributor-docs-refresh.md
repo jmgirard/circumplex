@@ -1,11 +1,11 @@
 # M97: Make the contributor docs describe this repo
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP3
-- **Branch/PR:** —
+- **Branch/PR:** `m97-contributor-docs-refresh`
 
 ## Goal
 
@@ -121,6 +121,7 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: plan gate chose hand-run, logged sweeps over a committed testthat fence because a checker over these docs can only fence recalled literals, not stale advice (the D-090 shape; the M96 lesson that a guard proving a negative over an open-ended grammar "loses to the next construct"); falsified by a post-merge reintroduction of any retired literal that a reviewer misses.
 - 2026-08-19: plan gate chose a full rewrite over a minimal edit of the false claims alone, because the audit showed a minimal edit leaves the stale claim standing in paraphrase (a "check the CI services listed in the README" rewrite passes every literal grep); falsified by the rewrite introducing a new inaccuracy the greps cannot see.
 - 2026-08-19: plan chose deleting the dead `.Rbuildignore` entries over exempting `.Rbuildignore` from AC4's sweep, because the entries name files that do not exist and cannot return; falsified by either pattern turning out to still match something `R CMD build` needs excluded.
+- 2026-08-19: implement session started; branch `m97-contributor-docs-refresh` cut from pushed master (908b65e0), tree clean.
 
 ## Decisions
 
