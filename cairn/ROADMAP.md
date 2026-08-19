@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-19 (M97 done pass: the four `.github/` contributor documents rewritten off the usethis template, plus two dead `.Rbuildignore` entries; three-lens review returned 12 findings, 8 actioned and 4 rejected, no defect returns; two gated criterion amendments during implementation, each audited by a fresh reader; the M95 lesson family extended with the zsh word-splitting no-op and compressed to pay for it — LESSONS at 19,996 bytes, so the next lesson needs a retirement first.)_
+_Last hygiene check: 2026-08-19 (status audit, no changes: all 16 `cairn_validate` checks pass and every advisory is `OK` except M7's 47 pre-M28 multi-line work-log WARNs, which are IP4 history; both GitHub inboxes empty; tracking matches git at `27b826aa`. LESSONS sits at 19,996 of 20,000 bytes, so the next lesson still needs a retirement first.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
