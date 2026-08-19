@@ -26,13 +26,17 @@ agree the change is wanted before you spend time on it:
 ### Pull request process
 
 *  We recommend that you create a Git branch for each pull request (PR).  
-*  Look at the Travis and AppVeyor build status before and after making changes.
-The `README` should contain badges for any continuous integration services used
-by the package.  
-*  New code should follow the tidyverse [style guide](https://style.tidyverse.org).
-You can use the [styler](https://CRAN.R-project.org/package=styler) package to
-apply these styles, but please don't restyle code that has nothing to do with 
-your PR.  
+*  Pull requests are checked by the `R-CMD-check.yaml` GitHub Actions workflow.
+A PR touching `R/`, `src/`, `tests/`, `vignettes/`, `data/`, `inst/`,
+`DESCRIPTION` or `NAMESPACE` runs `R CMD check` on Windows, macOS and Ubuntu;
+any other PR gets a single Ubuntu job. Check that it is green before and after
+your changes. (Pushes to `master` run a wider matrix that adds R-devel and
+oldrel.) `README.md` carries a badge for this workflow and for the coverage and
+pkgdown ones.  
+*  New code should match existing code style. This package is base R with
+minimal dependencies and no automatic formatter is run over it, so follow the
+conventions of the file you are editing, and please don't restyle code that has
+nothing to do with your PR.  
 *  We use [roxygen2](https://cran.r-project.org/package=roxygen2), with
 [Markdown syntax](https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html), 
 for documentation.  

@@ -95,7 +95,7 @@ GitHub renders them, and act on what they say.
 - [x] **T1** — CONTRIBUTING.md: rewrite the framing (L3-5, L47-48) and the
       "someone from the team agrees" prerequisite (L17-18) for a
       solo-maintainer, non-tidyverse package.
-- [ ] **T2** — CONTRIBUTING.md: rewrite the PR-process section — replace the
+- [x] **T2** — CONTRIBUTING.md: rewrite the PR-process section — replace the
       Travis/AppVeyor bullet (L25-27) with the actual workflows, and the
       styler/style-guide bullet (L28-31) with CLAUDE.md's rule.
 - [ ] **T3** — CONTRIBUTING.md: add the generated-files section (four paths, two
@@ -123,6 +123,7 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: plan chose deleting the dead `.Rbuildignore` entries over exempting `.Rbuildignore` from AC4's sweep, because the entries name files that do not exist and cannot return; falsified by either pattern turning out to still match something `R CMD build` needs excluded.
 - 2026-08-19: implement session started; branch `m97-contributor-docs-refresh` cut from pushed master (908b65e0), tree clean.
 - 2026-08-19: T1 — CONTRIBUTING.md framing, prerequisites, and closing section rewritten: the tidy-contrib pointers (L3-5, L47-48) removed, the "someone from the team" prerequisite replaced by an issue-for-bugs / discussion-for-features split (Discussions is enabled and in live use, 2 threads), and the reprex link repointed from `www.tidyverse.org/help/#reprex` to `reprex.tidyverse.org` (AC5's sole permitted exception).
+- 2026-08-19: T2 — PR-process section rewritten; AC1 probes green (`R-CMD-check.yaml` 1 match, `match existing code style` 1 match, workflow file present). The CI sentence was first drafted as "every pull request ... across several platforms and R versions" and corrected against `tools/ci-matrix.R:23-38`: only a PR touching the escalation set gets the three release platforms, any other PR gets one Ubuntu job, and the five-config matrix with R-devel/oldrel is the push-to-master matrix.
 
 ## Decisions
 
