@@ -29,7 +29,13 @@ if (nzchar(Sys.which("jq")) == FALSE) {
 
 PATH_YAML <- ".github/workflows/master-red-alert.yaml"
 doc <- yaml::read_yaml(PATH_YAML)
-body <- doc$jobs[[1L]]$steps[[1L]]$run
+steps <- doc$jobs[[1L]]$steps
+runs <- vapply(steps, function(s) is.character(s$run), logical(1L))
+if (sum(runs) != 1L) {
+  stop("expected exactly one step with a `run:` body in ", PATH_YAML,
+       call. = FALSE)
+}
+body <- steps[[which(runs)]]$run
 
 # The synthetic failure payload. These stand in for the workflow_run fields
 # the step's `env:` block carries in.

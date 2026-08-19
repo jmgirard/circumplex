@@ -105,7 +105,7 @@ is the only place that environment reports at all.
       issue, a matching open issue, and an absent marker label — with the
       GitHub calls stubbed and the stub recording every call.
 - [x] T4: Add the create-label-if-absent step ahead of the dedupe search.
-- [ ] T5: Grep the new file for the four dependency-install keys; run
+- [x] T5: Grep the new file for the four dependency-install keys; run
       `tools/check-ci-deps.R` as a regression guard and the profile's verify
       slot.
 
@@ -123,6 +123,7 @@ is the only place that environment reports at all.
 - 2026-08-18: minor amendment — T4 taken before T3 (task reorder only, no scope or criterion change): the dry-run harness T3 builds must exercise a finished shell body, including the label path T4 adds, so the whole body (label probe/create, dedupe search, create-or-comment) landed at T4 and T3 exercises it.
 - 2026-08-18: T4 — the shell body now probes `gh label list` and creates `master-red` when absent, ahead of the `gh issue list` dedupe search; dedupe is per watched workflow via the title. AC5's ordering check added to `tools/check-master-red-alert.R`; confirmed to fire against a copy with the label block moved below the search.
 - 2026-08-18: T3 — `tools/master-red-alert-dryrun.R` lifts the shell body out of the workflow file (no second copy to drift), puts a recording `gh` stub on PATH with `jq` left real, and runs three fixtures: label present + no issue -> one create; label present + matching issue -> one comment on #42, no create; label absent -> label create before the search, then one create. All three pass. Each is confirmed discriminating by a mutant: always-create, a dedupe filter inverted to `.title != $t`, and a deleted `gh label create` each fail in the fixture that should catch them.
+- 2026-08-18: T5 — AC6's grep for `setup-r`, `setup-r-dependencies`, `extra-packages` and `install.packages` added to `tools/check-master-red-alert.R`; the alert file carries none of the four, and the check fires against a copy with a `setup-r` step spliced in. `tools/check-ci-deps.R` green as an unchanged-regression guard (14 Suggests in sync), which says nothing about the new file. Verify slot clean: `devtools::test()` [ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ] (the warnings are the suite's pre-existing lavaan/optimizer notes, untouched by this branch). Both audit scripts also hardened to locate the alert step by its `run:` body rather than by position, found while mutating.
 
 ## Decisions
 

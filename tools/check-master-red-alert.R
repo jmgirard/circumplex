@@ -117,7 +117,15 @@ if (!is.list(perms) || !length(perms)) {
 # and requires that the sites reaching the body resolve to workflow_run
 # payload fields and nothing else.
 
-step <- job$steps[[1L]]
+# The alert is the one step carrying a shell body; locating it by content
+# rather than by position keeps this audit pointed at the right step if a
+# setup step is ever added ahead of it.
+runs <- vapply(job$steps, function(s) is.character(s$run), logical(1L))
+if (sum(runs) != 1L) {
+  stop(sprintf("%s: expected exactly one step with a `run:` body; found %d.",
+               PATH, sum(runs)), call. = FALSE)
+}
+step <- job$steps[[which(runs)]]
 script <- strsplit(step$run, "\n", fixed = TRUE)[[1L]]
 env <- vapply(step$env, as.character, character(1L))
 
@@ -242,6 +250,26 @@ if (!length(label_create) || !length(label_probe)) {
   problems <- c(problems, sprintf(
     "%s: the label is created at line %d of the shell body, after the dedupe search at line %d. A search on a nonexistent label returns empty and would defeat the dedupe.",
     PATH, max(label_create), min(search)
+  ))
+}
+
+# ---- AC6: the alert installs nothing -------------------------------------
+
+# tools/check-ci-deps.R keeps the R workflows' `extra-packages` allowlists in
+# sync with DESCRIPTION Suggests. This workflow needs no allowlist entry there
+# because it installs nothing at all: it runs `gh` and `jq`, both preinstalled
+# on GitHub-hosted runners. That is asserted here rather than assumed, since
+# check-ci-deps.R iterates a hand-written list of three workflow paths and
+# cannot see this fourth file.
+INSTALL_KEYS <- c("setup-r", "setup-r-dependencies", "extra-packages",
+                  "install.packages")
+found_keys <- INSTALL_KEYS[vapply(
+  INSTALL_KEYS, function(k) any(grepl(k, raw, fixed = TRUE)), logical(1L)
+)]
+if (length(found_keys)) {
+  problems <- c(problems, sprintf(
+    "%s: dependency-install key(s) present: %s. This workflow must install nothing — otherwise it needs an allowlist entry in tools/check-ci-deps.R, which does not watch this file.",
+    PATH, paste(found_keys, collapse = ", ")
   ))
 }
 
