@@ -1,11 +1,11 @@
 # M96: Say something when master goes red
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M95
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m96-master-red-alert`
 
 ## Goal
 
@@ -117,6 +117,7 @@ is the only place that environment reports at all.
 - 2026-08-18: M93's parking of this remedy overridden by Jeff at this plan gate; its stated promotion condition (a master red outliving a review cycle unnoticed) had not fired. Logged per the user-override rule; the M93 Out entry is a deferral, not a rejection on the merits, so no superseding decision entry is owed.
 - 2026-08-18: reduced criteria audit ([O], fresh context) returned four findings, all fixed before the criteria were written: AC3's `${{ }}` scan was a proxy that would pass vacuously if the body is composed inside the script body, so the domain now spans both and must find at least four fields; AC5 bound acceptance to the live repository label set, so its first disjunct was dropped for a parse of step order; AC6's reliance on `check-ci-deps.R` was vacuous because that script loops a hand-list of three workflows (tools/check-ci-deps.R:156) and cannot see a fourth, so the claim about the new file now rests on its own grep and the script is demoted to a regression guard. AC1, AC2 and AC4 passed both questions.
 - 2026-08-18: widening `tools/check-ci-deps.R` to glob `.github/workflows/` considered and left out — it is the checker-regress shape M93's plan gate already declined once for that script, and AC6's per-file grep gets this milestone what it needs without widening the checker's promise.
+- 2026-08-18: implement gate chose bash + `gh` for the alert body over `actions/github-script`, because no Node is installed on the maintainer machine and AC4 requires exercising the body locally; marker label `master-red`; the dry-run harness lands as a standalone `tools/` script, matching `tools/check-ci-deps.R`, not inside the test suite.
 
 ## Decisions
 
