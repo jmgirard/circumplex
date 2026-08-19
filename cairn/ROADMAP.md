@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M94 | Print the fired-marker list on the bootstrap path | done | — | normal | milestones/archive/M94-bootstrap-marker-list.md |
 | M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
 | M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
-| M97 | Make the contributor docs describe this repo | planned | — | normal | milestones/M97-contributor-docs-refresh.md |
+| M97 | Make the contributor docs describe this repo | review | — | normal | milestones/M97-contributor-docs-refresh.md |
 
 ## Candidates
 
