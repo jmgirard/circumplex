@@ -103,7 +103,7 @@ GitHub renders them, and act on what they say.
 - [x] **T4** — SUPPORT.md: fix the issue-search link (L23) to DESCRIPTION's
       `BugReports:` value; replace the tidyverse help venues (L11, L14, L16,
       L32) and framing; keep reprex.
-- [ ] **T5** — ISSUE_TEMPLATE.md: replace the stale question venues (L1) and
+- [x] **T5** — ISSUE_TEMPLATE.md: replace the stale question venues (L1) and
       help links (L3).
 - [ ] **T6** — CODE_OF_CONDUCT.md: replace with Contributor Covenant 2.1;
       enforcement contact = DESCRIPTION's `cre` email.
@@ -126,6 +126,7 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: T2 — PR-process section rewritten; AC1 probes green (`R-CMD-check.yaml` 1 match, `match existing code style` 1 match, workflow file present). The CI sentence was first drafted as "every pull request ... across several platforms and R versions" and corrected against `tools/ci-matrix.R:23-38`: only a PR touching the escalation set gets the three release platforms, any other PR gets one Ubuntu job, and the five-config matrix with R-devel/oldrel is the push-to-master matrix.
 - 2026-08-19: T3 — "Generated files" section added after "Fixing typos"; AC2 probes green (all six strings >=1 match: `R/RcppExports.R` 1, `src/RcppExports.cpp` 1, `man/*.Rd` 1, `NAMESPACE` 2, `devtools::document()` 1, `Rcpp::compileAttributes()` 1). README.md/README.Rmd added as a third generated pair from PROFILE.md's consistency-gate slot.
 - 2026-08-19: T4 — SUPPORT.md rewritten around this repo's own venues (Discussions for questions, Issues for bugs). AC3 probe green: the only `github.com/<owner>/circumplex` URLs are `jmgirard/...discussions` and `jmgirard/...issues`, and the issue-search link's origin-plus-path string-equals DESCRIPTION's `BugReports:` value with no query. The wrong-repo link (`github.com/tidyverse/circumplex/issues`) and the four tidyverse help venues are gone; the stale `help.github.com` qualifier link was repointed to `docs.github.com`.
+- 2026-08-19: T5 — ISSUE_TEMPLATE.md's question venues (StackOverflow, community.rstudio.com) replaced by this repo's Discussions; the tidyverse help pointer dropped and the reprex link repointed to `reprex.tidyverse.org`.
 
 ## Decisions
 
