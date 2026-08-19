@@ -34,7 +34,9 @@ is the only place that environment reports at all.
   than opening a second. A red that persists across pushes must not accumulate
   one issue per push.
 - The issue body names the failing workflow, the run URL, the head SHA, and
-  the conclusion — each read from the `workflow_run` payload, never composed.
+  the conclusion — each carried in from the `workflow_run` payload through the
+  step's `env:` block, and reaching the issue as reported text rather than
+  composed text under the dry run's fixtures.
 - `permissions:` grants `issues: write` and nothing else.
 
 **Out:**
@@ -52,19 +54,41 @@ is the only place that environment reports at all.
 
 ## Acceptance criteria
 
-- [ ] AC1: the workflow file exists, its `on: workflow_run` block names exactly
-      `R-CMD-check.yaml` and `test-coverage.yaml`, and its job carries an `if:`
-      requiring `conclusion == 'failure'`, `event == 'push'`, and the default
-      branch — read by parsing the file's `on:` and `if:` values.
+- [ ] AC1: the workflow file exists and declares exactly one job; its `on:`
+      block names `workflow_run` and nothing else; that block's `workflows:`
+      list is exactly `R-CMD-check.yaml` and `test-coverage.yaml`, and each of
+      those two files declares `name:` equal to its own filename
+      (`workflow_run` matches the name, not the filename); and the job's `if:`,
+      with every run of whitespace collapsed to a single space and the ends
+      trimmed, is byte-identical to `github.event.workflow_run.conclusion ==
+      'failure' && github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch ==
+      github.event.repository.default_branch` — read by parsing this file's
+      `on:`, `jobs:` and `if:` values and the `name:` of the two watched files.
 - [x] AC2: `permissions:` at the workflow or job level grants `issues: write`
       and no other write scope, read by parsing the `permissions:` mapping.
-- [ ] AC3: every value substituted into the issue body resolves to a
-      `workflow_run` payload path — enumerated by scanning both the body
-      template and the alert's script body for every interpolation site
-      (`${{ }}` expressions, `context.payload.*` reads, shell `$VAR`
-      substitutions) and checking each. The scan must find at least the four
-      fields the body names (workflow, run URL, head SHA, conclusion), so an
-      empty enumeration fails rather than passing vacuously.
+- [ ] AC3: the issue text the alert produces is fixed boilerplate plus
+      `workflow_run` payload values and nothing else, decided by two bounded
+      checks together. (a) The alert step's parsed `env:` mapping is exactly
+      `ALERT_WORKFLOW`, `ALERT_RUN_URL`, `ALERT_HEAD_SHA`, `ALERT_CONCLUSION`
+      (plus `GH_TOKEN`, `GH_REPO`), each byte-identical to
+      `${{ github.event.workflow_run.<name|html_url|head_sha|conclusion> }}`.
+      This is the only place the values are tied to the payload; no check
+      downstream of it can see that binding. (b) For one synthetic payload
+      whose four values are non-empty and are substrings neither of one another
+      nor of the boilerplate, the dry run captures the `--title` and `--body`
+      arguments of every `gh issue create` and `gh issue comment` call its stub
+      records, in every fixture, replaces each payload value in each capture
+      with its field name, and requires each result to be byte-identical to a
+      committed expected template — committed once as a reviewed expectation,
+      never regenerated from a failing capture. Each of the four payload values
+      must occur in each raw capture, so an empty or truncated capture fails
+      rather than passing vacuously; `--body` is the last argument of each such
+      call, so its multi-line value has an unambiguous end in the recorded
+      vector. (b) decides the text produced under the dry run's environment,
+      not the workflow's source: a construct that expands to nothing locally
+      and to text on a runner is out of its reach. Accepted at internal tier —
+      the source-scanning guarantee is deliberately descoped.
 - [x] AC4: a dry run against a synthetic failure payload produces exactly one
       issue on an empty issue list, exactly one comment when a matching open
       issue already exists, and a create-label call before the dedupe search on
@@ -85,9 +109,9 @@ is the only place that environment reports at all.
 
 ## Coverage
 
-- AC1 → T1
+- AC1 → T1, T9
 - AC2 → T1
-- AC3 → T2
+- AC3 → T9
 - AC4 → T3
 - AC5 → T4
 - AC6 → T5
@@ -112,6 +136,15 @@ is the only place that environment reports at all.
 - [x] T6: Repair AC3's scan — cover the whole shell body and the issue title, not only the body heredoc; refuse command substitution in anything that reaches the issue; make the `${{ }}` check site-based rather than value-based.
 - [x] T7: Harden the alert body — idempotent label creation that cannot abort the job, a label probe that cannot invert on a pipeline, a `concurrency:` group, and the unused `contents:` grant and its false checkout comments removed.
 - [x] T8: Repair the audits' own defects — effective (job-over-workflow) permissions precedence, watched-workflow `name:` equality, the zero-jobs crash, a dry-run fixture where a GitHub call fails; name both scripts in the profile's consistency-gate slot.
+
+- [ ] T9: Delete the source scanner from `tools/check-master-red-alert.R`,
+      including its "and nothing else" output line; build AC3(a)'s `env:`
+      comparison and AC1's exact `if:`, one-job, `on:`-exclusivity and sibling
+      `name:` checks in its place.
+- [ ] T10: Build AC3(b) in `tools/master-red-alert-dryrun.R` — capture the
+      `--title`/`--body` of every recorded issue create and comment in every
+      fixture, substitute the payload values back out, compare against a
+      committed template; fix the `set -e` abort on a failing `gh label list`.
 
 ## Work log
 
@@ -139,6 +172,10 @@ is the only place that environment reports at all.
 - 2026-08-18: T8 (return, F2/F5/F11/F12 + the gate wiring) — the permissions check now reads the effective mapping (job-level replaces workflow-level in GitHub) and refuses a file declaring both; each watched workflow's own `name:` is read and required to equal the string in `workflows:`, since `workflow_run` matches the name and not the filename; a zero-jobs file stops with a message instead of a subscript error; the dry run gained a fourth fixture where `gh label create` is refused. That fixture found a further defect and fixed it: a refused create still aborted the job under `set -e`, so the alert now falls back to posting an unlabeled issue with a `::warning::` saying it will not dedupe. A concurrency guard was added to the audit so T7's fix cannot be silently dropped. `PROFILE.md`'s consistency-gate slot now names both scripts (the two master-watch bullets merged and compressed in one pass to hold the 120-line cap, and carrying the stale-`gh run list` caution the review gate hit). Verify slot: `devtools::test()` [ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ].
 - 2026-08-18: return fixes complete (T6-T8); `devtools::check(args = "--no-manual")` Status OK (0/0/0). Status -> review.
 - 2026-08-18: defect return 2 (review gate) — AC3 falsified again inside its own domain by two new routes, and AC1's procedure shown not to test what it claims. Verified on copies: `--body "$BODY runner=$(hostname)"` at the `gh` call site, and `BODY="$BODY runner: $(hostname)"` re-composed after the heredoc, both pass the audit and the dry run; `&&` -> `||` in the job's `if:` passes both while the mutated workflow would alert on every push run including green ones. Production defect alongside them: a failing `gh label list` aborts the alert under `set -e` (verified, exit 1, no issue posted) — the returned F3 still live on the read call, since T8's fallback covers only `gh label create`. Thrash rule (b) fires: AC3 has now failed twice, each by a new mechanism of the same shape. Status review -> in-progress; AC1 and AC3 unticked.
+- 2026-08-18: amendment return: AC1 — "the job's `if:`, with every run of whitespace collapsed to a single space and the ends trimmed, is byte-identical to `github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == github.event.repository.default_branch`"
+- 2026-08-18: amendment return: AC3 — "the issue text the alert produces is fixed boilerplate plus `workflow_run` payload values and nothing else, decided by two bounded checks together"
+- 2026-08-18: descope chosen by Jeff at the second return, over a third audit-hardening pass and over a Fable escalation: the deliverable is the workflow, not the audit script. AC1 and AC3 narrowed (the source-scanning guarantee deleted outright, not widened), the Scope In bullet narrowed to match, T9/T10 added, Coverage remapped AC3 → T9 and AC1 → T1+T9. F5 is fixed as a real production bug; F4 and F6-F14 are won't-fix by that same call — logged in Review, and F4 means a dropped `--label` on the search or the create is caught by nothing.
+- 2026-08-18: the amended wording was audited by a fresh-context [O] reader that did not author it, before it was written to the file. It returned three defects, all adopted: AC3(b) quantified over one capture site where the body reaches `gh` at three (the returned F2 shape, one branch over); AC3 as first drafted tied nothing to the payload at all, since the dry run supplies the values itself, which also stranded the Scope bullet — hence clause (a) over the `env:` mapping; and AC1 had silently dropped the `on:`-exclusivity, sibling `name:` equality and one-job checks the existing audit already performs.
 
 ## Review
 
