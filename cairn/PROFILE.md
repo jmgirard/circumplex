@@ -33,6 +33,19 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
   default branch's push trigger (`gh run list --workflow=R-CMD-check.yaml
   --branch=<default> --event=push`) concluded success; a red or absent run is a
   gate failure (M93).
+- Master coverage watch: the newest `test-coverage.yaml` run for the default
+  branch's push trigger (`gh run list --workflow=test-coverage.yaml
+  --branch=<default> --event=push`) that concluded success OR failure concluded
+  success; a red one is a gate failure (M95). Newest *verdict*, not newest
+  completed: `cancel-in-progress` lets a later push cancel an earlier run, and
+  `cancelled` is completed without being a verdict (run 32187677266). No
+  qualifying run is likewise no verdict, not a failure — `paths-ignore` means
+  tracking-only merges produce none; say so at the gate. A red one is cleared
+  via `/hotfix` (gate-lite skips this slot), so this cannot deadlock against
+  "never implement on the default branch". It reads one milestone LATE — the
+  newest master run predates the branch under review — so it catches a
+  covr-only regression at the NEXT gate. The environment is still distinct —
+  `covr` instruments the code and perturbs optimizer results (M59).
 
 ## test-doctrine
 R-mechanical test expectations layered on the universal "What gets a test"
@@ -44,16 +57,18 @@ rules in tracking-rules:
 - Indirect by default: internal helpers (direct tests only for independent logic).
 - Never test print cosmetics beyond meaningful snapshots, trivial pass-throughs,
   dependency behavior, or plots except `vdiffr` when the plot is the product.
-- `covr` is a diagnostic, never a gate.
-- GitHub Actions CI uses the standard usethis pair:
-  `usethis::use_github_action("check-standard")` runs `R CMD check` across
-  platforms (a normal CI check — cairn's git model never merges red or pending
-  CI), and `usethis::use_github_action("test-coverage")` runs `covr` and uploads
-  to Codecov (`covr::codecov()`). Coverage reporting is diagnostic-only: Codecov
-  annotates the PR, but coverage never gates the merge — the `covr` line above
-  and tracking-rules' "no coverage-percentage target" both hold. Give the
-  `.github/` workflow dir an `.Rbuildignore` `^\.github$` entry (usethis adds it)
-  so it stays out of the built package.
+- The `covr` coverage NUMBER is a diagnostic, never a gate — no percentage
+  target. The coverage JOB's pass/fail does gate (the master coverage watch):
+  a red run means tests failed under instrumentation, not that coverage fell.
+- GitHub Actions CI began as the standard usethis pair and has since diverged.
+  `R-CMD-check.yaml` checks across platforms on a matrix `tools/ci-matrix.R`
+  computes per run (M93); `test-coverage.yaml` runs `covr` and uploads to
+  Codecov. Neither is stock — edit the files, not the usethis generators, which
+  would overwrite both. Codecov posts nothing on a PR either way (`codecov.yml`
+  sets `comment: false`, both statuses `informational: true`), and since M95 the
+  coverage workflow runs on push only, so its result reaches a PR by no route.
+  Give `.github/` an `.Rbuildignore` `^\.github$` entry so it stays out of the
+  built package.
 - Change governance renders here as: the dependency surface is DESCRIPTION
   Imports/Suggests; a breaking-change deprecation cycle warns via `lifecycle`
   (`deprecate_warn()`) before removal. The gates themselves — question-gate +

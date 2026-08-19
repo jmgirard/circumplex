@@ -1,13 +1,32 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+#
+# Push to the default branch ONLY (cairn M95). This job ran on pull requests
+# too, which meant every PR ran the whole suite twice — once under
+# R-CMD-check.yaml and again here under covr instrumentation. The two ran in
+# PARALLEL, so dropping this one saves runner minutes, not wall clock: measured
+# 2026-08-18, this job was 27 min (run 32184165512) against 38 min for a
+# three-platform check escalation (run 32184165497), and 27m19s for a plain
+# single-platform check on PR #124 — i.e. neither job is reliably the long pole.
+# No PR-side REPORTING is lost by stopping: codecov.yml sets `comment: false`
+# and marks both statuses `informational: true`, so Codecov never commented on
+# a PR and never gated one, and PROFILE.md's test-doctrine has always held the
+# covr coverage NUMBER to be a diagnostic rather than a gate.
+#
+# What the PR side DID lose is this job's distinct test ENVIRONMENT. covr
+# instruments the code, which perturbs optimizer results (M59) — that remains a
+# live source of divergence from the check job. It also installs the package
+# without vignettes; M92 is where CI caught that and no local run could, though
+# M92's own remedy was to make the vignette-reading guards SKIP there, so that
+# particular axis now skips rather than catches. Do not overstate what is left:
+# the standing distinct signal is the instrumentation, not the vignette gap.
+#
+# That signal now lands only here, on master, after the merge. It is not
+# unwatched: PROFILE.md's consistency-gate requires the most recent completed
+# push run of this workflow to have concluded success, so a red here fails the
+# NEXT milestone's review gate — never the one that introduced it.
 on:
   push:
-    branches: [main, master]
-    paths-ignore:
-      - 'cairn/**'
-      - 'man/**'
-      - 'README.md'
-  pull_request:
     branches: [main, master]
     paths-ignore:
       - 'cairn/**'
@@ -72,7 +91,10 @@ jobs:
 
       - uses: codecov/codecov-action@v7
         with:
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
+          # Always true: this workflow now runs only on push (see the header),
+          # which is the branch of the old event conditional that evaluated
+          # true. cairn M95.
+          fail_ci_if_error: true
           files: ./cobertura.xml
           plugins: noop
           disable_search: true
