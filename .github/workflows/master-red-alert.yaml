@@ -1,0 +1,51 @@
+# Open a GitHub issue when a push run of the checked workflows concludes
+# failure on the default branch (cairn M96).
+#
+# Why a separate workflow rather than a failure step inside each watched
+# workflow: the issue logic lives in one place, and this workflow cannot
+# redden the run it is reporting on.
+#
+# `workflow_run` runs the version of THIS file that is on the default branch,
+# with the default branch checked out — so nothing here fires from a pull
+# request, and changes to it take effect only after they merge.
+on:
+  workflow_run:
+    workflows:
+      - R-CMD-check.yaml
+      - test-coverage.yaml
+    types:
+      - completed
+
+name: master-red-alert.yaml
+
+# `issues: write` is the only write scope; `contents: read` is what
+# actions/checkout needs to fetch this file's own script body.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  alert:
+    # Three conditions, all read from the workflow_run payload: the run
+    # failed, it was a push run (pull-request runs are already visible to
+    # whoever opened the PR), and it was on the default branch.
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update the master-red issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ALERT_WORKFLOW: ${{ github.event.workflow_run.name }}
+          ALERT_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          ALERT_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          ALERT_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          LABEL='master-red'
+          TITLE="master is red: ${ALERT_WORKFLOW}"
