@@ -131,16 +131,25 @@ env <- vapply(step$env, as.character, character(1L))
 
 PAYLOAD_RE <- "^(github\\.event|context\\.payload)\\.workflow_run\\."
 
-# Sites of the form ${{ ... }}. All of them live in the step's `env:` mapping;
-# one appearing anywhere else would be a value the shell body cannot see this
-# audit resolve.
-expr_sites <- regmatches(raw, gregexpr("\\$\\{\\{[^}]*\\}\\}", raw))
-expr_sites <- unlist(expr_sites)
-expr_values <- trimws(gsub("^\\$\\{\\{|\\}\\}$", "", expr_sites))
-stray <- setdiff(expr_values, trimws(gsub("^\\$\\{\\{|\\}\\}$", "", env)))
+# --- interpolation sites of the form ${{ }} -------------------------------
+# These are checked by SITE, not by value: an expression is legitimate only
+# where it appears on a line of the step's `env:` block. Comparing the set of
+# expressions against the set in `env:` (the earlier shape of this check) let
+# the same expression pass anywhere else in the file, including directly in
+# the shell body — the standard Actions script-injection shape.
+env_lines <- grep("^\\s*env:\\s*$", raw)
+env_block <- integer(0L)
+if (length(env_lines) == 1L) {
+  indent <- nchar(sub("[^ ].*$", "", raw[env_lines]))
+  after <- seq.int(env_lines + 1L, length(raw))
+  deeper <- nchar(sub("[^ ].*$", "", raw[after])) > indent | !nzchar(raw[after])
+  env_block <- after[seq_len(match(FALSE, deeper, nomatch = length(after) + 1L) - 1L)]
+}
+expr_lines <- grep("\\$\\{\\{", raw)
+stray <- setdiff(expr_lines, env_block)
 if (length(stray)) {
   problems <- c(problems, sprintf(
-    "%s: `${{ }}` expressions outside the step's `env:` mapping: %s. Every interpolated value must be named in `env:` so this audit can resolve it.",
+    "%s: `${{ }}` expression(s) outside the step's `env:` block, at line(s) %s. Every interpolated value must arrive through `env:`, where this audit can resolve it; interpolating one straight into the shell body is the Actions script-injection shape.",
     PATH, paste(stray, collapse = ", ")
   ))
 }
@@ -156,28 +165,57 @@ if (length(bad_ctx)) {
   ))
 }
 
-# The issue body is the heredoc opened on the `BODY=` line; it ends at the
-# line that is exactly its delimiter.
-body_open <- grep("^BODY=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?", script)
-if (length(body_open) != 1L) {
-  problems <- c(problems, sprintf(
-    "%s: expected exactly one `BODY=` heredoc in the shell body; found %d.",
-    PATH, length(body_open)
-  ))
-  body_region <- character(0L)
-} else {
-  delim <- sub("^BODY=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?.*$", "\\1",
-               script[body_open])
-  body_close <- body_open + which(script[-seq_len(body_open)] == delim)[1L]
-  if (is.na(body_close)) {
-    problems <- c(problems, sprintf(
-      "%s: the `BODY=` heredoc is never closed by a bare `%s` line.",
-      PATH, delim
+# --- the regions that reach the issue -------------------------------------
+# Two of them: the `BODY=` heredoc, and the `TITLE=` assignment. The title is
+# not decoration — it is the dedupe key, and it is what a create call carries.
+# Scanning only the heredoc (the earlier shape) left a composed title
+# unaudited.
+heredoc_region <- function(var) {
+  open <- grep(sprintf("^%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?", var), script)
+  if (length(open) != 1L) {
+    problems <<- c(problems, sprintf(
+      "%s: expected exactly one `%s=` heredoc in the shell body; found %d.",
+      PATH, var, length(open)
     ))
-    body_region <- character(0L)
-  } else {
-    body_region <- script[seq.int(body_open + 1L, body_close - 1L)]
+    return(character(0L))
   }
+  delim <- sub(sprintf("^%s=.*<<'?([A-Za-z_][A-Za-z0-9_]*)'?.*$", var), "\\1",
+               script[open])
+  close <- open + which(script[-seq_len(open)] == delim)[1L]
+  if (is.na(close)) {
+    problems <<- c(problems, sprintf(
+      "%s: the `%s=` heredoc is never closed by a bare `%s` line.",
+      PATH, var, delim
+    ))
+    return(character(0L))
+  }
+  script[seq.int(open + 1L, close - 1L)]
+}
+
+body_region <- heredoc_region("BODY")
+title_region <- grep("^TITLE=", script, value = TRUE)
+if (length(title_region) != 1L) {
+  problems <- c(problems, sprintf(
+    "%s: expected exactly one `TITLE=` assignment in the shell body; found %d.",
+    PATH, length(title_region)
+  ))
+}
+reported <- c(body_region, title_region)
+
+# Nothing reaching the issue may be produced rather than interpolated. A
+# command substitution or a parameter expansion carrying a default is a value
+# this scan cannot resolve and the payload did not supply, so it is refused
+# outright rather than enumerated.
+composed <- grep("\\$\\(|`|\\$\\{[A-Za-z_][A-Za-z0-9_]*[^A-Za-z0-9_}]",
+                 reported, value = TRUE)
+composed <- composed[!grepl("^\\s*\\\\`", composed)]
+composed <- composed[grepl("\\$\\(|\\$\\{[A-Za-z_][A-Za-z0-9_]*[^A-Za-z0-9_}]", composed) |
+                       grepl("[^\\\\]`", composed)]
+if (length(composed)) {
+  problems <- c(problems, sprintf(
+    "%s: the issue title or body composes value(s) rather than reporting them, at: %s. Command substitution, backticks and defaulted expansions cannot resolve to a workflow_run field.",
+    PATH, paste(trimws(composed), collapse = " | ")
+  ))
 }
 
 assigned <- sub("^([A-Za-z_][A-Za-z0-9_]*)=.*$", "\\1",
@@ -209,14 +247,32 @@ resolve <- function(name, seen = character(0L)) {
   NA_character_
 }
 
-body_vars <- vars_in(body_region)
-resolved <- lapply(body_vars, resolve)
-names(resolved) <- body_vars
-unresolved <- body_vars[vapply(resolved, function(x) anyNA(x), logical(1L))]
+# Every site in the reported regions must resolve to the payload.
+reported_vars <- vars_in(reported)
+resolved <- lapply(reported_vars, resolve)
+names(resolved) <- reported_vars
+unresolved <- reported_vars[vapply(resolved, anyNA, logical(1L))]
 if (length(unresolved)) {
   problems <- c(problems, sprintf(
-    "%s: value(s) substituted into the issue body that do not come from the workflow_run payload: %s.",
+    "%s: value(s) substituted into the issue title or body that do not come from the workflow_run payload: %s.",
     PATH, paste(unresolved, collapse = ", ")
+  ))
+}
+
+# Every site in the REST of the shell body is enumerated too, and each must be
+# classifiable — an env value, a variable the script assigns, or one of the
+# shell's own. An unknown name means the scan has stopped seeing the body it
+# claims to cover.
+# `jq --arg <name>` declares a name inside the filter, not in the shell.
+jq_args <- unlist(regmatches(
+  script, gregexpr("(?<=--arg )[A-Za-z_][A-Za-z0-9_]*", script, perl = TRUE)
+))
+other_vars <- setdiff(vars_in(script), c(reported_vars, jq_args))
+unknown <- other_vars[!(other_vars %in% names(env) | other_vars %in% assigned)]
+if (length(unknown)) {
+  problems <- c(problems, sprintf(
+    "%s: unclassifiable substitution(s) in the shell body: %s. Every site must be an `env:` value, a variable the body assigns, or a declared local.",
+    PATH, paste(unknown, collapse = ", ")
   ))
 }
 
@@ -225,7 +281,7 @@ fields <- sub(PAYLOAD_RE, "", paths)
 REQUIRED_FIELDS <- c("name", "html_url", "head_sha", "conclusion")
 if (!all(REQUIRED_FIELDS %in% fields)) {
   problems <- c(problems, sprintf(
-    "%s: the issue body must name the failing workflow, run URL, head SHA and conclusion; payload fields it interpolates: %s. An empty or short enumeration fails rather than passing vacuously.",
+    "%s: the issue must name the failing workflow, run URL, head SHA and conclusion; payload fields it interpolates: %s. An empty or short enumeration fails rather than passing vacuously.",
     PATH, if (length(fields)) paste(fields, collapse = ", ") else "none"
   ))
 }
