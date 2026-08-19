@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-18 (M95 done pass: coverage off the PR trigger and the dead pr-commands workflow retired; two new candidate rows from its review; M90 terminal row pruned to the retention cap; one new lesson + one family extension.)_
+_Last hygiene check: 2026-08-19 (M96 done pass: master-red alert workflow + two hand-run audits, named in PROFILE.md's consistency-gate slot; two defect returns before a descope amendment; one new candidate row from its review; M91 terminal row pruned to the retention cap; the M95 lesson extended into a family rather than a new line, LESSONS at 19,985 bytes.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,17 +9,17 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M91 | Stop NA-ing computable numbers when only the raw arm refuses | done | M90 | normal | milestones/archive/M91-naive-arm-decoupling.md |
 | M92 | Teach the boundary regime the structure vignette's own example is in | done | — | normal | milestones/archive/M92-boundary-regime-guidance.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M93 | Close the CI platform gate | done | — | normal | milestones/archive/M93-ci-platform-gate.md |
 | M94 | Print the fired-marker list on the bootstrap path | done | — | normal | milestones/archive/M94-bootstrap-marker-list.md |
 | M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
-| M96 | Say something when master goes red | review | M95 | normal | milestones/M96-master-red-alert.md |
+| M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
 
 ## Candidates
 
 _Candidates carry no milestone ID — an `M<NN>` is assigned only at planning time. Legacy milestone/decision IDs (≤ M6) remain valid citations into `cairn/legacy/`; M7 is the first cairn-era ID. Struck rows are tombstones: their histories live in the named milestone archives and git._
+- **The master-red alert stays silent on `startup_failure` and `timed_out`** (M96 review, [O] diff-bug F8 across two passes): the alert fires only on `conclusion == 'failure'`, so a workflow whose YAML is malformed on master — a state where the run never starts and no other signal exists — or one that hits the job timeout leaves master red with no issue opened. Held out of M96 deliberately at its second return: AC1 pins that exact equality, and widening a criterion on a milestone already carrying defect returns is the wrong direction. Promote on either conclusion actually occurring on master unnoticed, or into whichever milestone next opens the alert workflow; the change is one `if:` clause plus the audit's expected-expression constant.
 - **A Codecov upload token is committed in plaintext** (M95 review, [O] diff-bug F14): `codecov.yml:36` carries `token: b885341a-…`, committed since M12 (7480a67a), while `.github/workflows/test-coverage.yaml:94` already supplies `secrets.CODECOV_TOKEN` — so the committed copy is redundant as well as readable in a public repo. Out of M95's diff and left there at its review gate (Jeff's call): rotating it happens in Jeff's Codecov account, not in the repo. Promote when Jeff has rotated the token, at which point the dead line is deleted in the same pass; deleting it before rotation removes the evidence without closing the exposure.
 - **`.github/CONTRIBUTING.md` is stale in two ways** (M95 review, [O] diff-bug F13, rescoped): line 25 tells contributors to "Look at the Travis and AppVeyor build status", which this repo has not used since before the cairn era, and lines 28-30 point them at `styler` and the tidyverse style guide, which sits against CLAUDE.md's own "match existing code style" rule and a `styler` that is in no dependency list. Both pre-date M95 and neither is stranded by it — the file never referenced the deleted `pr-commands.yaml` commands, so the `styler` advice still works as written (F13's "only in-repo mechanism" premise was about the automation, not about what the guide promises). Promote into whichever milestone next opens contributor-facing docs, or on a contributor following either line.
 - **Master has no GitHub-native branch protection** (M93 review, blame-history F1): no required status checks, so a red matrix blocks merges only through the cairn process gate (green `gh pr checks` + the merge guard), not through GitHub itself. Chosen at the M93 approval gate as a candidate over enabling now. Promote on a manual-merge slip, or fold into the next CI-touching milestone; enabling is one `gh api` settings call requiring Jeff's authorization.
