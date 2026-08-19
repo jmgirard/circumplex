@@ -1,6 +1,6 @@
 # M95: Stop running the suite twice on every pull request
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -64,11 +64,11 @@ consumer of the package reads either.
       `test-coverage.yaml` watch bullet naming `--workflow=test-coverage.yaml
       --branch=<default> --event=push`, parallel in form to the existing
       `R-CMD-check.yaml` bullet.
-- [ ] AC5: `grep -rn "pull_request\|the PR\|annotates" cairn/PROFILE.md
+- [x] AC5: `grep -rn "pull_request\|the PR\|annotates" cairn/PROFILE.md
       .github/workflows/test-coverage.yaml codecov.yml` returns no text stating
       that the coverage workflow runs on, or annotates, pull requests. (Scope is
       these three files; the criterion claims nothing about other surfaces.)
-- [ ] AC6: `Rscript tools/check-ci-deps.R` exits clean, and
+- [x] AC6: `Rscript tools/check-ci-deps.R` exits clean, and
       `Rscript -e 'devtools::check(args = "--no-manual")'` is clean (0 errors,
       0 warnings; NOTEs justified).
 
@@ -130,6 +130,12 @@ Fresh evidence, 2026-08-18, branch m95-ci-trigger-economy at 37348919 against or
 - **AC3** ✔ The `push` block extracted from `git show origin/master:` and from the working tree hashes to 51dce08235cd5670b78bae7a367c6857 on both sides. `fail_ci_if_error: true` at line 90; `github.event_name` occurs 0 times in the file.
 - **AC4** ✔ `cairn/PROFILE.md:36` carries the Master coverage watch bullet naming `gh run list --workflow=test-coverage.yaml --branch=<default> --event=push`, parallel in form to M93's matrix bullet at line 32. The command run as written returns `status=completed conclusion=success` for run 32189244160.
 - **AC5** ✔ The sweep over the three named files returns two hits, both in the `test-coverage.yaml` header (lines 9 and 14), both stating what the PR side lost; neither claims the workflow runs on or annotates pull requests. `annotates` occurs in none of the three.
+
+Post-amendment re-verification, 2026-08-18:
+
+- **AC5 (amended)** ✔ The sweep now returns one hit, `.github/workflows/test-coverage.yaml:16`, which states what the PR side lost; it does not claim the workflow runs on or annotates pull requests. `annotates` occurs in none of the three files.
+- **AC6** ✔ `Rscript tools/check-ci-deps.R` exits 0 (allowlists in sync with the 14 DESCRIPTION Suggests). `devtools::check(args = "--no-manual")` Status: OK — 0 errors, 0 warnings, 0 notes across the whole log, testthat 10m/11m, duration 12m34s, working tree clean at completion. The four files edited after this check began are all `.Rbuildignore`'d (`^\.github$`, `^cairn$`), so none reaches the built tarball.
+- **AC2 / AC3 / AC4** re-checked after the header and PROFILE rewrites: `on:` still one key `push`; the push block still hashes 51dce08235cd5670b78bae7a367c6857 against origin/master with `fail_ci_if_error: true`; the watch bullet still names its `gh run list` command.
 
 ### Consistency gate
 
