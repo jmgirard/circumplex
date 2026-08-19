@@ -113,7 +113,7 @@ GitHub renders them, and act on what they say.
       help links (L3).
 - [x] **T6** — CODE_OF_CONDUCT.md: replace with Contributor Covenant 2.1;
       enforcement contact = DESCRIPTION's `cre` email.
-- [ ] **T7** — Delete the two dead `.Rbuildignore` entries (L8, L13); confirm
+- [x] **T7** — Delete the two dead `.Rbuildignore` entries (L8, L13); confirm
       `devtools::check()` is unaffected.
 - [ ] **T8** — Run and log the AC4 pre/post sweep, the AC5 host enumeration, and
       the AC6 status probes; check tail bytes of every rewritten file
@@ -135,6 +135,7 @@ GitHub renders them, and act on what they say.
 - 2026-08-19: T5 — ISSUE_TEMPLATE.md's question venues (StackOverflow, community.rstudio.com) replaced by this repo's Discussions; the tidyverse help pointer dropped and the reprex link repointed to `reprex.tidyverse.org`.
 - 2026-08-19: **amendment (substantive), AC7** — the pinned source `https://www.contributor-covenant.org/version/2/1/code_of_conduct.md` returns HTTP 404 (a 3449-byte "Page not found" page), making AC7 unsatisfiable as planned. Amended at a mini gate to the usethis 3.2.1 bundled template, which Jeff confirms is where these files originally came from; the upstream raw markdown was rejected as the pin because it carries a Hugo TOML front-matter block and unwrapped lines, so a shipped copy would differ from it on nearly every line. Amended wording was audited first by a fresh-context [O] reader that did not author it, returning four findings, all applied: the normative reference was machine-local (deliverable SHA now the primary check, template SHA inline as provenance); "the placeholder carries the email" was backwards; the `grep -F` probe was location-free and was dropped; and "exactly one changed line" silently rode two coincidences now named in the criterion (both strings are 15 characters, and template line 62 is the file's only line ending in a trailing space).
 - 2026-08-19: T6 — CODE_OF_CONDUCT.md replaced (Contributor Covenant 1.0.0, 1396 bytes, no enforcement contact → 2.1 with `me@jmgirard.com`). AC7 verified independently in-session: template SHA-256 `e45d34f5…a499a`, deliverable SHA-256 `4828e2a2…1b87f4`, `diff` output exactly `62c62`, line 62's trailing space present in `od -c`, and the text's own 2.1 attribution at line 118.
+- 2026-08-19: T7 — the two dead `.Rbuildignore` entries deleted. Both verified dead first: no top-level file matches either pattern, and `.travis.yml`/`CONDUCT.md` were last touched in the pre-cairn Travis era (a95585ab, 34592d96, d685b51a). `R CMD build` succeeds afterwards and the tarball still excludes `.github`, `cairn`, `tools` and `devel`.
 
 ## Decisions
 
