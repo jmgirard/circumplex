@@ -1,6 +1,6 @@
 # M96: Say something when master goes red
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M95
 - **Driving RR:** —
@@ -137,6 +137,7 @@ is the only place that environment reports at all.
 - 2026-08-18: T6 (return, AC3) — the scan's reported region is now the `TITLE=` assignment as well as the `BODY=` heredoc; anything composed there (command substitution, backticks, defaulted expansion) is refused outright rather than enumerated; the `${{ }}` check is site-based, requiring each expression to sit on a line of the step's `env:` block; and every remaining site in the shell body must classify as an env value, an assigned variable or a `jq --arg` name. Re-run against the three mutations that defeated the old scan — composed `TITLE="master is red: $(hostname)"`, a `$(gh api /user --jq .login)` body row, and `${{ }}` interpolated straight into the body — each now fails, as do the two earlier regressions (body citing `GH_REPO`, dropped head-SHA row). No package code touched, so the verify slot runs once at T8.
 - 2026-08-18: T7 (return, F3/F4/F7) — label creation is now `--force` (updates instead of erroring when the label exists, so a race on the first-ever failure cannot abort the loser), the probe takes `--limit 200` (past `gh label list`'s 30-item default) and tests a captured string with a bash pattern instead of a `| grep -q` pipeline that `pipefail` can report as failed on EPIPE; a `concurrency:` group keyed on the watched workflow with `cancel-in-progress: false` serializes alerts so two near-simultaneous failures cannot both search-then-create; the unused `contents: read` grant is gone and the two comments describing an `actions/checkout` step that never existed are corrected. All three fixtures still pass and the audit's permissions, label-ordering and expression checks still fire against mutants.
 - 2026-08-18: T8 (return, F2/F5/F11/F12 + the gate wiring) — the permissions check now reads the effective mapping (job-level replaces workflow-level in GitHub) and refuses a file declaring both; each watched workflow's own `name:` is read and required to equal the string in `workflows:`, since `workflow_run` matches the name and not the filename; a zero-jobs file stops with a message instead of a subscript error; the dry run gained a fourth fixture where `gh label create` is refused. That fixture found a further defect and fixed it: a refused create still aborted the job under `set -e`, so the alert now falls back to posting an unlabeled issue with a `::warning::` saying it will not dedupe. A concurrency guard was added to the audit so T7's fix cannot be silently dropped. `PROFILE.md`'s consistency-gate slot now names both scripts (the two master-watch bullets merged and compressed in one pass to hold the 120-line cap, and carrying the stale-`gh run list` caution the review gate hit). Verify slot: `devtools::test()` [ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ].
+- 2026-08-18: return fixes complete (T6-T8); `devtools::check(args = "--no-manual")` Status OK (0/0/0). Status -> review.
 
 ## Review
 
