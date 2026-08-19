@@ -150,4 +150,88 @@ GitHub renders them, and act on what they say.
 
 ## Decisions
 
+- 2026-08-19 (AC7 source pin): Contributor Covenant 2.1 is taken from usethis
+  3.2.1's bundled template, not from contributor-covenant.org. The planned URL
+  404s, and the upstream raw markdown carries a Hugo TOML front-matter block and
+  unwrapped lines, so a shipped copy could not be diffed against it meaningfully.
+  usethis is also where these `.github/` files originally came from (Jeff,
+  2026-08-19). Reopens if usethis stops bundling 2.1, or if the contact changes.
+- 2026-08-19 (AC6 exemption): `.github/CODE_OF_CONDUCT.md:121`'s `[text][url]`
+  reference link is malformed verbatim upstream and unmodifiable under AC7's
+  byte pin, so it is exempt from the URL probe rather than repaired; its target
+  `https://github.com/mozilla/inclusion` was probed by hand (200). A URL failing
+  elsewhere in that vendored file is raised here as a decision, never silently
+  edited. Reopens if upstream repairs the line.
+
 ## Review
+
+**PR:** [#126](https://github.com/jmgirard/circumplex/pull/126) · reviewed 2026-08-19.
+
+**Acceptance criteria — fresh evidence** (all re-derived at review; implement had
+pre-ticked the boxes, so every one was re-run independently here):
+
+- AC1 — `grep -F` over the PR-process section alone: `R-CMD-check.yaml` 1 match,
+  `match existing code style` 1 match; `R-CMD-check.yaml` present in
+  `.github/workflows/`. Re-run after the gate's fix-now rewrite: still 1 and 1.
+- AC2 — all six strings >=1 match in `.github/CONTRIBUTING.md` (`R/RcppExports.R`
+  1, `src/RcppExports.cpp` 1, `man/*.Rd` 1, `NAMESPACE` 2, `devtools::document()`
+  1, `Rcpp::compileAttributes()` 1).
+- AC3 — the only `github.com/<owner>/circumplex` URLs in `SUPPORT.md` are
+  `jmgirard/…/issues` and `jmgirard/…/discussions`; the issue-search link
+  string-equals `DESCRIPTION`'s `BugReports:`.
+- AC4 — per-literal sweep over `git ls-files` (excl. `NEWS.md`, `cairn/`):
+  pre-change against `master` Travis 2, AppVeyor 1, styler 1,
+  style.tidyverse.org 1, tidy-contrib 1, tidyverse/circumplex 1,
+  community.rstudio.com 2 — every literal >=1, so the instrument discriminates;
+  post-change 0 for all seven.
+- AC5 — hosts in the four files: github.com 7, www.contributor-covenant.org 4,
+  reprex.tidyverse.org 3 (the permitted exception), cran.r-project.org 2,
+  roxygen2.r-lib.org 1, docs.github.com 1. No banned host; the only tidyverse
+  mentions are the three reprex links.
+- AC6 — all 12 http(s) URLs returned 200 on `curl -sIL --max-time 20`; no GET
+  fallback needed. Line 121 exempt per the Decisions entry, its target probed 200.
+- AC7 — template SHA-256 `e45d34f5…a499a`, deliverable SHA-256
+  `4828e2a2…1b87f4`, `diff` output exactly `62c62`, contact present.
+
+**Consistency gate:** `cairn_validate` all checks passed (47 advisory work-log
+warnings, 46 pre-existing on M7). `devtools::document()` no diff, 0
+`resolve link` warnings. README in sync; no generated files touched.
+`pkgdown::check_pkgdown()` no problems. `devtools::check()` **Status: OK** (0
+errors / 0 warnings / 0 notes). `devtools::test()` 8395 pass / 0 fail / 5
+lavaan warnings / 3 skips. Master watches: newest `R-CMD-check.yaml` push
+verdict success, newest `test-coverage.yaml` verdict success (cross-checked
+without `--event` per M96). `tools/check-master-red-alert.R` and
+`tools/master-red-alert-dryrun.R` both exit 0. No principle changed, so
+`cairn_impact` skipped.
+
+**Review — three lenses.** [S] blame-history: no concerning findings; it pinned
+the deleted `.Rbuildignore` entries' provenance (`.travis.yml` removed in
+d7607650, `CONDUCT.md` relocated in cd427514, both pre-cairn) and confirmed
+`^\.github$` already covers the relocated file. [S] prior-PR-comments: one
+finding (the CI escalation set, same defect class M95's review taught in this
+exact file); the `pulls/comments` probe returned `[]`, confirming M91's
+measurement that GitHub threads are empty here. [O] diff-bug: 11 ranked
+findings.
+
+**Findings and disposition** (12 total across lenses; 8 actioned, 4 rejected):
+
+- F1 CI escalation set incomplete (8 of `ESCALATION_SET`'s 11 paths listed,
+  making the "any other PR" clause false), F2 `paths-ignore` means some PRs run
+  no check at all, F3 `pkgdown.yaml` also gates PRs, F4 the prose duplicated CI
+  config literals against `R-CMD-check.yaml:26`'s single-source rule, F9 the
+  coverage badge tracks master since M95 — **fixed now, one rewrite**, at Jeff's
+  direction: the enumeration was removed rather than completed, pointing at
+  `tools/ci-matrix.R` as the source of truth (M93's rule; the M87 lesson that a
+  hand-pinned enumeration of a moving artifact cannot stay true).
+- F5 the two amendments lived only in the work log — **fixed now**: recorded as
+  milestone-local Decisions entries above.
+- F7 the `NEWS.md` bullet instruction referenced a development-version header
+  that does not exist (`# circumplex 2.0.0`, DESCRIPTION 2.0.0) — **fixed now**.
+- F8 "base R with minimal dependencies" could read as "no compiled code" though
+  the package ships `src/` C++ via Rcpp — **fixed now**, phrasing tightened.
+- F6 `CODE_OF_CONDUCT.md:121` renders as literal bracket text — **rejected as a
+  file change** (inherited verbatim from upstream, unmodifiable under AC7) and
+  **declined as a candidate row** at Jeff's selection.
+- F10 "start there" has a weak antecedent, F11 SUPPORT.md dropped the old "File
+  issues" pointer — **rejected**: cosmetic, and F11 is arguably an improvement
+  over a tidyverse-authority link.
