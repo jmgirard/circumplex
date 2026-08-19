@@ -5,9 +5,10 @@
 # workflow: the issue logic lives in one place, and this workflow cannot
 # redden the run it is reporting on.
 #
-# `workflow_run` runs the version of THIS file that is on the default branch,
-# with the default branch checked out — so nothing here fires from a pull
-# request, and changes to it take effect only after they merge.
+# `workflow_run` runs the version of THIS file that is on the default branch —
+# so nothing here fires from a pull request, and changes to it take effect only
+# after they merge. Nothing is checked out: the whole alert is this file's own
+# `run:` body, which is why there is no `contents:` grant below.
 on:
   workflow_run:
     workflows:
@@ -18,11 +19,18 @@ on:
 
 name: master-red-alert.yaml
 
-# `issues: write` is the only write scope; `contents: read` is what
-# actions/checkout needs to fetch this file's own script body.
+# Labels are issue-scoped, so `issues: write` covers every call the body
+# makes. Naming a `permissions:` block at all drops every other scope to none.
 permissions:
-  contents: read
   issues: write
+
+# Serialize alerts per watched workflow (never cancel one — a queued alert
+# still needs to post). Without this, two pushes that redden the same workflow
+# in quick succession can both search before either creates, and both open an
+# issue with the same title.
+concurrency:
+  group: master-red-alert-${{ github.event.workflow_run.name }}
+  cancel-in-progress: false
 
 jobs:
   alert:
@@ -73,8 +81,22 @@ jobs:
           # search filtered on a label that does not exist returns empty, so a
           # missing label would silently defeat the dedupe below and open a
           # fresh issue on every failed push.
-          if ! gh label list --json name --jq '.[].name' | grep -qx "$LABEL"; then
-            gh label create "$LABEL" --color 'B60205' \
+          #
+          # Three things here are deliberate, and all three exist because this
+          # job runs under `set -euo pipefail` — an abort anywhere in it means
+          # no alert at all, in exactly the case the alert is for:
+          #   * `--limit 200`, because `gh label list` returns 30 by default,
+          #     and a repo past 30 labels would stop finding the marker;
+          #   * a `case` over a captured string rather than a `... | grep -q`
+          #     pipeline, because `grep -q` exits at the first match and can
+          #     leave the producer with EPIPE, which `pipefail` then reports as
+          #     a failed pipeline — reading as "absent" when it is present;
+          #   * `--force` on the create, which updates instead of erroring when
+          #     the label already exists. Two alert runs racing on the repo's
+          #     first-ever failure would otherwise abort the loser.
+          LABELS="$(gh label list --limit 200 --json name --jq '.[].name')"
+          if [[ $'\n'"$LABELS"$'\n' != *$'\n'"$LABEL"$'\n'* ]]; then
+            gh label create "$LABEL" --color 'B60205' --force \
               --description 'A push run of a watched workflow failed on the default branch'
           fi
 

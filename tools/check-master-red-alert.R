@@ -132,25 +132,29 @@ env <- vapply(step$env, as.character, character(1L))
 PAYLOAD_RE <- "^(github\\.event|context\\.payload)\\.workflow_run\\."
 
 # --- interpolation sites of the form ${{ }} -------------------------------
-# These are checked by SITE, not by value: an expression is legitimate only
-# where it appears on a line of the step's `env:` block. Comparing the set of
-# expressions against the set in `env:` (the earlier shape of this check) let
-# the same expression pass anywhere else in the file, including directly in
-# the shell body — the standard Actions script-injection shape.
-env_lines <- grep("^\\s*env:\\s*$", raw)
-env_block <- integer(0L)
-if (length(env_lines) == 1L) {
-  indent <- nchar(sub("[^ ].*$", "", raw[env_lines]))
-  after <- seq.int(env_lines + 1L, length(raw))
-  deeper <- nchar(sub("[^ ].*$", "", raw[after])) > indent | !nzchar(raw[after])
-  env_block <- after[seq_len(match(FALSE, deeper, nomatch = length(after) + 1L) - 1L)]
+# These are checked by SITE, not by value: comparing the set of expressions
+# against the set in `env:` (the earlier shape of this check) let the same
+# expression pass anywhere else in the file, including inside the shell body.
+# The site that matters is the `run:` block — an expression there is
+# substituted into the script before bash ever sees it, which is the standard
+# Actions script-injection shape. Elsewhere in the file (`env:`,
+# `concurrency:`, `if:`) an expression is evaluated by Actions itself and
+# reaches no shell.
+indent_of <- function(lines) nchar(sub("[^ ].*$", "", lines))
+block_after <- function(key_line) {
+  if (is.na(key_line)) return(integer(0L))
+  after <- seq.int(key_line + 1L, length(raw))
+  deeper <- indent_of(raw[after]) > indent_of(raw[key_line]) | !nzchar(raw[after])
+  after[seq_len(match(FALSE, deeper, nomatch = length(after) + 1L) - 1L)]
 }
-expr_lines <- grep("\\$\\{\\{", raw)
-stray <- setdiff(expr_lines, env_block)
-if (length(stray)) {
+
+run_key <- grep("^\\s*run:\\s*\\|", raw)[1L]
+run_block <- block_after(run_key)
+in_run <- intersect(grep("\\$\\{\\{", raw), run_block)
+if (length(in_run)) {
   problems <- c(problems, sprintf(
-    "%s: `${{ }}` expression(s) outside the step's `env:` block, at line(s) %s. Every interpolated value must arrive through `env:`, where this audit can resolve it; interpolating one straight into the shell body is the Actions script-injection shape.",
-    PATH, paste(stray, collapse = ", ")
+    "%s: `${{ }}` expression(s) inside the `run:` body, at line(s) %s. Every value the shell reads must arrive through `env:`, where this audit can resolve it; interpolating one straight into the script is the Actions script-injection shape.",
+    PATH, paste(in_run, collapse = ", ")
   ))
 }
 

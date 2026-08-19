@@ -110,7 +110,7 @@ is the only place that environment reports at all.
       slot.
 
 - [x] T6: Repair AC3's scan — cover the whole shell body and the issue title, not only the body heredoc; refuse command substitution in anything that reaches the issue; make the `${{ }}` check site-based rather than value-based.
-- [ ] T7: Harden the alert body — idempotent label creation that cannot abort the job, a label probe that cannot invert on a pipeline, a `concurrency:` group, and the unused `contents:` grant and its false checkout comments removed.
+- [x] T7: Harden the alert body — idempotent label creation that cannot abort the job, a label probe that cannot invert on a pipeline, a `concurrency:` group, and the unused `contents:` grant and its false checkout comments removed.
 - [ ] T8: Repair the audits' own defects — effective (job-over-workflow) permissions precedence, watched-workflow `name:` equality, the zero-jobs crash, a dry-run fixture where a GitHub call fails; name both scripts in the profile's consistency-gate slot.
 
 ## Work log
@@ -135,6 +135,7 @@ is the only place that environment reports at all.
 - 2026-08-18: minor amendment — three repair tasks (T6-T8) added for the review return's findings; no criterion, scope or Coverage change (each repair sits under an existing criterion).
 - 2026-08-18: return question gate — the two audit scripts get named in `PROFILE.md`'s consistency-gate slot rather than wired into CI, which would need `yaml` in Suggests; F8's other red conclusions (`startup_failure`, `timed_out`) hold out of the criteria set and become a candidate row at merge, per the return-adjacent direction rule.
 - 2026-08-18: T6 (return, AC3) — the scan's reported region is now the `TITLE=` assignment as well as the `BODY=` heredoc; anything composed there (command substitution, backticks, defaulted expansion) is refused outright rather than enumerated; the `${{ }}` check is site-based, requiring each expression to sit on a line of the step's `env:` block; and every remaining site in the shell body must classify as an env value, an assigned variable or a `jq --arg` name. Re-run against the three mutations that defeated the old scan — composed `TITLE="master is red: $(hostname)"`, a `$(gh api /user --jq .login)` body row, and `${{ }}` interpolated straight into the body — each now fails, as do the two earlier regressions (body citing `GH_REPO`, dropped head-SHA row). No package code touched, so the verify slot runs once at T8.
+- 2026-08-18: T7 (return, F3/F4/F7) — label creation is now `--force` (updates instead of erroring when the label exists, so a race on the first-ever failure cannot abort the loser), the probe takes `--limit 200` (past `gh label list`'s 30-item default) and tests a captured string with a bash pattern instead of a `| grep -q` pipeline that `pipefail` can report as failed on EPIPE; a `concurrency:` group keyed on the watched workflow with `cancel-in-progress: false` serializes alerts so two near-simultaneous failures cannot both search-then-create; the unused `contents: read` grant is gone and the two comments describing an `actions/checkout` step that never existed are corrected. All three fixtures still pass and the audit's permissions, label-ordering and expression checks still fire against mutants.
 
 ## Review
 
