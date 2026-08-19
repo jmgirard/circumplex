@@ -100,7 +100,7 @@ is the only place that environment reports at all.
 - [x] T2: Write the issue body template, interpolating only `workflow_run`
       payload fields; run AC3's scan over both the template and the script body
       and check every site it returns.
-- [ ] T3: Extract the open-or-comment logic into a script body the milestone
+- [x] T3: Extract the open-or-comment logic into a script body the milestone
       can exercise locally, and run it against three fixtures — no existing
       issue, a matching open issue, and an absent marker label — with the
       GitHub calls stubbed and the stub recording every call.
@@ -122,6 +122,7 @@ is the only place that environment reports at all.
 - 2026-08-18: T2 — issue body written as a table over the four payload fields, all carried in through the step `env:`. The AC3 scan lands in `tools/check-master-red-alert.R`: it enumerates every `${{ }}` site, every `context.payload.*` read, and every shell `$VAR` in the body heredoc, resolves each through the env map and local assignments, and requires the four named fields; it reports 4 fields and nothing else. Confirmed to fire against three mutations (body citing `GH_REPO`, body dropping the head-SHA row, run URL recomposed from `github.server_url`).
 - 2026-08-18: minor amendment — T4 taken before T3 (task reorder only, no scope or criterion change): the dry-run harness T3 builds must exercise a finished shell body, including the label path T4 adds, so the whole body (label probe/create, dedupe search, create-or-comment) landed at T4 and T3 exercises it.
 - 2026-08-18: T4 — the shell body now probes `gh label list` and creates `master-red` when absent, ahead of the `gh issue list` dedupe search; dedupe is per watched workflow via the title. AC5's ordering check added to `tools/check-master-red-alert.R`; confirmed to fire against a copy with the label block moved below the search.
+- 2026-08-18: T3 — `tools/master-red-alert-dryrun.R` lifts the shell body out of the workflow file (no second copy to drift), puts a recording `gh` stub on PATH with `jq` left real, and runs three fixtures: label present + no issue -> one create; label present + matching issue -> one comment on #42, no create; label absent -> label create before the search, then one create. All three pass. Each is confirmed discriminating by a mutant: always-create, a dedupe filter inverted to `.title != $t`, and a deleted `gh label create` each fail in the fixture that should catch them.
 
 ## Decisions
 
