@@ -1,6 +1,6 @@
 # M96: Say something when master goes red
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M95
 - **Driving RR:** —
@@ -54,7 +54,7 @@ is the only place that environment reports at all.
 
 ## Acceptance criteria
 
-- [ ] AC1: the workflow file exists and declares exactly one job; its `on:`
+- [x] AC1: the workflow file exists and declares exactly one job; its `on:`
       block names `workflow_run` and nothing else; that block's `workflows:`
       list is exactly `R-CMD-check.yaml` and `test-coverage.yaml`, and each of
       those two files declares `name:` equal to its own filename
@@ -67,7 +67,7 @@ is the only place that environment reports at all.
       `on:`, `jobs:` and `if:` values and the `name:` of the two watched files.
 - [x] AC2: `permissions:` at the workflow or job level grants `issues: write`
       and no other write scope, read by parsing the `permissions:` mapping.
-- [ ] AC3: the issue text the alert produces is fixed boilerplate plus
+- [x] AC3: the issue text the alert produces is fixed boilerplate plus
       `workflow_run` payload values and nothing else, decided by two bounded
       checks together. (a) The alert step's parsed `env:` mapping is exactly
       `ALERT_WORKFLOW`, `ALERT_RUN_URL`, `ALERT_HEAD_SHA`, `ALERT_CONCLUSION`
@@ -261,3 +261,16 @@ _Fresh evidence on `m96-master-red-alert` after the return fixes (T6-T8), PR #12
 - F12 (return) — stub fidelity: it keys only on `"$1 $2"`, ignores every flag, and never fails a read call, so its conclusions transfer for ordering and counts but not for filter correctness (F4) or read-call failure (F5). The script header should say so, now that the profile sells it as a gate check.
 - F13 (no action) — the audit enforces "no other *write* scope" rather than the Scope section's "`issues: write` and nothing else"; AC2 is worded to match the audit, and the file grants only `issues: write`.
 - F14 (no action) — the title hardcodes "master is red" while the `if:` is generic over the default branch; if the branch is ever renamed the title lies, though the dedupe key is unaffected.
+
+### Third pass (2026-08-18) — after the descope amendment
+
+_Fresh evidence on `m96-master-red-alert`, PR #125, for the two amended criteria; AC2, AC4, AC5, AC6 re-run unchanged._
+
+- AC1 — PASS. Parsed: the file declares 1 job; `on:` names `workflow_run` and nothing else; `workflows:` is exactly `R-CMD-check.yaml` + `test-coverage.yaml`, and each of those files declares `name:` equal to its own filename; the job's `if:`, whitespace-normalized, is byte-identical to the expected expression. The comparison is now whole rather than three substring probes — `&&` -> `||` is caught, the mutation that previously passed while the workflow would have alerted on every push run including green ones.
+- AC3(a) — PASS. The parsed `env:` mapping is exactly the six expected entries, each byte-identical to its `${{ ... }}` expression. Verified discriminating: repointing `ALERT_HEAD_SHA` to `${{ github.sha }}` fails, the mutation that would report the wrong SHA while every downstream check stayed green.
+- AC3(b) — PASS. Across five fixtures, every recorded `gh issue create` and `gh issue comment` carries a `--title`/`--body` that reduces to the committed template once the four payload values are replaced by their field names, and each raw capture contains all four values. Verified discriminating against all four composition routes the second return found, each of which the deleted scanner passed: `--body "$BODY runner=$(hostname)"` on the labeled create, the same on the comment call, the same on the unlabeled fallback create, and `BODY="$BODY runner: $(hostname)"` re-composed after its heredoc.
+- AC2, AC4, AC5, AC6 — PASS, unchanged since the second pass; both scripts re-run clean here, with the dry run now at five fixtures (the fifth pins that a refused `gh label list` still posts an unlabeled alert rather than aborting).
+
+**What the descope gives up, recorded plainly.** No check now decides that the workflow's *source* composes nothing — AC3(b) decides the text produced under the harness. A construct expanding to nothing locally and to text on a runner is out of reach, as is any defect on a branch no fixture drives, as is a dropped `--label` on the search or the create (the stub dispatches on subcommand and ignores flags — second-pass F4, won't-fix by the maintainer's descope call). The dry-run script header and this file both state this; the audit script carries a do-not-reinstate note explaining why scanning was descoped rather than widened a third time.
+
+**Consistency gate (third pass).** `cairn_validate` exit 0, every check PASS (47 advisory `work-log format` warnings, all pre-existing M7 wrapped lines). `cairn_impact` skipped — no principle changed. `devtools::document()` no diff, zero `resolve link` warnings. `pkgdown::check_pkgdown()` clean. `devtools::check(args = "--no-manual")` Status OK (0/0/0) at 9e365d53, and `git diff 9e365d53..HEAD` outside `cairn/`, `.github/` and `tools/` is empty — no package content has changed since, and none of the three changed directories enters the built tarball. The branch's own R-CMD-check run is green on the PR. NEWS.md: no entry owed (internal tier). Master matrix watch: newest push run 32202243374, success. Master coverage watch: newest verdict 32202243432, success.
