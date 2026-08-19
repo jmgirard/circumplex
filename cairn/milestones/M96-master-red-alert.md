@@ -1,11 +1,11 @@
 # M96: Say something when master goes red
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M95
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m96-master-red-alert`
+- **Branch/PR:** `m96-master-red-alert` / https://github.com/jmgirard/circumplex/pull/125
 
 ## Goal
 
@@ -52,11 +52,11 @@ is the only place that environment reports at all.
 
 ## Acceptance criteria
 
-- [ ] AC1: the workflow file exists, its `on: workflow_run` block names exactly
+- [x] AC1: the workflow file exists, its `on: workflow_run` block names exactly
       `R-CMD-check.yaml` and `test-coverage.yaml`, and its job carries an `if:`
       requiring `conclusion == 'failure'`, `event == 'push'`, and the default
       branch — read by parsing the file's `on:` and `if:` values.
-- [ ] AC2: `permissions:` at the workflow or job level grants `issues: write`
+- [x] AC2: `permissions:` at the workflow or job level grants `issues: write`
       and no other write scope, read by parsing the `permissions:` mapping.
 - [ ] AC3: every value substituted into the issue body resolves to a
       `workflow_run` payload path — enumerated by scanning both the body
@@ -65,17 +65,17 @@ is the only place that environment reports at all.
       substitutions) and checking each. The scan must find at least the four
       fields the body names (workflow, run URL, head SHA, conclusion), so an
       empty enumeration fails rather than passing vacuously.
-- [ ] AC4: a dry run against a synthetic failure payload produces exactly one
+- [x] AC4: a dry run against a synthetic failure payload produces exactly one
       issue on an empty issue list, exactly one comment when a matching open
       issue already exists, and a create-label call before the dedupe search on
       the label-absent path — demonstrated by running the alert's script body
       against all three fixtures locally, with the GitHub calls stubbed and the
       stub recording every call made.
-- [ ] AC5: the alert creates the marker label if absent before searching for
+- [x] AC5: the alert creates the marker label if absent before searching for
       it, read by parsing the workflow for a create-label step ordered before
       the search step. (A search on a nonexistent label returns empty and would
       silently defeat the dedupe.)
-- [ ] AC6: the new workflow file contains no `setup-r`,
+- [x] AC6: the new workflow file contains no `setup-r`,
       `setup-r-dependencies`, `extra-packages`, or `install.packages` step,
       read by grepping the file for those keys — so it needs no allowlist
       entry. Separately, as an unchanged-regression guard only:
@@ -127,5 +127,50 @@ is the only place that environment reports at all.
 - 2026-08-18: all tasks complete; `devtools::check(args = "--no-manual")` Status OK (0 errors, 0 warnings, 0 notes) — the branch touches only `.github/` and `tools/`, both `.Rbuildignore`d, so nothing it adds enters the built package. Status -> review.
 
 ## Decisions
+- 2026-08-18: defect return 1 (review gate) — AC3 fails inside the domain of the procedure it names: `tools/check-master-red-alert.R` scans only the `BODY=` heredoc, not "the alert's script body", and its site regex sees neither `$( )` nor backticks, so a composed title (`$(hostname)`) and a composed body row both pass the audit. Twelve further findings logged in Review ([O] diff-bug F1-F13, [S] blame-history F1); F2, F3, F4, F5, F7, F9, F11, F12 join the return, F6/blame-F1 go to the next question gate, F8 rejected as written. Status review -> in-progress.
 
 ## Review
+
+_Evidence gathered 2026-08-18 on branch `m96-master-red-alert`, PR #125._
+
+- AC1 — PASS. `yaml::read_yaml()` on the workflow: the `on:` block names `workflow_run` and nothing else, its `workflows:` list is exactly `R-CMD-check.yaml`, `test-coverage.yaml` (types: `completed`), and the single job's `if:` parses to `github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == github.event.repository.default_branch`. `tools/check-master-red-alert.R` asserts all four and is confirmed to fire on a dropped workflow and on a dropped push condition.
+- AC2 — PASS. The parsed `permissions:` mapping is `contents=read | issues=write`, with no job-level override; `issues` is the only write scope. The audit's assertion fires on a copy where `contents` is raised to `write`.
+- AC3 — **FAIL (superseded; the PASS line below was written before the fan-out reported F1/F10).** The scan's domain is the `BODY=` heredoc only, not "the alert's script body" the criterion names, and its site regex matches `$VAR`/`${VAR}` only. Re-verified here on copies of the workflow: a title composed as `TITLE="master is red: $(hostname)"`, and a body row carrying `$(gh api /user --jq .login)`, both leave the audit exiting 0 and still printing "interpolates 4 workflow_run payload field(s) and nothing else". The criterion fails inside the domain of the procedure it names.
+- AC3 — superseded PASS line, retained: The scan enumerates every `${{ }}` site (all six live in the step's `env:` mapping — no stray), every `context.payload.*` read (none), and every shell `$VAR` in the `BODY=` heredoc, resolving each through the env map and local assignments. It reports 4 payload fields and nothing else: `conclusion`, `head_sha`, `html_url`, `name` — meeting the four-field floor, so an empty enumeration could not pass. Confirmed to fire on a body citing `GH_REPO`, on a dropped head-SHA row (3 fields, refused), and on a run URL recomposed from `github.server_url`.
+- AC4 — PASS. `tools/master-red-alert-dryrun.R` lifts the shell body out of the YAML, stubs `gh` (recording every call, `jq` left real) and runs three fixtures: label present + no open issue -> `label list -> issue list -> issue create` (exactly one create, no comment); label present + matching open issue -> `label list -> issue list -> issue comment` on #42 (exactly one comment, no create); label absent -> `label list -> label create -> issue list -> issue create`, the create ahead of the search. Each fixture is confirmed discriminating by a mutant that only it catches (always-create; dedupe filter inverted to `.title != $t`; `gh label create` deleted).
+- AC5 — PASS. Parsing the workflow puts `gh label list` at line 76 and `gh label create` at line 77, both ahead of the `gh issue list` dedupe search at line 85. The audit's ordering assertion fires on a copy with the label block relocated below the search.
+- AC6 — PASS. `grep -nE 'setup-r|extra-packages|install\.packages'` over the new workflow returns nothing; the audit's own grep over all four keys agrees, and fires on a copy with a `setup-r` step spliced in. Separately, as the unchanged-regression guard only: `Rscript tools/check-ci-deps.R` exits clean (14 Suggests in sync) — which, as the criterion states, is not evidence about the new file.
+
+### Consistency gate (2026-08-18)
+
+- `cairn_validate` — exit 0, all checks PASS; 47 advisory `work-log format` warnings, all pre-existing M7 wrapped lines, none from this branch.
+- `cairn_impact` — skipped; no DESIGN.md principle changed.
+- `devtools::document()` — no diff (working tree clean apart from this milestone file), zero `resolve link` warnings at `cli.width = 500`.
+- `pkgdown::check_pkgdown()` — "No problems found."
+- `devtools::check(args = "--no-manual")` — Status OK, 0 errors / 0 warnings / 0 notes, run at 467bc71e; `git diff 467bc71e..HEAD` outside `cairn/` is empty, so the checked package content is the content under review.
+- README.Rmd/README.md — untouched by this branch.
+- NEWS.md — no entry owed: the surface tier is internal and nothing user-visible changed.
+- `.Rbuildignore` — no new top-level files; `^\.github$` and `^tools$` already present.
+- Master matrix watch — newest push run of `R-CMD-check.yaml` on master is 32202243374 (2026-08-19T00:42:20Z), conclusion success.
+- Master coverage watch — newest push-run verdict of `test-coverage.yaml` on master is 32202243432 (2026-08-19T00:42:20Z), conclusion success; the intervening 32187677266 is `cancelled`, which is not a verdict.
+- Gate-command note: the first invocation of the profile's `gh run list --workflow=R-CMD-check.yaml --branch=master --event=push` returned three 2026-08-07 `failure` runs, the newest of them ten days stale. The identical command re-run, the same query without `--event`, and the raw API (`actions/workflows/3740495/runs?branch=master&event=push`) all agree on the green newest run above. Recorded because the stale answer was the red one: a gate that reads this command once could fail a milestone on a phantom red, or — with the staleness in the other direction — pass one on a phantom green.
+
+### Independent review (fresh-context fan-out)
+
+Reviewers: [O] diff-bug (13 findings), [S] blame-history (1 finding), [S] prior-PR-comments (no findings; its probe `gh api repos/{owner}/{repo}/pulls/comments?per_page=1` returned empty, so the repo carries no inline review threads at all — the same no-op this lens has recorded since M33).
+
+Every finding below is logged with its disposition; the return-floor finding is F10.
+
+- **F10 (floor return) — AC3's scan covers the body heredoc but not the script body the criterion names.** `TITLE` reaches `gh issue create --title` and is the dedupe key, yet sits outside the scanned region. Re-verified: `TITLE="master is red: $(hostname)"` passes the audit. Fails AC3 inside its named domain -> status returns to `in-progress`.
+- **F1 — the same scan cannot see command substitution.** `vars_in()` matches `$VAR`/`${VAR}` only, so `$( )`, backticks and `${VAR:-default}` are invisible; re-verified with a `$(gh api /user --jq .login)` body row. Fix with F10.
+- **F2 — the permissions check reads the wrong mapping.** `perms <- doc$permissions; if (is.null(perms)) perms <- job$permissions` inverts GitHub's precedence, where a job-level block REPLACES the workflow-level one. Re-verified: a job-level `contents: write` passes the audit while it prints "no other write scope". Fix on return.
+- **F3 — the label-create block can abort the alert under `set -e`.** `gh label create` without `--force` exits non-zero on an existing label (confirmed in `gh label create --help`: "or update an existing one with `--force`"), and `gh label list` defaults to 30 labels (confirmed in `--help`), so three paths reach it with the label present: two simultaneous alert runs racing on the first-ever failure, a repo past 30 labels, and a pipefail/SIGPIPE inversion on the probe pipeline. Each kills the alert in exactly the case it exists for. Fix on return.
+- **F4 — no `concurrency:` group, so two near-simultaneous failures can double-post.** Both sibling workflows carry one; this one does not. Fix on return.
+- **F5 — `on.workflow_run.workflows` matches a workflow's `name:`, not its filename.** It works only because both siblings set `name:` equal to their filename; the audit's `WATCHED` literal is never compared against those files. Fix on return by reading each watched file's `name:`.
+- **F9 — the stray-`${{ }}` check compares values, not sites.** An expression duplicating one already in `env:` passes wherever it appears, including directly in the shell body — the standard injection shape the check exists to prevent. Fix with F10.
+- **F11 — the dry-run stub always exits 0**, so no fixture exercises a failing GitHub call and F3's abort path is invisible to it. Fix on return with a fourth fixture.
+- **F12 — `job <- jobs[[1L]]` runs unconditionally after the zero-jobs check**, turning a diagnostic into a subscript error. Fix on return.
+- **F13 — AC5's evidence cites workflow-file line numbers while the audit compares indices into the dedented `run:` body.** Same ordering, different coordinate systems. Fix the evidence wording on re-review.
+- **F6 + blame-history F1 (follow-up, maintainer call at the next question gate) — neither audit script is invoked by anything, and `PROFILE.md`'s consistency-gate was not updated.** Their cited precedent `tools/check-ci-deps.R` IS run in CI. Wiring them in raises a real dependency question: the dry run needs `jq` and both need the `yaml` package, which is not in Suggests.
+- **F7 (fix on return) — two comments describe an `actions/checkout` step that does not exist.** The header claims the workflow runs "with the default branch checked out" and the permissions comment justifies `contents: read` as what checkout needs; there is no checkout step, and with the body inline nothing needs `contents` at all. Found independently in-session before the fan-out reported it.
+- **F8 (reject as written; candidate row on merge) — only `conclusion == 'failure'` alerts**, so `startup_failure` and `timed_out` leave master red and silent. AC1 requires exactly that equality, so widening it here would breach the criterion under review; it is a scope question for a follow-up, not a defect in this milestone.
