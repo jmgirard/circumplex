@@ -1,6 +1,6 @@
 # M96: Say something when master goes red
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M95
 - **Driving RR:** —
@@ -52,13 +52,13 @@ is the only place that environment reports at all.
 
 ## Acceptance criteria
 
-- [x] AC1: the workflow file exists, its `on: workflow_run` block names exactly
+- [ ] AC1: the workflow file exists, its `on: workflow_run` block names exactly
       `R-CMD-check.yaml` and `test-coverage.yaml`, and its job carries an `if:`
       requiring `conclusion == 'failure'`, `event == 'push'`, and the default
       branch — read by parsing the file's `on:` and `if:` values.
 - [x] AC2: `permissions:` at the workflow or job level grants `issues: write`
       and no other write scope, read by parsing the `permissions:` mapping.
-- [x] AC3: every value substituted into the issue body resolves to a
+- [ ] AC3: every value substituted into the issue body resolves to a
       `workflow_run` payload path — enumerated by scanning both the body
       template and the alert's script body for every interpolation site
       (`${{ }}` expressions, `context.payload.*` reads, shell `$VAR`
@@ -138,6 +138,7 @@ is the only place that environment reports at all.
 - 2026-08-18: T7 (return, F3/F4/F7) — label creation is now `--force` (updates instead of erroring when the label exists, so a race on the first-ever failure cannot abort the loser), the probe takes `--limit 200` (past `gh label list`'s 30-item default) and tests a captured string with a bash pattern instead of a `| grep -q` pipeline that `pipefail` can report as failed on EPIPE; a `concurrency:` group keyed on the watched workflow with `cancel-in-progress: false` serializes alerts so two near-simultaneous failures cannot both search-then-create; the unused `contents: read` grant is gone and the two comments describing an `actions/checkout` step that never existed are corrected. All three fixtures still pass and the audit's permissions, label-ordering and expression checks still fire against mutants.
 - 2026-08-18: T8 (return, F2/F5/F11/F12 + the gate wiring) — the permissions check now reads the effective mapping (job-level replaces workflow-level in GitHub) and refuses a file declaring both; each watched workflow's own `name:` is read and required to equal the string in `workflows:`, since `workflow_run` matches the name and not the filename; a zero-jobs file stops with a message instead of a subscript error; the dry run gained a fourth fixture where `gh label create` is refused. That fixture found a further defect and fixed it: a refused create still aborted the job under `set -e`, so the alert now falls back to posting an unlabeled issue with a `::warning::` saying it will not dedupe. A concurrency guard was added to the audit so T7's fix cannot be silently dropped. `PROFILE.md`'s consistency-gate slot now names both scripts (the two master-watch bullets merged and compressed in one pass to hold the 120-line cap, and carrying the stale-`gh run list` caution the review gate hit). Verify slot: `devtools::test()` [ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ].
 - 2026-08-18: return fixes complete (T6-T8); `devtools::check(args = "--no-manual")` Status OK (0/0/0). Status -> review.
+- 2026-08-18: defect return 2 (review gate) — AC3 falsified again inside its own domain by two new routes, and AC1's procedure shown not to test what it claims. Verified on copies: `--body "$BODY runner=$(hostname)"` at the `gh` call site, and `BODY="$BODY runner: $(hostname)"` re-composed after the heredoc, both pass the audit and the dry run; `&&` -> `||` in the job's `if:` passes both while the mutated workflow would alert on every push run including green ones. Production defect alongside them: a failing `gh label list` aborts the alert under `set -e` (verified, exit 1, no issue posted) — the returned F3 still live on the read call, since T8's fallback covers only `gh label create`. Thrash rule (b) fires: AC3 has now failed twice, each by a new mechanism of the same shape. Status review -> in-progress; AC1 and AC3 unticked.
 
 ## Review
 
@@ -204,3 +205,20 @@ _Fresh evidence on `m96-master-red-alert` after the return fixes (T6-T8), PR #12
 
 - **blame-history F1 (fixed on the branch) — the `PROFILE.md` compression lost the scoping of the absent-run rule.** Pre-branch the two watch bullets disagreed deliberately: M93's said of `R-CMD-check.yaml` "a red **or absent** run is a gate failure", while M95's said of `test-coverage.yaml` "No qualifying run is likewise no verdict, **not a failure** — `paths-ignore` means tracking-only merges produce none". Merging them left the second clause unscoped immediately after the first, so a gate-runner reading it would treat an absent `R-CMD-check.yaml` run as no verdict — reversing what M93 was built to close. Verified against `git show master:cairn/PROFILE.md` and both archives. The clause is now scoped ("there alone"), and M93's rule reads "red OR ABSENT is a gate failure".
 - blame-history F2/F3/F4 (no action) — the 120-line cap justifying the compression checks out (119 post-fix); every other M93/M95 operative fact survives with its attribution; and the alert's own `concurrency:` block does not fight the watched workflows' `cancel-in-progress: true` groups, nor does leaving `tools/check-ci-deps.R` unwidened contradict the plan-gate decision that chose it.
+
+[O] diff-bug, second pass — 14 findings. Five verified on copies in-session before triage.
+
+- **F1 (return) — the `if:` check is three independent substring greps, so `&&` -> `||` survives.** Verified: both scripts exit 0 on the mutated file, which would open an issue on every push run of either workflow, green ones and PR runs included. AC1's claim is not tested by the procedure AC1 names.
+- **F2 (return) — AC3's composition refusal stops short of the shell body it claims to cover.** `reported` is the `BODY=` heredoc plus the one `TITLE=` line, so composition at the `gh` call site is invisible: `--body "$BODY runner=$(hostname)"` passes both scripts. Same defect class as the first pass's F1/F10, one level out.
+- **F3 (return) — `BODY` can be re-composed after the heredoc and nothing sees it.** `BODY="$BODY\n\nrunner: $(hostname)"` between the heredoc and the label block passes both: the heredoc is still unique and `BODY` is in `assigned`. `TITLE` is guarded by an exactly-one assertion; `BODY` is not. A composed title also survives via an intermediate local (`SUF="$(hostname)"; TITLE="...${SUF}"`).
+- **F4 (return) — dedupe correctness is asserted by neither script.** Deleting `--label "$LABEL"` from the `gh issue list` search and/or from `gh issue create` leaves both at exit 0, individually and together; either mutation means one new issue per failed push. The stub ignores flags, so call-sequence and count assertions cannot see it.
+- **F5 (return) — a failing `gh label list` kills the alert outright.** Verified by running the lifted body with that call refused: exit 1, no issue posted. `gh issue list` and `gh issue create` abort the same way. T8's `LABEL_OK=0` fallback covers only `gh label create`.
+- **F6 (return) — T7's three hardenings have no regression guard.** Removing `--force`, removing `--limit 200`, and reverting the probe to a `| grep -q` pipeline each leave both scripts at exit 0, while a `concurrency:` guard was added for T7's fourth fix — inconsistent rather than principled, and each revert re-opens a documented abort path.
+- **F7 (return) — the concurrency comment is wrong about what `cancel-in-progress: false` protects.** GitHub cancels a *pending* run when a newer one queues; the flag only spares the in-progress run. The behaviour is acceptable; "never cancel one — a queued alert still needs to post" is not, and the audit's message repeats it.
+- **F8 (return) — a comment describes a `case` over a captured string; the code is a `[[ ... != *pattern* ]]` test.** The reasoning is right, the construct named is not the one used.
+- **F9 (return) — `set -euo pipefail` can be deleted with both scripts still green**, though every safety comment in the body is written on the premise that it is there.
+- **F10 (fix on return) — the first pass's evidence lines are stale against the current file** (AC5 cites body lines 76/77/85; they are now 98/100/110). Retained deliberately as the record of the first return and headed as such, but the AC5 line should say so on its face.
+- F11 (no action) — AC3's checkbox was `- [ ]` when the reviewer read the file; it had been ticked against second-pass evidence before this return unticked it again.
+- F12 (return) — stub fidelity: it keys only on `"$1 $2"`, ignores every flag, and never fails a read call, so its conclusions transfer for ordering and counts but not for filter correctness (F4) or read-call failure (F5). The script header should say so, now that the profile sells it as a gate check.
+- F13 (no action) — the audit enforces "no other *write* scope" rather than the Scope section's "`issues: write` and nothing else"; AC2 is worded to match the audit, and the file grants only `issues: write`.
+- F14 (no action) — the title hardcodes "master is red" while the `if:` is generic over the default branch; if the branch is ever renamed the title lies, though the dedupe key is unaffected.
