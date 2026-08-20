@@ -73,9 +73,16 @@ test_that("the manifest is set-equal to a fresh walk of the audit script (M87)",
   # cbind() column. Each of those escapes a search for the word and none of
   # them escapes this. The grep AC4 also names is a spot check on three
   # spellings, not what carries the claim (M88).
+  #
+  # Sorted and compared whole rather than as SETS: `expect_setequal()` reads
+  # membership, so a fourth field whose name REPEATS one of the three -- the
+  # one spelling of a fourth field that this assertion is the last line
+  # against -- was set-equal to the three and passed (M88 review, F12). Sorting
+  # rather than pinning the constructed order keeps a harmless reordering of
+  # the walk's own `list()` from reddening a test about the field set.
   expect_identical(names(NORMS_AUDIT_MANIFEST), c("kind", "binding", "key"))
   for (s in sites) {
-    expect_setequal(names(s), c("kind", "key", "binding"))
+    expect_identical(sort(names(s)), c("binding", "key", "kind"))
   }
 })
 
