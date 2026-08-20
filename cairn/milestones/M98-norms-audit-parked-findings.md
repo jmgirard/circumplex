@@ -104,7 +104,7 @@ the deliverable.
       dispositions, each carrying rationale and reopening evidence, and its
       relation to D-042 (whose "explicitly insufficient" clause is the ground
       for two of them) and D-043.
-- [ ] **T4** — Rewrite the four named findings' text in the M88 and M80 ROADMAP
+- [x] **T4** — Rewrite the four named findings' text in the M88 and M80 ROADMAP
       candidate rows to point at D-045, leaving every other finding in those
       rows untouched.
 - [ ] **T5** — `Rscript -e 'devtools::test()'` plus the AC5 `expect_` counts and
@@ -121,6 +121,8 @@ the deliverable.
 - 2026-08-20: T2 fail-closed measurement (AC2), under `LANGUAGE=C`/`LC_MESSAGES=C` after the deletion. `tryCatch(stopifnot(c(TRUE, FALSE)), error = conditionMessage)` gives verbatim `c(TRUE, FALSE) are not all TRUE`; `norms_audit_stopifnot_stem()` returns that message unchanged as its stem with `truncated = FALSE` (the pattern no longer strips the plural verdict), and `audit_key_matches("stopifnot", "c(TRUE, FALSE)", msg)` returns **FALSE** — the matcher refuses a site's own genuine message rather than accepting a stranger's.
 - 2026-08-20: full `devtools::test()` after T1+T2: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, identical to the branch-point baseline in every field.
 - 2026-08-20: T3 — D-045 appended to `cairn/DECISIONS.md`: one entry, four numbered dispositions, each with rationale and its own reopening class, applying D-042 rather than superseding it and leaving D-043's identity unchanged.
+- 2026-08-20: T4 — the M88 and M80 candidate rows rewritten to strike F11/F12/F4 and the M80 note-only finding and point each at D-045; the same-binding-twin conflation, the M84/M85 graduations and every other finding in both rows left byte-untouched.
+- 2026-08-20: T4 correction — the M80 row described the finding as "the `note-only-sample` emitter leaves the report's `sample` column `NA`". Measured against `data-raw/norms-audit-coverage.csv`: all 14 note-only rows carry `sample = "—"` and it is the `field` cell that is `NA`. The mechanism is that the emitter (`audit-norms.R:927-945`) writes no cell at all for the `anchor` its dedupe key discriminates on, so an anchor-differing pair emits identically. The row and D-045 finding 4 both state it that way now. `cairn/milestones/archive/M80-norms-audit-report-schema.md:24` carries the original wording and is left as written — it is history (IP4), not a live claim.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.
