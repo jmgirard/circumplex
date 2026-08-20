@@ -108,7 +108,7 @@ the deliverable.
 - [x] **T4** — Rewrite the four named findings' text in the M88 and M80 ROADMAP
       candidate rows to point at D-045, leaving every other finding in those
       rows untouched.
-- [ ] **T5** — `Rscript -e 'devtools::test()'` plus the AC5 `expect_` counts and
+- [x] **T5** — `Rscript -e 'devtools::test()'` plus the AC5 `expect_` counts and
       the AC6 skip-line comparison against the branch point; record all of it.
 
 ## Work log
@@ -127,6 +127,8 @@ the deliverable.
 - 2026-08-20: AC5 amended at a mini gate (substantive; Jeff chose the amendment over rewording the comment or dropping the criterion). As written it counted `expect_` anywhere in the file, so the new comment naming `expect_setequal()` — the record of what was wrong — read as an added assertion: 14 vs 13, while assertions were 12 vs 12. The procedure now excludes comment lines and both numbers are recorded.
 - 2026-08-20: AC5 amendment — the fresh-context [O] reader (reduced mode, internal tier) returned a second finding against the wording I proposed: the headline "the milestone subtracts rather than adds on the test surface" quantified over the whole test surface, which no `expect_` count enumerates (assertions can be added in helpers, in loops, or in files this branch does not touch, while the token count falls). The headline is narrowed to what the count settles. The same overclaim was in the pre-gate AC5 and round 2 of the plan-time audit passed it.
 - 2026-08-20: AC5 amendment — narrowed wording re-entered the reader once, per the one-fix rule: clean on both questions.
+- 2026-08-20: T5/AC5 — files in scope per `git diff --name-only master...HEAD -- tests data-raw`: `tests/testthat/helper-norms-audit-script.R` and `tests/testthat/test-norms-audit-manifest.R`. Non-comment `expect_` occurrences: master 12, HEAD 12 — no increase. Whole-file counts including comment lines: master 13, HEAD 14; the one added occurrence is the comment naming `expect_setequal()` as the assertion that was wrong.
+- 2026-08-20: T5/AC6 — final `devtools::test()`: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, every field identical to the branch-point baseline. The three skips are `test-axes-scaled-fit.R:536/922/1241`; the eight `test-norms-audit-*.R` files skip nothing, unchanged from the branch point.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.
