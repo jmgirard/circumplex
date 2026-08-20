@@ -1,6 +1,6 @@
 # M98: Close the parked norms-audit findings by subtraction
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -129,6 +129,8 @@ the deliverable.
 - 2026-08-20: AC5 amendment — narrowed wording re-entered the reader once, per the one-fix rule: clean on both questions.
 - 2026-08-20: T5/AC5 — files in scope per `git diff --name-only master...HEAD -- tests data-raw`: `tests/testthat/helper-norms-audit-script.R` and `tests/testthat/test-norms-audit-manifest.R`. Non-comment `expect_` occurrences: master 12, HEAD 12 — no increase. Whole-file counts including comment lines: master 13, HEAD 14; the one added occurrence is the comment naming `expect_setequal()` as the assertion that was wrong.
 - 2026-08-20: T5/AC6 — final `devtools::test()`: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, every field identical to the branch-point baseline. The three skips are `test-axes-scaled-fit.R:536/922/1241`; the eight `test-norms-audit-*.R` files skip nothing, unchanged from the branch point.
+- 2026-08-20: pre-review `devtools::check(args = "--no-manual")`: `Status: OK`, 0 errors / 0 warnings / 0 notes, 7m35s; `checking tests ... OK` (377s). `--no-manual` is CLAUDE.md's documented form, so the PDF-manual step did not run — no roxygen changed on this branch, so nothing on that surface moved.
+- 2026-08-20: all tasks complete; status → review.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.

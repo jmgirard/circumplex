@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
 | M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
-| M98 | Close the parked norms-audit findings by subtraction | in-progress | — | normal | milestones/M98-norms-audit-parked-findings.md |
+| M98 | Close the parked norms-audit findings by subtraction | review | — | normal | milestones/M98-norms-audit-parked-findings.md |
 
 ## Candidates
 
