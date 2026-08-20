@@ -89,7 +89,7 @@ the deliverable.
 
 ## Tasks
 
-- [ ] **T1** — Replace the `expect_setequal(names(s), ...)` assertion at
+- [x] **T1** — Replace the `expect_setequal(names(s), ...)` assertion at
       `tests/testthat/test-norms-audit-manifest.R:73` with an order-normalised
       exact one, and update the comment above it that credits the field-set
       assertion. Then plant the fourth-element mutant in
@@ -114,6 +114,9 @@ the deliverable.
 
 - 2026-08-20: created by /milestone-plan.
 - 2026-08-20: implement started on `m98-norms-audit-parked-findings`, cut from master at `f57d0127`.
+- 2026-08-20: branch-point baseline `devtools::test()`: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`; all three skips are `test-axes-scaled-fit.R:536/922/1241`, so the eight `test-norms-audit-*.R` files skip nothing at the branch point (AC6 comparison figure).
+- 2026-08-20: T1 — `expect_setequal(names(s), ...)` replaced by `expect_identical(sort(names(s)), c("binding", "key", "kind"))` in `test-norms-audit-manifest.R`; sorted rather than order-pinned so a harmless reordering of the walk's own `list()` cannot redden a test about the field set.
+- 2026-08-20: T1 mutation — committed `helper-norms-audit-script.R` (blob `50fedd23`) planted with a fourth element `key = "MUTANT"` in `norms_audit_abort_sites()`'s `stop` branch (blob `9656d7b0`); the file went red on the AC1 assertion alone, exceeding testthat's default 10-failure cap, and no other assertion of the file failed. Restored by copy, blob re-verified `50fedd23`, tree clean, file green at `[ FAIL 0 | WARN 0 | SKIP 0 | PASS 44 ]`.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.
