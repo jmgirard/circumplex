@@ -100,7 +100,7 @@ the deliverable.
       (`helper-norms-audit-script.R`), rewriting the comment above it to state
       why the alternative is gone and that an added vectorized guard fails
       closed. Measure AC2's fail-closed call and record its message verbatim.
-- [ ] **T3** — Write the single `cairn/DECISIONS.md` entry (D-045) with the four
+- [x] **T3** — Write the single `cairn/DECISIONS.md` entry (D-045) with the four
       dispositions, each carrying rationale and reopening evidence, and its
       relation to D-042 (whose "explicitly insufficient" clause is the ground
       for two of them) and D-043.
@@ -120,6 +120,7 @@ the deliverable.
 - 2026-08-20: T2 — `NORMS_AUDIT_VERDICT` is now `"is not TRUE"`; the `are not all TRUE` alternative is deleted, with the comment above it rewritten to record why and what restoring it would cost.
 - 2026-08-20: T2 fail-closed measurement (AC2), under `LANGUAGE=C`/`LC_MESSAGES=C` after the deletion. `tryCatch(stopifnot(c(TRUE, FALSE)), error = conditionMessage)` gives verbatim `c(TRUE, FALSE) are not all TRUE`; `norms_audit_stopifnot_stem()` returns that message unchanged as its stem with `truncated = FALSE` (the pattern no longer strips the plural verdict), and `audit_key_matches("stopifnot", "c(TRUE, FALSE)", msg)` returns **FALSE** — the matcher refuses a site's own genuine message rather than accepting a stranger's.
 - 2026-08-20: full `devtools::test()` after T1+T2: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, identical to the branch-point baseline in every field.
+- 2026-08-20: T3 — D-045 appended to `cairn/DECISIONS.md`: one entry, four numbered dispositions, each with rationale and its own reopening class, applying D-042 rather than superseding it and leaving D-043's identity unchanged.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.
