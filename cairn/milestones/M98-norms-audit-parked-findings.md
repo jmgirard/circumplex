@@ -68,11 +68,12 @@ the deliverable.
       four and no others — are each struck as closed by this milestone or left
       standing with a pointer to the AC3 entry; every other finding named in
       either row is left as it stands.
-- [ ] AC5 — the milestone subtracts rather than adds on the test surface: over
-      the files listed by `git diff --name-only master...HEAD -- tests data-raw`,
-      the total count of `expect_` occurrences reported by
-      `grep -o 'expect_' | wc -l` is no higher at HEAD than at `master`, with
-      both counts recorded in the work log.
+- [ ] AC5 — non-comment `expect_` occurrences do not increase in the files this
+      branch touches under `tests/` and `data-raw/`: over the files listed by
+      `git diff --name-only master...HEAD -- tests data-raw`, the count from
+      `grep -v '^[[:space:]]*#' | grep -o 'expect_' | wc -l` is no higher at HEAD
+      than at `master`, with both counts recorded in the work log alongside the
+      whole-file counts including comment lines.
 - [ ] AC6 — `Rscript -e 'devtools::test()'` is green, and the number of skips
       reported for the files listed by `ls tests/testthat/test-norms-audit-*.R`
       is unchanged from the same command run at the branch point, with both
@@ -123,6 +124,9 @@ the deliverable.
 - 2026-08-20: T3 — D-045 appended to `cairn/DECISIONS.md`: one entry, four numbered dispositions, each with rationale and its own reopening class, applying D-042 rather than superseding it and leaving D-043's identity unchanged.
 - 2026-08-20: T4 — the M88 and M80 candidate rows rewritten to strike F11/F12/F4 and the M80 note-only finding and point each at D-045; the same-binding-twin conflation, the M84/M85 graduations and every other finding in both rows left byte-untouched.
 - 2026-08-20: T4 correction — the M80 row described the finding as "the `note-only-sample` emitter leaves the report's `sample` column `NA`". Measured against `data-raw/norms-audit-coverage.csv`: all 14 note-only rows carry `sample = "—"` and it is the `field` cell that is `NA`. The mechanism is that the emitter (`audit-norms.R:927-945`) writes no cell at all for the `anchor` its dedupe key discriminates on, so an anchor-differing pair emits identically. The row and D-045 finding 4 both state it that way now. `cairn/milestones/archive/M80-norms-audit-report-schema.md:24` carries the original wording and is left as written — it is history (IP4), not a live claim.
+- 2026-08-20: AC5 amended at a mini gate (substantive; Jeff chose the amendment over rewording the comment or dropping the criterion). As written it counted `expect_` anywhere in the file, so the new comment naming `expect_setequal()` — the record of what was wrong — read as an added assertion: 14 vs 13, while assertions were 12 vs 12. The procedure now excludes comment lines and both numbers are recorded.
+- 2026-08-20: AC5 amendment — the fresh-context [O] reader (reduced mode, internal tier) returned a second finding against the wording I proposed: the headline "the milestone subtracts rather than adds on the test surface" quantified over the whole test surface, which no `expect_` count enumerates (assertions can be added in helpers, in loops, or in files this branch does not touch, while the token count falls). The headline is narrowed to what the count settles. The same overclaim was in the pre-gate AC5 and round 2 of the plan-time audit passed it.
+- 2026-08-20: AC5 amendment — narrowed wording re-entered the reader once, per the one-fix rule: clean on both questions.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.
