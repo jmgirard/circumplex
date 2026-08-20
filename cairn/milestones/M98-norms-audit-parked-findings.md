@@ -96,7 +96,7 @@ the deliverable.
       `tests/testthat/helper-norms-audit-script.R`'s `norms_audit_abort_sites()`,
       run the one file, record red; restore by copy and re-verify the blob hash
       (M82/M88: `git checkout --` restores from the index, so never use it).
-- [ ] **T2** — Delete `|are not all TRUE` from `NORMS_AUDIT_VERDICT`
+- [x] **T2** — Delete `|are not all TRUE` from `NORMS_AUDIT_VERDICT`
       (`helper-norms-audit-script.R`), rewriting the comment above it to state
       why the alternative is gone and that an added vectorized guard fails
       closed. Measure AC2's fail-closed call and record its message verbatim.
@@ -117,6 +117,9 @@ the deliverable.
 - 2026-08-20: branch-point baseline `devtools::test()`: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`; all three skips are `test-axes-scaled-fit.R:536/922/1241`, so the eight `test-norms-audit-*.R` files skip nothing at the branch point (AC6 comparison figure).
 - 2026-08-20: T1 — `expect_setequal(names(s), ...)` replaced by `expect_identical(sort(names(s)), c("binding", "key", "kind"))` in `test-norms-audit-manifest.R`; sorted rather than order-pinned so a harmless reordering of the walk's own `list()` cannot redden a test about the field set.
 - 2026-08-20: T1 mutation — committed `helper-norms-audit-script.R` (blob `50fedd23`) planted with a fourth element `key = "MUTANT"` in `norms_audit_abort_sites()`'s `stop` branch (blob `9656d7b0`); the file went red on the AC1 assertion alone, exceeding testthat's default 10-failure cap, and no other assertion of the file failed. Restored by copy, blob re-verified `50fedd23`, tree clean, file green at `[ FAIL 0 | WARN 0 | SKIP 0 | PASS 44 ]`.
+- 2026-08-20: T2 — `NORMS_AUDIT_VERDICT` is now `"is not TRUE"`; the `are not all TRUE` alternative is deleted, with the comment above it rewritten to record why and what restoring it would cost.
+- 2026-08-20: T2 fail-closed measurement (AC2), under `LANGUAGE=C`/`LC_MESSAGES=C` after the deletion. `tryCatch(stopifnot(c(TRUE, FALSE)), error = conditionMessage)` gives verbatim `c(TRUE, FALSE) are not all TRUE`; `norms_audit_stopifnot_stem()` returns that message unchanged as its stem with `truncated = FALSE` (the pattern no longer strips the plural verdict), and `audit_key_matches("stopifnot", "c(TRUE, FALSE)", msg)` returns **FALSE** — the matcher refuses a site's own genuine message rather than accepting a stranger's.
+- 2026-08-20: full `devtools::test()` after T1+T2: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, identical to the branch-point baseline in every field.
 - 2026-08-20: [O] reduced criteria audit (internal tier), round 1 over the pre-gate draft: two findings — AC2's "in both its untruncated and its truncated form" was a per-rendering enumeration, AC4's anchor-pair promise a proxy for all anchor-differing pairs; both had one clear answer and were narrowed before the gate.
 - 2026-08-20: [O] reduced criteria audit, round 2 over the final post-gate wording: one finding — AC4's "no finding named in either row is left with no disposition" quantified past its own hand-list, the M88 row also naming the same-binding-twin conflation and pointing at a fuller scored list; narrowed to the four named findings, AC1/AC2/AC3/AC5/AC6 clean.
 - 2026-08-20: plan gate chose closing F4 by deleting the unreachable `are not all TRUE` alternative over adding a test that exercises it, because no shipped site can raise it and its removal fails closed (an unstripped plural verdict makes `startsWith()` fail); falsified by a vectorized `stopifnot()` condition entering `data-raw/audit-norms.R`, which would want the alternative back.
