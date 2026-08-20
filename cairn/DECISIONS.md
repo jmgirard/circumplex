@@ -1526,8 +1526,9 @@ simplifying or deleting first.
 
 4. **M80 F1 (decline).** The `note-only-sample` emitter keys on the note row's
    `(sample, scale, value, anchor)` but emits no anchor cell, so two rows the key
-   correctly keeps apart would emit as two identical CSV rows and a `unique()`
-   over the report would drop one. None of the 14 committed note-only rows has
+   correctly keeps apart would emit as two identical CSV rows, and any reader
+   deduplicating the report would drop one — the audit itself never calls
+   `unique()` on the frame, so the loss is a downstream reader's. None of the 14 committed note-only rows has
    the shape. Both fixes — carrying `anchor` into `COVERAGE_COLUMNS`, or an
    emit-time refusal — widen an internal checker's promise for a case that has
    never occurred; the refusal would additionally add an abort site the manifest

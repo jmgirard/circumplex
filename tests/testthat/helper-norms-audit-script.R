@@ -309,7 +309,16 @@ norms_audit_key_regex <- function(key) {
 # that costs is a confusing red for whoever adds the first vectorized guard --
 # the fix is to restore the alternative here, which this comment is the record
 # for.
-NORMS_AUDIT_VERDICT <- "is not TRUE"
+#
+# The parentheses stay, holding one alternative, so that restoring the second
+# one is an edit INSIDE them. Both readers below interpolate this value into a
+# larger pattern anchored with `$`, and an ungrouped `a|b` would bind the
+# alternation across the whole pattern rather than the verdict: measured, a
+# plain (untruncated) plural message then matches the TRUNCATION detector,
+# which waives the stem floor -- the 2026-08-14 incident recorded above,
+# reintroduced by the obvious spelling of the fix this comment recommends
+# (M98 review, F2).
+NORMS_AUDIT_VERDICT <- "(is not TRUE)"
 
 norms_audit_stopifnot_stem <- function(msg) {
   truncated <- grepl(

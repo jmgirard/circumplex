@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5, GP2, GP6, GP7
-- **Branch/PR:** `m98-norms-audit-parked-findings`
+- **Branch/PR:** `m98-norms-audit-parked-findings` / [PR #127](https://github.com/jmgirard/circumplex/pull/127)
 
 ## Goal
 
@@ -123,7 +123,7 @@ the deliverable.
 - 2026-08-20: full `devtools::test()` after T1+T2: `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, identical to the branch-point baseline in every field.
 - 2026-08-20: T3 — D-045 appended to `cairn/DECISIONS.md`: one entry, four numbered dispositions, each with rationale and its own reopening class, applying D-042 rather than superseding it and leaving D-043's identity unchanged.
 - 2026-08-20: T4 — the M88 and M80 candidate rows rewritten to strike F11/F12/F4 and the M80 note-only finding and point each at D-045; the same-binding-twin conflation, the M84/M85 graduations and every other finding in both rows left byte-untouched.
-- 2026-08-20: T4 correction — the M80 row described the finding as "the `note-only-sample` emitter leaves the report's `sample` column `NA`". Measured against `data-raw/norms-audit-coverage.csv`: all 14 note-only rows carry `sample = "—"` and it is the `field` cell that is `NA`. The mechanism is that the emitter (`audit-norms.R:927-945`) writes no cell at all for the `anchor` its dedupe key discriminates on, so an anchor-differing pair emits identically. The row and D-045 finding 4 both state it that way now. `cairn/milestones/archive/M80-norms-audit-report-schema.md:24` carries the original wording and is left as written — it is history (IP4), not a live claim.
+- 2026-08-20: T4 correction — the M80 row described the finding as "the `note-only-sample` emitter leaves the report's `sample` column `NA`". Measured against `data-raw/norms-audit-coverage.csv`: all 14 note-only rows carry `sample = "—"`, and the cells `NA` across all 14 of them are `field`, `scale` and `tag` — not `field` alone (`coverage_rows()` defaults every cell the emitter does not pass, and `tag_or_na()` returns `NA` for an untagged block). The mechanism is that the emitter (`audit-norms.R:927-945`) writes no cell at all for the `anchor` its dedupe key discriminates on, so an anchor-differing pair emits identically. The row and D-045 finding 4 both state it that way now. `cairn/milestones/archive/M80-norms-audit-report-schema.md:24` carries the original wording and is left as written — it is history (IP4), not a live claim.
 - 2026-08-20: AC5 amended at a mini gate (substantive; Jeff chose the amendment over rewording the comment or dropping the criterion). As written it counted `expect_` anywhere in the file, so the new comment naming `expect_setequal()` — the record of what was wrong — read as an added assertion: 14 vs 13, while assertions were 12 vs 12. The procedure now excludes comment lines and both numbers are recorded.
 - 2026-08-20: AC5 amendment — the fresh-context [O] reader (reduced mode, internal tier) returned a second finding against the wording I proposed: the headline "the milestone subtracts rather than adds on the test surface" quantified over the whole test surface, which no `expect_` count enumerates (assertions can be added in helpers, in loops, or in files this branch does not touch, while the token count falls). The headline is narrowed to what the count settles. The same overclaim was in the pre-gate AC5 and round 2 of the plan-time audit passed it.
 - 2026-08-20: AC5 amendment — narrowed wording re-entered the reader once, per the one-fix rule: clean on both questions.
