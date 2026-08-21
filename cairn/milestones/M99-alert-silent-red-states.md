@@ -44,7 +44,7 @@ recording what the widening does not establish.
 
 ## Acceptance criteria
 
-- [ ] AC1: the job's `if:` no longer tests a single conclusion value — its
+- [x] AC1: the job's `if:` no longer tests a single conclusion value — its
       conclusion clause is a negated membership test whose operand list is
       exactly the committed benign list. `Rscript tools/check-master-red-alert.R`
       compares the whole whitespace-collapsed expression against its
@@ -52,19 +52,19 @@ recording what the widening does not establish.
       conclusion clause, the `event == 'push'` conjunct, and the
       default-branch conjunct are each mutated in turn (one mutant per run,
       three runs, each restored by copy, the workflow re-hashed after each).
-- [ ] AC2: the benign list's operands are exactly the five conclusions
+- [x] AC2: the benign list's operands are exactly the five conclusions
       `success`, `cancelled`, `skipped`, `neutral`, `stale`, so `failure`,
       `timed_out` and `startup_failure` are each admitted by exclusion. AC1's
       whole-expression comparison is the pin. (The per-value reasons are
       workflow prose promised by no criterion — `yaml::read_yaml` discards
       comments, so nothing could enumerate them.)
-- [ ] AC3: the workflow's header comment states, as a dated observation, what
+- [x] AC3: the workflow's header comment states, as a dated observation, what
       this widening does not establish — that a run which never starts may
       deliver no `workflow_run` event at all, and that
       `on.workflow_run.workflows` matches a workflow's declared `name:`, which
       an unparseable workflow file cannot declare — and points at the ROADMAP
       candidate row carrying that open question.
-- [ ] AC4: `Rscript tools/check-master-red-alert.R` and
+- [x] AC4: `Rscript tools/check-master-red-alert.R` and
       `Rscript tools/master-red-alert-dryrun.R` both exit clean unchanged
       (`cairn/PROFILE.md` consistency-gate), and the profile's `verify` slot is
       clean.
@@ -115,3 +115,90 @@ recording what the widening does not establish.
 ## Decisions
 
 ## Review
+
+**PR:** https://github.com/jmgirard/circumplex/pull/128 · reviewed 2026-08-21
+
+### Acceptance-criteria evidence (fresh, by command)
+
+- **AC1** — `Rscript tools/check-master-red-alert.R` exits 0 against the branch
+  workflow. Mutation battery, one mutant per invocation over the committed file,
+  restored by copy and re-hashed after each: dropping the `stale` operand,
+  dropping the `!`, `push` -> `pull_request`, and the default-branch comparand ->
+  a literal each exited 1, and each was caught by the `if:` mismatch itself
+  rather than a neighbouring check. Unmutated control exits 0; final hash matches
+  pristine. **Recorded limit ([O] diff-bug F5/F6, accepted):** the pin is a
+  whole-string `identical()`, so any single-character edit reddens it, including
+  semantically identical ones (operand reordering, spacing). The mutants
+  therefore establish that the equality check is wired and aimed, not that the
+  expression's *semantics* are fenced; nothing in the repo evaluates a GitHub
+  expression against a synthetic conclusion. AC1's operand-list clause is
+  separately evidenced under AC2 by parsing, which does not depend on the
+  string compare.
+- **AC2** — the gate's operand array was parsed out of the workflow with
+  `yaml::read_yaml` + `jsonlite::fromJSON` (not grepped): exactly
+  `success | cancelled | skipped | neutral | stale`, count 5, set-identical to
+  the committed five. Membership probe on the values that matter: `failure`,
+  `timed_out`, `startup_failure` and `action_required` all fall outside the list
+  and therefore alert.
+- **AC3** — the header note reads at `.github/workflows/master-red-alert.yaml`,
+  dated `observed 2026-08-21`, naming both halves of the doubt (the event may
+  never be delivered; `workflows:` matches a `name:` an unparseable file cannot
+  declare) and pointing at the ROADMAP row, which carries the open remainder
+  under an explicit "Open remainder, scoped out of M99 at that gate" paragraph.
+- **AC4** — both alert audits exit 0. `devtools::test()`:
+  FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, exit 0 (the five warnings are lavaan
+  marker-item notices in `test-ssm_sem.R`, present before this branch, which
+  touches no R package code).
+
+### Consistency gate
+
+- `cairn_validate` exit 0, 47 advisories (the pre-existing M7 work-log WARNs).
+  Adding the F1 candidate row pushed `ROADMAP.md` to 60 lines and failed the
+  weight cap; remedied per the tracking-rules remedy by pruning the fully
+  graduated `.github/CONTRIBUTING.md` tombstone (history stands in the M97
+  archive). Now 59 lines / 21,630 bytes.
+- `cairn_impact` not run: no `DESIGN.md` principle changed (Principles touched: —).
+- `document()` under `cli.width = 500`: no working-tree diff, zero lines matching
+  `resolve link`.
+- Master watches: newest push-run *verdict* on the default branch is `success`
+  for both `R-CMD-check.yaml` (32518464682) and `test-coverage.yaml`
+  (32518464711), at M98's merge. The M99 plan commit is docs-only and produced
+  no run.
+- `NEWS.md`: no entry owed — M99 changes CI tooling only and has no user-visible
+  surface. No new top-level files, so no `.Rbuildignore` entry owed.
+- Master-red alert audits: both exit 0 (also AC4).
+
+### Independent review — three fresh-context lenses
+
+**[S] prior-PR-comments — no findings.** Nothing in the diff reintroduces or
+contradicts a point a past review raised on these files; M96's three fixed
+defect classes are untouched, and M95's no-verdict rule is corroborated rather
+than contradicted by placing `cancelled` in the benign list. The GitHub inline
+comment probe returned empty, matching M91's measurement that this repo's review
+record lives in the archives.
+
+**[S] blame-history — no regression.** M96's descoped source scanner is not
+reinstated; the whole-expression comparison discipline is preserved; the
+`concurrency` block is untouched; the prose edits delete no load-bearing
+warning. One disclosure-level flag: `action_required` now alerts, which the
+workflow comment states explicitly.
+
+**[O] diff-bug — 12 items, ranked; dispositions below.** The lens independently
+re-ran both audits (exit 0) and confirmed the `if:` parses to the expected
+single scalar.
+
+| # | Finding | Disposition |
+|---|---|---|
+| F2 | The audit never pinned `on.workflow_run.types`; under admission-by-exclusion a `requested`/`in_progress` payload carries a null conclusion, which is outside the benign list, so the alert would fire on every run — a failure mode this widening created | **Fixed at the gate.** Assertion added; mutation-proved by admitting `requested` and by dropping the block, both caught by the new assertion itself, control green, file byte-restored |
+| F1 | The alert and `PROFILE.md`'s master-watch now classify the same run oppositely — a `timed_out` master run opens an issue while the watch walks past it and can answer green at the next gate | **Candidate row** (maintainer's call): widening the watch's verdict set changes the gate procedure every future milestone runs |
+| F3 | Nothing local validates a GitHub expression; the only guard is a string equality in an R script | **Rejected** (maintainer's call): the expression was confirmed correct and parses; `actionlint` would be a new dependency needing its own gate |
+| F4 | The `skipped` justification was factually wrong — `paths-ignore` produces no run at all, hence no event, not this conclusion | **Fixed at the gate** (comment corrected; the exclusion itself was already right) |
+| F8 | The T2 work log's "four live sites" reads as an exhaustive sweep and is not one; five further `failure`-specific phrases survive | **Fixed at the gate** — two stale phrases retitled, and a correcting work-log line appended (history is append-only) |
+| F5, F6 | The mutation battery proves the string compare is wired, not the expression's semantics; "operand list is exactly the committed benign list" overstates what a string compare establishes (it pins order and spacing too) | **Accepted and recorded** verbatim under AC1 above rather than left implicit |
+| F7 | The changed label description never lands if the `master-red` label already exists | **Closed by measurement**: `gh label list` shows the label absent — master has not gone red since M96 shipped — so the new description will land on first use |
+| F10 | An uncommitted working-tree edit contradicted T5's "tree clean" | **Resolved**: the review skill's PR-link edit, committed as the mid-gate checkpoint |
+| F9, F11, F12 | Dedupe-per-workflow is correct as designed and the body reads correctly for any conclusion; no benign value is actually a red state and no newly-alerting value is a chronic false-alarm source on this repo (`cancelled` is routine here via `cancel-in-progress` and is correctly excluded; `fail-fast: false` means a failing leg yields run-level `failure`); AC3's pointer resolves | **Verifications, not defects** — logged as corroboration |
+
+No finding demonstrated an acceptance criterion failing, so nothing met the
+return floor.
+
