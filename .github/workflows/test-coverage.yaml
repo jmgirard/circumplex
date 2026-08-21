@@ -22,9 +22,11 @@
 # the standing distinct signal is the instrumentation, not the vignette gap.
 #
 # That signal now lands only here, on master, after the merge. It is not
-# unwatched: PROFILE.md's consistency-gate requires the most recent completed
-# push run of this workflow to have concluded success, so a red here fails the
-# NEXT milestone's review gate — never the one that introduced it.
+# unwatched: cairn/PROFILE.md's consistency-gate master watch reads this
+# workflow's newest verdict-reaching push run on master. How a conclusion is
+# classified is stated once, there, and deliberately not restated here (cairn
+# M100) — a third copy is what M100 removed. A red here therefore fails the
+# NEXT milestone's review gate, never the one that introduced it.
 on:
   push:
     branches: [main, master]

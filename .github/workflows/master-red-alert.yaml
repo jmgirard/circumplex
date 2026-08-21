@@ -3,9 +3,13 @@
 # widened by M99 — see the job's `if:` for the list that stays quiet).
 #
 # The benign list in the job's `if:` below has a second reader: `cairn/PROFILE.md`'s
-# consistency-gate master watch derives its own NO-verdict set from it rather than
-# restating it (cairn M100), so widening that list also widens what the review gate
-# walks past. Change the two together, or deliberately.
+# consistency-gate master watch derives its own NO-verdict set from it — this list
+# minus `success` — rather than restating it (cairn M100). Any edit to the list moves
+# the review gate too, in whichever direction: adding a conclusion makes the gate walk
+# past it, and removing one makes the gate call it red. `success` in particular is
+# load-bearing for that derivation: drop it from the array and PROFILE.md loses the
+# term it subtracts, so the gate would read a passing run as no verdict. Change the
+# two together, or deliberately.
 #
 # Why a separate workflow rather than a failure step inside each watched
 # workflow: the issue logic lives in one place, and this workflow cannot
