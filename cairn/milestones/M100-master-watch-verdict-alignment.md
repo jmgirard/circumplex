@@ -1,6 +1,6 @@
 # M100: Align the review gate's master watch with the alert's verdict set
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -97,6 +97,7 @@ at this plan gate; the pointer removes the drift surface instead.
 - 2026-08-21: T3 — live watch run, both workflows, `--branch=master --event=push`: newest is `in_progress` with a null conclusion on each (32528271421, 32528271428), then `success` (32518464682, 32518464711), then `success`, then `cancelled` (32227173810, 32227173824). Both watches answer GREEN on the newest verdict-reaching run. A still-running run has reached no conclusion, so "every other conclusion is red" does not quantify over it — the alert side pins `types: [completed]` for the same reason (M99 review F2). Making that explicit in the bullet was drafted and dropped: it did not fit 13 lines, and `PROFILE.md` is at the 119-of-120 cap; the phrase "reaching a *verdict*" already excludes it. Recorded here rather than contorting the file.
 - 2026-08-21: T3 — AC6 evidence: `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0 (5/5 fixtures ok) against the workflow carrying T2's header comment, so no alert behaviour moved.
 - 2026-08-21: AC1 reading recorded for review — the criterion asks for a rule by exclusion UNDER WHICH `timed_out`/`startup_failure`/`action_required` are gate failures, not for those literals to appear in `PROFILE.md`. Naming them there would also have put a second copy of the conclusion vocabulary in the file, which is what AC2 forbids.
+- 2026-08-21: all tasks done; status → review. No R code, roxygen, or test file touched, so the profile's `verify` slot is vacuous on this diff; `devtools::test()` run anyway for a fresh number — FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, the same 8395 M99 recorded, the 5 warnings lavaan's and pre-existing.
 
 ## Decisions
 
