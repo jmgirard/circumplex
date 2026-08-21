@@ -35,24 +35,24 @@ at this plan gate; the pointer removes the drift surface instead.
 
 ## Acceptance criteria
 
-- [ ] AC1: `PROFILE.md`'s master-watch bullets state a verdict rule by
+- [x] AC1: `PROFILE.md`'s master-watch bullets state a verdict rule by
       EXCLUSION under which a push run of a watched workflow on the default
       branch concluding `timed_out`, `startup_failure`, `action_required`, or
       any conclusion not named benign, is a gate failure — while `cancelled`,
       `skipped`, `neutral` and `stale` are no verdict.
-- [ ] AC2: the benign set is not independently restated in `PROFILE.md`; the
+- [x] AC2: the benign set is not independently restated in `PROFILE.md`; the
       bullets name `.github/workflows/master-red-alert.yaml`'s job `if:` as its
       authority, and reading `PROFILE.md` end to end finds no second copy.
-- [ ] AC3: the bullets distinguish "no run exists at all" — carved out as no
+- [x] AC3: the bullets distinguish "no run exists at all" — carved out as no
       verdict for the coverage watch only, per `paths-ignore` (M95), a gate
       failure for the `R-CMD-check.yaml` watch (M93) — from "a run concluded
       outside the verdict set", and say which watch each rule binds.
-- [ ] AC4: the M96 stale-query cross-check applies to every red verdict, not
+- [x] AC4: the M96 stale-query cross-check applies to every red verdict, not
       only `failure`; its sentence names no conclusion that would restrict it.
-- [ ] AC5: `cairn/PROFILE.md` and `.github/workflows/master-red-alert.yaml`
+- [x] AC5: `cairn/PROFILE.md` and `.github/workflows/master-red-alert.yaml`
       are each dispositioned in the work log as updated by this milestone or
       left unchanged with a stated reason.
-- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit clean, unchanged by this
       milestone (no workflow behaviour moved).
 
@@ -154,3 +154,14 @@ at this plan gate; the pointer removes the drift surface instead.
 
 All six acceptance-criterion checkboxes unticked: the repair changes `PROFILE.md` and re-runs the sweep, so AC1/AC2/AC4/AC5's evidence no longer describes the artifact and must be re-earned at re-review.
 - 2026-08-21: REVIEW RETURN 1 (defect) — status → `in-progress`. What failed: (F1) `PROFILE.md`'s rule makes a still-running run a gate failure, because the bullet defines "verdict" solely as the complement of the benign set, so a null conclusion is red by its own arithmetic — the M95 false-fail shape, and T3's work-log claim that "reaching a *verdict*" already excludes it is wrong; (F2) `.github/workflows/test-coverage.yaml:25-27` still restates the pre-M100 rule, a third copy of the classification rule left standing by the milestone that exists to remove it; (F3) the T2 work-log line claims a nine-literal sweep where seven ran — `success` and `failure` were never grepped, which is why F2 survived. No acceptance criterion failed as written; returned at the maintainer's judgement under the load-bearing-defect limb of the return floor.
+
+**Re-review after return 1 — 2026-08-21.** PR #129, branch re-pushed at `bcfc2d39`.
+Master had not moved since the branch was cut (`git log HEAD..origin/master` empty),
+so no merge or re-run was owed. Evidence below is fresh against the repaired text;
+the first pass's evidence above described the pre-repair artifact and does not carry.
+- **AC1 met.** `cairn/PROFILE.md:32-38` now partitions in one pass: "read the newest push run on the default branch reaching a *verdict*, not the newest completed. A run with no conclusion yet has reached no verdict — skip it, as the alert's `types: [completed]` does. A conclusion in `.github/workflows/master-red-alert.yaml`'s job `if:` benign list minus `success` is no verdict either — one copy, so gate and alert cannot split a run (M100). Every other conclusion IS a verdict, and only `success` is green: the rest red BY EXCLUSION, later additions included (M99)." Chain for `timed_out`: it is a conclusion (so not the no-conclusion-yet case), it is absent from the benign list, therefore a verdict, therefore not `success`, therefore red — and `R-CMD-check.yaml:` red is a gate failure, `test-coverage.yaml:` red fails. Identical for `startup_failure`, `action_required`, and any conclusion GitHub adds. `cancelled`/`skipped`/`neutral`/`stale` are the benign list minus `success`, so no verdict. The rule reaches each verdict by one three-way partition rather than by two sentences narrowing each other, which is what F1 and F5 faulted.
+- **AC2 met.** `grep -n "cancelled\|skipped\|neutral\|stale\|timed_out\|startup_failure\|action_required" cairn/PROFILE.md` returns one line, `:44` — the word inside "ten-day-stale", not a conclusion literal. `success` appears on two lines (`:36` as the subtracted term, `:37` as the sole green), neither a restatement of the benign set. The pointer names `.github/workflows/master-red-alert.yaml`'s job `if:`, read at review as `!contains(fromJSON('["success","cancelled","skipped","neutral","stale"]'), github.event.workflow_run.conclusion)`. The nine-literal sweep re-run this pass found no third copy: `.github/workflows/test-coverage.yaml:24-29`, the copy F2 caught, now points at `PROFILE.md` instead of restating it.
+- **AC3 met.** `PROFILE.md:38-40`: "`R-CMD-check.yaml`: red OR ABSENT is a gate failure (M93). `test-coverage.yaml`: red fails, an ABSENT run is no verdict there alone (`paths-ignore` — say so; M95)." Each absent-run rule names its own watch and its own milestone; "there alone" fences the carve-out to the coverage watch. Distinct from the conclusion-outside-the-verdict-set case, which the preceding two sentences handle separately.
+- **AC4 met.** `PROFILE.md:43-44`: "Cross-check any red, whatever its conclusion: on 2026-08-18 `--event` surfaced a ten-day-stale red the unfiltered query called green (M96)." No conclusion is named; "whatever its conclusion" states the widening. The M96 example was compressed to fit the cap but keeps both the date and the mechanism (the `--event` filter).
+- **AC5 met.** Both files dispositioned in the work log, and both dispositions re-stated for the repair pass: `cairn/PROFILE.md` UPDATED (T1 and the return-1 T1 rewrite), `.github/workflows/master-red-alert.yaml` UPDATED (T2's header comment, reworded again for F7/F8). The work log's own accuracy was the subject of F3 and F6; both are corrected by appended lines that name what the earlier lines overstated, per the append-never-edit rule.
+- **AC6 met.** `Rscript tools/check-master-red-alert.R` exit 0; `Rscript tools/master-red-alert-dryrun.R` exit 0 (5/5 fixtures ok), both re-run this pass. "Unchanged by this milestone" verified mechanically: `git diff master...HEAD` over each of `.github/workflows/master-red-alert.yaml` and `.github/workflows/test-coverage.yaml`, filtered to non-comment added/removed lines, is empty — every workflow change on this branch is comment text.
