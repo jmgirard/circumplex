@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M99: Alert on the red states the gate ignores
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -93,7 +93,7 @@ recording what the widening does not establish.
 - [x] T4: write the header's limitation note as a dated observation, pointing
       at the never-started reachability remainder the M96-review candidate row
       keeps open.
-- [ ] T5: run both alert audits and the `verify` slot; check `git status` clean
+- [x] T5: run both alert audits and the `verify` slot; check `git status` clean
       before recording the gate.
 
 ## Work log
@@ -106,6 +106,7 @@ recording what the widening does not establish.
 - 2026-08-21: T2 — gate rewritten to `!contains(fromJSON(...), ...)` over the five benign conclusions, with a per-value reason above it; both alert audits exit 0. Swept the claim the widening falsified at four live sites (the workflow header, the `gh label create --description` text, and both audit scripts' headers, one of which also carried an M96-stale fixture count now stated as a derivation); the M96 archive and the M93 ROADMAP tombstone are history and stand.
 - 2026-08-21: T3 — mutation battery, one mutant per invocation over the committed file, restored by copy and re-hashed after each: dropping the `stale` operand, dropping the `!` from the membership test, `push` -> `pull_request`, and the default-branch comparand -> a literal `master` each made the audit exit 1, and each with the `if:` mismatch problem rather than some other check. Unmutated control exits 0; final hash matches pristine, tree clean.
 - 2026-08-21: T4 — limitation note written into the workflow header as a dated observation (2026-08-21), naming both halves of the doubt (the event may never be delivered; the `workflows:` filter matches a `name:` an unparseable file cannot declare) and pointing at the candidate row that keeps it open. Both audits still exit 0.
+- 2026-08-21: T5 — `devtools::test()` clean: FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, exit 0 (the five warnings are lavaan marker-item notices in test-ssm_sem.R, present before this branch, which touches no R code). Both alert audits exit 0; tree clean; branch diff is five files. Status -> review.
 - 2026-08-21: criteria audit (reduced mode, internal tier) returned findings on two of five drafted criteria — AC1 quantified over a conclusion set no named procedure enumerates, AC2 named the YAML audit as pin for comment prose the parser discards. Both narrowed at the gate; two criteria dropped by the dry-run decision above.
 
 ## Decisions
