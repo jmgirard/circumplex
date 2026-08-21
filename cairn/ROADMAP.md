@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
 | M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
 | M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
-| M100 | Align the review gate's master watch with the alert's verdict set | review | — | normal | milestones/M100-master-watch-verdict-alignment.md |
+| M100 | Align the review gate's master watch with the alert's verdict set | in-progress | — | normal | milestones/M100-master-watch-verdict-alignment.md |
 
 ## Candidates
 

@@ -1,6 +1,6 @@
 # M100: Align the review gate's master watch with the alert's verdict set
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -35,24 +35,24 @@ at this plan gate; the pointer removes the drift surface instead.
 
 ## Acceptance criteria
 
-- [x] AC1: `PROFILE.md`'s master-watch bullets state a verdict rule by
+- [ ] AC1: `PROFILE.md`'s master-watch bullets state a verdict rule by
       EXCLUSION under which a push run of a watched workflow on the default
       branch concluding `timed_out`, `startup_failure`, `action_required`, or
       any conclusion not named benign, is a gate failure — while `cancelled`,
       `skipped`, `neutral` and `stale` are no verdict.
-- [x] AC2: the benign set is not independently restated in `PROFILE.md`; the
+- [ ] AC2: the benign set is not independently restated in `PROFILE.md`; the
       bullets name `.github/workflows/master-red-alert.yaml`'s job `if:` as its
       authority, and reading `PROFILE.md` end to end finds no second copy.
-- [x] AC3: the bullets distinguish "no run exists at all" — carved out as no
+- [ ] AC3: the bullets distinguish "no run exists at all" — carved out as no
       verdict for the coverage watch only, per `paths-ignore` (M95), a gate
       failure for the `R-CMD-check.yaml` watch (M93) — from "a run concluded
       outside the verdict set", and say which watch each rule binds.
-- [x] AC4: the M96 stale-query cross-check applies to every red verdict, not
+- [ ] AC4: the M96 stale-query cross-check applies to every red verdict, not
       only `failure`; its sentence names no conclusion that would restrict it.
-- [x] AC5: `cairn/PROFILE.md` and `.github/workflows/master-red-alert.yaml`
+- [ ] AC5: `cairn/PROFILE.md` and `.github/workflows/master-red-alert.yaml`
       are each dispositioned in the work log as updated by this milestone or
       left unchanged with a stated reason.
-- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit clean, unchanged by this
       milestone (no workflow behaviour moved).
 
@@ -112,6 +112,22 @@ at this plan gate; the pointer removes the drift surface instead.
 - **F7: AC2's "no second copy" holds only because `success` is not counted as a member.** `success` is in the workflow's benign list and PROFILE restates it as the sole green; the pointer's correctness silently depends on it staying in the `if:` array.
 - **F8: the added workflow comment is one-directional.** It says widening the benign list widens what the gate walks past; narrowing it equally narrows the gate's no-verdict set. Every claim it makes is true — an omission, not an error.
 - **F9: `LESSONS.md` "verdict" is now a pointer-shaped term** whose definition lives only in `PROFILE.md`; and the file has 5 bytes of headroom (19,995 of 20,000) while `ROADMAP.md:4`'s stamp still records 19,999 — the stamp is rewritten at merge, so a note rather than a defect.
+
+
+**Triage (2026-08-21, maintainer's call at the approval gate): RETURNED.** Status → `in-progress`; review stops here. Dispositions, all nine surfaced and none dropped:
+
+- **F1 — fix now, and the reason for the return.** `PROFILE.md` must exclude a null/`in_progress` conclusion explicitly rather than leave it to the benign-complement arithmetic. A 13-line phrasing carrying the exclusion was verified at review to fit the <120-line cap.
+- **F2 — fix now.** `.github/workflows/test-coverage.yaml:25-27` rewritten to point at `PROFILE.md`'s rule rather than restate a stale copy of it.
+- **F3 — fix now.** Re-run the sweep over all nine literals and correct the T2 work-log line to state the procedure actually executed.
+- **F5 — fix now, with F1.** The two-sentence narrowing is repaired by the same rewrite.
+- **F6 — fix now, with F3.** T1's work-log line corrected to name all three dropped clauses.
+- **F4 — fix in the same pass if the rewrite frees the characters; otherwise reject with reason** (the fact survives in full at `test-coverage.yaml:16-22`).
+- **F7 — fix now, cheaply.** A line in the alert workflow noting `success`'s membership is load-bearing for `PROFILE.md`'s derivation.
+- **F8 — fix now, cheaply.** The comment reworded so it binds any change to the list, not only a widening.
+- **F9 — no action on the term** (LESSONS lines are terse by design); the byte-headroom note is carried into the next hygiene stamp, which is rewritten at merge anyway.
+
+All six acceptance-criterion checkboxes unticked: the repair changes `PROFILE.md` and re-runs the sweep, so AC1/AC2/AC4/AC5's evidence no longer describes the artifact and must be re-earned at re-review.
+- 2026-08-21: REVIEW RETURN 1 (defect) — status → `in-progress`. What failed: (F1) `PROFILE.md`'s rule makes a still-running run a gate failure, because the bullet defines "verdict" solely as the complement of the benign set, so a null conclusion is red by its own arithmetic — the M95 false-fail shape, and T3's work-log claim that "reaching a *verdict*" already excludes it is wrong; (F2) `.github/workflows/test-coverage.yaml:25-27` still restates the pre-M100 rule, a third copy of the classification rule left standing by the milestone that exists to remove it; (F3) the T2 work-log line claims a nine-literal sweep where seven ran — `success` and `failure` were never grepped, which is why F2 survived. No acceptance criterion failed as written; returned at the maintainer's judgement under the load-bearing-defect limb of the return floor.
 
 ## Decisions
 
