@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-21 (M98 merge: all 16 `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs, IP4 history. ROADMAP 20,275 bytes (M93's terminal row retired to keep retention at 5; its archive stands); LESSONS 19,996 of 20,000 in 39 lines, still full — **M98's lesson is owed and blocked on a retirement**: `sort()` drops NA names under its `na.last = NA` default, so a sorted comparison replacing a set one accepted a shape the old one rejected, and a regex constant interpolated into an anchored pattern must keep its own `(...)`; both belong on the M60-family line. Both GitHub inboxes empty; tracking matches git at the M98 squash.)_
+_Last hygiene check: 2026-08-21 (M98 merge + LESSONS retirement: all 16 `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs, IP4 history. ROADMAP 20,500 bytes (M93's terminal row retired to keep retention at 5; its archive stands). LESSONS 19,992 of 20,000 in 39 lines: M98's lesson landed on the M60-family line (a replacement guard can be weaker — `sort()` drops NA names under `na.last = NA`; a regex constant in an anchored pattern must keep its own `(...)`), paid for by retiring two clauses now owned elsewhere — the prior-PR-comments no-op measurement, which the review skill's own existence probe re-derives every run, and the `Rplots.pdf` action, owned by `.Rbuildignore:24` — plus compressing two M60-family clauses. Both GitHub inboxes empty; tracking matches git at the M98 squash.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
