@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-19 (status audit, no changes: all 16 `cairn_validate` checks pass and every advisory is `OK` except M7's 47 pre-M28 multi-line work-log WARNs, which are IP4 history; both GitHub inboxes empty; tracking matches git at `27b826aa`. LESSONS sits at 19,996 of 20,000 bytes, so the next lesson still needs a retirement first.)_
+_Last hygiene check: 2026-08-21 (M98 merge: all 16 `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs, IP4 history. ROADMAP 20,275 bytes (M93's terminal row retired to keep retention at 5; its archive stands); LESSONS 19,996 of 20,000 in 39 lines, still full — **M98's lesson is owed and blocked on a retirement**: `sort()` drops NA names under its `na.last = NA` default, so a sorted comparison replacing a set one accepted a shape the old one rejected, and a regex constant interpolated into an anchored pattern must keep its own `(...)`; both belong on the M60-family line. Both GitHub inboxes empty; tracking matches git at the M98 squash.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M93 | Close the CI platform gate | done | — | normal | milestones/archive/M93-ci-platform-gate.md |
 | M94 | Print the fired-marker list on the bootstrap path | done | — | normal | milestones/archive/M94-bootstrap-marker-list.md |
 | M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
 | M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
-| M98 | Close the parked norms-audit findings by subtraction | review | — | normal | milestones/M98-norms-audit-parked-findings.md |
+| M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
 
 ## Candidates
 
