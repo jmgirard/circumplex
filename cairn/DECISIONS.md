@@ -1521,7 +1521,15 @@ simplifying or deleting first.
    committed `NORMS_AUDIT_MANIFEST` constant. Splitting the constant-only halves
    out would run them on CRAN, but their verdict is fixed at commit time and
    cannot vary by machine, so the run adds coverage optics and no detection.
-   Declined. *Reopens:* the manifest ceasing to be a committed constant —
+   Declined. This is weighed against the standing lesson, not taken in ignorance
+   of it: "an always-skipping `skip_if_not(file.exists(...))` is the same trap —
+   split so a runtime half still runs on CRAN (M69, M70)" was written where the
+   skipped guard exercised computation whose result could vary by environment,
+   so a CRAN run could catch what a dev run had not. Both halves here read a
+   committed constant table, whose duplicate-freeness and field set are fixed at
+   commit time and identical on every machine, so a CRAN run of them cannot fail
+   where the dev run passed. The lesson's shape does not reach this case.
+   *Reopens:* the manifest ceasing to be a committed constant —
    generated at test time, or derived from a source `R CMD check` can also see.
 
 4. **M80 F1 (decline).** The `note-only-sample` emitter keys on the note row's

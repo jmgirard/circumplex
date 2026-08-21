@@ -244,7 +244,9 @@ package does for its users.
   still runs on CRAN (M69, M70)", and D-045 declines without citing it. The
   distinction is real — M69/M70's skipped guard exercised computation that could
   vary by environment, while these two read a committed constant — but it is
-  worth the maintainer's explicit sign-off rather than silent drift. (ii) M80
+  worth the maintainer's explicit sign-off rather than silent drift.
+  **Signed off at the approval gate; D-045 finding 3 now cites the lesson and
+  states why its shape does not reach this case.** (ii) M80
   F1's decline rests on "no committed note has the shape today", the
   inference-from-current-data shape the M86 lesson warns about; mitigated by
   D-045 recording a reopening trigger, and the blast radius is a maintainer's
