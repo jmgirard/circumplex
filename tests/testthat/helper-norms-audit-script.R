@@ -295,7 +295,30 @@ norms_audit_key_regex <- function(key) {
 # `is.data.frame(batch)` (measured 2026-08-14). A fixture failing BEFORE its
 # guard, with an unrelated message ending in `....`, would then be reported as
 # coverage for a site never reached -- what this file exists to prevent.
-NORMS_AUDIT_VERDICT <- "(is not TRUE|are not all TRUE)"
+#
+# One verdict, not two. R spells the verdict "are not all TRUE" where the failing
+# condition is a vector, and this constant carried that alternative until M98 --
+# unreachable from every site the script raises, all three of its positional
+# `stopifnot()` conditions being scalar, and so exercised by no test (M88 review,
+# F4). It is deleted rather than tested, because its absence fails CLOSED: a
+# vectorized condition added to `data-raw/audit-norms.R` raises a plural verdict
+# this pattern no longer strips, the stem keeps the verdict text, `startsWith()`
+# on the key fails, and `audit_key_matches()` refuses the site's own genuine
+# message rather than accepting a stranger's (measured 2026-08-20; the message is
+# `c(TRUE, FALSE) are not all TRUE` and the refusal is in M98's work log). What
+# that costs is a confusing red for whoever adds the first vectorized guard --
+# the fix is to restore the alternative here, which this comment is the record
+# for.
+#
+# The parentheses stay, holding one alternative, so that restoring the second
+# one is an edit INSIDE them. Both readers below interpolate this value into a
+# larger pattern anchored with `$`, and an ungrouped `a|b` would bind the
+# alternation across the whole pattern rather than the verdict: measured, a
+# plain (untruncated) plural message then matches the TRUNCATION detector,
+# which waives the stem floor -- the 2026-08-14 incident recorded above,
+# reintroduced by the obvious spelling of the fix this comment recommends
+# (M98 review, F2).
+NORMS_AUDIT_VERDICT <- "(is not TRUE)"
 
 norms_audit_stopifnot_stem <- function(msg) {
   truncated <- grepl(

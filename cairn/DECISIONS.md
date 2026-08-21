@@ -1479,3 +1479,80 @@ Consequences name: a raw-arm-only refusal now NAs `naive` alone, carried
 silently in `naive_reason`/`details$naive_reason`, while `corrected` and
 `fiml_ratio` compute; the cov2cor arm's refusals remain unit refusals, so the
 two surfaces' user-facing refusals still agree exactly._
+
+### D-045 (2026-08-20): the four parked norms-audit findings are closed by subtraction — two repairs that remove, two declines (M98)
+
+**Context:** Four findings sat parked against the norms-audit apparatus, three
+from the M88 review and one from M80's. All four are defects *in the machinery*
+around `data-raw/audit-norms.R`, a `.Rbuildignore`d developer script that ships
+to nobody; none is a wrong audited value. D-042 retired ~1500 lines of that
+machinery for a manifest and named what does **not** reopen it: "a wish for
+symmetry with the pre-M87 machinery, or a review preferring more assertions to
+fewer." Three of these four are that wish in specific form. The plan gate also
+hit the checker-regress shape — a scope hardening a checker this repo's own
+earlier milestones shipped, over repo-internal artifacts — whose rule is to put
+simplifying or deleting first.
+
+**Decision:** Close all four so the apparatus ends smaller.
+
+1. **F12 (repair, net zero).** `expect_setequal(names(s), ...)` in
+   `test-norms-audit-manifest.R` read membership, so a fourth field whose name
+   *repeated* one of the three passed. It is now
+   `expect_identical(sort(names(s)), c("binding", "key", "kind"))` — sorted, not
+   order-pinned, so a harmless reordering of the walk's own `list()` cannot
+   redden a test about the field set. *Reopens:* nothing; this is a repair, and
+   a duplicate-named fourth field now reddens (measured, M98 T1).
+
+2. **F4 (deletion, not a test).** `NORMS_AUDIT_VERDICT`'s `are not all TRUE`
+   alternative is unreachable from every site the script raises — all three of
+   its positional `stopifnot()` conditions are scalar — so no fixture could
+   exercise it without inventing one. Deleted. The deletion fails **closed**: a
+   vectorized guard added later raises a plural verdict the pattern no longer
+   strips, the stem keeps the verdict text, and `audit_key_matches()` refuses the
+   site's own genuine message (measured FALSE against R's
+   `c(TRUE, FALSE) are not all TRUE`, M98 T2). *Reopens:* a vectorized
+   `stopifnot()` condition entering `data-raw/audit-norms.R` — restore the
+   alternative, which the constant's comment records.
+
+3. **F11 (decline).** The manifest test's twin refusal and field-set assertion
+   sit behind `skip_if_not(file.exists(script))`, so they do not run under
+   `R CMD check`. Each splits into a half that reads the walk (needs
+   `data-raw/`, absent there by construction) and a half that reads only the
+   committed `NORMS_AUDIT_MANIFEST` constant. Splitting the constant-only halves
+   out would run them on CRAN, but their verdict is fixed at commit time and
+   cannot vary by machine, so the run adds coverage optics and no detection.
+   Declined. This is weighed against the standing lesson, not taken in ignorance
+   of it: "an always-skipping `skip_if_not(file.exists(...))` is the same trap —
+   split so a runtime half still runs on CRAN (M69, M70)" was written where the
+   skipped guard exercised computation whose result could vary by environment,
+   so a CRAN run could catch what a dev run had not. Both halves here read a
+   committed constant table, whose duplicate-freeness and field set are fixed at
+   commit time and identical on every machine, so a CRAN run of them cannot fail
+   where the dev run passed. The lesson's shape does not reach this case.
+   *Reopens:* the manifest ceasing to be a committed constant —
+   generated at test time, or derived from a source `R CMD check` can also see.
+
+4. **M80 F1 (decline).** The `note-only-sample` emitter keys on the note row's
+   `(sample, scale, value, anchor)` but emits no anchor cell, so two rows the key
+   correctly keeps apart would emit as two identical CSV rows, and any reader
+   deduplicating the report would drop one — the audit itself never calls
+   `unique()` on the frame, so the loss is a downstream reader's. None of the 14 committed note-only rows has
+   the shape. Both fixes — carrying `anchor` into `COVERAGE_COLUMNS`, or an
+   emit-time refusal — widen an internal checker's promise for a case that has
+   never occurred; the refusal would additionally add an abort site the manifest
+   must then carry. Declined. *Reopens:* a source note citing one sample to two
+   different tables actually arriving.
+
+**Consequences:** The apparatus loses one regex alternative and gains no
+assertion; M98's AC5 pins that the branch does not raise the `expect_` count over
+the files it touches. What is given up is stated per finding above rather than
+implied: F11 leaves two assertions unrun on CRAN, where they could not have
+failed differently anyway, and M80 F1 leaves the coverage report unable to
+distinguish an anchor-differing note-only pair — a report the maintainer reads,
+not a shipped result, and no shipped norm value is affected (IP5 untouched).
+D-042 is **applied, not superseded**: its retirement, its three surrendered
+properties and its reopening bar all stand, and this entry decides four
+individual findings under it. D-043's identity — (kind, binding, key) — is
+unchanged; finding 1 repairs the assertion that guards it. **Explicitly
+insufficient to reopen any of the four:** a later review preferring more
+assertions to fewer, which is the ground D-042 already refused.
