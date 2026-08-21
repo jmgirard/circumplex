@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m100-master-watch-verdict-alignment
+- **Branch/PR:** m100-master-watch-verdict-alignment · https://github.com/jmgirard/circumplex/pull/129
 
 ## Goal
 
@@ -35,24 +35,24 @@ at this plan gate; the pointer removes the drift surface instead.
 
 ## Acceptance criteria
 
-- [ ] AC1: `PROFILE.md`'s master-watch bullets state a verdict rule by
+- [x] AC1: `PROFILE.md`'s master-watch bullets state a verdict rule by
       EXCLUSION under which a push run of a watched workflow on the default
       branch concluding `timed_out`, `startup_failure`, `action_required`, or
       any conclusion not named benign, is a gate failure — while `cancelled`,
       `skipped`, `neutral` and `stale` are no verdict.
-- [ ] AC2: the benign set is not independently restated in `PROFILE.md`; the
+- [x] AC2: the benign set is not independently restated in `PROFILE.md`; the
       bullets name `.github/workflows/master-red-alert.yaml`'s job `if:` as its
       authority, and reading `PROFILE.md` end to end finds no second copy.
-- [ ] AC3: the bullets distinguish "no run exists at all" — carved out as no
+- [x] AC3: the bullets distinguish "no run exists at all" — carved out as no
       verdict for the coverage watch only, per `paths-ignore` (M95), a gate
       failure for the `R-CMD-check.yaml` watch (M93) — from "a run concluded
       outside the verdict set", and say which watch each rule binds.
-- [ ] AC4: the M96 stale-query cross-check applies to every red verdict, not
+- [x] AC4: the M96 stale-query cross-check applies to every red verdict, not
       only `failure`; its sentence names no conclusion that would restrict it.
-- [ ] AC5: `cairn/PROFILE.md` and `.github/workflows/master-red-alert.yaml`
+- [x] AC5: `cairn/PROFILE.md` and `.github/workflows/master-red-alert.yaml`
       are each dispositioned in the work log as updated by this milestone or
       left unchanged with a stated reason.
-- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit clean, unchanged by this
       milestone (no workflow behaviour moved).
 
@@ -98,7 +98,22 @@ at this plan gate; the pointer removes the drift surface instead.
 - 2026-08-21: T3 — AC6 evidence: `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0 (5/5 fixtures ok) against the workflow carrying T2's header comment, so no alert behaviour moved.
 - 2026-08-21: AC1 reading recorded for review — the criterion asks for a rule by exclusion UNDER WHICH `timed_out`/`startup_failure`/`action_required` are gate failures, not for those literals to appear in `PROFILE.md`. Naming them there would also have put a second copy of the conclusion vocabulary in the file, which is what AC2 forbids.
 - 2026-08-21: all tasks done; status → review. No R code, roxygen, or test file touched, so the profile's `verify` slot is vacuous on this diff; `devtools::test()` run anyway for a fresh number — FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, the same 8395 M99 recorded, the 5 warnings lavaan's and pre-existing.
+- 2026-08-21: review checkpoint (mid-flight, not a completed review) — PR #129 opened draft; all six criteria verified with fresh evidence and ticked; consistency gate green so far (`cairn_validate` 0, `document()` no diff and no resolve-link lines, `pkgdown` clean, both alert audits 0, master watches green under this milestone's own new rule). Still outstanding at this commit: local `devtools::check()` (in its testthat phase), PR CI (`ubuntu-latest`/`pkgdown` pending, `matrix` passed), and the [O] diff-bug and [S] blame-history reviewers. [S] prior-PR-comments returned no regression.
 
 ## Decisions
 
 ## Review
+
+**PR:** https://github.com/jmgirard/circumplex/pull/129 · **Reviewed:** 2026-08-21
+
+**Acceptance criteria — fresh evidence.**
+
+- **AC1 met.** `cairn/PROFILE.md:32-44` reads: "read the newest push run on the default branch reaching a *verdict*, not the newest completed. Only `success` is green; every other conclusion is red BY EXCLUSION, later additions included (M99). The NO-verdict set is not restated here: it is `.github/workflows/master-red-alert.yaml`'s job `if:` benign list minus `success`". The chain for a `timed_out` run: not in the benign list → not in the NO-verdict set → it is a conclusion → red by exclusion → "`R-CMD-check.yaml`: red OR ABSENT is a gate failure", "`test-coverage.yaml`: red fails". Same for `startup_failure`, `action_required`, and any conclusion GitHub adds. `cancelled`/`skipped`/`neutral`/`stale` are the benign list minus `success`, so no verdict. The rule reaches its conclusions by narrowing across two sentences rather than one partition — raised as F4 below and triaged there.
+- **AC2 met.** `grep -n "cancelled\|skipped\|neutral\|stale\|timed_out\|startup_failure\|action_required" cairn/PROFILE.md` returns one line, `ten-day-stale` at :44 — the word inside "ten-day-stale", not a conclusion literal. No conclusion vocabulary besides `success` appears in the file, so the benign set is nowhere restated. The pointer names `.github/workflows/master-red-alert.yaml`'s job `if:`, which exists and carries `!contains(fromJSON('["success","cancelled","skipped","neutral","stale"]'), github.event.workflow_run.conclusion)`, read from the file at review.
+- **AC3 met.** `PROFILE.md:38-40`: "`R-CMD-check.yaml`: red OR ABSENT is a gate failure (M93). `test-coverage.yaml`: red fails, an ABSENT run is no verdict there alone (`paths-ignore` — say so; M95)." Each absent-run rule is named with its own watch and its own milestone; "there alone" fences the carve-out to the coverage watch.
+- **AC4 met.** `PROFILE.md:43-44`: "Cross-check any red, whatever its conclusion: on 2026-08-18 this returned a ten-day-stale red where the same query without `--event` was green (M96)." No conclusion is named, and "whatever its conclusion" states the widening explicitly.
+- **AC5 met.** Both files dispositioned in the work log at T2: `.github/workflows/master-red-alert.yaml` UPDATED (header comment, no behaviour change), `cairn/PROFILE.md` UPDATED (T1). The sweep behind the disposition also caught `cairn/LESSONS.md:45`, outside AC5's promise and fixed anyway.
+- **AC6 met.** `Rscript tools/check-master-red-alert.R` exit 0; `Rscript tools/master-red-alert-dryrun.R` exit 0, 5/5 fixtures ok. Both re-run at review against the workflow carrying T2's comment.
+
+**Consistency gate.** `cairn_validate` exit 0, all checks passed, 47 advisories (M7's pre-M28 multi-line work-log WARNs, unrelated). `document()` at `cli.width = 500`: zero `resolve link` lines, no diff to `man/`, `NAMESPACE`, or `DESCRIPTION`. `pkgdown::check_pkgdown()`: no problems found. README untouched by the branch. No NEWS entry owed — `git diff --stat master...HEAD` over `R/ src/ man/ NAMESPACE DESCRIPTION tests/ vignettes/ inst/ data/` is empty, so there are no user-visible changes. No top-level files added. Master watches, run under this milestone's own new rule and so its first live use: newest verdict-reaching push run on master is `success` for both `R-CMD-check.yaml` (32528271421) and `test-coverage.yaml` (32528271428) — green, no cross-check owed.
+
