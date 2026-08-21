@@ -81,7 +81,7 @@ recording what the widening does not establish.
 - [x] T1: re-pin `EXPECTED_IF` in `tools/check-master-red-alert.R:74` to the
       negated-membership expression; run the audit and record in the work log
       that it fails against the unmodified workflow (the red before the fix).
-- [ ] T2: rewrite the job gate at
+- [x] T2: rewrite the job gate at
       `.github/workflows/master-red-alert.yaml:40-43` to
       `!contains(fromJSON('[...]'), github.event.workflow_run.conclusion) && …`,
       write the five per-value reasons into the comment above it, and re-run
@@ -103,6 +103,7 @@ recording what the widening does not establish.
 - 2026-08-21: plan gate chose leaving `tools/master-red-alert-dryrun.R` untouched over adding `timed_out`/`startup_failure` fixtures, because the shell body has no conclusion-dependent branch and the committed-template comparison already proves the value reaches both cells; falsified by the body gaining any branch on `ALERT_CONCLUSION`.
 - 2026-08-21: plan gate chose widening the gate plus a recorded doubt over building a scheduled sweep now, because a second detector needs its own design, audit, and dedupe against this one; falsified by a never-started run on the default branch going unalerted after this ships.
 - 2026-08-21: T1 — `EXPECTED_IF` re-pinned to the negated-membership expression. The audit now exits 1 with exactly one problem, the `if:` mismatch, quoting the pinned expression against the workflow's surviving `conclusion == 'failure'` equality: the red before the fix.
+- 2026-08-21: T2 — gate rewritten to `!contains(fromJSON(...), ...)` over the five benign conclusions, with a per-value reason above it; both alert audits exit 0. Swept the claim the widening falsified at four live sites (the workflow header, the `gh label create --description` text, and both audit scripts' headers, one of which also carried an M96-stale fixture count now stated as a derivation); the M96 archive and the M93 ROADMAP tombstone are history and stand.
 - 2026-08-21: criteria audit (reduced mode, internal tier) returned findings on two of five drafted criteria — AC1 quantified over a conclusion set no named procedure enumerates, AC2 named the YAML audit as pin for comment prose the parser discards. Both narrowed at the gate; two criteria dropped by the dry-run decision above.
 
 ## Decisions

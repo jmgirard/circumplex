@@ -1,5 +1,6 @@
-# Open a GitHub issue when a push run of the checked workflows concludes
-# failure on the default branch (cairn M96).
+# Open a GitHub issue when a push run of the checked workflows ends on the
+# default branch in any way this repo does not treat as harmless (cairn M96,
+# widened by M99 — see the job's `if:` for the list that stays quiet).
 #
 # Why a separate workflow rather than a failure step inside each watched
 # workflow: the issue logic lives in one place, and this workflow cannot
@@ -34,11 +35,31 @@ concurrency:
 
 jobs:
   alert:
-    # Three conditions, all read from the workflow_run payload: the run
-    # failed, it was a push run (pull-request runs are already visible to
-    # whoever opened the PR), and it was on the default branch.
+    # Three conditions, all read from the workflow_run payload: the run did
+    # not end in a way this repo treats as harmless, it was a push run
+    # (pull-request runs are already visible to whoever opened the PR), and it
+    # was on the default branch.
+    #
+    # The first condition admits by EXCLUSION, not by enumerating the bad
+    # endings (cairn M99). An allowlist of `failure` was what left a timed-out
+    # or never-started run silent; an allowlist of three would leave the next
+    # ending GitHub invents silent in the same way. So the five conclusions
+    # below are the whole of what stays quiet, and everything else — `failure`,
+    # `timed_out`, `startup_failure`, `action_required`, anything added later —
+    # opens an issue:
+    #   * success        — the run passed; there is nothing to say.
+    #   * cancelled      — a human or `cancel-in-progress` stopped it, so it
+    #                      never reached a verdict on the branch.
+    #   * skipped        — a `paths-ignore` or job-level condition skipped it;
+    #                      again no verdict, and not a red one.
+    #   * neutral        — GitHub's explicit "completed without a verdict".
+    #   * stale          — the run was superseded before it could report.
+    # Every one of these is "no verdict" or "green", never "master is broken".
+    # Read as an alert that would rather be noisy than silent: a spurious issue
+    # is closed in a click, an unannounced red branch is what M96 existed for.
     if: >-
-      github.event.workflow_run.conclusion == 'failure' &&
+      !contains(fromJSON('["success","cancelled","skipped","neutral","stale"]'),
+      github.event.workflow_run.conclusion) &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == github.event.repository.default_branch
     runs-on: ubuntu-latest
@@ -104,7 +125,7 @@ jobs:
           LABELS="$(gh label list --limit 200 --json name --jq '.[].name')" || LABEL_OK=0
           if [ "$LABEL_OK" = 1 ] && [[ $'\n'"$LABELS"$'\n' != *$'\n'"$LABEL"$'\n'* ]]; then
             gh label create "$LABEL" --color 'B60205' --force \
-              --description 'A push run of a watched workflow failed on the default branch' ||
+              --description 'A push run of a watched workflow ended badly on the default branch' ||
               LABEL_OK=0
           fi
 

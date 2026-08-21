@@ -3,7 +3,7 @@
 # Static audit of `.github/workflows/master-red-alert.yaml` (cairn M96).
 #
 # The alert workflow has no test suite of its own — it runs only when a push
-# run of a watched workflow fails on the default branch, which is precisely
+# run of a watched workflow ends badly on the default branch, which is precisely
 # the moment nobody wants to be debugging it. This script reads the file and
 # asserts the properties M96's acceptance criteria name, so they can be
 # re-checked on demand instead of by inspection.
@@ -264,6 +264,6 @@ if (length(problems)) {
 }
 
 cat(sprintf(
-  "%s: watches %s; fires only on a failed push run of the default branch; grants issues: write and no other write scope; carries the four workflow_run payload fields through `env:` and installs nothing.\n",
+  "%s: watches %s; fires on a push run of the default branch whose conclusion is outside the benign list the pinned `if:` names; grants issues: write and no other write scope; carries the four workflow_run payload fields through `env:` and installs nothing.\n",
   PATH, paste(WATCHED, collapse = " + ")
 ))
