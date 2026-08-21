@@ -71,8 +71,16 @@ job <- jobs[[1L]]
 # workflow, green ones and pull-request runs included. Whitespace is collapsed
 # so re-wrapping the YAML cannot break the audit, and nothing else about the
 # expression is left to interpretation.
+#
+# The conclusion clause is a negated membership test, not an equality (cairn
+# M99). Admission by exclusion is what makes the gate cover an ending nobody
+# enumerated: `timed_out`, `startup_failure`, and whatever GitHub adds next.
+# This literal is the pin for the benign list's membership — it is written
+# here independently and never derived from the workflow, so the two sides
+# cannot agree by construction.
 EXPECTED_IF <- paste(
-  "github.event.workflow_run.conclusion == 'failure' &&",
+  "!contains(fromJSON('[\"success\",\"cancelled\",\"skipped\",\"neutral\",\"stale\"]'),",
+  "github.event.workflow_run.conclusion) &&",
   "github.event.workflow_run.event == 'push' &&",
   "github.event.workflow_run.head_branch == github.event.repository.default_branch"
 )

@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M99: Alert on the red states the gate ignores
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m99-alert-silent-red-states`
 
 ## Goal
 
@@ -78,7 +78,7 @@ recording what the widening does not establish.
 
 ## Tasks
 
-- [ ] T1: re-pin `EXPECTED_IF` in `tools/check-master-red-alert.R:74` to the
+- [x] T1: re-pin `EXPECTED_IF` in `tools/check-master-red-alert.R:74` to the
       negated-membership expression; run the audit and record in the work log
       that it fails against the unmodified workflow (the red before the fix).
 - [ ] T2: rewrite the job gate at
@@ -102,6 +102,7 @@ recording what the widening does not establish.
 - 2026-08-21: plan gate chose alert-unless-benign (a negated membership test over five conclusions) over an allowlist of the three named conclusions, because an allowlist re-opens this same silence for any conclusion GitHub adds; falsified by a benign conclusion actually reaching the gate and opening a spurious issue.
 - 2026-08-21: plan gate chose leaving `tools/master-red-alert-dryrun.R` untouched over adding `timed_out`/`startup_failure` fixtures, because the shell body has no conclusion-dependent branch and the committed-template comparison already proves the value reaches both cells; falsified by the body gaining any branch on `ALERT_CONCLUSION`.
 - 2026-08-21: plan gate chose widening the gate plus a recorded doubt over building a scheduled sweep now, because a second detector needs its own design, audit, and dedupe against this one; falsified by a never-started run on the default branch going unalerted after this ships.
+- 2026-08-21: T1 — `EXPECTED_IF` re-pinned to the negated-membership expression. The audit now exits 1 with exactly one problem, the `if:` mismatch, quoting the pinned expression against the workflow's surviving `conclusion == 'failure'` equality: the red before the fix.
 - 2026-08-21: criteria audit (reduced mode, internal tier) returned findings on two of five drafted criteria — AC1 quantified over a conclusion set no named procedure enumerates, AC2 named the YAML audit as pin for comment prose the parser discards. Both narrowed at the gate; two criteria dropped by the dry-run decision above.
 
 ## Decisions

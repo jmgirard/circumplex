@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
 | M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
-| M99 | Alert on the red states the gate ignores | planned | — | normal | milestones/M99-alert-silent-red-states.md |
+| M99 | Alert on the red states the gate ignores | in-progress | — | normal | milestones/M99-alert-silent-red-states.md |
 
 ## Candidates
 
