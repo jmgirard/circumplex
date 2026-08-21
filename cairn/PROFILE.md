@@ -30,15 +30,15 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
 - New top-level files have `.Rbuildignore` entries (check `check()` NOTEs).
 - Full check at review: `Rscript -e 'devtools::check()'` clean (0 errors, 0 warnings; justify NOTEs).
 - Master watches (`gh run list --workflow=<file> --branch=<default> --event=push`): read the
-  newest push run on the default branch reaching a *verdict*, not the newest completed. A
-  run with no conclusion yet has reached no verdict — skip it, as the alert's
+  newest push run on the default branch reaching a *verdict*, not the newest completed. A run
+  with no conclusion yet has reached no verdict — skip it, as the alert's
   `types: [completed]` does. A conclusion in `.github/workflows/master-red-alert.yaml`'s job
-  `if:` benign list minus `success` is no verdict either — one copy, so gate and alert
-  cannot split a run (M100). Every other conclusion IS a verdict, and only `success` is
-  green: the rest red BY EXCLUSION, later additions included (M99). `R-CMD-check.yaml`: red
-  OR ABSENT is a gate failure (M93). `test-coverage.yaml`: red fails, an ABSENT run is no
-  verdict there alone (`paths-ignore` — say so; M95). A red is cleared via `/hotfix`, not
-  here (gate-lite skips this slot) — no deadlock with never-implement-on-default. The
+  `if:` benign list minus `success` is no verdict either — one copy, so gate and alert cannot
+  split a conclusion (M100). Every other conclusion IS a verdict, and only `success` is
+  green: the rest red BY EXCLUSION, later additions included (M99). `R-CMD-check.yaml`: red,
+  or NO RUN AT ALL, is a gate failure (M93). `test-coverage.yaml`: red fails, an ABSENT run
+  is no verdict there alone (`paths-ignore` — say so; M95). A red is cleared via `/hotfix`,
+  not here (gate-lite skips this slot) — no deadlock with never-implement-on-default. The
   coverage watch reads one milestone LATE, catching a covr-only regression at the NEXT gate;
   `covr` perturbs optimizer results (M59). Cross-check any red, whatever its conclusion: on
   2026-08-18 `--event` surfaced a ten-day-stale red the unfiltered query called green (M96).
