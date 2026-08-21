@@ -1,6 +1,6 @@
 # M100: Align the review gate's master watch with the alert's verdict set
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -108,6 +108,7 @@ at this plan gate; the pointer removes the drift surface instead.
 - 2026-08-21: return-1 repair, alert workflow (F7 + F8) — `.github/workflows/master-red-alert.yaml`'s header comment reworded. It now binds an edit in either direction ("adding a conclusion makes the gate walk past it, and removing one makes the gate call it red") and states that `success` is load-bearing for `PROFILE.md`'s derivation: drop it from the array and PROFILE loses the term it subtracts, so the gate would read a passing run as no verdict. Comment-only; both audits re-run clean.
 - 2026-08-21: return-1 repair, T3 — rewritten rule re-walked. (1) no conclusion yet → skipped by the bullet's own text, the case F1 raised. (2) `success` → the only green verdict. (3) benign non-`success` (`cancelled`/`skipped`/`neutral`/`stale`) → no verdict. (4) any other conclusion, `failure`/`timed_out`/`startup_failure`/`action_required` or later additions → red verdict. (5) absent → `R-CMD-check.yaml` a gate failure (M93), `test-coverage.yaml` no verdict, said at the gate (M95). Live query, both workflows, `--branch=master --event=push`: newest is `completed success` on each (32528271421, 32528271428) — both watches GREEN; run 32227173810/32227173824 `cancelled` two entries down still reads as no verdict. `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0 (5/5 fixtures ok) against both edited workflow files.
 - 2026-08-21: return-1 repair CHECKPOINT (not complete) — all seven fix-now findings applied and both alert audits re-run clean; `devtools::test()` was still running at this commit, so no fresh suite number is recorded here yet. The diff touches only `cairn/PROFILE.md`, two workflow comment blocks, and this file, so the profile's `verify` slot is vacuous on it; the suite is run anyway for a number, as at the pre-return checkpoint.
+- 2026-08-21: return-1 repair complete; status → review. `devtools::test()`: FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 — the same 8395 the pre-return checkpoint and M99 recorded, the 5 warnings lavaan's and pre-existing. All six acceptance criteria stay unticked: their evidence is re-earned at re-review against the rewritten `PROFILE.md` bullet and the two edited workflow comments.
 
 ## Decisions
 
