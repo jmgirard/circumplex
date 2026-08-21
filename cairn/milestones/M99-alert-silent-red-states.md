@@ -7,7 +7,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m99-alert-silent-red-states`
+- **Branch/PR:** `m99-alert-silent-red-states` / https://github.com/jmgirard/circumplex/pull/128
 
 ## Goal
 
@@ -107,6 +107,7 @@ recording what the widening does not establish.
 - 2026-08-21: T3 — mutation battery, one mutant per invocation over the committed file, restored by copy and re-hashed after each: dropping the `stale` operand, dropping the `!` from the membership test, `push` -> `pull_request`, and the default-branch comparand -> a literal `master` each made the audit exit 1, and each with the `if:` mismatch problem rather than some other check. Unmutated control exits 0; final hash matches pristine, tree clean.
 - 2026-08-21: T4 — limitation note written into the workflow header as a dated observation (2026-08-21), naming both halves of the doubt (the event may never be delivered; the `workflows:` filter matches a `name:` an unparseable file cannot declare) and pointing at the candidate row that keeps it open. Both audits still exit 0.
 - 2026-08-21: T5 — `devtools::test()` clean: FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, exit 0 (the five warnings are lavaan marker-item notices in test-ssm_sem.R, present before this branch, which touches no R code). Both alert audits exit 0; tree clean; branch diff is five files. Status -> review.
+- 2026-08-21: review opened draft PR #128; evidence gathering in progress — audits and mutation battery re-run green, `cairn_validate` exit 0, both master watches success on their newest verdict, prior-PR and blame-history lenses clean. Outstanding at this checkpoint: fresh `devtools::test()`, the [O] diff-bug lens, `document()` and `devtools::check()`.
 - 2026-08-21: criteria audit (reduced mode, internal tier) returned findings on two of five drafted criteria — AC1 quantified over a conclusion set no named procedure enumerates, AC2 named the YAML audit as pin for comment prose the parser discards. Both narrowed at the gate; two criteria dropped by the dry-run decision above.
 
 ## Decisions
