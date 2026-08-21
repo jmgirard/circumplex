@@ -44,7 +44,7 @@ the deliverable.
 
 ## Acceptance criteria
 
-- [ ] AC1 — `tests/testthat/test-norms-audit-manifest.R` no longer asserts a
+- [x] AC1 — `tests/testthat/test-norms-audit-manifest.R` no longer asserts a
       walked site's field set with `expect_setequal()`, and the assertion
       replacing it is sensitive to a repeated name. Evidence: with the
       replacement in place, a planted `norms_audit_abort_sites()` whose returned
@@ -52,29 +52,29 @@ the deliverable.
       the unplanted file is green. The plant is applied to a committed file, one
       mutant per invocation, restored by copy, with the file's blob hash
       re-verified after restore.
-- [ ] AC2 — `NORMS_AUDIT_VERDICT` in `tests/testthat/helper-norms-audit-script.R`
+- [x] AC2 — `NORMS_AUDIT_VERDICT` in `tests/testthat/helper-norms-audit-script.R`
       no longer carries the `are not all TRUE` alternative, and the deletion is
       measured to fail closed rather than open: for the message R raises from
       the stated call `stopifnot(c(TRUE, FALSE))` under `LANGUAGE=C`,
       `audit_key_matches("stopifnot", "c(TRUE, FALSE)", msg)` returns FALSE
       after the deletion, with the message and the verdict recorded verbatim in
       the work log.
-- [ ] AC3 — one `cairn/DECISIONS.md` entry records all four dispositions of this
+- [x] AC3 — one `cairn/DECISIONS.md` entry records all four dispositions of this
       milestone — the F12 repair, the F4 deletion, the F11 decline and the M80-F1
       decline — each with its rationale and its class of reopening evidence, and
       it states its relation to D-042 and D-043.
-- [ ] AC4 — the two ROADMAP candidate rows carrying these findings are rewritten
+- [x] AC4 — the two ROADMAP candidate rows carrying these findings are rewritten
       so that F12, F4, F11 and the M80 note-only `sample`-cell finding — those
       four and no others — are each struck as closed by this milestone or left
       standing with a pointer to the AC3 entry; every other finding named in
       either row is left as it stands.
-- [ ] AC5 — non-comment `expect_` occurrences do not increase in the files this
+- [x] AC5 — non-comment `expect_` occurrences do not increase in the files this
       branch touches under `tests/` and `data-raw/`: over the files listed by
       `git diff --name-only master...HEAD -- tests data-raw`, the count from
       `grep -v '^[[:space:]]*#' | grep -o 'expect_' | wc -l` is no higher at HEAD
       than at `master`, with both counts recorded in the work log alongside the
       whole-file counts including comment lines.
-- [ ] AC6 — `Rscript -e 'devtools::test()'` is green, and the number of skips
+- [x] AC6 — `Rscript -e 'devtools::test()'` is green, and the number of skips
       reported for the files listed by `ls tests/testthat/test-norms-audit-*.R`
       is unchanged from the same command run at the branch point, with both
       runs' skip lines recorded in the work log.
@@ -141,3 +141,112 @@ the deliverable.
 ## Decisions
 
 ## Review
+
+Fresh evidence, gathered at review on the post-fix branch; every measurement
+re-run rather than carried over from implement.
+
+- **AC1 ✓** — `expect_setequal()` is gone from the field-set assertion
+  (`test-norms-audit-manifest.R:83`). Plant against the committed helper
+  (`2ff55f7a` → `f73fd47e`), a fourth element whose name repeats `key`:
+  `[ FAIL 30 | WARN 0 | SKIP 0 | PASS 14 ]`, all 30 failures on
+  `sort(names(s), na.last = TRUE)` and no other assertion of the file failing;
+  30 is the site count the walk yields for the `stop` branch. Run with
+  `set_max_fails(Inf)` so the later blocks actually ran — the implement-time
+  run hit the default 10-failure cap and could not establish that (review F3).
+  Restored by copy, blob re-verified `2ff55f7a`, tree clean, unplanted file
+  green at `[ FAIL 0 | WARN 0 | SKIP 0 | PASS 44 ]`.
+- **AC2 ✓** — `NORMS_AUDIT_VERDICT` is `(is not TRUE)`; the plural alternative
+  is gone. Under `LANGUAGE=C`, `stopifnot(c(TRUE, FALSE))` raises
+  `c(TRUE, FALSE) are not all TRUE`, the stem comes back as that message
+  unchanged with `truncated = FALSE`, and
+  `audit_key_matches("stopifnot", "c(TRUE, FALSE)", msg)` is **FALSE** — fails
+  closed. Scalar control: `is.data.frame(1)` still matches its key (TRUE), so
+  the deletion cost the shipped sites nothing.
+- **AC3 ✓** — D-045 carries 4 numbered dispositions and 4 `*Reopens:*` clauses,
+  cites D-042 three times and D-043 once, and states the relation to each
+  ("applied, not superseded"; D-043's identity unchanged).
+- **AC4 ✓** — both rows rewritten, F12/F4/F11 and the M80 note-only finding each
+  struck with a D-045 pointer. Neighbours intact: the same-binding-twin clause
+  and its own promotion condition survive byte-for-byte, as do the M84/M85
+  graduations.
+- **AC5 ✓** — files in scope: `helper-norms-audit-script.R`,
+  `test-norms-audit-manifest.R`. Non-comment `expect_` master 12, HEAD 12 — no
+  increase. Whole-file including comments: master 13, HEAD 15; the three added
+  occurrences are all comment text naming the assertions this milestone
+  reasoned about.
+- **AC6 ✓** — `[ FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 ]`, every field identical
+  to the branch-point baseline. The 3 skips are `test-axes-scaled-fit.R`
+  536/922/1241; the eight `test-norms-audit-*.R` files skip nothing. The diff
+  adds and removes zero `skip_if_not` lines, so no skip gate moved.
+
+**Consistency gate.** `cairn_validate`: all 16 checks PASS, advisories 47 (M7's
+pre-M28 work-log WARNs, IP4 history). Toolchain slot: `document()` no diff and
+zero `resolve link` warnings at `cli.width = 500`; `pkgdown::check_pkgdown()`
+"No problems found"; `devtools::check(args = "--no-manual")` `Status: OK`,
+0 errors / 0 warnings / 0 notes, `checking tests ... OK`; master watches — newest
+push run concluding a verdict on `R-CMD-check.yaml` is success (2026-08-19, M97;
+the M96 run is `cancelled`, not a verdict) and likewise `test-coverage.yaml`;
+both alert audits exit 0. NEWS: no entry owed — `git diff --name-only` over
+`R/ src/ man/ NAMESPACE DESCRIPTION vignettes/` is empty, so nothing
+user-visible changed. No principle changed, so `cairn_impact` was skipped.
+
+**Independent review — three lenses, 11 findings, 6 actioned, 5 logged.**
+No finding met the return floor: none demonstrates an acceptance criterion
+failing inside its named procedure's domain, and none is a defect in what the
+package does for its users.
+
+- **F1 ([O], most severe) — fixed.** `sort()` defaults to `na.last = NA`, which
+  *discards* NA names, so a fourth field named `NA` sorted back to the same
+  three-element vector and passed — strictly weaker than the `expect_setequal()`
+  it replaced, which rejected that shape. Measured both ways before fixing.
+  `na.last = TRUE` now keeps it; mutation-proved with an NA-named fourth field
+  (30 failures, all on the assertion, restore hash-verified). AC1 as written
+  promised sensitivity to a *repeated* name, which held throughout — this was a
+  new weakness introduced beside the repair, not the repair failing.
+- **F2 ([O]) — fixed.** The constant lost its grouping parentheses. Both readers
+  interpolate it into a larger `$`-anchored pattern, so restoring the deleted
+  alternative the obvious way (`is not TRUE|are not all TRUE`) would bind the
+  alternation across the whole pattern: measured, a plain untruncated plural
+  message then matches the *truncation* detector, which waives the stem
+  floor — the 2026-08-14 incident recorded directly above it. The comment
+  recommending restoration was walking a maintainer into it. Parens restored
+  around the single alternative, with the trap named in the comment.
+- **F3 ([O]) — fixed.** The implement-time mutation run hit testthat's default
+  10-failure cap, which aborts the file, so "no other assertion failed" was
+  argued rather than measured. Re-run under `set_max_fails(Inf)`; the claim now
+  holds as a measurement (30 failures, all on the one assertion, 14 passes).
+- **F4 ([O]) — fixed.** The M80 row's promotion condition ("promote into
+  whichever milestone next opens `audit_norms()`") had been replaced by D-045's
+  narrower reopening clause, while the milestone's own Scope says the row keeps
+  its condition. The original condition is restored, with D-045's clause added
+  beside it rather than in place of it.
+- **F5 ([O]) — fixed.** The T4 correction named `field` as the NA cell; measured,
+  `field`, `scale` **and** `tag` are NA across all 14 note-only rows. The
+  reviewer's own correction named two of the three; the work log now names all
+  three and why.
+- **F6 ([O]) — fixed.** D-045 and the ROADMAP row said "a `unique()` over the
+  CSV drops one", attributing an operation the audit never performs (the only
+  dedupe is `duplicated(key)` at emit time). Reworded to attribute it to a
+  downstream reader. Wording inherited from M80, but it now sat in a decision
+  entry.
+- **F7 ([O]) — rejected, out of scope.** The empty `## Decisions` heading is the
+  milestone template's own stub; the archive summary replaces the file entirely.
+- **[S] history lens — no findings.** Independently reproduced the fail-closed
+  behaviour, confirmed the plural alternative was added in M81 as general
+  grammar accommodation and never exercised by any site, confirmed the M83/M88
+  truncation-floor measurements are unrelated to the singular/plural
+  alternative and their comment text survives verbatim, and confirmed the M80
+  wording correction against the code. Recorded one under-articulation, already
+  covered by F2's fix.
+- **[S] prior-review lens — 2 findings, both logged, not actioned.** (i) F11's
+  decline sits in tension with the LESSONS line "an always-skipping
+  `skip_if_not(file.exists(...))` is the same trap — split so a runtime half
+  still runs on CRAN (M69, M70)", and D-045 declines without citing it. The
+  distinction is real — M69/M70's skipped guard exercised computation that could
+  vary by environment, while these two read a committed constant — but it is
+  worth the maintainer's explicit sign-off rather than silent drift. (ii) M80
+  F1's decline rests on "no committed note has the shape today", the
+  inference-from-current-data shape the M86 lesson warns about; mitigated by
+  D-045 recording a reopening trigger, and the blast radius is a maintainer's
+  report, not a shipped value. GitHub probe returned `[]` — no inline review
+  threads exist, so that surface contributed nothing, as in M91.
