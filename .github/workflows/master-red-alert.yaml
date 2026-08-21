@@ -2,6 +2,11 @@
 # default branch in any way this repo does not treat as harmless (cairn M96,
 # widened by M99 — see the job's `if:` for the list that stays quiet).
 #
+# The benign list in the job's `if:` below has a second reader: `cairn/PROFILE.md`'s
+# consistency-gate master watch derives its own NO-verdict set from it rather than
+# restating it (cairn M100), so widening that list also widens what the review gate
+# walks past. Change the two together, or deliberately.
+#
 # Why a separate workflow rather than a failure step inside each watched
 # workflow: the issue logic lives in one place, and this workflow cannot
 # redden the run it is reporting on.
