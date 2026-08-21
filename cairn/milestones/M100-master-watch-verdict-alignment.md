@@ -67,7 +67,7 @@ at this plan gate; the pointer removes the drift surface instead.
 
 ## Tasks
 
-- [ ] T1: rewrite the two master-watch bullets in `cairn/PROFILE.md`'s
+- [x] T1: rewrite the two master-watch bullets in `cairn/PROFILE.md`'s
       consistency-gate slot — verdict-by-exclusion, the benign set carried by
       reference to the alert workflow's job `if:`, the M93 absent-run rule and
       M95 no-verdict rule each scoped to their own watch, and the M96
@@ -90,6 +90,7 @@ at this plan gate; the pointer removes the drift surface instead.
 - 2026-08-21: plan gate chose no PROFILE-vs-workflow checker over extending `tools/check-master-red-alert.R` to pin both, because the scope hit the checker-regress shape (a checker M96 shipped and M99 hardened, over repo-internal artifacts) and the pointer removes the drift surface rather than instrumenting it; falsified by the two sides diverging again despite the pointer.
 - 2026-08-21: reduced criteria audit ([O], internal tier) ran over the drafted criteria and returned one finding — the original AC4 promised "every tracked file" containing any of nine hand-listed conclusion literals, a per-rendering enumeration standing proxy for "every file whose instructions depend on how a conclusion is classified" (counterexamples: prose saying "the five benign conclusions" with no literal; a `TIMED_OUT` rendering). Fixed: the promise narrowed to the two files that carry the semantics (now AC5), and the repo-wide sweep kept as T2, which claims only what it swept.
 - 2026-08-21: constraint for implement — `cairn/PROFILE.md` is 119 lines against the <120-line cap, so T1's rewrite must not grow it net; the pointer form (AC2) is what buys the room.
+- 2026-08-21: T1 — `cairn/PROFILE.md`'s master-watch bullet rewritten (13 lines in, 13 out; file holds at 119 of the <120 cap). Rule is now by exclusion: only `success` is green, every other conclusion red, the NO-verdict set carried by reference to `.github/workflows/master-red-alert.yaml`'s job `if:` rather than restated. Fitting the full workflow path cost two clauses, both judged redundant where they sat: M59's "so its environment is distinct" (the same point is made by "reads one milestone LATE, catching a covr-only regression at the NEXT gate"), and the M96 cross-check's "while the same query" rephrased. The adjacent alert-audits bullet is untouched at 4 lines.
 
 ## Decisions
 
