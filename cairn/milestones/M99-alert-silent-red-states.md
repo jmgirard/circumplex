@@ -166,6 +166,12 @@ recording what the widening does not establish.
   no run.
 - `NEWS.md`: no entry owed — M99 changes CI tooling only and has no user-visible
   surface. No new top-level files, so no `.Rbuildignore` entry owed.
+- `devtools::check(args = "--no-manual")`: Status OK — 0 errors, 0 warnings,
+  0 notes (21m 25s). The PDF-manual step is skipped by that argument (the
+  command `CLAUDE.md` specifies); grepped the log to confirm the step is absent
+  rather than silently passed, and nothing is at risk here — the branch diff
+  touches no roxygen source, no `man/`, and `document()` produced no diff.
+- `pkgdown::check_pkgdown()`: no problems found.
 - Master-red alert audits: both exit 0 (also AC4).
 
 ### Independent review — three fresh-context lenses
