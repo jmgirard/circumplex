@@ -10,6 +10,15 @@
 # so nothing here fires from a pull request, and changes to it take effect only
 # after they merge. Nothing is checked out: the whole alert is this file's own
 # `run:` body, which is why there is no `contents:` grant below.
+#
+# What M99's widening does NOT establish — observed 2026-08-21, and unresolved:
+# a run that never starts may deliver no `workflow_run` event at all, and
+# `on.workflow_run.workflows` below matches each watched workflow's declared
+# `name:`, which a workflow file too malformed to parse cannot declare. So the
+# gate now admits `startup_failure`, but whether such a run ever reaches this
+# gate is untested — nothing checkable from inside this repo decides it. The
+# ROADMAP candidate row that graduated into M99 keeps that question open, with
+# a deliberate live probe or a scheduled sweep as the two candidate remedies.
 on:
   workflow_run:
     workflows:
