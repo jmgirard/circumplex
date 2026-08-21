@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-21 (M98 merge + LESSONS retirement: all 16 `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs, IP4 history. ROADMAP 20,500 bytes (M93's terminal row retired to keep retention at 5; its archive stands). LESSONS 19,992 of 20,000 in 39 lines: M98's lesson landed on the M60-family line (a replacement guard can be weaker — `sort()` drops NA names under `na.last = NA`; a regex constant in an anchored pattern must keep its own `(...)`), paid for by retiring two clauses now owned elsewhere — the prior-PR-comments no-op measurement, which the review skill's own existence probe re-derives every run, and the `Rplots.pdf` action, owned by `.Rbuildignore:24` — plus compressing two M60-family clauses. Both GitHub inboxes empty; tracking matches git at the M98 squash.)_
+_Last hygiene check: 2026-08-21 (M99 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. ROADMAP 58 lines, under both caps: M99's row landed done, M94's terminal row retired to hold retention at 5, the graduated M97 `CONTRIBUTING.md` tombstone pruned mid-review to hold the line cap, and the F1 alert-vs-watch divergence added as a candidate. LESSONS 19,999 of 20,000 in 45 lines: M99's lesson consolidated into the M60-family line as its mirror clause — a widened check ADMITS what the narrow one ignored inertly — paid for by trimming that line and retiring the M75 lesson's instance half, now owned by `references/horowitz2003.md`. Both GitHub inboxes empty; tracking matches git at the M99 squash.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M94 | Print the fired-marker list on the bootstrap path | done | — | normal | milestones/archive/M94-bootstrap-marker-list.md |
 | M95 | Stop running the suite twice on every pull request | done | — | normal | milestones/archive/M95-ci-trigger-economy.md |
 | M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
 | M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
-| M99 | Alert on the red states the gate ignores | review | — | normal | milestones/M99-alert-silent-red-states.md |
+| M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
 
 ## Candidates
 
