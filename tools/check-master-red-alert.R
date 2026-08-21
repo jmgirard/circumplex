@@ -3,7 +3,7 @@
 # Static audit of `.github/workflows/master-red-alert.yaml` (cairn M96).
 #
 # The alert workflow has no test suite of its own — it runs only when a push
-# run of a watched workflow fails on the default branch, which is precisely
+# run of a watched workflow ends badly on the default branch, which is precisely
 # the moment nobody wants to be debugging it. This script reads the file and
 # asserts the properties M96's acceptance criteria name, so they can be
 # re-checked on demand instead of by inspection.
@@ -55,6 +55,21 @@ if (length(trigger_name) != 1L) {
         if (length(watched)) paste(watched, collapse = ", ") else "nothing"
       ))
     }
+    # `types:` became load-bearing when the gate started admitting by
+    # exclusion (cairn M99 review, [O] diff-bug F2). Under the old
+    # `conclusion == 'failure'` equality a stray `requested`/`in_progress`
+    # here was harmless: those payloads carry a null conclusion, and
+    # `null == 'failure'` is false, so no alert. Under exclusion, null is not
+    # in the benign list — every push run of either workflow, green ones
+    # included, would open or comment on an issue. The widening created this;
+    # nothing else in this script would see it.
+    types <- as.character(trigger$workflow_run$types)
+    if (!identical(types, "completed")) {
+      problems <- c(problems, sprintf(
+        "%s: `on.workflow_run.types` must be exactly `completed`; found %s. The gate admits by exclusion, so a payload with no conclusion yet (`requested`, `in_progress`) is outside the benign list and would alert on every run.",
+        PATH, if (length(types)) paste(types, collapse = ", ") else "nothing"
+      ))
+    }
   }
 }
 
@@ -71,8 +86,16 @@ job <- jobs[[1L]]
 # workflow, green ones and pull-request runs included. Whitespace is collapsed
 # so re-wrapping the YAML cannot break the audit, and nothing else about the
 # expression is left to interpretation.
+#
+# The conclusion clause is a negated membership test, not an equality (cairn
+# M99). Admission by exclusion is what makes the gate cover an ending nobody
+# enumerated: `timed_out`, `startup_failure`, and whatever GitHub adds next.
+# This literal is the pin for the benign list's membership — it is written
+# here independently and never derived from the workflow, so the two sides
+# cannot agree by construction.
 EXPECTED_IF <- paste(
-  "github.event.workflow_run.conclusion == 'failure' &&",
+  "!contains(fromJSON('[\"success\",\"cancelled\",\"skipped\",\"neutral\",\"stale\"]'),",
+  "github.event.workflow_run.conclusion) &&",
   "github.event.workflow_run.event == 'push' &&",
   "github.event.workflow_run.head_branch == github.event.repository.default_branch"
 )
@@ -206,7 +229,7 @@ if (!identical(env[order(names(env))], EXPECTED_ENV[order(names(EXPECTED_ENV))])
 
 # `gh issue list --label X` on a label that does not exist returns an empty
 # list rather than an error, so an uncreated label reads as "no open issue"
-# and every failed push opens a new one.
+# and every red push opens a new one.
 label_create <- grep("gh label create", script, fixed = TRUE)
 label_probe <- grep("gh label list", script, fixed = TRUE)
 search <- grep("gh issue list", script, fixed = TRUE)
@@ -256,6 +279,6 @@ if (length(problems)) {
 }
 
 cat(sprintf(
-  "%s: watches %s; fires only on a failed push run of the default branch; grants issues: write and no other write scope; carries the four workflow_run payload fields through `env:` and installs nothing.\n",
+  "%s: watches %s; fires on a push run of the default branch whose conclusion is outside the benign list the pinned `if:` names; grants issues: write and no other write scope; carries the four workflow_run payload fields through `env:` and installs nothing.\n",
   PATH, paste(WATCHED, collapse = " + ")
 ))

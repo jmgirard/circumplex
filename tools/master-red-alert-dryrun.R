@@ -4,10 +4,10 @@
 # (cairn M96).
 #
 # The body in `.github/workflows/master-red-alert.yaml` runs only when a push
-# run of a watched workflow fails on the default branch. Rather than wait for
-# that, this script lifts the body straight out of the workflow file — so
+# run of a watched workflow ends badly on the default branch. Rather than wait
+# for that, this script lifts the body straight out of the workflow file — so
 # there is no second copy to drift — puts a recording stub for `gh` on PATH,
-# and runs it against three fixtures:
+# and runs it against the fixtures listed below:
 #
 #   1. marker label present, no open issue  -> exactly one issue created
 #   2. marker label present, matching issue -> exactly one comment, no issue
