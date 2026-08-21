@@ -1,11 +1,11 @@
 # M100: Align the review gate's master watch with the alert's verdict set
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m100-master-watch-verdict-alignment
 
 ## Goal
 
