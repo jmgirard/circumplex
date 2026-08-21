@@ -59,8 +59,12 @@ jobs:
     #   * success        — the run passed; there is nothing to say.
     #   * cancelled      — a human or `cancel-in-progress` stopped it, so it
     #                      never reached a verdict on the branch.
-    #   * skipped        — a `paths-ignore` or job-level condition skipped it;
-    #                      again no verdict, and not a red one.
+    #   * skipped        — every job was skipped by a job-level condition, so
+    #                      again no verdict, and not a red one. (A push
+    #                      filtered out by `paths-ignore` produces no run at
+    #                      all, hence no event here — that absence is what
+    #                      PROFILE.md's coverage watch carves out, and it is
+    #                      not this conclusion.)
     #   * neutral        — GitHub's explicit "completed without a verdict".
     #   * stale          — the run was superseded before it could report.
     # Every one of these is "no verdict" or "green", never "master is broken".
@@ -112,7 +116,7 @@ jobs:
           # Create the marker label if it is absent, BEFORE searching on it: a
           # search filtered on a label that does not exist returns empty, so a
           # missing label would silently defeat the dedupe below and open a
-          # fresh issue on every failed push.
+          # fresh issue on every red push.
           #
           # Three things here are deliberate, and all three exist because this
           # job runs under `set -euo pipefail` — an abort anywhere in it means

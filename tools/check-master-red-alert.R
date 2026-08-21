@@ -55,6 +55,21 @@ if (length(trigger_name) != 1L) {
         if (length(watched)) paste(watched, collapse = ", ") else "nothing"
       ))
     }
+    # `types:` became load-bearing when the gate started admitting by
+    # exclusion (cairn M99 review, [O] diff-bug F2). Under the old
+    # `conclusion == 'failure'` equality a stray `requested`/`in_progress`
+    # here was harmless: those payloads carry a null conclusion, and
+    # `null == 'failure'` is false, so no alert. Under exclusion, null is not
+    # in the benign list — every push run of either workflow, green ones
+    # included, would open or comment on an issue. The widening created this;
+    # nothing else in this script would see it.
+    types <- as.character(trigger$workflow_run$types)
+    if (!identical(types, "completed")) {
+      problems <- c(problems, sprintf(
+        "%s: `on.workflow_run.types` must be exactly `completed`; found %s. The gate admits by exclusion, so a payload with no conclusion yet (`requested`, `in_progress`) is outside the benign list and would alert on every run.",
+        PATH, if (length(types)) paste(types, collapse = ", ") else "nothing"
+      ))
+    }
   }
 }
 
@@ -214,7 +229,7 @@ if (!identical(env[order(names(env))], EXPECTED_ENV[order(names(EXPECTED_ENV))])
 
 # `gh issue list --label X` on a label that does not exist returns an empty
 # list rather than an error, so an uncreated label reads as "no open issue"
-# and every failed push opens a new one.
+# and every red push opens a new one.
 label_create <- grep("gh label create", script, fixed = TRUE)
 label_probe <- grep("gh label list", script, fixed = TRUE)
 search <- grep("gh issue list", script, fixed = TRUE)
