@@ -80,7 +80,7 @@ it still pass unchanged.
 
 ## Tasks
 
-- [ ] T1: Stand up the probe repository (`jmgirard/gha-startup-failure-probe`,
+- [x] T1: Stand up the probe repository (`jmgirard/gha-startup-failure-probe`,
       public) with an alert workflow copied verbatim from
       `.github/workflows/master-red-alert.yaml` and a watched workflow named
       `R-CMD-check.yaml` — the same name this repo uses, so the alert's
@@ -117,6 +117,7 @@ it still pass unchanged.
 - 2026-08-21: implement gate — Jeff chose `jmgirard/gha-startup-failure-probe` PUBLIC over private, so the recorded run URLs stay readable without auth; the repo is kept after the milestone rather than deleted, per the plan gate. Creating it is the outward-facing action he authorized at the plan gate, now with a name.
 - 2026-08-21: implement gate — Jeff chose running a positive control before the two cases in question. Recorded as a T2 refinement rather than a new task, so the Coverage map's positional numbering is untouched; AC2 promises "at least the two named cases", so a control sits inside the criterion as written.
 - 2026-08-21: T1 refinement (minor) — the plan's T1 said to adjust the watched workflow's name, which would have edited the very `on.workflow_run` block AC1 requires to be byte-identical. Resolved by naming the probe's watched workflow `R-CMD-check.yaml`, as here; the alert's `test-coverage.yaml` entry simply never matches in the probe repo, which changes nothing about the case under test.
+- 2026-08-21: T1 — `jmgirard/gha-startup-failure-probe` created (public) with `.github/workflows/master-red-alert.yaml` copied from circumplex at commit `0b8863f760b95e3938a1fe32710d753e6cfa5c74` and a watched workflow named `R-CMD-check.yaml`. `diff` of the two alert files is EMPTY — the whole file is identical, not merely the `on.workflow_run` block and job `if:` AC1 asks for; both were also diffed separately and are identical. Probe default branch is `main`; the alert's `if:` compares `head_branch` to `github.event.repository.default_branch`, so the branch name is not a divergence. The alert's `test-coverage.yaml` watch entry has no counterpart in the probe and simply never matches. Negative control, unplanned but free: the baseline push made `R-CMD-check.yaml` conclude `success` (run 32540334449), the alert run WAS delivered (32540340661, event `workflow_run`) and its job `alert` concluded `skipped`, opening no issue — so the `if:` is live and the copy is wired. Note for the record: a delivered alert RUN is not a fired alert JOB, since the `if:` is job-level; the two are recorded separately from here on.
 
 ## Decisions
 
