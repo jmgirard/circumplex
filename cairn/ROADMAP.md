@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-21 (M100 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. ROADMAP 58 lines / 20,712 bytes: M100's row landed done, M95's terminal row retired to hold retention at 5, and the M99-F1 candidate tombstone marked closed. LESSONS 45 lines / 19,996 bytes — no line added: M100's two lessons are recurrences marked on the families that already own them (M40's extraction-status line, M60's widened-check line), paid for by retiring the M95-family line's two prescriptions, now owned by `PROFILE.md`'s consistency-gate slot. The file has 4 bytes of headroom, so the next lesson-adding milestone compresses or retires first. PROFILE 119 of 120 lines. Both GitHub inboxes empty; tracking matches git at the M100 squash.)_
+_Last hygiene check: 2026-08-21 (M101 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. ROADMAP 58 lines / 22,894 bytes: M101's row landed done and M96's terminal row retired to hold retention at 5; the M99-lineage candidate row absorbed M101's disposition and now carries three separately-conditioned open items, so it grew rather than multiplied. LESSONS 45 lines / 19,996 bytes — unchanged: M101 added no line (its durable findings are owned by the alert header comment and that lineage row) and retired none, so the 4 bytes of headroom the M100 stamp flagged still stand and the next lesson-adding milestone compresses or retires first. PROFILE 119 of 120 lines. Both GitHub inboxes empty; tracking matches git at the M101 squash.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M96 | Say something when master goes red | done | M95 | normal | milestones/archive/M96-master-red-alert.md |
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
 | M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
 | M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
 | M100 | Align the review gate's master watch with the alert's verdict set | done | — | normal | milestones/archive/M100-master-watch-verdict-alignment.md |
-| M101 | Find out whether a run that never starts reaches the master-red alert | review | — | normal | milestones/M101-startup-failure-reachability-probe.md |
+| M101 | Find out whether a run that never starts reaches the master-red alert | done | — | normal | milestones/archive/M101-startup-failure-reachability-probe.md |
 
 ## Candidates
 
