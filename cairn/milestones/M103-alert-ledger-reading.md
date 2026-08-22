@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m103-alert-ledger-reading`
+- **Branch/PR:** `m103-alert-ledger-reading` / https://github.com/jmgirard/circumplex/pull/132
 
 ## Goal
 
@@ -34,7 +34,7 @@ alert's header owns the alert's rationale.
 
 ## Acceptance criteria
 
-- [ ] AC1 — The header records, for each of the five broken watched-workflow runs that
+- [x] AC1 — The header records, for each of the five broken watched-workflow runs that
       ran while the path-spelled subscriber was live (`32545583419`, `32545779577`,
       `32545943649`, `32545999116`, `32546052474`), that a subscriber whose `workflows:`
       value was that run's own reported name produced no run for it; and cites run
@@ -43,19 +43,19 @@ alert's header owns the alert's rationale.
 - [ ] AC2 — Every claim the added text makes about a run's behaviour names the run id it
       rests on. Domain enumerated by `git diff master -- .github/workflows/master-red-alert.yaml`:
       each added line asserting run behaviour carries an id from that diff hunk.
-- [ ] AC3 — The recorded reading states these four limits: (i) no run in the window
+- [x] AC3 — The recorded reading states these four limits: (i) no run in the window
       reported the conclusion `startup_failure`; (ii) the two spellings were driven as two
       separate subscriber files each listing one spelling, and a single subscriber listing
       both was never driven; (iii) the measurement is on `jmgirard/gha-startup-failure-probe`,
       not this repo; (iv) the path-spelled subscriber's live window — which ledger runs it
       could and could not have matched.
-- [ ] AC4 — The reading carries its dated observation inline (`— observed YYYY-MM-DD`) on
+- [x] AC4 — The reading carries its dated observation inline (`— observed YYYY-MM-DD`) on
       the cell values it cites, per the standing-facts-vs-dated-observations rule.
-- [ ] AC5 — The branch's change to `.github/workflows/master-red-alert.yaml` is
+- [x] AC5 — The branch's change to `.github/workflows/master-red-alert.yaml` is
       comment-only: `git diff master` shows no change to the `on:` block or the job `if:`
       expression, and `Rscript tools/check-master-red-alert.R` and
       `Rscript tools/master-red-alert-dryrun.R` each exit 0.
-- [ ] AC6 — `cairn/ROADMAP.md`'s alert lineage row no longer describes the reading as
+- [x] AC6 — `cairn/ROADMAP.md`'s alert lineage row no longer describes the reading as
       owed, points at the header comment for it, and restates open item (b) as what
       remains unmeasured; `wc -l` and `wc -c` show under 60 lines and under 24,000 bytes.
 - [ ] AC7 — The profile's `verify` slot is clean: `devtools::test()` PASS and
@@ -116,3 +116,14 @@ alert's header owns the alert's rationale.
 ## Decisions
 
 ## Review
+
+Evidence gathered 2026-08-22 on branch `m103-alert-ledger-reading` at c1f57bcb; PR #132 (draft).
+
+- **AC1 — met.** All five broken run ids (32545583419, 32545779577, 32545943649, 32545999116, 32546052474) and the control 32545706555 with its subscriber run 32545711782 each appear twice in `.github/workflows/master-red-alert.yaml` (once in the M102 ledger, once in the reading). The claim sentence reads: "for each of those five broken runs, a subscriber listing that run's own reported name produced no run for it, while a valid run reporting the same name in the same window did produce one."
+- **AC2 — NOT TICKED, referred to review.** The added text carries ids on every per-run cell, but two sites assert run behaviour without an id on the asserting line: "all three are `success` with 1 job" (its own sentence names all three ids) and the "So:" summary sentence (its five ids are listed four lines above). Whether AC2 as written is met turns on reading it claim-wise or line-wise; the criterion is not reinterpreted here — the [O] diff-bug reviewer was asked for an explicit MET/NOT-MET verdict and the disposition is taken at the gate.
+- **AC3 — met.** All four limits present, one grep hit each: the `startup_failure` limit; "a SEPARATE file listing ONE spelling"; "the measurement is on jmgirard/gha-startup-failure-probe, not this repo"; and the presence window ("entered the probe's default-branch tree at probe commit d0cc1cd ... until bbf43b2 removed it"), with the three outside-the-comparison runs and the two unseparated boundary cases stated.
+- **AC4 — met.** The dated observation is inline on the cited cell values at the head of the reading: "was re-read from the GitHub REST API, observed 2026-08-22", scoped explicitly to run-level cells with the probe-equivalence claims marked as inherited from M101/M102 rather than re-measured.
+- **AC5 — met.** `git diff master -- .github/workflows/master-red-alert.yaml`: 62 added lines, 0 of them non-comment, 0 deletions — so the `on:` block and job `if:` are byte-identical to master. `Rscript tools/check-master-red-alert.R` exit 0; `Rscript tools/master-red-alert-dryrun.R` exit 0 (5/5 synthetic payloads reduce to the committed template).
+- **AC6 — met.** `cairn/ROADMAP.md` no longer contains "Reading that ledger is OWED"; the row now reads "**recorded 2026-08-22 by M103**, in the same header beneath the ledger" and restates item (b) as "M103's reading shows only that no subscriber listing such a run's own reported name produced a run; whether an event existed is undecided." `wc -l` 59 (< 60), `wc -c` 23,640 (< 24,000).
+- **Consistency gate — universal.** `cairn_validate` exit 0, no failed checks. No `DESIGN.md` principle changed (`Principles touched: —`), so `cairn_impact` is skipped by its own condition.
+- **Consistency gate — toolchain (`r-package`).** Master watches: newest verdict-reaching push run on master is `success` for both `R-CMD-check.yaml` (32552061475) and `test-coverage.yaml` (32552061423), both at 6ec6816. Alert audits both exit 0 (above). NEWS.md: no entry owed — the milestone's only shipped change is comment text in a CI workflow plus tracking, with no user-visible behaviour. No new top-level files.
