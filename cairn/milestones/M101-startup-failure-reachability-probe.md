@@ -41,20 +41,20 @@ it still pass unchanged.
 
 ## Acceptance criteria
 
-- [ ] AC1: A probe environment exists whose `on.workflow_run` block and job
+- [x] AC1: A probe environment exists whose `on.workflow_run` block and job
       `if:` expression are byte-identical to
       `.github/workflows/master-red-alert.yaml`'s at the commit named in the
       work log, verified by a recorded diff of the two extracted blocks.
-- [ ] AC2: The probe drives at least the two named cases on the probe's
+- [x] AC2: The probe drives at least the two named cases on the probe's
       watched workflow — (i) a file whose YAML does not parse, (ii) a file
       that parses and declares `name:` but is rejected by workflow-schema
       validation — and the work log records, per case, the run's `status` and
       `conclusion` as reported by `gh run list`, and whether the alert job was
       triggered.
-- [ ] AC3: For each of the two cases in AC2, the work log states whether an
+- [x] AC3: For each of the two cases in AC2, the work log states whether an
       alert issue was opened, read from the probe repo's issue list, with the
       query recorded.
-- [ ] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
+- [x] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
       rewritten so that, for each of the two cases AC2 drove, it states the
       observed outcome (event delivered and alert job triggered / event
       delivered but not matched / no event observed) and attributes it to the
@@ -62,10 +62,10 @@ it still pass unchanged.
       sentence stating that cases other than those two remain untested. The
       header comment's full prior text and full new text are both quoted in
       the work log.
-- [ ] AC5: The ROADMAP candidate row carrying this question is dispositioned
+- [x] AC5: The ROADMAP candidate row carrying this question is dispositioned
       — closed, or narrowed to the sub-case AC2 left unsettled — and the row's
       text after the edit is quoted in the work log.
-- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit 0 at the end of the
       milestone, and `git diff` shows
       `.github/workflows/master-red-alert.yaml`'s `on:` block and job `if:`
@@ -188,4 +188,16 @@ it still pass unchanged.
 
 All six acceptance-criterion checkboxes unticked: the repair rewrites the header, the ROADMAP row and the work-log entries AC1-AC6's evidence describes, so every one is re-earned at re-review.
 - 2026-08-21: REVIEW RETURN 1 (defect) — status → `in-progress`. What failed: (G7) AC2 requires the run's `status` and `conclusion` "as reported by `gh run list`", and both case entries record them from `gh api repos/.../actions/runs` instead; (G8) AC3 requires the issue-list query recorded for each of the two cases, and it appears only in the control entry; (G1) the alert header asserts "no `workflow_run` event reached this workflow at all" where the measurement shows only an absent alert RUN, an observation that does not separate a non-delivered event from a delivered-and-filtered one — and the same paragraph argues the filtering story three lines later. G7 and G8 are acceptance criteria failing inside their own named procedures; G1 is the load-bearing prose defect the maintainer returned on alongside them.
+
+---
+
+**Re-review (2026-08-21) — after review return 1.** PR #130, branch re-pushed at `16007a1a`. Every figure below was re-read at this pass from the probe repo and from the working tree; nothing is carried over from review 1 or from the work log.
+
+**Acceptance criteria — fresh evidence.**
+- **AC1 met.** The probe's alert file was fetched at this pass (`gh api "repos/jmgirard/gha-startup-failure-probe/contents/.github/workflows/master-red-alert.yaml"`, base64-decoded, 180 lines) and diffed against `git show 0b8863f760b95e3938a1fe32710d753e6cfa5c74:.github/workflows/master-red-alert.yaml` (also 180 lines): the WHOLE FILE diff is empty, and the `on.workflow_run` block and the job `if:` block were each diffed separately and are each empty. The G12 correction was checked rather than taken on trust — `git show master:` of the same file is byte-identical to `git show 0b8863f7:`, so the provenance commit the work log names and the commit the branch was cut from carry the same bytes, and AC1's "the commit named in the work log" resolves the same either way.
+- **AC2 met.** Both named cases were driven and both are now recorded from the command AC2 names. `gh run list --repo jmgirard/gha-startup-failure-probe --limit 20 --json databaseId,name,workflowName,event,status,conclusion,createdAt`, re-run at this pass, reports case (i) run 32540432744 `event=push status=completed conclusion=failure` and case (ii) run 32540622138 `event=push status=completed conclusion=failure`, each with `name=.github/workflows/R-CMD-check.yaml`. Whether the alert job was triggered is recorded per case: it was NOT — the same listing, sorted by creation time, carries no `event=workflow_run` entry between case (i) (00:28:00Z) and case (ii)'s push (00:31:22Z), nor between case (ii) and the T6 restore push (00:35:12Z); its only `workflow_run` entries are 32540340661 (negative control, `skipped`), 32540393479 (positive control, `success`) and 32540825331 (post-restore, `skipped`). Review 1's G7 — that the values were recorded from `gh api` rather than the named `gh run list` — is repaired: the work log now records both cases from `gh run list`, and the values agree with what review 1 read from `gh api`.
+- **AC3 met.** The query is now recorded on each case entry, repairing review 1's G8. Re-run here: `gh issue list --repo jmgirard/gha-startup-failure-probe --state all --json number,title,state,createdAt` returns exactly one issue, `#1 CLOSED "master is red: R-CMD-check.yaml" created=2026-08-22T00:27:25Z` — the positive control's, created before case (i)'s run and before case (ii)'s. No issue exists whose creation time follows either broken run, so for each of the two cases the answer is that no alert issue was opened.
+- **AC4 met.** The header now states, for each of the two cases, the outcome in AC4's own vocabulary — "no event observed" — reached honestly: it says an alert run was not created and that this observation does not distinguish a non-delivered event from a delivered-and-filtered one. Each case carries its own bullet with a complete run URL (`https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540432744` and `.../32540622138`), repairing review 1's G9, and the probe repo is named in the paragraph's second line. The residual sentence is present: "Cases other than those two — other ways a workflow can break, and whatever does produce a `startup_failure` conclusion — remain untested." Both the full prior text and the full new text are quoted in the work log's repair entry.
+- **AC5 met, with a reservation recorded rather than reinterpreted.** `cairn/ROADMAP.md:23` was re-read at this pass. The row is dispositioned — the graduated remainder is marked ANSWERED (down from review 1's CLOSED, repairing G3), the un-discriminated alternative is kept live, and the residual is narrowed to what AC2 left unsettled. The row's full post-edit text is quoted verbatim in the work log. `cairn_validate`'s `roadmap<->disk orphans` and `weight caps` both PASS; the row measures 59 lines / 22,507 bytes for the file, under both caps. Reservation: AC5 says "narrowed to the sub-case AC2 left unsettled", singular, and the row now names three separately-conditioned open items — two of which, (b) delivered-and-filtered vs never-delivered and (c) what produces `startup_failure`, are exactly what AC2 left unsettled, while (a) the scheduled sweep predates M101 and is untouched by this criterion. Raised as H4 below and triaged there rather than read charitably here.
+- **AC6 met.** `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0, both re-run at this pass against the repaired header. `diff` of the alert's `on:` block against `git show master:` is empty; `diff` of its `if: >-` block against `git show master:` is empty.
 
