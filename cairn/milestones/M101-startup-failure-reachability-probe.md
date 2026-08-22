@@ -1,6 +1,6 @@
 # M101: Find out whether a run that never starts reaches the master-red alert
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -39,20 +39,20 @@ it still pass unchanged.
 
 ## Acceptance criteria
 
-- [x] AC1: A probe environment exists whose `on.workflow_run` block and job
+- [ ] AC1: A probe environment exists whose `on.workflow_run` block and job
       `if:` expression are byte-identical to
       `.github/workflows/master-red-alert.yaml`'s at the commit named in the
       work log, verified by a recorded diff of the two extracted blocks.
-- [x] AC2: The probe drives at least the two named cases on the probe's
+- [ ] AC2: The probe drives at least the two named cases on the probe's
       watched workflow — (i) a file whose YAML does not parse, (ii) a file
       that parses and declares `name:` but is rejected by workflow-schema
       validation — and the work log records, per case, the run's `status` and
       `conclusion` as reported by `gh run list`, and whether the alert job was
       triggered.
-- [x] AC3: For each of the two cases in AC2, the work log states whether an
+- [ ] AC3: For each of the two cases in AC2, the work log states whether an
       alert issue was opened, read from the probe repo's issue list, with the
       query recorded.
-- [x] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
+- [ ] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
       rewritten so that, for each of the two cases AC2 drove, it states the
       observed outcome (event delivered and alert job triggered / event
       delivered but not matched / no event observed) and attributes it to the
@@ -60,10 +60,10 @@ it still pass unchanged.
       sentence stating that cases other than those two remain untested. The
       header comment's full prior text and full new text are both quoted in
       the work log.
-- [x] AC5: The ROADMAP candidate row carrying this question is dispositioned
+- [ ] AC5: The ROADMAP candidate row carrying this question is dispositioned
       — closed, or narrowed to the sub-case AC2 left unsettled — and the row's
       text after the edit is quoted in the work log.
-- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit 0 at the end of the
       milestone, and `git diff` shows
       `.github/workflows/master-red-alert.yaml`'s `on:` block and job `if:`
@@ -163,3 +163,17 @@ it still pass unchanged.
 - **G12: the work log names commit `0b8863f760...` as the alert's source, but this branch was cut from master at `2b2c841d`.** The file is byte-identical across both, so AC1 holds in substance, but the recorded provenance commit is not the commit the branch modifies.
 - **G13: the plan-gate work-log entry says "Keep it (private)", the implement gate says PUBLIC.** Append-only history makes this defensible, but the two read as a live contradiction about an outward-facing artifact's visibility.
 - **G14: `cairn/ROADMAP.md` is at 59/60 lines, and T5 folded M101's residual into an existing row to avoid crossing the cap.** The fold means two logically separate open questions now share one promotion condition — the row says "Same promotion condition", which is arguably wrong: the sweep promotes on an unannounced master break, while "what produces `startup_failure`" is a measurement needing no such trigger.
+
+**Triage (2026-08-21, maintainer's call at the approval gate): RETURNED.** Status → `in-progress`; review stops here. All fourteen surfaced, none dropped.
+
+- **G1 — fix now, and a reason for the return.** The header must claim only what was observed: an absent alert RUN, which does not discriminate "no event delivered" from "event delivered and filtered out". AC4's three-way vocabulary is the wording to pick from honestly.
+- **G7 — fix now, and a reason for the return.** AC2 names `gh run list`; re-record both cases from that command.
+- **G8 — fix now, and a reason for the return.** AC3 requires the issue query per case; record it in each case entry.
+- **G2 — fix now, with G1.** The mechanism sentence weakens to the correlation actually measured, naming the confound (name resolution and file validity varied together, and `workflowName` resolves through the workflow entity, whose name refreshed at the T6 restore).
+- **G4 — gated amendment during the repair.** Goal and Scope are plan-owned; their `startup_failure` framing is contradicted by the milestone's own measurements and changes only through `/milestone-implement` step 6.
+- **G3, G5, G6, G9, G10, G11, G14 — fix now.** The ROADMAP row's overclaim and its shared promotion condition; the byte-identity claim that goes false at merge; the unhedged headline; the elided run URLs; the M99-widening sentence that supports nothing; "the same file" where only the path is shared.
+- **G12, G13 — appended work-log corrections**, history being append-only: the provenance commit named against the branch point, and the private/public contradiction between the two gate entries.
+
+All six acceptance-criterion checkboxes unticked: the repair rewrites the header, the ROADMAP row and the work-log entries AC1-AC6's evidence describes, so every one is re-earned at re-review.
+- 2026-08-21: REVIEW RETURN 1 (defect) — status → `in-progress`. What failed: (G7) AC2 requires the run's `status` and `conclusion` "as reported by `gh run list`", and both case entries record them from `gh api repos/.../actions/runs` instead; (G8) AC3 requires the issue-list query recorded for each of the two cases, and it appears only in the control entry; (G1) the alert header asserts "no `workflow_run` event reached this workflow at all" where the measurement shows only an absent alert RUN, an observation that does not separate a non-delivered event from a delivered-and-filtered one — and the same paragraph argues the filtering story three lines later. G7 and G8 are acceptance criteria failing inside their own named procedures; G1 is the load-bearing prose defect the maintainer returned on alongside them.
+
