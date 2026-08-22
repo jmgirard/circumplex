@@ -47,7 +47,7 @@ a candidate row on its existing promotion condition, untouched.
       driving push, whether each subscriber produced a run is recorded with the
       driving run's URL, read from
       `gh run list -R jmgirard/gha-startup-failure-probe`.
-- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
+- [x] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
       the case-(b) outcome, which of the two explanations M101 left open the
       result rules out and which it leaves open, carrying the driving run URL
       and the date measured.
@@ -58,10 +58,10 @@ a candidate row on its existing promotion condition, untouched.
       window, the conclusion actually reached is recorded with its run URL, and
       where any reached `startup_failure`, whether an alert run was created for
       it.
-- [ ] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
+- [x] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
       disposition — answered, or narrowed to a restated remainder with its
       promotion condition; item (a) is byte-unchanged.
-- [ ] AC5 Every probe-repo run URL cited in
+- [x] AC5 Every probe-repo run URL cited in
       `.github/workflows/master-red-alert.yaml` resolves: each URL matched by
       `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9][0-9]*'`
       over that file returns a run from `gh api`.
@@ -235,4 +235,46 @@ was still in its test phase at the return.
 WARNs); `document()` no-diff, zero unresolved-link warnings; `check_pkgdown()`
 clean; both alert audits exit 0; master's newest push runs green on both watched
 workflows; `devtools::test()` FAIL 0 / PASS 8395.
+
+**Round 2 (post-return) — evidence re-gathered from scratch 2026-08-21; no
+round-1 result inherited.**
+
+- **AC1 — met.** Probe commit `d0cc1cd` (the path subscriber) verified an
+  ancestor of `758ab1b` (case B) and present on `origin/main`, the probe's
+  default branch. Case B is run 32545779577; the `gh run list` window the
+  criterion names returns 13 runs, and no subscriber run falls between case B's
+  driving run and the next push.
+- **AC2 — met.** The header no longer contains "RULED OUT". It states the
+  measured claim — "no spelling derivable from a broken run's reported name
+  closes this gap" — says in terms that this is narrower than "no `workflows:`
+  change can help", and names both possibilities it leaves open, including that
+  under the second one listing that name would itself be a `workflows:`-side
+  fix. Driving run URLs and "measured 2026-08-21 local" are carried.
+- **AC3 — met.** C1 32545943649, C2 32545999116, C3 32546052474; each recorded
+  with its run URL, all `failure` with 0 jobs, none `startup_failure`. The
+  header now states the broken-start set as a derivation rather than a count.
+- **AC4 — met.** (b) restated as narrowed-not-closed with the unfiltered-
+  subscriber experiment live again and its self-retrigger hazard recorded;
+  (c) un-struck and marked NARROWED with both halves open and its promotion
+  condition. Item (a) re-verified with a BOUNDED extraction — from
+  `(a) **Scheduled sweep as a second detector**` to the next `(b) ` — 271 bytes
+  each side, identical. The round-1 greedy pattern is not reused.
+- **AC5 — met.** The procedure returns eleven URLs from the alert header, all
+  resolving, and each run's reported `name` matches the claim made about it —
+  32545896997 is `master-red-alert.yaml`/`skipped`, as the corrected cell 1 says.
+- **Gate.** `cairn_validate` all checks pass, 47 advisories. `document()`
+  no-diff, zero unresolved-link warnings. `check_pkgdown()` clean. Both alert
+  audits exit 0 after the `tools/` comment change. Master's newest push runs
+  green on both watched workflows. `ROADMAP.md` 23,453 bytes and `LESSONS.md`
+  19,996 — both inside budget; LESSONS has 4 bytes of headroom, so a lesson
+  added at hygiene must retire or compress first.
+
+**Round-2 independent readers — full three-lens fan-out, fresh context.**
+
+- **[S] prior-PR-comments: no regressions.** Verified each of the ten actioned
+  return-1 findings is reflected in the current artifacts, checked specifically
+  for M101's "criteria recorded from a command other than the one they named"
+  mode and found none, and confirmed M100's `EXPECTED_IF` co-edit note survived
+  the header rewrite. Its note that AC2/AC4/AC5 stood unticked is closed by this
+  round's evidence.
 
