@@ -1,6 +1,6 @@
 # M103: Record what the alert's per-run ledger implies about its watched-workflow list
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -49,7 +49,7 @@ alert's header owns the alert's rationale.
       both was never driven; (iii) the measurement is on `jmgirard/gha-startup-failure-probe`,
       not this repo; (iv) the path-spelled subscriber's live window — which ledger runs it
       could and could not have matched.
-- [x] AC4 — The reading carries its dated observation inline (`— observed YYYY-MM-DD`) on
+- [ ] AC4 — The reading carries its dated observation inline (`— observed YYYY-MM-DD`) on
       the cell values it cites, per the standing-facts-vs-dated-observations rule.
 - [x] AC5 — The branch's change to `.github/workflows/master-red-alert.yaml` is
       comment-only: `git diff master` shows no change to the `on:` block or the job `if:`
@@ -112,6 +112,8 @@ alert's header owns the alert's rationale.
 - 2026-08-22: T5 — gate clean. `git diff master` on the workflow: 62 added lines, all comments, 0 deletions. `Rscript tools/check-master-red-alert.R` and `Rscript tools/master-red-alert-dryrun.R` both exit 0 (dry-run: 5/5 synthetic payloads reduce to the template). `cairn/ROADMAP.md` 59 lines / 23,645 bytes. `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 8395. `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. `cairn_validate` 0 failed checks.
 - 2026-08-22: status -> review. OPEN FOR THE GATE: the Scope `Out:` clause still justifies the no-code-change decision with the counterfactual the T3 audit rejected ("a path-spelled entry would have caught none of the five broken runs"). The decision is unchanged and the header text does not repeat it; only the plan-owned rationale overclaims, and it is amend-via-gate.
 - 2026-08-22: amendment at the review gate, user-selected — Scope `Out:` rationale narrowed from "the measurement says a path-spelled entry would have caught none of the five broken runs" to what the T3 audit left standing: no measurement prices an edit to this alert's own list, so it is left unchanged as a choice not to act on an untested counterfactual. Narrowing only; the decision, the acceptance criteria and the shipped header text are unchanged.
+- 2026-08-22: review return 1 (defect) — [O] diff-bug finding 1: the header's "What follows is the LEDGER" paragraph still says the reading is "deliberately NOT recorded here" and "owed by a follow-up milestone", five lines above the reading itself. Status -> in-progress. Also actioned in this return: undated dated-observations outside the provenance preamble's two buckets, the "As run," garble, and the ROADMAP item (b) clause "and under what name" dropped from its bolded title.
+- 2026-08-22: review return — AC2 judged NOT MET by a fresh-context [O] reader, which judged the criterion the primary defect: its line-level operational test is unsatisfiable by hard-wrapped prose. Routed to the gated criterion-amendment protocol; AC4's tick withdrawn to be disposed at the same gate. The plan-gate criteria audit ran in reduced mode (internal tier), which omits the satisfiability question — that omission is why this reached review.
 
 ## Decisions
 
@@ -127,3 +129,29 @@ Evidence gathered 2026-08-22 on branch `m103-alert-ledger-reading` at c1f57bcb; 
 - **AC6 — met.** `cairn/ROADMAP.md` no longer contains "Reading that ledger is OWED"; the row now reads "**recorded 2026-08-22 by M103**, in the same header beneath the ledger" and restates item (b) as "M103's reading shows only that no subscriber listing such a run's own reported name produced a run; whether an event existed is undecided." `wc -l` 59 (< 60), `wc -c` 23,640 (< 24,000).
 - **Consistency gate — universal.** `cairn_validate` exit 0, no failed checks. No `DESIGN.md` principle changed (`Principles touched: —`), so `cairn_impact` is skipped by its own condition.
 - **Consistency gate — toolchain (`r-package`).** Master watches: newest verdict-reaching push run on master is `success` for both `R-CMD-check.yaml` (32552061475) and `test-coverage.yaml` (32552061423), both at 6ec6816. Alert audits both exit 0 (above). NEWS.md: no entry owed — the milestone's only shipped change is comment text in a CI workflow plus tracking, with no user-visible behaviour. No new top-level files.
+
+### Findings and triage (three fresh-context reviewers, 2026-08-22)
+
+Routing: full three-lens fan-out — the declared tier is internal but the diff touches a workflow YAML, which is executable surface, so the docs-only single-reviewer path did not apply.
+
+**[O] diff-bug.** Independently re-verified every cited cell against the live API; all true. Findings:
+1. **FIX — RETURN TRIGGER.** "The paragraph immediately above the new text now contradicts it and was not updated (`.github/workflows/master-red-alert.yaml`, the "What follows is the LEDGER" block): it still reads "What it implies for the `workflows:` list below is deliberately NOT recorded here … so the reading is owed by a follow-up milestone" — and the reading now follows it directly, so a reader of the shipped header is told the deliverable is absent one line before encountering it. The diff has zero deletions, which is how this survived; AC5 forbids touching the `on:` block and the job `if:`, not editing a stale comment, so the fix is in scope." Verified at the source: the paragraph reads exactly as quoted. This is the M56-family shape — a change making a fact newly false strands prose elsewhere.
+2. **FIX.** "Four claims in the added text fall outside the provenance preamble's own two buckets … the subscriber's whole-history run count, the d0cc1cd–bbf43b2 presence window and strict-between commit membership, the negative "produced no run from that subscriber, and no alert run either," and the `path-match-probe.yaml` file properties (no job `if:`, own name, empty `permissions:`) belong to neither — all are true and all are dated observations carrying no date."
+3. **DISPOSE AT THE AMENDMENT GATE.** "AC4 is checked but its literal form is not in the shipped text: it requires the dated observation inline as `— observed YYYY-MM-DD` "on the cell values it cites," and what shipped is a single comma-form ", observed 2026-08-22" in a blanket preamble." AC4's tick is withdrawn pending that gate.
+4. **FIX.** ""The window's other three runs sit outside that comparison. As run, 32545535964, 32545892860 and 32546138873 each reported…" is a garbled construction whose comma is load-bearing — drop or misread that comma and the sentence parses as "As run 32545535964, …" and asserts something different."
+5. **REJECTED, with reason.** "The T5 work-log gate line misreports the ROADMAP byte count as 23,645 where the committed file is 23,640." Not a misreport: 23,645 was correct when measured; the file then lost exactly 5 bytes when the status mirror went `in-progress` → `review` (11 chars → 6). The figure is stale by one status transition, not wrong at its stated time.
+6. **REJECTED.** Past-tense ROADMAP row against a `review` status — normal for a pre-merge branch, self-correcting on merge, as the finding itself notes.
+7. **NOT A FINDING.** AC2/AC7 unticked — the state of the mid-review checkpoint the reviewers were convened to close.
+
+**[S] blame-history.** Re-queried all nine runs independently; every cell matched. One finding actioned:
+2. **FIX.** "ROADMAP item (b)'s bolded title dropped the clause "and under what name." … Flagging only because a past milestone's specific phrase quietly disappeared from the place it had lived since M99/M101." Its finding 1 (the milestone's own gate incomplete) is **REJECTED** as an artifact of reviewing the mid-review checkpoint; findings 3–7 are its own non-findings, all confirming.
+
+**[S] prior-PR-comments.** No live findings. `gh api repos/jmgirard/circumplex/pulls/comments?per_page=1` returned `[]`, so the per-PR walk was skipped and `cairn/milestones/archive/` was the evidence base. It confirms the two mistakes M101's and M102's reviews taught — asserting non-delivery, and the "RULED OUT" overclaim — are both actively avoided in the shipped text.
+
+### AC2 verdict and disposition
+
+The [O] reviewer was asked for an explicit verdict and returned **NOT MET**, judging the criterion the primary defect: "AC2's second sentence is its operational test and it is line-level … Applied as written to the 62 added lines, the failures are far broader than the two sites you named … because the prose is hard-wrapped at ~76 columns and an id lands on whichever line the wrap put it on. No readable prose can satisfy that test without repeating a 12-digit id on nearly every line." At claim level it splits the two sites: site (i) MET ("all three" is bound by the three ids named in its own subject), site (ii) NOT MET ("a back-reference is not naming").
+
+This is the M114 shape — a criterion unsatisfiable as written — and the plan-gate criteria audit ran in **reduced** mode (internal tier), which by rule omits the satisfiability question. That omission is what let it through.
+
+**Disposition: amendment return on AC2**, per the never-reinterpret rule, plus a defect return on [O] finding 1. Status → `in-progress`; the amendment and the four actioned fixes are the work convened; review stops here and re-runs after.
