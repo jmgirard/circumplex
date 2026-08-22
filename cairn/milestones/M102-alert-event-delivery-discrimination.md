@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M102: Separate a filtered-out alert event from one never delivered
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m102-alert-event-delivery-discrimination`
 
 ## Goal
 
@@ -78,10 +78,16 @@ a candidate row on its existing promotion condition, untouched.
 
 ## Tasks
 
-- [ ] T1 On the probe repo's default branch, add a second `workflow_run`
+- [x] T1 On the probe repo's default branch, add a second `workflow_run`
       subscriber (`path-match-probe.yaml`) whose `workflows:` lists
       `.github/workflows/R-CMD-check.yaml` and whose job is a no-op `echo`;
       confirm it is on the default branch before driving anything.
+- [ ] T2a Positive control for the subscriber itself, isolating name
+      resolution from file validity: make the probe's `R-CMD-check.yaml` VALID
+      but drop its `name:` declaration, so GitHub resolves the run's name to
+      the path; push and record whether the path subscriber fired. Without
+      this, a silent subscriber in T2 cannot be told from a subscriber that
+      never works.
 - [ ] T2 Replace the probe's `R-CMD-check.yaml` with the M101 unparseable-YAML
       case, push to the default branch, and capture the full run list for that
       push — the driving run, and a run or no run for each of the two
@@ -104,6 +110,11 @@ a candidate row on its existing promotion condition, untouched.
 ## Work log
 
 - 2026-08-21: created by /milestone-plan.
+- 2026-08-21: implement started; branch cut from master at bd08b980.
+- 2026-08-21: implement gate chose a bounded set of three `startup_failure` constructions over an open-ended hunt (a null result is itself recordable), and removing the extra subscriber from the probe repo afterward over leaving it in place.
+- 2026-08-21: verified before driving anything — the probe repo's alert copy is still functionally current: its `on:` block is byte-identical to this repo's and its job `if:` differs only in line numbers.
+- 2026-08-21: T1 done — `path-match-probe.yaml` pushed to the probe repo's default branch (probe commit d0cc1cd), listing only `.github/workflows/R-CMD-check.yaml`; `gh workflow list` shows it active. That push's own valid R-CMD-check run (32545535964, `success`) produced NO path-subscriber run, as expected for a run whose name resolves to the declared name.
+- 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
 - 2026-08-21: plan gate chose measure-only over measuring and applying the `workflows:` path fix in the same milestone because the fix would be committed to before its measurement exists and a null result would leave the milestone half-empty; falsified by the path-spelling arm firing and the resulting one-line change proving to need no separate design.
 - 2026-08-21: plan gate chose the path-spelling subscriber over an unfiltered `workflow_run` subscriber because an unfiltered subscriber matches its own completion and can retrigger in a loop on a live repo, while the path arm answers the question that changes what we would do; falsified by a loop guard shown to hold, or by the path arm producing no run and leaving delivery undecided.
