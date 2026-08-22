@@ -53,11 +53,16 @@
 # `workflow_run` subscriber listing the PATH spelling
 # `.github/workflows/R-CMD-check.yaml` and driving six more cells. The probe's
 # copy of this file was re-verified first: its `on:` block byte-identical to
-# this one and its job `if:` differing only in line numbers. Each cell's
+# this one and its job `if:` identical in text, differing only in where it sits
+# in the file. Each cell's
 # conclusion, job count and `name` are read from `gh run list`:
 #   * valid, DECLARES `name:` — name = declared, `success`, 1 job; the
-#     declared-name subscriber ran
+#     declared-name subscriber (this alert's own copy) created a run, which its
+#     `if:` then skipped on `success`, and the PATH subscriber created none —
+#     driving run
 #     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545892860
+#     produced
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545896997
 #   * valid, declares NO `name:` — name = PATH, `success`, 1 job; the PATH
 #     subscriber RAN —
 #     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545706555
@@ -84,23 +89,34 @@
 #   * Name resolution is NOT why a broken run goes unalerted. The nameless-valid
 #     cell and every broken cell resolve to the SAME path; only the valid one
 #     was matched.
-#   * So a `workflows:`-side fix is RULED OUT for a run that fails to start: the
+#   * What that does and does NOT license about a `workflows:`-side fix. The
 #     path spelling is exactly the one that would have matched the name GitHub
-#     reports for those runs, and it did not fire. Either no `workflow_run`
-#     event is delivered for such a run, or one is delivered carrying a name
-#     different from the one the API reports for it. Adding spellings to the
-#     list above will not close this gap. A scheduled sweep is the remaining
-#     candidate remedy, and it is a ROADMAP candidate row, not a plan.
+#     REPORTS for the broken runs, and it did not fire — so no spelling
+#     derivable from a broken run's reported name closes this gap. That is the
+#     measured claim, and it is narrower than "no `workflows:` change can help".
+#     Two possibilities stay open and nothing here separates them: (1) no
+#     `workflow_run` event is delivered at all for a run that fails to start, or
+#     (2) one is delivered carrying a name the run's API record does not show —
+#     and under (2), listing THAT name would itself be a `workflows:`-side fix.
+#     One further limit: the probe drove TWO separate subscriber files each
+#     listing ONE spelling, never a single subscriber listing both, so the
+#     arrangement an actual fix would use was not itself driven. A scheduled
+#     sweep is the remaining candidate remedy that needs none of this resolved,
+#     and it is a ROADMAP candidate row, not a plan.
 #   * The path fallback is BROADER than M99 assumed. M99 reasoned that an
 #     unparseable file cannot declare the `name:` this filter matches — but the
 #     last three cells above parse AND declare one, and their runs still
-#     reported the path. Any run that fails to start reports the path.
-#   * M99's `startup_failure` widening still has NO measured instance: M101's
-#     two broken cells and M102's four broken cells above — six runs — every one
-#     concluded `failure` with 0 jobs.
-#     Three constructions aimed deliberately at `startup_failure` (the last
-#     three cells) did not produce it; other constructions were not tried, so
-#     this bounds what was driven, not what is possible.
+#     reported the path. Every run that failed to start in these cells reported
+#     the path; whether that holds for runs not driven here is untested.
+#   * M99's `startup_failure` widening still has NO measured instance. Take the
+#     broken-start runs cited in this comment — M101's two cells plus M102's
+#     four broken cells — together with the one M102 drove by accident and
+#     records in its milestone file (an unparseable first attempt at the
+#     nameless cell): every one concluded `failure` with 0 jobs and none
+#     concluded `startup_failure`. Three constructions aimed deliberately at
+#     `startup_failure` (the last three cells) did not produce it; other
+#     constructions were not tried, so this bounds what was driven, not what is
+#     possible.
 on:
   workflow_run:
     workflows:
