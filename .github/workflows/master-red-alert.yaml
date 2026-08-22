@@ -53,11 +53,11 @@
 # verified first — `on:` block byte-identical to this one, job `if:` identical
 # in text.
 #
-# What follows is the LEDGER of that window. What it implies for the
-# `workflows:` list below is deliberately NOT recorded here: two attempts at
-# writing that reading overstated the evidence and were returned at review, so
-# the reading is owed by a follow-up milestone. The ROADMAP lineage row carries
-# what is still open.
+# What follows is the LEDGER of that window, and after it the READING of that
+# ledger (cairn M103). M102 recorded the ledger alone: two attempts at writing
+# the reading overstated the evidence and were returned at review, so it was
+# left to a follow-up milestone. The ROADMAP lineage row carries what is still
+# open.
 #
 # Every `push` run in 02:10Z-02:30Z is listed. "declared" = the run's reported
 # `name` was `R-CMD-check.yaml`; "path" = it was
@@ -93,11 +93,85 @@
 #     -> alert https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32546143683 (skipped); path subscriber removed by this push
 #
 # No run in this window reported the conclusion `startup_failure`.
-# Two facts about the measurement itself, so the reading milestone inherits
-# them: the two spellings were driven as TWO separate subscriber files each
+# Two facts about the measurement itself, which the reading below inherits:
+# the two spellings were driven as TWO separate subscriber files each
 # listing ONE spelling, and a single subscriber listing both was never driven;
 # and the subscriber file is no longer on the probe's default branch — its text
 # is at probe commit 758ab1b.
+#
+# WHAT THAT LEDGER READS (cairn M103). Claims below come in three classes,
+# each with its own provenance. The first two were re-read from the GitHub
+# REST API and the probe's own commits — observed 2026-08-22. First: every
+# run-level cell of every run cited below — id, reported name, conclusion,
+# job count, head sha — and every statement of which subscribers did or did
+# not produce runs, M101's run 32540622138 included. Second: the subscriber
+# file's tree presence, the commit range bounding it, its own text, and
+# whether the watched file at a cited commit declared a `name:`. Third: the
+# probe-equivalence claims at the end, inherited from the M101/M102 records
+# and not re-measured here.
+#
+# The discriminating comparison is among runs that reported the PATH as their
+# name. `path-match-probe.yaml` — a subscriber listing that path spelling and
+# nothing else — entered the probe's default-branch tree at probe commit
+# d0cc1cd and left it at bbf43b2, and over the probe's whole history it
+# produced exactly one run, 32545711782. Against the window's watched runs
+# that reads:
+#   * 32545706555, head sha 8356ae0 and so inside that commit range — VALID,
+#     declaring no `name:`, reported name the path, `success`, 1 job —
+#     matched, and is what produced that one subscriber run.
+#   * 32545583419 (0c6f93a), 32545779577 (758ab1b), 32545943649 (bac657d),
+#     32545999116 (5fa2941) and 32546052474 (edcbf00), every one of those head
+#     shas inside that range too — broken, reported name also the path, each
+#     `failure` with 0 jobs — produced no run from that subscriber, and no
+#     alert run either.
+#
+# The window's other three runs sit outside that comparison. In the state they
+# ran, 32545535964, 32545892860 and 32546138873 each reported the DECLARED
+# name, which that subscriber does not list; all three are `success` with 1
+# job. For 32545892860 (6422872) the subscriber was in the tree and produced
+# no run. For the other two the reason is not separable: 32545535964's head
+# sha is d0cc1cd, which ADDED the file, and 32546138873's is bbf43b2, which
+# removed it, and whether a subscriber added or removed by a push is live for
+# that same push's event was never measured here — the header's earlier note
+# that `workflow_run` runs the default-branch version of a file settles which
+# VERSION runs, not whether a file added or removed by the triggering push is
+# live for that push's own event — so name spelling and subscriber presence
+# remain two unseparated explanations of their silence.
+#
+# So, for each of those five broken runs — 32545583419, 32545779577,
+# 32545943649, 32545999116 and 32546052474 — a subscriber listing that run's
+# own reported name produced no run for it, while 32545706555, a valid run
+# reporting the same name in the same window, did produce one. That is the
+# cell M101 lacked — there, name spelling and file validity varied together in
+# every case.
+#
+# What this reading does NOT say, in three parts.
+#   * It does not say no `workflow_run` event was delivered for the five. No
+#     subscriber run was created for them; whether an event existed is
+#     undecided, and one candidate follow-up — a subscriber that does not
+#     filter by workflow name — was not driven.
+#   * It does not price any edit to the `workflows:` list below. What was
+#     driven was a SEPARATE file listing ONE spelling; a single list holding
+#     both spellings was never driven, and `path-match-probe.yaml` is not this
+#     alert with a spelling swapped — it carries no job `if:`, its own
+#     workflow name, and empty `permissions:`. The list below is left
+#     unchanged as a choice not to act on an untested counterfactual, not
+#     because such an edit was measured inert.
+#   * It does not explain WHY those runs reported the path. M101's case (ii),
+#     run 32540622138, declared `name:` and GitHub still reported the path, so
+#     a missing `name:` is not established as the mechanism; and with one
+#     matching run, "the path spelling matches" cannot be separated from "it
+#     matches a run that actually started".
+#
+# Two further limits. None of the nine runs named above — the six in the two
+# bullets and the three that reported the declared name — reported the
+# conclusion `startup_failure`, so nothing here is measured on that
+# conclusion. And the measurement is on jmgirard/gha-startup-failure-probe,
+# not this repo: M101 recorded the probe's copy of THIS file as byte-identical
+# to this repo's file as of circumplex commit 0b8863f7 and not kept in sync
+# after that, and for the M102 window M102 verified only that the probe copy's
+# `on:` block was byte-identical and its job `if:` identical in text — nothing
+# beyond that.
 on:
   workflow_run:
     workflows:
