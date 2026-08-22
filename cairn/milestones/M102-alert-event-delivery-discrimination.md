@@ -77,7 +77,7 @@ condition, untouched.
       `.github/workflows/master-red-alert.yaml` resolves: each URL matched by
       `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9][0-9]*'`
       over that file returns a run from `gh api`.
-- [ ] AC6 `cairn/PROFILE.md`'s `verify` slot clean, and its consistency-gate
+- [x] AC6 `cairn/PROFILE.md`'s `verify` slot clean, and its consistency-gate
       checks clean at review.
 
 ## Coverage
@@ -356,4 +356,14 @@ AC1, AC3 and AC5 keep their round-2 evidence.
 - **Descope audit trail.** Three fresh-context [O] wording audits ran BEFORE any
   commit. What shipped is the outcome of deleting the prose they kept failing,
   not of rewriting it again; the ledger they verified is what remains.
+- **AC6 — met.** Verify slot: `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 |
+  PASS 8395 (the five warnings are lavaan's own Heywood markers in pre-existing
+  tests; the branch touches no package code). Consistency gate: `devtools::check()`
+  `Status: OK`; `document()` no-diff, zero unresolved-link warnings;
+  `check_pkgdown()` clean; `tools/check-master-red-alert.R` and
+  `tools/master-red-alert-dryrun.R` both exit 0 (5 synthetic payloads);
+  `cairn_validate` all checks pass, 47 advisories (M7's pre-existing multi-line
+  work-log WARNs); master's newest push runs green on both watched workflows.
+  No NEWS entry owed — no user-visible change. `ROADMAP.md` 22,309 bytes and
+  `LESSONS.md` 19,996, both inside budget.
 
