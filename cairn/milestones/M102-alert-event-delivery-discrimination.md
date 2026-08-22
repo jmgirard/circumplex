@@ -82,13 +82,13 @@ a candidate row on its existing promotion condition, untouched.
       subscriber (`path-match-probe.yaml`) whose `workflows:` lists
       `.github/workflows/R-CMD-check.yaml` and whose job is a no-op `echo`;
       confirm it is on the default branch before driving anything.
-- [ ] T2a Positive control for the subscriber itself, isolating name
+- [x] T2a Positive control for the subscriber itself, isolating name
       resolution from file validity: make the probe's `R-CMD-check.yaml` VALID
       but drop its `name:` declaration, so GitHub resolves the run's name to
       the path; push and record whether the path subscriber fired. Without
       this, a silent subscriber in T2 cannot be told from a subscriber that
       never works.
-- [ ] T2 Replace the probe's `R-CMD-check.yaml` with the M101 unparseable-YAML
+- [x] T2 Replace the probe's `R-CMD-check.yaml` with the M101 unparseable-YAML
       case, push to the default branch, and capture the full run list for that
       push — the driving run, and a run or no run for each of the two
       subscribers.
@@ -114,11 +114,16 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: implement gate chose a bounded set of three `startup_failure` constructions over an open-ended hunt (a null result is itself recordable), and removing the extra subscriber from the probe repo afterward over leaving it in place.
 - 2026-08-21: verified before driving anything — the probe repo's alert copy is still functionally current: its `on:` block is byte-identical to this repo's and its job `if:` differs only in line numbers.
 - 2026-08-21: T1 done — `path-match-probe.yaml` pushed to the probe repo's default branch (probe commit d0cc1cd), listing only `.github/workflows/R-CMD-check.yaml`; `gh workflow list` shows it active. That push's own valid R-CMD-check run (32545535964, `success`) produced NO path-subscriber run, as expected for a run whose name resolves to the declared name.
+- 2026-08-21: T2a first attempt was itself unparseable and must not be read as its cell — a plain YAML scalar cannot contain ": " and the `run:` value held one; identity verified by `yaml::read_yaml`, a scanner error at line 12 column 31, and the run (32545583419) concluded `failure` with 0 jobs, the broken-case signature, not the nameless-valid signature intended.
+- 2026-08-21: T2a done (corrected) — valid file declaring no `name:`, run 32545706555 concluded `success` with 1 job, name resolved to the PATH; the path subscriber FIRED (run 32545711782, 8s later) and the declared-name subscriber created no run. Positive control established: `workflows:` can match a full path, so a silent path subscriber elsewhere is not a subscriber that never works.
+- 2026-08-21: T2 done — M101 case (i) re-driven verbatim from probe commit e6cf376, parse failure re-verified locally before pushing; run 32545779577 concluded `failure` with 0 jobs and NEITHER subscriber produced a run, rechecked 3+ minutes after the driving run against case A's 8-second latency.
 - 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
 - 2026-08-21: plan gate chose measure-only over measuring and applying the `workflows:` path fix in the same milestone because the fix would be committed to before its measurement exists and a null result would leave the milestone half-empty; falsified by the path-spelling arm firing and the resulting one-line change proving to need no separate design.
 - 2026-08-21: plan gate chose the path-spelling subscriber over an unfiltered `workflow_run` subscriber because an unfiltered subscriber matches its own completion and can retrigger in a loop on a live repo, while the path arm answers the question that changes what we would do; falsified by a loop guard shown to hold, or by the path arm producing no run and leaving delivery undecided.
 
 ## Decisions
+
+- 2026-08-21 (M102, milestone-local): the four-cell result reverses M101's leading explanation, and the reversal — not the alert's configuration — is what this milestone records. M101 read name resolution as the likely reason a broken watched workflow went unalerted, because GitHub reported the broken runs' `name` as the file path while the matched control reported its declared name; name and validity varied together in every M101 cell, so it stood as a correlation. M102 varied them independently. A VALID workflow declaring no `name:` also has its name resolved to the path, and the path-spelling subscriber DID fire for it (driving run 32545706555, subscriber run 32545711782) while the declared-name subscriber created no run — so a path spelling in `workflows:` matches, and name resolution alone does not suppress a subscriber. The unparseable file, whose name resolves to the same path, produced NO run under either spelling (driving run 32545779577). Since the path spelling is exactly the one that would have matched the broken run's reported name and it did not fire, a `workflows:`-side fix is ruled out for the broken case: either no `workflow_run` event is delivered for a run that fails to start, or one is delivered carrying a name different from the one the API reports for that run. Item (a), a scheduled sweep, is left as the only remaining remedy shape.
 
 ## Review
