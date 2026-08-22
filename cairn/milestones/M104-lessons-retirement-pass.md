@@ -1,11 +1,11 @@
 # M104: Graduate the matured verification-craft families out of LESSONS.md
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m104-lessons-retirement
 
 ## Goal
 
@@ -74,12 +74,12 @@ milestone that opens the guarded code.
 
 ## Tasks
 
-- [ ] T1: author `cairn/test-craft.md` — a scope header declaring what the file
+- [x] T1: author `cairn/test-craft.md` — a scope header declaring what the file
       holds and that `/milestone-plan` reads it when the scope touches
       verification, then the six family entries moved byte-for-byte from
       `cairn/LESSONS.md`, with M102's two lessons folded into the M95-family
       entry from the ROADMAP parked row's preserved wording.
-- [ ] T2: trim `cairn/LESSONS.md` — remove the six graduated lines, add the
+- [x] T2: trim `cairn/LESSONS.md` — remove the six graduated lines, add the
       pointer line, and check the header note (`:3`) for anything the move makes
       false. Measure with `wc -l -c`.
 - [ ] T3: run the loss sweep — take the removed `- ` lines from
@@ -105,6 +105,8 @@ milestone that opens the guarded code.
 - 2026-08-22: plan gate chose the six verification-craft families over adding the M56 stranded-prose family (7 lines, 6,692 B) or graduating only the three heaviest (3,486 B) because the six are one genus and the M56 line is the file's most actively recurring; falsified by LESSONS.md returning to its byte cap within a few milestones, or by a plan-time read missing a graduated family it needed.
 - 2026-08-22: plan gate chose a pointer line inside `LESSONS.md` over a pointer in `PROFILE.md`'s test-doctrine slot because PROFILE.md is at 119 of 120 lines and `LESSONS.md` is already read whole twice per planning run; falsified by a planning run reaching the pointer and not the module.
 - 2026-08-22: plan gate chose folding M102's two lessons into the M95-family entry over landing them as standalone lines because the parked row already assigns them to that family; falsified by either lesson recurring in a shape the M95 headline does not cover.
+
+- 2026-08-22: T1+T2 committed together — LESSONS.md trimmed without the module in place would be data loss, so the move is one commit. `cairn/test-craft.md` 23 lines / 7,065 B holds the six families; `cairn/LESSONS.md` 45→40 lines, 19,996→14,738 B (AC1: under 50 lines and under 16,000 B).
 
 ## Decisions
 
