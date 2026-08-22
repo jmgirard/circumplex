@@ -1556,3 +1556,52 @@ individual findings under it. D-043's identity — (kind, binding, key) — is
 unchanged; finding 1 repairs the assertion that guards it. **Explicitly
 insufficient to reopen any of the four:** a later review preferring more
 assertions to fewer, which is the ground D-042 already refused.
+
+### D-046 (2026-08-22): the LESSONS.md retirement pass runs as a standalone milestone — supersedes M44's forced-time holding (M104)
+
+**Context:** M44 planned a standalone consolidation and retirement pass over
+`cairn/LESSONS.md` and was dropped on 2026-07-20 at Jeff's request. Its
+rationale, verbatim: "Not because the premise was wrong — `LESSONS.md` really is
+at the `weight caps` edge, 49/50 lines — but because Jeff chose to defer the
+compression rather than spend a dedicated milestone on it now. […] When the next milestone
+captures a lesson it will hit 50 lines and FAIL `weight caps`; the
+consolidation/retirement then happens at that milestone's post-merge hygiene,
+scoped to what it ships (D-051/D-015), instead of the pre-emptive standalone
+pass M44 planned."
+
+That is a holding about *mechanism*, not about the premise, and the mechanism
+has since been measured. The byte budget, not the line cap, became the binding
+axis: `LESSONS.md` reached 19,996 of 20,000 bytes and stayed there across four
+consecutive hygiene passes — the M100, M101, M102 and M103 stamps each report
+the same 4 bytes of headroom.
+
+Forced-time hygiene is not inert, and the record must not be read as saying so:
+M100's pass **did** retire, under the **ownership** exit, the M95-family line's
+two prescriptions that `PROFILE.md`'s consistency-gate slot had taken over — and
+spent the bytes it freed on two new recurrences in the same pass. What four
+passes never reached is the **maturation** exit. Scoping retirement to what a
+milestone ships means a milestone that shipped no guard can retire nothing under
+enforcement, and a milestone whose scope never touches a matured family cannot
+retire it under maturation — and the file's remaining fat is exactly those
+families. So the net moved by nothing, and M102 taught two lessons it could land
+neither of.
+
+**Decision:** M104 runs the pass as a standalone milestone. Six matured
+verification-craft families — M13, M82, M59, M60, M75, M95 — graduate whole into
+`cairn/test-craft.md` under the maturation exit; `LESSONS.md` keeps a pointer
+line; M102's two orphaned lessons land folded into the graduated M95-family
+entry. Measured result: 45 lines / 19,996 bytes → 40 lines / 14,738 bytes.
+
+**What this does not change.** Post-merge hygiene remains the ordinary route:
+every `/milestone-review` still retires what its own milestone's scope earns,
+under the enforcement and ownership exits, and this entry licenses no standing
+habit of dedicated cleanup milestones. What it holds is narrower — that the
+**maturation** exit cannot be reached from a shipping milestone's scope, so a
+family that has matured is retired deliberately or not at all.
+
+*Reopens:* a shipping milestone's post-merge hygiene actually retiring a matured
+family within its own scope, which would show the forced-time mechanism reaches
+the maturation exit after all. **Explicitly insufficient to reopen:** a
+preference for fewer tracking files, or `cairn/test-craft.md` being read less
+often than `LESSONS.md` — the pointer line, not the file count, is what carries
+reachability, and a pointer that goes unread is a defect in the pointer.
