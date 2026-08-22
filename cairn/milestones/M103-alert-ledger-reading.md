@@ -40,7 +40,7 @@ alert's header owns the alert's rationale.
       value was that run's own reported name produced no run for it; and cites run
       `32545706555` — a valid run in the same window whose reported name was likewise the
       path — as the same-window control that subscriber did match.
-- [ ] AC2 — Every per-run cell the added text states — a run's reported name, conclusion,
+- [x] AC2 — Every per-run cell the added text states — a run's reported name, conclusion,
       job count, head sha, or whether it produced a subscriber or alert run — appears in a
       sentence that names that run's id, or whose subject is a back-reference to an
       antecedent sentence naming it. Domain enumerated by
@@ -51,7 +51,7 @@ alert's header owns the alert's rationale.
       both was never driven; (iii) the measurement is on `jmgirard/gha-startup-failure-probe`,
       not this repo; (iv) the path-spelled subscriber's live window — which ledger runs it
       could and could not have matched.
-- [ ] AC4 — The reading carries its dated observation inline (`— observed YYYY-MM-DD`) on
+- [x] AC4 — The reading carries its dated observation inline (`— observed YYYY-MM-DD`) on
       the cell values it cites, per the standing-facts-vs-dated-observations rule.
 - [x] AC5 — The branch's change to `.github/workflows/master-red-alert.yaml` is
       comment-only: `git diff master` shows no change to the `on:` block or the job `if:`
@@ -60,7 +60,7 @@ alert's header owns the alert's rationale.
 - [x] AC6 — `cairn/ROADMAP.md`'s alert lineage row no longer describes the reading as
       owed, points at the header comment for it, and restates open item (b) as what
       remains unmeasured; `wc -l` and `wc -c` show under 60 lines and under 24,000 bytes.
-- [ ] AC7 — The profile's `verify` slot is clean: `devtools::test()` PASS and
+- [x] AC7 — The profile's `verify` slot is clean: `devtools::test()` PASS and
       `devtools::check(args = "--no-manual")` Status OK.
 
 ## Coverage
@@ -127,7 +127,7 @@ alert's header owns the alert's rationale.
 
 ## Review
 
-Evidence gathered 2026-08-22 on branch `m103-alert-ledger-reading` at c1f57bcb; PR #132 (draft).
+**Round 1 (SUPERSEDED — the text these lines cite was changed by the return-1 fixes; round 2 below is the operative evidence).** Evidence gathered 2026-08-22 on branch `m103-alert-ledger-reading` at c1f57bcb; PR #132 (draft).
 
 - **AC1 — met.** All five broken run ids (32545583419, 32545779577, 32545943649, 32545999116, 32546052474) and the control 32545706555 with its subscriber run 32545711782 each appear twice in `.github/workflows/master-red-alert.yaml` (once in the M102 ledger, once in the reading). The claim sentence reads: "for each of those five broken runs, a subscriber listing that run's own reported name produced no run for it, while a valid run reporting the same name in the same window did produce one."
 - **AC2 — NOT TICKED, referred to review.** The added text carries ids on every per-run cell, but two sites assert run behaviour without an id on the asserting line: "all three are `success` with 1 job" (its own sentence names all three ids) and the "So:" summary sentence (its five ids are listed four lines above). Whether AC2 as written is met turns on reading it claim-wise or line-wise; the criterion is not reinterpreted here — the [O] diff-bug reviewer was asked for an explicit MET/NOT-MET verdict and the disposition is taken at the gate.
@@ -163,3 +163,17 @@ The [O] reviewer was asked for an explicit verdict and returned **NOT MET**, jud
 This is the M114 shape — a criterion unsatisfiable as written — and the plan-gate criteria audit ran in **reduced** mode (internal tier), which by rule omits the satisfiability question. That omission is what let it through.
 
 **Disposition: amendment return on AC2**, per the never-reinterpret rule, plus a defect return on [O] finding 1. Status → `in-progress`; the amendment and the four actioned fixes are the work convened; review stops here and re-runs after.
+
+### Round 2 evidence (2026-08-22, at 27f2f524, PR #132)
+
+Every criterion re-executed against the repaired text; the [O] diff-bug reviewer independently re-verified every cited cell against the live GitHub API and returned an explicit MET verdict on AC1–AC6.
+
+- **AC1 — met.** Five broken ids appear together in the second bullet with "produced no run from that subscriber, and no alert run either"; 32545706555 is cited as the matched same-window control in the first bullet and again by name in the "So:" sentence; each id resolves twice in the file (ledger + reading), 32545706555 three times.
+- **AC2 — met.** Reviewer walked the added text sentence by sentence: the provenance preamble states cell *types* not cells (out of domain); each bullet names its ids inline with their cells; "In the state they ran, 32545535964, 32545892860 and 32546138873 …; all three are `success` with 1 job" names all three in one sentence; the 6422872, boundary-pair and 32540622138 sentences each name their ids. Two sites pass on a reading rather than mechanically — logged as findings 3 and 4 below.
+- **AC3 — met.** All four limits located: the `startup_failure` limit; "a SEPARATE file listing ONE spelling"; "the measurement is on jmgirard/gha-startup-failure-probe, not this repo"; and the presence window d0cc1cd→bbf43b2 with the six in-range runs, 6422872 in-tree and silent, and the two boundary runs marked unseparable.
+- **AC4 — met as written.** The em-dash form appears twice — "was re-read from the GitHub REST API — observed 2026-08-22" and "and its own text — observed 2026-08-22" — with the subject enumerating exactly the cell values cited. The reviewer states the round-1 objection "no longer holds" against AC4's literal words.
+- **AC5 — met.** 72 added / 5 deleted on the workflow, 0 non-comment changed lines; `diff` of master's `on:`-to-EOF span against HEAD's is empty, so the executable half is byte-identical. Both audit scripts exit 0.
+- **AC6 — met.** "OWED" absent; the row reads "**recorded 2026-08-22 by M103**, in the same header beneath the ledger", item (b) restated with "and under what name" restored and the open count corrected to three. 59 lines, 23,661 bytes.
+- **AC7 — met.** `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 8395; `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes (14m40s), run after the return-1 fixes on this tree.
+- **Consistency gate — universal.** `cairn_validate`: all checks passed, 47 advisories (M7's pre-M28 work-log WARNs). No principle changed, so `cairn_impact` no-ops by its own condition.
+- **Consistency gate — toolchain (`r-package`).** `options(cli.width = 500); devtools::document()`: no diff, zero `resolve link` lines. `pkgdown::check_pkgdown()`: no problems found. Master watches green (32552061475 / 32552061423 at 6ec6816). Both alert audits exit 0. No NEWS entry owed — no user-visible behaviour changes. No new top-level files.
