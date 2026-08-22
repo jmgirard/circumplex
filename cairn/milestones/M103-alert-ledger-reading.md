@@ -78,15 +78,15 @@ alert's header owns the alert's rationale.
       (`gh api ".../actions/runs?event=push"`, filtered by `created_at`). Record the
       observation date. Any disagreement with the committed ledger stops the milestone and
       is reported, not written around.
-- [ ] T2 — Derive the reading from T1's values: the discrimination the path subscriber's
+- [x] T2 — Derive the reading from T1's values: the discrimination the path subscriber's
       live window supports, and the four limits of AC3. Draft it in the milestone file
       first, not in the workflow, and map each drafted sentence to the run id or recorded
       limit licensing it (the mapping is the gate procedure for AC2, kept in the work log).
-- [ ] T3 — Hand the drafted reading and the ledger to a fresh-context [O] reader that
+- [x] T3 — Hand the drafted reading and the ledger to a fresh-context [O] reader that
       authored neither, asking of each sentence which ledger row licenses it and whether
       it claims more than that row carries. Two prior attempts at this reading were
       returned for overstatement, so this runs before the text reaches the workflow file.
-- [ ] T4 — Write the surviving text into `.github/workflows/master-red-alert.yaml`'s
+- [x] T4 — Write the surviving text into `.github/workflows/master-red-alert.yaml`'s
       header immediately after the ledger, and shrink the ROADMAP lineage row to a pointer,
       restating item (b) as what stays unmeasured. Re-read both aimed sites after the edit.
 - [ ] T5 — Gate: `git diff master` on the workflow shows comment-only change, both alert
@@ -101,6 +101,12 @@ alert's header owns the alert's rationale.
 - 2026-08-22: plan gate chose the header comment plus the ROADMAP row over a `DECISIONS.md` entry, because the reading is a finding about evidence rather than a choice and the header already owns the alert's rationale; falsified by a later milestone needing the reading to bind a decision outside the alert file.
 - 2026-08-22: plan gate chose re-reading the cited runs from the live API over trusting the committed ledger, because the prose failed twice on overstatement and fresh observation is cheap here; falsified by the API no longer resolving the probe's runs.
 - 2026-08-22: T1 — re-read all nine window runs via `gh api` (`name`, `path`, `conclusion`, jobs `total_count`); every field matches the committed ledger, no disagreement. `?event=push` reports exactly those nine in 02:10:55Z–02:23:56Z. `?event=workflow_run` reports one `path-match-probe.yaml` run in the window (32545711782, from 32545706555) and four `master-red-alert.yaml` runs, all from the three declared-name runs plus one; none from any broken run. Path subscriber live 02:10:51Z (probe commit d0cc1cd) to 02:23:53Z (bbf43b2), covering runs 2-8. Observed 2026-08-22.
+
+- 2026-08-22: correcting the T1 line above — the API reports SIX `master-red-alert.yaml` runs in the probe's history, of which THREE fall in the M102 window (heads d0cc1cd, 6422872, bbf43b2); the other three are M101's earlier window. The line's "four" was wrong; nothing else in it changes.
+- 2026-08-22: T2 — drafted in the session scratchpad rather than the milestone file (task wording said the milestone file; a multi-line draft cannot live in an append-only one-line work log) — minor deviation, the text lands in the workflow at T4.
+- 2026-08-22: T2 — sentence-to-evidence map for the added text (AC2's gate procedure): presence window <- probe commits d0cc1cd/bbf43b2 plus the nine head shas; matched cell <- 32545706555 producing 32545711782; unmatched cells <- 32545583419, 32545779577, 32545943649, 32545999116, 32546052474; outside-the-comparison cells <- 32545535964, 32545892860, 32546138873; mechanism refusal <- M101's 32540622138; the three refusals and the two closing limits restate limits already recorded (M102 ledger; ROADMAP item (b)) and assert no run behaviour of their own.
+- 2026-08-22: T3 — three adversarial rounds, each a fresh-context [O] reader that had seen no earlier draft. Round 1 (ten findings) killed the central overstatement: the draft had slid from "this one-spelling subscriber matched none of the five" to "adding the path spelling to the alert's list would have caught none of the five" — a counterfactual no cell prices. Round 2 (six) fixed provenance overreach, an asymmetric claim about the subscriber's add/remove boundaries, and a sha attributed to the wrong repo. Round 3 (four) required the five broken runs' head shas be shown inside the presence window and re-attributed the byte-identity record from M102 to M101. Round 4 returned SOUND AS WRITTEN with every cell independently re-verified.
+- 2026-08-22: T4 — reading written into `.github/workflows/master-red-alert.yaml` immediately beneath the ledger (62 added lines, every one a comment; zero deletions, so `on:` and the job `if:` are byte-identical to master), and the ROADMAP lineage row struck to a pointer with item (b) restated. Both aimed sites re-read after the edit.
 
 ## Decisions
 

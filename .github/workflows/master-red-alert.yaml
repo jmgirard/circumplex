@@ -98,6 +98,68 @@
 # listing ONE spelling, and a single subscriber listing both was never driven;
 # and the subscriber file is no longer on the probe's default branch — its text
 # is at probe commit 758ab1b.
+#
+# WHAT THAT LEDGER READS (cairn M103). Every run-level cell cited below — id,
+# reported name, conclusion, job count, head sha — was re-read from the GitHub
+# REST API, observed 2026-08-22; the probe-equivalence claims at the end are
+# inherited from the M101/M102 records, not re-measured here.
+#
+# The discriminating comparison is among runs that reported the PATH as their
+# name. `path-match-probe.yaml` — a subscriber listing that path spelling and
+# nothing else — entered the probe's default-branch tree at probe commit
+# d0cc1cd and left it at bbf43b2, and over the probe's whole history it
+# produced exactly one run, 32545711782. Against the window's watched runs
+# that reads:
+#   * 32545706555 (head sha 8356ae0) — VALID, declaring no `name:`, reported
+#     name the path, `success`, 1 job — matched, and is what produced that one
+#     subscriber run.
+#   * 32545583419 (0c6f93a), 32545779577 (758ab1b), 32545943649 (bac657d),
+#     32545999116 (5fa2941) and 32546052474 (edcbf00) — broken, reported name
+#     also the path, each `failure` with 0 jobs — produced no run from that
+#     subscriber, and no alert run either.
+# All six of those head shas are commits strictly between d0cc1cd and bbf43b2,
+# so the subscriber was in the tree for every one of them.
+#
+# The window's other three runs sit outside that comparison. As run,
+# 32545535964, 32545892860 and 32546138873 each reported the DECLARED name,
+# which that subscriber does not list; all three are `success` with 1 job. For
+# 32545892860 (6422872) the subscriber was in the tree and produced no run.
+# For the other two the reason is not separable: 32545535964's head sha is
+# d0cc1cd, which ADDED the file, and 32546138873's is bbf43b2, which removed
+# it, and whether a subscriber added or removed by a push is live for that
+# same push's event was never measured — so name spelling and subscriber
+# presence remain two unseparated explanations of their silence.
+#
+# So: for each of those five broken runs, a subscriber listing that run's own
+# reported name produced no run for it, while a valid run reporting the same
+# name in the same window did produce one. That is the cell M101 lacked —
+# there, name spelling and file validity varied together in every case.
+#
+# What this reading does NOT say, in three parts.
+#   * It does not say no `workflow_run` event was delivered for the five. No
+#     subscriber run was created; whether an event existed is undecided, and
+#     one candidate follow-up — a subscriber that does not filter by workflow
+#     name — was not driven.
+#   * It does not price any edit to the `workflows:` list below. What was
+#     driven was a SEPARATE file listing ONE spelling; a single list holding
+#     both spellings was never driven, and `path-match-probe.yaml` is not this
+#     alert with a spelling swapped — it carries no job `if:`, its own
+#     workflow name, and empty `permissions:`. The list below is left
+#     unchanged as a choice not to act on an untested counterfactual, not
+#     because such an edit was measured inert.
+#   * It does not explain WHY those runs reported the path. M101's case (ii),
+#     run 32540622138, declared `name:` and GitHub still reported the path, so
+#     a missing `name:` is not established as the mechanism; and with one
+#     matching run, "the path spelling matches" cannot be separated from "it
+#     matches a run that actually started".
+#
+# Two further limits. No run in the window reported the conclusion
+# `startup_failure`, so nothing here is measured on that conclusion. And the
+# measurement is on jmgirard/gha-startup-failure-probe, not this repo: M101
+# recorded the probe's copy of THIS file as byte-identical to this repo's file
+# as of circumplex commit 0b8863f7 and not kept in sync after that, and for
+# the M102 window M102 verified only that the probe copy's `on:` block was
+# byte-identical and its job `if:` identical in text — nothing beyond that.
 on:
   workflow_run:
     workflows:
