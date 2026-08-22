@@ -1,6 +1,6 @@
 # M103: Record what the alert's per-run ledger implies about its watched-workflow list
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -89,7 +89,7 @@ alert's header owns the alert's rationale.
 - [x] T4 — Write the surviving text into `.github/workflows/master-red-alert.yaml`'s
       header immediately after the ledger, and shrink the ROADMAP lineage row to a pointer,
       restating item (b) as what stays unmeasured. Re-read both aimed sites after the edit.
-- [ ] T5 — Gate: `git diff master` on the workflow shows comment-only change, both alert
+- [x] T5 — Gate: `git diff master` on the workflow shows comment-only change, both alert
       audit scripts exit 0, `wc -l`/`wc -c` on the ROADMAP under both caps, profile verify
       slot clean, `cairn_validate` clean.
 
@@ -107,6 +107,8 @@ alert's header owns the alert's rationale.
 - 2026-08-22: T2 — sentence-to-evidence map for the added text (AC2's gate procedure): presence window <- probe commits d0cc1cd/bbf43b2 plus the nine head shas; matched cell <- 32545706555 producing 32545711782; unmatched cells <- 32545583419, 32545779577, 32545943649, 32545999116, 32546052474; outside-the-comparison cells <- 32545535964, 32545892860, 32546138873; mechanism refusal <- M101's 32540622138; the three refusals and the two closing limits restate limits already recorded (M102 ledger; ROADMAP item (b)) and assert no run behaviour of their own.
 - 2026-08-22: T3 — three adversarial rounds, each a fresh-context [O] reader that had seen no earlier draft. Round 1 (ten findings) killed the central overstatement: the draft had slid from "this one-spelling subscriber matched none of the five" to "adding the path spelling to the alert's list would have caught none of the five" — a counterfactual no cell prices. Round 2 (six) fixed provenance overreach, an asymmetric claim about the subscriber's add/remove boundaries, and a sha attributed to the wrong repo. Round 3 (four) required the five broken runs' head shas be shown inside the presence window and re-attributed the byte-identity record from M102 to M101. Round 4 returned SOUND AS WRITTEN with every cell independently re-verified.
 - 2026-08-22: T4 — reading written into `.github/workflows/master-red-alert.yaml` immediately beneath the ledger (62 added lines, every one a comment; zero deletions, so `on:` and the job `if:` are byte-identical to master), and the ROADMAP lineage row struck to a pointer with item (b) restated. Both aimed sites re-read after the edit.
+- 2026-08-22: T5 — gate clean. `git diff master` on the workflow: 62 added lines, all comments, 0 deletions. `Rscript tools/check-master-red-alert.R` and `Rscript tools/master-red-alert-dryrun.R` both exit 0 (dry-run: 5/5 synthetic payloads reduce to the template). `cairn/ROADMAP.md` 59 lines / 23,645 bytes. `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 8395. `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. `cairn_validate` 0 failed checks.
+- 2026-08-22: status -> review. OPEN FOR THE GATE: the Scope `Out:` clause still justifies the no-code-change decision with the counterfactual the T3 audit rejected ("a path-spelled entry would have caught none of the five broken runs"). The decision is unchanged and the header text does not repeat it; only the plan-owned rationale overclaims, and it is amend-via-gate.
 
 ## Decisions
 
