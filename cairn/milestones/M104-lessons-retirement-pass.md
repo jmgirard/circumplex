@@ -88,10 +88,10 @@ milestone that opens the guarded code.
 - [x] T4: run the six citation greps across `cairn/` and `CLAUDE.md`; the known
       sites are `cairn/DECISIONS.md:846`, `:1091`, `:1524`. Fix what the move
       makes stale, in both directions (the M56-family lesson).
-- [ ] T5: append the D-entry superseding M44's holding — quote M44's rationale,
+- [x] T5: append the D-entry superseding M44's holding — quote M44's rationale,
       state what changed (three hygiene passes at 4 bytes, M102's lost lessons),
       and record what would reopen it.
-- [ ] T6: retire the ROADMAP parked-lessons candidate row; restate the hygiene
+- [x] T6: retire the ROADMAP parked-lessons candidate row; restate the hygiene
       stamp with the measured counts.
 - [ ] T7: gate checks — `python3 ~/.claude/skills/cairn/scripts/cairn_validate.py`
       clean, and `Rscript -e 'devtools::test()'` clean as a no-regression check
@@ -111,6 +111,9 @@ milestone that opens the guarded code.
 - 2026-08-22: T3 loss sweep — `git diff master..HEAD -- cairn/LESSONS.md` reported 6 removed `- ` lines (the domain); all 6 bolded family headlines and all 48 parenthesized milestone-tag clauses found by `grep -F` in `cairn/test-craft.md`; 0 failures (AC2).
 - 2026-08-22: T4 citation sweep — the six family-tag greps over `cairn/` and `CLAUDE.md` returned 13 hits: 6 in `cairn/test-craft.md` (the graduated content), 6 in M104's own AC6 wording (names the tags to grep — still true), 1 in `cairn/milestones/archive/M96-master-red-alert.md` ("Lesson graduated into the M95 family line" — still true, names no file, IP4 history). No hit directs a reader to `cairn/LESSONS.md` for graduated content (AC6).
 - 2026-08-22: T4 also checked the three sites the greps cannot reach (they cite lessons by other spellings): `cairn/DECISIONS.md:846` and `:1524` cite the M7 family, which did not graduate; `:1091` cites "the M59/M61 lesson" and names no file. All three still true, and all three IP4 history that is superseded rather than edited.
+
+- 2026-08-22: T5 — D-046 appended, superseding M44's holding that retirement runs at a shipping milestone's post-merge hygiene. Its narrow claim: the maturation exit cannot be reached from a shipping milestone's scope, so post-merge hygiene stays the ordinary route for the enforcement and ownership exits (AC5).
+- 2026-08-22: T6 — parked-lessons candidate row struck as a tombstone pointer; ROADMAP 59 lines, 23,668→23,190 bytes (AC7). Minor task deviation: T6's "restate the hygiene stamp" is NOT done here — the stamp records the last hygiene check, which is still the M103 merge; writing an M104 stamp before the merge would claim a check that has not run. It belongs to review's post-merge hygiene.
 
 ## Decisions
 
