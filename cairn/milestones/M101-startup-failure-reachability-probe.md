@@ -80,15 +80,20 @@ it still pass unchanged.
 
 ## Tasks
 
-- [ ] T1: Stand up the probe repository (private, under the maintainer's
-      account) with a watched workflow and an alert workflow copied from
-      `.github/workflows/master-red-alert.yaml`; adjust only the watched
-      workflow's name. Record the source commit, extract both sides'
-      `on.workflow_run` block and job `if:`, and record the diff.
-- [ ] T2: Drive case (i) — push a watched-workflow file whose YAML does not
-      parse to the probe's default branch. Record the run's `status` and
-      `conclusion` from `gh run list`, whether an alert run appeared, and
-      whether an issue was opened (with the issue query).
+- [ ] T1: Stand up the probe repository (`jmgirard/gha-startup-failure-probe`,
+      public) with an alert workflow copied verbatim from
+      `.github/workflows/master-red-alert.yaml` and a watched workflow named
+      `R-CMD-check.yaml` — the same name this repo uses, so the alert's
+      `on.workflow_run` block copies untouched. Record the source commit,
+      extract both sides' `on.workflow_run` block and job `if:`, and record
+      the diff.
+- [ ] T2: Drive the positive control first — a watched workflow that runs and
+      exits non-zero, which must open an alert issue; a silent probe would
+      otherwise make a null result in case (i) uninterpretable. Then drive
+      case (i) — push a watched-workflow file whose YAML does not parse to the
+      probe's default branch. Record, for the control and for case (i), the
+      run's `status` and `conclusion` from `gh run list`, whether an alert run
+      appeared, and whether an issue was opened (with the issue query).
 - [ ] T3: Drive case (ii) — push a watched-workflow file that parses and
       declares `name:` but fails workflow-schema validation. Record the same
       four things.
@@ -109,6 +114,9 @@ it still pass unchanged.
 - 2026-08-21: collision sweep — no `DECISIONS.md` entry has ruled on this question (the two `reachab` hits are norms-audit machinery, unrelated); the M96 archive does not mention it; the only prior state is the candidate row this milestone absorbs and M99's archive, which records the question as deliberately left open. GitHub's own `workflow_run` documentation was checked at plan time and answers none of the three sub-questions (is `workflows:` required, does it match `name:` or filename, is an event delivered for `startup_failure`), which is why the answer has to be measured.
 - 2026-08-21: creating the probe repository is an outward-facing action; authorized by Jeff at this plan gate. Keep it (private) rather than delete it at milestone end, so AC4's run URLs stay resolvable.
 - 2026-08-21: started by /milestone-implement; branch `m101-startup-failure-reachability-probe` cut from master at `2b2c841d`.
+- 2026-08-21: implement gate — Jeff chose `jmgirard/gha-startup-failure-probe` PUBLIC over private, so the recorded run URLs stay readable without auth; the repo is kept after the milestone rather than deleted, per the plan gate. Creating it is the outward-facing action he authorized at the plan gate, now with a name.
+- 2026-08-21: implement gate — Jeff chose running a positive control before the two cases in question. Recorded as a T2 refinement rather than a new task, so the Coverage map's positional numbering is untouched; AC2 promises "at least the two named cases", so a control sits inside the criterion as written.
+- 2026-08-21: T1 refinement (minor) — the plan's T1 said to adjust the watched workflow's name, which would have edited the very `on.workflow_run` block AC1 requires to be byte-identical. Resolved by naming the probe's watched workflow `R-CMD-check.yaml`, as here; the alert's `test-coverage.yaml` entry simply never matches in the probe repo, which changes nothing about the case under test.
 
 ## Decisions
 
