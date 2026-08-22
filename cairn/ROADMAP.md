@@ -10,6 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
+| M104 | Graduate the matured verification-craft families out of LESSONS.md | planned | — | normal | milestones/M104-lessons-retirement-pass.md |
 | M103 | Record what the alert's per-run ledger implies about its watched-workflow list | done | — | normal | milestones/archive/M103-alert-ledger-reading.md |
 | M102 | Separate a filtered-out alert event from one never delivered | done | — | normal | milestones/archive/M102-alert-event-delivery-discrimination.md |
 | M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
