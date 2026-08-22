@@ -97,12 +97,12 @@ a candidate row on its existing promotion condition, untouched.
 - [x] T4 Construct and drive candidate `startup_failure` cases (start with a
       top-level `uses:` naming a nonexistent reusable workflow); for each,
       record the conclusion actually reached and whether an alert run appeared.
-- [ ] T5 Restore the probe repo: valid succeeding `R-CMD-check.yaml`, and remove
+- [x] T5 Restore the probe repo: valid succeeding `R-CMD-check.yaml`, and remove
       `path-match-probe.yaml`; leave the repo public so cited URLs resolve.
-- [ ] T6 Write the measured outcomes into `.github/workflows/master-red-alert.yaml`'s
+- [x] T6 Write the measured outcomes into `.github/workflows/master-red-alert.yaml`'s
       header comment, per case, with run URLs and the date measured — claiming
       only what the driven cases show, in the register M101's header already uses.
-- [ ] T7 Update the ROADMAP lineage row's items (b) and (c) to their measured
+- [x] T7 Update the ROADMAP lineage row's items (b) and (c) to their measured
       dispositions.
 - [ ] T8 Verify every cited probe-repo run URL resolves, then run the profile's
       verify and consistency-gate checks.
@@ -121,6 +121,11 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: T4 done — the gate's bounded set of three, each verified to PARSE locally before pushing so none is a repeat of the case-B parse failure: C1 job `uses:` a nonexistent LOCAL reusable workflow (run 32545943649), C2 malformed Actions expression in a job-level `if:` (32545999116), C3 job `uses:` a reusable workflow in a nonexistent EXTERNAL repo (32546052474). All three concluded `failure` with 0 jobs; NONE reached `startup_failure`, and none produced a run under either subscriber. Null result recorded as the finding.
 - 2026-08-21: T4 side finding — C1/C2/C3 each PARSE and DECLARE `name: R-CMD-check.yaml`, yet every one of their runs reported `name` as the PATH. The path fallback therefore applies to any run that fails to start, not only to a file too malformed to declare a name, which is broader than M99's original reasoning for the gap.
 - 2026-08-21: run enumeration for the whole driving window is `gh run list -R jmgirard/gha-startup-failure-probe` filtered to `createdAt >= 2026-08-22T02:10Z`; it returns exactly the eleven runs the cells account for, so "no subscriber run" is read off an enumeration rather than off an absence noticed by eye.
+- 2026-08-21: T5 done — probe repo restored to its two-workflow baseline (`R-CMD-check.yaml` valid/named/green, run 32546138873 `success`, alert run 32546143683 `skipped`), `path-match-probe.yaml` removed, repo still PUBLIC so the cited run URLs resolve.
+- 2026-08-21: T6 done — the alert header now carries the six M102 cells with run URLs and the date measured, and states what the result settles. Verified comment-only: `git diff master` on the workflow shows no non-comment line changed, so the `on:` block and job `if:` are byte-identical and `EXPECTED_IF`'s pin is unmoved.
+- 2026-08-21: T6 correction before commit — a drafted header line said "all five broken-start runs"; the enumeration shows six (M101's two cells plus M102's four broken cells), so the line was rewritten to derive the count from the cells rather than assert a number.
+- 2026-08-21: T7 done — the ROADMAP lineage row carries (b) and (c) answered. Two claims in that row were current knowledge M102 falsified and were fixed in place, not appended to: "a `workflows:`-side fix is not ruled out" and "name resolution is the leading explanation". Item (a) verified byte-identical to master by extracting its 271-byte span from both versions and diffing.
+- 2026-08-21: ROADMAP is 23,431 of its 24,000-byte budget after T7 — 569 bytes of headroom, tighter than the 1,106 it had before; flagged for the review hygiene stamp.
 - 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
 - 2026-08-21: plan gate chose measure-only over measuring and applying the `workflows:` path fix in the same milestone because the fix would be committed to before its measurement exists and a null result would leave the milestone half-empty; falsified by the path-spelling arm firing and the resulting one-line change proving to need no separate design.
