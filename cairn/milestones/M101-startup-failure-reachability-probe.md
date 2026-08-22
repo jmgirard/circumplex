@@ -54,7 +54,7 @@ it still pass unchanged.
 - [x] AC3: For each of the two cases in AC2, the work log states whether an
       alert issue was opened, read from the probe repo's issue list, with the
       query recorded.
-- [ ] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
+- [x] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
       rewritten so that, for each of the two cases AC2 drove, it states the
       observed outcome (event delivered and alert job triggered / event
       delivered but not matched / no event observed) and attributes it to the
@@ -62,10 +62,10 @@ it still pass unchanged.
       sentence stating that cases other than those two remain untested. The
       header comment's full prior text and full new text are both quoted in
       the work log.
-- [ ] AC5: The ROADMAP candidate row carrying this question is dispositioned
+- [x] AC5: The ROADMAP candidate row carrying this question is dispositioned
       — closed, or narrowed to the sub-case AC2 left unsettled — and the row's
       text after the edit is quoted in the work log.
-- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit 0 at the end of the
       milestone, and `git diff` shows
       `.github/workflows/master-red-alert.yaml`'s `on:` block and job `if:`
@@ -242,4 +242,20 @@ All six acceptance-criterion checkboxes unticked: the repair rewrites the header
 
 **Constraint on the repair, set at this gate:** minimal diff. Exactly the sentences named above change; no new claims, no rewrites beyond them.
 - 2026-08-21: REVIEW RETURN 2 (defect) — status → `in-progress`. What failed: (F1) AC5 requires "the row's text after the edit is quoted in the work log", and the repair rewrote `cairn/ROADMAP.md:23` without ever quoting the post-edit text into the work log — the only verbatim row quote there is the T5 entry's superseded text, and the three distinctive strings of the current row (`that remainder was ANSWERED 2026-08-21 by M101`, `Three things stay open`, `(c) **What produces`) each return zero hits in the milestone file. That is an acceptance criterion unmet inside its own named procedure, the same shape as review 1's G7/G8. AC4 and AC6 were measured met at this pass but are unticked with AC5, because the F3/F4 repairs rewrite the header and the ROADMAP row their evidence describes.
+
+---
+
+**Re-review 2 (2026-08-21) — after review return 2.** PR #130, branch at `995b96e2`. Every figure below was re-measured at this pass; nothing is carried from either earlier pass or from the work log.
+
+**The two quotation clauses first**, since return 2 was called on exactly that defect class. Both were checked by exact substring match of the live source file against the milestone file, not by eye: the ROADMAP row's current text (`cairn/ROADMAP.md:23`) appears verbatim in the work log — TRUE; the alert header's full current text, all 33 comment lines from `# Two BROKEN` to the line before `on:`, appears verbatim in the work log — TRUE; the header's prior text (`# What M99's widening does NOT establish …`) is still quoted in the T4 entry — TRUE.
+
+**Acceptance criteria — fresh evidence.**
+- **AC1 met.** The probe's alert file fetched at this pass (`gh api "repos/jmgirard/gha-startup-failure-probe/contents/.github/workflows/master-red-alert.yaml"`, base64-decoded) and diffed against `git show 0b8863f760b95e3938a1fe32710d753e6cfa5c74:.github/workflows/master-red-alert.yaml`: the whole-file diff is empty, and the `on.workflow_run` block and the job `if:` block were diffed separately and are each empty.
+- **AC2 met.** `gh run list --repo jmgirard/gha-startup-failure-probe --limit 20 --json databaseId,name,event,status,conclusion,createdAt` — the command AC2 names — re-run at this pass: case (i) run 32540432744 `event=push status=completed conclusion=failure`, case (ii) run 32540622138 `event=push status=completed conclusion=failure`, each `name=.github/workflows/R-CMD-check.yaml`. Alert job per case: not triggered — sorted by creation time the listing carries no `event=workflow_run` entry between case (i) (00:28:00Z) and case (ii)'s push (00:31:22Z), nor between case (ii) and the restore push (00:35:12Z). The listing holds exactly three `workflow_run` runs — 32540340661, 32540393479, 32540825331 — none of them after a broken case.
+- **AC3 met.** `gh issue list --repo jmgirard/gha-startup-failure-probe --state all --json number,title,state,createdAt` re-run: exactly one issue, `#1 CLOSED created=2026-08-22T00:27:25Z`, predating both broken runs. For each of the two cases the answer is that no alert issue was opened, and the query is recorded on each case entry.
+- **AC4 met.** The header states, per case, the outcome in AC4's own vocabulary — "no event observed" — on its own bullet carrying a complete run URL (`.../32540432744`, `.../32540622138`), attributed to the probe repo named two lines above. It retains the residual sentence: "Cases other than those two — other ways a workflow can break, and whatever does produce a `startup_failure` conclusion — remain untested." Both the full prior text and the full current text are quoted in the work log, verified by exact substring match above.
+- **AC5 met.** `cairn/ROADMAP.md:23` is dispositioned — the graduated remainder marked ANSWERED, the un-discriminated alternative kept live, and the residual narrowed to what AC2 left unsettled and split across three separately-conditioned items. The row's post-edit text is quoted verbatim in the work log, verified by exact substring match above — the clause return 2 was called on. `cairn_validate`'s `roadmap<->disk orphans` and `weight caps` both PASS.
+- **AC6 met.** `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0, both re-run at this pass. `diff` of the alert's `on:` block against `git show master:` is empty; `diff` of its `if: >-` block against `git show master:` is empty.
+
+**Consistency gate (re-review 2).** `cairn_validate` exit 0, all 16 PASS checks, 47 advisories (M7's pre-M28 multi-line work-log WARNs, unrelated). No `DESIGN.md` principle changed, so `cairn_impact` is skipped. Toolchain slot: `document()` at `cli.width = 500` emits zero `resolve link` lines and leaves no diff; `pkgdown::check_pkgdown()` reports no problems; README untouched; no NEWS entry owed (`git diff master...HEAD` over `R/ src/ man/ NAMESPACE DESCRIPTION tests/ vignettes/ inst/ data/ README* NEWS.md` is empty); no new top-level files; both alert audits exit 0. Full `devtools::check(args = "--no-manual")` completed during this milestone's review: Status OK, 0 errors, 0 warnings, 0 notes, `testthat.R` 463s OK — and it remains the current answer, because the branch's package-surface diff against master is empty, so nothing R CMD check reads differs from master. Master watches green: newest verdict-reaching push run on master is `success` for `R-CMD-check.yaml` (32536471081) and `test-coverage.yaml` (32536471083). Caps: `ROADMAP.md` 59 lines / 23,004 bytes, `LESSONS.md` 45 lines / 19,996 bytes, `PROFILE.md` 119/120, plan-owned body 108/150 — all under. Note on the recorded ROADMAP byte figure, so the F11 pattern is not re-flagged as new: the repair-2 work-log entry records 23,009 bytes, true when measured, and the `in-progress` → `review` status flip in the same file shortened it by 5 bytes to the 23,004 measured here.
 
