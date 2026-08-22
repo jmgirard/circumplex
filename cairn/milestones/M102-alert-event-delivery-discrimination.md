@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M102: Separate a filtered-out alert event from one never delivered
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -25,19 +25,22 @@ it.
 **In:** On `jmgirard/gha-startup-failure-probe`, add a second `workflow_run`
 subscriber whose `workflows:` lists the file path
 `.github/workflows/R-CMD-check.yaml`, re-drive M101's unparseable-YAML case, and
-record whether that subscriber produced a run. Separately drive deliberately-
-broken cases aimed at a `startup_failure` conclusion and record the conclusion
-each actually reached, plus whether an alert run appeared. Write the measured
-outcomes into `.github/workflows/master-red-alert.yaml`'s header comment and
-update the ROADMAP lineage row's open items (b) and (c).
+drive deliberately-broken cases aimed at a `startup_failure` conclusion. Record
+the result as a per-run ledger in `.github/workflows/master-red-alert.yaml`'s
+header comment, and record in the ROADMAP lineage row that the experiment was
+driven and where the ledger lives.
 
-**Out:** Changing this repo's alert `on:`/`if:` blocks or `tools/check-master-red-alert.R`
-→ a separate milestone, planned once this measurement exists (plan gate, measure-only).
-An unfiltered `workflow_run` subscriber as a purer delivery test → stays out on
-the self-retrigger hazard; if the path-spelling arm produces no run, the
-delivered-vs-never-delivered question returns to the ROADMAP lineage row with
-that hazard recorded. A scheduled sweep as a second detector (item (a)) → stays
-a candidate row on its existing promotion condition, untouched.
+**Out:** Reading the ledger — what it implies for the alert's `workflows:` list,
+whether name resolution is the operative mechanism, and the dispositions of
+items (b) and (c) → a follow-up, which the ROADMAP row carries as owed and
+unstarted. Descoped at review return 2, after two returns for interpretive prose
+overreaching. Changing this repo's alert `on:`/`if:` blocks, or
+`tools/check-master-red-alert.R` including its comments → that same follow-up;
+the return-1 F10 comment repair is reverted and travels with it. An unfiltered
+`workflow_run` subscriber as a purer delivery test → stays out on the
+self-retrigger hazard, which the ROADMAP row records. A scheduled sweep as a
+second detector (item (a)) → stays a candidate row on its existing promotion
+condition, untouched.
 
 ## Acceptance criteria
 
@@ -47,10 +50,15 @@ a candidate row on its existing promotion condition, untouched.
       driving push, whether each subscriber produced a run is recorded with the
       driving run's URL, read from
       `gh run list -R jmgirard/gha-startup-failure-probe`.
-- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
-      the case-(b) outcome, which of the two explanations M101 left open the
-      result rules out and which it leaves open, carrying the driving run URL
-      and the date measured.
+- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment carries a
+      per-run ledger of M102's driving window, and: (a) for every run id
+      appearing in that ledger, `gh api
+      repos/jmgirard/gha-startup-failure-probe/actions/runs/<id>` returns the
+      `name` and `conclusion` the ledger states for it, and `.../runs/<id>/jobs`
+      returns the job count it states; and (b) the ledger has one row for every
+      `push` run returned by `gh run list -R jmgirard/gha-startup-failure-probe
+      --limit 40` whose `createdAt` falls in [2026-08-22T02:10Z,
+      2026-08-22T02:30Z].
 - [x] AC3 At least one deliberately-constructed case aimed at a
       `startup_failure` conclusion is driven on the probe repo; for every run
       that driving produced, enumerated from
@@ -58,9 +66,13 @@ a candidate row on its existing promotion condition, untouched.
       window, the conclusion actually reached is recorded with its run URL, and
       where any reached `startup_failure`, whether an alert run was created for
       it.
-- [ ] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
-      disposition — answered, or narrowed to a restated remainder with its
-      promotion condition; item (a) is byte-unchanged.
+- [ ] AC4 The ROADMAP lineage row states that the experiment was driven and
+      names where the ledger lives; states items (b) and (c) as open, each with
+      its promotion condition, with neither struck through
+      (`grep -c '(b) ~~\|(c) ~~'` over the row returns 0); and leaves item (a)
+      byte-unchanged, verified by extracting the span from
+      `(a) **Scheduled sweep as a second detector**` to the next `(b) ` in the
+      master and branch versions and comparing those two spans.
 - [x] AC5 Every probe-repo run URL cited in
       `.github/workflows/master-red-alert.yaml` resolves: each URL matched by
       `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9][0-9]*'`
@@ -140,6 +152,10 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: the AC4 item-(a) evidence recorded at the first review gate was weaker than it read — it extracted item (a) with a GREEDY regex running to "alert workflow.", a phrase the rewritten row also contains, so the span compared was not reliably item (a). Re-verified with a bounded extraction from "(a) **Scheduled sweep" to the "(b) " marker: 271 bytes on both sides, identical. The first result was right by luck, not by construction; the re-review must use the bounded form.
 - 2026-08-21: verify after the return-1 repairs — the branch touches no package code at all (`git diff --name-only master..HEAD` returns only the alert workflow, `tools/check-master-red-alert.R`, `cairn/ROADMAP.md` and this file; nothing under `R/`, `src/`, `tests/`, `man/` or `data/`). `devtools::test()` FAIL 0 / PASS 8395 and `devtools::check()` Status: OK were measured on this branch before the repairs, and every commit since changed only comments and tracking prose; the re-review re-runs both rather than inheriting them. Both alert audits exit 0 after the repairs, `cairn_validate` all checks pass. Status → review.
 - 2026-08-21: REVIEW RETURN 2 (defect) + AMENDMENT RETURN on AC2. Defect: R2-1, the ROADMAP row headline still declares the remainder ANSWERED while item (b) says undecided — introduced by the return-1 compression, the same overclaim class as F1. amendment return: AC2 — wording to be drafted and audited before it is written. Jeff chose DESCOPE over another retry: the interpretation leaves M102.
+- 2026-08-21: descope executed per Jeff's call at return 2 — bank the verified ledger, park the reading. The alert header's interpretation block is replaced by a per-run LEDGER of all nine push runs in the 02:10Z-02:30Z window (id, watched-file state, reported `name`, conclusion, job count, which subscribers produced runs), plus the date measured, the probe-equivalence fact, and two recorded limits of the measurement (two one-spelling subscriber files rather than one listing both; the subscriber file's text at probe commit 758ab1b). Every generalization, every eliminative claim and the whole "what that settles" block are gone. The ROADMAP row states the experiment was DRIVEN and where the ledger lives, carries the reading as owed and unstarted, and restates (b) and (c) as open and unstruck with their promotion conditions. Diff still comment-only on the workflow; both alert audits exit 0.
+- 2026-08-21: AC2 and AC4 amended (substantive, narrowing) to bind the ledger rather than an interpretation. AC2 now binds what the API can settle — each ledger row's `name`, `conclusion` and job count, plus completeness against a stated `gh run list` window — and drops the watched-file-state column from its promise, since commit content is not decidable from those endpoints. AC4 binds the row's structure (experiment driven, ledger located, (b)/(c) open and unstruck by a stated grep, item (a) byte-unchanged by the bounded extraction) rather than a banned-string list, which the v2 audit showed was an instrument standing in for the property. The prior banned-string draft is not what shipped.
+- 2026-08-21: the milestone-local Decisions entry is SUPERSEDED by an appended entry withdrawing its reading; the measurement is not withdrawn.
+- 2026-08-21: three pre-commit wording audits ([O], fresh context, none authoring what it read) ran on the descope drafts BEFORE anything was committed. v1 was rejected outright — a false count ("two cells" where the header lists one), interpretation smuggled into record-only prose, and two criteria whose satisfying state did not reach the defects they were written for. v2's ledger verified factually perfect against the API but its surrounding prose failed on sixteen points. What shipped removes the prose those audits kept failing rather than rewriting it again.
 - 2026-08-21: descope step 1 — reverted `tools/check-master-red-alert.R` to master. The return-1 F10 comment edit was defended in-log as "within measure-only", but the Scope/Out names that file outright, so the edit was out of scope as written; the round-2 [S] blame-history reader flagged it as talked-past rather than amended. Under the descope the narrowing repair is to revert, not to widen Scope (return-adjacent direction rule); the stale-comment finding goes to the follow-up that owns the interpretation. Both alert audits still exit 0 against master's copy.
 - 2026-08-21: correction to the F13 repair record — the work-log line above that reads "byte-identical to this repo's and its job `if:` differs only in line numbers" was NOT corrected by the return-1 append, which named only the header. The probe's `if:` is identical in TEXT; only its position in the file differs. (R2-11.)
 - 2026-08-21: correction to the ROADMAP byte line above — 23,431 was correct at commit 4203a91f; `wc -c` returns 23,426 at review because the status cell changed from `in-progress` to `review`, five bytes shorter. The figure is a dated measurement, not a standing fact.
@@ -151,6 +167,8 @@ a candidate row on its existing promotion condition, untouched.
 ## Decisions
 
 - 2026-08-21 (M102, milestone-local): the four-cell result reverses M101's leading explanation, and the reversal — not the alert's configuration — is what this milestone records. M101 read name resolution as the likely reason a broken watched workflow went unalerted, because GitHub reported the broken runs' `name` as the file path while the matched control reported its declared name; name and validity varied together in every M101 cell, so it stood as a correlation. M102 varied them independently. A VALID workflow declaring no `name:` also has its name resolved to the path, and the path-spelling subscriber DID fire for it (driving run 32545706555, subscriber run 32545711782) while the declared-name subscriber created no run — so a path spelling in `workflows:` matches, and name resolution alone does not suppress a subscriber. The unparseable file, whose name resolves to the same path, produced NO run under either spelling (driving run 32545779577). Since the path spelling is exactly the one that would have matched the broken run's reported name and it did not fire, no spelling derivable from a broken run's REPORTED name closes the gap. Corrected at review return 1: that is narrower than "a `workflows:`-side fix is ruled out", which this entry first claimed — two possibilities stay open and nothing measured separates them, (1) no `workflow_run` event is delivered at all for a run that fails to start, or (2) one is delivered carrying a name the run's API record does not show, and under (2) listing that name would itself be a `workflows:`-side fix. The probe also never drove ONE subscriber listing both spellings, the arrangement a real fix would use. Item (a), a scheduled sweep, is therefore the remaining remedy shape that needs none of this resolved — not the only remedy possible. This entry stays milestone-local: it constrains no future milestone's design while its own verdict is this provisional.
+
+- 2026-08-21 (M102, milestone-local, SUPERSEDES the entry above): the entry above is WITHDRAWN as this milestone's finding. It read the four-cell result as reversing M101's leading explanation and as ruling out a `workflows:`-side fix. Two review returns established that this reading, in every wording attempted, claimed more than the runs support — the header's own remaining possibility (an event delivered under a name the API does not report) is a case where some spelling could still match, and the probe never drove one subscriber listing both spellings. The entry also miscounted the cells as four. Under the descope Jeff directed at review return 2, M102 records the per-run ledger and states no reading of it; what the ledger implies is owed by a follow-up, carried on the ROADMAP lineage row. Nothing in the measurement is withdrawn — the ledger verified row-by-row against the API, three times, by readers that did not author it.
 
 ## Review
 
