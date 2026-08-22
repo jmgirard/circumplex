@@ -1,6 +1,6 @@
 # M101: Find out whether a run that never starts reaches the master-red alert
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -141,7 +141,8 @@ it still pass unchanged.
 - 2026-08-21: REPAIR (review return 1) — G4, gated amendment. Jeff chose amending Scope only at the repair gate; the Goal stands, since it says "fails to start", which the zero-jobs measurement supports, and it never names `startup_failure`. Scope's **In:** paragraph amended: "two `startup_failure` cases" → "two broken-workflow cases", with the added sentence "Both were expected at plan time to conclude `startup_failure`; both in fact concluded `failure` with zero jobs (work log, T2/T3), so this milestone measures those two file conditions, not that conclusion." This narrows what the milestone claims to have measured; it adds no acceptance criterion and extends none. Plan-owned body re-checked against the 150-line cap after the growth.
 - 2026-08-21: CORRECTION (G12) — the T1 entry names commit `0b8863f760b95e3938a1fe32710d753e6cfa5c74` as the source of the probe's alert copy, while this branch was cut from master at `2b2c841d`. Both are true and neither is wrong: `.github/workflows/master-red-alert.yaml` is byte-identical at the two commits (verified at review by diffing the probe's fetched copy against `git show 0b8863f7:`), so AC1 holds either way. Recorded so a reader does not take the provenance commit for the branch point. History is append-only; the T1 entry stands.
 - 2026-08-21: CORRECTION (G13) — the plan-gate entry says the probe repo would be kept "(private)"; the implement-gate entry records Jeff choosing PUBLIC so the recorded run URLs stay readable without auth. The implement-gate choice is the operative one and the repo is public today (`gh repo view` resolves it unauthenticated). Recorded so the two entries do not read as a live contradiction. History is append-only; both entries stand.
-- 2026-08-21: REPAIR T6 re-run against the repaired files — `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0. `diff` of the alert's `on:` block against `git show master:` is EMPTY; `diff` of its `if: >-` block against `git show master:` is EMPTY; `git diff master...HEAD -- .github/` filtered to non-comment, non-blank added/removed lines is empty, so every workflow change on this branch is still comment text.
+- 2026-08-21: REPAIR T6 re-run against the repaired files — `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0. `diff` of the alert's `on:` block against `git show master:` is EMPTY; `diff` of its `if: >-` block against `git show master:` is EMPTY; `git diff master...HEAD -- .github/` filtered to non-comment, non-blank added/removed lines is empty, so every workflow change on this branch is still comment text.- 2026-08-21: all fourteen review findings dispositioned on the branch; status → review. This repair touched only `.github/workflows/master-red-alert.yaml`'s comment header and cairn tracking files — no R code, roxygen or test file — so the profile's `verify` slot is vacuous on the added diff; the pre-return `devtools::check(args = "--no-manual")` Status OK (0/0/0) and `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 8395 recorded above still describe the package, and both alert audits were re-run against the repaired file (exit 0).
+
 ## Decisions
 
 ## Review
