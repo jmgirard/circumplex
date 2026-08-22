@@ -7,7 +7,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m102-alert-event-delivery-discrimination`
+- **Branch/PR:** `m102-alert-event-delivery-discrimination` / https://github.com/jmgirard/circumplex/pull/131
 
 ## Goal
 
@@ -41,27 +41,27 @@ a candidate row on its existing promotion condition, untouched.
 
 ## Acceptance criteria
 
-- [ ] AC1 A `workflow_run` subscriber whose `workflows:` lists the path
+- [x] AC1 A `workflow_run` subscriber whose `workflows:` lists the path
       `.github/workflows/R-CMD-check.yaml` is on the probe repo's default
       branch, and M101's unparseable-YAML case is re-driven there; for that
       driving push, whether each subscriber produced a run is recorded with the
       driving run's URL, read from
       `gh run list -R jmgirard/gha-startup-failure-probe`.
-- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
+- [x] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
       the case-(b) outcome, which of the two explanations M101 left open the
       result rules out and which it leaves open, carrying the driving run URL
       and the date measured.
-- [ ] AC3 At least one deliberately-constructed case aimed at a
+- [x] AC3 At least one deliberately-constructed case aimed at a
       `startup_failure` conclusion is driven on the probe repo; for every run
       that driving produced, enumerated from
       `gh run list -R jmgirard/gha-startup-failure-probe` over the driving
       window, the conclusion actually reached is recorded with its run URL, and
       where any reached `startup_failure`, whether an alert run was created for
       it.
-- [ ] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
+- [x] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
       disposition — answered, or narrowed to a restated remainder with its
       promotion condition; item (a) is byte-unchanged.
-- [ ] AC5 Every probe-repo run URL cited in
+- [x] AC5 Every probe-repo run URL cited in
       `.github/workflows/master-red-alert.yaml` resolves: each URL matched by
       `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9][0-9]*'`
       over that file returns a run from `gh api`.
@@ -143,3 +143,35 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21 (M102, milestone-local): the four-cell result reverses M101's leading explanation, and the reversal — not the alert's configuration — is what this milestone records. M101 read name resolution as the likely reason a broken watched workflow went unalerted, because GitHub reported the broken runs' `name` as the file path while the matched control reported its declared name; name and validity varied together in every M101 cell, so it stood as a correlation. M102 varied them independently. A VALID workflow declaring no `name:` also has its name resolved to the path, and the path-spelling subscriber DID fire for it (driving run 32545706555, subscriber run 32545711782) while the declared-name subscriber created no run — so a path spelling in `workflows:` matches, and name resolution alone does not suppress a subscriber. The unparseable file, whose name resolves to the same path, produced NO run under either spelling (driving run 32545779577). Since the path spelling is exactly the one that would have matched the broken run's reported name and it did not fire, a `workflows:`-side fix is ruled out for the broken case: either no `workflow_run` event is delivered for a run that fails to start, or one is delivered carrying a name different from the one the API reports for that run. Item (a), a scheduled sweep, is left as the only remaining remedy shape.
 
 ## Review
+
+**Evidence gathered fresh at review 2026-08-21; commands re-run, never recalled.**
+
+- **AC1 — met.** `path-match-probe.yaml`, whose `workflows:` lists only
+  `.github/workflows/R-CMD-check.yaml`, landed on the probe repo's default
+  branch at probe commit `d0cc1cd`; `git merge-base --is-ancestor d0cc1cd
+  758ab1b` confirms it preceded the case-B commit, and `git branch -r
+  --contains d0cc1cd` shows it on `origin/main`, the probe's default branch.
+  M101's unparseable case was re-driven verbatim as run 32545779577. For that
+  driving push `gh run list` over the window returns no run for either
+  subscriber — the next run in the enumeration is 32545892860, a later push.
+- **AC2 — met.** The alert header carries "So a `workflows:`-side fix is RULED
+  OUT for a run that fails to start" with the alternative it leaves open
+  ("Either no `workflow_run` event is delivered … or one is delivered carrying
+  a name different from the one the API reports"), the driving run URL, and
+  "measured 2026-08-21 local, the cited runs stamped 2026-08-22 UTC".
+- **AC3 — met.** Three constructions driven: C1 nonexistent LOCAL reusable
+  workflow (32545943649), C2 malformed job `if:` expression (32545999116), C3
+  nonexistent EXTERNAL reusable workflow (32546052474). Each conclusion is
+  recorded with its run URL; all three concluded `failure` with 0 jobs and none
+  reached `startup_failure`, so the clause conditioned on that conclusion is
+  vacuous rather than unmet. The run enumeration is the `gh run list` window
+  the criterion names.
+- **AC4 — met.** The lineage row carries "both graduated 2026-08-21 → M102 and
+  both are ANSWERED there" with (b)'s ruled-out disposition and (c)'s null
+  result plus its reopening condition. Item (a) verified byte-identical to
+  master: its 271-byte span extracted from both versions and compared with
+  `cmp`, no difference.
+- **AC5 — met.** The amended procedure — `grep -o` for the run-URL pattern with
+  `[0-9][0-9]*` over `.github/workflows/master-red-alert.yaml` — returns ten
+  URLs, and every one resolves via `gh api` (three from M101, seven from M102).
+
