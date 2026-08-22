@@ -23,8 +23,10 @@ window's broken runs; recording that reading and the limits bounding it in the a
 header comment; shrinking the ROADMAP lineage row to a pointer.
 
 **Out:** changing the alert's `workflows:` list or any executable line of the workflow —
-the measurement says a path-spelled entry would have caught none of the five broken runs,
-so the diff stays comment-only (plan gate, 2026-08-22). A scheduled sweep as a second
+what was driven was a separate subscriber file listing one spelling, so no measurement
+prices an edit to this alert's own list; the list is left unchanged as a choice not to act
+on an untested counterfactual, and the diff stays comment-only (plan gate, 2026-08-22;
+rationale narrowed at the T3 audit, decision unchanged). A scheduled sweep as a second
 detector → stays its ROADMAP candidate (item (a)). Driving an unfiltered `workflow_run`
 subscriber to settle delivery in principle → stays its ROADMAP candidate (item (b)). A
 `DECISIONS.md` entry → declined at the plan gate; the reading is a finding, and the
@@ -109,6 +111,7 @@ alert's header owns the alert's rationale.
 - 2026-08-22: T4 — reading written into `.github/workflows/master-red-alert.yaml` immediately beneath the ledger (62 added lines, every one a comment; zero deletions, so `on:` and the job `if:` are byte-identical to master), and the ROADMAP lineage row struck to a pointer with item (b) restated. Both aimed sites re-read after the edit.
 - 2026-08-22: T5 — gate clean. `git diff master` on the workflow: 62 added lines, all comments, 0 deletions. `Rscript tools/check-master-red-alert.R` and `Rscript tools/master-red-alert-dryrun.R` both exit 0 (dry-run: 5/5 synthetic payloads reduce to the template). `cairn/ROADMAP.md` 59 lines / 23,645 bytes. `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 8395. `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. `cairn_validate` 0 failed checks.
 - 2026-08-22: status -> review. OPEN FOR THE GATE: the Scope `Out:` clause still justifies the no-code-change decision with the counterfactual the T3 audit rejected ("a path-spelled entry would have caught none of the five broken runs"). The decision is unchanged and the header text does not repeat it; only the plan-owned rationale overclaims, and it is amend-via-gate.
+- 2026-08-22: amendment at the review gate, user-selected — Scope `Out:` rationale narrowed from "the measurement says a path-spelled entry would have caught none of the five broken runs" to what the T3 audit left standing: no measurement prices an edit to this alert's own list, so it is left unchanged as a choice not to act on an untested counterfactual. Narrowing only; the decision, the acceptance criteria and the shipped header text are unchanged.
 
 ## Decisions
 
