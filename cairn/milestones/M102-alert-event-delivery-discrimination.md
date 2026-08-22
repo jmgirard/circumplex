@@ -61,9 +61,10 @@ a candidate row on its existing promotion condition, untouched.
 - [ ] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
       disposition — answered, or narrowed to a restated remainder with its
       promotion condition; item (a) is byte-unchanged.
-- [ ] AC5 Every probe-repo run URL cited on the branch resolves: each URL
-      matched by `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9]*'`
-      over the branch's changed files returns a run from `gh api`.
+- [ ] AC5 Every probe-repo run URL cited in
+      `.github/workflows/master-red-alert.yaml` resolves: each URL matched by
+      `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9][0-9]*'`
+      over that file returns a run from `gh api`.
 - [ ] AC6 `cairn/PROFILE.md`'s `verify` slot clean, and its consistency-gate
       checks clean at review.
 
@@ -104,7 +105,7 @@ a candidate row on its existing promotion condition, untouched.
       only what the driven cases show, in the register M101's header already uses.
 - [x] T7 Update the ROADMAP lineage row's items (b) and (c) to their measured
       dispositions.
-- [ ] T8 Verify every cited probe-repo run URL resolves, then run the profile's
+- [x] T8 Verify every cited probe-repo run URL resolves, then run the profile's
       verify and consistency-gate checks.
 
 ## Work log
@@ -126,6 +127,10 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: T6 correction before commit — a drafted header line said "all five broken-start runs"; the enumeration shows six (M101's two cells plus M102's four broken cells), so the line was rewritten to derive the count from the cells rather than assert a number.
 - 2026-08-21: T7 done — the ROADMAP lineage row carries (b) and (c) answered. Two claims in that row were current knowledge M102 falsified and were fixed in place, not appended to: "a `workflows:`-side fix is not ruled out" and "name resolution is the leading explanation". Item (a) verified byte-identical to master by extracting its 271-byte span from both versions and diffing.
 - 2026-08-21: ROADMAP is 23,431 of its 24,000-byte budget after T7 — 569 bytes of headroom, tighter than the 1,106 it had before; flagged for the review hygiene stamp.
+- 2026-08-21: SUBSTANTIVE amendment at the mini gate — AC5 was unsatisfiable as written: it swept the branch's changed files for run URLs, and the milestone file quotes AC5's own grep pattern, so the procedure matched its own literal text and returned a bare prefix carrying no run id. Narrowed, not widened: the domain is now `.github/workflows/master-red-alert.yaml` alone and the pattern is `[0-9][0-9]*` so a bare prefix cannot match. Jeff chose the narrowing over a carve-out for the quoting line and over a return to planning. The amended wording was re-asked the reduced-mode audit questions IN-SESSION rather than by a fresh-context reader, the same standing no-subagent deviation recorded at plan.
+- 2026-08-21: T8 done — the amended AC5 procedure returns ten URLs from the alert header, all resolving. Beyond AC5's promise, all fifteen run ids cited anywhere on the branch were resolved and each one's conclusion and reported `name` match what the records claim.
+- 2026-08-21: T8 caught a header defect before the amendment: an explanatory line written as `.../runs/N` produced a bare URL-prefix match; the six cells were rewritten to carry full URLs, as M101's header already does, so the artifact satisfies the criterion rather than the criterion bending to the artifact.
+- 2026-08-21: T8 tooling note — the first run of AC5's sweep used an unquoted `$FILES` in zsh, which does not word-split, so the grep read one nonexistent filename and reported nothing; caught by the shell's own warning and re-run with a `while read` loop. The LESSONS M95-family line already warns of exactly this.
 - 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
 - 2026-08-21: plan gate chose measure-only over measuring and applying the `workflows:` path fix in the same milestone because the fix would be committed to before its measurement exists and a null result would leave the milestone half-empty; falsified by the path-spelling arm firing and the resulting one-line change proving to need no separate design.

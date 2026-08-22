@@ -56,21 +56,25 @@
 # this one and its job `if:` differing only in line numbers. Each cell's
 # conclusion, job count and `name` are read from `gh run list`:
 #   * valid, DECLARES `name:` — name = declared, `success`, 1 job; the
-#     declared-name subscriber ran .../runs/32545892860
+#     declared-name subscriber ran
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545892860
 #   * valid, declares NO `name:` — name = PATH, `success`, 1 job; the PATH
-#     subscriber RAN: .../runs/32545706555 produced .../runs/32545711782
+#     subscriber RAN —
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545706555
+#     produced
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545711782
 #   * unparseable, M101 case (i) re-driven verbatim — name = PATH, `failure`,
-#     0 jobs, NEITHER subscriber ran: .../runs/32545779577
+#     0 jobs, NEITHER subscriber ran
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545779577
 #   * parses, declares `name:`, job `uses:` a nonexistent LOCAL reusable
-#     workflow — name = PATH, `failure`, 0 jobs, neither ran:
-#     .../runs/32545943649
+#     workflow — name = PATH, `failure`, 0 jobs, neither ran
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545943649
 #   * parses, declares `name:`, malformed expression in a job `if:` — name =
-#     PATH, `failure`, 0 jobs, neither ran: .../runs/32545999116
+#     PATH, `failure`, 0 jobs, neither ran
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545999116
 #   * parses, declares `name:`, job `uses:` a reusable workflow in a nonexistent
-#     EXTERNAL repo — name = PATH, `failure`, 0 jobs, neither ran:
-#     .../runs/32546052474
-# (Each `.../runs/N` above is
-# https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/N.)
+#     EXTERNAL repo — name = PATH, `failure`, 0 jobs, neither ran
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32546052474
 #
 # What that settles:
 #   * A PATH spelling in `workflows:` DOES match. The valid-but-nameless cell
