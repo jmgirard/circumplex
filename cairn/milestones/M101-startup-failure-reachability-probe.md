@@ -39,20 +39,20 @@ it still pass unchanged.
 
 ## Acceptance criteria
 
-- [ ] AC1: A probe environment exists whose `on.workflow_run` block and job
+- [x] AC1: A probe environment exists whose `on.workflow_run` block and job
       `if:` expression are byte-identical to
       `.github/workflows/master-red-alert.yaml`'s at the commit named in the
       work log, verified by a recorded diff of the two extracted blocks.
-- [ ] AC2: The probe drives at least the two named cases on the probe's
+- [x] AC2: The probe drives at least the two named cases on the probe's
       watched workflow — (i) a file whose YAML does not parse, (ii) a file
       that parses and declares `name:` but is rejected by workflow-schema
       validation — and the work log records, per case, the run's `status` and
       `conclusion` as reported by `gh run list`, and whether the alert job was
       triggered.
-- [ ] AC3: For each of the two cases in AC2, the work log states whether an
+- [x] AC3: For each of the two cases in AC2, the work log states whether an
       alert issue was opened, read from the probe repo's issue list, with the
       query recorded.
-- [ ] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
+- [x] AC4: `.github/workflows/master-red-alert.yaml`'s header comment is
       rewritten so that, for each of the two cases AC2 drove, it states the
       observed outcome (event delivered and alert job triggered / event
       delivered but not matched / no event observed) and attributes it to the
@@ -60,10 +60,10 @@ it still pass unchanged.
       sentence stating that cases other than those two remain untested. The
       header comment's full prior text and full new text are both quoted in
       the work log.
-- [ ] AC5: The ROADMAP candidate row carrying this question is dispositioned
+- [x] AC5: The ROADMAP candidate row carrying this question is dispositioned
       — closed, or narrowed to the sub-case AC2 left unsettled — and the row's
       text after the edit is quoted in the work log.
-- [ ] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
+- [x] AC6: `Rscript tools/check-master-red-alert.R` and `Rscript
       tools/master-red-alert-dryrun.R` both exit 0 at the end of the
       milestone, and `git diff` shows
       `.github/workflows/master-red-alert.yaml`'s `on:` block and job `if:`
@@ -134,3 +134,13 @@ it still pass unchanged.
 ## Decisions
 
 ## Review
+
+**PR:** https://github.com/jmgirard/circumplex/pull/130 · **Reviewed:** 2026-08-21
+
+**Acceptance criteria — fresh evidence.** Every probe figure below was re-read at review from `gh api repos/jmgirard/gha-startup-failure-probe/actions/runs`, not carried over from the work log.
+- **AC1 met.** The probe's alert file was fetched at review (`gh api "repos/jmgirard/gha-startup-failure-probe/contents/.github/workflows/master-red-alert.yaml"`, base64-decoded, 180 lines) and diffed against `git show 0b8863f760b95e3938a1fe32710d753e6cfa5c74:.github/workflows/master-red-alert.yaml` — the commit the work log names. The WHOLE FILE diff is empty, and the `on.workflow_run` block and job `if:` were diffed separately and are each empty too. AC1 asks only for those two blocks; the whole file happens to match.
+- **AC2 met.** Both named cases were driven on the probe's watched workflow and both are recorded per case. Case (i), YAML that does not parse: run 32540432744, `status=completed conclusion=failure`, `jobs.total_count` 0. Case (ii), parses and declares `name:` but a job carries no `runs-on`: run 32540622138, `status=completed conclusion=failure`, `jobs.total_count` 0. Whether the alert job was triggered is recorded for each: it was NOT — the run list carries no `workflow_run` entry after either, so no alert run existed to have a job. Read as written, AC2 asks for the two FILE conditions plus status, conclusion and alert-job outcome per case; it does not require a particular conclusion, and the fact that neither produced `startup_failure` is a finding about the world rather than a criterion failure. Raised as G1 below and triaged there.
+- **AC3 met.** For both cases the answer is that no issue was opened. Query recorded and re-run at review: `gh issue list --repo jmgirard/gha-startup-failure-probe --state all --json number,title,state,createdAt` returns exactly one issue, `#1 [CLOSED] master is red: R-CMD-check.yaml created=2026-08-22T00:27:25Z` — the positive control's, created before either broken case was pushed and closed before case (i). No issue exists with a creation time after either broken run.
+- **AC4 met.** `.github/workflows/master-red-alert.yaml`'s header now states, per case, the outcome from AC4's own vocabulary — "both were MISSED — no `workflow_run` event reached this workflow at all, so no alert run, no issue" — with each case on its own line carrying its run id (32540432744, 32540622138), and attributes them to `https://github.com/jmgirard/gha-startup-failure-probe`, named two lines above. The residual sentence is present: "Cases other than those two — including whatever does produce a `startup_failure` conclusion — remain untested." Both the full prior text and the full new text are quoted in the work log's T4 entry. One reservation recorded rather than reinterpreted: the run references are written repo-relative (`run .../actions/runs/<id>`) against the repo URL two lines above, not as complete URLs; whether that satisfies "naming the probe repo and run URL" is raised as G2 below and triaged there.
+- **AC5 met.** The candidate row is dispositioned CLOSED for the graduated remainder, and its full post-edit text is quoted verbatim in the work log's T5 entry. Re-read at review, `cairn/ROADMAP.md:23` carries the closure, the measured mechanism, the surviving scheduled-sweep remainder with its promotion condition, and the folded-in residual question. `cairn_validate`'s `roadmap<->disk orphans` and `weight caps` both PASS against it.
+- **AC6 met.** `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0, both re-run at review. `diff` of the alert's `on:` block against `git show master:` is empty; `diff` of its job `if:` against `git show master:` is empty; and `git diff master...HEAD -- .github/` filtered to non-comment added/removed lines is empty, so every workflow change on the branch is comment text.
