@@ -11,10 +11,10 @@
 
 ## Goal
 
-Establish by deliberate experiment on the existing probe repo whether the
-`workflow_run` event for a broken watched workflow is delivered and then
-excluded by the alert's `workflows:` filter or never delivered at all, and
-measure what conclusion deliberately-broken workflows actually reach.
+Drive, on the existing probe repo, an experiment that observes the two spellings
+`on.workflow_run.workflows` can match separately, and record the result as a
+per-run ledger where the alert's readers will find it. Reading that ledger is
+out of scope (descoped at review return 2).
 
 ## Scope
 
@@ -50,7 +50,7 @@ condition, untouched.
       driving push, whether each subscriber produced a run is recorded with the
       driving run's URL, read from
       `gh run list -R jmgirard/gha-startup-failure-probe`.
-- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment carries a
+- [x] AC2 `.github/workflows/master-red-alert.yaml`'s header comment carries a
       per-run ledger of M102's driving window, and: (a) for every run id
       appearing in that ledger, `gh api
       repos/jmgirard/gha-startup-failure-probe/actions/runs/<id>` returns the
@@ -66,7 +66,7 @@ condition, untouched.
       window, the conclusion actually reached is recorded with its run URL, and
       where any reached `startup_failure`, whether an alert run was created for
       it.
-- [ ] AC4 The ROADMAP lineage row states that the experiment was driven and
+- [x] AC4 The ROADMAP lineage row states that the experiment was driven and
       names where the ledger lives; states items (b) and (c) as open, each with
       its promotion condition, with neither struck through
       (`grep -c '(b) ~~\|(c) ~~'` over the row returns 0); and leaves item (a)
@@ -152,6 +152,7 @@ condition, untouched.
 - 2026-08-21: the AC4 item-(a) evidence recorded at the first review gate was weaker than it read — it extracted item (a) with a GREEDY regex running to "alert workflow.", a phrase the rewritten row also contains, so the span compared was not reliably item (a). Re-verified with a bounded extraction from "(a) **Scheduled sweep" to the "(b) " marker: 271 bytes on both sides, identical. The first result was right by luck, not by construction; the re-review must use the bounded form.
 - 2026-08-21: verify after the return-1 repairs — the branch touches no package code at all (`git diff --name-only master..HEAD` returns only the alert workflow, `tools/check-master-red-alert.R`, `cairn/ROADMAP.md` and this file; nothing under `R/`, `src/`, `tests/`, `man/` or `data/`). `devtools::test()` FAIL 0 / PASS 8395 and `devtools::check()` Status: OK were measured on this branch before the repairs, and every commit since changed only comments and tracking prose; the re-review re-runs both rather than inheriting them. Both alert audits exit 0 after the repairs, `cairn_validate` all checks pass. Status → review.
 - 2026-08-21: REVIEW RETURN 2 (defect) + AMENDMENT RETURN on AC2. Defect: R2-1, the ROADMAP row headline still declares the remainder ANSWERED while item (b) says undecided — introduced by the return-1 compression, the same overclaim class as F1. amendment return: AC2 — wording to be drafted and audited before it is written. Jeff chose DESCOPE over another retry: the interpretation leaves M102.
+- 2026-08-21: GOAL AMENDED at the review gate, with Jeff's explicit call and this line as the record. The prior goal — "Establish by deliberate experiment ... whether the `workflow_run` event ... is delivered and then excluded ... or never delivered at all" — promised the determination the descope moved out, so it was no longer what this milestone delivers. Doctrine says a wrong goal returns to `/milestone-plan` rather than being edited in place; Jeff chose amendment over a re-cut whose only content would have been one sentence, on a milestone already carrying two returns. Recorded as a deliberate deviation, not an oversight.
 - 2026-08-21: descope executed per Jeff's call at return 2 — bank the verified ledger, park the reading. The alert header's interpretation block is replaced by a per-run LEDGER of all nine push runs in the 02:10Z-02:30Z window (id, watched-file state, reported `name`, conclusion, job count, which subscribers produced runs), plus the date measured, the probe-equivalence fact, and two recorded limits of the measurement (two one-spelling subscriber files rather than one listing both; the subscriber file's text at probe commit 758ab1b). Every generalization, every eliminative claim and the whole "what that settles" block are gone. The ROADMAP row states the experiment was DRIVEN and where the ledger lives, carries the reading as owed and unstarted, and restates (b) and (c) as open and unstruck with their promotion conditions. Diff still comment-only on the workflow; both alert audits exit 0.
 - 2026-08-21: AC2 and AC4 amended (substantive, narrowing) to bind the ledger rather than an interpretation. AC2 now binds what the API can settle — each ledger row's `name`, `conclusion` and job count, plus completeness against a stated `gh run list` window — and drops the watched-file-state column from its promise, since commit content is not decidable from those endpoints. AC4 binds the row's structure (experiment driven, ledger located, (b)/(c) open and unstruck by a stated grep, item (a) byte-unchanged by the bounded extraction) rather than a banned-string list, which the v2 audit showed was an instrument standing in for the property. The prior banned-string draft is not what shipped.
 - 2026-08-21: the milestone-local Decisions entry is SUPERSEDED by an appended entry withdrawing its reading; the measurement is not withdrawn.
@@ -335,4 +336,24 @@ So the interpretation leaves M102: the milestone narrows to the experiment, its
 cells and the run record, and what the result MEANS is planned separately with
 fresh eyes. AC2 and AC4 are unticked pending their gated narrowing amendment;
 AC1, AC3 and AC5 keep their round-2 evidence.
+
+**Round 3 (post-descope) — evidence 2026-08-21.**
+
+- **AC2 — met.** Ledger rows verified one by one: for all nine run ids,
+  `gh api .../runs/<id>` returns the `name` and `conclusion` the ledger states
+  and `.../runs/<id>/jobs` returns its stated job count (three `success`/1 job
+  with the declared name, six `failure`/0 jobs with the path). Completeness:
+  `gh run list --limit 40` filtered to `event == push` and `createdAt` in
+  [02:10Z, 02:30Z] returns exactly those nine ids. The header states the date
+  measured and records that no single subscriber listing both spellings was
+  driven.
+- **AC4 — met.** The row states the experiment was DRIVEN, names the alert
+  header as the ledger's home, and carries (b) and (c) as open with their
+  promotion conditions; `grep -c '(b) ~~\|(c) ~~'` returns 0. Item (a)
+  byte-unchanged by the bounded extraction, 271 bytes each side.
+- **AC5 — re-met after the rewrite.** The header now cites 16 run URLs; all 16
+  resolve via `gh api`.
+- **Descope audit trail.** Three fresh-context [O] wording audits ran BEFORE any
+  commit. What shipped is the outcome of deleting the prose they kept failing,
+  not of rewriting it again; the ledger they verified is what remains.
 
