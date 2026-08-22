@@ -22,14 +22,25 @@
 # after they merge. Nothing is checked out: the whole alert is this file's own
 # `run:` body, which is why there is no `contents:` grant below.
 #
-# What M99's widening does NOT establish — observed 2026-08-21, and unresolved:
-# a run that never starts may deliver no `workflow_run` event at all, and
-# `on.workflow_run.workflows` below matches each watched workflow's declared
-# `name:`, which a workflow file too malformed to parse cannot declare. So the
-# gate now admits `startup_failure`, but whether such a run ever reaches this
-# gate is untested — nothing checkable from inside this repo decides it. The
-# ROADMAP candidate row that graduated into M99 keeps that question open, with
-# a deliberate live probe or a scheduled sweep as the two candidate remedies.
+# A BROKEN watched workflow is invisible here — measured 2026-08-21 (cairn
+# M101) in https://github.com/jmgirard/gha-startup-failure-probe, a repo whose
+# copy of this file is byte-identical. Two cases were driven on a watched
+# workflow, and both were MISSED — no `workflow_run` event reached this
+# workflow at all, so no alert run, no issue:
+#   * YAML that does not parse — run .../actions/runs/32540432744
+#   * parses and declares `name:` but fails schema validation, a job with no
+#     `runs-on` — run .../actions/runs/32540622138
+# Neither concluded `startup_failure`; both concluded `failure` with zero jobs.
+# The discriminator is the NAME, not the conclusion: GitHub reported each
+# broken run's name as the PATH `.github/workflows/R-CMD-check.yaml`, while the
+# probe's control run — the same file, valid, exiting non-zero — reported the
+# declared `R-CMD-check.yaml` and DID reach the alert (issue opened). So
+# `on.workflow_run.workflows` below matches a declared name that GitHub does
+# not resolve for a workflow it cannot validate. M99's widening is untouched by
+# this: such a run would pass the `if:` if it arrived, and it never arrives.
+# Cases other than those two — including whatever does produce a
+# `startup_failure` conclusion — remain untested. A scheduled sweep is the
+# candidate remedy, and it is a ROADMAP candidate row, not a plan.
 on:
   workflow_run:
     workflows:
