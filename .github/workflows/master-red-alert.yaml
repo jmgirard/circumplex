@@ -35,27 +35,69 @@
 #   * parses and declares `name:` but fails schema validation, a job with no
 #     `runs-on` —
 #     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540622138
-# Read that narrowly: an absent alert RUN does not distinguish "no `workflow_run`
-# event was delivered" from "an event was delivered and the `workflows:` filter
-# below did not match it". Nothing the probe MEASURED separates the two, so a
-# `workflows:`-side fix is NOT ruled out; the experiment that would separate
-# them is a ROADMAP candidate, not a settled impossibility.
-# What the runs do show: neither concluded `startup_failure`; both concluded
-# `failure` with zero jobs; and GitHub reported each broken run's `name` as the
-# PATH `.github/workflows/R-CMD-check.yaml`, while the probe's control — the same
-# path holding a valid file that exited non-zero —
+# Read the M101 result narrowly: an absent alert RUN does not by itself
+# distinguish "no `workflow_run` event was delivered" from "an event was
+# delivered and the `workflows:` filter below did not match it".
+# What those two runs do show: neither concluded `startup_failure`; both
+# concluded `failure` with zero jobs; and GitHub reported each broken run's
+# `name` as the PATH `.github/workflows/R-CMD-check.yaml`, while the probe's
+# control — the same path holding a valid file that exited non-zero —
 # https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540381494
-# reported the declared `R-CMD-check.yaml` and DID reach the alert (issue opened).
-# Name and file validity varied together in every cell, so that is a correlation,
-# not an isolated mechanism: the run list's `workflowName` field reports
-# `R-CMD-check.yaml` even for the broken runs, but it resolves through the
-# workflow ENTITY, whose name refreshed when the probe file was restored, so it
-# does not settle the question either.
-# M99's `startup_failure` widening gained no support from this: both broken runs
-# concluded `failure`, which the pre-M99 list already admitted.
-# Cases other than those two — other ways a workflow can break, and whatever does
-# produce a `startup_failure` conclusion — remain untested. A scheduled sweep is
-# the candidate remedy, and it is a ROADMAP candidate row, not a plan.
+# reported the declared `R-CMD-check.yaml` and DID reach the alert (issue
+# opened). In every M101 cell name and file validity varied TOGETHER.
+#
+# The experiment M101 left open was DRIVEN by cairn M102 on 2026-08-21 (runs
+# stamped 2026-08-22 UTC): a second `workflow_run` subscriber was added to the
+# probe repo listing the PATH spelling `.github/workflows/R-CMD-check.yaml`,
+# and nine push runs were driven against it. The probe's copy of this file was
+# verified first — `on:` block byte-identical to this one, job `if:` identical
+# in text.
+#
+# What follows is the LEDGER of that window. What it implies for the
+# `workflows:` list below is deliberately NOT recorded here: two attempts at
+# writing that reading overstated the evidence and were returned at review, so
+# the reading is owed by a follow-up milestone. The ROADMAP lineage row carries
+# what is still open.
+#
+# Every `push` run in 02:10Z-02:30Z is listed. "declared" = the run's reported
+# `name` was `R-CMD-check.yaml`; "path" = it was
+# `.github/workflows/R-CMD-check.yaml`. Sub-lines record which subscribers
+# produced runs.
+#
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545535964
+#     valid, declares `name:` — declared, `success`, 1 job
+#     -> alert https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545540389 (skipped); path subscriber added by this push
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545583419
+#     unparseable, unintended (a `run:` scalar holding ": ") — path,
+#     `failure`, 0 jobs -> neither subscriber
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545706555
+#     valid, declares NO `name:` — path, `success`, 1 job
+#     -> path https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545711782 (success); no alert run
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545779577
+#     unparseable, M101 case (i) re-driven verbatim — path, `failure`, 0 jobs
+#     -> neither subscriber
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545892860
+#     valid, declares `name:` — declared, `success`, 1 job
+#     -> alert https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545896997 (skipped); no path-subscriber run
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545943649
+#     `uses:` a nonexistent LOCAL reusable workflow — path, `failure`, 0 jobs
+#     -> neither subscriber
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32545999116
+#     malformed expression in a job-level `if:` — path, `failure`, 0 jobs
+#     -> neither subscriber
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32546052474
+#     `uses:` a reusable workflow in a nonexistent EXTERNAL repo — path,
+#     `failure`, 0 jobs -> neither subscriber
+#   https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32546138873
+#     valid, declares `name:` — declared, `success`, 1 job
+#     -> alert https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32546143683 (skipped); path subscriber removed by this push
+#
+# No run in this window reported the conclusion `startup_failure`.
+# Two facts about the measurement itself, so the reading milestone inherits
+# them: the two spellings were driven as TWO separate subscriber files each
+# listing ONE spelling, and a single subscriber listing both was never driven;
+# and the subscriber file is no longer on the probe's default branch — its text
+# is at probe commit 758ab1b.
 on:
   workflow_run:
     workflows:
