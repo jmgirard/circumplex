@@ -40,9 +40,11 @@ alert's header owns the alert's rationale.
       value was that run's own reported name produced no run for it; and cites run
       `32545706555` — a valid run in the same window whose reported name was likewise the
       path — as the same-window control that subscriber did match.
-- [ ] AC2 — Every claim the added text makes about a run's behaviour names the run id it
-      rests on. Domain enumerated by `git diff master -- .github/workflows/master-red-alert.yaml`:
-      each added line asserting run behaviour carries an id from that diff hunk.
+- [ ] AC2 — Every per-run cell the added text states — a run's reported name, conclusion,
+      job count, head sha, or whether it produced a subscriber or alert run — appears in a
+      sentence that names that run's id, or whose subject is a back-reference to an
+      antecedent sentence naming it. Domain enumerated by
+      `git diff master -- .github/workflows/master-red-alert.yaml`, read sentence by sentence.
 - [x] AC3 — The recorded reading states these four limits: (i) no run in the window
       reported the conclusion `startup_failure`; (ii) the two spellings were driven as two
       separate subscriber files each listing one spelling, and a single subscriber listing
@@ -114,6 +116,11 @@ alert's header owns the alert's rationale.
 - 2026-08-22: amendment at the review gate, user-selected — Scope `Out:` rationale narrowed from "the measurement says a path-spelled entry would have caught none of the five broken runs" to what the T3 audit left standing: no measurement prices an edit to this alert's own list, so it is left unchanged as a choice not to act on an untested counterfactual. Narrowing only; the decision, the acceptance criteria and the shipped header text are unchanged.
 - 2026-08-22: review return 1 (defect) — [O] diff-bug finding 1: the header's "What follows is the LEDGER" paragraph still says the reading is "deliberately NOT recorded here" and "owed by a follow-up milestone", five lines above the reading itself. Status -> in-progress. Also actioned in this return: undated dated-observations outside the provenance preamble's two buckets, the "As run," garble, and the ROADMAP item (b) clause "and under what name" dropped from its bolded title.
 - 2026-08-22: review return — AC2 judged NOT MET by a fresh-context [O] reader, which judged the criterion the primary defect: its line-level operational test is unsatisfiable by hard-wrapped prose. Routed to the gated criterion-amendment protocol; AC4's tick withdrawn to be disposed at the same gate. The plan-gate criteria audit ran in reduced mode (internal tier), which omits the satisfiability question — that omission is why this reached review.
+- 2026-08-22: amendment return: AC2 — "Every per-run cell the added text states — a run's reported name, conclusion, job count, head sha, or whether it produced a subscriber or alert run — appears in a sentence that names that run's id, or whose subject is a back-reference to an antecedent sentence naming it. Domain enumerated by `git diff master -- .github/workflows/master-red-alert.yaml`, read sentence by sentence."
+- 2026-08-22: AC2's amended wording went to two fresh-context [O] readers in reduced mode (internal tier) before being written — the sentence-level draft passed all three questions but was found indeterminate on which sentences fall in the domain, so the one permitted re-entry replaced "asserting run behaviour" with the five named cell types; the second reader passed all three questions and judged it satisfiable. Further churn on AC2 goes to the user.
+- 2026-08-22: mini gate — AC4 HELD as written at the user's selection rather than widened to cover every claim (the return-adjacent direction rule's recommended option); the four uncovered dated observations are repaired in the text instead, and the preamble now carries the `— observed 2026-08-22` form AC4 names.
+- 2026-08-22: return-1 fixes — (1) the ledger preamble no longer says the reading is "deliberately NOT recorded here"; it now says M102 recorded the ledger alone and names the reading that follows. (2) The provenance preamble states three claim classes, covering run-level cells, subscriber-run outcomes, the subscriber file's tree presence and commit range and its own text, and the inherited M101/M102 equivalence claims. (3) "As run," became "In the state they ran," — the load-bearing comma is gone. (4) The "So:" sentence and the two head-sha claims now name 32545706555 and fold the commit-range fact into the id-naming bullets; the `startup_failure` limit back-references "the nine runs listed above". (5) ROADMAP item (b) has "and under what name" restored to its bolded title.
+- 2026-08-22: everything from `on:` to EOF is byte-identical to master (`diff` on that span, empty), so the alert's executable half is untouched; both audit scripts exit 0.
 
 ## Decisions
 
