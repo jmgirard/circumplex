@@ -82,10 +82,10 @@ milestone that opens the guarded code.
 - [x] T2: trim `cairn/LESSONS.md` — remove the six graduated lines, add the
       pointer line, and check the header note (`:3`) for anything the move makes
       false. Measure with `wc -l -c`.
-- [ ] T3: run the loss sweep — take the removed `- ` lines from
+- [x] T3: run the loss sweep — take the removed `- ` lines from
       `git diff master..<branch> -- cairn/LESSONS.md`, `grep -F` each headline
       and milestone-tag clause in `cairn/test-craft.md`, record the counts.
-- [ ] T4: run the six citation greps across `cairn/` and `CLAUDE.md`; the known
+- [x] T4: run the six citation greps across `cairn/` and `CLAUDE.md`; the known
       sites are `cairn/DECISIONS.md:846`, `:1091`, `:1524`. Fix what the move
       makes stale, in both directions (the M56-family lesson).
 - [ ] T5: append the D-entry superseding M44's holding — quote M44's rationale,
@@ -107,6 +107,10 @@ milestone that opens the guarded code.
 - 2026-08-22: plan gate chose folding M102's two lessons into the M95-family entry over landing them as standalone lines because the parked row already assigns them to that family; falsified by either lesson recurring in a shape the M95 headline does not cover.
 
 - 2026-08-22: T1+T2 committed together — LESSONS.md trimmed without the module in place would be data loss, so the move is one commit. `cairn/test-craft.md` 23 lines / 7,065 B holds the six families; `cairn/LESSONS.md` 45→40 lines, 19,996→14,738 B (AC1: under 50 lines and under 16,000 B).
+
+- 2026-08-22: T3 loss sweep — `git diff master..HEAD -- cairn/LESSONS.md` reported 6 removed `- ` lines (the domain); all 6 bolded family headlines and all 48 parenthesized milestone-tag clauses found by `grep -F` in `cairn/test-craft.md`; 0 failures (AC2).
+- 2026-08-22: T4 citation sweep — the six family-tag greps over `cairn/` and `CLAUDE.md` returned 13 hits: 6 in `cairn/test-craft.md` (the graduated content), 6 in M104's own AC6 wording (names the tags to grep — still true), 1 in `cairn/milestones/archive/M96-master-red-alert.md` ("Lesson graduated into the M95 family line" — still true, names no file, IP4 history). No hit directs a reader to `cairn/LESSONS.md` for graduated content (AC6).
+- 2026-08-22: T4 also checked the three sites the greps cannot reach (they cite lessons by other spellings): `cairn/DECISIONS.md:846` and `:1524` cite the M7 family, which did not graduate; `:1091` cites "the M59/M61 lesson" and names no file. All three still true, and all three IP4 history that is superseded rather than edited.
 
 ## Decisions
 
