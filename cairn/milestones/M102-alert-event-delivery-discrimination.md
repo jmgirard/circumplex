@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M102: Separate a filtered-out alert event from one never delivered
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -131,6 +131,8 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: T8 done — the amended AC5 procedure returns ten URLs from the alert header, all resolving. Beyond AC5's promise, all fifteen run ids cited anywhere on the branch were resolved and each one's conclusion and reported `name` match what the records claim.
 - 2026-08-21: T8 caught a header defect before the amendment: an explanatory line written as `.../runs/N` produced a bare URL-prefix match; the six cells were rewritten to carry full URLs, as M101's header already does, so the artifact satisfies the criterion rather than the criterion bending to the artifact.
 - 2026-08-21: T8 tooling note — the first run of AC5's sweep used an unquoted `$FILES` in zsh, which does not word-split, so the grep read one nonexistent filename and reported nothing; caught by the shell's own warning and re-run with a `while read` loop. The LESSONS M95-family line already warns of exactly this.
+- 2026-08-21: AC6 verify half — `devtools::test()` clean: FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, the same pass count M99 recorded; the branch changes no R code. `tools/check-master-red-alert.R` and `tools/master-red-alert-dryrun.R` both exit 0 (5 synthetic payloads ok), so the `EXPECTED_IF` pin is unmoved by the comment-only diff. `cairn_validate` all checks pass, 47 advisories — the pre-existing M7 multi-line work-log WARNs. Consistency-gate half runs at review.
+- 2026-08-21: all tasks checked; status → review.
 - 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
 - 2026-08-21: plan gate chose measure-only over measuring and applying the `workflows:` path fix in the same milestone because the fix would be committed to before its measurement exists and a null result would leave the milestone half-empty; falsified by the path-spelling arm firing and the resulting one-line change proving to need no separate design.
