@@ -130,6 +130,7 @@ it still pass unchanged.
 - 2026-08-21: T6 — `Rscript tools/check-master-red-alert.R` exit 0 and `Rscript tools/master-red-alert-dryrun.R` exit 0 against the rewritten header. `diff` of the alert's `on:` block and of its job `if:` against `git show master:` are both EMPTY, and `git diff master...HEAD -- .github/` filtered to non-comment added/removed lines is empty, so every workflow change on this branch is comment text.
 - 2026-08-21: probe repo restored to a valid, succeeding workflow now the experiment is done; the four states it passed through remain in its git history, and the cited run URLs are unaffected. The repo is kept public per the plan gate.
 - 2026-08-21: all tasks done; status → review. No R code, roxygen, or test file touched, so the profile's `verify` slot is vacuous on this diff; `devtools::test()` run anyway for a fresh number — FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, the same 8395 M99 and M100 recorded, the 5 warnings lavaan's and pre-existing.
+- 2026-08-21: post-return evidence (the gate check was already running when review returned) — `devtools::check(args = "--no-manual")` Status: OK, 0 errors, 0 warnings, 0 notes. The PDF-manual step was skipped by that explicit argument rather than silently (M7-family lesson); no roxygen changed on this branch, so nothing is owed there. None of this bears on G1/G7/G8, which are prose and record defects no package check can see.
 
 ## Decisions
 
