@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-21 (M102 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. ROADMAP 59 lines: M102 landed `done`, M97's terminal row retired to hold retention at 5, and the lineage row SHRANK sharply when M102's descope stripped its interpretation. New row: `LESSONS.md` is at its cap and a retirement pass is owed — M102's two lessons are parked there verbatim because nothing could be retired for them, and LESSONS is unchanged at 45 lines / 19,996 bytes. PROFILE 119 of 120 lines. Both GitHub inboxes empty; tracking matches git at the M102 squash.)_
+_Last hygiene check: 2026-08-22 (M103 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. ROADMAP 58 lines: M103 landed `done`, M98's terminal row retired to hold retention at 5, and the alert lineage row shrank to a pointer once the owed reading was recorded. `LESSONS.md` unchanged at 45 lines / 19,996 bytes and still at its cap — M103 added none (its stranded-prose recurrence is owned by the M56-family line) and retired none, so the parked-lessons row stands. PROFILE 119 of 120 lines. Both GitHub inboxes empty; tracking matches git at the M103 squash.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,9 +10,8 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M103 | Record what the alert's per-run ledger implies about its watched-workflow list | review | — | normal | milestones/M103-alert-ledger-reading.md |
+| M103 | Record what the alert's per-run ledger implies about its watched-workflow list | done | — | normal | milestones/archive/M103-alert-ledger-reading.md |
 | M102 | Separate a filtered-out alert event from one never delivered | done | — | normal | milestones/archive/M102-alert-event-delivery-discrimination.md |
-| M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
 | M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
 | M100 | Align the review gate's master watch with the alert's verdict set | done | — | normal | milestones/archive/M100-master-watch-verdict-alignment.md |
 | M101 | Find out whether a run that never starts reaches the master-red alert | done | — | normal | milestones/archive/M101-startup-failure-reachability-probe.md |
