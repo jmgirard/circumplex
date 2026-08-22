@@ -22,14 +22,40 @@
 # after they merge. Nothing is checked out: the whole alert is this file's own
 # `run:` body, which is why there is no `contents:` grant below.
 #
-# What M99's widening does NOT establish — observed 2026-08-21, and unresolved:
-# a run that never starts may deliver no `workflow_run` event at all, and
-# `on.workflow_run.workflows` below matches each watched workflow's declared
-# `name:`, which a workflow file too malformed to parse cannot declare. So the
-# gate now admits `startup_failure`, but whether such a run ever reaches this
-# gate is untested — nothing checkable from inside this repo decides it. The
-# ROADMAP candidate row that graduated into M99 keeps that question open, with
-# a deliberate live probe or a scheduled sweep as the two candidate remedies.
+# Two BROKEN watched workflows went unalerted in a PROBE of this configuration,
+# not in this repo — measured 2026-08-21 local, the cited runs stamped
+# 2026-08-22 UTC (cairn M101), in
+# https://github.com/jmgirard/gha-startup-failure-probe, whose copy of
+# this file was byte-identical to this repo's at commit 0b8863f7; the probe copy
+# is not kept in sync after that. Two cases were driven on that repo's watched
+# workflow, and for BOTH the outcome was "no event observed" — no alert run was
+# created, so no alert job and no issue:
+#   * YAML that does not parse —
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540432744
+#   * parses and declares `name:` but fails schema validation, a job with no
+#     `runs-on` —
+#     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540622138
+# Read that narrowly: an absent alert RUN does not distinguish "no `workflow_run`
+# event was delivered" from "an event was delivered and the `workflows:` filter
+# below did not match it". Nothing the probe MEASURED separates the two, so a
+# `workflows:`-side fix is NOT ruled out; the experiment that would separate
+# them is a ROADMAP candidate, not a settled impossibility.
+# What the runs do show: neither concluded `startup_failure`; both concluded
+# `failure` with zero jobs; and GitHub reported each broken run's `name` as the
+# PATH `.github/workflows/R-CMD-check.yaml`, while the probe's control — the same
+# path holding a valid file that exited non-zero —
+# https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540381494
+# reported the declared `R-CMD-check.yaml` and DID reach the alert (issue opened).
+# Name and file validity varied together in every cell, so that is a correlation,
+# not an isolated mechanism: the run list's `workflowName` field reports
+# `R-CMD-check.yaml` even for the broken runs, but it resolves through the
+# workflow ENTITY, whose name refreshed when the probe file was restored, so it
+# does not settle the question either.
+# M99's `startup_failure` widening gained no support from this: both broken runs
+# concluded `failure`, which the pre-M99 list already admitted.
+# Cases other than those two — other ways a workflow can break, and whatever does
+# produce a `startup_failure` conclusion — remain untested. A scheduled sweep is
+# the candidate remedy, and it is a ROADMAP candidate row, not a plan.
 on:
   workflow_run:
     workflows:
