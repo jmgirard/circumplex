@@ -1,11 +1,11 @@
 # M103: Record what the alert's per-run ledger implies about its watched-workflow list
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m103-alert-ledger-reading`
 
 ## Goal
 
@@ -71,7 +71,7 @@ alert's header owns the alert's rationale.
 
 ## Tasks
 
-- [ ] T1 — Re-read every run the reading will cite from the GitHub REST API
+- [x] T1 — Re-read every run the reading will cite from the GitHub REST API
       (`gh api repos/jmgirard/gha-startup-failure-probe/actions/runs/<id>` for `name`,
       `conclusion`, `path`; the run's jobs endpoint for job count), and confirm the window
       holds exactly the nine push runs the ledger lists
@@ -100,6 +100,7 @@ alert's header owns the alert's rationale.
 - 2026-08-22: plan gate chose recording the reading with no change to the alert's `workflows:` list over adding the file-path spelling, because the window's own control shows a path-spelled subscriber matched a valid run and none of the five broken ones; falsified by a broken zero-job run that a path-spelled subscriber does match.
 - 2026-08-22: plan gate chose the header comment plus the ROADMAP row over a `DECISIONS.md` entry, because the reading is a finding about evidence rather than a choice and the header already owns the alert's rationale; falsified by a later milestone needing the reading to bind a decision outside the alert file.
 - 2026-08-22: plan gate chose re-reading the cited runs from the live API over trusting the committed ledger, because the prose failed twice on overstatement and fresh observation is cheap here; falsified by the API no longer resolving the probe's runs.
+- 2026-08-22: T1 — re-read all nine window runs via `gh api` (`name`, `path`, `conclusion`, jobs `total_count`); every field matches the committed ledger, no disagreement. `?event=push` reports exactly those nine in 02:10:55Z–02:23:56Z. `?event=workflow_run` reports one `path-match-probe.yaml` run in the window (32545711782, from 32545706555) and four `master-red-alert.yaml` runs, all from the three declared-name runs plus one; none from any broken run. Path subscriber live 02:10:51Z (probe commit d0cc1cd) to 02:23:53Z (bbf43b2), covering runs 2-8. Observed 2026-08-22.
 
 ## Decisions
 
