@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M102: Separate a filtered-out alert event from one never delivered
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,7 +47,7 @@ a candidate row on its existing promotion condition, untouched.
       driving push, whether each subscriber produced a run is recorded with the
       driving run's URL, read from
       `gh run list -R jmgirard/gha-startup-failure-probe`.
-- [x] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
+- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
       the case-(b) outcome, which of the two explanations M101 left open the
       result rules out and which it leaves open, carrying the driving run URL
       and the date measured.
@@ -58,10 +58,10 @@ a candidate row on its existing promotion condition, untouched.
       window, the conclusion actually reached is recorded with its run URL, and
       where any reached `startup_failure`, whether an alert run was created for
       it.
-- [x] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
+- [ ] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
       disposition — answered, or narrowed to a restated remainder with its
       promotion condition; item (a) is byte-unchanged.
-- [x] AC5 Every probe-repo run URL cited in
+- [ ] AC5 Every probe-repo run URL cited in
       `.github/workflows/master-red-alert.yaml` resolves: each URL matched by
       `grep -o 'https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/[0-9][0-9]*'`
       over that file returns a run from `gh api`.
@@ -133,6 +133,9 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: T8 tooling note — the first run of AC5's sweep used an unquoted `$FILES` in zsh, which does not word-split, so the grep read one nonexistent filename and reported nothing; caught by the shell's own warning and re-run with a `while read` loop. The LESSONS M95-family line already warns of exactly this.
 - 2026-08-21: AC6 verify half — `devtools::test()` clean: FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, the same pass count M99 recorded; the branch changes no R code. `tools/check-master-red-alert.R` and `tools/master-red-alert-dryrun.R` both exit 0 (5 synthetic payloads ok), so the `EXPECTED_IF` pin is unmoved by the comment-only diff. `cairn_validate` all checks pass, 47 advisories — the pre-existing M7 multi-line work-log WARNs. Consistency-gate half runs at review.
 - 2026-08-21: all tasks checked; status → review.
+- 2026-08-21: REVIEW RETURN 1 (defect) — returned to `in-progress`. What failed: F1, the header's "a `workflows:`-side fix is RULED OUT" overclaims what six cells support, since the header's own remaining disjunct (an event delivered under a name the API does not report) is a case where some spelling could still match; and F2, the ROADMAP calls the unfiltered-subscriber variant "moot" and deletes the self-retrigger hazard, contradicting this milestone's own Scope/Out. Eight further record defects actioned, two rejected; full table in the Review section.
+- 2026-08-21: correction to the T8 enumeration line above — the window `createdAt >= 2026-08-22T02:10Z` returns THIRTEEN runs, not eleven, and 32545540389 (the alert subscriber's `skipped` run from the T1 push at 02:11:03) is accounted for nowhere in the records. The "no subscriber run" reading for case B is unaffected — 32545540389 predates case B's 02:16:04 driving run — but the completeness claim the line rested on was wrong as written.
+- 2026-08-21: correction to the ROADMAP byte line above — 23,431 was correct at commit 4203a91f; `wc -c` returns 23,426 at review because the status cell changed from `in-progress` to `review`, five bytes shorter. The figure is a dated measurement, not a standing fact.
 - 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
 - 2026-08-21: plan gate chose measure-only over measuring and applying the `workflows:` path fix in the same milestone because the fix would be committed to before its measurement exists and a null result would leave the milestone half-empty; falsified by the path-spelling arm firing and the resulting one-line change proving to need no separate design.
@@ -174,4 +177,58 @@ a candidate row on its existing promotion condition, untouched.
 - **AC5 — met.** The amended procedure — `grep -o` for the run-URL pattern with
   `[0-9][0-9]*` over `.github/workflows/master-red-alert.yaml` — returns ten
   URLs, and every one resolves via `gh api` (three from M101, seven from M102).
+
+**Independent review 2026-08-21 — three fresh-context readers, full fan-out**
+([O] diff-bug, [S] blame-history, [S] prior-PR-comments). Jeff lifted the
+session's standing no-subagent constraint for this step at the review gate.
+
+- **[S] prior-PR-comments: clean.** Its GitHub probe found no real inline review
+  threads on this repo, so archived `## Review` sections were the primary
+  surface, as doctrine expects. It judged the diff to APPLY the M101 and M99
+  lessons rather than repeat them, and reported no regression.
+- **[S] blame-history: no silent regressions.** Confirmed the deleted M101 prose
+  is explicitly superseded rather than dropped, M101's archive is untouched
+  (history not edited), item (a) byte-identical, and the `on:`/`if:` unmoved.
+  Its AC6 finding is mid-review state, not a defect. Its byte-count finding is
+  F14 below.
+- **[O] diff-bug: fifteen findings; ten actioned, five rejected.** Jeff chose a
+  return over a gate-side patch. Verified against the implementation, not the
+  reviewer's account: the window enumeration returns 13 runs, not 11;
+  32545892860 is the driving run, not the subscriber run (32545896997); the
+  falsified `name:`-only sentence is still readable unmarked in the ROADMAP row;
+  `tools/check-master-red-alert.R:112` carries the same partial fact.
+
+**Findings and dispositions**
+
+| # | Finding | Disposition |
+|---|---|---|
+| F1 | "RULED OUT" overclaims — the header's own open disjunct ("delivered carrying a name different from the one the API reports") is a case where a `workflows:` spelling could still match | FIX — narrow to what the cells support |
+| F2 | ROADMAP calls the unfiltered-subscriber variant "moot" and deletes the self-retrigger hazard, contradicting M102's Scope, which promised the question returns to the row with that hazard recorded | FIX — restore the remainder and the hazard |
+| F3 | Work log claims the window enumerates "eleven runs"; it returns thirteen, with 32545540389 unaccounted | FIX — append a correction (work log is append-only) |
+| F4 | Header cites 32545892860 as the declared-name subscriber's run; it is the driving run, and 32545896997 is uncited | FIX |
+| F5 | "Any run that fails to start reports the path" — unhedged universal from six runs | FIX — bound to the cells |
+| F6 | Construct-validity gap: the probe used two one-spelling subscribers; a real fix would be one subscriber listing both | FIX — acknowledge explicitly |
+| F7 | "six runs" omits 32545583419, a seventh measured broken-start run; and a hand-pinned count should be a stated derivation (M87) | FIX |
+| F8 | Item (c) struck through as ANSWERED while carrying a reopen condition — AC4's own wording makes it "narrowed" | FIX |
+| F9 | The falsified "matches a declared `name:`, which an unparseable file cannot declare" left readable unmarked in the ROADMAP row | FIX in place |
+| F10 | `tools/check-master-red-alert.R:112` states the same now-partial fact | FIX — comment-only, within measure-only |
+| F13 | "differs only in line numbers" — an `if:` expression has no line numbers | FIX — assert text-identical, position differs |
+| F14 | Recorded 23,431 bytes does not re-derive (23,426 now) | Accepted, no history edit: 23,431 was correct at commit 4203a91f; the 5-byte drop is the status cell `in-progress`→`review`. Append the derivation |
+| F15 | The milestone-local Decisions entry constrains future milestones | FIX wording with F1/F2; not promoted to a D-entry while the verdict is under correction, per the reviewer's own advice |
+| F11 | AC5's narrowing shrank coverage below "every citation on the branch" | REJECTED — all fifteen ids were verified beyond AC5's promise and recorded; a second amendment naming AC5 hits the one-per-criterion stop |
+| F12 | AC6 unticked while its covering task T8 is checked | REJECTED — mid-review state by design; the consistency-gate half runs at review |
+
+**Gate result: RETURNED to `in-progress`.** What failed: F1 — the milestone's
+headline conclusion is stated more strongly than its own evidence supports, the
+failure mode M101 was returned twice for — together with F2, a promise M102's
+Scope made and the delivered record broke. AC2, AC4 and AC5 are unticked because
+the artifacts they verify are being rewritten; AC1 and AC3 keep their evidence,
+which the findings do not disturb. AC6 was never reached — `devtools::check()`
+was still in its test phase at the return.
+
+**Gate checks that DID pass, for the re-review to re-run rather than inherit:**
+`cairn_validate` all checks pass (47 advisories, the pre-existing M7 work-log
+WARNs); `document()` no-diff, zero unresolved-link warnings; `check_pkgdown()`
+clean; both alert audits exit 0; master's newest push runs green on both watched
+workflows; `devtools::test()` FAIL 0 / PASS 8395.
 

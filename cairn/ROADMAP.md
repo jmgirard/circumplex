@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M102 | Separate a filtered-out alert event from one never delivered | review | — | normal | milestones/M102-alert-event-delivery-discrimination.md |
+| M102 | Separate a filtered-out alert event from one never delivered | in-progress | — | normal | milestones/M102-alert-event-delivery-discrimination.md |
 | M97 | Make the contributor docs describe this repo | done | — | normal | milestones/archive/M97-contributor-docs-refresh.md |
 | M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
 | M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
