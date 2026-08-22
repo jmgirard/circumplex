@@ -1,6 +1,6 @@
 # Lessons
 
-Durable repo lessons — build quirks, testing tricks, gotchas. Not status, not decisions. One line per lesson: `- YYYY-MM-DD (M<NN>): <lesson>`. Caps: line count (prune/retire) and bytes (compress). Git holds the case histories (milestone tags).
+Durable repo lessons — build quirks, testing tricks, gotchas. Not status, not decisions. One line per lesson: `- YYYY-MM-DD (M<NN>): <lesson>`. A line may instead be a pointer to a doctrine module a matured family graduated into; it carries no date or milestone tag. Caps: line count (prune/retire) and bytes (compress). Git holds the case histories (milestone tags).
 
 <!-- lessons appended below by /milestone-review post-merge hygiene -->
 

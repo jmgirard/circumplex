@@ -1563,20 +1563,28 @@ assertions to fewer, which is the ground D-042 already refused.
 `cairn/LESSONS.md` and was dropped on 2026-07-20 at Jeff's request. Its
 rationale, verbatim: "Not because the premise was wrong — `LESSONS.md` really is
 at the `weight caps` edge, 49/50 lines — but because Jeff chose to defer the
-compression rather than spend a dedicated milestone on it now. […] the
+compression rather than spend a dedicated milestone on it now. […] When the next milestone
+captures a lesson it will hit 50 lines and FAIL `weight caps`; the
 consolidation/retirement then happens at that milestone's post-merge hygiene,
 scoped to what it ships (D-051/D-015), instead of the pre-emptive standalone
 pass M44 planned."
 
 That is a holding about *mechanism*, not about the premise, and the mechanism
 has since been measured. The byte budget, not the line cap, became the binding
-axis: `LESSONS.md` reached 19,996 of 20,000 bytes and stayed there. The M100,
-M101 and M102 hygiene stamps each report the same 4 bytes of headroom. M102
-taught two lessons and could land neither, because scoping retirement to what a
-milestone ships means a milestone that shipped no guard has nothing it may
-retire — and the file's remaining fat is in consolidated families whose exit is
-maturation, which no shipping milestone's scope ever reaches. Three consecutive
-forced-time passes therefore freed nothing.
+axis: `LESSONS.md` reached 19,996 of 20,000 bytes and stayed there across four
+consecutive hygiene passes — the M100, M101, M102 and M103 stamps each report
+the same 4 bytes of headroom.
+
+Forced-time hygiene is not inert, and the record must not be read as saying so:
+M100's pass **did** retire, under the **ownership** exit, the M95-family line's
+two prescriptions that `PROFILE.md`'s consistency-gate slot had taken over — and
+spent the bytes it freed on two new recurrences in the same pass. What four
+passes never reached is the **maturation** exit. Scoping retirement to what a
+milestone ships means a milestone that shipped no guard can retire nothing under
+enforcement, and a milestone whose scope never touches a matured family cannot
+retire it under maturation — and the file's remaining fat is exactly those
+families. So the net moved by nothing, and M102 taught two lessons it could land
+neither of.
 
 **Decision:** M104 runs the pass as a standalone milestone. Six matured
 verification-craft families — M13, M82, M59, M60, M75, M95 — graduate whole into

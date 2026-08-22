@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m104-lessons-retirement
+- **Branch/PR:** m104-lessons-retirement / https://github.com/jmgirard/circumplex/pull/133
 
 ## Goal
 
@@ -40,27 +40,27 @@ milestone that opens the guarded code.
 
 ## Acceptance criteria
 
-- [ ] AC1: `wc -l -c cairn/LESSONS.md` reports fewer than 50 lines and fewer
+- [x] AC1: `wc -l -c cairn/LESSONS.md` reports fewer than 50 lines and fewer
       than 16,000 bytes.
-- [ ] AC2: no lesson text is lost in the move — every `- ` line that
+- [x] AC2: no lesson text is lost in the move — every `- ` line that
       `git diff master..<branch> -- cairn/LESSONS.md` reports as removed has its
       bolded family headline and each of its parenthesized milestone-tag clauses
       found by `grep -F` in `cairn/test-craft.md`. The diff's removed-line set
       is the domain swept.
-- [ ] AC3: `cairn/LESSONS.md` carries one pointer line naming
+- [x] AC3: `cairn/LESSONS.md` carries one pointer line naming
       `cairn/test-craft.md` and stating what it holds.
-- [ ] AC4: `cairn/test-craft.md`'s M95-family entry carries both lessons M102
+- [x] AC4: `cairn/test-craft.md`'s M95-family entry carries both lessons M102
       could not land — the greedy-span-extraction lesson and the
       YAML-plain-scalar lesson — in the wording the ROADMAP's parked-lessons row
       preserved.
-- [ ] AC5: `cairn/DECISIONS.md` carries a new D-entry superseding M44's holding
+- [x] AC5: `cairn/DECISIONS.md` carries a new D-entry superseding M44's holding
       that the retirement pass happens at a shipping milestone's post-merge
       hygiene, citing the M100/M101/M102 hygiene stamps as the evidence.
-- [ ] AC6: six greps are run — one per graduated family tag (`M13 family`,
+- [x] AC6: six greps are run — one per graduated family tag (`M13 family`,
       `M82 family`, `M59 family`, `M60 family`, `M75 family`, `M95 family`)
       across `cairn/` and `CLAUDE.md` — and every hit each returns either sits
       inside `cairn/test-craft.md` or states a claim still true after the move.
-- [ ] AC7: the ROADMAP's parked-lessons candidate row is retired.
+- [x] AC7: the ROADMAP's parked-lessons candidate row is retired.
 
 ## Coverage
 
@@ -120,3 +120,38 @@ milestone that opens the guarded code.
 ## Decisions
 
 ## Review
+
+**Evidence (fresh, post-fix, 2026-08-22).**
+
+- AC1 — `wc -l -c cairn/LESSONS.md` → **40 lines / 14,861 bytes**; under 50 and under 16,000. Was 45 / 19,996 on master.
+- AC2 — `git diff master..HEAD -- cairn/LESSONS.md` reports **6** removed `- ` lines (the domain). All 6 bolded family headlines and all **48** parenthesized milestone-tag clauses found by `grep -F` in `cairn/test-craft.md`; **0 failures**. The [O] reviewer independently confirmed five of the six lines byte-identical old vs. new, the M95 line diverging only at its date range plus the appended M102 text.
+- AC3 — one pointer line in `cairn/LESSONS.md` names `cairn/test-craft.md` and lists all six graduated headlines.
+- AC4 — the M95-family entry in `cairn/test-craft.md` carries both M102 lessons; `grep` finds "GREEDY span extraction overruns once added text repeats its terminator" and "YAML plain scalar cannot hold" in that entry, matching the ROADMAP row's preserved wording apart from one sentence-initial `a`→`A`.
+- AC5 — `cairn/DECISIONS.md:1560` carries D-046.
+- AC6 — the six family greps over `cairn/` and `CLAUDE.md` return 10 sites: 6 in `cairn/test-craft.md` (the graduated content), 3 in M104's own file (AC6's wording and T4's log line), 1 in `cairn/milestones/archive/M96-master-red-alert.md` ("Lesson graduated into the M95 family line" — still true, names no file, IP4 history). **No site directs a reader to `cairn/LESSONS.md` for graduated content.**
+- AC7 — the parked-lessons row is struck as a tombstone; zero live parked rows remain.
+
+**Consistency gate.** `cairn_validate`: all 16 checks PASS, exit 0, 47 advisories (the M103-merge baseline). No principle change (`Principles touched: —`), so `cairn_impact` skipped. Toolchain slot (`PROFILE.md` consistency-gate): `devtools::check(args="--no-manual")` **0 errors, 0 warnings, 0 notes**, 8m03s; master watches both green on the newest push run reaching a verdict (`R-CMD-check.yaml` and `test-coverage.yaml`, M103 merge); both master-red-alert audits exit 0; `.Rbuildignore:22` `^cairn$` already covers the new file; no NEWS entry owed (zero non-`cairn/` files changed). Byte budgets by hand: ROADMAP 23,342 < 24,000; LESSONS 14,861 < 20,000.
+
+**Independent review.** Internal tier + docs-only diff → single [O] diff-bug lens (12 findings, ranked). Every factual claim was verified against the record before triage.
+
+*Fixed at this gate:*
+
+- **F1** — D-046's "verbatim" quote elided "When the next milestone captures a lesson it will hit 50 lines and FAIL `weight caps`;", leaving "that milestone's post-merge hygiene" without its antecedent and inverting M44's holding. Confirmed against `archive/M44-lessons-consolidation.md:10-11`. Sentence restored to the quote.
+- **F2** — D-046 claimed forced-time hygiene "freed nothing". Confirmed false: the M100 stamp (`7b0e6dc4`) records that pass retiring the M95-family line's two prescriptions under the **ownership** exit, spending the bytes on two new recurrences. D-046 rewritten to say what is true — the *maturation* exit is what four passes never reached — and to say explicitly that hygiene is not inert.
+- **F9** — the evidence was under-counted at three passes; M103's stamp (`dcc5034a`) reports the same 4 bytes. Corrected to four throughout D-046.
+- **F4** — the new tombstone said the row "had stood since the M100 stamp". `git log -S` puts its creation at `be08ec28` (M102 merge). Corrected: the row dates to M102, the 4-byte condition to M100.
+- **F3** — the ROADMAP stamp still asserted "unchanged at 45 lines / 19,996 bytes … so the parked-lessons row stands" while this branch struck it. Past-tensed and annotated with what M104 changed, without claiming a hygiene check that has not run.
+- **F5** — `cairn/test-craft.md` asserted the `LESSONS.md` caps "exist to force retirement of lessons that have not matured", a rationale no record holds and the sentence licensing the file's uncapped status. Rewritten as M104's own choice, citing where the caps are actually stated.
+- **F7** — the pointer line broke the format `LESSONS.md:3` declares (no date, no milestone tag), the one thing T2 was told to check. Header amended to admit a pointer line explicitly.
+
+*Recorded, not fixed:*
+
+- **F8** — T6's work-log figure "23,668→23,190 bytes" is wrong at both ends (branch was 23,672 when T6 ran; HEAD is 23,342 after this gate's fixes). Confirmed. The work log is IP4 history, so it is corrected here rather than edited: this is the M87 clause of the M56-family line — a hand-pinned count of a moving artifact cannot stay true — recurring inside the very milestone that moved that lesson.
+- **F10** — the maturation exit requires the archive summary to name what graduated. Not yet due; discharged at step 9 hygiene.
+- **F12** — no defect; the M95 date-range restyle to `2026-08-18→2026-08-21` is correct (M102 merged 2026-08-21, `6ec6816a`).
+
+*To the maintainer at the approval gate:* **F6** and **F11** are real and not fixed here — F6 because Scope is plan-owned and amendment-gated, F11 because the fix lies outside this repo's diff. Both appear verbatim in the gate presentation.
+
+**Return floor.** No finding demonstrates an acceptance criterion failing inside its named procedure's domain; AC1–AC7 all hold as written. No defect return, no amendment return. Defect-return count for M104: 0.
+
