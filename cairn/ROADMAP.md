@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M98 | Close the parked norms-audit findings by subtraction | done | — | normal | milestones/archive/M98-norms-audit-parked-findings.md |
 | M99 | Alert on the red states the gate ignores | done | — | normal | milestones/archive/M99-alert-silent-red-states.md |
 | M100 | Align the review gate's master watch with the alert's verdict set | done | — | normal | milestones/archive/M100-master-watch-verdict-alignment.md |
-| M101 | Find out whether a run that never starts reaches the master-red alert | review | — | normal | milestones/M101-startup-failure-reachability-probe.md |
+| M101 | Find out whether a run that never starts reaches the master-red alert | in-progress | — | normal | milestones/M101-startup-failure-reachability-probe.md |
 
 ## Candidates
 

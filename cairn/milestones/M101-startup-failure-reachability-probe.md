@@ -1,6 +1,6 @@
 # M101: Find out whether a run that never starts reaches the master-red alert
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -223,4 +223,19 @@ All six acceptance-criterion checkboxes unticked: the repair rewrites the header
 - **F10: `cairn/milestones/M101-startup-failure-reachability-probe.md:136`: the G7 repair entry contradicts itself — "the only two `workflow_run` runs in the listing are 32540340661 … and 32540393479 …, plus 32540825331".** Three `workflow_run` runs exist (I confirmed all three). Failure scenario: a later audit reconciling the recorded count against `gh run list` finds a mismatch and cannot tell whether the record or the world moved. VERIFIED at re-review.
 - **F11: `cairn/milestones/M101-startup-failure-reachability-probe.md:140`: the recorded cap measurement is wrong — "59 lines / 22,512 bytes"; the file is 59 lines / 22,507 bytes.** Failure scenario: minor, but it is a derived claim written against output that does not match, in the same entry that justifies not splitting the row on cap grounds — the kind of drift that makes the next cap decision rest on a number nobody re-measured. VERIFIED at re-review, with the cause: 22,512 was the true measurement when written, and the later `in-progress` → `review` status flip in the same file shortened it by 5 bytes.
 - **F12 (lowest): `cairn/milestones/M101-startup-failure-reachability-probe.md:12-13` (Goal), low: the Goal still frames the experiment as a run "that fails to start", which neither driven case is known to be.** Both concluded `failure` with zero jobs, not `startup_failure`, and the G4 entry's argument that zero jobs "supports" *fails to start* is an interpretation, not a measurement. Failure scenario: this was Jeff's explicit call at the repair gate so it is dispositioned, but the archived milestone title and Goal will still be cited as having measured startup-failure reachability, which is the risk G4 named and only half-closed.
+
+**Triage (2026-08-21, maintainer's call at the re-review approval gate): RETURNED, minimal-diff repair only.** Status → `in-progress`; review stops here. All fifteen findings surfaced, none dropped.
+
+- **F1 — fix now, and the reason for the return.** Paste the post-edit ROADMAP row text verbatim into the work log; AC5's second clause is unmet inside its own named procedure until that lands.
+- **F3, F4 — fix now.** Restore the hedge in both artifacts: the header's "went unalerted here" must not state a cross-repository demonstration as a fact about this repo, and the ROADMAP row's "a broken watched workflow goes unalerted" must not carry the unhedged universal G6 was raised against.
+- **F5 — fix now.** The missing newline splitting two work-log entries onto one line.
+- **F6 — fix now.** Record the broadened sweep disjunct in the work log; the broadening itself stands, its non-recording does not.
+- **F10 — fix now.** "the only two `workflow_run` runs … plus" → three.
+- **F11 — fix now.** Update the recorded byte count to the measured 22,507.
+- **F2 — follow-up, not this milestone.** The discriminating experiment (a second `workflow_run` subscriber listing the file path, re-driving case (i)) is registered on the ROADMAP rather than driven here. Search-first: the question is already owned by the lineage row's open item (b), so the recipe is absorbed into that item rather than duplicated as a new row — which also holds the file under its 60-line cap.
+- **F7, F8, H1, H2, H3 — declined, no rewording.** Maintainer's call: style and inference findings against prose that is already hedged. F7 (declared name equals basename in the probe, so the control does not isolate which GitHub reports) and F8 (the entity-name refresh is an inference, not a captured observation) are both true readings; the header already labels the mechanism a correlation rather than an isolated mechanism, and neither finding changes what the record claims. H1 (the hedge arrives late for a skimming reader), H2 (three open items packed into one prose bullet — its "Same promotion condition" scenario verified stale) and H3 (the pinned byte-identity claim is a maintenance trap nothing enforces) are declined on the same ground. Recorded here so a later reader finds them without re-deriving them.
+- **F9, F12 — no action needed.** F9 was addressed before this record was written (fresh re-review evidence appended, boxes re-earned against it). F12 (the Goal's "fails to start") is dispositioned by the maintainer's call at the repair gate; the Goal stands.
+
+**Constraint on the repair, set at this gate:** minimal diff. Exactly the sentences named above change; no new claims, no rewrites beyond them.
+- 2026-08-21: REVIEW RETURN 2 (defect) — status → `in-progress`. What failed: (F1) AC5 requires "the row's text after the edit is quoted in the work log", and the repair rewrote `cairn/ROADMAP.md:23` without ever quoting the post-edit text into the work log — the only verbatim row quote there is the T5 entry's superseded text, and the three distinctive strings of the current row (`that remainder was ANSWERED 2026-08-21 by M101`, `Three things stay open`, `(c) **What produces`) each return zero hits in the milestone file. That is an acceptance criterion unmet inside its own named procedure, the same shape as review 1's G7/G8. AC4 and AC6 were measured met at this pass but are unticked with AC5, because the F3/F4 repairs rewrite the header and the ROADMAP row their evidence describes.
 
