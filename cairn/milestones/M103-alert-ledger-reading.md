@@ -1,6 +1,6 @@
 # M103: Record what the alert's per-run ledger implies about its watched-workflow list
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -121,6 +121,7 @@ alert's header owns the alert's rationale.
 - 2026-08-22: mini gate — AC4 HELD as written at the user's selection rather than widened to cover every claim (the return-adjacent direction rule's recommended option); the four uncovered dated observations are repaired in the text instead, and the preamble now carries the `— observed 2026-08-22` form AC4 names.
 - 2026-08-22: return-1 fixes — (1) the ledger preamble no longer says the reading is "deliberately NOT recorded here"; it now says M102 recorded the ledger alone and names the reading that follows. (2) The provenance preamble states three claim classes, covering run-level cells, subscriber-run outcomes, the subscriber file's tree presence and commit range and its own text, and the inherited M101/M102 equivalence claims. (3) "As run," became "In the state they ran," — the load-bearing comma is gone. (4) The "So:" sentence and the two head-sha claims now name 32545706555 and fold the commit-range fact into the id-naming bullets; the `startup_failure` limit back-references "the nine runs listed above". (5) ROADMAP item (b) has "and under what name" restored to its bolded title.
 - 2026-08-22: everything from `on:` to EOF is byte-identical to master (`diff` on that span, empty), so the alert's executable half is untouched; both audit scripts exit 0.
+- 2026-08-22: verify slot after the return-1 fixes — `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 8395; `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes (14m40s). Status -> review; the Review section's prior evidence lines are superseded by the re-review that follows, since the text they cite has changed.
 
 ## Decisions
 
