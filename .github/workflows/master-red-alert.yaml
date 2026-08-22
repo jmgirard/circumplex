@@ -23,7 +23,8 @@
 # `run:` body, which is why there is no `contents:` grant below.
 #
 # Two BROKEN watched workflows went unalerted in a PROBE of this configuration,
-# not in this repo — measured 2026-08-21 (cairn M101) in
+# not in this repo — measured 2026-08-21 local, the cited runs stamped
+# 2026-08-22 UTC (cairn M101), in
 # https://github.com/jmgirard/gha-startup-failure-probe, whose copy of
 # this file was byte-identical to this repo's at commit 0b8863f7; the probe copy
 # is not kept in sync after that. Two cases were driven on that repo's watched
@@ -36,7 +37,7 @@
 #     https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32540622138
 # Read that narrowly: an absent alert RUN does not distinguish "no `workflow_run`
 # event was delivered" from "an event was delivered and the `workflows:` filter
-# below did not match it". Nothing MEASURED here separates the two, so a
+# below did not match it". Nothing the probe MEASURED separates the two, so a
 # `workflows:`-side fix is NOT ruled out; the experiment that would separate
 # them is a ROADMAP candidate, not a settled impossibility.
 # What the runs do show: neither concluded `startup_failure`; both concluded
