@@ -113,14 +113,6 @@ if (!identical(cond, EXPECTED_IF)) {
 # `name:` to their own filename; give one a human-readable name and this alert
 # silently stops firing forever, with nothing else to notice it. So the names
 # are read out of the watched files themselves.
-#
-# One refinement from M102, which does not change the check below: where a
-# workflow declares NO `name:`, GitHub resolves its runs' name to the file PATH,
-# and `workflows:` matches that path spelling — measured on the probe repo the
-# alert's own header comment cites. So the value matched is the declared name
-# when there is one and the path otherwise; reading the declared name out of the
-# watched files, as this loop does, is still the right check for the siblings
-# here, which both declare one.
 for (w in WATCHED) {
   wf <- file.path(".github/workflows", w)
   if (!file.exists(wf)) {
