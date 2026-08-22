@@ -93,20 +93,22 @@
 #     -> alert https://github.com/jmgirard/gha-startup-failure-probe/actions/runs/32546143683 (skipped); path subscriber removed by this push
 #
 # No run in this window reported the conclusion `startup_failure`.
-# Two facts about the measurement itself, so the reading milestone inherits
-# them: the two spellings were driven as TWO separate subscriber files each
+# Two facts about the measurement itself, which the reading below inherits:
+# the two spellings were driven as TWO separate subscriber files each
 # listing ONE spelling, and a single subscriber listing both was never driven;
 # and the subscriber file is no longer on the probe's default branch — its text
 # is at probe commit 758ab1b.
 #
 # WHAT THAT LEDGER READS (cairn M103). Claims below come in three classes,
-# each with its own provenance. Every run-level cell — id, reported name,
-# conclusion, job count, head sha — and every statement of which subscribers
-# did or did not produce runs was re-read from the GitHub REST API — observed
-# 2026-08-22. So were the subscriber file's tree presence, the commit range
-# bounding it, and its own text — observed 2026-08-22. The probe-equivalence
-# claims at the end are inherited from the M101/M102 records, not re-measured
-# here.
+# each with its own provenance. The first two were re-read from the GitHub
+# REST API and the probe's own commits — observed 2026-08-22. First: every
+# run-level cell of every run cited below — id, reported name, conclusion,
+# job count, head sha — and every statement of which subscribers did or did
+# not produce runs, M101's run 32540622138 included. Second: the subscriber
+# file's tree presence, the commit range bounding it, its own text, and
+# whether the watched file at a cited commit declared a `name:`. Third: the
+# probe-equivalence claims at the end, inherited from the M101/M102 records
+# and not re-measured here.
 #
 # The discriminating comparison is among runs that reported the PATH as their
 # name. `path-match-probe.yaml` — a subscriber listing that path spelling and
@@ -130,11 +132,15 @@
 # no run. For the other two the reason is not separable: 32545535964's head
 # sha is d0cc1cd, which ADDED the file, and 32546138873's is bbf43b2, which
 # removed it, and whether a subscriber added or removed by a push is live for
-# that same push's event was never measured — so name spelling and subscriber
-# presence remain two unseparated explanations of their silence.
+# that same push's event was never measured here — the header's earlier note
+# that `workflow_run` runs the default-branch version of a file settles which
+# VERSION runs, not whether a file added or removed by the triggering push is
+# live for that push's own event — so name spelling and subscriber presence
+# remain two unseparated explanations of their silence.
 #
-# So: for each of those five broken runs, a subscriber listing that run's own
-# reported name produced no run for it, while 32545706555, a valid run
+# So, for each of those five broken runs — 32545583419, 32545779577,
+# 32545943649, 32545999116 and 32546052474 — a subscriber listing that run's
+# own reported name produced no run for it, while 32545706555, a valid run
 # reporting the same name in the same window, did produce one. That is the
 # cell M101 lacked — there, name spelling and file validity varied together in
 # every case.
@@ -157,7 +163,8 @@
 #     matching run, "the path spelling matches" cannot be separated from "it
 #     matches a run that actually started".
 #
-# Two further limits. None of the nine runs listed above reported the
+# Two further limits. None of the nine runs named above — the six in the two
+# bullets and the three that reported the declared name — reported the
 # conclusion `startup_failure`, so nothing here is measured on that
 # conclusion. And the measurement is on jmgirard/gha-startup-failure-probe,
 # not this repo: M101 recorded the probe's copy of THIS file as byte-identical
