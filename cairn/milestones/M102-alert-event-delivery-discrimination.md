@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M102: Separate a filtered-out alert event from one never delivered
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,7 +47,7 @@ a candidate row on its existing promotion condition, untouched.
       driving push, whether each subscriber produced a run is recorded with the
       driving run's URL, read from
       `gh run list -R jmgirard/gha-startup-failure-probe`.
-- [x] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
+- [ ] AC2 `.github/workflows/master-red-alert.yaml`'s header comment states, for
       the case-(b) outcome, which of the two explanations M101 left open the
       result rules out and which it leaves open, carrying the driving run URL
       and the date measured.
@@ -58,7 +58,7 @@ a candidate row on its existing promotion condition, untouched.
       window, the conclusion actually reached is recorded with its run URL, and
       where any reached `startup_failure`, whether an alert run was created for
       it.
-- [x] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
+- [ ] AC4 The ROADMAP lineage row's items (b) and (c) each carry their measured
       disposition — answered, or narrowed to a restated remainder with its
       promotion condition; item (a) is byte-unchanged.
 - [x] AC5 Every probe-repo run URL cited in
@@ -139,6 +139,8 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21: ROADMAP hit 24,440 bytes after the return-1 rewrite — OVER the 24,000 budget. Remedied per the tracking-rules widest-row rule by compressing the lineage row's M99/M101 narration (982 bytes) into a pointer at the alert header and the M101/M102 archives, which own that detail; 23,458 bytes now.
 - 2026-08-21: the AC4 item-(a) evidence recorded at the first review gate was weaker than it read — it extracted item (a) with a GREEDY regex running to "alert workflow.", a phrase the rewritten row also contains, so the span compared was not reliably item (a). Re-verified with a bounded extraction from "(a) **Scheduled sweep" to the "(b) " marker: 271 bytes on both sides, identical. The first result was right by luck, not by construction; the re-review must use the bounded form.
 - 2026-08-21: verify after the return-1 repairs — the branch touches no package code at all (`git diff --name-only master..HEAD` returns only the alert workflow, `tools/check-master-red-alert.R`, `cairn/ROADMAP.md` and this file; nothing under `R/`, `src/`, `tests/`, `man/` or `data/`). `devtools::test()` FAIL 0 / PASS 8395 and `devtools::check()` Status: OK were measured on this branch before the repairs, and every commit since changed only comments and tracking prose; the re-review re-runs both rather than inheriting them. Both alert audits exit 0 after the repairs, `cairn_validate` all checks pass. Status → review.
+- 2026-08-21: REVIEW RETURN 2 (defect) + AMENDMENT RETURN on AC2. Defect: R2-1, the ROADMAP row headline still declares the remainder ANSWERED while item (b) says undecided — introduced by the return-1 compression, the same overclaim class as F1. amendment return: AC2 — wording to be drafted and audited before it is written. Jeff chose DESCOPE over another retry: the interpretation leaves M102.
+- 2026-08-21: correction to the F13 repair record — the work-log line above that reads "byte-identical to this repo's and its job `if:` differs only in line numbers" was NOT corrected by the return-1 append, which named only the header. The probe's `if:` is identical in TEXT; only its position in the file differs. (R2-11.)
 - 2026-08-21: correction to the ROADMAP byte line above — 23,431 was correct at commit 4203a91f; `wc -c` returns 23,426 at review because the status cell changed from `in-progress` to `review`, five bytes shorter. The figure is a dated measurement, not a standing fact.
 - 2026-08-21: minor amendment — added T2a, a positive control that makes the watched file VALID but nameless so GitHub resolves its name to the path. M101's confound was that name and validity varied together; without this control a silent subscriber in T2 is indistinguishable from one that never works. No acceptance criterion changed.
 - 2026-08-21: criteria audit ran in REDUCED mode (internal tier) and IN-SESSION rather than in a fresh-context reader, because this session carries a standing no-subagent instruction; the auditor authored the criteria, weaker than doctrine intends. Two findings, both fixed before the gate: a universal negative over the header comment's assertions with no enumerating procedure, narrowed to a positive statement of what the header must say; and a criterion binding the probe repo's own validity and visibility, an instrument property, moved to T5.
@@ -150,6 +152,11 @@ a candidate row on its existing promotion condition, untouched.
 - 2026-08-21 (M102, milestone-local): the four-cell result reverses M101's leading explanation, and the reversal — not the alert's configuration — is what this milestone records. M101 read name resolution as the likely reason a broken watched workflow went unalerted, because GitHub reported the broken runs' `name` as the file path while the matched control reported its declared name; name and validity varied together in every M101 cell, so it stood as a correlation. M102 varied them independently. A VALID workflow declaring no `name:` also has its name resolved to the path, and the path-spelling subscriber DID fire for it (driving run 32545706555, subscriber run 32545711782) while the declared-name subscriber created no run — so a path spelling in `workflows:` matches, and name resolution alone does not suppress a subscriber. The unparseable file, whose name resolves to the same path, produced NO run under either spelling (driving run 32545779577). Since the path spelling is exactly the one that would have matched the broken run's reported name and it did not fire, no spelling derivable from a broken run's REPORTED name closes the gap. Corrected at review return 1: that is narrower than "a `workflows:`-side fix is ruled out", which this entry first claimed — two possibilities stay open and nothing measured separates them, (1) no `workflow_run` event is delivered at all for a run that fails to start, or (2) one is delivered carrying a name the run's API record does not show, and under (2) listing that name would itself be a `workflows:`-side fix. The probe also never drove ONE subscriber listing both spellings, the arrangement a real fix would use. Item (a), a scheduled sweep, is therefore the remaining remedy shape that needs none of this resolved — not the only remedy possible. This entry stays milestone-local: it constrains no future milestone's design while its own verdict is this provisional.
 
 ## Review
+
+**Round 1 — WITHDRAWN by review return 1. The three verdicts below quote text
+that no longer exists (AC2's "RULED OUT", AC4's "both are ANSWERED there", AC5's
+ten URLs). Kept as the record of a returned round, superseded by Round 2 below;
+not a current verdict on any criterion.**
 
 **Evidence gathered fresh at review 2026-08-21; commands re-run, never recalled.**
 
@@ -277,4 +284,36 @@ round-1 result inherited.**
   mode and found none, and confirmed M100's `EXPECTED_IF` co-edit note survived
   the header rewrite. Its note that AC2/AC4/AC5 stood unticked is closed by this
   round's evidence.
+
+**Round-2 readers — full three-lens fan-out, fresh context.** [S] blame-history
+and [S] prior-PR-comments both returned no blocking defects and independently
+verified the ten return-1 repairs landed. [O] diff-bug re-verified all 16 run
+ids against the API and reported the run citations, experimental design,
+measure-only constraint, AC5 procedure, ROADMAP budget and probe-repo state all
+clean — then found ten wording and cross-surface defects.
+
+| # | Finding | Disposition |
+|---|---|---|
+| R2-1 | The ROADMAP row's headline still declares the remainder "ANSWERED 2026-08-21 by M101 and M102" while (b) 400 bytes later says the question is undecided — a now-false claim readable as fact, the same overclaim class as return 1's F1, and introduced by the return-1 compression itself | DESCOPE |
+| R2-2 | Item (b) still struck through as a tombstone while its text says "narrowed, not closed"; F8 was applied to (c) but not (b) | DESCOPE |
+| R2-3 | AC2 is not satisfiable by the repaired header: it demands the header say which explanation the result rules out, and the result rules out NEITHER | AMENDMENT RETURN — AC2 |
+| R2-4 | "Name resolution is NOT why a broken run goes unalerted" is unqualified; under the header's own open possibility (2) a name mismatch IS why nothing matched | DESCOPE |
+| R2-5 | Cell 2 omits the negative that makes it a control — that the declared-name subscriber created no run, which is what proves name and validity varied independently | FIX — it is record, not interpretation |
+| R2-6 | The Decisions entry says "the four-cell result" where every other surface says six | FIX |
+| R2-9 | No pointer survives to the removed `path-match-probe.yaml` for a future reader | FIX — cite probe commit 758ab1b |
+| R2-10 | M101's inherited "for BOTH the outcome was 'no event observed'" clashes with the sharpened epistemics | FIX |
+| R2-11 | A work-log line still carries F13's "differs only in line numbers" error, uncorrected by the append that fixed the header | FIX — append naming this line |
+| R2-12 | The round-1 Review block's withdrawn "AC2 — met … RULED OUT" verdict reads as current | FIXED above |
+| R2-13 | "no spelling derivable from a broken run's REPORTED name" — "derivable" is wider than the two spellings driven | DESCOPE |
+| R2-7 | Recorded "271 bytes each side" claimed not to re-derive (reader got 269) | REJECTED — the reader compared characters to bytes; the span is 271 bytes and 269 characters, verified both ways. The recorded figure is correct |
+| R2-8 | The hygiene stamp is stale at 22,577 bytes | REJECTED — the stamp is rewritten at post-merge hygiene by design |
+
+**Gate result: RETURNED (defect return 2), and Jeff chose to DESCOPE rather than
+retry.** Every return on this milestone has been about interpretive prose
+overreaching, twice now, while the measurements themselves have been clean since
+the first pass — R2-1 was introduced by the very commit repairing return 1's F1.
+So the interpretation leaves M102: the milestone narrows to the experiment, its
+cells and the run record, and what the result MEANS is planned separately with
+fresh eyes. AC2 and AC4 are unticked pending their gated narrowing amendment;
+AC1, AC3 and AC5 keep their round-2 evidence.
 
