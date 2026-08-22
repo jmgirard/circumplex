@@ -1,6 +1,6 @@
 # M104: Graduate the matured verification-craft families out of LESSONS.md
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -93,7 +93,7 @@ milestone that opens the guarded code.
       and record what would reopen it.
 - [x] T6: retire the ROADMAP parked-lessons candidate row; restate the hygiene
       stamp with the measured counts.
-- [ ] T7: gate checks — `python3 ~/.claude/skills/cairn/scripts/cairn_validate.py`
+- [x] T7: gate checks — `python3 ~/.claude/skills/cairn/scripts/cairn_validate.py`
       clean, and `Rscript -e 'devtools::test()'` clean as a no-regression check
       (no code is touched, so this carries no acceptance criterion).
 
@@ -114,6 +114,8 @@ milestone that opens the guarded code.
 
 - 2026-08-22: T5 — D-046 appended, superseding M44's holding that retirement runs at a shipping milestone's post-merge hygiene. Its narrow claim: the maturation exit cannot be reached from a shipping milestone's scope, so post-merge hygiene stays the ordinary route for the enforcement and ownership exits (AC5).
 - 2026-08-22: T6 — parked-lessons candidate row struck as a tombstone pointer; ROADMAP 59 lines, 23,668→23,190 bytes (AC7). Minor task deviation: T6's "restate the hygiene stamp" is NOT done here — the stamp records the last hygiene check, which is still the M103 merge; writing an M104 stamp before the merge would claim a check that has not run. It belongs to review's post-merge hygiene.
+
+- 2026-08-22: T7 — `cairn_validate` all checks pass, 47 advisories (the M103-merge baseline, M7's pre-M28 multi-line work-log WARNs). `devtools::test()`: FAIL 0 | WARN 5 | SKIP 3 | PASS 8395, exit 0. The branch touches only `cairn/*.md`, so the suite is a no-regression check by construction; `git status` clean after the run (M86).
 
 ## Decisions
 
