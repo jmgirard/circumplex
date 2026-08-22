@@ -1,11 +1,11 @@
 # M101: Find out whether a run that never starts reaches the master-red alert
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m101-startup-failure-reachability-probe
 
 ## Goal
 
@@ -108,6 +108,7 @@ it still pass unchanged.
 - 2026-08-21: reduced criteria audit ([O], internal tier) ran over the drafted criteria and returned one finding — the original AC4 promised that "each surviving open sub-case is named as still open with its reason", a universal over a domain no named procedure enumerates (its membership fixed by author recall), and it silently carried a cross-repository demonstration into a claim about this repo. Fixed by adopting the auditor's narrower wording verbatim: the promise now quantifies over exactly the two cases AC2 drives, the residual is one blanket sentence, and the probe's provenance is stated rather than absorbed. AC1, AC2, AC3, AC5, AC6 passed both questions.
 - 2026-08-21: collision sweep — no `DECISIONS.md` entry has ruled on this question (the two `reachab` hits are norms-audit machinery, unrelated); the M96 archive does not mention it; the only prior state is the candidate row this milestone absorbs and M99's archive, which records the question as deliberately left open. GitHub's own `workflow_run` documentation was checked at plan time and answers none of the three sub-questions (is `workflows:` required, does it match `name:` or filename, is an event delivered for `startup_failure`), which is why the answer has to be measured.
 - 2026-08-21: creating the probe repository is an outward-facing action; authorized by Jeff at this plan gate. Keep it (private) rather than delete it at milestone end, so AC4's run URLs stay resolvable.
+- 2026-08-21: started by /milestone-implement; branch `m101-startup-failure-reachability-probe` cut from master at `2b2c841d`.
 
 ## Decisions
 
