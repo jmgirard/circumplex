@@ -52,16 +52,18 @@ M7's own gate.
       block states in so many words that the derivation uses no published
       source. The same target is restated at `R/axes_reliability.R:720` and
       `:1030`. *(RB tripwire: no-oracle)*
-- [ ] AC2 — `axes_degeneracy_tau`'s committed value equals AC1's derived target
-      or differs from it by at most one decade, with any deviation stated
-      beside the constant.
+- [ ] AC2 — `axes_degeneracy_tau` is committed as `δ*/C` = 1e-5, with the
+      accuracy target δ* = 1e-4 and the calibration ceiling C = 10 named and
+      documented beside it as separate quantities, so the constant's stated
+      definition and its enforced cap no longer differ by the slack factor.
 - [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× the committed
       floor and `"ill_conditioned"` at 0.95×, at p = 3, 12 and 24, and across
       three spectral forms at 0.95×: positive λmin, λmin negative but inside
       `-λmax·sqrt(p·ε)` (still `"ill_conditioned"`), and decisively negative
       (`"indefinite"`).
-- [ ] AC4 — Through `axes_reliability()`, three κ in [1.4e4, 1.4e7] at three
-      different p: one strictly below the committed threshold returns numbers,
+- [ ] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
+      different p, straddling the committed threshold (4.3e4 at p = 24):
+      one strictly below the committed threshold returns numbers,
       one strictly above returns NA with its reason named, one within a factor
       of 2 of the threshold resolves as AC1's derivation implies. The upper
       cases reach the band through the `axes_fitted_cov` seam, since no
@@ -71,7 +73,8 @@ M7's own gate.
       `details$se_correction_failed` and `details$fit_scaling_failed` each
       asserted to the value the derivation states for this input; a second
       near-duplicate radius brackets the committed threshold from the other
-      side.
+      side — and where the refusal does fire, its `"ill_conditioned"` warning
+      names κ and the dominant collinear item pair, not a bare reason code.
 - [ ] AC6 — Over the sites
       `grep -rniE 'tau|accuracy target|double\.eps|kappa' R/ tests/ NEWS.md`
       returns, plus the two comment blocks read whole
@@ -80,6 +83,11 @@ M7's own gate.
       one stale value planted per spelling class — numeric literal, prose "tau
       floor", derived κ threshold — is caught by that sweep. `cairn/` is
       excluded deliberately: D-044 is superseded, never edited.
+- [ ] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
+      (model-implied, p ≥ 4, including one near-duplicate construction from
+      RR19 §3a) with its own pass window asserting attainment stays at least
+      three decades below 1; `Rscript devel/degeneracy-oracle/exact_oracle.R`
+      passes both that window and the existing fixture window.
 - [ ] AC7 — `devtools::document()` no diff, `devtools::test()` and
       `devtools::check()` clean (0/0/0), per `cairn/PROFILE.md`.
 
@@ -91,6 +99,7 @@ M7's own gate.
 - AC4 → T4
 - AC5 → T5
 - AC6 → T6
+- AC8 → T8
 - AC7 → T7
 
 ## Tasks
@@ -105,9 +114,13 @@ M7's own gate.
 - [ ] T4 — Band cases at three κ / three p through `axes_reliability()`, upper
       cases via the `axes_fitted_cov` seam; committed `data-raw/` generator
       with a seed.
-- [ ] T5 — The two `cormat` near-duplicate radii, same generator and seed.
+- [ ] T5 — The two `cormat` near-duplicate radii, same generator and seed;
+      extend the `"ill_conditioned"` warning to carry κ and the dominant
+      collinear pair (the smallest eigenvector's two dominant loadings).
 - [ ] T6 — Run AC6's sweep, update every stale site and NEWS.md, then plant one
       stale value per spelling class and confirm the sweep catches each.
+- [ ] T8 — Add the reachable-geometry family to `exact_oracle.R` from RR19
+      §3a's stated constructions, with its own pass window.
 - [ ] T7 — If τ moved: superseding `DECISIONS.md` entry against D-044. Then
       `document()`, `test()`, `check()`.
 
@@ -119,6 +132,9 @@ M7's own gate.
 - 2026-08-22: plan gate chose pre-build Fable escalation over letting implement offer it, at Jeff's choice, so the constant and its tests are built against a reviewed target; falsified by the RR returning no argument the session could not have reached.
 - 2026-08-22: status planned→blocked on RB19 (T1); the accuracy target the constant and its tests are built against comes from that review.
 - 2026-08-22: RR19 returned and ingested; status blocked→planned. Oracle re-run reproduced both anchors and the Q4 sweep before any new measurement (ANCHORS PASS, SWEEP PASS).
+- 2026-08-22: AC/task amendment after the RR19 ingest, at Jeff's gate choice. AC2 restated as δ*/C with both quantities named (the review found the old wording's definition and enforced cap differed by the slack factor); AC4's literal band re-centred on the new 4.3e4 threshold; AC5 absorbed RR19 rec 4 (the warning names κ and the collinear pair) rather than taking a ninth criterion; AC8/T8 added for rec 5's reachable-geometry oracle family.
+- 2026-08-22: gate chose folding rec 4 into AC5 over a separate criterion because both test the same input path at the same geometry, and a ninth criterion would trip the sizing tripwire into a split the work does not need; falsified by the warning work turning out to need its own fixture family.
+- 2026-08-22: `cairn_validate` sizing advisory notes 8 acceptance criteria against the >7 tripwire. Not split: AC7 is the profile's mandated verify criterion rather than scope, so the substantive count is 7, and separating AC8's oracle family would ship the recalibration without the reachable-geometry evidence that justifies its calibration ceiling. Tasks are 8 of a 10 tripwire.
 
 ## Decisions
 
