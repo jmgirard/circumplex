@@ -35,7 +35,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 
 ## Acceptance criteria
 
-- [ ] In one `R CMD check` run of the built tarball, none of the four sites
+- [x] In one `R CMD check` run of the built tarball, none of the four sites
       the mutation criterion names skips, per that run's own skip listing,
       and no skip in that listing names `rb18-counterexample-b.rds`. Other
       skips in that listing are out of this criterion's reach.
@@ -144,3 +144,15 @@ was needed before gathering evidence.
   and 1235) therefore did not fire, so all three comparisons — `got$fit$cfi`
   vs `r1`, `got2$fit$cfi` vs `r2`, and `res$fit$cfi` vs `ref` — executed and
   passed against lavaan 0.7.2.
+- **AC1 — pass.** A fresh `R CMD build` + `R CMD check --no-manual` of
+  `circumplex_2.0.0.tar.gz` at `1f1f66a7`: FAIL 0 / WARN 4 / SKIP 146 /
+  PASS 7507. The tarball ships the fixture
+  (`circumplex/tests/testthat/fixtures/rb18-counterexample-b.rds`, listed by
+  `tar tzf`). That run's skip listing names exactly three entries in
+  `test-axes-scaled-fit.R` — `:918` (M68 fixture environment), `:966`
+  (vignette source), `:1140` (package R/ sources absent). The four sites are
+  the `test_that` blocks opening at 1592, 1661, 1672 and 2069, none of which
+  appears. `grep -c rb18-counterexample-b.rds` over the whole check test log
+  returns 0, so no skip in the listing names the fixture. The remaining skip
+  groups (On CRAN, `cairn/` not present, `data-raw/` not present, the drift
+  guard's "repo tracking record absent") are out of this criterion's reach.
