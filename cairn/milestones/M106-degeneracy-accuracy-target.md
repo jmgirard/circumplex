@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -153,6 +153,9 @@ M7's own gate.
 - 2026-08-22: the 5 test warnings are pre-existing, verified rather than assumed — the four `test-ci_accuracy.R` diagnostics the M7 record already names, plus a lavaan poor-marker notice at `test-ssm_sem.R:708`. That fifth one was checked out on master and reproduces byte-identical there. (A first attempt to check it used a grep pattern that does not match testthat's summary format and returned 0 warnings on master; that was an artifact of the pattern, not a measurement, and the comparison was redone.)
 - 2026-08-22: **PDF-manual path unverified locally, and not silently.** This branch changed roxygen, and the repo's check command carries `--no-manual` — the exact skip that hid a CRAN-blocking LaTeX error at M7 — so `R CMD Rd2pdf` was run deliberately. It exits 1 for a missing TeX: `pdflatex` and `texi2dvi` are absent from this machine, so the LaTeX-to-PDF step cannot run here at all. What did run and pass is the Rd-to-LaTeX conversion. The added roxygen is pure ASCII and `git diff master -- man/` adds no non-ASCII line; the two in `man/axes_reliability.Rd` are pre-existing em dashes, which the M7 record measured as inputenc-safe and win-builder did not flag. The PDF build still needs a machine with TeX, at CI or the release walk.
 - 2026-08-22: status in-progress→review. Every task checked; AC1–AC8 have evidence on the branch but are unticked, since ticking them is review's act against fresh evidence.
+- 2026-08-22: review gate — status review→in-progress, defect return 1 of this milestone. What failed: AC5 on findings 1 and 2 (the hint fires on every degeneracy literal, printing a negative "condition number" on an indefinite refusal; and its pair-naming gates both misfire under eigenvalue multiplicity — naming an arbitrary pair among identical triplets and naming nothing on genuine duplicate pairs); AC8 on finding 3 (the oracle prices the near-duplicate cases with `FIT_ZETA1 = FALSE` while `axes_fits_zeta1()` is TRUE for that design). Findings 5–14 ride along: one further defect, six unsupported claims in comments and NEWS, two test gaps.
+- 2026-08-22: amendment return: AC3 — "across three spectral forms at 0.95×" is unsatisfiable, since a negative λmin makes the ratio negative rather than 0.95× a positive floor; the box was ticked against evidence matching the test's sensible resolution rather than the criterion's words, and has been unticked.
+- 2026-08-22: F17 parked as a ROADMAP candidate row at Jeff's gate choice, not absorbed into M106 — D-048 names that evidence class as its own reopening trigger, so it is settled deliberately or not at all.
 
 ## Decisions
 
