@@ -8,6 +8,10 @@ concerns; angular/boundary behavior is where bugs hide.
 
 - Test: `Rscript -e 'devtools::test()'`
 - Check: `Rscript -e 'devtools::check(args = "--no-manual")'` (slow; run before commits touching R/ or src/)
+- Release check: `Rscript -e 'devtools::check(manual = TRUE)'` — adds the PDF-manual
+  step `--no-manual` skips, where LaTeX-hostile characters in roxygen surface. Required
+  before any release-readiness claim; `cran-comments.md` advertises this command, not the
+  one above. Needs TinyTeX on PATH (`~/.Renviron` carries it).
 - Document: `Rscript -e 'devtools::document()'` (after changing any roxygen)
 - Rebuild C++ after editing src/: `Rscript -e 'Rcpp::compileAttributes(); devtools::load_all()'`
 - Never edit generated files by hand: `R/RcppExports.R`, `src/RcppExports.cpp`, `man/*.Rd`, `NAMESPACE`
