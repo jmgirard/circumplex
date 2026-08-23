@@ -46,7 +46,8 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
   `Rscript tools/master-red-alert-dryrun.R` both exit clean — nothing else runs them,
   and the alert fires only when master is already broken. Both need `yaml` and `jq`
   (neither a package dependency), and say so if absent.
-- Branch protection (M105): `Rscript tools/check-branch-protection.R` exits clean — live rulesets vs committed `tools/branch-protection.json`; needs authenticated `gh` + `jsonlite`, and says so.
+- Branch protection (M105): `Rscript tools/check-branch-protection.R` exits clean —
+  live rulesets vs committed `tools/branch-protection.json`; needs authenticated `gh` + `jsonlite`, and says so.
 
 ## test-doctrine
 R-mechanical test expectations layered on the universal "What gets a test"
@@ -96,8 +97,7 @@ Followed by `/cairn-release` — a CRAN release walk (never self-submits):
   email, then `usethis::use_github_release()` + `usethis::use_dev_version()`.
 
 ## changelog
-The repo's changelog file, read by `/hotfix`, the release-walk, and the
-consistency-gate: **`NEWS.md`** (the R-package convention).
+Read by `/hotfix`, the release-walk, and the consistency-gate: **`NEWS.md`** (the R-package convention).
 
 ## init-detection
 Recognized by `cairn-init` when a **`DESCRIPTION` file is present** at the repo
@@ -107,7 +107,7 @@ of the built package).
 ## greenfield-openers
 Language-specific opener `cairn-init` asks in a new/empty R package. The
 universal openers (distribution ambition, rendered here as **CRAN intent**, and
-numeric-work-needs-oracle-verification) live in cairn-init's universal layer.
+numeric-work-needs-oracle-verification) live in cairn-init's universal layer, so they are not repeated here.
 
 - **Compiled code?** Will the package include compiled code
   (Rcpp / RcppArmadillo / C / C++ / Fortran)?

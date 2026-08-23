@@ -151,6 +151,9 @@ entry recording the two-ruleset split and the bypass rationale.
 
 - 2026-08-22: T8 closed — `devtools::check()` Status: OK, 0 errors / 0 warnings / 0 notes (20m40s). All tasks done; status → review.
 
+- 2026-08-22: record correction ([O]6): T5's "cap held without compressing anything" was written before `cairn_validate` showed the 120-line cap is exclusive (<120); the overrun was then paid at T8 by the greenfield compression. One event, two lines written either side of the discovery — T8's account is the correct one.
+- 2026-08-22: review triage — nine findings fixed at the gate (see Review), two rejected with reasons, none met the return floor: AC5's promise quantifies over `COMPARED_FIELDS` and held throughout, and the fixes harden the checker beyond what any criterion binds.
+
 ## Decisions
 
 ## Review
@@ -165,3 +168,19 @@ Review 2026-08-22 (PR #134). Evidence per criterion, fresh at review:
 - AC6: `cairn/PROFILE.md:49` names the checker in the consistency-gate; `wc -l` = 119 ≤ 120. Verified.
 
 Consistency gate: `cairn_validate` all OK (WARN work-log format = M7's standing pre-M28 advisory). No principle change → `cairn_impact` skipped. `document()` no diff, zero resolve-link lines. README untouched. `pkgdown::check_pkgdown()` no problems. NEWS: no user-visible package change (internal tier — repo settings + tools/) → no entry owed. No new top-level files (`tools/` predates, `^tools$` in .Rbuildignore). Master watches: newest verdict-reaching push runs green on both workflows (ab83f30b success ×2; newer cairn-only pushes run none, per paths-ignore — said so per M95). Alert audits: check-master-red-alert.R and dryrun both clean. Branch-protection check: exit 0.
+
+Independent review (three-lens fan-out; findings and dispositions, most severe first):
+
+- [O]1 `ref_name.exclude` not in `COMPARED_FIELDS` — a web-UI exclude pattern matching master turns a ruleset off while enforcement stays active and the checker stays green (the fail-open class, the M58 shape). **Fixed at the gate:** `ref_name_exclude` added to the constant with its own extractor; mutation proved (exclude→refs/heads/master, exit 1 naming the field; clean after restore). AC5 as written held throughout — its promise quantifies over the constant.
+- [S-prior]1 `sort()`'s default `na.last = NA` silently drops an NA element (M98's shape). **Fixed:** `na.last = TRUE` on all four sorted extractors.
+- [O]3 duplicate live ruleset names silently collapsed by by-name lookup. **Fixed:** `anyDuplicated(names(live))` now dies.
+- [O]8 PROFILE said "needs authenticated `gh`" but only PATH was checked. **Fixed:** `gh auth status` precondition added.
+- [O]4 unpaginated list call (false-FAIL past 30 rulesets). **Fixed:** `--paginate`.
+- [O]5 `source_type %||% "Repository"` defaulted open. **Fixed:** defaults to `""` (fail-closed).
+- [O]7 196-char PROFILE gate line against ~80-col siblings. **Fixed:** wrapped to two lines; paid by compressing the changelog prose one line (PROFILE stays 119).
+- [S-blame]2 greenfield compression dropped "so they are not repeated here" (deliberate wording, blame 0b4172706). **Fixed:** clause restored within the line budget.
+- [O]6 work-log self-contradiction on the PROFILE cap (T5 "cap held" vs T8 "overrun paid"). **Fixed by appended correction line** (append-only log, never edited).
+- [S-blame]1 AC7 lacked review-time evidence when that lens ran. **Disposed by process:** the fresh review-time `devtools::test()` run and the check() evidence line below close it; AC7 ticked only on that evidence.
+- [O]2 `required_status_checks` parameters other than contexts uncompared. **Rejected:** none of the three weakens protection on an existing branch (`do_not_enforce_on_create` is creation-only; the other two only tighten or fail closed) — recorded here, promote only if a parameter that can weaken appears.
+- [S-prior]2 bypass-actor fields joined with in-band `/`. **Rejected:** all three fields are GitHub-defined enums/integers that cannot contain `/` today, and the joined form doubles as the human-readable report; defensive only.
+- Cleared by [O] after examination (recorded, no action): EXTRACT-before-`%||%` (lexical late binding, verified empirically), `sort(NULL)` vs `character(0)` asymmetry (fail-closed only), zero-length `vapply`, `system2` status handling, jq-less `gh -q`, `dQuote` locale, `Filter` over parsed list, JSON POST-body contract, fail-closed preconditions. [S-prior]: probe found no PR-thread evidence; no prior-review finding contradicted or reintroduced.

@@ -37,6 +37,7 @@ COMPARED_FIELDS <- c(
   "enforcement",
   "target",
   "ref_name_include",
+  "ref_name_exclude",
   "rule_types",
   "required_status_check_contexts",
   "bypass_actors"
@@ -50,18 +51,30 @@ EXTRACT <- list(
   enforcement = function(r) as.character(r$enforcement %||% NA_character_),
   target = function(r) as.character(r$target %||% NA_character_),
   ref_name_include = function(r) {
-    sort(vapply(r$conditions$ref_name$include %||% list(), as.character, ""))
+    sort(vapply(r$conditions$ref_name$include %||% list(), as.character, ""),
+         na.last = TRUE)
+  },
+  # The exclude list is a switch beside the rules it can disable: one pattern
+  # matching the default branch turns the ruleset off for it while enforcement
+  # stays "active" and include stays untouched (review finding, M105).
+  ref_name_exclude = function(r) {
+    sort(vapply(r$conditions$ref_name$exclude %||% list(), as.character, ""),
+         na.last = TRUE)
   },
   rule_types = function(r) {
-    sort(vapply(r$rules %||% list(), function(x) as.character(x$type), ""))
+    sort(vapply(r$rules %||% list(), function(x) as.character(x$type), ""),
+         na.last = TRUE)
   },
   required_status_check_contexts = function(r) {
     rules <- r$rules %||% list()
     checks <- rules[vapply(rules, function(x) identical(x$type, "required_status_checks"), NA)]
+    # na.last = TRUE throughout: sort()'s default na.last = NA silently DROPS
+    # an NA element, which would erase a malformed live entry instead of
+    # flagging it (the M98 lesson's shape).
     sort(unlist(lapply(checks, function(x) {
       vapply(x$parameters$required_status_checks %||% list(),
              function(cc) as.character(cc$context), "")
-    }), use.names = FALSE))
+    }), use.names = FALSE), na.last = TRUE)
   },
   bypass_actors = function(r) {
     sort(vapply(r$bypass_actors %||% list(), function(a) {
@@ -86,6 +99,10 @@ if (!requireNamespace("jsonlite", quietly = TRUE)) {
 }
 if (!nzchar(Sys.which("gh"))) {
   die("this guard reads the live rulesets and needs the GitHub CLI (`gh`) on PATH.")
+}
+if (!identical(suppressWarnings(system2("gh", c("auth", "status"),
+                                        stdout = FALSE, stderr = FALSE)), 0L)) {
+  die("`gh` is not authenticated (`gh auth status` failed) — the rulesets API needs auth.")
 }
 if (!file.exists(INTENT)) {
   die("%s: file not found (run from the repository root).", INTENT)
@@ -128,12 +145,12 @@ if (!grepl("^[^/]+/[^/]+$", slug)) {
   die("could not derive OWNER/REPO from the checkout (got %s).", dQuote(slug))
 }
 
-summaries <- parse_json(gh("api", sprintf("repos/%s/rulesets", slug)),
+summaries <- parse_json(gh("api", "--paginate", sprintf("repos/%s/rulesets", slug)),
                         sprintf("the ruleset list for %s", slug))
 
 # Only this repository's own branch rulesets; see the scope note in the header.
 summaries <- Filter(function(s) {
-  identical(s$target, "branch") && identical(s$source_type %||% "Repository", "Repository")
+  identical(s$target, "branch") && identical(s$source_type %||% "", "Repository")
 }, summaries)
 
 live <- lapply(summaries, function(s) {
@@ -142,6 +159,13 @@ live <- lapply(summaries, function(s) {
 })
 names(live) <- vapply(live, function(r) as.character(r$name), "")
 names(committed) <- vapply(committed, function(r) as.character(r$name), "")
+
+# GitHub permits two rulesets with one name; a by-name lookup would compare
+# only the first and silently skip its twin. Refuse rather than guess.
+if (anyDuplicated(names(live))) {
+  die("two live branch rulesets share a name (%s) — refusing to compare by name.",
+      paste(unique(names(live)[duplicated(names(live))]), collapse = ", "))
+}
 
 # ---- compare --------------------------------------------------------------
 
