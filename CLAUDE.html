@@ -67,6 +67,7 @@
 <ul><li>Test: <code>Rscript -e 'devtools::test()'</code>
 </li>
 <li>Check: <code>Rscript -e 'devtools::check(args = "--no-manual")'</code> (slow; run before commits touching R/ or src/)</li>
+<li>Release check: <code>Rscript -e 'devtools::check(manual = TRUE)'</code> — adds the PDF-manual step <code>--no-manual</code> skips, where LaTeX-hostile characters in roxygen surface. Required before any release-readiness claim; <code>cran-comments.md</code> advertises this command, not the one above. Needs TinyTeX on PATH (<code>~/.Renviron</code> carries it).</li>
 <li>Document: <code>Rscript -e 'devtools::document()'</code> (after changing any roxygen)</li>
 <li>Rebuild C++ after editing src/: <code>Rscript -e 'Rcpp::compileAttributes(); devtools::load_all()'</code>
 </li>
