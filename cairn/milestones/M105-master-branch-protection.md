@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M105: Give master GitHub-native branch protection
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m105-master-branch-protection
 
 ## Goal
 
@@ -91,7 +91,7 @@ entry recording the two-ruleset split and the bypass rationale.
 
 ## Tasks
 
-- [ ] T1: write `tools/branch-protection.json` — the two rulesets' intended
+- [x] T1: write `tools/branch-protection.json` — the two rulesets' intended
       shape, in the field layout `gh api .../rulesets/<id>` returns, so the
       comparison is against the API's own vocabulary rather than a translation.
 - [ ] T2: write `tools/check-branch-protection.R` (base R + `gh`, matching
@@ -132,6 +132,8 @@ entry recording the two-ruleset split and the bypass rationale.
 - 2026-08-22: plan gate chose required contexts `matrix` + `ubuntu-latest (release)` over `ubuntu-latest (release)` alone; requiring the classifier means a fail-closed classification cannot be merged past, not only that the check job passed; falsified by a PR class where `matrix` reports and `ubuntu-latest (release)` cannot.
 - 2026-08-22: plan gate chose a live-API checker wired into the review gate over a D-entry record alone; web-UI settings drift is invisible to the repo, and M58's lesson is to assert the enabling condition (`enforcement: active`) beside the thing it enables; falsified by the gate line proving unpayable inside PROFILE.md's 120-line cap.
 - 2026-08-22: [O] criteria audit ran in REDUCED mode (surface tier: internal). Returned eight findings, all disposed as clear fixes, none escalated to the gate: AC5's promise was universal over the whole mismatch space while naming five sampled mutations, and bound the mutation battery itself — narrowed to the domain `COMPARED_FIELDS` enumerates, battery moved to T2; AC3 claimed force pushes are refused as a class from one attempt — narrowed to the named attempt; AC1, AC3 and AC6 each bound a recording act (quote the API output, quote the rejection text, strike the ROADMAP row) — quoting moved to the tasks and the gate procedure, the tombstone dropped as post-merge hygiene. AC2 and AC4 passed all three questions.
+
+- 2026-08-22: T1 — `tools/branch-protection.json` written in GitHub's literal ruleset vocabulary rather than a projection of it, so each `rulesets` element is a complete POST body; what is committed is therefore what T4 creates, not a transcription of it, and the checker can project both sides through one extractor.
 
 ## Decisions
 
