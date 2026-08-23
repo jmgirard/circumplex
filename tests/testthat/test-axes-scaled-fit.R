@@ -1862,12 +1862,10 @@ test_that("M106 AC3: the floor discriminates p and spectral form at the threshol
   # and the rest at 1, in a rotated basis so the defect is not axis-aligned --
   # an axis-aligned planted eigenvalue would leave the off-diagonal structure
   # of a diagonal matrix, which is not the shape a fitted matrix ever has.
-  planted <- function(p, lambda_min) {
-    q <- qr.Q(qr(matrix(seq_len(p * p) %% 7 + 1, p, p)))
-    ev <- c(rep(1, p - 1L), lambda_min)
-    S <- q %*% diag(ev) %*% t(q)
-    (S + t(S)) / 2
-  }
+  # m106_planted() rotates with the helper's arithmetic DCT-II basis rather
+  # than a qr.Q() of a rank-deficient integer matrix, whose pivoting is
+  # BLAS-dependent in principle (M106 review round 2, F19; round 3, F10).
+  planted <- m106_planted
 
   for (p in c(3L, 12L, 24L)) {
     f <- sqrt(p * .Machine$double.eps / 1e-5)
@@ -2095,8 +2093,8 @@ test_that("M106 AC5: the refusal warning names the conditioning and the collinea
   near <- m106_family_b(2e-5)          # r = .9999714, kappa 1.01e5 -- refused
   msg <- axes_degeneracy_hint(near)
   expect_match(msg, "condition number 1.01e+05", fixed = TRUE)
-  # Column order, not the order which() happened to walk the matrix in: the
-  # message reads against the caller's own matrix.
+  # Row index then column index, so the list reads down the caller's own
+  # matrix rather than in the column-major order which() walked it in.
   expect_match(msg, "items i1 and i9 are nearly collinear", fixed = TRUE)
   expect_match(msg, "(r = 0.999971)", fixed = TRUE)
   expect_match(msg, "consider dropping one", fixed = TRUE)
@@ -2228,7 +2226,9 @@ test_that("M106 review F11: the collinearity cut is the criterion's, not a flat 
   # a hand-set 0.99 would name anyway. Ten items (3..12) carry a near-null
   # alternating combination -- that is what drives lambda_min to 1.1e-6 -- and
   # items 1 and 2 correlate 0.995, which by Cauchy interlacing bounds
-  # lambda_min only by 5e-3, twenty-five times ABOVE this p's floor. So that
+  # lambda_min only by 5e-3, which is 153.5 times ABOVE this p's floor
+  # (lambda_max 1.995, floor lambda_max*sqrt(p*eps/tau) = 3.2565e-5; measured
+  # on this construction 2026-08-23, and 25x was wrong for it). So that
   # pair does not force the refusal, and naming it would be a false claim about
   # the cause and wrong advice about the remedy.
   p <- 12L

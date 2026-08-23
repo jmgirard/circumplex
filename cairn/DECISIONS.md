@@ -1735,3 +1735,28 @@ calibration-domain sentence.
 — its SE half is measured, its `cval` half is not. On it being met in full, the
 remedy stays D-048's: an a-posteriori per-fit error estimate replacing this
 limb, not a further move of the constant.
+
+### D-050 (2026-08-23): the reopening trigger D-049 called one measurement short is met in full — annotates D-049's Reopens clause, moves nothing it decided (M106)
+
+**Context:** D-049 closed by recording that D-048's first reopening trigger — a
+converged fit this criterion refuses whose reported quantities an exact oracle
+puts inside the accuracy target — was one measurement from met, its `cval` half
+unmeasured. That measurement was taken the next day on the same branch, against
+the same matrix the refusing test uses rather than a rebuild of it.
+
+**Decision.** The trigger is met in full, so D-048's remedy is due rather than
+conditional: an a-posteriori per-fit error certificate replacing the refusal
+where the certificate passes, never another move of the constant. Nothing
+D-049 decided moves — the constants stand, the two sample-size-free channels
+still carry them, and the stated calibration domain is unchanged. What this
+entry corrects is D-049's own Reopens clause, which a later reader would
+otherwise take as a live "one measurement short".
+
+**Consequences:** no code and no exported behaviour changes. The remedy is not
+planned in M106 — it is a new estimator needing its own design pass and its own
+oracle obligation, and nothing about it is urgent. It is recorded on M106's
+roadmap candidate row, which carries the figures; the measurement itself is in
+that milestone's work log and in `devel/degeneracy-oracle/exact_oracle.R`.
+
+**Reopens:** nothing new. D-048's second trigger — field reports of this
+refusal on real data — is unchanged and still open.

@@ -313,7 +313,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # the raw arm runs: a matrix destined for a unit refusal never pays for a
   # raw sandwich whose result would be dropped, and by the time the raw arm
   # can record a refusal no na_out() exit remains to discard it.
-  std <- axes_se_pricing(stats::cov2cor(sigma), d, n)
+  std <- axes_se_pricing(cor_sigma, d, n)
   if (is.character(std)) return(na_out(std))
 
   # The raw arm, decoupled (M91): a criterion trip or a pricing failure here
@@ -386,11 +386,17 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # WHY THIS CUTOFF: the corrected branch builds the information matrix
 # Delta'V Delta from the priced matrix's INVERSE twice, so its entries carry a
 # relative error growing like p * kappa^2 * eps; the floor is where that bound
-# reaches the accuracy target. The shipped sqrt(p*eps) floor -- no target at
-# all, in these terms -- sat 1/sqrt(tau) = 316 times lower in the eigenvalue
-# ratio, which is 1/tau = 1e5 times looser in the error bound it tolerates (the
-# bound is quadratic in kappa, so the two figures are not interchangeable and
-# this comment previously quoted the second one about the first). It accepted
+# reaches TAU -- the implementation constant defined below, not the accuracy
+# target delta_star, which is C = 10 times larger and would put the floor
+# sqrt(10) times higher in kappa. (Master's text read "the accuracy target
+# tau", self-consistent while tau WAS the target; splitting the two quantities
+# left this sentence naming the larger one. M106 review round 3, F1.)
+#
+# The shipped sqrt(p*eps) floor -- no target at all, in these terms -- sat
+# 1/sqrt(tau) = 316 times lower in the eigenvalue ratio, which is 1/tau = 1e5
+# times looser in the error bound it tolerates (the bound is quadratic in
+# kappa, so the two figures are not interchangeable and this comment previously
+# quoted the second one about the first). It accepted
 # the committed exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which
 # the reported corrected SEs were wrong by 3.4% with reason NULL, the package's
 # first measured silent wrong number in this subsystem (RR18).
@@ -405,17 +411,25 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #   delta_star = 1e-4 -- THE ACCURACY TARGET: the largest relative error a
 #     reported corrected SE may carry. It rests on two channels that do not
 #     depend on the sample size, and is corroborated by a third that does.
-#     No citekey on this repo's shelf carries the sampling-SD result the third
-#     channel uses, and RR19 declined to manufacture a citation for a
-#     textbook-standard one.
+#     THE DERIVATION CITES NO PUBLISHED SOURCE, anywhere: no citekey on this
+#     repo's shelf carries the sampling-SD result the third channel uses, and
+#     RR19 declined to manufacture a citation for a textbook-standard one;
+#     channel 1 rests on this package's own printed output, channel 2 on the
+#     standard normal-theory Wald construction, and every figure below on this
+#     repo's own oracle and review measurements.
 #
 #     CHANNEL 1 -- PRINT RESOLUTION (n-free, load-bearing).
-#     print.circumplex_axes_reliability() formats the component SE column at 3
-#     DECIMAL PLACES, not 3 significant digits (axes_fmt,
-#     R/axes_reliability_oop.R), so the absolute resolution is 1e-3 and the
-#     half-step 5e-4. PREMISE, and the one this channel hangs on: the
-#     components are variance shares of a unit-diagonal matrix, so their SEs
-#     are bounded by about 0.5 (typical 0.01-0.17). Without a scale bound a
+#     summary.circumplex_axes_reliability() formats the component SE column at
+#     3 DECIMAL PLACES, not 3 significant digits (axes_fmt at
+#     R/axes_reliability_oop.R:31, the column built at :344). The SE column is
+#     the summary method's: print() itself carries Reliability, SEm and
+#     NB_Reliability. So the absolute resolution is 1e-3 and the half-step
+#     5e-4. TWO PREMISES, both load-bearing for this channel: `digits = 3` is
+#     the DEFAULT of a user-settable argument on both display methods, so 1e-3
+#     is the resolution a user gets unless they ask for more, and the target is
+#     stated for that default; and the components are variance shares of a
+#     unit-diagonal matrix, so their SEs are bounded by about 0.5 (typical
+#     0.01-0.17). Without a scale bound a
 #     RELATIVE print resolution has no floor at all. At that bound
 #     5e-4/0.5 = 1e-3 is the finest relative change print can ever resolve, and
 #     it is coarser at every smaller SE -- so the channel is evaluated at its
@@ -452,11 +466,17 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #     0.1*a/sqrt(n), which at the anchor and n = 5e5 is 1.0e-4.
 #
 #     CALIBRATION DOMAIN of channel 3, stated because the coefficient and n
-#     both move it: the tenth-margin holds to about n = 5e5 at the anchor
-#     coefficient and about n = 2e4 at the worst geometry measured; delta_star
-#     reaches PARITY with the noise at about n = 5e7 and about n = 2.1e5
-#     respectively. Above its domain the guarantee is the fixed cap delta_star
-#     alone -- a print-resolution and coverage guarantee, both n-free, no
+#     both move it. Solving 0.1*a/sqrt(n) = delta_star gives the tenth-margin
+#     at n = 1e6*a^2, and a/sqrt(n) = delta_star gives PARITY at n = 1e8*a^2 --
+#     so at any one coefficient parity is exactly 100x the tenth-margin. At the
+#     anchor a = 1/sqrt(2) that pair is n = 5.0e5 and 5.0e7; at the worst
+#     measured a = 0.045 it is n = 2.0e3 and 2.0e5. (This block previously
+#     paired a tenth-margin and a parity belonging to coefficients a decade
+#     apart, overstating how far the noise-dominance reading survives at the
+#     worst geometry. M106 review round 3, F2.)
+#
+#     Above its domain the guarantee is the fixed cap delta_star alone -- a
+#     print-resolution and coverage guarantee, both n-free, no
 #     longer a noise-dominance one. Nothing operational follows: an
 #     n-dependent target would rebuild the sliding scale rejected just below,
 #     and the exposure is to the wording rather than to the number, since
@@ -483,8 +503,9 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #     covers that trend with at least 3x headroom at every kappa below the
 #     floors this target sets.
 #
-# WHAT THE TARGET ASSUMES (RR20 section 6). Seven premises the argument above
-# uses, each stated because a silent one cannot be checked:
+# WHAT THE TARGET ASSUMES. Eight premises the argument above uses, each stated
+# because a silent one cannot be checked -- the first seven from RR20
+# section 6, the eighth added at M106's third review round:
 #   1. The FITTED-MANIFOLD restriction -- the SE varies only along the
 #      q-dimensional model manifold, which is what caps the averaging shrink at
 #      about sqrt(q) (channel 3).
@@ -511,6 +532,10 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #   7. The noise yardstick is STABLE where the criterion operates. Measured
 #      true (RR20: identical to four digits across a decade of kappa on the
 #      near-duplicate family) -- it had been assumed until then.
+#   8. The 3-decimal resolution channel 1 reads is the DEFAULT of a
+#      user-settable `digits` argument on both display methods. A caller who
+#      asks for more decimals resolves differences finer than delta_star; the
+#      target is stated for the shipped default.
 #
 # tau = delta_star / C is therefore the implementation constant: refuse when
 # the bound exceeds tau, and a computed answer's error is capped at
