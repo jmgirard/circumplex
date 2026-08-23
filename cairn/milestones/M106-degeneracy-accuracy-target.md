@@ -117,7 +117,7 @@ M7's own gate.
 - [x] T5 — The two `cormat` near-duplicate radii, same generator and seed;
       extend the `"ill_conditioned"` warning to carry κ and the dominant
       collinear pair (the smallest eigenvector's two dominant loadings).
-- [ ] T6 — Run AC6's sweep, update every stale site and NEWS.md, then plant one
+- [x] T6 — Run AC6's sweep, update every stale site and NEWS.md, then plant one
       stale value per spelling class and confirm the sweep catches each.
 - [x] T8 — Add the reachable-geometry family to `exact_oracle.R` from RR19
       §3a's stated constructions, with its own pass window.
@@ -146,6 +146,9 @@ M7's own gate.
 - 2026-08-22: two plan assumptions corrected against measurement. The planned second radius r = .99999 is unreachable through the exported path — lavaan stops converging and `axes_reliability()` errors before the criterion runs — so the bracketing radius is r = .9999714 (kappa 1.01e5), the deepest measured that both converges and refuses. And `components$SE`'s `item`/epsilon row is NA at every radius including kappa = 289, so it is not evidence about the criterion; the assertion covers the three priced components.
 - 2026-08-22: T4 done. Three cases at three p, all inside [1e4, 1e7]: p = 4 at kappa 1.2e4 against a 1.06e5 floor computes; p = 8 at kappa 1.0e5 against a 7.5e4 floor refuses, a ratio of 1.33 so it discriminates where the floor sits rather than only that one exists; p = 24 at kappa 7.2e5 against a 4.33e4 floor refuses. The first two reach the criterion through real converged fits; only p = 24 needed the `axes_fitted_cov` seam, and it needed it for the measured reason AC4 anticipated — lavaan does not converge on that matrix.
 - 2026-08-22: T8 done. `exact_oracle.R` gains five reachable-geometry cases — family A at p = 8 (two eps), family C at the p = 4 API minimum, and the near-duplicate geometry at r = .9999 and .99999 — each measured against the exact-rational oracle, with its own window (`REACHABLE_WINDOW = 1e-3`) asserting the OPPOSITE property to the fixture sweep's: that in reachable geometry the bound stays decades away from the error. Measured attainment 3.4e-8 to 3.3e-7, independently reproducing RR19 s3a's 8.1e-9 to 6.3e-7 on constructions written from its stated parameters. The window is live, not vacuous: tightened to 1e-9 it FAILs and the script exits 1; restored it exits 0.
+- 2026-08-22: T6 done. The concept-token sweep found one genuinely stale site, `NEWS.md:65-67`, now restated with the target, the ceiling and the new warning content. It also surfaced two prose sites a value-literal grep would have missed entirely — `R/axes_scaled_fit.R:262` and `R/axes_reliability.R:2021`, both reading "the tau floor" — which carry no figure and stay true. That is the case for the concept-token form: the plan's original literal grep would have found neither, and after the edit it could no longer match `1e-6` at all.
+- 2026-08-22: T6 planted-defect check, one per spelling class, each caught by the sweep and each restored: a doc site reverted to `1e-6` (numeric literal, caught at `R/axes_reliability.R:1036`); a prose clause given a stale `tau = 1e-6` (caught at `R/axes_corrected_se.R:384`); the derived threshold left at `1.4e4` (caught at `R/axes_corrected_se.R:352`). Sweep silent and tree clean afterwards.
+- 2026-08-22: T7 — D-048 appended, superseding D-044's floor only; its metric choice stands and RR19 declined to reopen it. The entry carries the decision and its rationale and cites M106 and the constant's own block for the figures, rather than restating the measurements.
 
 ## Decisions
 

@@ -1640,3 +1640,54 @@ escalated PRs and pushes (`tools/ci-matrix.R:23-31`).
 the docs-only direct-push carve-out is retired from cairn's git model; or a
 non-admin contributor path becomes routine, which is also the aggregator
 remainder's promotion condition.
+
+### D-048 (2026-08-22): the degeneracy criterion's accuracy target is derived from the reported SE's own sampling variability, and τ moves 1e-6 → 1e-5 — supersedes D-044's floor (M106, RR19)
+
+**Context:** D-044 set `axes_degeneracy_tau = 1e-6` against the exact-rational
+oracle, capping a computed answer's error at ~1e-5 relative. That calibration
+was entirely numerical. Nothing in the package said what relative error a
+reported SE can tolerate, so no argument distinguished 1e-6 from 1e-3 — and
+the M89 round-3 review measured the consequence: an item pair at r = .9999
+fits cleanly and was refused, though its corrected SEs are accurate to 2e-13.
+
+**Decision.** Two documented quantities now stand behind one shipped constant,
+because D-044's single τ was defined as the largest tolerated reported error
+while enforcing a cap ten times looser. `axes_degeneracy_delta_star` is the
+accuracy target: the largest relative error a reported corrected SE may carry,
+derived from the SE's own sampling variability rather than from machine
+epsilon, with the numerical bias held to a tenth of that statistical noise and
+the calibration taken at a sample size a decade past anything the literature
+publishes. `axes_degeneracy_calibration_ceiling` is the factor by which the
+criterion's error bound may undershoot the error it stands for, kept at the
+oracle's measured value. `axes_degeneracy_tau` is their quotient. Refusal
+thresholds move outward accordingly. The figures, their derivation and the
+oracle measurements are in M106 and beside the constant.
+
+This supersedes D-044's floor only. D-044's metric choice — `cov2cor(Σ̂)` for
+every user-reported quantity, raw Σ̂ at the `naive` arm — is untouched, and
+RR19 explicitly declined to reopen it.
+
+**Also decided on the same review.** The ill-conditioning limb is kept:
+removal was weighed on this mechanism's second escalation and rejected
+narrowly, because past the floor the package has no shipped means of
+certifying the number to the accuracy target (IP3), and the only a-priori
+error estimate a replacement caution could carry is the same bound, which
+overstates the actual error by several decades in every reachable geometry —
+it would cry percent-level error over numbers accurate to 1e-13. τ also stays
+a single n-free constant shared by both surfaces: an n-dependent τ would make
+refusal a property of the yardstick rather than of the refused matrix, and the
+identical matrix would compute at one sample size and refuse at another on a
+path where the user types that number themselves.
+
+**Consequences:** exported behavior changes on the unreleased dev line
+(NEWS-documented). Correlation structures between the old and new thresholds
+now compute where they previously refused; RR18's counterexample still
+refuses. The `"ill_conditioned"` warning now names the condition number and,
+where one near-duplicate pair dominates, that pair.
+
+**Reopens** (GP7, from RR19 §5): (i) an exhibited Σ̂ from a converged
+`axes_reliability()` fit that this criterion refuses while an exact oracle
+shows its corrected SEs and `cval` within the accuracy target; or (ii) field
+reports of `"ill_conditioned"` refusals on real data. On either, the remedy is
+an a-posteriori per-fit error estimate replacing this limb — refusal retained
+for indefiniteness and exact singularity — not another decade on τ.
