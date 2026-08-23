@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M105: Give master GitHub-native branch protection
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -119,7 +119,7 @@ entry recording the two-ruleset split and the bypass rationale.
       again. Quote the rejection text into the work log.
 - [x] T7: after both rulesets are active, push one docs-only tracking commit
       directly to master and confirm it landed (AC4).
-- [ ] T8: sweep for prose the rulesets make newly false — grep `cairn/` and
+- [x] T8: sweep for prose the rulesets make newly false — grep `cairn/` and
       `.github/` for `branch protection`, `required status`, `force`,
       `enforcement boundary`; run `devtools::test()` and `devtools::check()`;
       write the `DECISIONS.md` entry for the two-ruleset split and the
@@ -148,6 +148,8 @@ entry recording the two-ruleset split and the bypass rationale.
 - 2026-08-22: branch synced with the moved master by rebase rather than merge-in — the session's merge guard denies all `git merge` forms, and the branch was unpushed, so the rebase is equivalent and keeps history linear.
 
 - 2026-08-22: T8 in progress — sweep clean (no live prose outside archives claims master is unprotected or force-pushable); D-047 appended (two-ruleset split, bypass rationale, reopening conditions); PROFILE.md's 120-line overrun paid by compressing the greenfield-openers intro one line (cap is exclusive; `cairn_validate` all-OK at 119). `devtools::test()` FAIL 0 (5 lavaan WARNs, 3 SKIPs, standing baseline); `devtools::check()` running, its verdict is the checkpoint that closes T8.
+
+- 2026-08-22: T8 closed — `devtools::check()` Status: OK, 0 errors / 0 warnings / 0 notes (20m40s). All tasks done; status → review.
 
 ## Decisions
 
