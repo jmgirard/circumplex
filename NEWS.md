@@ -85,7 +85,9 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   which is what a duplicate item pair makes it — and names item pairs
   correlated tightly enough to force the refusal on their own: one pair with
   advice to drop one of them, several with the count and up to three of them
-  named. So a bare reason code no longer leaves a caller with nowhere to go.
+  named. That diagnosis rides the warning; the stored result's reason
+  fields, and the note `print()` shows for them, still carry the bare
+  code.
   (The scaled-fit surface has a second, separate refusal that reports the same
   reason for a numerical cancellation rather than for conditioning; that one
   carries no such diagnosis, because it is reached only by a matrix this

@@ -2093,8 +2093,10 @@ test_that("M106 AC5: the refusal warning names the conditioning and the collinea
   near <- m106_family_b(2e-5)          # r = .9999714, kappa 1.01e5 -- refused
   msg <- axes_degeneracy_hint(near)
   expect_match(msg, "condition number 1.01e+05", fixed = TRUE)
-  # Row index then column index, so the list reads down the caller's own
-  # matrix rather than in the column-major order which() walked it in.
+  # Only one pair qualifies here, so nothing on this line observes the listing
+  # ORDER -- the row-then-column ordering is pinned separately, on the (2,3)
+  # before (1,4) construction where it and column-major differ (M106 review
+  # round 4, F10).
   expect_match(msg, "items i1 and i9 are nearly collinear", fixed = TRUE)
   expect_match(msg, "(r = 0.999971)", fixed = TRUE)
   expect_match(msg, "consider dropping one", fixed = TRUE)

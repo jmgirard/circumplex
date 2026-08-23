@@ -493,8 +493,10 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #     which is why channels 1 and 2 carry the target and channel 3 corroborates
 #     it. The corner where the corrected sampling arithmetic lands at 6.5e-6
 #     needs both conservatisms stacked -- the worst measured geometry AND a
-#     sample size 1.7 decades past the published ceiling; each alone stays
-#     within a factor of 2 of 1e-4.
+#     sample size 1.7 decades past the published ceiling. Neither alone gets
+#     near it: the n conservatism alone (a = 1/sqrt(2), n = 5e5) lands at
+#     exactly 1.0e-4, and the geometry conservatism alone (a = 0.045 at the
+#     published ceiling n = 1e4) at 4.5e-5, a factor of 2.22 below.
 #
 #   C = 10 -- THE CALIBRATION CEILING: how far the enforced bound
 #     p * kappa(cov2cor(Sigma-hat))^2 * eps may sit below the error it stands
@@ -526,7 +528,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #      section 3c across df (cval relative error 1.1e-8 at df = 4, 1.1e-13 at
 #      df = 26), and the oracle's reachable family, which now prices cval at
 #      each case's own df and measures 2.1e-14 to 1.1e-8 over the five, all
-#      decades inside delta_star. This is the largest of the seven: the
+#      decades inside delta_star. This is the largest of the eight: the
 #      criterion refuses both surfaces at one floor, and only one surface's
 #      accuracy target is derived.
 #   7. The noise yardstick is STABLE where the criterion operates. Measured
@@ -617,13 +619,28 @@ axes_degeneracy_tau <-
 # correlation-metric call sites AND the SE helper's raw arm, where since M91
 # a trip labels only `naive_reason` (M91-D2, closing M90 review F11). Changing
 # this constant is an escalation (RB, no-oracle), never a silent edit.
+axes_sigma_degenerate <- function(sigma) {
+  if (!all(is.finite(sigma))) return("singular")
+  ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
+  p <- nrow(sigma)
+  floor_ <- sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
+  if (ev[p] <= ev[1] * floor_) {
+    if (ev[p] < -ev[1] * sqrt(p * .Machine$double.eps)) return("indefinite")
+    return("ill_conditioned")
+  }
+  NULL
+}
+
+
 # The actionable half of an "ill_conditioned" refusal (M106; RR19 section 6).
 # Returns a clause naming the conditioning, plus every item pair collinear
 # enough to force the refusal on its own -- otherwise the conditioning alone.
 # Deliberately a separate function called at the warning sites rather than
 # folded into axes_sigma_degenerate(): the criterion's return is a bare literal
-# that both surfaces compare and eleven tests assert identity against, and a
-# diagnostic is not part of deciding whether to refuse.
+# that both surfaces compare and many tests assert identity against (a count
+# left unstated deliberately -- it went stale in the very commit that wrote
+# it, M106 review round 4 F6), and a diagnostic is not part of deciding
+# whether to refuse.
 #
 # SCOPE (M106 review F1/F6, narrowed again at round 2 F2): called ONLY where
 # the criterion said "ill_conditioned". The other two literals are excluded on
@@ -690,6 +707,15 @@ axes_degeneracy_tau <-
 # Where more than one pair qualifies, the count is what carries the message and
 # the advice becomes plural: "drop one" is wrong counsel among many equally
 # redundant items.
+#
+# PRECONDITION: `sigma` has a unit diagonal. The interlacing cut below needs it
+# twice -- lambda_min(R) <= 1 - |r_ij| and lambda_max <= p both assume it -- so
+# on a general covariance matrix a qualifying pair would not force the refusal
+# by itself and the "nearly collinear (r ...)" clause would be reporting a
+# covariance as a correlation. Both call sites pass a cov2cor()'d matrix, which
+# is why this is stated rather than enforced: the helper is internal, and a
+# stopifnot() here would price an eigen-sized guarantee at every refusal
+# (M106 review round 4 F8).
 axes_degeneracy_hint <- function(sigma) {
   ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
   p <- nrow(sigma)
@@ -713,7 +739,9 @@ axes_degeneracy_hint <- function(sigma) {
 
   if (nrow(ij) == 1L) {
     return(paste0(hint, sprintf(
-      "; items %s and %s are nearly collinear (r %s) -- near-duplicate items make the fitted matrix numerically degenerate, so consider dropping one",
+      paste0("; items %s and %s are nearly collinear (r %s) -- ",
+             "near-duplicate items make the fitted matrix numerically ",
+             "degenerate, so consider dropping one"),
       nms[ij[1L, 1L]], nms[ij[1L, 2L]],
       axes_fmt_near_unit_r(sigma[ij[1L, 1L], ij[1L, 2L]])
     )))
@@ -725,7 +753,9 @@ axes_degeneracy_hint <- function(sigma) {
     lst <- paste0(lst, sprintf(", and %d more", nrow(ij) - shown))
   }
   paste0(hint, sprintf(
-    "; %d item pairs are nearly collinear (%s) -- near-duplicate items make the fitted matrix numerically degenerate, so consider dropping the redundant ones",
+    paste0("; %d item pairs are nearly collinear (%s) -- near-duplicate items ",
+           "make the fitted matrix numerically degenerate, so consider ",
+           "dropping the redundant ones"),
     nrow(ij), lst
   ))
 }
@@ -743,18 +773,6 @@ axes_fmt_near_unit_r <- function(r) {
   } else {
     sprintf("= %.6g", r)
   }
-}
-
-axes_sigma_degenerate <- function(sigma) {
-  if (!all(is.finite(sigma))) return("singular")
-  ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
-  p <- nrow(sigma)
-  floor_ <- sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
-  if (ev[p] <= ev[1] * floor_) {
-    if (ev[p] < -ev[1] * sqrt(p * .Machine$double.eps)) return("indefinite")
-    return("ill_conditioned")
-  }
-  NULL
 }
 
 
