@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -295,3 +295,4 @@ Reviewed against master at b712a007, unmoved since the branch was cut, so no mer
 - 2026-08-23: amendment return: AC4 — "The upper cases reach the band through the `axes_fitted_cov` seam, since no converged fit is known to (`R/axes_corrected_se.R:444-449`)." — falsified by the work itself: case 2 (p = 8, κ = 1.0e5) now reaches the criterion through a converged fit and asserts `details$converged` in-test. Second amendment return of this milestone, first naming AC4, so the second-occurrence stop does not fire.
 - 2026-08-23: gate dispositions on the three maintainer-judgment findings, decided by the session at Jeff's delegation. Finding 12 (unreachable dimnames fallback) and finding 19 (fixtures pinning exact 3-significant-figure condition numbers off a `qr.Q` decomposition) are fixed in the return — both cheap, and 19 is the shape that already cost this branch one ubuntu-only red. Finding 16 (the `cormat` path's unbounded n named as binding and then unfenced) is folded into the escalation rather than fixed or parked: it is the same question as finding 3 — what n the accuracy target is calibrated for and what holds outside it — so settling it blind or deferring it both waste the review.
 - 2026-08-23: escalation chosen at Jeff's gate for findings 3 and 16, on AC1's own `no-oracle` tripwire. The accuracy target and therefore τ are what the answer moves, so the constant is not repaired until the review returns.
+- 2026-08-23: status in-progress→blocked on RB20 (round-2 findings 3 and 16). The brief asks whether the corrected SE's relative sampling SD is correctly priced at `1/sqrt(2(n-1))` when the SE is a functional of all p(p+1)/2 entries of Σ̂, what the answer does to δ* against M106's own 6e-6 falsifier, what n the target is calibrated for and what holds above it, whether the block's two n-free cross-checks survive (both alleged wrong, both reproduced wrong here), and — this mechanism's third escalation, so removal is on the table by rule — whether the answers move RR19 §5's narrow keep, given D-048's reopening trigger (i) is now half-met. Committed on the milestone branch rather than the default branch, since the questions are about code that exists only here.
