@@ -12,11 +12,14 @@ place where it is proven false and mark the correction (`corrected M<NN>`);
 never append a correction that leaves the wrong text readable. Not status, not
 decisions. One family per line, so the file stays greppable.
 
-Uncapped, by M104's choice rather than by any rule: `LESSONS.md`'s caps and
-their remedy set are stated in the cairn tracking rulebook's "Weight caps", which
-sets no cap on a repo-specific file like this one. Nothing measures this file, so
-keep it honest by hand — an entry that stops earning its line is trimmed or
-deleted here the same way it would be there.
+Capped by this header rather than by `cairn_validate`, whose `LINE_CAPS` live in
+the cairn plugin repo and not in this one: **under 35 lines and under 9,000
+bytes**, set from the graduated size (26 lines / 7,293 bytes on 2026-08-22) plus
+headroom for roughly one more family. Read with `wc -l -c` at ROADMAP hygiene
+passes — the same hand-checked treatment the cairn tracking rulebook's "Weight
+caps" gives `ROADMAP.md`'s and `LESSONS.md`'s byte budgets. Over either figure the
+remedy is retirement or compression here, never "let it grow": an entry that stops
+earning its line is trimmed or deleted the same way it would be in `LESSONS.md`.
 
 - 2026-07-12→2026-08-18 (M13 family): **a guard has teeth only if you break the guarded line and see it fail — prove by mutation, never by eye.** test re-types the production expression (M13); assertion implied by the defect (M33); fixture sits where the bug is invisible (M35) or is impossible — build from ONE population, assert estimates near truth (M61); guard never matched (M40); probe narrower than what it probes — scope it, `grep -F` metacharacters, verify ranges by first AND last line, flatten wrapped prose (M43, M57); guard checks fewer dimensions than the indexing; mutation reddens for the wrong reason — assert the quantity the path determines (M59); seam mock routes past the condition — assert it unmocked (M62); two sides built by the SAME line catch nothing common-mode — pin one to a literal (M65); a mutation certifies only the REVERT — pin verb stems, pair negatives with positives, never author-certify (M66); sides sharing an ORIGIN cannot disagree — name each's independent origin (M72); `pdftotext` proves in-FILE, not on-PAGE — render and look; after correcting an anchored fact, `grep -rn` the OLD string repo-wide (M73); a suite that never visits the threshold kills no mutants — pin 1.05×/0.95× the floor, verify reddening (M89); vdiffr baselines count only on the CHANGED path (M38); a block-EXTRACTION helper certifies content, never PLACEMENT — pin the container header and seam bytes too (M94).
 - 2026-08-14→2026-08-17 (M82 family): **the mutation harness itself lies.** `git checkout --` restores from the INDEX, discarding uncommitted work — commit before mutating, restore by copy, re-hash after every restore (M82, M92); `gregexpr` returns −1 with length 1 — assert the ARTIFACT changed (blob hash), never that the edit call returned (M82); `on.exit` restores don't survive a hard kill — one mutant per invocation, mutate only committed files (M88); a DOTALL regex spans ACROSS call sites — anchor multi-line edits line-by-line, re-read aimed sites before recording success (M87); a top-level mutant in a `sys.source()`d script executes at load — plant inside a function never called (M87).
