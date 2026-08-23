@@ -7,7 +7,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m105-master-branch-protection
+- **Branch/PR:** m105-master-branch-protection · https://github.com/jmgirard/circumplex/pull/134
 
 ## Goal
 
@@ -55,25 +55,25 @@ entry recording the two-ruleset split and the bypass rationale.
 
 ## Acceptance criteria
 
-- [ ] AC1: `gh api repos/jmgirard/circumplex/rulesets` returns two rulesets
+- [x] AC1: `gh api repos/jmgirard/circumplex/rulesets` returns two rulesets
       targeting the default branch, both `enforcement: "active"`. Read whole via
       `gh api repos/jmgirard/circumplex/rulesets/<id>`, one has rule types
       exactly `{deletion, non_fast_forward, required_linear_history}` and an
       empty `bypass_actors`; the other has rule types exactly
       `{required_status_checks}` and a `bypass_actors` array holding exactly one
       entry, the repository-admin role at `bypass_mode: "always"`.
-- [ ] AC2: the checks ruleset's required status check contexts are exactly
+- [x] AC2: the checks ruleset's required status check contexts are exactly
       `["matrix", "ubuntu-latest (release)"]`, read from the AC1 output.
-- [ ] AC3: the single force-push attempt named in T6 is rejected by GitHub, and
+- [x] AC3: the single force-push attempt named in T6 is rejected by GitHub, and
       `git rev-parse origin/master` immediately afterwards equals the tip master
       held before the attempt.
-- [ ] AC4: at least one docs-only tracking commit is pushed directly to master
+- [x] AC4: at least one docs-only tracking commit is pushed directly to master
       after both rulesets are active, and `git log origin/master` shows it —
       i.e. the carve-out the bypass exists to preserve still works.
-- [ ] AC5: `tools/check-branch-protection.R` exits zero when the live rulesets
+- [x] AC5: `tools/check-branch-protection.R` exits zero when the live rulesets
       agree with committed `tools/branch-protection.json`, and non-zero on a
       difference in any field named by its own `COMPARED_FIELDS` constant.
-- [ ] AC6: `cairn/PROFILE.md`'s consistency-gate section names
+- [x] AC6: `cairn/PROFILE.md`'s consistency-gate section names
       `tools/check-branch-protection.R` as a check the review gate runs, and
       `wc -l cairn/PROFILE.md` is ≤ 120.
 - [ ] AC7: `Rscript -e 'devtools::test()'` clean and
@@ -154,3 +154,14 @@ entry recording the two-ruleset split and the bypass rationale.
 ## Decisions
 
 ## Review
+
+Review 2026-08-22 (PR #134). Evidence per criterion, fresh at review:
+
+- AC1: `gh api repos/jmgirard/circumplex/rulesets` → exactly two branch rulesets, both `enforcement: "active"`: 21216269 `master-destructive` (rules deletion + non_fast_forward + required_linear_history, `bypass_actors` []) and 21216270 `master-checks` (rules required_status_checks only, one bypass actor RepositoryRole/5/always). Verified.
+- AC2: 21216270's contexts read back as exactly `["matrix", "ubuntu-latest (release)"]`. Verified.
+- AC3: T6's attempt (`git push --force origin 0b1e1957:master`, run by Jeff) was refused — `remote: error: GH013: Repository rule violations found for refs/heads/master` — and `git rev-parse origin/master` at review still equals cd08db79, the pre-attempt tip. Verified.
+- AC4: docs-only commit cd08db79 pushed directly to master under both active rulesets is at `origin/master` tip at review; the remote's push reply showed the checks rule firing and the admin bypass carrying it. Verified.
+- AC5: pass arm exit 0 against the live pair; fail arm re-proved at review with a SECOND mutation battery using different forms than implement's (enforcement→disabled, target→tag, include→refs/heads/main, an ADDED rule type, an ADDED context, bypass_actors emptied) — all six exit 1, each naming exactly the mutated COMPARED_FIELDS field; clean pass after restore. Verified.
+- AC6: `cairn/PROFILE.md:49` names the checker in the consistency-gate; `wc -l` = 119 ≤ 120. Verified.
+
+Consistency gate: `cairn_validate` all OK (WARN work-log format = M7's standing pre-M28 advisory). No principle change → `cairn_impact` skipped. `document()` no diff, zero resolve-link lines. README untouched. `pkgdown::check_pkgdown()` no problems. NEWS: no user-visible package change (internal tier — repo settings + tools/) → no entry owed. No new top-level files (`tools/` predates, `^tools$` in .Rbuildignore). Master watches: newest verdict-reaching push runs green on both workflows (ab83f30b success ×2; newer cairn-only pushes run none, per paths-ignore — said so per M95). Alert audits: check-master-red-alert.R and dryrun both clean. Branch-protection check: exit 0.
