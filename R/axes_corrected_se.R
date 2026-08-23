@@ -226,10 +226,11 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # reason speaks for all three and `naive_reason` is deliberately NULL --
   # never a second label beside it. Every na_out() call sits ahead of the
   # raw arm below, so no determined raw-arm refusal is ever discarded here.
-  na_out <- function(reason) {
+  na_out <- function(reason, hint = NULL) {
     warning(
       "The corrected component standard errors could not be computed (",
-      reason, "); they are reported as NA.",
+      reason, if (is.null(hint)) "" else paste0(": ", hint),
+      "); they are reported as NA.",
       call. = FALSE
     )
     list(naive = empty, corrected = empty, fiml_ratio = empty, reason = reason,
@@ -297,14 +298,22 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # R/axes_scaled_fit.R; finiteness is metric-blind, so hoisting it moves no
   # refusal across the arms' boundary).
   if (!all(is.finite(sigma))) return(na_out("singular"))
-  degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
-  if (!is.null(degenerate)) return(na_out(degenerate))
+  cor_sigma <- stats::cov2cor(sigma)
+  degenerate <- axes_sigma_degenerate(cor_sigma)
+  if (!is.null(degenerate)) {
+    # Only the ill-conditioning literal gets the diagnostic -- see the scope
+    # note at axes_degeneracy_hint(). The sibling surface gates identically, so
+    # the two warnings stay in agreement (M89's nestedness contract).
+    return(na_out(degenerate, if (identical(degenerate, "ill_conditioned")) {
+      axes_degeneracy_hint(cor_sigma)
+    }))
+  }
 
   # The whole cov2cor arm -- criterion above, pricing here -- resolves before
   # the raw arm runs: a matrix destined for a unit refusal never pays for a
   # raw sandwich whose result would be dropped, and by the time the raw arm
   # can record a refusal no na_out() exit remains to discard it.
-  std <- axes_se_pricing(stats::cov2cor(sigma), d, n)
+  std <- axes_se_pricing(cor_sigma, d, n)
   if (is.character(std)) return(na_out(std))
 
   # The raw arm, decoupled (M91): a criterion trip or a pricing failure here
@@ -345,7 +354,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # matrix is refused. One inequality carries three spectral cases -- a
 # negative smallest eigenvalue (lambda_min <= 0 < lambda_max), exact
 # singularity (lambda_min = 0), and mere ill-conditioning
-# (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4 at p = 24) --
+# (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 4.3e4 at p = 24) --
 # and since M90 the refusal's LITERAL is decided by depth, not by case:
 # "indefinite" only where the negativity is decisive, "ill_conditioned" for
 # everything else including roundoff-level negativity; the partition and
@@ -377,25 +386,208 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # WHY THIS CUTOFF: the corrected branch builds the information matrix
 # Delta'V Delta from the priced matrix's INVERSE twice, so its entries carry a
 # relative error growing like p * kappa^2 * eps; the floor is where that bound
-# reaches the accuracy target tau. The shipped sqrt(p*eps) floor -- tau = 1 in
-# these terms -- was a thousand times looser: it accepted the committed
-# exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which the
-# reported corrected SEs were wrong by 3.4% with reason NULL, the package's
+# reaches TAU -- the implementation constant defined below, not the accuracy
+# target delta_star, which is C = 10 times larger and would put the floor
+# sqrt(10) times higher in kappa. (Master's text read "the accuracy target
+# tau", self-consistent while tau WAS the target; splitting the two quantities
+# left this sentence naming the larger one. M106 review round 3, F1.)
+#
+# The shipped sqrt(p*eps) floor -- no target at all, in these terms -- sat
+# 1/sqrt(tau) = 316 times lower in the eigenvalue ratio, which is 1/tau = 1e5
+# times looser in the error bound it tolerates (the bound is quadratic in
+# kappa, so the two figures are not interchangeable and this comment previously
+# quoted the second one about the first). It accepted
+# the committed exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which
+# the reported corrected SEs were wrong by 3.4% with reason NULL, the package's
 # first measured silent wrong number in this subsystem (RR18).
 #
-# THE ACCURACY TARGET tau: the largest relative error tolerated in a reported
-# corrected SE before the matrix is refused instead. Calibrated against the
-# exact-rational oracle (devel/degeneracy-oracle/): its Q4 sweep measures the
-# double-precision SE relative error to sit within a factor of 10 of
-# p * kappa(cov2cor(Sigma-hat))^2 * eps (ratios 3.28/2.4/1.27 across three
-# decades of kappa, M89 T1), so refusing when that bound exceeds tau -- i.e.
-# when lambda_min/lambda_max <= sqrt(p*eps/tau) -- caps the error a computed
-# answer can carry at ~10*tau = 1e-5 relative, far below anything a reported
-# SE's downstream use can resolve. The committed counterexample
-# cairn/reviews/rb18-counterexample-b.rds sits at 3.4% relative error
-# (RR18/M89): three orders past any defensible target, and one the shipped
-# sqrt(p*eps) floor -- tau = 1, in these terms -- accepted with reason NULL.
-axes_degeneracy_tau <- 1e-6
+# THE TARGET AND THE CEILING (M106; set at RR19 sections 1-2, and the argument
+# for it rewritten at RR20 with the constants unchanged). Two documented
+# quantities stand behind one shipped constant. Keeping them apart is the
+# point: M89 defined tau as the largest tolerated reported error and then
+# enforced a cap ten times looser, so the stated definition and the enforced
+# behaviour disagreed by exactly the slack factor.
+#
+#   delta_star = 1e-4 -- THE ACCURACY TARGET: the largest relative error a
+#     reported corrected SE may carry. It rests on two channels that do not
+#     depend on the sample size, and is corroborated by a third that does.
+#     THE DERIVATION CITES NO PUBLISHED SOURCE, anywhere: no citekey on this
+#     repo's shelf carries the sampling-SD result the third channel uses, and
+#     RR19 declined to manufacture a citation for a textbook-standard one;
+#     channel 1 rests on this package's own printed output, channel 2 on the
+#     standard normal-theory Wald construction, and every figure below on this
+#     repo's own oracle and review measurements.
+#
+#     CHANNEL 1 -- PRINT RESOLUTION (n-free, load-bearing).
+#     summary.circumplex_axes_reliability() formats the component SE column at
+#     3 DECIMAL PLACES, not 3 significant digits (axes_fmt at
+#     R/axes_reliability_oop.R:31, the column built at :344). The SE column is
+#     the summary method's: print() itself carries Reliability, SEm and
+#     NB_Reliability. So the absolute resolution is 1e-3 and the half-step
+#     5e-4. TWO PREMISES, both load-bearing for this channel: `digits = 3` is
+#     the DEFAULT of a user-settable argument on both display methods, so 1e-3
+#     is the resolution a user gets unless they ask for more, and the target is
+#     stated for that default; and the components are variance shares of a
+#     unit-diagonal matrix, so their SEs are bounded by about 0.5 (typical
+#     0.01-0.17). Without a scale bound a
+#     RELATIVE print resolution has no floor at all. At that bound
+#     5e-4/0.5 = 1e-3 is the finest relative change print can ever resolve, and
+#     it is coarser at every smaller SE -- so the channel is evaluated at its
+#     binding endpoint, the largest printable SE, and delta_star sits one
+#     decade inside it. One decade looser (1e-3) reaches the printed resolution
+#     and becomes marginally visible.
+#
+#     CHANNEL 2 -- WALD COVERAGE (n-free, load-bearing). A relative SE error
+#     delta moves the coverage of a nominal 95% two-sided Wald interval by
+#     about 2*1.96*phi(1.96)*delta = 0.229*delta, linearizing at delta = 0. At
+#     delta_star that is 2.3e-5 IN COVERAGE PROBABILITY, which is 0.0023
+#     PERCENTAGE POINTS. The unit is not decoration: this block previously read
+#     "0.002 points", which taken as a probability is 87x the real shift (M106
+#     review round 2, F13). At any finite n the shift is invisible against the
+#     error of the asymptotic approximation the interval already makes.
+#
+#     CHANNEL 3 -- THE SE'S OWN SAMPLING NOISE (typical case, NOT a bound).
+#     The reported SE is a plug-in through the FITTED matrix:
+#     se_r = n^(-1/2)*sqrt(v_r(cov2cor(Sigma(theta-hat)))), and Sigma(theta) is
+#     linear in theta, so every path from data to reported number runs through
+#     the q-dimensional fitted parameter vector (q = n_comp + p; 10 at p = 8,
+#     27 at p = 24), never through the p(p+1)/2 free moments of a matrix.
+#     PREMISE: that manifold restriction is what makes averaging over
+#     p(p+1)/2 entries structurally unavailable -- the available shrink caps at
+#     about sqrt(q). By the delta method the relative sampling SD is a/sqrt(n)
+#     with a an n-free coefficient. The single-variance anchor a = 1/sqrt(2)
+#     (from (n-1)s^2/sigma^2 ~ chi^2_{n-1}, halved for the square root) is a
+#     fair TYPICAL value and not a floor: RR20 measured a = 0.045 to 1.38 over
+#     reachable designs by a delta-method driver built on this file's own
+#     pricing and confirmed by Monte Carlo, the small values arising from
+#     gradient near-cancellation, which no theorem bounds away from zero.
+#     Holding the numerical bias to a tenth of that noise -- the conventional
+#     "numerical error much smaller than statistical error" margin -- gives
+#     0.1*a/sqrt(n), which at the anchor and n = 5e5 is 1.0e-4.
+#
+#     CALIBRATION DOMAIN of channel 3, stated because the coefficient and n
+#     both move it. Solving 0.1*a/sqrt(n) = delta_star gives the tenth-margin
+#     at n = 1e6*a^2, and a/sqrt(n) = delta_star gives PARITY at n = 1e8*a^2 --
+#     so at any one coefficient parity is exactly 100x the tenth-margin. At the
+#     anchor a = 1/sqrt(2) that pair is n = 5.0e5 and 5.0e7; at the worst
+#     measured a = 0.045 it is n = 2.0e3 and 2.0e5. (This block previously
+#     paired a tenth-margin and a parity belonging to coefficients a decade
+#     apart, overstating how far the noise-dominance reading survives at the
+#     worst geometry. M106 review round 3, F2.)
+#
+#     Above its domain the guarantee is the fixed cap delta_star alone -- a
+#     print-resolution and coverage guarantee, both n-free, no
+#     longer a noise-dominance one. Nothing operational follows: an
+#     n-dependent target would rebuild the sliding scale rejected just below,
+#     and the exposure is to the wording rather than to the number, since
+#     measured attainment of the error bound over reachable geometries is at
+#     most 4e-6, so actual errors run about 1e-12. n = 5e5 is 1.7 decades past
+#     the n ~ 1e4 ceiling of published circumplex correlation matrices.
+#
+#     WHY THE SAMPLING CHANNEL CANNOT BE THE PRIMARY ONE (RR20 section 2). Read
+#     as a uniform requirement -- bias below a tenth of the noise at EVERY
+#     reachable geometry and EVERY typed n -- it yields no positive constant at
+#     all: the coefficient has no established positive floor and the cormat
+#     path's n has no ceiling. It rejects 1e-6 exactly as it rejects 1e-4. A
+#     criterion that must produce a fixed constant cannot rest on that frame,
+#     which is why channels 1 and 2 carry the target and channel 3 corroborates
+#     it. The corner where the corrected sampling arithmetic lands at 6.5e-6
+#     needs both conservatisms stacked -- the worst measured geometry AND a
+#     sample size 1.7 decades past the published ceiling. Neither alone gets
+#     near it: the n conservatism alone (a = 1/sqrt(2), n = 5e5) lands at
+#     exactly 1.0e-4, and the geometry conservatism alone (a = 0.045 at the
+#     published ceiling n = 1e4) at 4.5e-5, a factor of 2.22 below.
+#
+#   C = 10 -- THE CALIBRATION CEILING: how far the enforced bound
+#     p * kappa(cov2cor(Sigma-hat))^2 * eps may sit below the error it stands
+#     for. The oracle's fixture sweep measured attainment ratios 1.27/2.4/3.28
+#     across three decades of kappa, drifting up about 1.6x per decade; 10
+#     covers that trend with at least 3x headroom at every kappa below the
+#     floors this target sets.
+#
+# WHAT THE TARGET ASSUMES. Eight premises the argument above uses, each stated
+# because a silent one cannot be checked -- the first seven from RR20
+# section 6, the eighth added at M106's third review round:
+#   1. The FITTED-MANIFOLD restriction -- the SE varies only along the
+#      q-dimensional model manifold, which is what caps the averaging shrink at
+#      about sqrt(q) (channel 3).
+#   2. Component SEs are bounded by about 0.5, as variance shares of a
+#      unit-diagonal matrix (channel 1; without it relative print resolution
+#      has no floor).
+#   3. The coverage figure is in PERCENTAGE POINTS, and the channel linearizes
+#      at delta = 0 for a two-sided nominal-95% Wald interval (channel 2).
+#   4. NORMAL-THEORY sampling: both the chi-square anchor and the W_c pricing
+#      assume Wishart-order moments. Excess kurtosis inflates the noise, which
+#      is the harmless direction; platykurtic bounded item scales deflate it
+#      modestly (same order) -- the direction nothing here prices.
+#   5. The n the caller types is an INDEPENDENT-OBSERVATION count. On the
+#      cormat path nothing verifies this; pairwise-complete or clustered data
+#      breaks the 1/sqrt(n) pricing in either direction.
+#   6. The SE-derived target is extended to the SCALING surface's cval BY FIAT,
+#      supported by measurement rather than by a derivation of its own -- RR19
+#      section 3c across df (cval relative error 1.1e-8 at df = 4, 1.1e-13 at
+#      df = 26), and the oracle's reachable family, which now prices cval at
+#      each case's own df and measures 2.1e-14 to 1.1e-8 over the five, all
+#      decades inside delta_star. This is the largest of the eight: the
+#      criterion refuses both surfaces at one floor, and only one surface's
+#      accuracy target is derived.
+#   7. The noise yardstick is STABLE where the criterion operates. Measured
+#      true (RR20: identical to four digits across a decade of kappa on the
+#      near-duplicate family) -- it had been assumed until then.
+#   8. The 3-decimal resolution channel 1 reads is the DEFAULT of a
+#      user-settable `digits` argument on both display methods. A caller who
+#      asks for more decimals resolves differences finer than delta_star; the
+#      target is stated for the shipped default.
+#
+# tau = delta_star / C is therefore the implementation constant: refuse when
+# the bound exceeds tau, and a computed answer's error is capped at
+# C*tau = delta_star. Refusal thresholds kappa = sqrt(tau/(p*eps)) are then
+# 4.3e4 at p = 24, 7.5e4 at p = 8, and 1.06e5 at p = 4.
+#
+# WHAT THE BOUND IS AND IS NOT (RR19 section 3). p*kappa^2*eps is a
+# conservative envelope, not an error model for this quantity. Measured against
+# the exact-rational oracle over model-implied unit-diagonal matrices at
+# p = 4, 8 and 9 -- the form every lavaan-fitted Sigma-hat has -- the actual SE
+# relative error sits 5 to 8 decades BELOW the bound, attainment ratios at most
+# 4e-6. The bound's only measured attainment is the committed fixture
+# cairn/reviews/rb18-counterexample-b.rds, which no exported call can produce:
+# it is p = 3 with df = 1 while axes_reliability() requires four scales (the
+# minimum reachable df is 4), and it sits 25 units off the model manifold at
+# its own stated configuration. What drives the error is coupling of near-null
+# directions into the COMPONENT ROWS of the information matrix's inverse,
+# indexed by df rather than by kappa: measured cval relative error is 3.4e-1
+# with a sign flip at df = 1, 1.1e-8 at df = 4, and 1.1e-13 at df = 26. No
+# measured regime shows the bound optimistic beyond the fixture's own 3.3x.
+# The four-scale minimum is what keeps the reachable set out of that regime --
+# lowering it means re-running the exact oracle at the new minimum first.
+#
+# ONE CONSTANT, NOT SEVERAL (RR19 section 4). tau does not depend on n. An
+# n-dependent tau would make refusal a property of the yardstick rather than of
+# the refused matrix -- the identical matrix computing at n = 200 and refusing
+# at n = 20000, and gameable on the cormat path where n is typed by the user --
+# while buying only n^(1/4) of threshold movement, since the floor moves as
+# sqrt(tau). p already appears inside the bound, where it belongs.
+#
+# WHY THE LIMB EXISTS AT ALL (RR19 section 5; re-affirmed at RR20 section 5,
+# this mechanism's third escalation). Removal was weighed and rejected: past
+# the floor the
+# package has no shipped means of certifying the number to delta_star (IP3),
+# and the only a-priori error estimate a replacement caution could carry is
+# this same bound, which overstates the actual error by 5 to 8 decades in every
+# geometry users occupy -- it would cry "up to 3% error" over numbers accurate
+# to 1e-13. RR20 adds one point in favour of keeping: the noise yardstick does
+# not collapse at the floor (premise 7), so refusal there is not sitting where
+# the statistical ground itself gives way. The reopening evidence is recorded
+# in the D-entry superseding D-044, and its first trigger is partly met on the
+# record already -- a converged fit this criterion refuses whose SEs an exact
+# oracle measures eight decades inside delta_star. The remedy that evidence
+# schedules is an a-posteriori per-fit error certificate, never another decade
+# on tau. Changing delta_star or C is an escalation (RB, no-oracle), never a
+# silent edit.
+axes_degeneracy_delta_star <- 1e-4
+axes_degeneracy_calibration_ceiling <- 10
+axes_degeneracy_tau <-
+  axes_degeneracy_delta_star / axes_degeneracy_calibration_ceiling
 
 # Returns NULL (priceable), "singular" (non-finite entries: the literal the
 # NA/NaN-diagonal route has carried since before M69, now reached here rather
@@ -440,11 +632,160 @@ axes_sigma_degenerate <- function(sigma) {
 }
 
 
+# The actionable half of an "ill_conditioned" refusal (M106; RR19 section 6).
+# Returns a clause naming the conditioning, plus every item pair collinear
+# enough to force the refusal on its own -- otherwise the conditioning alone.
+# Deliberately a separate function called at the warning sites rather than
+# folded into axes_sigma_degenerate(): the criterion's return is a bare literal
+# that both surfaces compare and many tests assert identity against (a count
+# left unstated deliberately -- it went stale in the very commit that wrote
+# it, M106 review round 4 F6), and a diagnostic is not part of deciding
+# whether to refuse.
+#
+# SCOPE (M106 review F1/F6, narrowed again at round 2 F2): called ONLY where
+# the criterion said "ill_conditioned". The other two literals are excluded on
+# their own grounds, not on a shared one -- "indefinite" is M90's statement
+# about the USER'S MODEL, and the partition draws that model/numerics line
+# precisely so a numerical caution is not attached to it; "singular" is reached
+# on non-finite entries that eigen() cannot decompose at all, so there is no
+# spectrum to describe. The round-1 comment gave "an indefinite matrix has
+# lambda_min < 0, so its condition number prints negative" as the reason, which
+# does not discriminate: the included half of "ill_conditioned" has
+# lambda_min <= 0 too, and printed exactly that negative figure until the
+# repair just below.
+#
+# A CONDITION NUMBER IS REPORTED ONLY WHERE ONE EXISTS (M106 review round 2,
+# F1). Gating on the literal does not bound lambda_min below by zero: M90 files
+# roundoff-level negativity under "ill_conditioned" as well, and an exactly
+# collinear pair puts lambda_min at 0 exactly. The ratio was printed anyway --
+# measured "condition number -7.75e+07" / "-3.87e+07" / "-2.74e+07" at
+# p = 3/12/24 on the very spectral form the threshold pins enumerate, and "Inf"
+# for a collinear pair. Where lambda_min <= 0 the matrix is called numerically
+# rank-deficient instead. That clause is true and not merely evasive BECAUSE of
+# the gate: reaching here with lambda_min <= 0 means the criterion returned
+# "ill_conditioned", which bounds lambda_min below by -lambda_max*sqrt(p*eps),
+# so the smallest eigenvalue is at or below zero and within the fit's own noise
+# of it. The pair naming is untouched -- a duplicate pair is exactly what puts
+# lambda_min at zero, so that is the case the clause exists for.
+#
+# WHY A PAIR CAN BE NAMED AT ALL, and which pairs qualify. Cauchy interlacing
+# bounds the whole matrix's smallest eigenvalue by any 2x2 principal
+# submatrix's: lambda_min(R) <= 1 - |r_ij|. So a pair with
+#
+#   |r_ij| >= 1 - lambda_max * sqrt(p * eps / tau)
+#
+# forces lambda_min at or below the criterion's own floor BY ITSELF: no other
+# entry of the matrix has to cooperate. The cut is still a function of the
+# matrix given, since it reads lambda_max off it -- what is independent of the
+# rest of the matrix is the CONCLUSION the interlacing bound draws once the cut
+# is met, not the cut's location (M106 review round 2, F15). That is the
+# threshold used below -- read off the criterion rather than hand-set, which is
+# what the two constants it replaces (a 0.8 eigenvector-mass gate and a flat
+# 0.99) were not (M106 review F11).
+#
+# The earlier form took the smallest EIGENVECTOR's two dominant loadings. That
+# is not well defined when the smallest eigenvalue repeats -- and it repeats in
+# exactly the case this diagnostic exists for, since k duplicate pairs give a
+# k-dimensional near-null space and LAPACK returns an arbitrary basis of it.
+# Measured on one p = 16 matrix with eight duplicate pairs, relabelling the
+# items alone moved the message between naming an arbitrary member pair and
+# naming nothing (M106 review F2). The interlacing test reads only |r_ij| and
+# lambda_max, so WHICH PAIRS QUALIFY is invariant to that basis choice by
+# construction. The order the qualifying pairs are listed in is a separate
+# matter and is not basis-free: it follows the caller's own row and column
+# order, which is the point of it (M106 review round 2, F10).
+#
+# The threshold cannot slide down to where "nearly collinear" would overstate:
+# a correlation matrix has trace p, so lambda_max <= p, so the cut is at least
+# 1 - sqrt(p^3 * eps / tau) -- at or above 0.99 for every p up to 165, far past
+# any circumplex item set.
+#
+# Pairs are named from DIMNAMES, never from positions -- a position would be an
+# index into the priced matrix, which is the caller's own item order only
+# because both call sites realign to `item_names` first, and an index is not
+# what a user acts on in any case. No dimnames means the conditioning alone.
+# Where more than one pair qualifies, the count is what carries the message and
+# the advice becomes plural: "drop one" is wrong counsel among many equally
+# redundant items.
+#
+# PRECONDITION: `sigma` has a unit diagonal. The interlacing cut below needs it
+# twice -- lambda_min(R) <= 1 - |r_ij| and lambda_max <= p both assume it -- so
+# on a general covariance matrix a qualifying pair would not force the refusal
+# by itself and the "nearly collinear (r ...)" clause would be reporting a
+# covariance as a correlation. Both call sites pass a cov2cor()'d matrix, which
+# is why this is stated rather than enforced: the helper is internal, and a
+# stopifnot() here would price an eigen-sized guarantee at every refusal
+# (M106 review round 4 F8).
+axes_degeneracy_hint <- function(sigma) {
+  ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
+  p <- nrow(sigma)
+  hint <- if (ev[p] > 0) {
+    sprintf("condition number %.3g", ev[1L] / ev[p])
+  } else {
+    "numerically rank-deficient (smallest eigenvalue at or below the fit's own precision)"
+  }
+
+  nms <- rownames(sigma)
+  if (is.null(nms) || !all(!is.na(nms) & nzchar(nms))) return(hint)
+
+  cut <- 1 - ev[1L] * sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
+  ij <- which(abs(sigma) >= cut & upper.tri(sigma), arr.ind = TRUE)
+  if (nrow(ij) == 0L) return(hint)
+  # Row index then column index, so the list reads down the caller's own matrix
+  # rather than in the column-major order `which()` walked it in -- those two
+  # differ whenever one qualifying pair sits above and left of another, e.g.
+  # (2,3) before (1,4) by column-major and after it here.
+  ij <- ij[order(ij[, 1L], ij[, 2L]), , drop = FALSE]
+
+  if (nrow(ij) == 1L) {
+    return(paste0(hint, sprintf(
+      paste0("; items %s and %s are nearly collinear (r %s) -- ",
+             "near-duplicate items make the fitted matrix numerically ",
+             "degenerate, so consider dropping one"),
+      nms[ij[1L, 1L]], nms[ij[1L, 2L]],
+      axes_fmt_near_unit_r(sigma[ij[1L, 1L], ij[1L, 2L]])
+    )))
+  }
+  shown <- min(nrow(ij), 3L)
+  lst <- paste(vapply(seq_len(shown), function(k)
+    sprintf("%s and %s", nms[ij[k, 1L]], nms[ij[k, 2L]]), ""), collapse = ", ")
+  if (nrow(ij) > shown) {
+    lst <- paste0(lst, sprintf(", and %d more", nrow(ij) - shown))
+  }
+  paste0(hint, sprintf(
+    paste0("; %d item pairs are nearly collinear (%s) -- near-duplicate items ",
+           "make the fitted matrix numerically degenerate, so consider ",
+           "dropping the redundant ones"),
+    nrow(ij), lst
+  ))
+}
+
+# Every pair this message names sits within `lambda_max * sqrt(p*eps/tau)` of
+# +/-1, so a fixed-width format is the wrong tool: sprintf("%.6g", 0.9999999)
+# is "1", which reports a near-duplicate pair as a perfectly collinear one --
+# the same rounding failure a fixed 4 decimals had, two digits deeper (M106
+# review F7). Past what %.6g can separate from 1 the message states a bound
+# instead of a value, which is true at every radius; an exactly collinear pair
+# still prints as 1, because there it is the value.
+axes_fmt_near_unit_r <- function(r) {
+  if (abs(r) < 1 && abs(r) > 0.999999) {
+    if (r > 0) "> 0.999999" else "< -0.999999"
+  } else {
+    sprintf("= %.6g", r)
+  }
+}
+
+
 # The one expression both fitted-matrix consumers are fed from (M89): the
 # fitted covariance matrix exactly as lavaan reports it, dimnames and all. A
 # named seam rather than an inline `lavaan::fitted(fit)$cov` at each call site
 # in axes_reliability(), so the assembly-level tests can inject a constructed
-# degenerate matrix: no converged fit is known to reach the degenerate regime,
-# and the criterion's assembly behavior still needs exercising through
-# axes_reliability() itself.
+# degenerate matrix where no converged fit reaches one, and the criterion's
+# assembly behavior still needs exercising through axes_reliability() itself.
+# The rationale narrowed at M106 (review round 2, F8): this comment used to say
+# "no converged fit is known to reach the degenerate regime", which M106's own
+# work falsified -- its p = 8 case at kappa 1.0e5 reaches the criterion through
+# a genuinely converged fit, asserted in-test. What the seam is for is the
+# constructions lavaan does not converge on, measured one construction at a
+# time, not a claim about fits in general.
 axes_fitted_cov <- function(fit) lavaan::fitted(fit)$cov

@@ -1640,3 +1640,123 @@ escalated PRs and pushes (`tools/ci-matrix.R:23-31`).
 the docs-only direct-push carve-out is retired from cairn's git model; or a
 non-admin contributor path becomes routine, which is also the aggregator
 remainder's promotion condition.
+
+### D-048 (2026-08-22): the degeneracy criterion's accuracy target is derived from the reported SE's own sampling variability, and τ moves 1e-6 → 1e-5 — supersedes D-044's floor (M106, RR19)
+
+**Context:** D-044 set `axes_degeneracy_tau = 1e-6` against the exact-rational
+oracle, capping a computed answer's error at ~1e-5 relative. That calibration
+was entirely numerical. Nothing in the package said what relative error a
+reported SE can tolerate, so no argument distinguished 1e-6 from 1e-3 — and
+the M89 round-3 review measured the consequence: an item pair at r = .9999
+fits cleanly and was refused, though its corrected SEs are accurate to 2e-13.
+
+**Decision.** Two documented quantities now stand behind one shipped constant,
+because D-044's single τ was defined as the largest tolerated reported error
+while enforcing a cap ten times looser. `axes_degeneracy_delta_star` is the
+accuracy target: the largest relative error a reported corrected SE may carry,
+derived from the SE's own sampling variability rather than from machine
+epsilon, with the numerical bias held to a tenth of that statistical noise and
+the calibration taken at a sample size a decade past anything the literature
+publishes. `axes_degeneracy_calibration_ceiling` is the factor by which the
+criterion's error bound may undershoot the error it stands for, kept at the
+oracle's measured value. `axes_degeneracy_tau` is their quotient. Refusal
+thresholds move outward accordingly. The figures, their derivation and the
+oracle measurements are in M106 and beside the constant.
+
+This supersedes D-044's floor only. D-044's metric choice — `cov2cor(Σ̂)` for
+every user-reported quantity, raw Σ̂ at the `naive` arm — is untouched, and
+RR19 explicitly declined to reopen it.
+
+**Also decided on the same review.** The ill-conditioning limb is kept:
+removal was weighed on this mechanism's second escalation and rejected
+narrowly, because past the floor the package has no shipped means of
+certifying the number to the accuracy target (IP3), and the only a-priori
+error estimate a replacement caution could carry is the same bound, which
+overstates the actual error by several decades in every reachable geometry —
+it would cry percent-level error over numbers accurate to 1e-13. τ also stays
+a single n-free constant shared by both surfaces: an n-dependent τ would make
+refusal a property of the yardstick rather than of the refused matrix, and the
+identical matrix would compute at one sample size and refuse at another on a
+path where the user types that number themselves.
+
+**Consequences:** exported behavior changes on the unreleased dev line
+(NEWS-documented). Correlation structures between the old and new thresholds
+now compute where they previously refused; RR18's counterexample still
+refuses. The `"ill_conditioned"` warning now names the condition number and,
+where one near-duplicate pair dominates, that pair.
+
+**Reopens** (GP7, from RR19 §5): (i) an exhibited Σ̂ from a converged
+`axes_reliability()` fit that this criterion refuses while an exact oracle
+shows its corrected SEs and `cval` within the accuracy target; or (ii) field
+reports of `"ill_conditioned"` refusals on real data. On either, the remedy is
+an a-posteriori per-fit error estimate replacing this limb — refusal retained
+for indefiniteness and exact singularity — not another decade on τ.
+
+### D-049 (2026-08-23): the accuracy target's constants stand, but its justification moves to the two n-free channels — annotates and narrows D-048's grounds, not its numbers (M106, RR20)
+
+**Context:** D-048 set `axes_degeneracy_delta_star = 1e-4` and grounded it in
+the reported SE's own sampling variability, holding the numerical bias to a
+tenth of that noise at a sample size well past anything the literature
+publishes. M106's second review round found the load-bearing step of that
+derivation asserted rather than argued: the reported SE was priced as though it
+were a single variance, when it is a plug-in through the fitted model.
+
+**Decision.** The constants do not move. `delta_star` stays 1e-4, the
+calibration ceiling stays 10, and `axes_degeneracy_tau` stays their quotient.
+What moves is which argument carries them. The sampling-noise comparison is
+demoted to typical-case corroboration, because the coefficient it treats as
+fixed is a property of the design rather than a constant, and no positive floor
+for it is established — so a bias-below-a-fraction-of-noise rule stated
+uniformly over designs and over sample sizes yields no fixed constant at all,
+and rejects every candidate including the value D-048 superseded. The two
+sample-size-free channels — the reported resolution of the printed output, and
+the sensitivity of nominal Wald coverage — become the primary support; both
+were re-checked and both hold. The target's calibration domain in the sample
+size is stated rather than left open, and beyond that domain the criterion's
+guarantee is the fixed cap alone rather than a noise-dominance claim.
+
+This annotates D-048 and narrows the reach of its rationale. It supersedes
+nothing D-048 decided, and D-044's metric choice remains untouched.
+
+**Also decided on the same review.** Removal of the ill-conditioning limb was
+weighed for the third time and rejected again on IP3's unchanged ground. An
+accuracy target that varies with the typed sample size, and a runtime warning
+keyed to it, are both rejected — they rebuild the yardstick-dependence D-048
+already refused, and the documented calibration domain is the whole remedy. A
+tighter target was offered and declined: it would re-narrow the computable
+region on a stacked-worst-case argument no user-visible channel can resolve.
+
+**Consequences:** no exported behavior changes. The derivation written beside
+the constant is rewritten to carry the argument it actually rests on, with its
+unstated premises stated; the two exported documentation sites gain the
+calibration-domain sentence.
+
+**Reopens:** D-048's trigger (i) is unchanged and now one measurement from met
+— its SE half is measured, its `cval` half is not. On it being met in full, the
+remedy stays D-048's: an a-posteriori per-fit error estimate replacing this
+limb, not a further move of the constant.
+
+### D-050 (2026-08-23): the reopening trigger D-049 called one measurement short is met in full — annotates D-049's Reopens clause, moves nothing it decided (M106)
+
+**Context:** D-049 closed by recording that D-048's first reopening trigger — a
+converged fit this criterion refuses whose reported quantities an exact oracle
+puts inside the accuracy target — was one measurement from met, its `cval` half
+unmeasured. That measurement was taken the next day on the same branch, against
+the same matrix the refusing test uses rather than a rebuild of it.
+
+**Decision.** The trigger is met in full, so D-048's remedy is due rather than
+conditional: an a-posteriori per-fit error certificate replacing the refusal
+where the certificate passes, never another move of the constant. Nothing
+D-049 decided moves — the constants stand, the two sample-size-free channels
+still carry them, and the stated calibration domain is unchanged. What this
+entry corrects is D-049's own Reopens clause, which a later reader would
+otherwise take as a live "one measurement short".
+
+**Consequences:** no code and no exported behaviour changes. The remedy is not
+planned in M106 — it is a new estimator needing its own design pass and its own
+oracle obligation, and nothing about it is urgent. It is recorded on M106's
+roadmap candidate row, which carries the figures; the measurement itself is in
+that milestone's work log and in `devel/degeneracy-oracle/exact_oracle.R`.
+
+**Reopens:** nothing new. D-048's second trigger — field reports of this
+refusal on real data — is unchanged and still open.

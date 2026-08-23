@@ -85,9 +85,10 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
 
   d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
                       fit_zeta1, fit_zeta2)
-  na_out <- function(reason) {
+  na_out <- function(reason, hint = NULL) {
     warning(
       "The scaled fit statistics could not be computed (", reason,
+      if (is.null(hint)) "" else paste0(": ", hint),
       "); they are reported as NA.",
       call. = FALSE
     )
@@ -162,7 +163,14 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   if (!all(is.finite(sigma))) return(na_out("singular"))
   sigma <- stats::cov2cor(sigma)
   degenerate <- axes_sigma_degenerate(sigma)
-  if (!is.null(degenerate)) return(na_out(degenerate))
+  if (!is.null(degenerate)) {
+    # Only the ill-conditioning literal gets the diagnostic -- see the scope
+    # note at axes_degeneracy_hint() in R/axes_corrected_se.R. The sibling
+    # surface gates identically, so the two warnings stay in agreement.
+    return(na_out(degenerate, if (identical(degenerate, "ill_conditioned")) {
+      axes_degeneracy_hint(sigma)
+    }))
+  }
 
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return(na_out("singular"))
@@ -266,6 +274,14 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   #     Retained because "not reached by the search" is not "unreachable":
   #     the p = 3 / df = 1 family approaches 0+ continuously, so a deeper
   #     adversary could land inside the cancellation noise.
+  #   No axes_degeneracy_hint() here, deliberately (M106 review F5/F6): this
+  #     door is reached only by a matrix the conditioning criterion ACCEPTED,
+  #     so its condition number is below the floor and naming it would offer a
+  #     figure that is not the reason. The refusal is cancellation in the cval
+  #     sum, which no property of sigma's spectrum localizes. What the two
+  #     doors share is the literal, not the diagnosis -- so the claim that the
+  #     warning names the conditioning is scoped to the criterion's refusal,
+  #     here and in NEWS.md.
   if (!is.finite(cval) || !is.finite(cb) || cval <= 0 || cb <= 0) {
     return(na_out("ill_conditioned"))
   }

@@ -35,12 +35,17 @@ py <- file.path("devel", "degeneracy-oracle", "exact_oracle.py")
 
 # Hand the exact bits over: %a round-trips a double exactly, decimal does not,
 # and at kappa ~ 6.7e6 the lost bits change the answer's sign.
-hex_dump <- function(S, mats, n_comp) {
+# `df` and `baseline_df` are arguments rather than reads of the globals above.
+# The globals are the p = 3 FIXTURE's counts; every other case has its own, and
+# EXACT_CVAL divides by df, so a case priced under the fixture's counts would
+# report a cval for a model it is not. The reachable family below does read
+# EXACT_CVAL, at each case's own counts (M106 T11).
+hex_dump <- function(S, mats, n_comp, df, baseline_df) {
   f <- tempfile(fileext = ".txt")
   h <- function(v) paste(sprintf("%a", as.numeric(v)), collapse = " ")
   lines <- c(
-    sprintf("P: %d", nrow(S)), sprintf("N: %d", N), sprintf("DF: %d", DF),
-    sprintf("BASELINE_DF: %d", BASELINE_DF), sprintf("NCOMP: %d", n_comp),
+    sprintf("P: %d", nrow(S)), sprintf("N: %d", N), sprintf("DF: %d", df),
+    sprintf("BASELINE_DF: %d", baseline_df), sprintf("NCOMP: %d", n_comp),
     sprintf("Q: %d", length(mats)), sprintf("S: %s", h(S)),
     vapply(seq_along(mats), function(i) sprintf("M%d: %s", i, h(mats[[i]])), "")
   )
@@ -48,8 +53,15 @@ hex_dump <- function(S, mats, n_comp) {
   f
 }
 
-exact <- function(S, d) {
-  out <- system2("python3", c(py, hex_dump(S, d$mats, d$n_comp)), stdout = TRUE)
+# The same two identities axes_scaling_factor() guards on: df is the count of
+# overidentifying restrictions, baseline_df the independence model's.
+df_of <- function(S, d) nrow(S) * (nrow(S) + 1) / 2 - length(d$mats)
+baseline_df_of <- function(S) nrow(S) * (nrow(S) - 1) / 2
+
+exact <- function(S, d, df = DF, baseline_df = BASELINE_DF) {
+  out <- system2("python3",
+                 c(py, hex_dump(S, d$mats, d$n_comp, df, baseline_df)),
+                 stdout = TRUE)
   vals <- as.numeric(sub("^[A-Z_0-9]+: ", "", out))
   stats::setNames(vals, sub(":.*$", "", out))
 }
@@ -80,27 +92,32 @@ dbl_sf <- suppressWarnings(
                       df = DF, baseline_df = BASELINE_DF)
 )
 
+# The cval the shipped double-precision code computes BEFORE its refusal
+# discards it. axes_scaling_factor() returns a reason and no number wherever
+# the criterion trips, so a refused case has no other route to the double
+# value being priced (M106 T11). Same arithmetic as R/axes_scaled_fit.R's.
+double_cval <- function(S, d, df) {
+  si <- solve(S); sim <- lapply(d$mats, function(m) si %*% m)
+  q <- length(sim)
+  info <- matrix(0, q, q)
+  for (s in seq_len(q)) for (t in s:q)
+    info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
+  acov <- solve(info)
+  up <- upper.tri(S); rho <- S[up]
+  tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
+  ys <- lapply(sim, function(sm) {
+    w <- 0.5 * sm %*% si
+    diag(w) <- diag(w) - diag(S %*% w)
+    w %*% S
+  })
+  b <- matrix(0, q, q)
+  for (s in seq_len(q)) for (t in s:q)
+    b[s, t] <- b[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
+  (tr_vg - sum(acov * b)) / df
+}
+
 cat(sprintf("\ncval   exact %+.12g | double %+.12g | shipped reason: %s\n",
-            ex[["EXACT_CVAL"]], (function() {
-              # the double value the shipped code computes, before its refusal
-              si <- solve(S); sim <- lapply(d$mats, function(m) si %*% m)
-              q <- length(sim)
-              info <- matrix(0, q, q)
-              for (s in seq_len(q)) for (t in s:q)
-                info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
-              acov <- solve(info)
-              up <- upper.tri(S); rho <- S[up]
-              tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
-              ys <- lapply(sim, function(sm) {
-                w <- 0.5 * sm %*% si
-                diag(w) <- diag(w) - diag(S %*% w)
-                w %*% S
-              })
-              b <- matrix(0, q, q)
-              for (s in seq_len(q)) for (t in s:q)
-                b[s, t] <- b[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
-              (tr_vg - sum(acov * b)) / DF
-            })(),
+            ex[["EXACT_CVAL"]], double_cval(S, d, DF),
             if (is.null(dbl_sf$reason)) "NULL" else dbl_sf$reason))
 cat(sprintf("       the exact value is POSITIVE: the refusal is a cancellation sign-flip\n"))
 cat(sprintf("       (exact tr_vg %.10g - proj %.10g; amplification %.4g)\n",
@@ -140,6 +157,110 @@ for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
               tt, kappa_of(St), rel, bound, ratio))
 }
 
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\n",
-            if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL"))
-if (!ok || !sweep_ok) quit(status = 1L)
+# --- M106 / RR19 B2: the REACHABLE-geometry family ---------------------------
+#
+# Everything above is measured at counterexample B, and B is not a matrix this
+# criterion can be handed in production: it is p = 3 with df = 1 while
+# axes_reliability() requires four scales, and it sits 25 units off the model
+# manifold at its own stated configuration. So the sweep above establishes that
+# the bound is TIGHT AT B -- a property of that fixture, not of the criterion.
+# Its pass window (ratio in [0.1, 10]) encodes exactly that and must not be
+# applied here.
+#
+# This family is model-implied -- Sigma = xi1*C + xi2*J + zeta1*Bm + diag(eps),
+# the form every lavaan-fitted Sigma-hat has -- at dimensions the exported API
+# actually reaches. What it asserts is the OPPOSITE property: that in reachable
+# geometry the bound stays decades away from the error it stands for. If a
+# future change puts a reachable design into B's coupling regime, this is what
+# reddens.
+#
+# The window is three decades below 1. Running this script on 2026-08-22
+# measured attainment across the five cases below at 6.8e-8 to 3.8e-7, so 1e-3
+# sits three to four decades looser than anything measured -- deliberately,
+# because a bar set at the measured value is a bar calibrated on one machine.
+REACHABLE_WINDOW <- 1e-3
+
+reachable_family <- function(eps, per_scale, xi1 = 0.3, xi2 = 0.3, zeta1 = 0) {
+  oct <- c(90, 135, 180, 225, 270, 315, 360, 45)
+  ang <- rep(oct, each = per_scale)
+  sid <- rep(seq_along(oct), each = per_scale)
+  rad <- ang * pi / 180
+  cm <- outer(rad, rad, function(u, v) cos(u - v))
+  bm <- outer(sid, sid, "==") * 1
+  sg <- xi1 * cm + xi2 * matrix(1, length(ang), length(ang)) +
+    zeta1 * bm + eps * diag(length(ang))
+  nms <- paste0("i", seq_along(ang))
+  dimnames(sg) <- list(nms, nms)
+  list(S = cov2cor(sg), ang = ang, scale = as.character(sid))
+}
+
+# Near-duplicate geometry: a ninth item sharing scale 1's angle, with the
+# pair's item errors driven down together. This is M89 F3's own case -- the
+# refusal that motivated M106 -- so the family covers the shape the
+# recalibration was made for, not only well-spread designs.
+near_duplicate_family <- function(pair_eps, xi1 = 0.3, xi2 = 0.2,
+                                  zeta1 = 0.2, other_eps = 0.30) {
+  oct <- c(90, 135, 180, 225, 270, 315, 360, 45)
+  ang <- c(oct, oct[1])
+  sid <- c(seq_along(oct), 1L)
+  rad <- ang * pi / 180
+  cm <- outer(rad, rad, function(u, v) cos(u - v))
+  bm <- outer(sid, sid, "==") * 1
+  ev <- rep(other_eps, length(ang))
+  ev[c(1L, length(ang))] <- pair_eps
+  sg <- xi1 * cm + xi2 * matrix(1, length(ang), length(ang)) +
+    zeta1 * bm + diag(ev)
+  nms <- paste0("i", seq_along(ang))
+  dimnames(sg) <- list(nms, nms)
+  list(S = cov2cor(sg), ang = ang, scale = as.character(sid))
+}
+
+cat("\n== M106 reachable-geometry family: is the bound decades LOOSE here? ==\n")
+cat("  construction                p     kappa(R)     rel.err     bound        ratio     cval rel.err\n")
+reach_ok <- TRUE
+reach_cases <- list(
+  list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-4, 1L)),
+  list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-5, 1L)),
+  list(lbl = "family C, p = 4 minimum", g = local({
+    ang <- c(90, 180, 270, 360); rad <- ang * pi / 180
+    cm <- outer(rad, rad, function(u, v) cos(u - v))
+    sg <- 0.3 * cm + 0.3 * matrix(1, 4, 4) + 1.2e-5 * diag(4)
+    nms <- paste0("i", 1:4); dimnames(sg) <- list(nms, nms)
+    list(S = cov2cor(sg), ang = ang, scale = as.character(1:4))
+  })),
+  list(lbl = "near-duplicate r=.9999 ", g = near_duplicate_family(7e-5)),
+  list(lbl = "near-duplicate r=.99999", g = near_duplicate_family(7e-6))
+)
+for (cs in reach_cases) {
+  g <- cs$g
+  pr <- nrow(g$S)
+  # zeta1 is read off the case's own item map with the package's own predicate,
+  # never inherited from the p = 3 fixture's FIT_ZETA1 above. The near-duplicate
+  # cases put two items on scale 1, so axes_fits_zeta1() is TRUE for them and
+  # the exported path fits a scale-specificity component the fixture's model
+  # does not have; pricing them at FALSE measured a model axes_reliability()
+  # would never fit, which is not the reachable geometry this family claims.
+  zr <- axes_fits_zeta1(split(seq_along(g$scale), g$scale))
+  dr <- axes_se_derivs(g$ang, g$scale, NULL, zr, FALSE)
+  dfr <- df_of(g$S, dr)
+  exr <- exact(g$S, dr, dfr, baseline_df_of(g$S))
+  dtr <- axes_se_pricing(g$S, dr, N)$corrected
+  exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)
+  rel <- max(abs(exv - dtr) / abs(exv))
+  bnd <- pr * kappa_of(g$S)^2 * .Machine$double.eps
+  rat <- rel / bnd
+  # The SCALING surface's own quantity, measured at each case's own df (M106
+  # T11). The SE target is extended to cval by fiat (see the premises beside
+  # axes_degeneracy_tau), so what that extension costs is only visible if cval
+  # is priced against the exact oracle in the same reachable geometries.
+  cvr <- abs(exr[["EXACT_CVAL"]] - double_cval(g$S, dr, dfr)) /
+    abs(exr[["EXACT_CVAL"]])
+  reach_ok <- reach_ok && rat <= REACHABLE_WINDOW
+  cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e   %9.3e\n",
+              cs$lbl, pr, kappa_of(g$S), rel, bnd, rat, cvr))
+}
+
+cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\n",
+            if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
+            REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL"))
+if (!ok || !sweep_ok || !reach_ok) quit(status = 1L)

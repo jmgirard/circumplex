@@ -717,9 +717,20 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' fitted covariance matrix whose correlation form `cov2cor()` is degenerate
 #' -- indefinite, singular, or so ill-conditioned that its smallest
 #' eigenvalue, relative to its largest, falls at or below
-#' `sqrt(p * .Machine$double.eps / 1e-6)`, where the `1e-6` is a stated
-#' accuracy target: past that floor the corrected standard errors could carry
-#' relative error above it -- is refused by both surfaces, and the refusal
+#' `sqrt(p * .Machine$double.eps / 1e-5)` -- is refused by both surfaces. That
+#' `1e-5` is not itself the tolerance: it is the accuracy target `1e-4`, the
+#' largest relative error a reported standard error may carry, divided by the
+#' factor of `10` by which the criterion's error bound may undershoot the error
+#' it stands for. Past the floor a reported standard error could carry relative
+#' error above the target. The accuracy target is set from two channels that
+#' do not depend on the sample size -- the resolution the standard errors are
+#' printed at, and the coverage of a nominal 95% Wald interval -- and is
+#' corroborated by a third, the standard error's own sampling variability,
+#' under which a numerical error at the target is about a tenth of the
+#' statistical noise already in the number for a typical design at
+#' `n` up to about `5e5`. Above that the guarantee is the fixed target alone,
+#' not noise dominance. The derivation and the premises it rests on are stated
+#' beside the constant in the source. The refusal
 #' says which degeneracy happened: `"indefinite"` when the smallest
 #' eigenvalue is decisively negative (below
 #' `-lambda_max * sqrt(p * .Machine$double.eps)` -- beyond the fit's own
@@ -1027,8 +1038,12 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   that correction succeeded or a string naming why the reported SEs are
 #'   `NA` -- notably the shared degeneracy criterion's two literals
 #'   (smallest eigenvalue relative to largest at or below
-#'   `sqrt(p * .Machine$double.eps / 1e-6)`, evaluated on `cov2cor()` of the
-#'   fitted covariance matrix): `"indefinite"` for a decisively negative
+#'   `sqrt(p * .Machine$double.eps / 1e-5)`, evaluated on `cov2cor()` of the
+#'   fitted covariance matrix, where the `1e-5` is the `1e-4` accuracy target
+#'   divided by the criterion's factor-of-`10` calibration ceiling, and the
+#'   target's noise-dominance reading is calibrated for `n` up to about
+#'   `5e5`):
+#'   `"indefinite"` for a decisively negative
 #'   smallest eigenvalue
 #'   (below `-lambda_max * sqrt(p * .Machine$double.eps)`), a
 #'   statement about the model, and `"ill_conditioned"` for roundoff-level

@@ -1346,3 +1346,44 @@ test_that("M91 AC1: the non-rescaling raw-degenerate member reaches the same dec
   expect_true(all(is.finite(got$corrected)))
   expect_true(all(is.finite(got$fiml_ratio)))
 })
+
+
+# ---- M106 review round 2, F4: the SE surface's own diagnostic gate -----------
+
+test_that("M106 review round 2 F4: only the SE surface's ill-conditioning refusal carries the diagnostic", {
+  # Round 1 gated the conditioning clause on the "ill_conditioned" literal at
+  # BOTH call sites, but only the scaled-fit gate was mutation-proved: deleting
+  # this surface's gate left the whole suite green, so the contract that an
+  # "indefinite" refusal carries no conditioning figure was asserted on one
+  # surface and merely believed on the other.
+  pp <- probe_pop()
+
+  # Decisively indefinite in the correlation metric -- past the M90 band, so
+  # the criterion calls it a statement about the user's model.
+  ind <- pp$sigma
+  ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
+  expect_identical(axes_sigma_degenerate(stats::cov2cor(ind)), "indefinite")
+
+  w <- testthat::capture_warnings(
+    got <- axes_corrected_se(ind, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_identical(got$reason, "indefinite")
+  expect_length(grep("indefinite", w, fixed = TRUE), 1L)
+  expect_length(grep("condition number", w, fixed = TRUE), 0L)
+  expect_length(grep("nearly collinear", w, fixed = TRUE), 0L)
+
+  # The control, on the same surface: an ill-conditioned matrix DOES carry the
+  # clause, so the assertion above is about the literal and not about whether
+  # this call site ever attaches a hint.
+  nm9 <- paste0("i", 1:9)
+  ang9 <- c(as.numeric(octants()), as.numeric(octants())[1L])
+  wc <- testthat::capture_warnings(
+    gc <- axes_corrected_se(m106_family_b(2e-5), nm9, ang9,
+                            as.character(c(1:8, 1L)),
+                            n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_identical(gc$reason, "ill_conditioned")
+  expect_length(grep("condition number 1.01e+05", wc, fixed = TRUE), 1L)
+  expect_length(grep("items i1 and i9 are nearly collinear", wc, fixed = TRUE), 1L)
+})
