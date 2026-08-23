@@ -109,7 +109,7 @@ M7's own gate.
       sampling variability? Ingest the RR. *(RB tripwire: no-oracle)*
 - [x] T2 — Write the derivation beside `axes_degeneracy_tau`; set the constant;
       restate the target at both roxygen sites.
-- [ ] T3 — Threshold pins at p = 3/12/24 × three spectral forms; mutate
+- [x] T3 — Threshold pins at p = 3/12/24 × three spectral forms; mutate
       `axes_degeneracy_tau` and record each pin's observed failure.
 - [ ] T4 — Band cases at three κ / three p through `axes_reliability()`, upper
       cases via the `axes_fitted_cov` seam; committed `data-raw/` generator
@@ -140,6 +140,7 @@ M7's own gate.
 - 2026-08-22: T2 done. `axes_degeneracy_tau` is now `axes_degeneracy_delta_star / axes_degeneracy_calibration_ceiling` = 1e-4/10 = 1e-5, with the derivation and the reachable-geometry finding written beside it; both exported roxygen sites restate the target and the ceiling. The regression test went in first and failed for the right reason — `"ill_conditioned"` on RR19's family-B geometry at r = .9999, whose SEs the review measured accurate to 2.0e-13. Two M89 tests hard-coded the old literal and were re-pinned; the near-threshold probe keeps its floor literal and asserts it against the constant separately, so a future edit fails the probe rather than being tracked by it. `document()` no diff beyond the regenerated Rd, zero unresolved-link warnings. test-axes-scaled-fit.R, -corrected-se.R, -reliability.R and -fiml.R all pass.
 - 2026-08-22: minor plan refinement — T4/T5's "committed data-raw generator with a seed" is unnecessary: RR19's families are closed-form model-implied matrices with no RNG, so they are built deterministically in `tests/testthat/helper-m106-degeneracy.R` rather than committed as fixtures. No committed fixture means nothing whose bit-exactness is unfalsifiable on the authoring machine.
 - 2026-08-22: helper defect found and fixed before it reached a commit — the family-B builder appended a hard-coded 360 as the duplicate angle, but `octants()` starts at 90, so item 9 paired with scale 7 while the driven-down errors sat on items 1 and 9 (r = 0.57, not 0.9999). It now duplicates `octants()[1]` whatever that is.
+- 2026-08-22: T3 done. Pins at p = 3/12/24 across three spectral forms (positive both sides of the floor; lambda_min negative inside the noise band; decisively negative), 13 assertions. Mutation-proved with four mutants, each red at a different pin family and restored by copy with the source blob re-hashed to 14cb2a23 after every one: dropping the floor's p factor reddens the 0.95x positive pins at all three p; loosening delta_star a decade reddens the constant assertion and those pins; widening the indefiniteness band 1000x reddens the decisively-negative pins; narrowing it 1000x reddens the roundoff-level pins. The last two exercise the forms M89's probe never reached — it varied only p and which side of the floor a positive spectrum sat on.
 
 ## Decisions
 
