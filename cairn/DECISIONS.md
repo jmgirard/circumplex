@@ -1605,3 +1605,38 @@ the maturation exit after all. **Explicitly insufficient to reopen:** a
 preference for fewer tracking files, or `cairn/test-craft.md` being read less
 often than `LESSONS.md` — the pointer line, not the file count, is what carries
 reachability, and a pointer that goes unread is a defect in the pointer.
+
+### D-047 (2026-08-22): master's destructive gates move into GitHub itself, split across two rulesets by bypass scope (M105)
+
+**Decision.** The default branch carries two GitHub-native rulesets, created
+and read back at the M105 build: `master-destructive` (deletion,
+non_fast_forward, required_linear_history; **no bypass actors**, so it binds
+the repository admin from every client including the web UI) and
+`master-checks` (required status checks `matrix` + `ubuntu-latest (release)`;
+repository-admin bypass at `always`). Committed intent:
+`tools/branch-protection.json`, in the API's own POST vocabulary; drift
+detection: `tools/check-branch-protection.R` via PROFILE.md's
+consistency-gate, comparing the fields its `COMPARED_FIELDS` constant names,
+`enforcement` among them (the M58 lesson: validate the switch beside the rules
+it enables).
+
+**Why two rulesets.** A ruleset's bypass actor bypasses every rule in that
+ruleset, and the admin must keep the docs-only direct-push carve-out —
+required status checks block pushes as well as merges, and a `cairn/**`-only
+push runs no workflow (PR #133 reported zero checks). One ruleset therefore
+cannot both hard-block the admin's force-push and admit the admin's tracking
+pushes. Consequence accepted openly: `master-checks` enforces nothing against
+the admin; its value against the admin is the bypass banner, and its
+enforcement is real only for non-admin contributors.
+
+**Rejected here.** An always-reporting aggregator job in `R-CMD-check.yaml`
+(would let checks report on `cairn/**`-only PRs) — declined at the M105 plan
+gate because the direct-push bypass is needed regardless and it reopens M93's
+fail-closed classifier; parked on the graduated candidate row's remainder.
+Requiring `windows-latest`/`macos-latest` contexts — refused, they run only on
+escalated PRs and pushes (`tools/ci-matrix.R:23-31`).
+
+**Reopen if:** GitHub ships per-rule (rather than per-ruleset) bypass scoping;
+the docs-only direct-push carve-out is retired from cairn's git model; or a
+non-admin contributor path becomes routine, which is also the aggregator
+remainder's promotion condition.

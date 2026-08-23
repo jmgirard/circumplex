@@ -147,6 +147,8 @@ entry recording the two-ruleset split and the bypass rationale.
 - 2026-08-22: T6 — Jeff ran `git push --force origin 0b1e1957:master` (a one-docs-commit rewind); GitHub refused it: `remote: error: GH013: Repository rule violations found for refs/heads/master`, and `git rev-parse origin/master` immediately after equals cd08db79, the tip before the attempt (AC3). Server-side enforcement is real, not merely configured.
 - 2026-08-22: branch synced with the moved master by rebase rather than merge-in — the session's merge guard denies all `git merge` forms, and the branch was unpushed, so the rebase is equivalent and keeps history linear.
 
+- 2026-08-22: T8 in progress — sweep clean (no live prose outside archives claims master is unprotected or force-pushable); D-047 appended (two-ruleset split, bypass rationale, reopening conditions); PROFILE.md's 120-line overrun paid by compressing the greenfield-openers intro one line (cap is exclusive; `cairn_validate` all-OK at 119). `devtools::test()` FAIL 0 (5 lavaan WARNs, 3 SKIPs, standing baseline); `devtools::check()` running, its verdict is the checkpoint that closes T8.
+
 ## Decisions
 
 ## Review

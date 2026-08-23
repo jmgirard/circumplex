@@ -106,9 +106,8 @@ of the built package).
 
 ## greenfield-openers
 Language-specific opener `cairn-init` asks in a new/empty R package. The
-universal openers — distribution ambition (rendered here as **CRAN intent**) and
-numeric-work-needs-oracle-verification — are asked by cairn-init's universal
-layer, so they are not repeated here.
+universal openers (distribution ambition, rendered here as **CRAN intent**, and
+numeric-work-needs-oracle-verification) live in cairn-init's universal layer.
 
 - **Compiled code?** Will the package include compiled code
   (Rcpp / RcppArmadillo / C / C++ / Fortran)?
