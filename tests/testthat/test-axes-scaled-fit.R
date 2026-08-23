@@ -2162,3 +2162,64 @@ test_that("M106 AC5: both cormat radii resolve as the recalibrated target implie
   expect_length(grep("nearly collinear", w, fixed = TRUE), 2L)
   expect_length(grep("items i1 and i9", w, fixed = TRUE), 2L)
 })
+
+
+test_that("M106 AC4: three kappa across the band, at three p, straddle the committed floor", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+
+  # Case 1 -- p = 4, the minimum design the API accepts. kappa 1.2e4 against a
+  # floor of 1.06e5: strictly below, so it computes. Reaches the criterion
+  # through a real converged fit.
+  r4 <- m106_family_c(1e-4)
+  expect_lt(m106_kappa(r4), m106_floor_kappa(4L))
+  res4 <- suppressMessages(axes_reliability(
+    cormat = r4, items = split(paste0("i", 1:4), 1:4),
+    angles = c(90, 180, 270, 360), n = 600L
+  ))
+  expect_null(res4$details$se_correction_failed)
+  expect_null(res4$details$fit_scaling_failed)
+
+  # Case 2 -- p = 8. kappa 1.0e5 against a floor of 7.5e4: above it, but within
+  # a factor of 2, so this is the case that actually discriminates where the
+  # floor sits rather than merely that one exists. Also a real converged fit.
+  r8 <- m106_family_a(2.4e-5)
+  ratio8 <- m106_kappa(r8) / m106_floor_kappa(8L)
+  expect_gt(ratio8, 1)
+  expect_lt(ratio8, 2)
+  res8 <- suppressWarnings(suppressMessages(axes_reliability(
+    cormat = r8, items = split(paste0("i", 1:8), seq_along(oct)),
+    angles = oct, n = 600L
+  )))
+  expect_identical(res8$details$se_correction_failed, "ill_conditioned")
+  expect_identical(res8$details$fit_scaling_failed, "ill_conditioned")
+
+  # Case 3 -- p = 24, three items per octant scale. kappa 7.2e5 against a floor
+  # of 4.33e4: strictly above, refused. This one CANNOT reach the criterion
+  # through a real fit -- lavaan does not converge on it, measured -- so it is
+  # injected at the axes_fitted_cov seam, which exists for exactly this
+  # (R/axes_corrected_se.R: no converged fit is known to reach the degenerate
+  # regime). The fit it rides on is the benign p = 24 construction.
+  r24_bad <- m106_family_a(1e-5, per_scale = 3L)
+  expect_gt(m106_kappa(r24_bad), m106_floor_kappa(24L))
+  r24_ok <- m106_family_a(1e-2, per_scale = 3L)
+  expect_null(axes_sigma_degenerate(r24_ok))
+
+  local_mocked_bindings(axes_fitted_cov = function(fit) r24_bad)
+  w <- testthat::capture_warnings(
+    res24 <- suppressMessages(axes_reliability(
+      cormat = r24_ok,
+      items = split(paste0("i", 1:24), rep(seq_along(oct), each = 3L)),
+      angles = oct, n = 600L
+    ))
+  )
+  expect_identical(res24$details$se_correction_failed, "ill_conditioned")
+  expect_identical(res24$details$fit_scaling_failed, "ill_conditioned")
+  expect_length(grep("ill_conditioned", w, fixed = TRUE), 2L)
+
+  # All three sit inside the band M89's tightening newly refused.
+  for (k in c(m106_kappa(r4), m106_kappa(r8), m106_kappa(r24_bad))) {
+    expect_gt(k, 1e4)
+    expect_lt(k, 1e7)
+  }
+})

@@ -111,7 +111,7 @@ M7's own gate.
       restate the target at both roxygen sites.
 - [x] T3 — Threshold pins at p = 3/12/24 × three spectral forms; mutate
       `axes_degeneracy_tau` and record each pin's observed failure.
-- [ ] T4 — Band cases at three κ / three p through `axes_reliability()`, upper
+- [x] T4 — Band cases at three κ / three p through `axes_reliability()`, upper
       cases via the `axes_fitted_cov` seam; committed `data-raw/` generator
       with a seed.
 - [x] T5 — The two `cormat` near-duplicate radii, same generator and seed;
@@ -144,6 +144,7 @@ M7's own gate.
 - 2026-08-22: T5 done. `axes_degeneracy_hint()` computes the conditioning and, where one pair dominates the near-null direction, names it; called at both `na_out()` sites so the two surfaces' warnings stay in agreement, leaving `axes_sigma_degenerate()`'s bare-literal return untouched (Jeff's gate choice). Both `cormat` radii resolve: r = .9999 (kappa 2.87e4) computes with both failure fields NULL, r = .9999714 (kappa 1.01e5) refuses with both naming `ill_conditioned` and both warnings carrying the pair.
 - 2026-08-22: three defects found and fixed inside T5, none reaching a commit. (i) `%.4f` printed r = .99999 as `1.0000`, reporting a near-duplicate pair as a perfectly collinear one — now `%.6g`. (ii) The pair printed in eigenvector-loading order (`i9 and i1`) rather than the caller's column order — now sorted. (iii) The eigenvector-mass gate alone passed a rotated planted eigenvalue whose two dominant items correlate at 0.48, so the warning asserted "nearly collinear" about a pair that is not; a second gate now requires |r| >= 0.99, and the diffuse case is pinned by test.
 - 2026-08-22: two plan assumptions corrected against measurement. The planned second radius r = .99999 is unreachable through the exported path — lavaan stops converging and `axes_reliability()` errors before the criterion runs — so the bracketing radius is r = .9999714 (kappa 1.01e5), the deepest measured that both converges and refuses. And `components$SE`'s `item`/epsilon row is NA at every radius including kappa = 289, so it is not evidence about the criterion; the assertion covers the three priced components.
+- 2026-08-22: T4 done. Three cases at three p, all inside [1e4, 1e7]: p = 4 at kappa 1.2e4 against a 1.06e5 floor computes; p = 8 at kappa 1.0e5 against a 7.5e4 floor refuses, a ratio of 1.33 so it discriminates where the floor sits rather than only that one exists; p = 24 at kappa 7.2e5 against a 4.33e4 floor refuses. The first two reach the criterion through real converged fits; only p = 24 needed the `axes_fitted_cov` seam, and it needed it for the measured reason AC4 anticipated — lavaan does not converge on that matrix.
 
 ## Decisions
 
