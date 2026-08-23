@@ -51,7 +51,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 - [x] In one `devtools::test()` run, that run's own skip listing contains no
       skip whose reason names `lav_fit_cfi` being uncallable, and the three
       comparisons execute.
-- [ ] The helper's older-spelling fallback is exercised by a test that fails
+- [x] The helper's older-spelling fallback is exercised by a test that fails
       when the fallback arm is deleted.
 - [ ] `PROFILE.md`'s verify slot clean, plus `devtools::check(manual = TRUE)`
       per CLAUDE.md's release check.
@@ -171,3 +171,11 @@ was needed before gathering evidence.
   The mutant runs used `--no-vignettes --ignore-vignettes` for speed, which
   raises their skip count to 153 against the baseline's 146; the four sites
   execute in both.
+- **AC5 — pass.** Deleting the older-spelling arm from `lav_cfi_ref()` and
+  re-running `test-lavaan-cfi-helper.R`: FAIL 1 / PASS 5, the single failure at
+  `test-lavaan-cfi-helper.R:14` — `lav_cfi_ref(200, 100, 400, 150, f =
+  old_only)` returns NULL where 0.6 is expected, i.e. the stand-in accepting
+  only the older names is no longer reachable. Restored: FAIL 0 / PASS 6.
+  The failure is the fallback's own, not a bare red: the discriminating
+  companion test ("the current spelling is preferred over the older one")
+  passes in both states.
