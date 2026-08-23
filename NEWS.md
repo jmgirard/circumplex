@@ -62,13 +62,21 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   a single stated criterion, evaluated in the metric every reported number is
   computed in: when the smallest eigenvalue of `cov2cor()` of the fitted
   matrix, relative to its largest, falls at or below
-  `sqrt(p * .Machine$double.eps / 1e-6)` — an indefinite, singular, or
-  severely ill-conditioned correlation structure; the `1e-6` is a stated
-  accuracy target, past whose floor the corrected standard errors could carry
-  relative error above it — both surfaces refuse with reason
-  `"ill_conditioned"`, the component standard errors and the four scaled
-  statistics (`chisq`, `pvalue`, `rmsea`, `cfi`) are `NA` together, and each
-  surface's warning names that shared reason; `df` and `srmr` still report.
+  `sqrt(p * .Machine$double.eps / 1e-5)` — an indefinite, singular, or
+  severely ill-conditioned correlation structure — both surfaces refuse with
+  reason `"ill_conditioned"`, the component standard errors and the four
+  scaled statistics (`chisq`, `pvalue`, `rmsea`, `cfi`) are `NA` together, and
+  each surface's warning names that shared reason; `df` and `srmr` still
+  report. The `1e-5` is the accuracy target `1e-4` — the largest relative
+  error a reported standard error may carry, derived from the standard error's
+  own sampling variability so that a numerical error at the target is a tenth
+  of the statistical noise already in the number — divided by the factor of
+  `10` by which the criterion's error bound may undershoot the error it stands
+  for. Where the refusal is ill-conditioning, the warning names the condition
+  number and, when a single near-duplicate item pair is what makes the matrix
+  degenerate, names that pair: on the `cormat` input path the caller has no
+  items for the package to inspect, so a bare reason code left them nowhere to
+  go.
   The standard-error surface additionally applies the same criterion to the
   raw fitted matrix, which one internal arm of its computation — the
   uncorrected normal-theory pricing kept only as a diagnostic tie to lavaan's
