@@ -41,7 +41,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
       skips in that listing are out of this criterion's reach.
 - [x] `grep -n 'cairn' tests/testthat/test-axes-scaled-fit.R` returns no line
       also containing `test_path`.
-- [ ] Each of the four relocated assertions is proved to execute under
+- [x] Each of the four relocated assertions is proved to execute under
       `R CMD check` by mutation: with the asserted value altered, that run
       reddens naming that test; restored, it passes. The four are the
       fixture read sites reported by `git show
@@ -156,3 +156,18 @@ was needed before gathering evidence.
   returns 0, so no skip in the listing names the fixture. The remaining skip
   groups (On CRAN, `cairn/` not present, `data-raw/` not present, the drift
   guard's "repo tracking record absent") are out of this criterion's reach.
+- **AC3 — pass.** The criterion's enumerator, re-run fresh, reports exactly
+  four lines on `68ada0f8`: 1601, 1661, 1680, 2085. Their enclosing
+  `test_that` blocks are, in order, "AC2/AC3: the committed exemplar B is
+  refused by both surfaces at p = 3", "M90 AC5: the one recorded negative-cval
+  matrix is refused by the criterion, not the backstop", "M90 AC5: the
+  backstop's own literal is 'ill_conditioned'", and "M106 AC2: the
+  near-duplicate geometry computes and the RR18 fixture still refuses". Four
+  fresh `R CMD check` runs of the built tarball, one mutant each, altering only
+  the asserted literal at the post-move line (1628, 1668, 1696, 2090
+  respectively). Every run: FAIL 1 — the mutated test alone, named in the
+  failure header, failing for its own reason (`actual "ill_conditioned"` vs
+  `expected "ill_conditionedXX"`). Restored between runs; the tree is clean.
+  The mutant runs used `--no-vignettes --ignore-vignettes` for speed, which
+  raises their skip count to 153 against the baseline's 146; the four sites
+  execute in both.
