@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-22 (M104 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. `devtools::check()` 0/0/0. ROADMAP 58 lines / see `wc -c`: M104 landed `done`, M99's terminal row retired to hold retention at 5, and the fully-closed M100 tombstone pruned to pay for the new F6/F11 candidate row. `LESSONS.md` 42 lines — M104 graduated six matured verification-craft families to the new `cairn/test-craft.md` under the maturation exit, taking the file off the 4-byte ledge it held across the M100–M103 stamps, and added two lessons of its own; `cairn/test-craft.md` is uncapped and measured by nothing, which is the F11 candidate row. PROFILE 119 of 120 lines. Both GitHub inboxes empty; tracking matches git at the M104 squash.)_
+_Last hygiene check: 2026-08-22 (M105 merge: all `cairn_validate` checks pass, advisories 47 — M7's pre-M28 multi-line work-log WARNs. PR #134 checks green (matrix, ubuntu, pkgdown); `devtools::check()` 0/0/0 at review. ROADMAP: M105 `done`, M101's terminal row retired to hold done-retention at 5. LESSONS 43 lines / see `wc -c` — one M105 line added. PROFILE 119 of 120 lines. Master now carries the two M105 rulesets; the branch-protection check joins the consistency gate. Tracking matches git at the M105 squash.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M105 | Give master GitHub-native branch protection | review | — | normal | milestones/M105-master-branch-protection.md |
+| M105 | Give master GitHub-native branch protection | done | — | normal | milestones/archive/M105-master-branch-protection.md |
 | M104 | Graduate the matured verification-craft families out of LESSONS.md | done | — | normal | milestones/archive/M104-lessons-retirement-pass.md |
 | M103 | Record what the alert's per-run ledger implies about its watched-workflow list | done | — | normal | milestones/archive/M103-alert-ledger-reading.md |
 | M102 | Separate a filtered-out alert event from one never delivered | done | — | normal | milestones/archive/M102-alert-event-delivery-discrimination.md |
 | M100 | Align the review gate's master watch with the alert's verdict set | done | — | normal | milestones/archive/M100-master-watch-verdict-alignment.md |
-| M101 | Find out whether a run that never starts reaches the master-red alert | done | — | normal | milestones/archive/M101-startup-failure-reachability-probe.md |
 
 ## Candidates
 
