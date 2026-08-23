@@ -108,7 +108,7 @@ entry recording the two-ruleset split and the bypass rationale.
       either — a repository settings change.
 - [x] T4: on that authorization, create both rulesets; read each back with
       `gh api .../rulesets/<id>` and confirm AC1 and AC2 field by field.
-- [ ] T5: add the consistency-gate line to `cairn/PROFILE.md`. It is a
+- [x] T5: add the consistency-gate line to `cairn/PROFILE.md`. It is a
       one-line budget: 119 → 120 is the cap exactly, so the line must fit on
       one line or pay for itself by compressing another.
 - [ ] T6: hand Jeff the force-push demonstration and have him run it — after a
@@ -140,6 +140,8 @@ entry recording the two-ruleset split and the bypass rationale.
 
 - 2026-08-22: T3/T4 — Jeff authorized both POST calls at the implement gate; rulesets created: `master-destructive` id 21216269, `master-checks` id 21216270. Read-back of each via `gh api .../rulesets/<id>` agrees with the committed intent in every COMPARED_FIELDS field — GitHub normalized nothing, so `tools/branch-protection.json` needed no correction. Checker exits 0 against the live pair.
 - 2026-08-22: T2 battery (run after T4 per the reorder line above) — six mutations of the committed JSON, one per COMPARED_FIELDS field (enforcement→evaluate, target→tag, ref_name_include→refs/heads/master, rule_types minus non_fast_forward, contexts ubuntu release→devel, bypass_mode always→pull_request): every one exits 1 naming exactly the mutated field; JSON restored after each, clean exit-0 pass after restore.
+
+- 2026-08-22: T5 — gate line added to PROFILE.md's consistency-gate beneath the alert-audit line; fits on one line, `wc -l` 119 → 120, cap held without compressing anything.
 
 ## Decisions
 

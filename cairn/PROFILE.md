@@ -46,6 +46,7 @@ cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
   `Rscript tools/master-red-alert-dryrun.R` both exit clean — nothing else runs them,
   and the alert fires only when master is already broken. Both need `yaml` and `jq`
   (neither a package dependency), and say so if absent.
+- Branch protection (M105): `Rscript tools/check-branch-protection.R` exits clean — live rulesets vs committed `tools/branch-protection.json`; needs authenticated `gh` + `jsonlite`, and says so.
 
 ## test-doctrine
 R-mechanical test expectations layered on the universal "What gets a test"
