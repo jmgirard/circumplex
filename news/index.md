@@ -79,29 +79,52 @@ on a real ggplot2 coordinate system.
   computed in: when the smallest eigenvalue of
   [`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the fitted matrix,
   relative to its largest, falls at or below
-  `sqrt(p * .Machine$double.eps / 1e-6)` — an indefinite, singular, or
-  severely ill-conditioned correlation structure; the `1e-6` is a stated
-  accuracy target, past whose floor the corrected standard errors could
-  carry relative error above it — both surfaces refuse with reason
-  `"ill_conditioned"`, the component standard errors and the four scaled
-  statistics (`chisq`, `pvalue`, `rmsea`, `cfi`) are `NA` together, and
-  each surface’s warning names that shared reason; `df` and `srmr` still
-  report. The standard-error surface additionally applies the same
-  criterion to the raw fitted matrix, which one internal arm of its
-  computation — the uncorrected normal-theory pricing kept only as a
-  diagnostic tie to lavaan’s own standard errors — inverts. A matrix
-  degenerate only in the raw metric (wildly unequal fitted variances
-  over a well-conditioned correlation structure) refuses that internal
-  arm alone: the reported standard errors and scaled fit statistics all
-  compute, with no warning, and the internal refusal is recorded
-  silently in `details$naive_reason` (a new `details` field, `NULL`
-  whenever that arm computed) under the same reason vocabulary. Under
-  the shared criterion the two surfaces’ user-facing refusals therefore
-  agree exactly, and on a unit-diagonal fitted matrix the two metrics
-  coincide; each surface retains its own refusals outside the criterion
-  (such as the saturated-model door, which touches only the fit
-  statistics). Previously the two surfaces disagreed at the numerical
-  margin — whichever internal
+  `sqrt(p * .Machine$double.eps / 1e-5)`, both surfaces refuse, the
+  component standard errors and the four scaled statistics (`chisq`,
+  `pvalue`, `rmsea`, `cfi`) are `NA` together, and each surface’s
+  warning names that shared reason; `df` and `srmr` still report. The
+  shared reason is `"ill_conditioned"` for a numerically degenerate
+  correlation structure, `"indefinite"` where the smallest eigenvalue is
+  negative by more than the fit’s own convergence noise — a statement
+  about the model rather than about arithmetic — and `"singular"` where
+  the matrix carries non-finite entries. The `1e-5` is the accuracy
+  target `1e-4` — the largest relative error a reported standard error
+  may carry, set from the resolution those standard errors are printed
+  at and from the coverage of a nominal 95% Wald interval, and
+  corroborated by the standard error’s own sampling variability, under
+  which a numerical error at the target is about a tenth of the
+  statistical noise already in the number for a typical design at sample
+  sizes up to about 500,000 — divided by the factor of `10` by which the
+  criterion’s error bound may undershoot the error it stands for. Where
+  this criterion refuses for ill-conditioning, the warning also names
+  the conditioning — the condition number where the smallest eigenvalue
+  is positive, and otherwise that the matrix is numerically
+  rank-deficient, which is what a duplicate item pair makes it — and
+  names item pairs correlated tightly enough to force the refusal on
+  their own: one pair with advice to drop one of them, several with the
+  count and up to three of them named. That diagnosis rides the warning;
+  the stored result’s reason fields, and the note
+  [`print()`](https://rdrr.io/r/base/print.html) shows for them, still
+  carry the bare code. (The scaled-fit surface has a second, separate
+  refusal that reports the same reason for a numerical cancellation
+  rather than for conditioning; that one carries no such diagnosis,
+  because it is reached only by a matrix this criterion accepted, whose
+  conditioning is therefore not the reason.) The standard-error surface
+  additionally applies the same criterion to the raw fitted matrix,
+  which one internal arm of its computation — the uncorrected
+  normal-theory pricing kept only as a diagnostic tie to lavaan’s own
+  standard errors — inverts. A matrix degenerate only in the raw metric
+  (wildly unequal fitted variances over a well-conditioned correlation
+  structure) refuses that internal arm alone: the reported standard
+  errors and scaled fit statistics all compute, with no warning, and the
+  internal refusal is recorded silently in `details$naive_reason` (a new
+  `details` field, `NULL` whenever that arm computed) under the same
+  reason vocabulary. Under the shared criterion the two surfaces’
+  user-facing refusals therefore agree exactly, and on a unit-diagonal
+  fitted matrix the two metrics coincide; each surface retains its own
+  refusals outside the criterion (such as the saturated-model door,
+  which touches only the fit statistics). Previously the two surfaces
+  disagreed at the numerical margin — whichever internal
   [`solve()`](https://rdrr.io/r/base/solve.html) failed first refused
   with an incidental label — so a sufficiently degenerate fitted matrix
   could yield `NA` corrected standard errors beside silently scaled fit
