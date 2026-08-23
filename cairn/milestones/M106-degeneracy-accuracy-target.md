@@ -56,7 +56,7 @@ M7's own gate.
       accuracy target δ* = 1e-4 and the calibration ceiling C = 10 named and
       documented beside it as separate quantities, so the constant's stated
       definition and its enforced cap no longer differ by the slack factor.
-- [x] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× the committed
+- [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× the committed
       floor and `"ill_conditioned"` at 0.95×, at p = 3, 12 and 24, and across
       three spectral forms at 0.95×: positive λmin, λmin negative but inside
       `-λmax·sqrt(p·ε)` (still `"ill_conditioned"`), and decisively negative
@@ -68,7 +68,7 @@ M7's own gate.
       of 2 of the threshold resolves as AC1's derivation implies. The upper
       cases reach the band through the `axes_fitted_cov` seam, since no
       converged fit is known to (`R/axes_corrected_se.R:444-449`).
-- [x] AC5 — `axes_reliability(cormat = ...)` on an item set carrying one pair at
+- [ ] AC5 — `axes_reliability(cormat = ...)` on an item set carrying one pair at
       r = .9999 returns the outcome AC1's derivation implies, with
       `details$se_correction_failed` and `details$fit_scaling_failed` each
       asserted to the value the derivation states for this input; a second
@@ -83,7 +83,7 @@ M7's own gate.
       one stale value planted per spelling class — numeric literal, prose "tau
       floor", derived κ threshold — is caught by that sweep. `cairn/` is
       excluded deliberately: D-044 is superseded, never edited.
-- [x] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
+- [ ] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
       (model-implied, p ≥ 4, including one near-duplicate construction from
       RR19 §3a) with its own pass window asserting attainment stays at least
       three decades below 1; `Rscript devel/degeneracy-oracle/exact_oracle.R`
@@ -173,18 +173,45 @@ M7's own gate.
 
 **AC2 — the constant is the quotient.** Measured under `load_all()`: `delta_star = 1e-4`, `C = 10`, `tau = 1e-5`, and `identical(tau, delta_star/C)` is TRUE. Not a third number that happens to agree.
 
-**AC3 — floor discriminates p and spectral form.** 13 assertions green at p = 3/12/24 across positive-spectrum both sides of the floor, roundoff-level negative, and decisively negative. Teeth shown by four mutants, each red at a different pin family and each restored by copy with the source blob re-hashed to 14cb2a23: floor's p factor dropped; delta_star loosened a decade; indefiniteness band widened 1000x; band narrowed 1000x.
+**AC3 — UNTICKED at the gate.** The criterion as written is unsatisfiable: it asks for three spectral forms *at 0.95x the floor*, but a negative λmin makes the ratio negative rather than 0.95x a positive floor, so forms 2 and 3 cannot sit where the wording puts them. The test resolves it sensibly (forms 2 and 3 sit at the M90 band), but that is a charitable reading of a criterion, which review may not do. Routes to a gated amendment. The underlying evidence, for the record: 13 assertions green at p = 3/12/24 across positive-spectrum both sides of the floor, roundoff-level negative, and decisively negative. Teeth shown by four mutants, each red at a different pin family and each restored by copy with the source blob re-hashed to 14cb2a23: floor's p factor dropped; delta_star loosened a decade; indefiniteness band widened 1000x; band narrowed 1000x.
 
 **AC4 — three kappa, three p, straddling the floor.** p = 4 at kappa 1.2e4 (floor 1.06e5) computes; p = 8 at kappa 1.0e5 (floor 7.5e4, ratio 1.33) refuses; p = 24 at kappa 7.2e5 (floor 4.33e4) refuses. All three inside [1e4, 1e7], asserted in-test. The first two reach the criterion through real converged fits; only p = 24 used the `axes_fitted_cov` seam, for the measured reason the criterion allows.
 
-**AC5 — cormat radii and the warning's content.** r = .9999 (kappa 2.87e4) computes with both failure fields NULL; r = .9999714 (kappa 1.01e5) refuses with both fields `"ill_conditioned"`, two warnings, both naming the pair. All four `axes_degeneracy_hint()` branches pinned: conditioning present, pair named in column order, `%g` so .9999714 does not print as 1.0000, dimnames absent falls back to conditioning alone, and a diffuse near-null direction (dominant pair correlating 0.48) makes no collinearity claim.
+**AC5 — UNTICKED at the gate** on review findings 1 and 2 (below): the diagnostic this criterion certifies is defective outside the single-pair input the criterion names. Evidence as recorded: r = .9999 (kappa 2.87e4) computes with both failure fields NULL; r = .9999714 (kappa 1.01e5) refuses with both fields `"ill_conditioned"`, two warnings, both naming the pair. All four `axes_degeneracy_hint()` branches pinned: conditioning present, pair named in column order, `%g` so .9999714 does not print as 1.0000, dimnames absent falls back to conditioning alone, and a diffuse near-null direction (dominant pair correlating 0.48) makes no collinearity claim.
 
 **AC6 — every site carries the committed value.** The concept-token sweep returns clean. One genuinely stale site was found and fixed (`NEWS.md:65-72`); two prose sites reading "the tau floor" carry no figure and stay true. Planted-defect check, one per spelling class, each caught and restored: numeric literal at `R/axes_reliability.R:1036`, prose `tau = 1e-6` at `R/axes_corrected_se.R:384`, derived threshold at `R/axes_corrected_se.R:352`.
 
-**AC8 — reachable-geometry family in the oracle.** `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS PASS, SWEEP PASS and REACHABLE PASS. Five model-implied cases at p = 4, 8, 9 measure attainment 3.4e-8 to 3.3e-7, independently reproducing RR19 §3a from its stated parameters. The window is live: tightened to 1e-9 the script FAILs and exits 1.
+**AC8 — UNTICKED at the gate** on review finding 3: the near-duplicate cases are priced with `FIT_ZETA1 = FALSE`, but `axes_fits_zeta1()` is TRUE for that design, so the case M89 F3 is about is measured under a model the exported path would not fit — not "reachable geometry" as the criterion claims. Evidence as recorded: `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS PASS, SWEEP PASS and REACHABLE PASS. Five model-implied cases at p = 4, 8, 9 measure attainment 3.4e-8 to 3.3e-7, independently reproducing RR19 §3a from its stated parameters. The window is live: tightened to 1e-9 the script FAILs and exits 1.
 
 **AC7 — toolchain verify.** `document()` no diff, zero lines matching `resolve link` at `cli.width = 500`. `devtools::test()` FAIL 0 / PASS 8451 / SKIP 3 / WARN 5, the five warnings verified byte-identical on master. `devtools::check(args = "--no-manual")` Status OK, 0/0/0.
 
 **Consistency gate.** `cairn_validate` all checks pass, 48 advisories (47 pre-existing M7 work-log WARNs plus M106's sizing advisory, dispositioned at plan). `pkgdown::check_pkgdown()` no problems. README.Rmd not newer than README.md. No new top-level files. Master watches both green on the newest push run reaching a verdict (809e7d6a); the three `cairn/**`-only commits after it trigger no workflow by design, which is the M105 open remainder, not a new gap. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all exit 0.
 
 **Carried forward, unverified here.** The PDF manual has not been built: this branch changed roxygen and the repo's check command carries `--no-manual`, so `R CMD Rd2pdf` was run deliberately and exits 1 because no TeX binary exists on this machine. Rd-to-LaTeX conversion passed and the diff adds no non-ASCII to `man/`. Needs a machine with TeX, at CI or the release walk.
+
+### Review findings (three fresh-context lenses, 2026-08-22)
+
+**[S] prior-PR-comments:** no prior-review evidence of a regression. M91's decoupling contract, M90's arm ordering and band rationale, and M89's threshold-pin discipline all verified intact; GitHub inline-comment probe returned empty, that surface correctly skipped. One out-of-scope observation (the `cval <= 0` backstop lacks the hint) — merged into [O] finding 5.
+
+**[S] blame-history:** confirmed the recalibration does not resurrect M89's fixed bug (new floor κ ≈ 1.2e5 at p = 3 against the fixture's 6.65e6) and that D-044's metric choice is untouched in the code, not merely in D-048's claim. Its one defect finding is [O] finding 1, found independently.
+
+**[O] diff-bug:** 19 findings. Dispositions below; every one logged, none dropped. Findings 1, 2, 3, 7, 8, 9, 10 independently reproduced by the reviewing session before triage.
+
+- **F1 (defect, reproduced).** `axes_degeneracy_hint()` is attached to every degeneracy literal, not only `"ill_conditioned"`, so an indefinite refusal prints a negative "condition number" — measured `(indefinite: condition number -1.94e+05)`. Exceeds RR19 rec 4's stated scope and blurs the model-vs-numerics distinction M90 built. → **fix**
+- **F2 (defect, reproduced).** The pair-naming gates fail in both directions under eigenvalue multiplicity. Measured: eight identical triplets at p = 24 name "i1 and i2" and advise dropping one, which is wrong advice among 24 equally-guilty items; eight genuine duplicate *pairs* — the case the feature exists for — fail gate 1 and name nothing. The comment's claim that gate 1 establishes "THIS pair drives the degeneracy" is false under multiplicity. → **fix; needs a design choice, hence a gated return**
+- **F3 (AC8 gap, reproduced).** The oracle prices the near-duplicate cases with `FIT_ZETA1 = FALSE` while `axes_fits_zeta1()` is TRUE for that design (two items on one scale); re-measured with TRUE, attainment rises 5.47e-8 → 3.82e-7. Window still passes, but the case is measured off the exported path. → **fix**
+- **F4.** The oracle feeds the p = 3 fixture's `DF`/`BASELINE_DF` globals to every new case; no current assertion reads `EXACT_CVAL`, so nothing is wrong today, but a future cval line there would be silently wrong. → **fix (cheap) or candidate row**
+- **F5 (defect).** `R/axes_scaled_fit.R:273`'s cval backstop returns `na_out("ill_conditioned")` with no hint, so NEWS's "Where the refusal is ill-conditioning, the warning names the condition number" is false on that path. → **fix**
+- **F6.** Scope mismatch across the helper comment, NEWS and D-048: all three scope the diagnostic to one literal; the code over-applies (F1) and under-applies (F5) it. → **fix with F1/F5**
+- **F7 (reproduced).** `%.6g` does not fix what its comment claims: `sprintf("%.6g", 0.9999999)` is `"1"`, the same rounding failure two digits deeper, at radii reachable at large p. → **fix**
+- **F8 (reproduced).** "a hundred thousand times looser" is wrong for its own subject: the floor ratio is `1/sqrt(1e-5)` = 316, not 1e5. The unit silently switched from the floor to τ while the subject stayed the floor. → **fix**
+- **F9 (reproduced).** "they hand over a matrix, not items" is false — `axes_reliability(cormat=)` requires `items`, and errors without it. The same wrong claim is in NEWS. → **fix**
+- **F10 (reproduced).** The "positions would mislead" rationale does not hold: both call sites realign `sigma` to `item_names` (`axes_corrected_se.R:218`, `axes_scaled_fit.R:84`) before the hint runs. Dimnames are still right; the stated reason is not. → **fix**
+- **F11.** `0.8` and `0.99` decide user-facing text with no derivation and no escalation note, unlike every other constant in the file. → **fix with F2**
+- **F12.** The oracle comment says "measured attainment of 1e-9 to 1e-6"; the script prints 3.41e-8 to 3.31e-7. → **fix**
+- **F13.** The AC5 diffuse case discriminates gate 2 for the right reason (top-2 mass 0.966, pair entry 0.483), but the entry the comment calls a correlation is a covariance. → **fix (comment)**
+- **F14.** AC4 case 2 asserts no convergence, so a non-convergence route to the same literal would pass silently. → **fix (add the assertion)**
+- **F15.** AC3's literal wording is unsatisfiable (see above). → **amendment return**
+- **F16.** The AC2 over-loosening guard reads a `.Rbuildignore`d fixture, so only the loosening half runs under `R CMD check`. Pre-existing pattern, but it now guards a τ that just moved. → **candidate row**
+- **F17 (open question, for the maintainer).** This branch may ship half of D-048's own reopening trigger (i): AC4 case 2 is refused through a converged fit while the new oracle measures the identical construction at rel.err 3.0e-12, eight decades inside δ* = 1e-4. Only the cval half is missing, and F4 is why. → **maintainer decision**
+- **F18, F19.** Confirmations, no action: AC6's sweep re-verified clean, AC2's arithmetic reproduced (δ* = 0.1/sqrt(2·(5e5−1)) = 1.0e-4; thresholds 43318.6 / 75030.0 / 106108.4 at p = 24/8/4), the `hint = NULL` threading behaviour-preserving for every non-degeneracy refusal, M71 and M89 contracts untouched, no reachable error path in the helper, no NAMESPACE/DESCRIPTION drift, no RNG use.
