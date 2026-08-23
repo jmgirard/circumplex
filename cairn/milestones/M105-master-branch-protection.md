@@ -111,13 +111,13 @@ entry recording the two-ruleset split and the bypass rationale.
 - [x] T5: add the consistency-gate line to `cairn/PROFILE.md`. It is a
       one-line budget: 119 → 120 is the cap exactly, so the line must fit on
       one line or pay for itself by compressing another.
-- [ ] T6: hand Jeff the force-push demonstration and have him run it — after a
+- [x] T6: hand Jeff the force-push demonstration and have him run it — after a
       docs-only commit lands, `git push --force origin <previous-sha>:master`,
       which must be rejected. This session cannot run it (the force_push_guard
       hook denies force-push to the default branch), and it is reversible if
       the ruleset fails: master rewinds one docs commit, restored by pushing it
       again. Quote the rejection text into the work log.
-- [ ] T7: after both rulesets are active, push one docs-only tracking commit
+- [x] T7: after both rulesets are active, push one docs-only tracking commit
       directly to master and confirm it landed (AC4).
 - [ ] T8: sweep for prose the rulesets make newly false — grep `cairn/` and
       `.github/` for `branch protection`, `required status`, `force`,
@@ -142,6 +142,10 @@ entry recording the two-ruleset split and the bypass rationale.
 - 2026-08-22: T2 battery (run after T4 per the reorder line above) — six mutations of the committed JSON, one per COMPARED_FIELDS field (enforcement→evaluate, target→tag, ref_name_include→refs/heads/master, rule_types minus non_fast_forward, contexts ubuntu release→devel, bypass_mode always→pull_request): every one exits 1 naming exactly the mutated field; JSON restored after each, clean exit-0 pass after restore.
 
 - 2026-08-22: T5 — gate line added to PROFILE.md's consistency-gate beneath the alert-audit line; fits on one line, `wc -l` 119 → 120, cap held without compressing anything.
+
+- 2026-08-22: T7 — docs-only tracking commit cd08db79 pushed directly to master under both active rulesets; the remote replied `Bypassed rule violations for refs/heads/master: 2 of 2 required status checks are expected`, i.e. the checks rule fired and the admin bypass carried the push — the carve-out works by the designed mechanism, not by accident (AC4).
+- 2026-08-22: T6 — Jeff ran `git push --force origin 0b1e1957:master` (a one-docs-commit rewind); GitHub refused it: `remote: error: GH013: Repository rule violations found for refs/heads/master`, and `git rev-parse origin/master` immediately after equals cd08db79, the tip before the attempt (AC3). Server-side enforcement is real, not merely configured.
+- 2026-08-22: branch synced with the moved master by rebase rather than merge-in — the session's merge guard denies all `git merge` forms, and the branch was unpushed, so the rebase is equivalent and keeps history linear.
 
 ## Decisions
 
