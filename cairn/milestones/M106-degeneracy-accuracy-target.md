@@ -45,7 +45,7 @@ M7's own gate.
 
 ## Acceptance criteria
 
-- [x] AC1 — The comment block beside `axes_degeneracy_tau` derives the largest
+- [ ] AC1 — The comment block beside `axes_degeneracy_tau` derives the largest
       relative error a reported corrected SE may carry from the SE's own
       sampling relative standard error, stating every premise the derivation
       rests on; each published result it uses is cited `citekey (p. N)`, or the
@@ -56,13 +56,13 @@ M7's own gate.
       accuracy target δ* = 1e-4 and the calibration ceiling C = 10 named and
       documented beside it as separate quantities, so the constant's stated
       definition and its enforced cap no longer differ by the slack factor.
-- [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× and
+- [x] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× and
       `"ill_conditioned"` at 0.95× of the committed eigenvalue-ratio floor
       `λmax·sqrt(p·ε/τ)`, at p = 3, 12 and 24, on a positive-λmin spectrum. At
       the same three p it returns `"ill_conditioned"` where λmin is negative at
       half the noise band `-λmax·sqrt(p·ε)`, and `"indefinite"` where λmin is
       100× past that band.
-- [x] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
+- [ ] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
       different p, straddling the committed threshold (4.3e4 at p = 24):
       one strictly below the committed threshold returns numbers,
       one strictly above returns NA with its reason named, one within a factor
@@ -84,7 +84,7 @@ M7's own gate.
       one stale value planted per spelling class — numeric literal, prose "tau
       floor", derived κ threshold — is caught by that sweep. `cairn/` is
       excluded deliberately: D-044 is superseded, never edited.
-- [ ] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
+- [x] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
       (model-implied, p ≥ 4, including one near-duplicate construction from
       RR19 §3a) with its own pass window asserting attainment stays at least
       three decades below 1; `Rscript devel/degeneracy-oracle/exact_oracle.R`
@@ -177,6 +177,8 @@ M7's own gate.
 
 ## Review
 
+### Round 1 (2026-08-22) — returned
+
 **PR:** https://github.com/jmgirard/circumplex/pull/135 · reviewed 2026-08-22 against master at b712a007 (unmoved since the branch was cut, so no merge was needed).
 
 **AC1 — derivation beside the constant, restated at both roxygen sites.** `R/axes_corrected_se.R:386-424` derives the target from the reported SE's own sampling relative SD (`1/sqrt(2(n-1))`, from the chi-square anchor, halved by the delta method), holds the numerical bias to a tenth of it, calibrates at n = 5e5, and names the two n-free cross-checks. It states in so many words that no shelf citekey carries the sampling-SD result rather than citing one it does not have — the criterion's stated alternative. Restated at `R/axes_reliability.R:720-728` and `:1036-1039`.
@@ -237,3 +239,55 @@ M7's own gate.
 - 2026-08-23: this session crossed midnight — every line above is dated to when the work or the decision happened, so the return's repairs read 2026-08-22 and the closing lines read 2026-08-23.
 - 2026-08-23: T9 — finding 16 and the corrected finding-17 reason both landed on M106's own existing candidate row rather than a new one: `ROADMAP.md` stood at 59 of its < 60 lines, and absorbing is what search-first asks for on an overlapping row. The hygiene stamp was replaced with a one-pass line, which is where the bytes came from. 59 lines / 23,916 bytes, and worth naming: 84 bytes of headroom is not a working margin, and the next candidate row needs a graduate-or-prune pass first.
 - 2026-08-23: CI on the return push (run 32619293688, head e9347bb8): `matrix` and `pkgdown` pass, `macos-latest` passes at 17m3s, `ubuntu-latest` and `windows-latest` still pending after two ten-minute blocking waits. Nothing is left watching — the ubuntu verdict is the one that decides whether the carrier-fit repair worked, and it is re-derived from `gh pr checks 135`, never from a remembered state.
+
+### Round 2 (2026-08-23) — returned
+
+Reviewed against master at b712a007, unmoved since the branch was cut, so no merge was needed. Working tree clean; PR #135 draft, head 518386bc.
+
+**AC1 — FAILS, unticked.** The block at `R/axes_corrected_se.R:398-470` derives the target and states the no-published-source clause, and both roxygen sites restate it (`R/axes_reliability.R:721-728`, `:1037-1038`). But the criterion asks for **every premise the derivation rests on**, and the load-bearing one is unstated: the block asserts that because the corrected SE is a smooth plug-in functional of Σ̂ its relative sampling SD is of order `1/sqrt(2(n-1))` — the relative SD of a single variance. The corrected SE is a functional of all p(p+1)/2 entries, and whether averaging over them shrinks that SD is neither argued nor named as an assumption. It is not academic: the plan gate's own falsifier is a target at or below 6e-6, only ~17× below δ* = 1e-4, and the derivation's `1/10` margin cannot absorb a factor that size. Two further claims in the same block are wrong as measured: the Wald channel's "0.002 points" is a coverage change of 2.291e-5 in probability (0.0023 percentage points), ~87× smaller than written; and "print resolution is at least 1e-3 relative at the largest printable SE" inverts the relation — `axes_fmt` rounds to 3 *decimals*, so relative resolution is 1e-3/SE and falls *below* 1e-3 exactly at the largest SEs.
+
+**AC2 — verified, ticked.** Measured under `load_all()`: `delta_star = 1e-4`, `C = 10`, `tau = 1e-5`, `identical(tau, delta_star/C)` TRUE. `0.1/sqrt(2*(5e5-1)) = 1.0e-4` reproduces.
+
+**AC3 — verified as amended, ticked.** Measured directly at p = 3, 12, 24: 1.05x of the eigenvalue-ratio floor returns `NULL`, 0.95x returns `"ill_conditioned"` on a positive-λmin spectrum; λmin at half the noise band returns `"ill_conditioned"`; λmin 100x past it returns `"indefinite"`. Floor ratios 8.162e-6 / 1.632e-5 / 2.308e-5. `equicorr()` places the ratio exactly, so the 1.05x/0.95x locations are the criterion's, not an approximation of them. 13 assertions green; four mutants from round 1 still stand.
+
+**AC4 — FAILS as written, unticked; routes to amendment.** The criterion says the upper cases reach the band through the `axes_fitted_cov` seam "since no converged fit is known to". On this branch one is: case 2 (p = 8, κ = 1.0e5 against a 7.5e4 floor, ratio 1.333) reaches the criterion through a real converged fit, and since finding 14 of round 1 the test asserts `details$converged` on it. The work is better than the criterion — but the criterion's premise is falsified by the work, and round 1 ticked it on a charitable reading review may not make. Measured figures otherwise reproduce exactly: κ 1.2e4 vs floor 1.06e5 (p = 4, computes); κ 1.0e5 vs 7.5e4 (p = 8, refuses); κ 7.2e5 vs 4.33e4 (p = 24, refuses, via the seam); all three inside [1e4, 1e7].
+
+**AC5 — FAILS, unticked.** The criterion's own input resolves: `m106_family_b(7e-5)` at r = .9999, κ 2.87e4 computes with both failure fields NULL; `m106_family_b(2e-5)` at r = .9999714, κ 1.01e5 refuses with both fields `"ill_conditioned"`, two warnings, both naming κ and the pair. But the diagnostic this criterion certifies still prints a negative condition number, which is the same user-visible symptom round 1 returned on as finding 1 — narrowed, not closed. Gating on the `"ill_conditioned"` literal does not exclude negative λmin, because M90's partition puts roundoff-level negativity under that same literal. Measured on the exact spectral form AC3 enumerates (`planted(p, -band*0.5)`): `"condition number -7.75e+07"` at p = 3, `-3.87e+07` at p = 12, `-2.74e+07` at p = 24. An exactly collinear pair gives `"condition number Inf; items i1 and i2 are nearly collinear (r = 1)"`.
+
+**AC6 — verified, ticked.** The concept-token sweep returns one hit, `test-axes-scaled-fit.R:2070`, inspected and correct — a deliberate statement about the superseded value. Planted-defect check re-run fresh, one per spelling class, each caught and each restored by blob hash: numeric literal staled in place at `R/axes_reliability.R:1037`, prose `tau = 1e-6` at `R/axes_corrected_se.R:433`, derived κ threshold `1.4e4` at `R/axes_corrected_se.R:357`. Recorded limitation, found while probing: the sweep is line-scoped, so a figure sitting on a continuation line that carries no concept token escapes it — `R/axes_reliability.R:1038`'s factor-of-`10` is such a site today.
+
+**AC7 — verified, ticked.** `document()` no diff, zero lines matching `resolve link` at `cli.width = 500`. `devtools::test()` FAIL 0 / PASS 8482 / SKIP 3 / WARN 5. `devtools::check(args = "--no-manual")` Status OK, 0/0/0.
+
+**AC8 — verified, ticked.** `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS PASS, SWEEP PASS, REACHABLE PASS. Five model-implied cases at p = 4, 8, 9 — all at or above the four-scale minimum — including RR19 §3a's near-duplicate construction at two radii, each now priced with `fit_zeta1` and df read off its own item map. Attainment 6.82e-8 to 3.82e-7 against `REACHABLE_WINDOW = 1e-3`. Window live: tightened to 1e-9 the script FAILs and exits 1; restored by copy, blob re-hashed to 63ed8633, it exits 0.
+
+**Consistency gate.** `cairn_validate` all checks pass, 48 advisories (47 pre-existing M7 work-log WARNs plus M106's sizing advisory, dispositioned at plan). No `DESIGN.md` principle changed, so `cairn_impact` is skipped. Toolchain slot: `document()` clean as above; no generated file hand-edited; README.Rmd not newer than README.md; `pkgdown::check_pkgdown()` no problems; NEWS entry present; no new top-level files. CI on PR #135 (run 32620185914): `matrix`, `pkgdown` and `macos-latest` pass; `ubuntu-latest` and `windows-latest` still pending at the gate.
+
+#### Round 2 findings (three fresh-context lenses, 2026-08-23)
+
+**[S] blame-history:** no findings. Verified independently, by loading the package rather than on the branch's word: RR18's counterexample B (κ = 6,654,373) still refuses under the loosened τ against the new p = 3 floor; both surfaces gate the diagnostic identically; the cval backstop still returns a bare literal and never `"indefinite"`; no earlier milestone's assertion was deleted or loosened — M89's AC3 pin was re-pinned *stricter*, now asserting the two component constants and their quotient identity; D-044 untouched and D-048 a pure append; M90's separate `sqrt(p·ε)` band constant untouched; M91's `naive_reason` decoupling untouched.
+
+**[S] prior-PR-comments:** no findings. Traced every touched file against round 1's 19 findings and the archived M89/M90/M91 reviews; each round-1 finding is fixed at every site it named, not partially. GitHub probe `gh api repos/jmgirard/circumplex/pulls/comments?per_page=1` returned `[]` — the repo has no inline PR-review surface at all, so the per-PR walk was correctly skipped rather than paid for. Named one near-miss and correctly dispositioned it: D-048's unscoped "the `"ill_conditioned"` warning now names the condition number" is false of the cval backstop, but the milestone's own 2026-08-22 Decisions entry considered exactly that tension and left D-048 alone under never-edit-history.
+
+**[O] diff-bug:** 20 findings. Findings 1, 7, 13, 14 and 20 independently reproduced by the reviewing session before triage; 8 verified against the criterion text.
+
+- **F1 (defect, reproduced) — FLOOR RETURN.** Gating the hint on the `"ill_conditioned"` literal does not exclude a negative smallest eigenvalue: M90 puts roundoff-level negativity under that same literal, so the negative "condition number" round 1 returned on is still reachable, on the exact spectral form AC3 enumerates. Measured `"condition number -7.75e+07"` / `-3.87e+07` / `-2.74e+07` at p = 3/12/24, and `Inf` for an exactly collinear pair. → **return**
+- **F2.** The scope comment offers "an indefinite matrix has λmin < 0, so its condition number prints negative" as the reason `"indefinite"` is excluded — equally true of the included half of `"ill_conditioned"`, so the stated discriminator does not discriminate. → **fix with F1**
+- **F3 (AC1 gap) — FLOOR RETURN.** The derivation's load-bearing step is asserted, not argued: the corrected SE is a functional of all p(p+1)/2 entries of Σ̂, and the premise that averaging over them does not materially shrink its relative sampling SD below a single variance's is never stated. The plan gate's own falsifier sits ~17× below δ*, which the 1/10 margin cannot absorb. Carries AC1's `no-oracle` tripwire. → **return; escalation offered**
+- **F4 (test gap, reproduced by the mutation record).** Only the scaled-fit gate was mutation-proved; nothing exercises `axes_corrected_se()` with an indefinite matrix and inspects its warning, so deleting the guard at `R/axes_corrected_se.R:307` leaves the suite green. → **fix with F1**
+- **F5.** `test-axes-scaled-fit.R:2069` says the *first* assertion fails under the old τ; the first is a property of the matrix and τ-independent, the τ-sensitive one is the fourth. → **fix**
+- **F6.** The same comment quotes the p = 24 threshold for a p = 9 matrix; the conclusion survives, the figure is for a different matrix. → **fix**
+- **F7 (reproduced).** "twenty-five times ABOVE this p's floor" measures 153.5, not 25: λmax = 1.995, floor 3.257e-5, interlacing bound 5e-3. Also in the 2026-08-22 work log, which is history — superseded, not edited. → **fix comment; superseding work-log line**
+- **F8 (AC4 false as written) — AMENDMENT RETURN.** "The upper cases reach the band through the `axes_fitted_cov` seam, since no converged fit is known to" — case 2 now does reach it through a converged fit, asserted in-test. The work falsified the criterion's premise. → **amendment**
+- **F9.** The comment says "Column order"; `which(arr.ind = TRUE)` walks column-major and the sort is row-then-column. No test discriminates them. → **fix comment or add the discriminating pin**
+- **F10.** "basis-free by construction" is true of *which pairs qualify*, not of *which three are printed* — the displayed three follow the caller's column order. → **fix comment**
+- **F11.** NEWS says the warning "lists any item pair"; the code lists at most three and counts the rest. → **fix**
+- **F12.** The `is.null(nms)` fallback is unreachable from both call sites, which `stop()` without dimnames and then realign; its test's rationale describes a user-facing choice for a branch no user reaches. → **maintainer**
+- **F13 (reproduced).** "0.002 points" for the Wald channel: the measured coverage change at δ* is 2.291e-5 in probability, 0.0023 percentage points — ~87× smaller as written. → **fix**
+- **F14 (reproduced).** "print resolution is at least 1e-3 relative at the largest printable SE" inverts the relation: `axes_fmt` rounds to 3 decimals, so relative resolution is 1e-3/SE and is *worst* at the largest SEs. → **fix**
+- **F15.** "whatever the rest of the matrix does" overstates: the cut reads λmax off the given matrix, so it is conditional on it. Mathematics correct, phrasing not. → **fix**
+- **F16.** The block names the `cormat` path's unbounded n as the binding direction and then fences nothing; at n = 1e8 a numerical error at δ* exceeds the statistical noise it is priced against. RR19 §4 settled the n-dependence of τ, not this. → **maintainer**
+- **F17.** `NEWS.md:65-67` still attributes `"ill_conditioned"` to indefinite structures; indefinite structures refuse with `"indefinite"`. Pre-existing text this diff rewrote around. → **fix**
+- **F18.** AC8 unverifiable on the reviewer's machine (no python deps), flagged as unverified coverage rather than a defect; reproduced here — exit 0, all three windows PASS. → **no action**
+- **F19.** Two tests assert exact 3-significant-figure condition numbers off `qr.Q(qr(...))` on a rank-deficient integer matrix; pivoting did not fire here (`q$pivot` is the identity) but the construction is BLAS-dependent in principle. → **maintainer**
+- **F20 (reproduced).** The 2026-08-23 work-log line says 23,916 bytes; measured 23,911. History — superseded, not edited. → **superseding work-log line**
+- 2026-08-23: corrections to two figures this milestone's own work log recorded, superseding rather than editing them (IP4). The 2026-08-22 T9 mutation line's "twenty-five times above the floor" is 153.5 times, measured on that construction (λmax 1.995, floor 3.257e-5, interlacing bound 5e-3). The 2026-08-23 hygiene line's "23,916 bytes" is 23,911, by `wc -c`.
