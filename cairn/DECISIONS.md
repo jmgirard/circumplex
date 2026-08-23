@@ -1691,3 +1691,47 @@ shows its corrected SEs and `cval` within the accuracy target; or (ii) field
 reports of `"ill_conditioned"` refusals on real data. On either, the remedy is
 an a-posteriori per-fit error estimate replacing this limb — refusal retained
 for indefiniteness and exact singularity — not another decade on τ.
+
+### D-049 (2026-08-23): the accuracy target's constants stand, but its justification moves to the two n-free channels — annotates and narrows D-048's grounds, not its numbers (M106, RR20)
+
+**Context:** D-048 set `axes_degeneracy_delta_star = 1e-4` and grounded it in
+the reported SE's own sampling variability, holding the numerical bias to a
+tenth of that noise at a sample size well past anything the literature
+publishes. M106's second review round found the load-bearing step of that
+derivation asserted rather than argued: the reported SE was priced as though it
+were a single variance, when it is a plug-in through the fitted model.
+
+**Decision.** The constants do not move. `delta_star` stays 1e-4, the
+calibration ceiling stays 10, and `axes_degeneracy_tau` stays their quotient.
+What moves is which argument carries them. The sampling-noise comparison is
+demoted to typical-case corroboration, because the coefficient it treats as
+fixed is a property of the design rather than a constant, and no positive floor
+for it is established — so a bias-below-a-fraction-of-noise rule stated
+uniformly over designs and over sample sizes yields no fixed constant at all,
+and rejects every candidate including the value D-048 superseded. The two
+sample-size-free channels — the reported resolution of the printed output, and
+the sensitivity of nominal Wald coverage — become the primary support; both
+were re-checked and both hold. The target's calibration domain in the sample
+size is stated rather than left open, and beyond that domain the criterion's
+guarantee is the fixed cap alone rather than a noise-dominance claim.
+
+This annotates D-048 and narrows the reach of its rationale. It supersedes
+nothing D-048 decided, and D-044's metric choice remains untouched.
+
+**Also decided on the same review.** Removal of the ill-conditioning limb was
+weighed for the third time and rejected again on IP3's unchanged ground. An
+accuracy target that varies with the typed sample size, and a runtime warning
+keyed to it, are both rejected — they rebuild the yardstick-dependence D-048
+already refused, and the documented calibration domain is the whole remedy. A
+tighter target was offered and declined: it would re-narrow the computable
+region on a stacked-worst-case argument no user-visible channel can resolve.
+
+**Consequences:** no exported behavior changes. The derivation written beside
+the constant is rewritten to carry the argument it actually rests on, with its
+unstated premises stated; the two exported documentation sites gain the
+calibration-domain sentence.
+
+**Reopens:** D-048's trigger (i) is unchanged and now one measurement from met
+— its SE half is measured, its `cval` half is not. On it being met in full, the
+remedy stays D-048's: an a-posteriori per-fit error estimate replacing this
+limb, not a further move of the constant.

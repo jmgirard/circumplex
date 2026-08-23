@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -94,13 +94,13 @@ M7's own gate.
 
 ## Coverage
 
-- AC1 → T1, T2
+- AC1 → T1, T2, T10
 - AC2 → T2
 - AC3 → T3
 - AC4 → T4
-- AC5 → T5
+- AC5 → T5, T10
 - AC6 → T6
-- AC8 → T8
+- AC8 → T8, T11
 - AC7 → T7
 
 ## Tasks
@@ -127,6 +127,15 @@ M7's own gate.
 - [x] T9 — Work review return 1: the fix-dispositioned findings, the AC3
       amendment, and the ubuntu-only CI repair. Re-run `document()`, `test()`,
       `check()`.
+- [ ] T10 — Work review return 2, and rewrite the derivation block on RR20's
+      numbers: the two n-free channels primary (print, with its SE bound
+      stated and the coverage unit restored), the sampling-noise channel as
+      typical-case corroboration carrying its measured coefficient range and
+      calibration domain, and RR20 §6's seven premises stated. Mirror the
+      domain sentence at both exported roxygen sites. Constants unchanged.
+- [ ] T11 — Emit exact `cval` for AC4 case 2's construction from the oracle
+      driver and record the result; if it lands inside δ*, record D-048
+      trigger (i) as met on the successor candidate row.
 
 ## Work log
 
@@ -174,6 +183,14 @@ M7's own gate.
 - 2026-08-22 (RR19 B3, recorded not scheduled): df is the exposure axis, and the four-scale minimum is what keeps the reachable set out of the fixture's regime. Any future change lowering the minimum scale count must re-run the exact oracle at the new minimum before shipping.
 - 2026-08-22 (review return 1, findings 1/5/6): the conditioning diagnostic is scoped to the degeneracy criterion's `"ill_conditioned"` refusal and to nothing else. The other two criterion literals are excluded on their own grounds — `"indefinite"` is M90's statement about the user's model, and a matrix with λmin < 0 has no condition number worth reporting (measured: it printed as −1.94e5); `"singular"` is reached on non-finite entries `eigen()` cannot decompose at all. The scaled-fit surface's cval backstop returns the same literal for double-precision cancellation on a matrix the conditioning criterion **accepted**, so it stays undiagnosed: its condition number is below the floor and would be a figure that is not the reason. D-048's sentence that the `"ill_conditioned"` warning names the condition number is read against the criterion's refusal, the surface it was written about; the backstop shares the literal, not the diagnosis. Recorded here rather than as a superseding D-entry because nothing D-048 decided moves — one clause's scope is now stated where the code states it, at `R/axes_scaled_fit.R` and in `NEWS.md`.
 - 2026-08-22 (review return 1, finding 2, at Jeff's gate choice): a pair is named from the correlation matrix under a threshold read off the criterion — `|r| >= 1 - λmax·sqrt(p·ε/τ)`, the condition under which Cauchy interlacing puts λmin at or below the refusal floor on that pair's account alone — rather than from the smallest eigenvector's dominant loadings. The eigenvector is not well defined in exactly the case the diagnostic exists for: k duplicate pairs give a k-dimensional near-null space and LAPACK returns an arbitrary basis of it, so relabelling one p = 16 matrix moved the old message between naming an arbitrary member pair and naming nothing. Two alternatives were declined: projecting onto the whole near-null eigenspace is basis-free but keeps an underived mass cutoff and still cannot say which of eight identical pairs to drop, and retracting pair-naming altogether would drop RR19 rec 4 and need a second gated amendment narrowing AC5. The cost accepted is that a degeneracy driven by three or more items together names no pair — the message falls back to the conditioning alone, which is what it did before for that case too.
+- 2026-08-23 (RR20 §1): the derivation's order is right and its coefficient is not a constant. The reported corrected SE is a plug-in through the q-dimensional fitted manifold, not a free functional of all p(p+1)/2 moments, so the averaging the objection proposed is structurally unavailable — it caps at about sqrt(q), not sqrt(p(p+1)/2). But the coefficient is a property of the design: measured 0.045 to 1.38 across reachable geometries against the 1/sqrt(2) = 0.707 anchor, by a delta-method driver built on the package's own pricing and confirmed by Monte Carlo, with the small values coming from gradient near-cancellation, which has no floor theorem. Two subsidiary findings: the coefficient is stable at the refusal floor (identical to four digits across a decade of κ on the near-duplicate family), and the correlation-input pricing is right for both user paths.
+- 2026-08-23 (RR20 §2): **δ\* = 1e-4 and τ = 1e-5 stand, on repaired grounds.** Priced under the block's own frame — bias a tenth of the noise, uniformly over geometries, at n = 5e5 — the corrected number is 6.5e-6, which sits at this milestone's plan-gate falsifier. The right reading is that the frame is unsound rather than that τ = 1e-6 was right: the same frame rejects τ = 1e-6 (ratio 0.15 at the worst geometry) and every other finite constant, because the coefficient has no positive floor and the `cormat` path's n has no ceiling. A criterion that must yield a fixed constant cannot rest on a uniform-over-geometries, uniform-over-n noise comparison. The 6.5e-6 corner needs both conservatisms stacked — the worst measured geometry and a sample size 1.7 decades past the published ceiling; each alone stays within a factor of 2 of 1e-4.
+- 2026-08-23 (RR20 §3): the calibration domain is stated, and nothing operational is added. The tenth-margin holds to about n = 5e5 at the anchor coefficient and about 2e4 at the worst measured geometry; parity comes at about 5e7 and 2.1e5 respectively. The exposure is real for the guarantee's wording and academic for the error, on two independent shields — reachable attainment of the error bound is at most 4e-6, so actual errors run about 1e-12, and no circumplex correlation matrix at n above about 1e4 exists in the literature. What must change is the block's present state: it names the unbounded-n direction as binding and then fences nothing.
+- 2026-08-23 (RR20 §4): both n-free cross-checks survive, and one of this milestone's own round-2 findings was wrong. The print-resolution claim is **not** inverted — "at the largest printable SE" already evaluates the channel at its binding endpoint — but it hangs on an unstated premise, that component SEs are bounded by about 0.5 as variance shares of a unit-diagonal matrix. Round-2 finding 14 is corrected here rather than in the Review section that recorded it. The coverage figure is right in percentage points and wrong by 87x read as probability: the transcription from RR19 dropped the word "percentage". Both are one-line repairs, and with the noise channel demoted these two are now the load-bearing supports.
+- 2026-08-23 (RR20 §5, third escalation of this mechanism): removal is rejected again, on IP3's unchanged ground — past the floor the package still cannot certify a number to the target, a finite probe set is not a bound, and the only a-priori estimate a replacement caution could carry is the same 5-to-8-decades-loose envelope. One finding mildly strengthens keeping: the noise yardstick does not collapse where the criterion operates. The a-posteriori per-fit estimator is not rejected but not yet due: D-048's trigger (i) is half-met on this branch's own record, and only the `cval` half is unmeasured. A tighter τ = 2e-6 is available and coherent and was advised against.
+- 2026-08-23 (RR20 §6): seven premises the block uses silently, all to be stated — the fitted-manifold restriction; the SE ≤ 0.5 scale bound; the coverage figure's units and its linearization; normal-theory sampling law, whose bounded-scale deflation is the direction never priced; that a typed n is an independent-observation count, which pairwise-complete or clustered data breaks; that the SE-derived target is extended to the scaling surface's `cval` **by fiat** plus RR19 §3c's measurements, which is the largest of the seven; and that the yardstick is stable at the floor, true but unmeasured until now.
+- 2026-08-23 (RR20 ingest triage): **apply** — rec 1 (rewrite the derivation block, constants unchanged → T10) and rec 2 (measure the `cval` half of trigger (i) → T11). **Reject, per RR20's own reasoning** — rec 4 (an n-dependent target or a runtime warning above some n; it agrees with RR19 §4 rather than reversing it) and rec 5 (removal or retirement of the limb). **Consider, declined by the session** — rec 3 (τ = 2e-6): the reviewer advised against it, both recorded exemplars land the same way either way, and taking it would re-narrow GP2's computable region on a stacked-worst-case argument no user-visible channel can resolve; reopened only by evidence that a reachable geometry attains the error bound. **Recorded, not scheduled** (RR20 B1): the plan-gate falsifier is unsatisfiable as a frame rather than false as a number, so the gate it was written for does not read as failed.
+
 
 ## Review
 
@@ -296,3 +313,5 @@ Reviewed against master at b712a007, unmoved since the branch was cut, so no mer
 - 2026-08-23: gate dispositions on the three maintainer-judgment findings, decided by the session at Jeff's delegation. Finding 12 (unreachable dimnames fallback) and finding 19 (fixtures pinning exact 3-significant-figure condition numbers off a `qr.Q` decomposition) are fixed in the return — both cheap, and 19 is the shape that already cost this branch one ubuntu-only red. Finding 16 (the `cormat` path's unbounded n named as binding and then unfenced) is folded into the escalation rather than fixed or parked: it is the same question as finding 3 — what n the accuracy target is calibrated for and what holds outside it — so settling it blind or deferring it both waste the review.
 - 2026-08-23: escalation chosen at Jeff's gate for findings 3 and 16, on AC1's own `no-oracle` tripwire. The accuracy target and therefore τ are what the answer moves, so the constant is not repaired until the review returns.
 - 2026-08-23: status in-progress→blocked on RB20 (round-2 findings 3 and 16). The brief asks whether the corrected SE's relative sampling SD is correctly priced at `1/sqrt(2(n-1))` when the SE is a functional of all p(p+1)/2 entries of Σ̂, what the answer does to δ* against M106's own 6e-6 falsifier, what n the target is calibrated for and what holds above it, whether the block's two n-free cross-checks survive (both alleged wrong, both reproduced wrong here), and — this mechanism's third escalation, so removal is on the table by rule — whether the answers move RR19 §5's narrow keep, given D-048's reopening trigger (i) is now half-met. Committed on the milestone branch rather than the default branch, since the questions are about code that exists only here.
+- 2026-08-23: RR20 returned and ingested; status blocked→in-progress. It re-ran the committed oracle before measuring anything new (ANCHORS/SWEEP/REACHABLE all PASS, AC4 case 2's construction reproduced at 3.004e-12) and built its own delta-method driver on the package's own pricing, confirmed by Monte Carlo. Constants unchanged; the derivation's grounds move, recorded as D-049 annotating D-048. Recs 1 and 2 became T10 and T11; recs 4 and 5 rejected on the RR's own reasoning; rec 3 (τ = 2e-6) considered and declined by the session. RB20/RR20 archived.
+- 2026-08-23: round-2 finding 14 was wrong and is corrected here rather than in the Review section that recorded it (that section is review's own dated evidence). The print-resolution claim does not invert the relation — "at the largest printable SE" already evaluates the channel at its binding endpoint — it is missing a premise, that component SEs are bounded by about 0.5. Finding 13 stands as recorded: the coverage figure lost the word "percentage" in transcription. Both are repaired under T10.
