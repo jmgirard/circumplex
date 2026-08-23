@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3
-- **Branch/PR:** `m107-skipping-guards`
+- **Branch/PR:** `m107-skipping-guards` / https://github.com/jmgirard/circumplex/pull/136
 
 ## Goal
 
@@ -39,7 +39,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
       the mutation criterion names skips, per that run's own skip listing,
       and no skip in that listing names `rb18-counterexample-b.rds`. Other
       skips in that listing are out of this criterion's reach.
-- [ ] `grep -n 'cairn' tests/testthat/test-axes-scaled-fit.R` returns no line
+- [x] `grep -n 'cairn' tests/testthat/test-axes-scaled-fit.R` returns no line
       also containing `test_path`.
 - [ ] Each of the four relocated assertions is proved to execute under
       `R CMD check` by mutation: with the asserted value altered, that run
@@ -123,3 +123,16 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 - 2026-08-23: T6 — verify slot clean (`devtools::test()`: FAIL 0 / WARN 5 / SKIP 1 / PASS 8520; the one skip is the pre-existing fixture-environment gate at `test-axes-scaled-fit.R:918`). Release check `devtools::check(manual = TRUE)` clean: 0 errors, 0 warnings, 1 NOTE, 8m38s. The NOTE is this machine's check tooling, not the package — `/usr/bin/tidy` is Apple's 2006 build, whose `--version` carries no version triple for R's `.find_tidy_cmd` pattern, and the `V8` package is not installed, so R skips HTML validation and math rendering. Both are present on CRAN's machines; remedy on this Mac is `brew install tidy-html5`, `R_TIDYCMD=/opt/homebrew/bin/tidy` in `~/.Renviron` (needed because `/usr/bin` precedes `/opt/homebrew/bin` on PATH), and `install.packages("V8")`.
 - 2026-08-23: AC1 evidence — a separate clean `R CMD check` of the built tarball, kept so its skip listing is readable (`devtools::check` prints none on a passing run): FAIL 0 / SKIP 153 / PASS 7462. No skip in that listing names `rb18-counterexample-b.rds`, and none of the four sites appears in it; the file's only skips are `:918` (fixture environment), `:966` (vignette source) and `:1140` (R/ sources absent), all outside the four. Two skips still name an absent `cairn/` directory (`test-norms-provenance.R:581,703`) — the deferred sites the amended criterion no longer reaches — and one is the T2 drift guard skipping as designed.
 - 2026-08-23: no NEWS entry — internal tier, exported behaviour unchanged; the deliverable is test coverage under `R CMD check`.
+
+## Review
+
+PR: https://github.com/jmgirard/circumplex/pull/136 (draft; opened at review start).
+Base `master` at `68ada0f8` had not moved since the branch was cut, so no merge
+was needed before gathering evidence.
+
+### Acceptance-criteria evidence
+
+- **AC2 — pass.** `grep -n 'cairn' tests/testthat/test-axes-scaled-fit.R`
+  returns one line, 1605, a prose comment; piping it through `grep test_path`
+  exits 1 (no line). The criterion's promise holds for its own reason: the
+  drift guard that does read `cairn/` lives in a separate file.
