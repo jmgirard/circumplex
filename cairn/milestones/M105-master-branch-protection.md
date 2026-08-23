@@ -94,7 +94,7 @@ entry recording the two-ruleset split and the bypass rationale.
 - [x] T1: write `tools/branch-protection.json` — the two rulesets' intended
       shape, in the field layout `gh api .../rulesets/<id>` returns, so the
       comparison is against the API's own vocabulary rather than a translation.
-- [ ] T2: write `tools/check-branch-protection.R` (base R + `gh`, matching
+- [x] T2: write `tools/check-branch-protection.R` (base R + `gh`, matching
       `tools/check-ci-deps.R`'s shape). A `COMPARED_FIELDS` constant names the
       fields compared — enforcement, target, rule types, required status check
       contexts, bypass actors — and the comparison iterates it, so the constant
@@ -103,10 +103,10 @@ entry recording the two-ruleset split and the bypass rationale.
       unparseable response. Prove the non-zero arm by mutating the committed
       JSON in each `COMPARED_FIELDS` field one at a time, restoring after each,
       and record each mutation's exit status in the work log.
-- [ ] T3: draft the two `gh api --method POST repos/jmgirard/circumplex/rulesets`
+- [x] T3: draft the two `gh api --method POST repos/jmgirard/circumplex/rulesets`
       calls and show them to Jeff for explicit authorization before running
       either — a repository settings change.
-- [ ] T4: on that authorization, create both rulesets; read each back with
+- [x] T4: on that authorization, create both rulesets; read each back with
       `gh api .../rulesets/<id>` and confirm AC1 and AC2 field by field.
 - [ ] T5: add the consistency-gate line to `cairn/PROFILE.md`. It is a
       one-line budget: 119 → 120 is the cap exactly, so the line must fit on
@@ -137,6 +137,9 @@ entry recording the two-ruleset split and the bypass rationale.
 
 - 2026-08-22: T2 — `tools/check-branch-protection.R` written; `COMPARED_FIELDS` holds six fields (enforcement, target, ref_name_include, rule_types, required_status_check_contexts, bypass_actors) and one extractor set projects BOTH sides, so a projection bug cannot make them falsely agree in one direction only. Missing-ruleset arm proved live against the unprotected repo: exit 1, both committed rulesets reported absent.
 - 2026-08-22: minor amendment (task reorder, no criterion touched): T2's six-field mutation battery moves to after T4. While no ruleset exists live the field-comparison loop is unreachable — every mutation would re-print the missing-ruleset message rather than a field mismatch — so the battery can only prove what AC5 claims once T4 has created them. T2 stays unchecked until it runs.
+
+- 2026-08-22: T3/T4 — Jeff authorized both POST calls at the implement gate; rulesets created: `master-destructive` id 21216269, `master-checks` id 21216270. Read-back of each via `gh api .../rulesets/<id>` agrees with the committed intent in every COMPARED_FIELDS field — GitHub normalized nothing, so `tools/branch-protection.json` needed no correction. Checker exits 0 against the live pair.
+- 2026-08-22: T2 battery (run after T4 per the reorder line above) — six mutations of the committed JSON, one per COMPARED_FIELDS field (enforcement→evaluate, target→tag, ref_name_include→refs/heads/master, rule_types minus non_fast_forward, contexts ubuntu release→devel, bypass_mode always→pull_request): every one exits 1 naming exactly the mutated field; JSON restored after each, clean exit-0 pass after restore.
 
 ## Decisions
 
