@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2, GP4
-- **Branch/PR:** `m106-degeneracy-accuracy-target`
+- **Branch/PR:** `m106-degeneracy-accuracy-target` / https://github.com/jmgirard/circumplex/pull/135
 
 ## Goal
 
@@ -45,37 +45,37 @@ M7's own gate.
 
 ## Acceptance criteria
 
-- [ ] AC1 — The comment block beside `axes_degeneracy_tau` derives the largest
+- [x] AC1 — The comment block beside `axes_degeneracy_tau` derives the largest
       relative error a reported corrected SE may carry from the SE's own
       sampling relative standard error, stating every premise the derivation
       rests on; each published result it uses is cited `citekey (p. N)`, or the
       block states in so many words that the derivation uses no published
       source. The same target is restated at `R/axes_reliability.R:720` and
       `:1030`. *(RB tripwire: no-oracle)*
-- [ ] AC2 — `axes_degeneracy_tau` is committed as `δ*/C` = 1e-5, with the
+- [x] AC2 — `axes_degeneracy_tau` is committed as `δ*/C` = 1e-5, with the
       accuracy target δ* = 1e-4 and the calibration ceiling C = 10 named and
       documented beside it as separate quantities, so the constant's stated
       definition and its enforced cap no longer differ by the slack factor.
-- [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× the committed
+- [x] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× the committed
       floor and `"ill_conditioned"` at 0.95×, at p = 3, 12 and 24, and across
       three spectral forms at 0.95×: positive λmin, λmin negative but inside
       `-λmax·sqrt(p·ε)` (still `"ill_conditioned"`), and decisively negative
       (`"indefinite"`).
-- [ ] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
+- [x] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
       different p, straddling the committed threshold (4.3e4 at p = 24):
       one strictly below the committed threshold returns numbers,
       one strictly above returns NA with its reason named, one within a factor
       of 2 of the threshold resolves as AC1's derivation implies. The upper
       cases reach the band through the `axes_fitted_cov` seam, since no
       converged fit is known to (`R/axes_corrected_se.R:444-449`).
-- [ ] AC5 — `axes_reliability(cormat = ...)` on an item set carrying one pair at
+- [x] AC5 — `axes_reliability(cormat = ...)` on an item set carrying one pair at
       r = .9999 returns the outcome AC1's derivation implies, with
       `details$se_correction_failed` and `details$fit_scaling_failed` each
       asserted to the value the derivation states for this input; a second
       near-duplicate radius brackets the committed threshold from the other
       side — and where the refusal does fire, its `"ill_conditioned"` warning
       names κ and the dominant collinear item pair, not a bare reason code.
-- [ ] AC6 — Over the sites
+- [x] AC6 — Over the sites
       `grep -rniE 'tau|accuracy target|double\.eps|kappa' R/ tests/ NEWS.md`
       returns, plus the two comment blocks read whole
       (`R/axes_corrected_se.R:336-398`, `R/axes_scaled_fit.R:245-270`), every
@@ -83,7 +83,7 @@ M7's own gate.
       one stale value planted per spelling class — numeric literal, prose "tau
       floor", derived κ threshold — is caught by that sweep. `cairn/` is
       excluded deliberately: D-044 is superseded, never edited.
-- [ ] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
+- [x] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
       (model-implied, p ≥ 4, including one near-duplicate construction from
       RR19 §3a) with its own pass window asserting attainment stays at least
       three decades below 1; `Rscript devel/degeneracy-oracle/exact_oracle.R`
@@ -166,3 +166,25 @@ M7's own gate.
 - 2026-08-22 (RR19 B3, recorded not scheduled): df is the exposure axis, and the four-scale minimum is what keeps the reachable set out of the fixture's regime. Any future change lowering the minimum scale count must re-run the exact oracle at the new minimum before shipping.
 
 ## Review
+
+**PR:** https://github.com/jmgirard/circumplex/pull/135 · reviewed 2026-08-22 against master at b712a007 (unmoved since the branch was cut, so no merge was needed).
+
+**AC1 — derivation beside the constant, restated at both roxygen sites.** `R/axes_corrected_se.R:386-424` derives the target from the reported SE's own sampling relative SD (`1/sqrt(2(n-1))`, from the chi-square anchor, halved by the delta method), holds the numerical bias to a tenth of it, calibrates at n = 5e5, and names the two n-free cross-checks. It states in so many words that no shelf citekey carries the sampling-SD result rather than citing one it does not have — the criterion's stated alternative. Restated at `R/axes_reliability.R:720-728` and `:1036-1039`.
+
+**AC2 — the constant is the quotient.** Measured under `load_all()`: `delta_star = 1e-4`, `C = 10`, `tau = 1e-5`, and `identical(tau, delta_star/C)` is TRUE. Not a third number that happens to agree.
+
+**AC3 — floor discriminates p and spectral form.** 13 assertions green at p = 3/12/24 across positive-spectrum both sides of the floor, roundoff-level negative, and decisively negative. Teeth shown by four mutants, each red at a different pin family and each restored by copy with the source blob re-hashed to 14cb2a23: floor's p factor dropped; delta_star loosened a decade; indefiniteness band widened 1000x; band narrowed 1000x.
+
+**AC4 — three kappa, three p, straddling the floor.** p = 4 at kappa 1.2e4 (floor 1.06e5) computes; p = 8 at kappa 1.0e5 (floor 7.5e4, ratio 1.33) refuses; p = 24 at kappa 7.2e5 (floor 4.33e4) refuses. All three inside [1e4, 1e7], asserted in-test. The first two reach the criterion through real converged fits; only p = 24 used the `axes_fitted_cov` seam, for the measured reason the criterion allows.
+
+**AC5 — cormat radii and the warning's content.** r = .9999 (kappa 2.87e4) computes with both failure fields NULL; r = .9999714 (kappa 1.01e5) refuses with both fields `"ill_conditioned"`, two warnings, both naming the pair. All four `axes_degeneracy_hint()` branches pinned: conditioning present, pair named in column order, `%g` so .9999714 does not print as 1.0000, dimnames absent falls back to conditioning alone, and a diffuse near-null direction (dominant pair correlating 0.48) makes no collinearity claim.
+
+**AC6 — every site carries the committed value.** The concept-token sweep returns clean. One genuinely stale site was found and fixed (`NEWS.md:65-72`); two prose sites reading "the tau floor" carry no figure and stay true. Planted-defect check, one per spelling class, each caught and restored: numeric literal at `R/axes_reliability.R:1036`, prose `tau = 1e-6` at `R/axes_corrected_se.R:384`, derived threshold at `R/axes_corrected_se.R:352`.
+
+**AC8 — reachable-geometry family in the oracle.** `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS PASS, SWEEP PASS and REACHABLE PASS. Five model-implied cases at p = 4, 8, 9 measure attainment 3.4e-8 to 3.3e-7, independently reproducing RR19 §3a from its stated parameters. The window is live: tightened to 1e-9 the script FAILs and exits 1.
+
+**AC7 — toolchain verify.** `document()` no diff, zero lines matching `resolve link` at `cli.width = 500`. `devtools::test()` FAIL 0 / PASS 8451 / SKIP 3 / WARN 5, the five warnings verified byte-identical on master. `devtools::check(args = "--no-manual")` Status OK, 0/0/0.
+
+**Consistency gate.** `cairn_validate` all checks pass, 48 advisories (47 pre-existing M7 work-log WARNs plus M106's sizing advisory, dispositioned at plan). `pkgdown::check_pkgdown()` no problems. README.Rmd not newer than README.md. No new top-level files. Master watches both green on the newest push run reaching a verdict (809e7d6a); the three `cairn/**`-only commits after it trigger no workflow by design, which is the M105 open remainder, not a new gap. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all exit 0.
+
+**Carried forward, unverified here.** The PDF manual has not been built: this branch changed roxygen and the repo's check command carries `--no-manual`, so `R CMD Rd2pdf` was run deliberately and exits 1 because no TeX binary exists on this machine. Rd-to-LaTeX conversion passed and the diff adds no non-ASCII to `man/`. Needs a machine with TeX, at CI or the release walk.
