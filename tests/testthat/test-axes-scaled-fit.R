@@ -1596,10 +1596,21 @@ test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at t
 
 
 test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 3", {
-  # The committed fixture is repo material, absent from an installed package;
-  # stated plainly because a silent skip is false coverage (the M7 lesson).
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  # Fixture provenance. The file is a list carrying the 3x3 correlation
+  # matrix `S`, the item angles `ia`, the two observed reasons, and
+  # kappa = 6.65e6. Source: the RB18 brief's random search over
+  # near-collinear 3x3 correlation matrices at randomly drawn angles,
+  # keeping only draws the criterion accepted.
+  # NO GENERATOR AND NO SEED -- the search seed was never recorded, so
+  # nothing regenerates this matrix, and it cannot be rewritten as code
+  # either: dput() round-tripping loses the last bits and the case flips to
+  # NULL. The bytes ARE the artifact, which is why it is committed and read
+  # from the package's own fixtures directory -- so these assertions run
+  # under R CMD check instead of skipping there (M107; the M7 lesson said a
+  # silent skip is false coverage, and until M107 this site was one).
+  # The copy under the repo's cairn/reviews/ is the record of record;
+  # test-fixture-drift.R fences the two against each other.
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   S <- fx$S
 
@@ -1658,8 +1669,7 @@ test_that("M90 AC5: the one recorded negative-cval matrix is refused by the crit
   # doubles (true cval +0.0556, RR18), and the degeneracy criterion -- not
   # the backstop -- is what refuses it. Asserted at the criterion itself, so
   # the refusal's identity is pinned, not inferred from a shared literal.
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 })
@@ -1677,8 +1687,7 @@ test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRI
   # no accepted input reaching (never "unreachable"; see the backstop
   # comment). Under the stub the backstop is the only remaining site in this
   # function that can emit this literal, so the assertion is site-exclusive.
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   testthat::local_mocked_bindings(
     axes_sigma_degenerate = function(sigma) NULL
@@ -2082,8 +2091,7 @@ test_that("M106 AC2: the near-duplicate geometry computes and the RR18 fixture s
   expect_lt(m106_kappa(near), 3.0e4)
   expect_null(axes_sigma_degenerate(near))
 
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp))
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 })

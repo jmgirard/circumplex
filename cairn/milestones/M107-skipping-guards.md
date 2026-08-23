@@ -1,11 +1,11 @@
 # M107: Make the exemplar-B guards run in the gate that ships a release
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3
-- **Branch/PR:** —
+- **Branch/PR:** `m107-skipping-guards`
 
 ## Goal
 
@@ -62,7 +62,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 
 ## Tasks
 
-- [ ] **T1** — Copy the fixture to `tests/testthat/fixtures/`; repoint the
+- [x] **T1** — Copy the fixture to `tests/testthat/fixtures/`; repoint the
       four sites to `test_path("fixtures", ...)`; drop their
       `skip_if_not(file.exists(...))` guards, which no longer have anything
       to guard.
@@ -108,3 +108,4 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
   falsified by evidence that a skipped source-tree read in the norms-audit or
   vignette families hides a shipped-behaviour defect, which would make the
   survey urgent rather than deferred.
+- 2026-08-23: T1 — fixture copied to `tests/testthat/fixtures/`, four sites repointed to `test_path("fixtures", ...)`, their absence guards dropped; suite FAIL 0 / SKIP 3 / PASS 8509, none of the three skips an absent fixture.

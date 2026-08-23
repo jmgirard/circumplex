@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M106 | Price the degeneracy refusal region on a stated statistical argument | done | — | high | milestones/archive/M106-degeneracy-accuracy-target.md |
-| M107 | Make the exemplar-B guards run in the gate that ships a release | planned | — | high | milestones/M107-skipping-guards.md |
+| M107 | Make the exemplar-B guards run in the gate that ships a release | in-progress | — | high | milestones/M107-skipping-guards.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
 | M105 | Give master GitHub-native branch protection | done | — | normal | milestones/archive/M105-master-branch-protection.md |
 | M104 | Graduate the matured verification-craft families out of LESSONS.md | done | — | normal | milestones/archive/M104-lessons-retirement-pass.md |
