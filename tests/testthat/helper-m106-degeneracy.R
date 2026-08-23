@@ -77,3 +77,27 @@ m106_family_c <- function(eps, xi1 = 0.3, xi2 = 0.3) {
 
 # The criterion's own floor, for locating a construction relative to it.
 m106_floor_kappa <- function(p) sqrt(axes_degeneracy_tau / (p * .Machine$double.eps))
+
+# A closed-form orthonormal basis (the DCT-II basis), used where a test needs
+# a matrix whose defect is not axis-aligned. `qr.Q(qr(...))` would do the same
+# job, but it is a pivoting LAPACK call on a rank-deficient integer matrix, so
+# any figure read off the result is BLAS-dependent in principle (M106 review
+# round 2, F19). This basis is arithmetic.
+m106_orthobasis <- function(p) {
+  k <- seq_len(p) - 1
+  q <- outer(seq_len(p) - 0.5, k, function(i, j) cos(pi * j * i / p))
+  q %*% diag(1 / sqrt(colSums(q^2)), p, p)
+}
+
+# One eigenvalue planted at a chosen (possibly negative) value, the rest at 1,
+# rotated out of the coordinate axes.
+m106_planted <- function(p, lambda_min) {
+  q <- m106_orthobasis(p)
+  s <- q %*% diag(c(rep(1, p - 1L), lambda_min), p, p) %*% t(q)
+  s <- (s + t(s)) / 2
+  dimnames(s) <- list(paste0("i", seq_len(p)), paste0("i", seq_len(p)))
+  s
+}
+
+# The M90 indefiniteness band, in units of lambda_max.
+m106_band <- function(p) sqrt(p * .Machine$double.eps)

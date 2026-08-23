@@ -38,8 +38,8 @@ py <- file.path("devel", "degeneracy-oracle", "exact_oracle.py")
 # `df` and `baseline_df` are arguments rather than reads of the globals above.
 # The globals are the p = 3 FIXTURE's counts; every other case has its own, and
 # EXACT_CVAL divides by df, so a case priced under the fixture's counts would
-# report a cval for a model it is not. Nothing reads EXACT_CVAL outside the
-# fixture today -- these are the counts a line that starts to would need.
+# report a cval for a model it is not. The reachable family below does read
+# EXACT_CVAL, at each case's own counts (M106 T11).
 hex_dump <- function(S, mats, n_comp, df, baseline_df) {
   f <- tempfile(fileext = ".txt")
   h <- function(v) paste(sprintf("%a", as.numeric(v)), collapse = " ")
@@ -92,27 +92,32 @@ dbl_sf <- suppressWarnings(
                       df = DF, baseline_df = BASELINE_DF)
 )
 
+# The cval the shipped double-precision code computes BEFORE its refusal
+# discards it. axes_scaling_factor() returns a reason and no number wherever
+# the criterion trips, so a refused case has no other route to the double
+# value being priced (M106 T11). Same arithmetic as R/axes_scaled_fit.R's.
+double_cval <- function(S, d, df) {
+  si <- solve(S); sim <- lapply(d$mats, function(m) si %*% m)
+  q <- length(sim)
+  info <- matrix(0, q, q)
+  for (s in seq_len(q)) for (t in s:q)
+    info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
+  acov <- solve(info)
+  up <- upper.tri(S); rho <- S[up]
+  tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
+  ys <- lapply(sim, function(sm) {
+    w <- 0.5 * sm %*% si
+    diag(w) <- diag(w) - diag(S %*% w)
+    w %*% S
+  })
+  b <- matrix(0, q, q)
+  for (s in seq_len(q)) for (t in s:q)
+    b[s, t] <- b[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
+  (tr_vg - sum(acov * b)) / df
+}
+
 cat(sprintf("\ncval   exact %+.12g | double %+.12g | shipped reason: %s\n",
-            ex[["EXACT_CVAL"]], (function() {
-              # the double value the shipped code computes, before its refusal
-              si <- solve(S); sim <- lapply(d$mats, function(m) si %*% m)
-              q <- length(sim)
-              info <- matrix(0, q, q)
-              for (s in seq_len(q)) for (t in s:q)
-                info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
-              acov <- solve(info)
-              up <- upper.tri(S); rho <- S[up]
-              tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
-              ys <- lapply(sim, function(sm) {
-                w <- 0.5 * sm %*% si
-                diag(w) <- diag(w) - diag(S %*% w)
-                w %*% S
-              })
-              b <- matrix(0, q, q)
-              for (s in seq_len(q)) for (t in s:q)
-                b[s, t] <- b[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
-              (tr_vg - sum(acov * b)) / DF
-            })(),
+            ex[["EXACT_CVAL"]], double_cval(S, d, DF),
             if (is.null(dbl_sf$reason)) "NULL" else dbl_sf$reason))
 cat(sprintf("       the exact value is POSITIVE: the refusal is a cancellation sign-flip\n"))
 cat(sprintf("       (exact tr_vg %.10g - proj %.10g; amplification %.4g)\n",
@@ -211,7 +216,7 @@ near_duplicate_family <- function(pair_eps, xi1 = 0.3, xi2 = 0.2,
 }
 
 cat("\n== M106 reachable-geometry family: is the bound decades LOOSE here? ==\n")
-cat("  construction                p     kappa(R)     rel.err     bound        ratio\n")
+cat("  construction                p     kappa(R)     rel.err     bound        ratio     cval rel.err\n")
 reach_ok <- TRUE
 reach_cases <- list(
   list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-4, 1L)),
@@ -237,15 +242,22 @@ for (cs in reach_cases) {
   # would never fit, which is not the reachable geometry this family claims.
   zr <- axes_fits_zeta1(split(seq_along(g$scale), g$scale))
   dr <- axes_se_derivs(g$ang, g$scale, NULL, zr, FALSE)
-  exr <- exact(g$S, dr, df_of(g$S, dr), baseline_df_of(g$S))
+  dfr <- df_of(g$S, dr)
+  exr <- exact(g$S, dr, dfr, baseline_df_of(g$S))
   dtr <- axes_se_pricing(g$S, dr, N)$corrected
   exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)
   rel <- max(abs(exv - dtr) / abs(exv))
   bnd <- pr * kappa_of(g$S)^2 * .Machine$double.eps
   rat <- rel / bnd
+  # The SCALING surface's own quantity, measured at each case's own df (M106
+  # T11). The SE target is extended to cval by fiat (see the premises beside
+  # axes_degeneracy_tau), so what that extension costs is only visible if cval
+  # is priced against the exact oracle in the same reachable geometries.
+  cvr <- abs(exr[["EXACT_CVAL"]] - double_cval(g$S, dr, dfr)) /
+    abs(exr[["EXACT_CVAL"]])
   reach_ok <- reach_ok && rat <= REACHABLE_WINDOW
-  cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e\n",
-              cs$lbl, pr, kappa_of(g$S), rel, bnd, rat))
+  cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e   %9.3e\n",
+              cs$lbl, pr, kappa_of(g$S), rel, bnd, rat, cvr))
 }
 
 cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\n",

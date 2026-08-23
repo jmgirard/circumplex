@@ -83,7 +83,9 @@ that correction succeeded or a string naming why the reported SEs are
 (smallest eigenvalue relative to largest at or below
 \code{sqrt(p * .Machine$double.eps / 1e-5)}, evaluated on \code{cov2cor()} of the
 fitted covariance matrix, where the \code{1e-5} is the \code{1e-4} accuracy target
-divided by the criterion's factor-of-\code{10} calibration ceiling):
+divided by the criterion's factor-of-\code{10} calibration ceiling, and the
+target's noise-dominance reading is calibrated for \code{n} up to about
+\code{5e5}):
 \code{"indefinite"} for a decisively negative
 smallest eigenvalue
 (below \code{-lambda_max * sqrt(p * .Machine$double.eps)}), a
@@ -221,10 +223,15 @@ eigenvalue, relative to its largest, falls at or below
 largest relative error a reported standard error may carry, divided by the
 factor of \code{10} by which the criterion's error bound may undershoot the error
 it stands for. Past the floor a reported standard error could carry relative
-error above the target. The accuracy target is derived from the standard
-error's own sampling variability, so a numerical error at the target is a
-tenth of the statistical noise already in the number; the derivation and its
-premises are stated beside the constant in the source. The refusal
+error above the target. The accuracy target is set from two channels that
+do not depend on the sample size -- the resolution the standard errors are
+printed at, and the coverage of a nominal 95\% Wald interval -- and is
+corroborated by a third, the standard error's own sampling variability,
+under which a numerical error at the target is about a tenth of the
+statistical noise already in the number for a typical design at
+\code{n} up to about \code{5e5}. Above that the guarantee is the fixed target alone,
+not noise dominance. The derivation and its seven premises are stated beside
+the constant in the source. The refusal
 says which degeneracy happened: \code{"indefinite"} when the smallest
 eigenvalue is decisively negative (below
 \code{-lambda_max * sqrt(p * .Machine$double.eps)} -- beyond the fit's own

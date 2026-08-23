@@ -722,10 +722,15 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' largest relative error a reported standard error may carry, divided by the
 #' factor of `10` by which the criterion's error bound may undershoot the error
 #' it stands for. Past the floor a reported standard error could carry relative
-#' error above the target. The accuracy target is derived from the standard
-#' error's own sampling variability, so a numerical error at the target is a
-#' tenth of the statistical noise already in the number; the derivation and its
-#' premises are stated beside the constant in the source. The refusal
+#' error above the target. The accuracy target is set from two channels that
+#' do not depend on the sample size -- the resolution the standard errors are
+#' printed at, and the coverage of a nominal 95% Wald interval -- and is
+#' corroborated by a third, the standard error's own sampling variability,
+#' under which a numerical error at the target is about a tenth of the
+#' statistical noise already in the number for a typical design at
+#' `n` up to about `5e5`. Above that the guarantee is the fixed target alone,
+#' not noise dominance. The derivation and its seven premises are stated beside
+#' the constant in the source. The refusal
 #' says which degeneracy happened: `"indefinite"` when the smallest
 #' eigenvalue is decisively negative (below
 #' `-lambda_max * sqrt(p * .Machine$double.eps)` -- beyond the fit's own
@@ -1035,7 +1040,9 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   (smallest eigenvalue relative to largest at or below
 #'   `sqrt(p * .Machine$double.eps / 1e-5)`, evaluated on `cov2cor()` of the
 #'   fitted covariance matrix, where the `1e-5` is the `1e-4` accuracy target
-#'   divided by the criterion's factor-of-`10` calibration ceiling):
+#'   divided by the criterion's factor-of-`10` calibration ceiling, and the
+#'   target's noise-dominance reading is calibrated for `n` up to about
+#'   `5e5`):
 #'   `"indefinite"` for a decisively negative
 #'   smallest eigenvalue
 #'   (below `-lambda_max * sqrt(p * .Machine$double.eps)`), a

@@ -2066,11 +2066,15 @@ test_that("AC2: the scaling factor refuses as 'unidentified' when the model's de
 # --- M106: the recalibrated accuracy target ----------------------------------
 
 test_that("M106 AC2: the near-duplicate geometry computes and the RR18 fixture still refuses", {
-  # The regression pinning the recalibration (RR19 rec 1). Under the pre-M106
-  # tau = 1e-6 the first assertion FAILS: r = .9999 reaches kappa 2.87e4,
-  # above that floor's 1.37e4-at-p-24 threshold, and was refused -- though its
-  # corrected SEs are accurate to 2.0e-13 (RR19 s3a). Under tau = 1e-5 it
-  # computes. The second assertion holds under both and is the guard against
+  # The regression pinning the recalibration (RR19 rec 1). The tau-sensitive
+  # assertion is the FOURTH, expect_null(axes_sigma_degenerate(near)): the
+  # three before it are properties of the matrix, which no value of tau moves.
+  # Under the pre-M106 tau = 1e-6 that fourth one FAILS -- r = .9999 reaches
+  # kappa 2.87e4, above the 2.24e4 threshold that floor sets AT THIS p = 9
+  # (the p = 24 figure, 1.37e4, is a different matrix's), and the geometry was
+  # refused though its corrected SEs are accurate to 2.0e-13 (RR19 s3a). Under
+  # tau = 1e-5 the p = 9 threshold is 7.07e4 and it computes.
+  # The fifth assertion holds under both and is the guard against
   # over-loosening: counterexample B is a MEASURED silent wrong number (SEs
   # 3.4% off with reason NULL under the pre-M89 floor), so no recalibration may
   # admit it.
@@ -2097,8 +2101,12 @@ test_that("M106 AC5: the refusal warning names the conditioning and the collinea
   expect_match(msg, "(r = 0.999971)", fixed = TRUE)
   expect_match(msg, "consider dropping one", fixed = TRUE)
 
-  # No dimnames: the conditioning alone. A position is an index into the priced
-  # matrix, which is not what a user acts on.
+  # No dimnames: the conditioning alone. Not a user-facing choice -- neither
+  # call site can reach it, since both stop() on a dimnames-less matrix and
+  # realign to `item_names` before the hint runs (M106 review round 2, F12).
+  # The guard stays because a helper that indexes `nms` must not index NULL,
+  # and it is pinned here so the fallback is a stated behaviour of the helper
+  # rather than an accident of how the callers happen to be written today.
   anon <- near
   dimnames(anon) <- NULL
   expect_identical(axes_degeneracy_hint(anon), "condition number 1.01e+05")
@@ -2107,11 +2115,17 @@ test_that("M106 AC5: the refusal warning names the conditioning and the collinea
   # the correlations the threshold is stated in -- the largest is 0.934, well
   # under this p's cut of 0.99997, so no pair forces the refusal on its own and
   # no collinearity claim is made.
+  # Built arithmetically from its own near-null direction rather than by
+  # rotating with qr.Q(qr(...)): this assertion reads an exact
+  # three-significant-figure condition number off the result, and a pivoting
+  # LAPACK call on a rank-deficient integer matrix is BLAS-dependent in
+  # principle (M106 review round 2, F19). Same figures as the superseded
+  # construction to every digit either pinned or quoted -- top-2 mass 0.9658,
+  # largest correlation 0.9339, condition number 1.03e+09.
   p <- 12L
-  e <- rep(1, p); e[p] <- 1e-9
-  q <- qr.Q(qr(matrix(seq_len(p * p) %% 7 + 1, p, p)))
-  diffuse <- q %*% diag(e) %*% t(q)
-  diffuse <- stats::cov2cor((diffuse + t(diffuse)) / 2)
+  w <- c(1, -1, rep(0.0841, p - 2L))
+  w <- w / sqrt(sum(w^2))
+  diffuse <- stats::cov2cor(diag(p) - (1 - 1e-9) * outer(w, w))
   dimnames(diffuse) <- list(paste0("v", seq_len(p)), paste0("v", seq_len(p)))
   expect_gt(max(abs(diffuse[upper.tri(diffuse)])), 0.9)
   expect_lt(max(abs(diffuse[upper.tri(diffuse)])), 0.99)
@@ -2182,6 +2196,17 @@ test_that("M106 review F2: the named pairs do not depend on the eigensolver's ba
     expect_match(axes_degeneracy_hint(dup[pm, pm]),
                  "8 item pairs are nearly collinear", fixed = TRUE, label = k)
   }
+
+  # Row-then-column order, discriminated from the column-major order
+  # `which(arr.ind = TRUE)` walks in: pairs at (2,3) and (1,4) come out
+  # (2,3) then (1,4) column-major, and (1,4) then (2,3) here.
+  ord <- diag(6L)
+  ord[2L, 3L] <- ord[3L, 2L] <- 1
+  ord[1L, 4L] <- ord[4L, 1L] <- 1
+  dimnames(ord) <- list(paste0("i", 1:6), paste0("i", 1:6))
+  expect_identical(axes_sigma_degenerate(ord), "ill_conditioned")
+  expect_match(axes_degeneracy_hint(ord), "(i1 and i4, i2 and i3)",
+               fixed = TRUE)
 
   # And the same construction at three items per scale: 8 triplets are 24
   # pairs, not 8 -- the count tracks the matrix, not the block structure.
@@ -2270,6 +2295,46 @@ test_that("M106 review F1: only the ill-conditioning refusal carries the diagnos
 })
 
 
+test_that("M106 review round 2 F1: a nonpositive smallest eigenvalue reports no condition number", {
+  # Gating the hint on the "ill_conditioned" literal does NOT bound lambda_min
+  # below by zero: M90 files roundoff-level negativity under that same literal,
+  # so the round-1 repair narrowed the symptom rather than closing it.
+  # Measured before this repair, on the exact spectral form M106 AC3
+  # enumerates: "condition number -7.75e+07" at p = 3, "-3.87e+07" at p = 12,
+  # "-2.74e+07" at p = 24, and "Inf" for an exactly collinear pair.
+  for (p in c(3L, 12L, 24L)) {
+    s <- m106_planted(p, -m106_band(p) * 0.5)
+    lab <- sprintf("p %d, roundoff-level negative", p)
+    # The precondition: this really is the criterion's ill-conditioning arm.
+    expect_identical(axes_sigma_degenerate(s), "ill_conditioned", label = lab)
+    msg <- axes_degeneracy_hint(s)
+    expect_no_match(msg, "condition number", fixed = TRUE, label = lab)
+    expect_match(msg, "numerically rank-deficient", fixed = TRUE, label = lab)
+  }
+
+  # lambda_min EXACTLY zero -- an exactly collinear pair -- takes the same
+  # branch, where the ratio would be Inf. The pair is still named: this is the
+  # case the pair-naming exists for, so the clause must survive the swap.
+  ex <- diag(4L)
+  ex[1L, 2L] <- ex[2L, 1L] <- 1
+  dimnames(ex) <- list(paste0("i", 1:4), paste0("i", 1:4))
+  expect_identical(axes_sigma_degenerate(ex), "ill_conditioned")
+  msg <- axes_degeneracy_hint(ex)
+  expect_no_match(msg, "condition number", fixed = TRUE)
+  expect_no_match(msg, "Inf", fixed = TRUE)
+  expect_match(msg, "numerically rank-deficient", fixed = TRUE)
+  expect_match(msg, "items i1 and i2 are nearly collinear (r = 1)", fixed = TRUE)
+
+  # And the positive-spectrum arm is untouched: a condition number is reported
+  # wherever one exists, so the swap is keyed to the spectrum and not to the
+  # presence of a collinear pair.
+  pos <- m106_planted(6L, 1e-9)
+  expect_identical(axes_sigma_degenerate(pos), "ill_conditioned")
+  expect_match(axes_degeneracy_hint(pos), "condition number", fixed = TRUE)
+  expect_no_match(axes_degeneracy_hint(pos), "rank-deficient", fixed = TRUE)
+})
+
+
 test_that("M106 AC5: both cormat radii resolve as the recalibrated target implies", {
   skip_if_not_installed("lavaan")
   oct <- octants()
@@ -2348,11 +2413,11 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
   expect_true(res8$details$converged)
 
   # Case 3 -- p = 24, three items per octant scale. kappa 7.2e5 against a floor
-  # of 4.33e4: strictly above, refused. This one CANNOT reach the criterion
-  # through a real fit -- lavaan does not converge on it, measured -- so it is
-  # injected at the axes_fitted_cov seam, which exists for exactly this
-  # (R/axes_corrected_se.R: no converged fit is known to reach the degenerate
-  # regime).
+  # of 4.33e4: strictly above, refused. This construction cannot reach the
+  # criterion through a real fit -- lavaan does not converge on it, measured
+  # here on 2026-08-23 and not assumed of fits in general (case 2 above IS a
+  # converged fit at kappa 1.0e5) -- so it is injected at the axes_fitted_cov
+  # seam, which exists for exactly that.
   r24_bad <- m106_family_a(1e-5, per_scale = 3L)
   expect_gt(m106_kappa(r24_bad), m106_floor_kappa(24L))
 
