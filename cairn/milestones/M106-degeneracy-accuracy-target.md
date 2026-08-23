@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** planned
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -117,6 +117,7 @@ M7's own gate.
 - 2026-08-22: plan gate chose loosening-is-live over assuming τ is already right because the two recorded exemplars leave a ~3-decade τ window in which the near-duplicate computes and RR18's exemplar still refuses; falsified by a derivation whose target lands at or below 6e-6.
 - 2026-08-22: plan gate chose deriving τ from the SE's own sampling variability over keeping τ and rewording the refusal, because a refusal message cannot make a defensible analysis computable (GP2); falsified by evidence that every κ in the reopened band is a design defect rather than a usable fit.
 - 2026-08-22: plan gate chose pre-build Fable escalation over letting implement offer it, at Jeff's choice, so the constant and its tests are built against a reviewed target; falsified by the RR returning no argument the session could not have reached.
+- 2026-08-22: status planned→blocked on RB19 (T1); the accuracy target the constant and its tests are built against comes from that review.
 
 ## Decisions
 
