@@ -48,7 +48,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
       68ada0f8:tests/testthat/test-axes-scaled-fit.R | grep -n
       'test_path("\.\.", "\.\.", "cairn"'`, each with the assertion in the
       `test_that` block containing it.
-- [ ] In one `devtools::test()` run, that run's own skip listing contains no
+- [x] In one `devtools::test()` run, that run's own skip listing contains no
       skip whose reason names `lav_fit_cfi` being uncallable, and the three
       comparisons execute.
 - [ ] The helper's older-spelling fallback is exercised by a test that fails
@@ -136,3 +136,11 @@ was needed before gathering evidence.
   returns one line, 1605, a prose comment; piping it through `grep test_path`
   exits 1 (no line). The criterion's promise holds for its own reason: the
   drift guard that does read `cairn/` lives in a separate file.
+- **AC4 — pass.** A fresh `devtools::test()` run at `52b251be`:
+  FAIL 0 / WARN 5 / SKIP 1 / PASS 8520. The run's skip listing has exactly one
+  entry, `test-axes-scaled-fit.R:918` ("fixture was generated under a different
+  R or lavaan version") — the pre-existing M68 environment gate. No skip names
+  `lav_fit_cfi`. The two `skip_if()` calls guarding the comparisons (lines 532
+  and 1235) therefore did not fire, so all three comparisons — `got$fit$cfi`
+  vs `r1`, `got2$fit$cfi` vs `r2`, and `res$fit$cfi` vs `ref` — executed and
+  passed against lavaan 0.7.2.
