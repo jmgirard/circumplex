@@ -1,11 +1,11 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2, GP4
-- **Branch/PR:** —
+- **Branch/PR:** `m106-degeneracy-accuracy-target`
 
 ## Goal
 
@@ -135,6 +135,7 @@ M7's own gate.
 - 2026-08-22: AC/task amendment after the RR19 ingest, at Jeff's gate choice. AC2 restated as δ*/C with both quantities named (the review found the old wording's definition and enforced cap differed by the slack factor); AC4's literal band re-centred on the new 4.3e4 threshold; AC5 absorbed RR19 rec 4 (the warning names κ and the collinear pair) rather than taking a ninth criterion; AC8/T8 added for rec 5's reachable-geometry oracle family.
 - 2026-08-22: gate chose folding rec 4 into AC5 over a separate criterion because both test the same input path at the same geometry, and a ninth criterion would trip the sizing tripwire into a split the work does not need; falsified by the warning work turning out to need its own fixture family.
 - 2026-08-22: `cairn_validate` sizing advisory notes 8 acceptance criteria against the >7 tripwire. Not split: AC7 is the profile's mandated verify criterion rather than scope, so the substantive count is 7, and separating AC8's oracle family would ship the recalibration without the reachable-geometry evidence that justifies its calibration ceiling. Tasks are 8 of a 10 tripwire.
+- 2026-08-22: status planned→in-progress on branch `m106-degeneracy-accuracy-target`, cut from master at b712a007.
 
 ## Decisions
 
