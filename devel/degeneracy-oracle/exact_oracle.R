@@ -157,8 +157,9 @@ for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
 # future change puts a reachable design into B's coupling regime, this is what
 # reddens.
 #
-# The window is three decades below 1, against measured attainment of 1e-9 to
-# 1e-6 -- deliberately three to five decades looser than anything measured,
+# The window is three decades below 1. Running this script on 2026-08-22
+# measured attainment across the five cases below at 6.8e-8 to 3.8e-7, so 1e-3
+# sits three to four decades looser than anything measured -- deliberately,
 # because a bar set at the measured value is a bar calibrated on one machine.
 REACHABLE_WINDOW <- 1e-3
 
@@ -216,7 +217,14 @@ reach_cases <- list(
 for (cs in reach_cases) {
   g <- cs$g
   pr <- nrow(g$S)
-  dr <- axes_se_derivs(g$ang, g$scale, NULL, FALSE, FALSE)
+  # zeta1 is read off the case's own item map with the package's own predicate,
+  # never inherited from the p = 3 fixture's FIT_ZETA1 above. The near-duplicate
+  # cases put two items on scale 1, so axes_fits_zeta1() is TRUE for them and
+  # the exported path fits a scale-specificity component the fixture's model
+  # does not have; pricing them at FALSE measured a model axes_reliability()
+  # would never fit, which is not the reachable geometry this family claims.
+  zr <- axes_fits_zeta1(split(seq_along(g$scale), g$scale))
+  dr <- axes_se_derivs(g$ang, g$scale, NULL, zr, FALSE)
   exr <- exact(g$S, dr)
   dtr <- axes_se_pricing(g$S, dr, N)$corrected
   exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)

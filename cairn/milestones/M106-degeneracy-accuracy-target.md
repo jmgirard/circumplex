@@ -123,6 +123,9 @@ M7's own gate.
       §3a's stated constructions, with its own pass window.
 - [x] T7 — If τ moved: superseding `DECISIONS.md` entry against D-044. Then
       `document()`, `test()`, `check()`.
+- [ ] T9 — Work review return 1: the fix-dispositioned findings, the AC3
+      amendment, and the ubuntu-only CI repair. Re-run `document()`, `test()`,
+      `check()`.
 
 ## Work log
 
@@ -219,3 +222,4 @@ M7's own gate.
 - **F16.** The AC2 over-loosening guard reads a `.Rbuildignore`d fixture, so only the loosening half runs under `R CMD check`. Pre-existing pattern, but it now guards a τ that just moved. → **candidate row**
 - **F17 (open question, for the maintainer).** This branch may ship half of D-048's own reopening trigger (i): AC4 case 2 is refused through a converged fit while the new oracle measures the identical construction at rel.err 3.0e-12, eight decades inside δ* = 1e-4. Only the cval half is missing, and F4 is why. → **maintainer decision**
 - **F18, F19.** Confirmations, no action: AC6's sweep re-verified clean, AC2's arithmetic reproduced (δ* = 0.1/sqrt(2·(5e5−1)) = 1.0e-4; thresholds 43318.6 / 75030.0 / 106108.4 at p = 24/8/4), the `hint = NULL` threading behaviour-preserving for every non-degeneracy refusal, M71 and M89 contracts untouched, no reachable error path in the helper, no NAMESPACE/DESCRIPTION drift, no RNG use.
+- 2026-08-22: T9 opened for return 1; minor plan refinement, no criteria touched. Finding 3 fixed first: the oracle's reachable cases now read `fit_zeta1` off each case's own item map with `axes_fits_zeta1()` instead of inheriting the p = 3 fixture's FALSE. The two near-duplicate cases put two items on scale 1, so they were priced under a model the exported path would not fit; re-measured, their attainment moves 5.47e-8 → 3.82e-7 and 3.41e-8 → 6.82e-8, reproducing the review's own re-measurement. Finding 12 fixed with it — the window comment claimed attainment "1e-9 to 1e-6" against a script that prints 6.8e-8 to 3.8e-7, now stated as measured and pinned to this script and date. `exact_oracle.R` exits 0, ANCHORS/SWEEP/REACHABLE all PASS.
