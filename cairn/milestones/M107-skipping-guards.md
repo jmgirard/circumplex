@@ -66,7 +66,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
       four sites to `test_path("fixtures", ...)`; drop their
       `skip_if_not(file.exists(...))` guards, which no longer have anything
       to guard.
-- [ ] **T2** — Drift guard: when `cairn/reviews/rb18-counterexample-b.rds` is
+- [x] **T2** — Drift guard: when `cairn/reviews/rb18-counterexample-b.rds` is
       present, assert the packaged copy is byte-identical to it. This guard
       legitimately skips under `R CMD check` — it fences the `cairn/` record,
       not shipped behaviour — and says so in place.
@@ -109,3 +109,4 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
   vignette families hides a shipped-behaviour defect, which would make the
   survey urgent rather than deferred.
 - 2026-08-23: T1 — fixture copied to `tests/testthat/fixtures/`, four sites repointed to `test_path("fixtures", ...)`, their absence guards dropped; suite FAIL 0 / SKIP 3 / PASS 8509, none of the three skips an absent fixture.
+- 2026-08-23: T2 — drift guard added as `tests/testthat/test-fixture-drift.R`, comparing raw bytes and skipping when the tracking record is absent; kept out of `test-axes-scaled-fit.R` so that file names `cairn` nowhere (AC2 passes for its own reason, not by splitting a line). Mutation-proved: flipping the packaged copy's last byte reddens the byte-identity assertion at line 30 naming bytes 243-246; restored, it passes. Suite FAIL 0 / SKIP 3 / PASS 8511.
