@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-23 (M106 archived; its row and M7's dependency updated, the oldest terminal row pruned to the 5-row cap, one round-4 finding absorbed into the M106 candidate row. 58 lines. The graduate-or-prune pass earlier stamps call for is still owed — Jeff's call.)_
+_Last hygiene check: 2026-08-23 (second same-day pass; only 8773945c since. Validator green. Caps nearly full: ROADMAP 58/60 lines and ~24,000 bytes, PROFILE 119/120, LESSONS 45/50 — the next candidate row breaches the byte budget, so graduate-or-prune is owed before it.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
