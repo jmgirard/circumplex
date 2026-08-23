@@ -345,7 +345,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # matrix is refused. One inequality carries three spectral cases -- a
 # negative smallest eigenvalue (lambda_min <= 0 < lambda_max), exact
 # singularity (lambda_min = 0), and mere ill-conditioning
-# (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4 at p = 24) --
+# (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 4.3e4 at p = 24) --
 # and since M90 the refusal's LITERAL is decided by depth, not by case:
 # "indefinite" only where the negativity is decisive, "ill_conditioned" for
 # everything else including roundoff-level negativity; the partition and
@@ -377,25 +377,89 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # WHY THIS CUTOFF: the corrected branch builds the information matrix
 # Delta'V Delta from the priced matrix's INVERSE twice, so its entries carry a
 # relative error growing like p * kappa^2 * eps; the floor is where that bound
-# reaches the accuracy target tau. The shipped sqrt(p*eps) floor -- tau = 1 in
-# these terms -- was a thousand times looser: it accepted the committed
-# exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which the
-# reported corrected SEs were wrong by 3.4% with reason NULL, the package's
+# reaches the accuracy target. The shipped sqrt(p*eps) floor -- no target at
+# all, in these terms -- was a hundred thousand times looser: it accepted the
+# committed exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which
+# the reported corrected SEs were wrong by 3.4% with reason NULL, the package's
 # first measured silent wrong number in this subsystem (RR18).
 #
-# THE ACCURACY TARGET tau: the largest relative error tolerated in a reported
-# corrected SE before the matrix is refused instead. Calibrated against the
-# exact-rational oracle (devel/degeneracy-oracle/): its Q4 sweep measures the
-# double-precision SE relative error to sit within a factor of 10 of
-# p * kappa(cov2cor(Sigma-hat))^2 * eps (ratios 3.28/2.4/1.27 across three
-# decades of kappa, M89 T1), so refusing when that bound exceeds tau -- i.e.
-# when lambda_min/lambda_max <= sqrt(p*eps/tau) -- caps the error a computed
-# answer can carry at ~10*tau = 1e-5 relative, far below anything a reported
-# SE's downstream use can resolve. The committed counterexample
-# cairn/reviews/rb18-counterexample-b.rds sits at 3.4% relative error
-# (RR18/M89): three orders past any defensible target, and one the shipped
-# sqrt(p*eps) floor -- tau = 1, in these terms -- accepted with reason NULL.
-axes_degeneracy_tau <- 1e-6
+# THE TARGET AND THE CEILING (M106, RR19). Two documented quantities stand
+# behind one shipped constant. Keeping them apart is the point: M89 defined tau
+# as the largest tolerated reported error and then enforced a cap ten times
+# looser, so the stated definition and the enforced behaviour disagreed by
+# exactly the slack factor.
+#
+#   delta_star = 1e-4 -- THE ACCURACY TARGET: the largest relative error a
+#     reported corrected SE may carry. Derived from the SE's own sampling
+#     variability rather than from machine epsilon (RR19 section 1). The
+#     corrected SE is a smooth plug-in functional of Sigma-hat, so its relative
+#     sampling SD is of order 1/sqrt(2*(n-1)): for (n-1)s^2/sigma^2 ~
+#     chi^2_{n-1} the relative SD of s^2 is sqrt(2/(n-1)), which the delta
+#     method halves for the square root. Holding the numerical bias to one
+#     tenth of that statistical noise -- the conventional "numerical error much
+#     smaller than statistical error" margin -- and calibrating at n = 5e5, a
+#     decade past any published circumplex sample, gives 0.1/sqrt(2*(n-1)) =
+#     1.0e-4. Smaller n only loosens the requirement, which is why the absence
+#     of a minimum sample size is the harmless direction and the cormat path's
+#     unbounded n is the binding one. No citekey on this repo's shelf carries
+#     the sampling-SD result, and RR19 declined to manufacture a citation for a
+#     textbook-standard one. Two n-free channels agree: print.circumplex_axes_
+#     reliability() formats at 3 decimals (axes_fmt, R/axes_reliability_oop.R),
+#     so print resolution is at least 1e-3 relative at the largest printable
+#     SE; and a relative SE error delta moves nominal 95% Wald coverage by
+#     about 0.23*delta, so 1e-4 shifts coverage by 0.002 points. One decade
+#     looser (1e-3) reaches the printed resolution and becomes marginally
+#     resolvable; one decade tighter buys nothing any channel can see.
+#
+#   C = 10 -- THE CALIBRATION CEILING: how far the enforced bound
+#     p * kappa(cov2cor(Sigma-hat))^2 * eps may sit below the error it stands
+#     for. The oracle's fixture sweep measured attainment ratios 1.27/2.4/3.28
+#     across three decades of kappa, drifting up about 1.6x per decade; 10
+#     covers that trend with at least 3x headroom at every kappa below the
+#     floors this target sets.
+#
+# tau = delta_star / C is therefore the implementation constant: refuse when
+# the bound exceeds tau, and a computed answer's error is capped at
+# C*tau = delta_star. Refusal thresholds kappa = sqrt(tau/(p*eps)) are then
+# 4.3e4 at p = 24, 7.5e4 at p = 8, and 1.06e5 at p = 4.
+#
+# WHAT THE BOUND IS AND IS NOT (RR19 section 3). p*kappa^2*eps is a
+# conservative envelope, not an error model for this quantity. Measured against
+# the exact-rational oracle over model-implied unit-diagonal matrices at
+# p = 4, 8 and 9 -- the form every lavaan-fitted Sigma-hat has -- the actual SE
+# relative error sits 5 to 8 decades BELOW the bound, attainment ratios at most
+# 4e-6. The bound's only measured attainment is the committed fixture
+# cairn/reviews/rb18-counterexample-b.rds, which no exported call can produce:
+# it is p = 3 with df = 1 while axes_reliability() requires four scales (the
+# minimum reachable df is 4), and it sits 25 units off the model manifold at
+# its own stated configuration. What drives the error is coupling of near-null
+# directions into the COMPONENT ROWS of the information matrix's inverse,
+# indexed by df rather than by kappa: measured cval relative error is 3.4e-1
+# with a sign flip at df = 1, 1.1e-8 at df = 4, and 1.1e-13 at df = 26. No
+# measured regime shows the bound optimistic beyond the fixture's own 3.3x.
+# The four-scale minimum is what keeps the reachable set out of that regime --
+# lowering it means re-running the exact oracle at the new minimum first.
+#
+# ONE CONSTANT, NOT SEVERAL (RR19 section 4). tau does not depend on n. An
+# n-dependent tau would make refusal a property of the yardstick rather than of
+# the refused matrix -- the identical matrix computing at n = 200 and refusing
+# at n = 20000, and gameable on the cormat path where n is typed by the user --
+# while buying only n^(1/4) of threshold movement, since the floor moves as
+# sqrt(tau). p already appears inside the bound, where it belongs.
+#
+# WHY THE LIMB EXISTS AT ALL (RR19 section 5). Removal was weighed on this
+# mechanism's second escalation and rejected narrowly: past the floor the
+# package has no shipped means of certifying the number to delta_star (IP3),
+# and the only a-priori error estimate a replacement caution could carry is
+# this same bound, which overstates the actual error by 5 to 8 decades in every
+# geometry users occupy -- it would cry "up to 3% error" over numbers accurate
+# to 1e-13. The reopening evidence is recorded in the D-entry superseding
+# D-044. Changing delta_star or C is an escalation (RB, no-oracle), never a
+# silent edit.
+axes_degeneracy_delta_star <- 1e-4
+axes_degeneracy_calibration_ceiling <- 10
+axes_degeneracy_tau <-
+  axes_degeneracy_delta_star / axes_degeneracy_calibration_ceiling
 
 # Returns NULL (priceable), "singular" (non-finite entries: the literal the
 # NA/NaN-diagonal route has carried since before M69, now reached here rather

@@ -1717,9 +1717,19 @@ test_that("M90 AC7: an NA fitted diagonal refuses with exactly ONE warning on th
 test_that("AC3: tau is a named constant, and the floored criterion accepts all three probe-map fits", {
   skip_if_not_installed("lavaan")
   # The accuracy target is a named constant beside the criterion, not an
-  # inlined magic number: tau = 1e-6, making the floor sqrt(p * eps / tau) --
-  # the pre-re-cut sqrt(p * eps) floor times 1000.
-  expect_identical(axes_degeneracy_tau, 1e-6)
+  # inlined magic number. Since M106 it is two documented quantities behind one
+  # shipped constant (RR19 s2): the accuracy target delta_star -- the largest
+  # relative error a reported corrected SE may carry -- and the calibration
+  # ceiling C by which the enforced bound may undershoot the error it stands
+  # for. tau = delta_star / C, making the floor sqrt(p * eps / tau).
+  expect_identical(axes_degeneracy_delta_star, 1e-4)
+  expect_identical(axes_degeneracy_calibration_ceiling, 10)
+  expect_identical(axes_degeneracy_tau, 1e-5)
+  # And the constant IS the quotient, not a third number that happens to agree.
+  expect_identical(
+    axes_degeneracy_tau,
+    axes_degeneracy_delta_star / axes_degeneracy_calibration_ceiling
+  )
 
   # The tightened floor must not refuse anything the surfaces price
   # accurately: all three probe-map FITTED matrices (p = 24, 12, 8) are
@@ -1806,8 +1816,12 @@ test_that("AC3: the floor discriminates its p factor at the threshold", {
   # p*sqrt(eps/tau); these points can -- dropping the p factor accepts the
   # below-floor probe at p = 24, and squaring it refuses the above-floor
   # one (both mutants verified red at review round 3).
+  # tau is pinned to its literal here and asserted against the constant
+  # separately: deriving the floor from axes_degeneracy_tau on both sides would
+  # make the probe track any future edit silently instead of failing on it.
+  expect_identical(axes_degeneracy_tau, 1e-5)
   for (p in c(24L, 8L)) {
-    f <- sqrt(p * .Machine$double.eps / 1e-6)
+    f <- sqrt(p * .Machine$double.eps / 1e-5)
     for (mult in c(1.05, 0.95)) {
       r <- f * mult
       c_ <- (1 - r) / (1 + r * (p - 1))
@@ -1991,4 +2005,28 @@ test_that("AC2: the scaling factor refuses as 'unidentified' when the model's de
   expect_null(ctl$reason)
   expect_true(is.finite(ctl$scale))
   expect_true(is.finite(ctl$baseline))
+})
+
+
+# --- M106: the recalibrated accuracy target ----------------------------------
+
+test_that("M106 AC2: the near-duplicate geometry computes and the RR18 fixture still refuses", {
+  # The regression pinning the recalibration (RR19 rec 1). Under the pre-M106
+  # tau = 1e-6 the first assertion FAILS: r = .9999 reaches kappa 2.87e4,
+  # above that floor's 1.37e4-at-p-24 threshold, and was refused -- though its
+  # corrected SEs are accurate to 2.0e-13 (RR19 s3a). Under tau = 1e-5 it
+  # computes. The second assertion holds under both and is the guard against
+  # over-loosening: counterexample B is a MEASURED silent wrong number (SEs
+  # 3.4% off with reason NULL under the pre-M89 floor), so no recalibration may
+  # admit it.
+  near <- m106_family_b(7e-5)
+  expect_equal(near[1L, 9L], 0.9999, tolerance = 1e-4)
+  expect_gt(m106_kappa(near), 2.8e4)
+  expect_lt(m106_kappa(near), 3.0e4)
+  expect_null(axes_sigma_degenerate(near))
+
+  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
+  skip_if_not(file.exists(fp))
+  fx <- readRDS(fp)
+  expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 })

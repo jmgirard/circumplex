@@ -104,10 +104,10 @@ M7's own gate.
 
 ## Tasks
 
-- [ ] T1 — Escalate the accuracy target via `/milestone-brief` (RB): what
+- [x] T1 — Escalate the accuracy target via `/milestone-brief` (RB): what
       relative error may a reported corrected SE carry, priced against its own
       sampling variability? Ingest the RR. *(RB tripwire: no-oracle)*
-- [ ] T2 — Write the derivation beside `axes_degeneracy_tau`; set the constant;
+- [x] T2 — Write the derivation beside `axes_degeneracy_tau`; set the constant;
       restate the target at both roxygen sites.
 - [ ] T3 — Threshold pins at p = 3/12/24 × three spectral forms; mutate
       `axes_degeneracy_tau` and record each pin's observed failure.
@@ -136,6 +136,10 @@ M7's own gate.
 - 2026-08-22: gate chose folding rec 4 into AC5 over a separate criterion because both test the same input path at the same geometry, and a ninth criterion would trip the sizing tripwire into a split the work does not need; falsified by the warning work turning out to need its own fixture family.
 - 2026-08-22: `cairn_validate` sizing advisory notes 8 acceptance criteria against the >7 tripwire. Not split: AC7 is the profile's mandated verify criterion rather than scope, so the substantive count is 7, and separating AC8's oracle family would ship the recalibration without the reachable-geometry evidence that justifies its calibration ceiling. Tasks are 8 of a 10 tripwire.
 - 2026-08-22: status planned→in-progress on branch `m106-degeneracy-accuracy-target`, cut from master at b712a007.
+- 2026-08-22: T1 done — discharged by RR19 before implementation started, so its no-oracle tripwire is closed rather than open.
+- 2026-08-22: T2 done. `axes_degeneracy_tau` is now `axes_degeneracy_delta_star / axes_degeneracy_calibration_ceiling` = 1e-4/10 = 1e-5, with the derivation and the reachable-geometry finding written beside it; both exported roxygen sites restate the target and the ceiling. The regression test went in first and failed for the right reason — `"ill_conditioned"` on RR19's family-B geometry at r = .9999, whose SEs the review measured accurate to 2.0e-13. Two M89 tests hard-coded the old literal and were re-pinned; the near-threshold probe keeps its floor literal and asserts it against the constant separately, so a future edit fails the probe rather than being tracked by it. `document()` no diff beyond the regenerated Rd, zero unresolved-link warnings. test-axes-scaled-fit.R, -corrected-se.R, -reliability.R and -fiml.R all pass.
+- 2026-08-22: minor plan refinement — T4/T5's "committed data-raw generator with a seed" is unnecessary: RR19's families are closed-form model-implied matrices with no RNG, so they are built deterministically in `tests/testthat/helper-m106-degeneracy.R` rather than committed as fixtures. No committed fixture means nothing whose bit-exactness is unfalsifiable on the authoring machine.
+- 2026-08-22: helper defect found and fixed before it reached a commit — the family-B builder appended a hard-coded 360 as the duplicate angle, but `octants()` starts at 90, so item 9 paired with scale 7 while the driven-down errors sat on items 1 and 9 (r = 0.57, not 0.9999). It now duplicates `octants()[1]` whatever that is.
 
 ## Decisions
 

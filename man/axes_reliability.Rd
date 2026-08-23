@@ -81,8 +81,10 @@ correlation-structure correction, \code{se_correction_failed}, \code{NULL} when
 that correction succeeded or a string naming why the reported SEs are
 \code{NA} -- notably the shared degeneracy criterion's two literals
 (smallest eigenvalue relative to largest at or below
-\code{sqrt(p * .Machine$double.eps / 1e-6)}, evaluated on \code{cov2cor()} of the
-fitted covariance matrix): \code{"indefinite"} for a decisively negative
+\code{sqrt(p * .Machine$double.eps / 1e-5)}, evaluated on \code{cov2cor()} of the
+fitted covariance matrix, where the \code{1e-5} is the \code{1e-4} accuracy target
+divided by the criterion's factor-of-\code{10} calibration ceiling):
+\code{"indefinite"} for a decisively negative
 smallest eigenvalue
 (below \code{-lambda_max * sqrt(p * .Machine$double.eps)}), a
 statement about the model, and \code{"ill_conditioned"} for roundoff-level
@@ -214,9 +216,15 @@ criterion evaluated in the metric the reported numbers are computed in: a
 fitted covariance matrix whose correlation form \code{cov2cor()} is degenerate
 -- indefinite, singular, or so ill-conditioned that its smallest
 eigenvalue, relative to its largest, falls at or below
-\code{sqrt(p * .Machine$double.eps / 1e-6)}, where the \code{1e-6} is a stated
-accuracy target: past that floor the corrected standard errors could carry
-relative error above it -- is refused by both surfaces, and the refusal
+\code{sqrt(p * .Machine$double.eps / 1e-5)} -- is refused by both surfaces. That
+\code{1e-5} is not itself the tolerance: it is the accuracy target \code{1e-4}, the
+largest relative error a reported standard error may carry, divided by the
+factor of \code{10} by which the criterion's error bound may undershoot the error
+it stands for. Past the floor a reported standard error could carry relative
+error above the target. The accuracy target is derived from the standard
+error's own sampling variability, so a numerical error at the target is a
+tenth of the statistical noise already in the number; the derivation and its
+premises are stated beside the constant in the source. The refusal
 says which degeneracy happened: \code{"indefinite"} when the smallest
 eigenvalue is decisively negative (below
 \code{-lambda_max * sqrt(p * .Machine$double.eps)} -- beyond the fit's own
