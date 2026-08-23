@@ -76,7 +76,7 @@ entry recording the two-ruleset split and the bypass rationale.
 - [x] AC6: `cairn/PROFILE.md`'s consistency-gate section names
       `tools/check-branch-protection.R` as a check the review gate runs, and
       `wc -l cairn/PROFILE.md` is ≤ 120.
-- [ ] AC7: `Rscript -e 'devtools::test()'` clean and
+- [x] AC7: `Rscript -e 'devtools::test()'` clean and
       `Rscript -e 'devtools::check()'` 0 errors / 0 warnings / 0 notes.
 
 ## Coverage
@@ -168,6 +168,8 @@ Review 2026-08-22 (PR #134). Evidence per criterion, fresh at review:
 - AC6: `cairn/PROFILE.md:49` names the checker in the consistency-gate; `wc -l` = 119 ≤ 120. Verified.
 
 Consistency gate: `cairn_validate` all OK (WARN work-log format = M7's standing pre-M28 advisory). No principle change → `cairn_impact` skipped. `document()` no diff, zero resolve-link lines. README untouched. `pkgdown::check_pkgdown()` no problems. NEWS: no user-visible package change (internal tier — repo settings + tools/) → no entry owed. No new top-level files (`tools/` predates, `^tools$` in .Rbuildignore). Master watches: newest verdict-reaching push runs green on both workflows (ab83f30b success ×2; newer cairn-only pushes run none, per paths-ignore — said so per M95). Alert audits: check-master-red-alert.R and dryrun both clean. Branch-protection check: exit 0.
+
+- AC7: fresh review-time `devtools::test()` FAIL 0 (PASS 8395; 5 lavaan WARNs + 3 SKIPs, the standing baseline). `devtools::check()` 0 errors / 0 warnings / 0 notes, Status: OK (20m40s), run this session on a tree whose every commit since is `cairn/`- or `tools/`-only (`^tools$` and `^cairn$` in .Rbuildignore — the checked package surface is byte-identical). Verified.
 
 Independent review (three-lens fan-out; findings and dispositions, most severe first):
 
