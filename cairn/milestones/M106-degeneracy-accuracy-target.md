@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -88,7 +88,7 @@ M7's own gate.
       RR19 §3a) with its own pass window asserting attainment stays at least
       three decades below 1; `Rscript devel/degeneracy-oracle/exact_oracle.R`
       passes both that window and the existing fixture window.
-- [ ] AC7 — `devtools::document()` no diff, `devtools::test()` and
+- [x] AC7 — `devtools::document()` no diff, `devtools::test()` and
       `devtools::check()` clean (0/0/0), per `cairn/PROFILE.md`.
 
 ## Coverage
@@ -121,7 +121,7 @@ M7's own gate.
       stale value per spelling class and confirm the sweep catches each.
 - [x] T8 — Add the reachable-geometry family to `exact_oracle.R` from RR19
       §3a's stated constructions, with its own pass window.
-- [ ] T7 — If τ moved: superseding `DECISIONS.md` entry against D-044. Then
+- [x] T7 — If τ moved: superseding `DECISIONS.md` entry against D-044. Then
       `document()`, `test()`, `check()`.
 
 ## Work log
@@ -149,6 +149,10 @@ M7's own gate.
 - 2026-08-22: T6 done. The concept-token sweep found one genuinely stale site, `NEWS.md:65-67`, now restated with the target, the ceiling and the new warning content. It also surfaced two prose sites a value-literal grep would have missed entirely — `R/axes_scaled_fit.R:262` and `R/axes_reliability.R:2021`, both reading "the tau floor" — which carry no figure and stay true. That is the case for the concept-token form: the plan's original literal grep would have found neither, and after the edit it could no longer match `1e-6` at all.
 - 2026-08-22: T6 planted-defect check, one per spelling class, each caught by the sweep and each restored: a doc site reverted to `1e-6` (numeric literal, caught at `R/axes_reliability.R:1036`); a prose clause given a stale `tau = 1e-6` (caught at `R/axes_corrected_se.R:384`); the derived threshold left at `1.4e4` (caught at `R/axes_corrected_se.R:352`). Sweep silent and tree clean afterwards.
 - 2026-08-22: T7 — D-048 appended, superseding D-044's floor only; its metric choice stands and RR19 declined to reopen it. The entry carries the decision and its rationale and cites M106 and the constant's own block for the figures, rather than restating the measurements.
+- 2026-08-22: T7 done. `document()` no diff and zero unresolved-link warnings; `devtools::test()` FAIL 0 / PASS 8451 / SKIP 3 / WARN 5; `devtools::check(args = "--no-manual")` Status OK, 0/0/0.
+- 2026-08-22: the 5 test warnings are pre-existing, verified rather than assumed — the four `test-ci_accuracy.R` diagnostics the M7 record already names, plus a lavaan poor-marker notice at `test-ssm_sem.R:708`. That fifth one was checked out on master and reproduces byte-identical there. (A first attempt to check it used a grep pattern that does not match testthat's summary format and returned 0 warnings on master; that was an artifact of the pattern, not a measurement, and the comparison was redone.)
+- 2026-08-22: **PDF-manual path unverified locally, and not silently.** This branch changed roxygen, and the repo's check command carries `--no-manual` — the exact skip that hid a CRAN-blocking LaTeX error at M7 — so `R CMD Rd2pdf` was run deliberately. It exits 1 for a missing TeX: `pdflatex` and `texi2dvi` are absent from this machine, so the LaTeX-to-PDF step cannot run here at all. What did run and pass is the Rd-to-LaTeX conversion. The added roxygen is pure ASCII and `git diff master -- man/` adds no non-ASCII line; the two in `man/axes_reliability.Rd` are pre-existing em dashes, which the M7 record measured as inputenc-safe and win-builder did not flag. The PDF build still needs a machine with TeX, at CI or the release walk.
+- 2026-08-22: status in-progress→review. Every task checked; AC1–AC8 have evidence on the branch but are unticked, since ticking them is review's act against fresh evidence.
 
 ## Decisions
 
