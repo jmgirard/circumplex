@@ -230,8 +230,8 @@ corroborated by a third, the standard error's own sampling variability,
 under which a numerical error at the target is about a tenth of the
 statistical noise already in the number for a typical design at
 \code{n} up to about \code{5e5}. Above that the guarantee is the fixed target alone,
-not noise dominance. The derivation and its seven premises are stated beside
-the constant in the source. The refusal
+not noise dominance. The derivation and the premises it rests on are stated
+beside the constant in the source. The refusal
 says which degeneracy happened: \code{"indefinite"} when the smallest
 eigenvalue is decisively negative (below
 \code{-lambda_max * sqrt(p * .Machine$double.eps)} -- beyond the fit's own

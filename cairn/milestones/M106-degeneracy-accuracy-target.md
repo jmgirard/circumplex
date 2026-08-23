@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -37,71 +37,70 @@ still refusing RR18's 3.4%-wrong exemplar (κ = 6.65e6, p = 3). τ = 1e-6 sits
 below that window; the derivation, not the window, decides where τ lands, and
 τ may legitimately stay where it is.
 
-**Out:** Which matrix is priced (`cov2cor(Σ̂)` vs raw) — settled by D-044, not
-reopened. The separate `sqrt(p·ε)` indefinite/`ill_conditioned` band constant →
+**Out:** Certifying the derivation block's prose to a stated-premise-and-citation
+bar, including its restatement at the two exported roxygen sites → exits to a
+follow-on, recorded as a candidate row for planning. The block stays in the
+code; what leaves is the criterion that certifies its prose.
+
+Which matrix is priced (`cov2cor(Σ̂)` vs raw) — settled by D-044, not reopened. The separate `sqrt(p·ε)` indefinite/`ill_conditioned` band constant →
 stays M90's, its own escalation. Making τ user-settable → candidate row if the
 derivation shows one target cannot serve every design. Release sequencing →
 M7's own gate.
 
 ## Acceptance criteria
 
-- [ ] AC1 — The comment block beside `axes_degeneracy_tau` derives the largest
-      relative error a reported corrected SE may carry from the SE's own
-      sampling relative standard error, stating every premise the derivation
-      rests on; each published result it uses is cited `citekey (p. N)`, or the
-      block states in so many words that the derivation uses no published
-      source. The same target is restated at `R/axes_reliability.R:720` and
-      `:1030`. *(RB tripwire: no-oracle)*
-- [x] AC2 — `axes_degeneracy_tau` is committed as `δ*/C` = 1e-5, with the
-      accuracy target δ* = 1e-4 and the calibration ceiling C = 10 named and
-      documented beside it as separate quantities, so the constant's stated
-      definition and its enforced cap no longer differ by the slack factor.
-- [x] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× and
-      `"ill_conditioned"` at 0.95× of the committed eigenvalue-ratio floor
-      `λmax·sqrt(p·ε/τ)`, at p = 3, 12 and 24, on a positive-λmin spectrum. At
-      the same three p it returns `"ill_conditioned"` where λmin is negative at
-      half the noise band `-λmax·sqrt(p·ε)`, and `"indefinite"` where λmin is
-      100× past that band.
-- [x] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
-      different p, straddling the committed threshold (4.3e4 at p = 24):
-      one strictly below the committed threshold returns numbers,
-      one strictly above returns NA with its reason named, one within a factor
-      of 2 of the threshold resolves as AC1's derivation implies. An upper
-      case the exported path cannot reach may be injected at the
-      `axes_fitted_cov` seam (`R/axes_corrected_se.R:647-654`).
-- [x] AC5 — `axes_reliability(cormat = ...)` on an item set carrying one pair at
-      r = .9999 returns the outcome AC1's derivation implies, with
-      `details$se_correction_failed` and `details$fit_scaling_failed` each
-      asserted to the value the derivation states for this input; a second
-      near-duplicate radius brackets the committed threshold from the other
-      side — and where the refusal does fire, its `"ill_conditioned"` warning
-      names κ and the dominant collinear item pair, not a bare reason code.
-- [x] AC6 — Over the sites
-      `grep -rniE 'tau|accuracy target|double\.eps|kappa' R/ tests/ NEWS.md`
-      returns, plus the two comment blocks read whole
-      (`R/axes_corrected_se.R:336-398`, `R/axes_scaled_fit.R:245-270`), every
-      site stating the criterion's numeric claim carries the committed value;
-      one stale value planted per spelling class — numeric literal, prose "tau
-      floor", derived κ threshold — is caught by that sweep. `cairn/` is
-      excluded deliberately: D-044 is superseded, never edited.
-- [x] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family
-      (model-implied, p ≥ 4, including one near-duplicate construction from
-      RR19 §3a) with its own pass window asserting attainment stays at least
-      three decades below 1; `Rscript devel/degeneracy-oracle/exact_oracle.R`
-      passes both that window and the existing fixture window.
-- [x] AC7 — `devtools::document()` no diff, `devtools::test()` and
-      `devtools::check()` clean (0/0/0), per `cairn/PROFILE.md`.
+- [ ] AC1 — **Descoped 2026-08-23 at the third-return gate.** Nothing is promised here
+      and nothing is verified here: the derivation block's certification exits to the
+      follow-on named in Scope Out. The slot is kept unrenumbered so the referents this
+      milestone's three review rounds, its work log and its tests already cite stay
+      stable; the box never ticks.
+- [ ] AC2 — `axes_degeneracy_tau` is committed as `δ*/C` = 1e-5, with the accuracy
+      target δ* = 1e-4 and the calibration ceiling C = 10 named and documented beside it
+      as separate quantities, so the constant's stated definition and its enforced cap
+      no longer differ by the slack factor.
+- [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× and `"ill_conditioned"` at
+      0.95× of the committed eigenvalue-ratio floor `λmax·sqrt(p·ε/τ)`, at p = 3, 12 and
+      24, on a positive-λmin spectrum. At the same three p it returns
+      `"ill_conditioned"` where λmin is negative at half the noise band
+      `-λmax·sqrt(p·ε)`, and `"indefinite"` where λmin is 100× past that band.
+- [ ] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three different p,
+      straddling the committed threshold (4.3e4 at p = 24): one strictly below the
+      committed threshold returns numbers, one strictly above returns NA with its reason
+      named, one within a factor of 2 of the threshold, above it, returns NA with its
+      reason named and `details$converged` TRUE. An upper case the exported path cannot
+      reach may be injected at the `axes_fitted_cov` seam
+      (`R/axes_corrected_se.R:647-654`).
+- [ ] AC5 — `axes_reliability(cormat = ...)` on an item set carrying one pair at r =
+      .9999 returns numbers, with `details$se_correction_failed` and
+      `details$fit_scaling_failed` both `NULL`; a second near-duplicate radius brackets
+      the committed threshold from the other side — and where the refusal does fire, its
+      `"ill_conditioned"` warning names κ and the dominant collinear item pair, not a
+      bare reason code.
+- [ ] AC6 — Over the sites `grep -rniE 'tau|accuracy target|double\.eps|kappa' R/ tests/
+      NEWS.md` returns, plus the two comment blocks read whole
+      (`R/axes_corrected_se.R:336-398`, `R/axes_scaled_fit.R:245-270`), every site
+      stating the criterion's numeric claim carries the committed value; one stale value
+      planted per spelling class — numeric literal, prose "tau floor", derived κ
+      threshold — is caught by that sweep. `cairn/` is excluded deliberately: D-044 is
+      superseded, never edited.
+- [ ] AC8 — `devel/degeneracy-oracle/` gains a reachable-geometry family (model-implied,
+      p ≥ 4, including one near-duplicate construction from RR19 §3a) with its own pass
+      window asserting attainment stays at least three decades below 1; `Rscript
+      devel/degeneracy-oracle/exact_oracle.R` passes both that window and the existing
+      fixture window.
+- [ ] AC7 — `devtools::document()` no diff, `devtools::test()` and `devtools::check()`
+      clean (0/0/0), per `cairn/PROFILE.md`.
 
 ## Coverage
 
-- AC1 → T1, T2, T10
-- AC2 → T2
+- AC1 → descoped, no task
+- AC2 → T1, T2
 - AC3 → T3
 - AC4 → T4
 - AC5 → T5, T10
 - AC6 → T6
 - AC8 → T8, T11
-- AC7 → T7
+- AC7 → T7, T12
 
 ## Tasks
 
@@ -137,12 +136,13 @@ M7's own gate.
       driver and record the result; if it lands inside δ*, record D-048
       trigger (i) as met on the successor candidate row.
 
-- [ ] T12 — Descope amendment: AC1 exits, AC4/AC5 repointed, the follow-on
+- [x] T12 — Descope amendment: AC1 exits, AC4/AC5 repointed, the follow-on
       recorded. Then the ten directed round-3 findings — the four
       derivation-block defects (floor-vs-target sentence, calibration-domain
       pair, print-vs-summary attribution, the unstated `digits = 3` premise),
       the citation-clause widening, the two stale test comments, the `qr.Q`
-      basis, the recomputed `cov2cor`, and a superseding note against the
+      basis, the recomputed `cov2cor`, the stale premise count at
+      `R/axes_reliability.R:732`, and a superseding note against the
       decisions entry whose reopening clause this branch falsified. Re-run
       `document()`, `test()`, `check()`.
 
@@ -181,9 +181,22 @@ M7's own gate.
 - 2026-08-22: CI finding, joins the return list — `R-CMD-check` red on **ubuntu only** (run 32615474776, head 0e3c5148; matrix, windows and macos all green). `test-axes-scaled-fit.R:2209` errors "The lavaan model did not converge": AC4 case 3's CARRIER fit, `m106_family_a(1e-2, per_scale = 3L)` at κ = 721, is a stiff matrix whose convergence is platform-dependent. Its conditioning is irrelevant to what the test asserts — it exists only so the seam has a converged fit to ride on — so choosing a near-degenerate one was the defect. Repair: carry the case on `probe_octant()` (p = 24, κ = 10.45, the figure D-044 cites for the probe fits), already exercised on all three platforms across the M89/M90 suites; keep injecting `r24_bad` at the seam unchanged. Local `test()`/`check()` could not have caught this — the failure is platform-specific and only a live run shows it (the M93 lesson).
 - 2026-08-23: review gate — status review→in-progress, defect return 3 of this milestone. What failed: AC1, on four independently reproduced defects inside the derivation block. (i) `R/axes_corrected_se.R:388-389` sets the floor from the accuracy target δ* = 1e-4 where the code sets it from τ = 1e-5 — measured, κ 43,319 against the sentence's 136,985 at p = 24 — reinstating the definition-versus-enforcement conflation the block's own opening exists to remove. (ii) `:455-457`'s calibration domain pairs a tenth-margin of n = 2e4 with a parity of n = 2.1e5, which cannot share a coefficient: parity is exactly 100× the tenth-margin, and at RR20's worst a = 0.045 the pair is 2.02e3 / 2.02e5, so the stated domain overstates by a decade. (iii) channel 1 attributes the 3-decimal component-SE column to `print.circumplex_axes_reliability()`, which does not print it — `summary.circumplex_axes_reliability()` builds it at `R/axes_reliability_oop.R:344`. (iv) channel 1's 1e-3 resolution rests on `digits = 3` being a user-settable default, a premise the seven-premise list does not state. AC2–AC8 all verified with fresh evidence and ticked.
 - 2026-08-23: thrash rule — both triggers fire and compose. (a) This is the third defect return, so no further retry runs under the current plan. (b) AC1 has now failed twice, each by a new mechanism of the same shape: round 2 returned on a load-bearing step asserted rather than argued, round 3 on a premise unstated plus three false claims inside the same block. The alternative the plan gate recorded against — keep τ and reword the refusal — is unspent, and no `/milestone-plan` re-cut or split has been spent on this milestone. Disposition goes to Jeff.
+- 2026-08-23: gate disposition, Jeff's choice — descope. M106 narrows to the seven criteria round 3 verified; AC1 exits to its own follow-on milestone, and the narrowed set is re-reviewed. The eleven round-3 findings are directed to that amendment pass: the four AC1 defects plus findings 3, 6, 7, 8, 10 and 11 are fixed there so nothing measured false ships with the descope, finding 9 rejected as superseded history. Re-plan and park were both on the menu and declined; escalating the derivation was offered and declined.
 - 2026-08-23: T12 opened. Nine of the ten directed findings repaired in code, tests and DECISIONS before the criteria amendment: the floor sentence now names τ rather than the accuracy target and says what the target reading would put the floor at (F1); the calibration domain states its two solved forms, n = 1e6·a² and n = 1e8·a², and quotes the anchor and worst-geometry pairs off them, so the tenth-margin and the parity share a coefficient (F2, measured 5.0e5/5.0e7 and 2.0e3/2.0e5); channel 1 attributes the 3-decimal component-SE column to `summary()`, which builds it, not `print()`, which carries the other columns (F4); the `digits = 3` default is stated in the channel and added as an eighth premise (F5); the no-published-source clause now covers the whole derivation rather than channel 3 alone (F8); the interlacing comment reads 153.5× rather than 25×, measured on its own construction with the floor's formula beside it (F3); the AC5 listing comment says row-then-column instead of "column order" (F7); the AC3 test's local `planted()` is `m106_planted()`, so the rank-deficient `qr.Q` basis is gone from the file (F10); and `axes_se_pricing()` is handed the `cor_sigma` already built two lines above (F11). Finding 9 rejected as the review directed — D-048 is history, and the figure it misstates is correct where it is load-bearing.
 - 2026-08-23: T12 — F6 answered by D-050, appended: D-049's Reopens clause says the first trigger is one measurement from met, and T11 took that measurement the next day on this branch. D-049 is history and is not edited; D-050 annotates it, moves nothing it decided, and records that D-048's remedy is now due rather than conditional.
-- 2026-08-23: gate disposition, Jeff's choice — descope. M106 narrows to the seven criteria round 3 verified; AC1 exits to its own follow-on milestone, and the narrowed set is re-reviewed. The eleven round-3 findings are directed to that amendment pass: the four AC1 defects plus findings 3, 6, 7, 8, 10 and 11 are fixed there so nothing measured false ships with the descope, finding 9 rejected as superseded history. Re-plan and park were both on the menu and declined; escalating the derivation was offered and declined.
+- 2026-08-23: T12 — the descope amendment. AC1 is out of the criteria set (7 remain, 6 substantive); Scope's Out clause names what left, including the roxygen restatement AC1 carried; Coverage drops AC1's line, gives T1 to AC2 (RR19 §§1–2 set δ* and C, which is what AC2 commits) and adds T12 under AC7. The Goal stands at Jeff's gate choice: the footing is stated beside the constant and in D-048/D-049 and AC2 still binds the constant to it — what left is the criterion certifying the block's prose.
+- 2026-08-23: the amended AC4 and AC5 wording went to a fresh-context [O] reader that did not author it, in the FULL criteria-audit mode the user-facing tier assigns, before anything was written. It returned 13 findings and its two leading ones changed the amendment: pointing either criterion at "the derivation beside `axes_degeneracy_tau`" would make a verified criterion depend on prose the descope leaves uncertified — and on the state round 3 reviewed, that prose implied the opposite outcome for AC4's factor-of-2 case. Both clauses now state the outcome round 3 measured, so the recorded evidence carries over verbatim. Taken with them: the Out clause covers the roxygen restatement, its work-promise sentence is deleted, T12 gains the stale premise count, and Coverage's orphaned T1 is closed.
+- 2026-08-23: widening verdict NARROWS. The criteria set drops from 8 to 7, and neither amended clause adds a property, object, domain or quantifier — each replaces a reference to uncertified prose with the outcome already measured. The one widening the audit recommended, extending AC6's read-whole range from `R/axes_corrected_se.R:336-398` to the block's current end at :563, was offered at the gate as the explicitly non-recommended alternative and declined; the stale line it was aimed at (`R/axes_reliability.R:732`, "seven premises" against the eight now in the block) is repaired in this pass regardless, and the uncovered remainder is on the follow-on row.
+- 2026-08-23: sizing dispositions, so round 4 does not re-litigate them: tasks are 12 against a 10 tripwire, and T9, T10, T11 and T12 are all review returns rather than new scope; criteria are 7, of which AC7 is the profile's mandated verify criterion, so the substantive count is 6 and the >7 advisory round 3 recorded no longer fires.
+- 2026-08-23: the AC boxes untick on return. Round 3 ticked AC2–AC8; this amendment rewords AC4 and AC5, and T12's repairs touch code those criteria run through (`m106_planted()` for AC3's rotated basis, the `cor_sigma` reuse on the SE path), so round 4 measures rather than carries round 3's numbers.
+- 2026-08-23: the follow-on absorbed into M106's own ROADMAP candidate row rather than a new one — search-first, and the file has no line to spare. 59 lines / 23,980 bytes, with the stamp, that row's two parked clauses and one clause of the alert row compressed in the same pass to make room. 20 bytes of headroom is not a margin: the graduate-or-prune pass earlier stamps called for is owed before anything else lands there.
+- 2026-08-23: the six T12 lines above were first appended above the gate-disposition line (commit efdf4bde and the amendment edit); they are moved below it here so the log reads in the order things happened. No line's text changed.
+
+- 2026-08-23: the criteria numbering keeps its gap, and AC1's slot is kept as an explicit descope record rather than renumbered. `cairn_validate`'s coverage check reads criteria positionally — it requires AC1..ACn — so a bare deletion FAILed it. Renumbering AC2–AC8 down one would have silently moved the referents three review rounds, this work log, the tests and several code comments already cite, which is the worse trade; the kept slot promises nothing, verifies nothing and never ticks. The positional assumption is a plugin-side limitation and is owed a candidate row in the cairn repo, not this one (the M104 precedent for `LINE_CAPS`).
+- 2026-08-23: the plan-owned body hit exactly 150 lines against its < 150 cap after the amendment, and the remedy was one rewrite of the heaviest section named by the breakdown — Acceptance criteria, rewrapped to a wider measure, no criterion's words changed. 143 lines now.
+- 2026-08-23: T12 verify — `devtools::document()` no diff beyond the regenerated Rd and zero lines matching `resolve link` at `cli.width = 500`; `devtools::test()` FAIL 0 / PASS 8509 / SKIP 3 / WARN 5, the same five pre-existing warnings round 1 verified byte-identical on master; `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes in 8m12s. `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS, SWEEP and REACHABLE all PASS.
+- 2026-08-23: the PDF-manual gap of rounds 1-3 stands unchanged and is carried forward, not re-verified: this pass touched roxygen again, the check command still carries `--no-manual`, and this machine still has no TeX binary. The added roxygen is ASCII and `git diff master -- man/` adds no non-ASCII line. Still needs a machine with TeX, at CI or the release walk.
+- 2026-08-23: status in-progress→review. All twelve tasks checked; the seven criteria are unticked, since ticking them is review's act against its own fresh evidence.
 
 ## Decisions
 
