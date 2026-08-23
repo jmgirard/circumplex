@@ -520,23 +520,19 @@ test_that("M68 review F2: CFI is 1, not NaN, when neither model nor baseline mis
 
   # Against lavaan's own function on the same two scaled statistics, so the
   # agreement is with the reference implementation and not with our reading of
-  # it. `lav_fit_cfi()` is UNEXPORTED, so neither its existence nor its argument
-  # names are a contract: an earlier lavaan takes them positionally under
-  # different names, and calling it by name errored the whole test on CI while
-  # passing locally (M68 review round 2 -- the existence probe checked that the
-  # symbol resolved, not that it accepted these arguments). The call itself is
-  # therefore what is probed, and any failure to reach it SKIPS: the assertions
-  # above already pin the behaviour without lavaan's help, and this is
-  # corroboration against the reference implementation, not the check itself.
-  ref <- tryCatch({
-    f <- get("lav_fit_cfi", envir = asNamespace("lavaan"))
-    c(f(X2 = 200 / 0.95, df = 273, X2.null = 260 / 0.95, df.null = 276),
-      f(X2 = 400 / 0.95, df = 273, X2.null = 4000 / 0.95, df.null = 276))
-  }, error = function(e) NULL, warning = function(w) NULL)
-  skip_if(is.null(ref) || length(ref) != 2L || anyNA(ref),
-          "lavaan::lav_fit_cfi is not callable with these arguments")
-  expect_equal(got$fit$cfi, ref[[1]])
-  expect_equal(got2$fit$cfi, ref[[2]])
+  # it. Reached through lav_cfi_ref() (helper-lavaan-cfi.R), which probes both
+  # known argument spellings by CALL -- `lav_fit_cfi()` is UNEXPORTED, so
+  # neither its existence nor its argument names are a contract, and this
+  # comparison spent a release silently skipping after lavaan renamed them
+  # (M107). NULL means neither spelling worked, and then this SKIPS: the
+  # assertions above already pin the behaviour without lavaan's help, and this
+  # is corroboration, not the check itself.
+  r1 <- lav_cfi_ref(200 / 0.95, 273, 260 / 0.95, 276)
+  r2 <- lav_cfi_ref(400 / 0.95, 273, 4000 / 0.95, 276)
+  skip_if(is.null(r1) || is.null(r2),
+          "lavaan::lav_fit_cfi is not callable under either argument spelling")
+  expect_equal(got$fit$cfi, r1)
+  expect_equal(got2$fit$cfi, r2)
 })
 
 
@@ -1230,17 +1226,15 @@ test_that("AC4: the reported cfi IS the cfi.scaled definition, not cfi.robust", 
   expect_gt(abs(cfi_scaled - cfi_robust), 1e-4)
 
   # Corroboration only, against lavaan's own implementation of the definition
-  # the assertions above already pin. `lav_fit_cfi()` is UNEXPORTED, so neither
-  # its existence nor its argument names are a contract -- reached via get(),
-  # and any failure to call it skips rather than reddening (the M68 round-2
-  # lesson).
-  ref <- tryCatch({
-    f <- get("lav_fit_cfi", envir = asNamespace("lavaan"))
-    f(X2 = t_unscaled / cc, df = df, X2.null = tb_unscaled / cb, df.null = df_b)
-  }, error = function(e) NULL, warning = function(w) NULL)
-  skip_if(is.null(ref) || length(ref) != 1L || anyNA(ref),
-          "lavaan::lav_fit_cfi is not callable with these arguments")
-  expect_equal(res$fit$cfi, unname(ref), tolerance = 1e-10)
+  # the assertions above already pin. Reached through lav_cfi_ref()
+  # (helper-lavaan-cfi.R), which probes both known argument spellings by call;
+  # `lav_fit_cfi()` is UNEXPORTED, so neither its existence nor its argument
+  # names are a contract, and a failure to reach it skips rather than reddening
+  # (the M68 round-2 lesson).
+  ref <- lav_cfi_ref(t_unscaled / cc, df, tb_unscaled / cb, df_b)
+  skip_if(is.null(ref),
+          "lavaan::lav_fit_cfi is not callable under either argument spelling")
+  expect_equal(res$fit$cfi, ref, tolerance = 1e-10)
 })
 
 

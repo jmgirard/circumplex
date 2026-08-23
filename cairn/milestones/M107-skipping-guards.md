@@ -73,12 +73,12 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 - [ ] **T3** — Mutation-prove all four run under `R CMD check`, one mutant per
       invocation against committed files (test-craft M82 family); record which
       test each mutant reddened and that it reddened for its own reason.
-- [ ] **T4** — Helper probing `lav_fit_cfi()` by call, new spelling
+- [x] **T4** — Helper probing `lav_fit_cfi()` by call, new spelling
       (`x2, df, x2_null, df_null`, lavaan 0.7.2) then old
       (`X2, df, X2.null, df.null`), skipping only if neither returns a finite
       value; repoint lines 536, 922 and 1241. The names stay non-contractual:
       the helper probes, it does not assume.
-- [ ] **T5** — Mutation-prove the fallback arm: delete it and confirm a test
+- [x] **T5** — Mutation-prove the fallback arm: delete it and confirm a test
       reddens on a forced old-spelling call.
 - [ ] **T6** — Full verify + `check(manual = TRUE)`; record evidence.
 
@@ -110,3 +110,5 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
   survey urgent rather than deferred.
 - 2026-08-23: T1 — fixture copied to `tests/testthat/fixtures/`, four sites repointed to `test_path("fixtures", ...)`, their absence guards dropped; suite FAIL 0 / SKIP 3 / PASS 8509, none of the three skips an absent fixture.
 - 2026-08-23: T2 — drift guard added as `tests/testthat/test-fixture-drift.R`, comparing raw bytes and skipping when the tracking record is absent; kept out of `test-axes-scaled-fit.R` so that file names `cairn` nowhere (AC2 passes for its own reason, not by splitting a line). Mutation-proved: flipping the packaged copy's last byte reddens the byte-identity assertion at line 30 naming bytes 243-246; restored, it passes. Suite FAIL 0 / SKIP 3 / PASS 8511.
+- 2026-08-23: minor amendment — T4/T5 taken before T3, and committed together. T3 needs `R CMD check` runs against committed files, so doing it once after the code settles avoids re-running a ~10-minute check per intermediate state; T4 and T5 are one code change (helper, its tests, three call sites) and split into two commits only artificially.
+- 2026-08-23: T4/T5 — `lav_cfi_ref()` in `tests/testthat/helper-lavaan-cfi.R` probes both spellings by call and takes the function as an argument, so a stand-in can force the older arm; three call sites repointed. Both `lav_fit_cfi` skips gone and the three comparisons now execute against lavaan 0.7.2 (whose signature is the newer `x2, df, x2_null, df_null` — the older spelling errors here, which is why they had been skipping). Fallback mutation-proved: deleting the older-spelling arm reddens `test-lavaan-cfi-helper.R:14` alone, returning NULL where 0.6 was expected; restored, six pass. Suite FAIL 0 / SKIP 1 / PASS 8520.
