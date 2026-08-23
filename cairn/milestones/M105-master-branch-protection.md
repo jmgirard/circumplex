@@ -135,6 +135,9 @@ entry recording the two-ruleset split and the bypass rationale.
 
 - 2026-08-22: T1 — `tools/branch-protection.json` written in GitHub's literal ruleset vocabulary rather than a projection of it, so each `rulesets` element is a complete POST body; what is committed is therefore what T4 creates, not a transcription of it, and the checker can project both sides through one extractor.
 
+- 2026-08-22: T2 — `tools/check-branch-protection.R` written; `COMPARED_FIELDS` holds six fields (enforcement, target, ref_name_include, rule_types, required_status_check_contexts, bypass_actors) and one extractor set projects BOTH sides, so a projection bug cannot make them falsely agree in one direction only. Missing-ruleset arm proved live against the unprotected repo: exit 1, both committed rulesets reported absent.
+- 2026-08-22: minor amendment (task reorder, no criterion touched): T2's six-field mutation battery moves to after T4. While no ruleset exists live the field-comparison loop is unreachable — every mutation would re-print the missing-ruleset message rather than a field mismatch — so the battery can only prove what AC5 claims once T4 has created them. T2 stays unchecked until it runs.
+
 ## Decisions
 
 ## Review
