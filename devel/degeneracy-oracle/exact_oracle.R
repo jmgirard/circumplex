@@ -35,12 +35,17 @@ py <- file.path("devel", "degeneracy-oracle", "exact_oracle.py")
 
 # Hand the exact bits over: %a round-trips a double exactly, decimal does not,
 # and at kappa ~ 6.7e6 the lost bits change the answer's sign.
-hex_dump <- function(S, mats, n_comp) {
+# `df` and `baseline_df` are arguments rather than reads of the globals above.
+# The globals are the p = 3 FIXTURE's counts; every other case has its own, and
+# EXACT_CVAL divides by df, so a case priced under the fixture's counts would
+# report a cval for a model it is not. Nothing reads EXACT_CVAL outside the
+# fixture today -- these are the counts a line that starts to would need.
+hex_dump <- function(S, mats, n_comp, df, baseline_df) {
   f <- tempfile(fileext = ".txt")
   h <- function(v) paste(sprintf("%a", as.numeric(v)), collapse = " ")
   lines <- c(
-    sprintf("P: %d", nrow(S)), sprintf("N: %d", N), sprintf("DF: %d", DF),
-    sprintf("BASELINE_DF: %d", BASELINE_DF), sprintf("NCOMP: %d", n_comp),
+    sprintf("P: %d", nrow(S)), sprintf("N: %d", N), sprintf("DF: %d", df),
+    sprintf("BASELINE_DF: %d", baseline_df), sprintf("NCOMP: %d", n_comp),
     sprintf("Q: %d", length(mats)), sprintf("S: %s", h(S)),
     vapply(seq_along(mats), function(i) sprintf("M%d: %s", i, h(mats[[i]])), "")
   )
@@ -48,8 +53,15 @@ hex_dump <- function(S, mats, n_comp) {
   f
 }
 
-exact <- function(S, d) {
-  out <- system2("python3", c(py, hex_dump(S, d$mats, d$n_comp)), stdout = TRUE)
+# The same two identities axes_scaling_factor() guards on: df is the count of
+# overidentifying restrictions, baseline_df the independence model's.
+df_of <- function(S, d) nrow(S) * (nrow(S) + 1) / 2 - length(d$mats)
+baseline_df_of <- function(S) nrow(S) * (nrow(S) - 1) / 2
+
+exact <- function(S, d, df = DF, baseline_df = BASELINE_DF) {
+  out <- system2("python3",
+                 c(py, hex_dump(S, d$mats, d$n_comp, df, baseline_df)),
+                 stdout = TRUE)
   vals <- as.numeric(sub("^[A-Z_0-9]+: ", "", out))
   stats::setNames(vals, sub(":.*$", "", out))
 }
@@ -225,7 +237,7 @@ for (cs in reach_cases) {
   # would never fit, which is not the reachable geometry this family claims.
   zr <- axes_fits_zeta1(split(seq_along(g$scale), g$scale))
   dr <- axes_se_derivs(g$ang, g$scale, NULL, zr, FALSE)
-  exr <- exact(g$S, dr)
+  exr <- exact(g$S, dr, df_of(g$S, dr), baseline_df_of(g$S))
   dtr <- axes_se_pricing(g$S, dr, N)$corrected
   exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)
   rel <- max(abs(exv - dtr) / abs(exv))

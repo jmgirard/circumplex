@@ -301,7 +301,12 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   cor_sigma <- stats::cov2cor(sigma)
   degenerate <- axes_sigma_degenerate(cor_sigma)
   if (!is.null(degenerate)) {
-    return(na_out(degenerate, axes_degeneracy_hint(cor_sigma)))
+    # Only the ill-conditioning literal gets the diagnostic -- see the scope
+    # note at axes_degeneracy_hint(). The sibling surface gates identically, so
+    # the two warnings stay in agreement (M89's nestedness contract).
+    return(na_out(degenerate, if (identical(degenerate, "ill_conditioned")) {
+      axes_degeneracy_hint(cor_sigma)
+    }))
   }
 
   # The whole cov2cor arm -- criterion above, pricing here -- resolves before
@@ -382,8 +387,11 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # Delta'V Delta from the priced matrix's INVERSE twice, so its entries carry a
 # relative error growing like p * kappa^2 * eps; the floor is where that bound
 # reaches the accuracy target. The shipped sqrt(p*eps) floor -- no target at
-# all, in these terms -- was a hundred thousand times looser: it accepted the
-# committed exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which
+# all, in these terms -- sat 1/sqrt(tau) = 316 times lower in the eigenvalue
+# ratio, which is 1/tau = 1e5 times looser in the error bound it tolerates (the
+# bound is quadratic in kappa, so the two figures are not interchangeable and
+# this comment previously quoted the second one about the first). It accepted
+# the committed exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which
 # the reported corrected SEs were wrong by 3.4% with reason NULL, the package's
 # first measured silent wrong number in this subsystem (RR18).
 #
@@ -496,52 +504,99 @@ axes_degeneracy_tau <-
 # a trip labels only `naive_reason` (M91-D2, closing M90 review F11). Changing
 # this constant is an escalation (RB, no-oracle), never a silent edit.
 # The actionable half of an "ill_conditioned" refusal (M106; RR19 section 6).
-# Returns a clause naming the conditioning, and the offending item pair where
-# one pair dominates the near-null direction -- otherwise the conditioning
-# alone. Deliberately a separate function called at the two warning sites
-# rather than folded into axes_sigma_degenerate(): the criterion's return is a
-# bare literal that both surfaces compare and eleven tests assert identity
-# against, and a diagnostic is not part of deciding whether to refuse.
+# Returns a clause naming the conditioning, plus every item pair collinear
+# enough to force the refusal on its own -- otherwise the conditioning alone.
+# Deliberately a separate function called at the warning sites rather than
+# folded into axes_sigma_degenerate(): the criterion's return is a bare literal
+# that both surfaces compare and eleven tests assert identity against, and a
+# diagnostic is not part of deciding whether to refuse.
 #
-# WHY A PAIR CAN BE NAMED AT ALL: near-duplicate items make the smallest
-# eigenvector load almost entirely on the two of them with opposite signs, so
-# its two dominant loadings identify the pair. The user cannot see this on the
-# `cormat` path -- they hand over a matrix, not items -- which is exactly where
-# a bare reason code leaves them with nowhere to go.
+# SCOPE (M106 review F1/F6): called ONLY where the criterion said
+# "ill_conditioned". The other literals are not about conditioning -- an
+# indefinite matrix has lambda_min < 0, so its "condition number" prints
+# negative, and "singular" is reached on non-finite entries that eigen() cannot
+# decompose at all. The M90 partition draws the model/numerics line; a
+# conditioning clause on the model side blurs it.
 #
-# The pair is named only from DIMNAMES, never from positions: lavaan reorders
-# variables, so a positional index would be reported against the caller's own
-# column order and mislead. No dimnames means the conditioning clause alone.
+# WHY A PAIR CAN BE NAMED AT ALL, and which pairs qualify. Cauchy interlacing
+# bounds the whole matrix's smallest eigenvalue by any 2x2 principal
+# submatrix's: lambda_min(R) <= 1 - |r_ij|. So a pair with
+#
+#   |r_ij| >= 1 - lambda_max * sqrt(p * eps / tau)
+#
+# forces lambda_min at or below the criterion's own floor BY ITSELF, whatever
+# the rest of the matrix does. That is the threshold used below -- read off the
+# criterion rather than hand-set, which is what the two constants it replaces
+# (a 0.8 eigenvector-mass gate and a flat 0.99) were not (M106 review F11).
+#
+# The earlier form took the smallest EIGENVECTOR's two dominant loadings. That
+# is not well defined when the smallest eigenvalue repeats -- and it repeats in
+# exactly the case this diagnostic exists for, since k duplicate pairs give a
+# k-dimensional near-null space and LAPACK returns an arbitrary basis of it.
+# Measured on one p = 16 matrix with eight duplicate pairs, relabelling the
+# items alone moved the message between naming an arbitrary member pair and
+# naming nothing (M106 review F2). The interlacing test reads only |r_ij| and
+# lambda_max, so it is invariant to that basis choice by construction.
+#
+# The threshold cannot slide down to where "nearly collinear" would overstate:
+# a correlation matrix has trace p, so lambda_max <= p, so the cut is at least
+# 1 - sqrt(p^3 * eps / tau) -- at or above 0.99 for every p up to 165, far past
+# any circumplex item set.
+#
+# Pairs are named from DIMNAMES, never from positions -- a position would be an
+# index into the priced matrix, which is the caller's own item order only
+# because both call sites realign to `item_names` first, and an index is not
+# what a user acts on in any case. No dimnames means the conditioning alone.
+# Where more than one pair qualifies, the count is what carries the message and
+# the advice becomes plural: "drop one" is wrong counsel among many equally
+# redundant items.
 axes_degeneracy_hint <- function(sigma) {
-  ev <- eigen(sigma, symmetric = TRUE)
+  ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
   p <- nrow(sigma)
-  kap <- ev$values[1L] / ev$values[p]
-  hint <- sprintf("condition number %.3g", kap)
+  hint <- sprintf("condition number %.3g", ev[1L] / ev[p])
 
   nms <- rownames(sigma)
   if (is.null(nms) || !all(!is.na(nms) & nzchar(nms))) return(hint)
 
-  # Two independent gates, because the message makes two claims and the mass
-  # test alone establishes only the first. (1) Dominance: the two largest
-  # |loadings| of the near-null direction carry most of its mass, so THIS pair
-  # is what drives the degeneracy rather than a diffuse combination. (2)
-  # Collinearity: the pair is actually near-duplicate. A rotated planted
-  # eigenvalue passes (1) while its two dominant items correlate at 0.48 --
-  # measured, and the reason (2) exists: without it the warning asserts
-  # "nearly collinear" about a pair that is nothing of the kind.
-  v <- abs(ev$vectors[, p])
-  ord <- order(v, decreasing = TRUE)
-  if (sum(v[ord[1:2]]^2) < 0.8) return(hint)
-  if (abs(sigma[ord[1L], ord[2L]]) < 0.99) return(hint)
+  cut <- 1 - ev[1L] * sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
+  ij <- which(abs(sigma) >= cut & upper.tri(sigma), arr.ind = TRUE)
+  if (nrow(ij) == 0L) return(hint)
+  # Column order, so the list reads against the caller's own matrix rather than
+  # in whatever order `which()` walked it.
+  ij <- ij[order(ij[, 1L], ij[, 2L]), , drop = FALSE]
 
-  # Column order, not loading order, so the message reads against the caller's
-  # own matrix; and %g rather than a fixed 4 decimals, which rounds .99999 to
-  # 1.0000 and reports a near-duplicate pair as a perfectly collinear one.
-  ij <- sort(ord[1:2])
+  if (nrow(ij) == 1L) {
+    return(paste0(hint, sprintf(
+      "; items %s and %s are nearly collinear (r %s) -- near-duplicate items make the fitted matrix numerically degenerate, so consider dropping one",
+      nms[ij[1L, 1L]], nms[ij[1L, 2L]],
+      axes_fmt_near_unit_r(sigma[ij[1L, 1L], ij[1L, 2L]])
+    )))
+  }
+  shown <- min(nrow(ij), 3L)
+  lst <- paste(vapply(seq_len(shown), function(k)
+    sprintf("%s and %s", nms[ij[k, 1L]], nms[ij[k, 2L]]), ""), collapse = ", ")
+  if (nrow(ij) > shown) {
+    lst <- paste0(lst, sprintf(", and %d more", nrow(ij) - shown))
+  }
   paste0(hint, sprintf(
-    "; items %s and %s are nearly collinear (r = %.6g) -- near-duplicate items make the fitted matrix numerically degenerate, so consider dropping one",
-    nms[ij[1L]], nms[ij[2L]], sigma[ij[1L], ij[2L]]
+    "; %d item pairs are nearly collinear (%s) -- near-duplicate items make the fitted matrix numerically degenerate, so consider dropping the redundant ones",
+    nrow(ij), lst
   ))
+}
+
+# Every pair this message names sits within `lambda_max * sqrt(p*eps/tau)` of
+# +/-1, so a fixed-width format is the wrong tool: sprintf("%.6g", 0.9999999)
+# is "1", which reports a near-duplicate pair as a perfectly collinear one --
+# the same rounding failure a fixed 4 decimals had, two digits deeper (M106
+# review F7). Past what %.6g can separate from 1 the message states a bound
+# instead of a value, which is true at every radius; an exactly collinear pair
+# still prints as 1, because there it is the value.
+axes_fmt_near_unit_r <- function(r) {
+  if (abs(r) < 1 && abs(r) > 0.999999) {
+    if (r > 0) "> 0.999999" else "< -0.999999"
+  } else {
+    sprintf("= %.6g", r)
+  }
 }
 
 axes_sigma_degenerate <- function(sigma) {

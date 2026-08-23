@@ -72,11 +72,14 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   own sampling variability so that a numerical error at the target is a tenth
   of the statistical noise already in the number — divided by the factor of
   `10` by which the criterion's error bound may undershoot the error it stands
-  for. Where the refusal is ill-conditioning, the warning names the condition
-  number and, when a single near-duplicate item pair is what makes the matrix
-  degenerate, names that pair: on the `cormat` input path the caller has no
-  items for the package to inspect, so a bare reason code left them nowhere to
-  go.
+  for. Where this criterion refuses for ill-conditioning, the warning also
+  names the condition number, and lists any item pair correlated tightly enough
+  to force the refusal on its own — one pair with advice to drop one of them,
+  several with the count — so a bare reason code no longer leaves a caller with
+  nowhere to go. (The scaled-fit surface has a second, separate refusal that
+  reports the same reason for a numerical cancellation rather than for
+  conditioning; that one carries no such diagnosis, because there is no
+  condition number to blame.)
   The standard-error surface additionally applies the same criterion to the
   raw fitted matrix, which one internal arm of its computation — the
   uncorrected normal-theory pricing kept only as a diagnostic tie to lavaan's

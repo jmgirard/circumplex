@@ -2088,36 +2088,185 @@ test_that("M106 AC2: the near-duplicate geometry computes and the RR18 fixture s
 
 
 test_that("M106 AC5: the refusal warning names the conditioning and the collinear pair", {
-  # Four branches, because the message makes two claims under two conditions.
   near <- m106_family_b(2e-5)          # r = .9999714, kappa 1.01e5 -- refused
   msg <- axes_degeneracy_hint(near)
   expect_match(msg, "condition number 1.01e+05", fixed = TRUE)
-  # Column order, not eigenvector-loading order: the message reads against the
-  # caller's own matrix.
+  # Column order, not the order which() happened to walk the matrix in: the
+  # message reads against the caller's own matrix.
   expect_match(msg, "items i1 and i9 are nearly collinear", fixed = TRUE)
-  # %g, not a fixed 4 decimals -- .9999714 must not print as 1.0000 and report
-  # a near-duplicate pair as a perfectly collinear one.
   expect_match(msg, "(r = 0.999971)", fixed = TRUE)
-  expect_no_match(msg, "1.0000", fixed = TRUE)
+  expect_match(msg, "consider dropping one", fixed = TRUE)
 
-  # No dimnames: the conditioning alone. A positional index would be reported
-  # against the caller's column order, and lavaan reorders variables.
+  # No dimnames: the conditioning alone. A position is an index into the priced
+  # matrix, which is not what a user acts on.
   anon <- near
   dimnames(anon) <- NULL
   expect_identical(axes_degeneracy_hint(anon), "condition number 1.01e+05")
 
-  # A diffuse near-null direction: the two dominant loadings carry the mass,
-  # but the pair correlates at 0.48, so no collinearity claim is made. Without
-  # the second gate this branch asserted "nearly collinear" about that pair.
+  # A diffuse near-null direction. cov2cor'd, so its off-diagonal entries are
+  # the correlations the threshold is stated in -- the largest is 0.934, well
+  # under this p's cut of 0.99997, so no pair forces the refusal on its own and
+  # no collinearity claim is made.
   p <- 12L
   e <- rep(1, p); e[p] <- 1e-9
   q <- qr.Q(qr(matrix(seq_len(p * p) %% 7 + 1, p, p)))
   diffuse <- q %*% diag(e) %*% t(q)
-  diffuse <- (diffuse + t(diffuse)) / 2
+  diffuse <- stats::cov2cor((diffuse + t(diffuse)) / 2)
   dimnames(diffuse) <- list(paste0("v", seq_len(p)), paste0("v", seq_len(p)))
-  expect_gt(abs(diffuse[5L, 12L]), 0.4)
-  expect_lt(abs(diffuse[5L, 12L]), 0.99)
-  expect_identical(axes_degeneracy_hint(diffuse), "condition number 1e+09")
+  expect_gt(max(abs(diffuse[upper.tri(diffuse)])), 0.9)
+  expect_lt(max(abs(diffuse[upper.tri(diffuse)])), 0.99)
+  expect_identical(axes_degeneracy_hint(diffuse), "condition number 1.03e+09")
+})
+
+
+test_that("M106 review F7: a radius %.6g cannot separate from 1 states a bound, not 1", {
+  # sprintf("%.6g", 0.9999999) is "1", so a fixed-width format reports a
+  # near-duplicate pair as a perfectly collinear one -- the failure a fixed 4
+  # decimals had, two digits deeper. Reachable: the pair only has to beat
+  # 1 - lambda_max*sqrt(p*eps/tau), which is above 0.9999 at every p.
+  expect_identical(sprintf("%.6g", 0.9999999), "1")   # the failure, pinned
+  s <- diag(4)
+  s[1L, 2L] <- s[2L, 1L] <- 0.9999999
+  dimnames(s) <- list(paste0("i", 1:4), paste0("i", 1:4))
+  msg <- axes_degeneracy_hint(s)
+  expect_match(msg, "nearly collinear (r > 0.999999)", fixed = TRUE)
+  expect_no_match(msg, "r = 1", fixed = TRUE)
+  # An exactly collinear pair still prints the value, because there it IS 1.
+  s[1L, 2L] <- s[2L, 1L] <- 1
+  expect_match(axes_degeneracy_hint(s), "(r = 1)", fixed = TRUE)
+})
+
+
+test_that("M106 review F2: the named pairs do not depend on the eigensolver's basis", {
+  # Eight duplicate item pairs give an eight-dimensional near-null space, and
+  # LAPACK returns an arbitrary basis of it. The superseded eigenvector gates
+  # read one vector of that basis, so relabelling the items alone moved the
+  # message between naming an arbitrary member pair and naming nothing. The
+  # interlacing test reads only |r_ij| and lambda_max, so it cannot.
+  oct <- as.numeric(octants())
+  ang <- rep(oct, each = 2L)
+  sid <- rep(seq_along(oct), each = 2L)
+  rad <- ang * pi / 180
+  s <- 0.3 * outer(rad, rad, function(u, v) cos(u - v)) +
+    0.3 * matrix(1, 16L, 16L) + 0.2 * (outer(sid, sid, "==") * 1) +
+    1e-9 * diag(16L)
+  nms <- paste0("i", seq_len(16L))
+  dimnames(s) <- list(nms, nms)
+  dup <- stats::cov2cor(s)
+
+  expect_identical(axes_sigma_degenerate(dup), "ill_conditioned")
+  msg <- axes_degeneracy_hint(dup)
+  # The COUNT is the claim, and the advice is plural: "drop one" is wrong
+  # counsel among eight equally redundant pairs.
+  expect_match(msg, "8 item pairs are nearly collinear", fixed = TRUE)
+  expect_match(msg, "consider dropping the redundant ones", fixed = TRUE)
+  expect_no_match(msg, "consider dropping one", fixed = TRUE)
+  # Only three are listed, and the rest are counted rather than dropped.
+  expect_match(msg, "(i1 and i2, i3 and i4, i5 and i6, and 5 more)", fixed = TRUE)
+
+  # Same matrix, five relabellings: the count never moves. Fixed permutations
+  # rather than draws -- the claim is about every relabelling, so a seed would
+  # add an axis without adding coverage. The second splits every duplicate pair
+  # across the two halves, which is the arrangement the eigenvector gates were
+  # measured to fail on.
+  perms <- list(
+    reversed    = 16:1,
+    evens_odds  = c(seq(2L, 16L, 2L), seq(1L, 15L, 2L)),
+    rotated     = c(9:16, 1:8),
+    shifted     = c(16L, 1:15),
+    multiplied  = (0:15 * 7L) %% 16L + 1L
+  )
+  for (k in names(perms)) {
+    pm <- perms[[k]]
+    expect_setequal(pm, seq_len(16L))     # it really is a permutation
+    expect_match(axes_degeneracy_hint(dup[pm, pm]),
+                 "8 item pairs are nearly collinear", fixed = TRUE, label = k)
+  }
+
+  # And the same construction at three items per scale: 8 triplets are 24
+  # pairs, not 8 -- the count tracks the matrix, not the block structure.
+  ang3 <- rep(oct, each = 3L)
+  sid3 <- rep(seq_along(oct), each = 3L)
+  rad3 <- ang3 * pi / 180
+  s3 <- 0.3 * outer(rad3, rad3, function(u, v) cos(u - v)) +
+    0.3 * matrix(1, 24L, 24L) + 0.2 * (outer(sid3, sid3, "==") * 1) +
+    1e-9 * diag(24L)
+  nm3 <- paste0("i", seq_len(24L))
+  dimnames(s3) <- list(nm3, nm3)
+  expect_match(axes_degeneracy_hint(stats::cov2cor(s3)),
+               "24 item pairs are nearly collinear", fixed = TRUE)
+})
+
+
+test_that("M106 review F11: the collinearity cut is the criterion's, not a flat 0.99", {
+  # A matrix refused for a reason NO pair accounts for, carrying one pair that
+  # a hand-set 0.99 would name anyway. Ten items (3..12) carry a near-null
+  # alternating combination -- that is what drives lambda_min to 1.1e-6 -- and
+  # items 1 and 2 correlate 0.995, which by Cauchy interlacing bounds
+  # lambda_min only by 5e-3, twenty-five times ABOVE this p's floor. So that
+  # pair does not force the refusal, and naming it would be a false claim about
+  # the cause and wrong advice about the remedy.
+  p <- 12L
+  w <- c(rep(0, 2L), rep(c(1, -1), 5L)) / sqrt(10)
+  s <- diag(p) - (1 - 1e-6) * outer(w, w)
+  s[1L, 2L] <- s[2L, 1L] <- 0.995
+  s <- stats::cov2cor(s)
+  dimnames(s) <- list(paste0("v", seq_len(p)), paste0("v", seq_len(p)))
+
+  ev <- eigen(s, symmetric = TRUE, only.values = TRUE)$values
+  cut <- 1 - ev[1L] * sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
+  # The case lands where it must to discriminate: past 0.99, short of the cut.
+  expect_gt(max(abs(s[upper.tri(s)])), 0.99)
+  expect_lt(max(abs(s[upper.tri(s)])), cut)
+
+  expect_identical(axes_sigma_degenerate(s), "ill_conditioned")
+  expect_identical(axes_degeneracy_hint(s), "condition number 1.8e+06")
+})
+
+
+test_that("M106 review F1: only the ill-conditioning refusal carries the diagnostic", {
+  # The hint was attached to every degeneracy literal, so an indefinite refusal
+  # printed a NEGATIVE "condition number" -- lambda_min < 0 is what makes the
+  # matrix indefinite. M90's partition puts "indefinite" on the model side of
+  # the model/numerics line, and a conditioning figure there blurs it.
+  # df counts come off axes_se_derivs() rather than being written in, so the
+  # two df guards this surface checks first cannot swallow the call and leave
+  # the assertion below passing for the wrong reason.
+  dfs <- function(p, ang, scale) {
+    q <- length(axes_se_derivs(ang, scale, NULL, TRUE, FALSE)$mats)
+    list(df = p * (p + 1) / 2 - q, baseline_df = p * (p - 1) / 2)
+  }
+
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  ind <- pp$sigma
+  ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
+  ind <- stats::cov2cor(ind)
+  expect_identical(axes_sigma_degenerate(ind), "indefinite")
+  ev <- eigen(ind, symmetric = TRUE, only.values = TRUE)$values
+  expect_lt(ev[p], 0)                     # so the ratio would print negative
+
+  di <- dfs(p, pp$item_angle, pp$scale)
+  w <- testthat::capture_warnings(
+    axes_scaling_factor(ind, pp$names, pp$item_angle, pp$scale, NULL,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = di$df, baseline_df = di$baseline_df)
+  )
+  expect_length(grep("indefinite", w, fixed = TRUE), 1L)
+  expect_length(grep("condition number", w, fixed = TRUE), 0L)
+
+  # The control: the SAME surface on an ill-conditioned matrix DOES carry it,
+  # so the assertion above is about the literal and not about the call site.
+  ang9 <- c(as.numeric(octants()), as.numeric(octants())[1L])
+  sc9 <- as.character(c(1:8, 1L))
+  dc <- dfs(9L, ang9, sc9)
+  wc <- testthat::capture_warnings(
+    axes_scaling_factor(m106_family_b(2e-5), paste0("i", 1:9), ang9, sc9, NULL,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = dc$df, baseline_df = dc$baseline_df)
+  )
+  expect_length(grep("ill_conditioned", wc, fixed = TRUE), 1L)
+  expect_length(grep("condition number 1.01e+05", wc, fixed = TRUE), 1L)
 })
 
 
@@ -2193,24 +2342,40 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
   )))
   expect_identical(res8$details$se_correction_failed, "ill_conditioned")
   expect_identical(res8$details$fit_scaling_failed, "ill_conditioned")
+  # The literal must come from the CRITERION, not from a fit that never
+  # converged: non-convergence has its own refusal, and without this the two
+  # routes to the same reported reason are indistinguishable here.
+  expect_true(res8$details$converged)
 
   # Case 3 -- p = 24, three items per octant scale. kappa 7.2e5 against a floor
   # of 4.33e4: strictly above, refused. This one CANNOT reach the criterion
   # through a real fit -- lavaan does not converge on it, measured -- so it is
   # injected at the axes_fitted_cov seam, which exists for exactly this
   # (R/axes_corrected_se.R: no converged fit is known to reach the degenerate
-  # regime). The fit it rides on is the benign p = 24 construction.
+  # regime).
   r24_bad <- m106_family_a(1e-5, per_scale = 3L)
   expect_gt(m106_kappa(r24_bad), m106_floor_kappa(24L))
-  r24_ok <- m106_family_a(1e-2, per_scale = 3L)
+
+  # The CARRIER fit is probe_octant()'s p = 24 map (kappa 10.45, the figure
+  # D-044 cites for the probe fits), not a second near-degenerate construction.
+  # Its conditioning is irrelevant to what this case asserts -- it exists only
+  # so the seam has a converged fit to ride on -- and choosing a stiff one made
+  # convergence platform-dependent: m106_family_a(1e-2, per_scale = 3L) at
+  # kappa 721 converged locally and on windows and macos but errored "The
+  # lavaan model did not converge" on ubuntu (run 32615474776, head 0e3c5148).
+  # probe_octant() is exercised on all three platforms across the M89/M90
+  # suites.
+  pp <- probe_octant()
+  r24_ok <- pp$sigma
   expect_null(axes_sigma_degenerate(r24_ok))
+  # The injected matrix is realigned to the carrier's item names downstream, so
+  # it has to carry them; the geometry is unchanged by the relabelling.
+  dimnames(r24_bad) <- dimnames(r24_ok)
 
   local_mocked_bindings(axes_fitted_cov = function(fit) r24_bad)
   w <- testthat::capture_warnings(
     res24 <- suppressMessages(axes_reliability(
-      cormat = r24_ok,
-      items = split(paste0("i", 1:24), rep(seq_along(oct), each = 3L)),
-      angles = oct, n = 600L
+      cormat = r24_ok, items = pp$items, angles = oct, n = 600L
     ))
   )
   expect_identical(res24$details$se_correction_failed, "ill_conditioned")
