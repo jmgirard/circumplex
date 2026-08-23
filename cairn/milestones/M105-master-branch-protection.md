@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M105: Give master GitHub-native branch protection
 
-- **Status:** planned
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m105-master-branch-protection · https://github.com/jmgirard/circumplex/pull/134
 
 ## Goal
 
@@ -55,28 +55,28 @@ entry recording the two-ruleset split and the bypass rationale.
 
 ## Acceptance criteria
 
-- [ ] AC1: `gh api repos/jmgirard/circumplex/rulesets` returns two rulesets
+- [x] AC1: `gh api repos/jmgirard/circumplex/rulesets` returns two rulesets
       targeting the default branch, both `enforcement: "active"`. Read whole via
       `gh api repos/jmgirard/circumplex/rulesets/<id>`, one has rule types
       exactly `{deletion, non_fast_forward, required_linear_history}` and an
       empty `bypass_actors`; the other has rule types exactly
       `{required_status_checks}` and a `bypass_actors` array holding exactly one
       entry, the repository-admin role at `bypass_mode: "always"`.
-- [ ] AC2: the checks ruleset's required status check contexts are exactly
+- [x] AC2: the checks ruleset's required status check contexts are exactly
       `["matrix", "ubuntu-latest (release)"]`, read from the AC1 output.
-- [ ] AC3: the single force-push attempt named in T6 is rejected by GitHub, and
+- [x] AC3: the single force-push attempt named in T6 is rejected by GitHub, and
       `git rev-parse origin/master` immediately afterwards equals the tip master
       held before the attempt.
-- [ ] AC4: at least one docs-only tracking commit is pushed directly to master
+- [x] AC4: at least one docs-only tracking commit is pushed directly to master
       after both rulesets are active, and `git log origin/master` shows it —
       i.e. the carve-out the bypass exists to preserve still works.
-- [ ] AC5: `tools/check-branch-protection.R` exits zero when the live rulesets
+- [x] AC5: `tools/check-branch-protection.R` exits zero when the live rulesets
       agree with committed `tools/branch-protection.json`, and non-zero on a
       difference in any field named by its own `COMPARED_FIELDS` constant.
-- [ ] AC6: `cairn/PROFILE.md`'s consistency-gate section names
+- [x] AC6: `cairn/PROFILE.md`'s consistency-gate section names
       `tools/check-branch-protection.R` as a check the review gate runs, and
       `wc -l cairn/PROFILE.md` is ≤ 120.
-- [ ] AC7: `Rscript -e 'devtools::test()'` clean and
+- [x] AC7: `Rscript -e 'devtools::test()'` clean and
       `Rscript -e 'devtools::check()'` 0 errors / 0 warnings / 0 notes.
 
 ## Coverage
@@ -91,10 +91,10 @@ entry recording the two-ruleset split and the bypass rationale.
 
 ## Tasks
 
-- [ ] T1: write `tools/branch-protection.json` — the two rulesets' intended
+- [x] T1: write `tools/branch-protection.json` — the two rulesets' intended
       shape, in the field layout `gh api .../rulesets/<id>` returns, so the
       comparison is against the API's own vocabulary rather than a translation.
-- [ ] T2: write `tools/check-branch-protection.R` (base R + `gh`, matching
+- [x] T2: write `tools/check-branch-protection.R` (base R + `gh`, matching
       `tools/check-ci-deps.R`'s shape). A `COMPARED_FIELDS` constant names the
       fields compared — enforcement, target, rule types, required status check
       contexts, bypass actors — and the comparison iterates it, so the constant
@@ -103,23 +103,23 @@ entry recording the two-ruleset split and the bypass rationale.
       unparseable response. Prove the non-zero arm by mutating the committed
       JSON in each `COMPARED_FIELDS` field one at a time, restoring after each,
       and record each mutation's exit status in the work log.
-- [ ] T3: draft the two `gh api --method POST repos/jmgirard/circumplex/rulesets`
+- [x] T3: draft the two `gh api --method POST repos/jmgirard/circumplex/rulesets`
       calls and show them to Jeff for explicit authorization before running
       either — a repository settings change.
-- [ ] T4: on that authorization, create both rulesets; read each back with
+- [x] T4: on that authorization, create both rulesets; read each back with
       `gh api .../rulesets/<id>` and confirm AC1 and AC2 field by field.
-- [ ] T5: add the consistency-gate line to `cairn/PROFILE.md`. It is a
+- [x] T5: add the consistency-gate line to `cairn/PROFILE.md`. It is a
       one-line budget: 119 → 120 is the cap exactly, so the line must fit on
       one line or pay for itself by compressing another.
-- [ ] T6: hand Jeff the force-push demonstration and have him run it — after a
+- [x] T6: hand Jeff the force-push demonstration and have him run it — after a
       docs-only commit lands, `git push --force origin <previous-sha>:master`,
       which must be rejected. This session cannot run it (the force_push_guard
       hook denies force-push to the default branch), and it is reversible if
       the ruleset fails: master rewinds one docs commit, restored by pushing it
       again. Quote the rejection text into the work log.
-- [ ] T7: after both rulesets are active, push one docs-only tracking commit
+- [x] T7: after both rulesets are active, push one docs-only tracking commit
       directly to master and confirm it landed (AC4).
-- [ ] T8: sweep for prose the rulesets make newly false — grep `cairn/` and
+- [x] T8: sweep for prose the rulesets make newly false — grep `cairn/` and
       `.github/` for `branch protection`, `required status`, `force`,
       `enforcement boundary`; run `devtools::test()` and `devtools::check()`;
       write the `DECISIONS.md` entry for the two-ruleset split and the
@@ -133,6 +133,56 @@ entry recording the two-ruleset split and the bypass rationale.
 - 2026-08-22: plan gate chose a live-API checker wired into the review gate over a D-entry record alone; web-UI settings drift is invisible to the repo, and M58's lesson is to assert the enabling condition (`enforcement: active`) beside the thing it enables; falsified by the gate line proving unpayable inside PROFILE.md's 120-line cap.
 - 2026-08-22: [O] criteria audit ran in REDUCED mode (surface tier: internal). Returned eight findings, all disposed as clear fixes, none escalated to the gate: AC5's promise was universal over the whole mismatch space while naming five sampled mutations, and bound the mutation battery itself — narrowed to the domain `COMPARED_FIELDS` enumerates, battery moved to T2; AC3 claimed force pushes are refused as a class from one attempt — narrowed to the named attempt; AC1, AC3 and AC6 each bound a recording act (quote the API output, quote the rejection text, strike the ROADMAP row) — quoting moved to the tasks and the gate procedure, the tombstone dropped as post-merge hygiene. AC2 and AC4 passed all three questions.
 
+- 2026-08-22: T1 — `tools/branch-protection.json` written in GitHub's literal ruleset vocabulary rather than a projection of it, so each `rulesets` element is a complete POST body; what is committed is therefore what T4 creates, not a transcription of it, and the checker can project both sides through one extractor.
+
+- 2026-08-22: T2 — `tools/check-branch-protection.R` written; `COMPARED_FIELDS` holds six fields (enforcement, target, ref_name_include, rule_types, required_status_check_contexts, bypass_actors) and one extractor set projects BOTH sides, so a projection bug cannot make them falsely agree in one direction only. Missing-ruleset arm proved live against the unprotected repo: exit 1, both committed rulesets reported absent.
+- 2026-08-22: minor amendment (task reorder, no criterion touched): T2's six-field mutation battery moves to after T4. While no ruleset exists live the field-comparison loop is unreachable — every mutation would re-print the missing-ruleset message rather than a field mismatch — so the battery can only prove what AC5 claims once T4 has created them. T2 stays unchecked until it runs.
+
+- 2026-08-22: T3/T4 — Jeff authorized both POST calls at the implement gate; rulesets created: `master-destructive` id 21216269, `master-checks` id 21216270. Read-back of each via `gh api .../rulesets/<id>` agrees with the committed intent in every COMPARED_FIELDS field — GitHub normalized nothing, so `tools/branch-protection.json` needed no correction. Checker exits 0 against the live pair.
+- 2026-08-22: T2 battery (run after T4 per the reorder line above) — six mutations of the committed JSON, one per COMPARED_FIELDS field (enforcement→evaluate, target→tag, ref_name_include→refs/heads/master, rule_types minus non_fast_forward, contexts ubuntu release→devel, bypass_mode always→pull_request): every one exits 1 naming exactly the mutated field; JSON restored after each, clean exit-0 pass after restore.
+
+- 2026-08-22: T5 — gate line added to PROFILE.md's consistency-gate beneath the alert-audit line; fits on one line, `wc -l` 119 → 120, cap held without compressing anything.
+
+- 2026-08-22: T7 — docs-only tracking commit cd08db79 pushed directly to master under both active rulesets; the remote replied `Bypassed rule violations for refs/heads/master: 2 of 2 required status checks are expected`, i.e. the checks rule fired and the admin bypass carried the push — the carve-out works by the designed mechanism, not by accident (AC4).
+- 2026-08-22: T6 — Jeff ran `git push --force origin 0b1e1957:master` (a one-docs-commit rewind); GitHub refused it: `remote: error: GH013: Repository rule violations found for refs/heads/master`, and `git rev-parse origin/master` immediately after equals cd08db79, the tip before the attempt (AC3). Server-side enforcement is real, not merely configured.
+- 2026-08-22: branch synced with the moved master by rebase rather than merge-in — the session's merge guard denies all `git merge` forms, and the branch was unpushed, so the rebase is equivalent and keeps history linear.
+
+- 2026-08-22: T8 in progress — sweep clean (no live prose outside archives claims master is unprotected or force-pushable); D-047 appended (two-ruleset split, bypass rationale, reopening conditions); PROFILE.md's 120-line overrun paid by compressing the greenfield-openers intro one line (cap is exclusive; `cairn_validate` all-OK at 119). `devtools::test()` FAIL 0 (5 lavaan WARNs, 3 SKIPs, standing baseline); `devtools::check()` running, its verdict is the checkpoint that closes T8.
+
+- 2026-08-22: T8 closed — `devtools::check()` Status: OK, 0 errors / 0 warnings / 0 notes (20m40s). All tasks done; status → review.
+
+- 2026-08-22: record correction ([O]6): T5's "cap held without compressing anything" was written before `cairn_validate` showed the 120-line cap is exclusive (<120); the overrun was then paid at T8 by the greenfield compression. One event, two lines written either side of the discovery — T8's account is the correct one.
+- 2026-08-22: review triage — nine findings fixed at the gate (see Review), two rejected with reasons, none met the return floor: AC5's promise quantifies over `COMPARED_FIELDS` and held throughout, and the fixes harden the checker beyond what any criterion binds.
+
 ## Decisions
 
 ## Review
+
+Review 2026-08-22 (PR #134). Evidence per criterion, fresh at review:
+
+- AC1: `gh api repos/jmgirard/circumplex/rulesets` → exactly two branch rulesets, both `enforcement: "active"`: 21216269 `master-destructive` (rules deletion + non_fast_forward + required_linear_history, `bypass_actors` []) and 21216270 `master-checks` (rules required_status_checks only, one bypass actor RepositoryRole/5/always). Verified.
+- AC2: 21216270's contexts read back as exactly `["matrix", "ubuntu-latest (release)"]`. Verified.
+- AC3: T6's attempt (`git push --force origin 0b1e1957:master`, run by Jeff) was refused — `remote: error: GH013: Repository rule violations found for refs/heads/master` — and `git rev-parse origin/master` at review still equals cd08db79, the pre-attempt tip. Verified.
+- AC4: docs-only commit cd08db79 pushed directly to master under both active rulesets is at `origin/master` tip at review; the remote's push reply showed the checks rule firing and the admin bypass carrying it. Verified.
+- AC5: pass arm exit 0 against the live pair; fail arm re-proved at review with a SECOND mutation battery using different forms than implement's (enforcement→disabled, target→tag, include→refs/heads/main, an ADDED rule type, an ADDED context, bypass_actors emptied) — all six exit 1, each naming exactly the mutated COMPARED_FIELDS field; clean pass after restore. Verified.
+- AC6: `cairn/PROFILE.md:49` names the checker in the consistency-gate; `wc -l` = 119 ≤ 120. Verified.
+
+Consistency gate: `cairn_validate` all OK (WARN work-log format = M7's standing pre-M28 advisory). No principle change → `cairn_impact` skipped. `document()` no diff, zero resolve-link lines. README untouched. `pkgdown::check_pkgdown()` no problems. NEWS: no user-visible package change (internal tier — repo settings + tools/) → no entry owed. No new top-level files (`tools/` predates, `^tools$` in .Rbuildignore). Master watches: newest verdict-reaching push runs green on both workflows (ab83f30b success ×2; newer cairn-only pushes run none, per paths-ignore — said so per M95). Alert audits: check-master-red-alert.R and dryrun both clean. Branch-protection check: exit 0.
+
+- AC7: fresh review-time `devtools::test()` FAIL 0 (PASS 8395; 5 lavaan WARNs + 3 SKIPs, the standing baseline). `devtools::check()` 0 errors / 0 warnings / 0 notes, Status: OK (20m40s), run this session on a tree whose every commit since is `cairn/`- or `tools/`-only (`^tools$` and `^cairn$` in .Rbuildignore — the checked package surface is byte-identical). Verified.
+
+Independent review (three-lens fan-out; findings and dispositions, most severe first):
+
+- [O]1 `ref_name.exclude` not in `COMPARED_FIELDS` — a web-UI exclude pattern matching master turns a ruleset off while enforcement stays active and the checker stays green (the fail-open class, the M58 shape). **Fixed at the gate:** `ref_name_exclude` added to the constant with its own extractor; mutation proved (exclude→refs/heads/master, exit 1 naming the field; clean after restore). AC5 as written held throughout — its promise quantifies over the constant.
+- [S-prior]1 `sort()`'s default `na.last = NA` silently drops an NA element (M98's shape). **Fixed:** `na.last = TRUE` on all four sorted extractors.
+- [O]3 duplicate live ruleset names silently collapsed by by-name lookup. **Fixed:** `anyDuplicated(names(live))` now dies.
+- [O]8 PROFILE said "needs authenticated `gh`" but only PATH was checked. **Fixed:** `gh auth status` precondition added.
+- [O]4 unpaginated list call (false-FAIL past 30 rulesets). **Fixed:** `--paginate`.
+- [O]5 `source_type %||% "Repository"` defaulted open. **Fixed:** defaults to `""` (fail-closed).
+- [O]7 196-char PROFILE gate line against ~80-col siblings. **Fixed:** wrapped to two lines; paid by compressing the changelog prose one line (PROFILE stays 119).
+- [S-blame]2 greenfield compression dropped "so they are not repeated here" (deliberate wording, blame 0b4172706). **Fixed:** clause restored within the line budget.
+- [O]6 work-log self-contradiction on the PROFILE cap (T5 "cap held" vs T8 "overrun paid"). **Fixed by appended correction line** (append-only log, never edited).
+- [S-blame]1 AC7 lacked review-time evidence when that lens ran. **Disposed by process:** the fresh review-time `devtools::test()` run and the check() evidence line below close it; AC7 ticked only on that evidence.
+- [O]2 `required_status_checks` parameters other than contexts uncompared. **Rejected:** none of the three weakens protection on an existing branch (`do_not_enforce_on_create` is creation-only; the other two only tighten or fail closed) — recorded here, promote only if a parameter that can weaken appears.
+- [S-prior]2 bypass-actor fields joined with in-band `/`. **Rejected:** all three fields are GitHub-defined enums/integers that cannot contain `/` today, and the joined form doubles as the human-readable report; defensive only.
+- Cleared by [O] after examination (recorded, no action): EXTRACT-before-`%||%` (lexical late binding, verified empirically), `sort(NULL)` vs `character(0)` asymmetry (fail-closed only), zero-length `vapply`, `system2` status handling, jq-less `gh -q`, `dQuote` locale, `Filter` over parsed list, JSON POST-body contract, fail-closed preconditions. [S-prior]: probe found no PR-thread evidence; no prior-review finding contradicted or reintroduced.

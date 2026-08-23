@@ -1,0 +1,74 @@
+{
+  "_readme": [
+    "Intended shape of this repository's two branch rulesets (cairn M105).",
+    "",
+    "Source of truth for tools/check-branch-protection.R, which reads the LIVE",
+    "rulesets via `gh api` and fails on any difference in the fields named by",
+    "that script's COMPARED_FIELDS constant.",
+    "",
+    "Two rulesets, not one, because a ruleset's bypass actor bypasses EVERY rule",
+    "in that ruleset. The destructive rules must bind the repository admin, and",
+    "the required-status-check rule must not: required status checks block direct",
+    "pushes as well as merges, and a `cairn/**`-only push runs no workflow at all,",
+    "so without the bypass the cairn docs-only direct-push carve-out deadlocks.",
+    "",
+    "Each element of `rulesets` below is a complete POST body for",
+    "`gh api --method POST repos/OWNER/REPO/rulesets`, so what is committed here",
+    "is what was created rather than a transcription of it. Server-assigned",
+    "fields (id, node_id, source, source_type, created_at, updated_at, _links)",
+    "are absent by design: they are not part of the intent.",
+    "",
+    "`~DEFAULT_BRANCH` rather than `refs/heads/master`: cairn never hardcodes the",
+    "default branch name, and this targeting follows a rename."
+  ],
+  "rulesets": [
+    {
+      "name": "master-destructive",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["~DEFAULT_BRANCH"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        { "type": "deletion" },
+        { "type": "non_fast_forward" },
+        { "type": "required_linear_history" }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "master-checks",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["~DEFAULT_BRANCH"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": false,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              { "context": "matrix" },
+              { "context": "ubuntu-latest (release)" }
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_type": "RepositoryRole",
+          "actor_id": 5,
+          "bypass_mode": "always"
+        }
+      ]
+    }
+  ]
+}
