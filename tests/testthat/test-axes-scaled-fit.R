@@ -1838,6 +1838,61 @@ test_that("AC3: the floor discriminates its p factor at the threshold", {
   }
 })
 
+test_that("M106 AC3: the floor discriminates p and spectral form at the threshold", {
+  # AC3 extends the M89 probe on two axes at once. p = 3, 12 and 24, because
+  # the floor carries a p factor. And three SPECTRAL FORMS at the refusing
+  # side, because the criterion is free in more than the eigenvalue ratio: the
+  # M89 probe varied only p and which side of the floor a POSITIVE spectrum
+  # sat on, so one exemplar stood in for the whole family the partition
+  # covers.
+  #
+  # tau pinned to its literal, asserted against the constant separately -- see
+  # the sibling probe above for why both sides must not come off the constant.
+  expect_identical(axes_degeneracy_tau, 1e-5)
+
+  # An equicorrelation matrix (1-c)I + cJ has eigenvalue ratio
+  # (1-c)/(1+(p-1)c), so c places the ratio anywhere relative to the floor.
+  equicorr <- function(p, ratio) {
+    c_ <- (1 - ratio) / (1 + ratio * (p - 1))
+    S <- matrix(c_, p, p)
+    diag(S) <- 1
+    S
+  }
+  # A matrix with one eigenvalue planted at a chosen (possibly negative) value
+  # and the rest at 1, in a rotated basis so the defect is not axis-aligned --
+  # an axis-aligned planted eigenvalue would leave the off-diagonal structure
+  # of a diagonal matrix, which is not the shape a fitted matrix ever has.
+  planted <- function(p, lambda_min) {
+    q <- qr.Q(qr(matrix(seq_len(p * p) %% 7 + 1, p, p)))
+    ev <- c(rep(1, p - 1L), lambda_min)
+    S <- q %*% diag(ev) %*% t(q)
+    (S + t(S)) / 2
+  }
+
+  for (p in c(3L, 12L, 24L)) {
+    f <- sqrt(p * .Machine$double.eps / 1e-5)
+    band <- sqrt(p * .Machine$double.eps)   # the M90 indefiniteness band
+
+    # Form 1, both sides of the floor: a positive spectrum.
+    expect_null(axes_sigma_degenerate(equicorr(p, f * 1.05)),
+                label = sprintf("p %d, positive spectrum 1.05x floor", p))
+    expect_identical(axes_sigma_degenerate(equicorr(p, f * 0.95)),
+                     "ill_conditioned",
+                     label = sprintf("p %d, positive spectrum 0.95x floor", p))
+
+    # Form 2: lambda_min NEGATIVE but inside the fit's own noise band, so the
+    # negativity is not decisive and the literal stays the numerical caution.
+    expect_identical(axes_sigma_degenerate(planted(p, -band * 0.5)),
+                     "ill_conditioned",
+                     label = sprintf("p %d, roundoff-level negative", p))
+
+    # Form 3: decisively negative -- past the band, a claim about the model.
+    expect_identical(axes_sigma_degenerate(planted(p, -band * 100)),
+                     "indefinite",
+                     label = sprintf("p %d, decisively negative", p))
+  }
+})
+
 test_that("M90 AC2: within the refusal region, deep negativity says 'indefinite', roundoff-level says 'ill_conditioned'", {
   # The two anchors, each named by construction and metric (M90 AC2). The
   # nestedness-grid indefinite probe is deeply indefinite in BOTH metrics
