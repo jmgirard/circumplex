@@ -56,11 +56,12 @@ M7's own gate.
       accuracy target δ* = 1e-4 and the calibration ceiling C = 10 named and
       documented beside it as separate quantities, so the constant's stated
       definition and its enforced cap no longer differ by the slack factor.
-- [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× the committed
-      floor and `"ill_conditioned"` at 0.95×, at p = 3, 12 and 24, and across
-      three spectral forms at 0.95×: positive λmin, λmin negative but inside
-      `-λmax·sqrt(p·ε)` (still `"ill_conditioned"`), and decisively negative
-      (`"indefinite"`).
+- [ ] AC3 — `axes_sigma_degenerate()` returns `NULL` at 1.05× and
+      `"ill_conditioned"` at 0.95× of the committed eigenvalue-ratio floor
+      `λmax·sqrt(p·ε/τ)`, at p = 3, 12 and 24, on a positive-λmin spectrum. At
+      the same three p it returns `"ill_conditioned"` where λmin is negative at
+      half the noise band `-λmax·sqrt(p·ε)`, and `"indefinite"` where λmin is
+      100× past that band.
 - [x] AC4 — Through `axes_reliability()`, three κ in [1e4, 1e7] at three
       different p, straddling the committed threshold (4.3e4 at p = 24):
       one strictly below the committed threshold returns numbers,
@@ -223,3 +224,5 @@ M7's own gate.
 - **F17 (open question, for the maintainer).** This branch may ship half of D-048's own reopening trigger (i): AC4 case 2 is refused through a converged fit while the new oracle measures the identical construction at rel.err 3.0e-12, eight decades inside δ* = 1e-4. Only the cval half is missing, and F4 is why. → **maintainer decision**
 - **F18, F19.** Confirmations, no action: AC6's sweep re-verified clean, AC2's arithmetic reproduced (δ* = 0.1/sqrt(2·(5e5−1)) = 1.0e-4; thresholds 43318.6 / 75030.0 / 106108.4 at p = 24/8/4), the `hint = NULL` threading behaviour-preserving for every non-degeneracy refusal, M71 and M89 contracts untouched, no reachable error path in the helper, no NAMESPACE/DESCRIPTION drift, no RNG use.
 - 2026-08-22: T9 opened for return 1; minor plan refinement, no criteria touched. Finding 3 fixed first: the oracle's reachable cases now read `fit_zeta1` off each case's own item map with `axes_fits_zeta1()` instead of inheriting the p = 3 fixture's FALSE. The two near-duplicate cases put two items on scale 1, so they were priced under a model the exported path would not fit; re-measured, their attainment moves 5.47e-8 → 3.82e-7 and 3.41e-8 → 6.82e-8, reproducing the review's own re-measurement. Finding 12 fixed with it — the window comment claimed attainment "1e-9 to 1e-6" against a script that prints 6.8e-8 to 3.8e-7, now stated as measured and pinned to this script and date. `exact_oracle.R` exits 0, ANCHORS/SWEEP/REACHABLE all PASS.
+- 2026-08-22: the amended AC3 wording went to a fresh-context [O] reader that did not author it, in the FULL criteria-audit mode the user-facing tier assigns. It returned three findings, each with one clear right answer and each applied verbatim before the text was written: name the floor as the eigenvalue-ratio floor rather than a bare "committed floor" (the κ-threshold reading of which is unsatisfiable in the other direction); name the two negative depths the evidence actually uses instead of leaving λmin's depth free; and drop "decisively", whose vagueness invites the same charitable reading that sank the original. Widening verdict HOLDS — same function, same two literals, same three p, same three spectral forms, no new object or surface bound.
+- 2026-08-22: amendment return: AC3 — "`axes_sigma_degenerate()` returns `NULL` at 1.05× and `"ill_conditioned"` at 0.95× of the committed eigenvalue-ratio floor `λmax·sqrt(p·ε/τ)`, at p = 3, 12 and 24, on a positive-λmin spectrum. At the same three p it returns `"ill_conditioned"` where λmin is negative at half the noise band `-λmax·sqrt(p·ε)`, and `"indefinite"` where λmin is 100× past that band."
