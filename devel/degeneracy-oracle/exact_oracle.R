@@ -140,6 +140,95 @@ for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
               tt, kappa_of(St), rel, bound, ratio))
 }
 
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\n",
-            if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL"))
-if (!ok || !sweep_ok) quit(status = 1L)
+# --- M106 / RR19 B2: the REACHABLE-geometry family ---------------------------
+#
+# Everything above is measured at counterexample B, and B is not a matrix this
+# criterion can be handed in production: it is p = 3 with df = 1 while
+# axes_reliability() requires four scales, and it sits 25 units off the model
+# manifold at its own stated configuration. So the sweep above establishes that
+# the bound is TIGHT AT B -- a property of that fixture, not of the criterion.
+# Its pass window (ratio in [0.1, 10]) encodes exactly that and must not be
+# applied here.
+#
+# This family is model-implied -- Sigma = xi1*C + xi2*J + zeta1*Bm + diag(eps),
+# the form every lavaan-fitted Sigma-hat has -- at dimensions the exported API
+# actually reaches. What it asserts is the OPPOSITE property: that in reachable
+# geometry the bound stays decades away from the error it stands for. If a
+# future change puts a reachable design into B's coupling regime, this is what
+# reddens.
+#
+# The window is three decades below 1, against measured attainment of 1e-9 to
+# 1e-6 -- deliberately three to five decades looser than anything measured,
+# because a bar set at the measured value is a bar calibrated on one machine.
+REACHABLE_WINDOW <- 1e-3
+
+reachable_family <- function(eps, per_scale, xi1 = 0.3, xi2 = 0.3, zeta1 = 0) {
+  oct <- c(90, 135, 180, 225, 270, 315, 360, 45)
+  ang <- rep(oct, each = per_scale)
+  sid <- rep(seq_along(oct), each = per_scale)
+  rad <- ang * pi / 180
+  cm <- outer(rad, rad, function(u, v) cos(u - v))
+  bm <- outer(sid, sid, "==") * 1
+  sg <- xi1 * cm + xi2 * matrix(1, length(ang), length(ang)) +
+    zeta1 * bm + eps * diag(length(ang))
+  nms <- paste0("i", seq_along(ang))
+  dimnames(sg) <- list(nms, nms)
+  list(S = cov2cor(sg), ang = ang, scale = as.character(sid))
+}
+
+# Near-duplicate geometry: a ninth item sharing scale 1's angle, with the
+# pair's item errors driven down together. This is M89 F3's own case -- the
+# refusal that motivated M106 -- so the family covers the shape the
+# recalibration was made for, not only well-spread designs.
+near_duplicate_family <- function(pair_eps, xi1 = 0.3, xi2 = 0.2,
+                                  zeta1 = 0.2, other_eps = 0.30) {
+  oct <- c(90, 135, 180, 225, 270, 315, 360, 45)
+  ang <- c(oct, oct[1])
+  sid <- c(seq_along(oct), 1L)
+  rad <- ang * pi / 180
+  cm <- outer(rad, rad, function(u, v) cos(u - v))
+  bm <- outer(sid, sid, "==") * 1
+  ev <- rep(other_eps, length(ang))
+  ev[c(1L, length(ang))] <- pair_eps
+  sg <- xi1 * cm + xi2 * matrix(1, length(ang), length(ang)) +
+    zeta1 * bm + diag(ev)
+  nms <- paste0("i", seq_along(ang))
+  dimnames(sg) <- list(nms, nms)
+  list(S = cov2cor(sg), ang = ang, scale = as.character(sid))
+}
+
+cat("\n== M106 reachable-geometry family: is the bound decades LOOSE here? ==\n")
+cat("  construction                p     kappa(R)     rel.err     bound        ratio\n")
+reach_ok <- TRUE
+reach_cases <- list(
+  list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-4, 1L)),
+  list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-5, 1L)),
+  list(lbl = "family C, p = 4 minimum", g = local({
+    ang <- c(90, 180, 270, 360); rad <- ang * pi / 180
+    cm <- outer(rad, rad, function(u, v) cos(u - v))
+    sg <- 0.3 * cm + 0.3 * matrix(1, 4, 4) + 1.2e-5 * diag(4)
+    nms <- paste0("i", 1:4); dimnames(sg) <- list(nms, nms)
+    list(S = cov2cor(sg), ang = ang, scale = as.character(1:4))
+  })),
+  list(lbl = "near-duplicate r=.9999 ", g = near_duplicate_family(7e-5)),
+  list(lbl = "near-duplicate r=.99999", g = near_duplicate_family(7e-6))
+)
+for (cs in reach_cases) {
+  g <- cs$g
+  pr <- nrow(g$S)
+  dr <- axes_se_derivs(g$ang, g$scale, NULL, FALSE, FALSE)
+  exr <- exact(g$S, dr)
+  dtr <- axes_se_pricing(g$S, dr, N)$corrected
+  exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)
+  rel <- max(abs(exv - dtr) / abs(exv))
+  bnd <- pr * kappa_of(g$S)^2 * .Machine$double.eps
+  rat <- rel / bnd
+  reach_ok <- reach_ok && rat <= REACHABLE_WINDOW
+  cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e\n",
+              cs$lbl, pr, kappa_of(g$S), rel, bnd, rat))
+}
+
+cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\n",
+            if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
+            REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL"))
+if (!ok || !sweep_ok || !reach_ok) quit(status = 1L)

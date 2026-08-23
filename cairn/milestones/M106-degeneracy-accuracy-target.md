@@ -119,7 +119,7 @@ M7's own gate.
       collinear pair (the smallest eigenvector's two dominant loadings).
 - [ ] T6 — Run AC6's sweep, update every stale site and NEWS.md, then plant one
       stale value per spelling class and confirm the sweep catches each.
-- [ ] T8 — Add the reachable-geometry family to `exact_oracle.R` from RR19
+- [x] T8 — Add the reachable-geometry family to `exact_oracle.R` from RR19
       §3a's stated constructions, with its own pass window.
 - [ ] T7 — If τ moved: superseding `DECISIONS.md` entry against D-044. Then
       `document()`, `test()`, `check()`.
@@ -145,6 +145,7 @@ M7's own gate.
 - 2026-08-22: three defects found and fixed inside T5, none reaching a commit. (i) `%.4f` printed r = .99999 as `1.0000`, reporting a near-duplicate pair as a perfectly collinear one — now `%.6g`. (ii) The pair printed in eigenvector-loading order (`i9 and i1`) rather than the caller's column order — now sorted. (iii) The eigenvector-mass gate alone passed a rotated planted eigenvalue whose two dominant items correlate at 0.48, so the warning asserted "nearly collinear" about a pair that is not; a second gate now requires |r| >= 0.99, and the diffuse case is pinned by test.
 - 2026-08-22: two plan assumptions corrected against measurement. The planned second radius r = .99999 is unreachable through the exported path — lavaan stops converging and `axes_reliability()` errors before the criterion runs — so the bracketing radius is r = .9999714 (kappa 1.01e5), the deepest measured that both converges and refuses. And `components$SE`'s `item`/epsilon row is NA at every radius including kappa = 289, so it is not evidence about the criterion; the assertion covers the three priced components.
 - 2026-08-22: T4 done. Three cases at three p, all inside [1e4, 1e7]: p = 4 at kappa 1.2e4 against a 1.06e5 floor computes; p = 8 at kappa 1.0e5 against a 7.5e4 floor refuses, a ratio of 1.33 so it discriminates where the floor sits rather than only that one exists; p = 24 at kappa 7.2e5 against a 4.33e4 floor refuses. The first two reach the criterion through real converged fits; only p = 24 needed the `axes_fitted_cov` seam, and it needed it for the measured reason AC4 anticipated — lavaan does not converge on that matrix.
+- 2026-08-22: T8 done. `exact_oracle.R` gains five reachable-geometry cases — family A at p = 8 (two eps), family C at the p = 4 API minimum, and the near-duplicate geometry at r = .9999 and .99999 — each measured against the exact-rational oracle, with its own window (`REACHABLE_WINDOW = 1e-3`) asserting the OPPOSITE property to the fixture sweep's: that in reachable geometry the bound stays decades away from the error. Measured attainment 3.4e-8 to 3.3e-7, independently reproducing RR19 s3a's 8.1e-9 to 6.3e-7 on constructions written from its stated parameters. The window is live, not vacuous: tightened to 1e-9 it FAILs and the script exits 1; restored it exits 0.
 
 ## Decisions
 
