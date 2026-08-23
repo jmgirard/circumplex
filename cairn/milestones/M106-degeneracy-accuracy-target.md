@@ -1,6 +1,6 @@
 # M106: Price the degeneracy refusal region on a stated statistical argument
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -203,6 +203,9 @@ M7's own gate.
 - 2026-08-23: **T11 done, and D-048's reopening trigger (i) is met in full.** The oracle driver now emits exact `cval` for every reachable case at that case's own df, against the double value the shipped code computes before its refusal discards it (`axes_scaling_factor()` returns a reason and no number wherever the criterion trips, so a refused case has no other route to the number being priced). AC4 case 2's construction — verified `identical()` to the matrix the test refuses, not merely built from the same parameters — measures `cval` relative error **2.205e-13** beside its SE relative error 3.004e-12, both against δ\* = 1e-4. Trigger (i) asks for a converged-fit Σ̂ the criterion refuses whose SEs *and* `cval` an exact oracle puts within the target; this is that matrix, at nine and eight decades of margin. The other four reachable cases measure `cval` at 2.1e-14 to 1.1e-8. ANCHORS/SWEEP/REACHABLE all still PASS.
 - 2026-08-23: T11's consequence recorded on M106's own ROADMAP candidate row rather than as a new one, which is where RR20 rec 2 and the row's own promotion clause both point. D-048's remedy — an a-posteriori per-fit error certificate replacing the refusal where the certificate passes — is now due rather than conditional. It is not planned here: it is a new estimator needing its own design pass and its own oracle obligation (RR20 tiers it Fable), so it wants `/milestone-plan`, and nothing about it is urgent — no field report exists and probe fits sit about 3.6 decades under the floor.
 
+- 2026-08-23: T10/T11 verify — `devtools::document()` no diff and zero unresolved-link warnings at `cli.width = 500`; `devtools::test()` FAIL 0 / PASS 8509 / SKIP 3 / WARN 5, the same five pre-existing warnings whose identity round 1 verified against master; `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes in 15m43s. `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS, SWEEP and REACHABLE all PASS.
+- 2026-08-23: the PDF-manual gap of round 1 stands unchanged and is carried forward, not re-verified: this return touched roxygen again, the repo's check command still carries `--no-manual`, and this machine still has no TeX binary, so `R CMD Rd2pdf` cannot run here. The added roxygen is ASCII and `git diff master -- man/` adds no non-ASCII line. Still needs a machine with TeX, at CI or the release walk.
+- 2026-08-23: status in-progress→review. All eleven tasks checked. AC1–AC8 are unticked: three were ticked in round 2 and untick on return by rule, and ticking any of them is review's act against fresh evidence, not implement's.
 
 ## Review
 
