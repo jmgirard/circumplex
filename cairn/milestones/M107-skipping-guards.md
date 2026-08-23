@@ -1,6 +1,6 @@
 # M107: Make the exemplar-B guards run in the gate that ships a release
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -85,7 +85,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
       the helper probes, it does not assume.
 - [x] **T5** — Mutation-prove the fallback arm: delete it and confirm a test
       reddens on a forced old-spelling call.
-- [ ] **T6** — Full verify + `check(manual = TRUE)`; record evidence.
+- [x] **T6** — Full verify + `check(manual = TRUE)`; record evidence.
 
 ## Work log
 
@@ -120,3 +120,6 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 - 2026-08-23: amendment (substantive, gated) — AC1 rewritten and AC3's enumerator repinned. AC1 as written could not pass: the check run's skip listing names an absent `cairn/` directory for `test-norms-provenance.R:581,703`, two of the ~50 sites the Out section defers, and the same wording also caught the T2 drift guard the plan declares a correct skip. AC3 named "the criterion-2 grep", which AC2 requires to return nothing once T1 lands, so it enumerated the empty set; it now pins the pre-move revision `68ada0f8`, where the grep reports exactly the four Scope lines 1601/1661/1680/2085. Neither promise widened: AC1's fixture clause narrows to one filename, AC3's promise is unchanged with a resolvable enumerator.
 - 2026-08-23: criteria audit on the amended AC1/AC3 ran in **reduced mode** (internal tier) with a **fresh-context [O] reader** that authored neither text, at the user's instruction — the independence the planning session recorded as absent. Two passes, both returning findings on the bounded-promise question, none on proportionality or instrument: pass 1 found AC3's enumerator unresolvable and AC1 asserting an unenumerated identity; pass 2 found AC1's replacement sentence a universal claim over every other skip that is false (the drift guard and the lavaan-absent skips are neither deferred sites nor source-tree reads). Both fixed at the gate, the second by the user's call since AC1 had re-entered once. Reader also verified the AC3 command resolves to exactly four lines.
 - 2026-08-23: T3 — all four mutation-proved under `R CMD check` on the built tarball, one mutant per invocation against committed files, each reddening alone (FAIL 1) for its own reason (the altered literal): line 1628 → "AC2/AC3: the committed exemplar B is refused by both surfaces at p = 3"; 1668 → "M90 AC5: the one recorded negative-cval matrix is refused by the criterion, not the backstop"; 1696 → "M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRING only...)"; 2090 → "M106 AC2: the near-duplicate geometry computes and the RR18 fixture still refuses". Restored after each; tree clean.
+- 2026-08-23: T6 — verify slot clean (`devtools::test()`: FAIL 0 / WARN 5 / SKIP 1 / PASS 8520; the one skip is the pre-existing fixture-environment gate at `test-axes-scaled-fit.R:918`). Release check `devtools::check(manual = TRUE)` clean: 0 errors, 0 warnings, 1 NOTE, 8m38s. The NOTE is this machine's check tooling, not the package — `/usr/bin/tidy` is Apple's 2006 build, whose `--version` carries no version triple for R's `.find_tidy_cmd` pattern, and the `V8` package is not installed, so R skips HTML validation and math rendering. Both are present on CRAN's machines; remedy on this Mac is `brew install tidy-html5`, `R_TIDYCMD=/opt/homebrew/bin/tidy` in `~/.Renviron` (needed because `/usr/bin` precedes `/opt/homebrew/bin` on PATH), and `install.packages("V8")`.
+- 2026-08-23: AC1 evidence — a separate clean `R CMD check` of the built tarball, kept so its skip listing is readable (`devtools::check` prints none on a passing run): FAIL 0 / SKIP 153 / PASS 7462. No skip in that listing names `rb18-counterexample-b.rds`, and none of the four sites appears in it; the file's only skips are `:918` (fixture environment), `:966` (vignette source) and `:1140` (R/ sources absent), all outside the four. Two skips still name an absent `cairn/` directory (`test-norms-provenance.R:581,703`) — the deferred sites the amended criterion no longer reaches — and one is the T2 drift guard skipping as designed.
+- 2026-08-23: no NEWS entry — internal tier, exported behaviour unchanged; the deliverable is test coverage under `R CMD check`.
