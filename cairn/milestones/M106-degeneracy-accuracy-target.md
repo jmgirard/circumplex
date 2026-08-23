@@ -114,7 +114,7 @@ M7's own gate.
 - [ ] T4 — Band cases at three κ / three p through `axes_reliability()`, upper
       cases via the `axes_fitted_cov` seam; committed `data-raw/` generator
       with a seed.
-- [ ] T5 — The two `cormat` near-duplicate radii, same generator and seed;
+- [x] T5 — The two `cormat` near-duplicate radii, same generator and seed;
       extend the `"ill_conditioned"` warning to carry κ and the dominant
       collinear pair (the smallest eigenvector's two dominant loadings).
 - [ ] T6 — Run AC6's sweep, update every stale site and NEWS.md, then plant one
@@ -141,6 +141,9 @@ M7's own gate.
 - 2026-08-22: minor plan refinement — T4/T5's "committed data-raw generator with a seed" is unnecessary: RR19's families are closed-form model-implied matrices with no RNG, so they are built deterministically in `tests/testthat/helper-m106-degeneracy.R` rather than committed as fixtures. No committed fixture means nothing whose bit-exactness is unfalsifiable on the authoring machine.
 - 2026-08-22: helper defect found and fixed before it reached a commit — the family-B builder appended a hard-coded 360 as the duplicate angle, but `octants()` starts at 90, so item 9 paired with scale 7 while the driven-down errors sat on items 1 and 9 (r = 0.57, not 0.9999). It now duplicates `octants()[1]` whatever that is.
 - 2026-08-22: T3 done. Pins at p = 3/12/24 across three spectral forms (positive both sides of the floor; lambda_min negative inside the noise band; decisively negative), 13 assertions. Mutation-proved with four mutants, each red at a different pin family and restored by copy with the source blob re-hashed to 14cb2a23 after every one: dropping the floor's p factor reddens the 0.95x positive pins at all three p; loosening delta_star a decade reddens the constant assertion and those pins; widening the indefiniteness band 1000x reddens the decisively-negative pins; narrowing it 1000x reddens the roundoff-level pins. The last two exercise the forms M89's probe never reached — it varied only p and which side of the floor a positive spectrum sat on.
+- 2026-08-22: T5 done. `axes_degeneracy_hint()` computes the conditioning and, where one pair dominates the near-null direction, names it; called at both `na_out()` sites so the two surfaces' warnings stay in agreement, leaving `axes_sigma_degenerate()`'s bare-literal return untouched (Jeff's gate choice). Both `cormat` radii resolve: r = .9999 (kappa 2.87e4) computes with both failure fields NULL, r = .9999714 (kappa 1.01e5) refuses with both naming `ill_conditioned` and both warnings carrying the pair.
+- 2026-08-22: three defects found and fixed inside T5, none reaching a commit. (i) `%.4f` printed r = .99999 as `1.0000`, reporting a near-duplicate pair as a perfectly collinear one — now `%.6g`. (ii) The pair printed in eigenvector-loading order (`i9 and i1`) rather than the caller's column order — now sorted. (iii) The eigenvector-mass gate alone passed a rotated planted eigenvalue whose two dominant items correlate at 0.48, so the warning asserted "nearly collinear" about a pair that is not; a second gate now requires |r| >= 0.99, and the diffuse case is pinned by test.
+- 2026-08-22: two plan assumptions corrected against measurement. The planned second radius r = .99999 is unreachable through the exported path — lavaan stops converging and `axes_reliability()` errors before the criterion runs — so the bracketing radius is r = .9999714 (kappa 1.01e5), the deepest measured that both converges and refuses. And `components$SE`'s `item`/epsilon row is NA at every radius including kappa = 289, so it is not evidence about the criterion; the assertion covers the three priced components.
 
 ## Decisions
 

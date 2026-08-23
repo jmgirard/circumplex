@@ -226,10 +226,11 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # reason speaks for all three and `naive_reason` is deliberately NULL --
   # never a second label beside it. Every na_out() call sits ahead of the
   # raw arm below, so no determined raw-arm refusal is ever discarded here.
-  na_out <- function(reason) {
+  na_out <- function(reason, hint = NULL) {
     warning(
       "The corrected component standard errors could not be computed (",
-      reason, "); they are reported as NA.",
+      reason, if (is.null(hint)) "" else paste0(": ", hint),
+      "); they are reported as NA.",
       call. = FALSE
     )
     list(naive = empty, corrected = empty, fiml_ratio = empty, reason = reason,
@@ -297,8 +298,11 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # R/axes_scaled_fit.R; finiteness is metric-blind, so hoisting it moves no
   # refusal across the arms' boundary).
   if (!all(is.finite(sigma))) return(na_out("singular"))
-  degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
-  if (!is.null(degenerate)) return(na_out(degenerate))
+  cor_sigma <- stats::cov2cor(sigma)
+  degenerate <- axes_sigma_degenerate(cor_sigma)
+  if (!is.null(degenerate)) {
+    return(na_out(degenerate, axes_degeneracy_hint(cor_sigma)))
+  }
 
   # The whole cov2cor arm -- criterion above, pricing here -- resolves before
   # the raw arm runs: a matrix destined for a unit refusal never pays for a
@@ -491,6 +495,55 @@ axes_degeneracy_tau <-
 # correlation-metric call sites AND the SE helper's raw arm, where since M91
 # a trip labels only `naive_reason` (M91-D2, closing M90 review F11). Changing
 # this constant is an escalation (RB, no-oracle), never a silent edit.
+# The actionable half of an "ill_conditioned" refusal (M106; RR19 section 6).
+# Returns a clause naming the conditioning, and the offending item pair where
+# one pair dominates the near-null direction -- otherwise the conditioning
+# alone. Deliberately a separate function called at the two warning sites
+# rather than folded into axes_sigma_degenerate(): the criterion's return is a
+# bare literal that both surfaces compare and eleven tests assert identity
+# against, and a diagnostic is not part of deciding whether to refuse.
+#
+# WHY A PAIR CAN BE NAMED AT ALL: near-duplicate items make the smallest
+# eigenvector load almost entirely on the two of them with opposite signs, so
+# its two dominant loadings identify the pair. The user cannot see this on the
+# `cormat` path -- they hand over a matrix, not items -- which is exactly where
+# a bare reason code leaves them with nowhere to go.
+#
+# The pair is named only from DIMNAMES, never from positions: lavaan reorders
+# variables, so a positional index would be reported against the caller's own
+# column order and mislead. No dimnames means the conditioning clause alone.
+axes_degeneracy_hint <- function(sigma) {
+  ev <- eigen(sigma, symmetric = TRUE)
+  p <- nrow(sigma)
+  kap <- ev$values[1L] / ev$values[p]
+  hint <- sprintf("condition number %.3g", kap)
+
+  nms <- rownames(sigma)
+  if (is.null(nms) || !all(!is.na(nms) & nzchar(nms))) return(hint)
+
+  # Two independent gates, because the message makes two claims and the mass
+  # test alone establishes only the first. (1) Dominance: the two largest
+  # |loadings| of the near-null direction carry most of its mass, so THIS pair
+  # is what drives the degeneracy rather than a diffuse combination. (2)
+  # Collinearity: the pair is actually near-duplicate. A rotated planted
+  # eigenvalue passes (1) while its two dominant items correlate at 0.48 --
+  # measured, and the reason (2) exists: without it the warning asserts
+  # "nearly collinear" about a pair that is nothing of the kind.
+  v <- abs(ev$vectors[, p])
+  ord <- order(v, decreasing = TRUE)
+  if (sum(v[ord[1:2]]^2) < 0.8) return(hint)
+  if (abs(sigma[ord[1L], ord[2L]]) < 0.99) return(hint)
+
+  # Column order, not loading order, so the message reads against the caller's
+  # own matrix; and %g rather than a fixed 4 decimals, which rounds .99999 to
+  # 1.0000 and reports a near-duplicate pair as a perfectly collinear one.
+  ij <- sort(ord[1:2])
+  paste0(hint, sprintf(
+    "; items %s and %s are nearly collinear (r = %.6g) -- near-duplicate items make the fitted matrix numerically degenerate, so consider dropping one",
+    nms[ij[1L]], nms[ij[2L]], sigma[ij[1L], ij[2L]]
+  ))
+}
+
 axes_sigma_degenerate <- function(sigma) {
   if (!all(is.finite(sigma))) return("singular")
   ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values

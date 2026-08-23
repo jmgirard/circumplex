@@ -2085,3 +2085,80 @@ test_that("M106 AC2: the near-duplicate geometry computes and the RR18 fixture s
   fx <- readRDS(fp)
   expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 })
+
+
+test_that("M106 AC5: the refusal warning names the conditioning and the collinear pair", {
+  # Four branches, because the message makes two claims under two conditions.
+  near <- m106_family_b(2e-5)          # r = .9999714, kappa 1.01e5 -- refused
+  msg <- axes_degeneracy_hint(near)
+  expect_match(msg, "condition number 1.01e+05", fixed = TRUE)
+  # Column order, not eigenvector-loading order: the message reads against the
+  # caller's own matrix.
+  expect_match(msg, "items i1 and i9 are nearly collinear", fixed = TRUE)
+  # %g, not a fixed 4 decimals -- .9999714 must not print as 1.0000 and report
+  # a near-duplicate pair as a perfectly collinear one.
+  expect_match(msg, "(r = 0.999971)", fixed = TRUE)
+  expect_no_match(msg, "1.0000", fixed = TRUE)
+
+  # No dimnames: the conditioning alone. A positional index would be reported
+  # against the caller's column order, and lavaan reorders variables.
+  anon <- near
+  dimnames(anon) <- NULL
+  expect_identical(axes_degeneracy_hint(anon), "condition number 1.01e+05")
+
+  # A diffuse near-null direction: the two dominant loadings carry the mass,
+  # but the pair correlates at 0.48, so no collinearity claim is made. Without
+  # the second gate this branch asserted "nearly collinear" about that pair.
+  p <- 12L
+  e <- rep(1, p); e[p] <- 1e-9
+  q <- qr.Q(qr(matrix(seq_len(p * p) %% 7 + 1, p, p)))
+  diffuse <- q %*% diag(e) %*% t(q)
+  diffuse <- (diffuse + t(diffuse)) / 2
+  dimnames(diffuse) <- list(paste0("v", seq_len(p)), paste0("v", seq_len(p)))
+  expect_gt(abs(diffuse[5L, 12L]), 0.4)
+  expect_lt(abs(diffuse[5L, 12L]), 0.99)
+  expect_identical(axes_degeneracy_hint(diffuse), "condition number 1e+09")
+})
+
+
+test_that("M106 AC5: both cormat radii resolve as the recalibrated target implies", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  inames <- paste0("i", seq_len(9L))
+  items <- split(inames, c(seq_along(oct), 1L))
+
+  # Radius 1 -- r = .9999, kappa 2.87e4, BELOW the recalibrated floor. RR19
+  # measured this geometry's corrected SEs accurate to 2.0e-13; it computes,
+  # and both failure fields stay NULL.
+  computes <- m106_family_b(7e-5)
+  dimnames(computes) <- list(inames, inames)
+  res <- suppressMessages(
+    axes_reliability(cormat = computes, items = items, angles = oct, n = 600L)
+  )
+  expect_null(res$details$se_correction_failed)
+  expect_null(res$details$fit_scaling_failed)
+  # The three components the correction prices. `item`/epsilon carries no SE in
+  # this configuration at ANY radius -- measured at kappa = 289 too -- so it is
+  # not evidence about the criterion either way.
+  priced <- res$components$SE[res$components$Symbol != "epsilon"]
+  expect_true(all(is.finite(priced)))
+
+  # Radius 2 -- r = .9999714, kappa 1.01e5, ABOVE it. Brackets the threshold
+  # from the other side: refused, both surfaces naming the shared literal, and
+  # both warnings carrying the actionable clause rather than a bare reason code.
+  # 2e-5 rather than a deeper pair because lavaan stops converging past about
+  # r = .99999 -- at 7e-6 the function errors before the criterion is reached,
+  # so a deeper radius would test nothing about the refusal.
+  refuses <- m106_family_b(2e-5)
+  dimnames(refuses) <- list(inames, inames)
+  w <- testthat::capture_warnings(
+    res2 <- suppressMessages(
+      axes_reliability(cormat = refuses, items = items, angles = oct, n = 600L)
+    )
+  )
+  expect_identical(res2$details$se_correction_failed, "ill_conditioned")
+  expect_identical(res2$details$fit_scaling_failed, "ill_conditioned")
+  expect_length(grep("ill_conditioned", w, fixed = TRUE), 2L)
+  expect_length(grep("nearly collinear", w, fixed = TRUE), 2L)
+  expect_length(grep("items i1 and i9", w, fixed = TRUE), 2L)
+})

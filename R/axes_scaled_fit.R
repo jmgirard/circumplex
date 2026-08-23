@@ -85,9 +85,10 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
 
   d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
                       fit_zeta1, fit_zeta2)
-  na_out <- function(reason) {
+  na_out <- function(reason, hint = NULL) {
     warning(
       "The scaled fit statistics could not be computed (", reason,
+      if (is.null(hint)) "" else paste0(": ", hint),
       "); they are reported as NA.",
       call. = FALSE
     )
@@ -162,7 +163,9 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   if (!all(is.finite(sigma))) return(na_out("singular"))
   sigma <- stats::cov2cor(sigma)
   degenerate <- axes_sigma_degenerate(sigma)
-  if (!is.null(degenerate)) return(na_out(degenerate))
+  if (!is.null(degenerate)) {
+    return(na_out(degenerate, axes_degeneracy_hint(sigma)))
+  }
 
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return(na_out("singular"))
