@@ -498,7 +498,8 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #     gradient near-cancellation, which no theorem bounds away from zero.
 #     Holding the numerical bias to a tenth of that noise -- the conventional
 #     "numerical error much smaller than statistical error" margin -- gives
-#     0.1*a/sqrt(n), which at the anchor and n = 5e5 is 1.0e-4.
+#     0.1*a/sqrt(n), which at the anchor a = 1/sqrt(2) and n = 5e5 is
+#     1.0e-4.
 #
 #     CALIBRATION DOMAIN of channel 3, stated because the coefficient and n
 #     both move it. Solving 0.1*a/sqrt(n) = delta_star gives the tenth-margin
@@ -516,8 +517,14 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #     n-dependent target would rebuild the sliding scale rejected just below,
 #     and the exposure is to the wording rather than to the number, since
 #     measured attainment of the error bound over reachable geometries is at
-#     most 4e-6, so actual errors run about 1e-12. n = 5e5 is 1.7 decades past
-#     the n ~ 1e4 ceiling of published circumplex correlation matrices.
+#     most 4e-6, so actual errors run about 1e-12. The two tenth-margin
+#     endpoints fall on opposite sides of the n ~ 1e4 ceiling of published
+#     circumplex correlation matrices: the anchor's n = 5.0e5 (a = 1/sqrt(2))
+#     is 1.7 decades past that ceiling, while the worst measured geometry's
+#     n = 2.0e3 (a = 0.045) is below it -- so at that geometry the
+#     noise-dominance reading lapses inside the published range, not far
+#     beyond it, and only the fixed cap delta_star carries the guarantee
+#     there.
 #
 #     WHY THE SAMPLING CHANNEL CANNOT BE THE PRIMARY ONE (RR20 section 2). Read
 #     as a uniform requirement -- bias below a tenth of the noise at EVERY
