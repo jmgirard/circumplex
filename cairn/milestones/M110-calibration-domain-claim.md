@@ -65,7 +65,7 @@ typical, two do not.
 - [x] T1: Rewrite the closing sentence at `R/axes_corrected_se.R:484-485`. The
       arithmetic is already in the block at `:469-473`: the tenth-margin is
       `n = 1e6 * a^2`, so a = 0.045 gives 2.0e3 and a = 1/sqrt(2) gives 5.0e5.
-- [ ] T2: Correct the two roxygen sites — `R/axes_reliability.R:1045`
+- [x] T2: Correct the two roxygen sites — `R/axes_reliability.R:1045`
       ("calibrated for `n` up to about `5e5`", unqualified) and `:731`
       ("for a typical design at `n` up to about `5e5`", which names the typical
       case but never says the domain ends below the published ceiling at the
@@ -85,6 +85,7 @@ typical, two do not.
 - 2026-08-24: plan gate chose a bounded repair of one named sentence over reopening general prose certification, because the general form failed three review rounds in M106 and was descoped there; falsified by a second defect of the same class turning up in the block.
 - 2026-08-24: criteria audit (FULL mode, [O], fresh context) returned three findings here, all fixed before writing. The sweep's literal `5e5` missed `5.0e5`, which the target file itself uses at `R/axes_corrected_se.R:472`, and its `R/ man/` directory set missed `NEWS.md:79`, which ships and carries the same unqualified claim — both verified against the repo and the sweep widened. A drafted criterion binding the existence of a pinning test was an instrument promise rather than a property of the deliverable; it moved to T4, leaving AC2 to bind the shipped text itself.
 - 2026-08-24: T1 — the closing sentence now states both tenth-margin endpoints with their coefficients and which falls below the n ~ 1e4 published ceiling; the channel-3 line at :501 gained the anchor's value so its 5e5 names its coefficient too. Full suite clean (FAIL 0, PASS 8619).
+- 2026-08-24: T2 — both roxygen sites now carry the anchor and worst-measured endpoints with their coefficients, per the gate's choice to name both rather than drop the figures; `document()` regenerated `man/axes_reliability.Rd` and emitted no `resolve link` line.
 
 ## Decisions
 

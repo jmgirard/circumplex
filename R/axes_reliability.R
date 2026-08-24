@@ -727,9 +727,13 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' printed at, and the coverage of a nominal 95% Wald interval -- and is
 #' corroborated by a third, the standard error's own sampling variability,
 #' under which a numerical error at the target is about a tenth of the
-#' statistical noise already in the number for a typical design at
-#' `n` up to about `5e5`. Above that the guarantee is the fixed target alone,
-#' not noise dominance. The derivation and the premises it rests on are stated
+#' statistical noise already in the number for a typical design (relative
+#' sampling coefficient `a = 1/sqrt(2)`) at `n` up to about `5e5`. That
+#' endpoint scales as `1e6 * a^2`, so at the least favorable geometry
+#' measured, `a = 0.045`, it falls to `n` of about `2e3` -- below the `n` of
+#' about `1e4` typical of published circumplex correlation matrices. Above
+#' the endpoint the guarantee is the fixed target alone, not noise
+#' dominance. The derivation and the premises it rests on are stated
 #' beside the constant in the source. The refusal
 #' says which degeneracy happened: `"indefinite"` when the smallest
 #' eigenvalue is decisively negative (below
@@ -1042,7 +1046,8 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   fitted covariance matrix, where the `1e-5` is the `1e-4` accuracy target
 #'   divided by the criterion's factor-of-`10` calibration ceiling, and the
 #'   target's noise-dominance reading is calibrated for `n` up to about
-#'   `5e5`):
+#'   `5e5` at a typical design (`a = 1/sqrt(2)`) and only to about `2e3` at
+#'   the least favorable geometry measured (`a = 0.045`)):
 #'   `"indefinite"` for a decisively negative
 #'   smallest eigenvalue
 #'   (below `-lambda_max * sqrt(p * .Machine$double.eps)`), a
