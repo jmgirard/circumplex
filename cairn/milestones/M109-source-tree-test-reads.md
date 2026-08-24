@@ -1,11 +1,11 @@
 # M109: Repair the test guards that skip on the surface that ships
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m109-source-tree-test-reads`
 
 ## Goal
 
@@ -18,10 +18,13 @@ suite contains.
 Surface tier: **internal** — the deliverable is test-suite code, which no
 external consumer of the package relies on.
 
-Running the enumerating grep over `tests/testthat/` returns 50 lines in 25
-files. Twelve already resolve under check through a dual-source fallback;
-38 read artifacts `.Rbuildignore` excludes, so no installed counterpart exists
-for them by construction. Exactly two assert shipped behaviour and always skip.
+Running the enumerating grep over `tests/testthat/` returns 50 lines in 24
+files. Eleven already resolve under check through a dual-source fallback; four
+are the guards this milestone repairs and two more are the read AC3 fences; 22
+read artifacts no check-time test can reach (19 excluded from the build, 3
+reading `R/` sources absent from the installed package); 11 sit in
+`_problems/`, which testthat never collects. Exactly two assert shipped
+behaviour and always skip.
 
 **In:**
 - The two vignette guards that always skip under check.
@@ -49,11 +52,10 @@ for them by construction. Exactly two assert shipped behaviour and always skip.
       sentence the test requires present, one inserting a sentence the test
       requires absent — because a deletion probe cannot exercise the
       `expect_no_match` half at all.
-- [ ] AC3: The dual-source Rd read at
-      `tests/testthat/test-axes-scaled-fit.R:1049` carries a vacuity fence that
-      fails both when its source yields empty text and when it yields a
-      truncated read, proved by both plants. It is the only one of the four
-      dual-source Rd reads without such a fence.
+- [ ] AC3: The dual-source Rd read in `tests/testthat/test-axes-scaled-fit.R`'s
+      "AC12: the Rd fences the scaling against the robustness misreading" test
+      carries a vacuity fence that fails both when its source yields empty text
+      and when it yields a truncated read, proved by both plants.
 - [ ] AC4: The two guards at `tests/testthat/test-norms-provenance.R:581` and
       `:703` gate on `dir.exists()` of the tracking directory rather than on
       the status file, so a deleted `norms-audit.md` in a source checkout fails
@@ -62,8 +64,10 @@ for them by construction. Exactly two assert shipped behaviour and always skip.
 - [ ] AC5: Running `grep -rn 'test_path("\.\."' tests/testthat/` classifies
       every line it returns into exactly one of: runs under `R CMD check`
       today; repaired by this milestone; development-only by construction,
-      because the artifact it reads is excluded from the built package; or
-      never executed, because testthat does not collect it. The classification
+      because the artifact it reads is absent from the tree a check-time test
+      can reach -- its path is excluded by `.Rbuildignore`, or it is a file
+      under `R/`, which an installed package does not carry; or never executed,
+      because testthat does not collect it. The classification
       is committed in this file's `## Decisions` section, one row per returned
       line.
 - [ ] AC6: `Rscript -e 'devtools::test()'` and
@@ -87,9 +91,9 @@ for them by construction. Exactly two assert shipped behaviour and always skip.
       vector, `nzchar() & file.exists()` filter, `skip_if` on the empty case.
 - [ ] T3: Probe both repaired guards inside a check run, deletion and insertion
       arms, and record which assertion each reddens.
-- [ ] T4: Add the vacuity fence at `test-axes-scaled-fit.R:1049`, matching the
-      `expect_gt(nchar(rd), 1000L)` its three siblings carry; plant an empty
-      and a truncated read.
+- [ ] T4: Add the vacuity fence to `test-axes-scaled-fit.R`'s AC12 test,
+      matching the `expect_gt(nchar(rd), 1000L)` the other five dual-source
+      reads of `axes_reliability.Rd` carry; plant an empty and a truncated read.
 - [ ] T5: Repair the two `norms-provenance.R` guards to `dir.exists()`; prove
       by scratch-copy deletion that a missing record reddens.
 - [ ] T6: Run the profile verify slot and the check.
@@ -100,6 +104,11 @@ for them by construction. Exactly two assert shipped behaviour and always skip.
 - 2026-08-24: plan gate chose leaving the 38 no-counterpart reads in place over relocating the norms-audit checkers to a developer script, because they cannot run under a package check by construction and most already say so in a comment; falsified by evidence a maintainer path reaches them expecting check coverage.
 - 2026-08-24: criteria audit ran in FULL mode ([O], fresh context, authored none of them) over M109 and M110 together — M110's user-facing tier mandates full, and M109 was audited at the same bar though its internal tier and tripwire-free criteria would have allowed the reduced mode. Fixed here before writing: the classification trichotomy could not classify the 11 never-collected `_problems/` lines nor the dev-only builder-script reads, so a fourth class was added and the runtime-half clause dropped; and the mutation probe was deletion-only, which provably cannot exercise the five `expect_no_match` assertions in the AC7 test, so an insertion arm was added.
 - 2026-08-24: M108 deleted `tests/testthat/test-fixture-drift.R` with the second copy of the exemplar-B fixture; AC4 cites it as the shape to follow, and AC4 states that shape in full itself (gate on `dir.exists()` of the tracking directory, not on the status file). The worked example now lives in the M107 archive and in git.
+- 2026-08-24: implement gate chose a shared `helper-vignette.R` lookup over per-file copies (the boundary-vignette test keeps its own, being out of scope), and `dir.exists("cairn/references")` over the tracking root for the norms guards.
+- 2026-08-24: amendment (mini gate, all three recommended): Scope's tally corrected to the measured 50 lines / 24 files and its four classes; AC3's "one of the four dual-source Rd reads" census clause deleted and its `:1049` cite replaced by the test's own title; AC5's third class restated as `.Rbuildignore`-excluded or under `R/`, so the three `R/` reads it could not classify now sort.
+- 2026-08-24: amended AC3 and AC5 went to a fresh-context [O] reduced criteria audit (internal tier) that authored neither; it returned six findings. Its two narrowing repairs are the amended wording above. Its two instrument findings -- AC3's "proved by both plants", AC5's committed-ledger sentence -- were declined: the deliverable here is a check whose ability to fail is the shipped property, and the ledger is that classification's evidence.
+- 2026-08-24: T4 reworded to name the AC12 test rather than a line number, matching the amended AC3.
+- 2026-08-24: the two guards AC1 names are the `AC7: the vignette's caveats match the corrected contract` test in `test-axes-corrected-se.R` and the `AC11: the vignette carries the same four claims` test in `test-axes-scaled-fit.R`; the line numbers AC1 cites move as this branch edits those files.
 
 ## Decisions
 
