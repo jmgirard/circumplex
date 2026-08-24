@@ -49,15 +49,32 @@ though this milestone changes no exported return.
       `devel/degeneracy-oracle/exact_oracle.R` enumerates, the estimate is at
       least the exact-rational oracle's measured relative error for that case
       and at most 1e3 times it — for the SE estimate and the `cval` estimate
-      separately. The 1e3 ceiling is pre-registered here, before measurement:
-      the a-priori bound this replaces overstates by 5 to 8 decades, so 1e3 is
-      at least two decades of improvement and falsifies a certificate that only
-      restates the old bound.
+      separately, both priced on the same machine in the same run. The 1e3
+      ceiling is pre-registered here, before measurement: the a-priori bound
+      this replaces overstates by 5 to 8 decades, so 1e3 is at least two
+      decades of improvement and falsifies a certificate that only restates the
+      old bound. Verified two ways. (a) `Rscript
+      devel/degeneracy-oracle/exact_oracle.R`, run from the repo root with
+      `python3` on PATH, prints a ratio line per case and reports
+      `CERTIFICATE (... at all six geometries): PASS`; the ten ratios belonging
+      to the five reachable cases are each read off that run's output and each
+      lies in [1, 1e3]. (b) The packaged suite asserts the same bracket against
+      that run's frozen figures, behind a bit-identity precondition: a case's
+      assertion runs only where the running machine reproduces, exactly under
+      `identical()`, both the committed anchor inputs for that case and the
+      committed shipped double-precision pricing of it, and skips naming that
+      reason otherwise. The precondition is required because a frozen relative
+      error describes one matrix priced on one machine, and neither the matrix
+      — built through `cos()` — nor the shipped `solve()`/`%*%` path is
+      bit-portable; the double-double reference route is plain R arithmetic, so
+      once both are reproduced the bracket is deterministic. A skip on some
+      platform is expected; a run in which every case skips does not satisfy
+      this criterion.
 - [x] AC3: The estimate discriminates. On the five cases of AC2 every estimate
       is below 1e-4; on the committed counterexample at
       `tests/testthat/fixtures/rb18-counterexample-b.rds`, whose corrected SEs
       the oracle measures 3.4% wrong, the estimate exceeds 1e-4.
-- [x] AC4: The certificate is mutation-proved by at least three planted
+- [ ] AC4: The certificate is mutation-proved by at least three planted
       defects varying in form as well as in location, each recorded with the
       AC2 or AC3 assertion it reddens.
 - [x] AC5: `Rscript devel/degeneracy-oracle/exact_oracle.R` run from the repo
@@ -118,6 +135,12 @@ though this milestone changes no exported return.
       procedure; prove that run able to see what AC6 promises by planting one
       changed exported return and confirming it reddens; run the profile verify
       slot and the check (AC7).
+- [ ] T9: Execute the AC2 amendment. Commit each anchor's inputs and its
+      shipped `v`/`u` as exact hex literals and gate the bracket on
+      reproducing them; make `exact_oracle.R` assert its ratio-line count
+      before printing the certificate flag and stop reporting FAIL at an
+      exactly priced case; re-run AC4's planted defects against the moved
+      assertions.
 
 ## Work log
 
@@ -150,6 +173,10 @@ though this milestone changes no exported return.
 - 2026-08-24: consistency gate FAILED on the master watch — R-CMD-check run 32736668637 on master's ac7fd860 is red on ubuntu-latest devel and release, three failures at test-axes-scaled-fit.R:1698/1705/1706 (the M90 AC5 backstop-wiring test, which depends on the platform's BLAS). Pre-existing and outside this branch; cleared via /hotfix on master, not here. Status -> in-progress.
 - 2026-08-24: amendment return: AC2 — "the estimate is at least the exact-rational oracle's measured relative error for that case" — falsified on windows-latest (PR #138 run 32752082137, test-axes-certificate.R:86, cert$se 2e-12 against the frozen floor 3.004e-12) while the procedure AC2 names, devel/degeneracy-oracle/exact_oracle.R, passes with all six ratios in [1, 1e3]: the frozen figure is a macOS measurement of the shipped route's error used as a platform-invariant floor, and Windows' BLAS commits about 15x less error at that geometry. Route to /milestone-implement step 6.
 - 2026-08-24: review evidence for AC1, AC3, AC4, AC5, AC6, AC7 recorded in the Review section and their boxes ticked; AC2 left unticked. Thirteen findings from the three fresh-context reviewers logged there, triage deferred to the re-review gate.
+- 2026-08-24: amendment return: AC2 — "Verified two ways. (a) `Rscript devel/degeneracy-oracle/exact_oracle.R`, run from the repo root with `python3` on PATH, prints a ratio line per case and reports `CERTIFICATE (... at all six geometries): PASS`; the ten ratios belonging to the five reachable cases are each read off that run's output and each lies in [1, 1e3]. (b) The packaged suite asserts the same bracket against that run's frozen figures, behind a bit-identity precondition: a case's assertion runs only where the running machine reproduces, exactly under `identical()`, both the committed anchor inputs for that case and the committed shipped double-precision pricing of it, and skips naming that reason otherwise." — this line EXECUTES the return the review logged above; the two lines are one amendment return on AC2, not two.
+- 2026-08-24: the amended AC2 wording went to a fresh-context [O] reader that authored none of it, in FULL mode (user-facing tier), before it was written. It rejected the first draft as the wrong shape: that draft moved the bracket out of the packaged suite on the ground that the committed error is a property of the machine's linear-algebra library, and the reader measured that swapping the matrix-product implementation moves the estimate 0x while a 1-ulp perturbation of the anchor matrix moves it 82x — larger than the 15x CI gap the draft attributed to the library. It also priced what the draft gave up: the exact-rational oracle would stop asserting at any packaged test, leaving only the closed-form oracle, which covers a configuration whose committed error is zero; and two of AC4's planted defects would redden nothing. The adopted wording keeps the bracket in the suite behind a bit-identity precondition instead.
+- 2026-08-24: mini gate chose gating the packaged bracket on bit-identity over moving it to the dev script, over widening the floor by a platform tolerance (a 100x slack exceeds the 10x the dropped-safety-factor plant moves, so it would retire that plant's coverage), and over escalating. The causal prose and the 15x figure stay out of the criterion: they are recorded here and in the Review section, pinned to CI run 32752082137.
+- 2026-08-24: AC4 unticked — its recorded plant-to-assertion mapping is stated against assertions this amendment moves, so it is re-taken at T9 rather than carried forward. T9 added for the amendment's execution.
 
 ## Decisions
 
