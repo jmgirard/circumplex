@@ -3233,3 +3233,49 @@ test_that("M91 AC4: the printed SE-failure note stays silent in the raw-arm-only
   # naive_reason is deliberately silent (M91-D1): nothing printed names it.
   expect_no_match(out, "naive", fixed = TRUE)
 })
+
+
+test_that("M110 AC1/AC2: every help-page calibration-domain figure names the coefficient it belongs to", {
+  # The dual-source pattern the Rd guards above use: man/ in the dev tree,
+  # Rd_db() once installed, because a man/-only read silently SKIPS under
+  # R CMD check and an Rd_db()-only read errors under load_all().
+  rd_file <- test_path("..", "..", "man", "axes_reliability.Rd")
+  rd <- if (file.exists(rd_file)) {
+    paste(readLines(rd_file, warn = FALSE), collapse = " ")
+  } else {
+    paste(as.character(tools::Rd_db("circumplex")[["axes_reliability.Rd"]]),
+          collapse = "")
+  }
+  # Fail loudly rather than pass vacuously if neither source yielded anything.
+  expect_gt(nchar(rd), 1000L)
+
+  # Strip the \code{} wrappers so a figure and its coefficient are compared as
+  # the reader sees them, then cut into sentences. A period followed by
+  # whitespace ends a sentence; `.Machine`, `1e-5`, `0.045` and the like carry
+  # no space after the period and so survive intact.
+  txt <- gsub("\\\\code\\{([^}]*)\\}", "\\1", gsub("\\s+", " ", rd))
+  sentences <- unlist(strsplit(txt, "(?<=\\.)\\s+", perl = TRUE))
+
+  # The noise-dominance reading holds only out to n = 1e6 * a^2, so a
+  # sample-size endpoint stated without the coefficient a it belongs to reads
+  # as the whole domain. Both help-page sites state the anchor's endpoint; the
+  # defect this pins is either one stating it alone (M106 review round 4, F4).
+  anchor <- grep("5e5", sentences, fixed = TRUE, value = TRUE)
+  # The domain this sweep runs over is non-empty -- otherwise the loop below
+  # is green on nothing, which is how a renamed or re-wrapped Rd would go quiet.
+  expect_identical(length(anchor), 2L)
+  for (s in anchor) expect_match(s, "a = 1/sqrt(2)", fixed = TRUE)
+
+  # And the worst measured geometry's endpoint travels with its own
+  # coefficient, at both sites: it is the figure that falls BELOW the n ~ 1e4
+  # of published circumplex correlation matrices, which is the whole point of
+  # stating it.
+  worst <- grep("2e3", sentences, fixed = TRUE, value = TRUE)
+  expect_identical(length(worst), 2L)
+  for (s in worst) expect_match(s, "a = 0.045", fixed = TRUE)
+
+  # The published-ceiling comparison itself, without which a reader has both
+  # endpoints and no reason to care which one they are at.
+  expect_match(txt, "typical of published circumplex correlation matrices",
+               fixed = TRUE)
+})

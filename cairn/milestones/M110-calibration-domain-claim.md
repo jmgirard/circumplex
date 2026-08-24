@@ -1,6 +1,6 @@
 # M110: Correct the calibration-domain claim in the accuracy target and its shipped surfaces
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -72,7 +72,7 @@ typical, two do not.
       worst measured geometry). Regenerate the Rd.
 - [x] T3: Correct `NEWS.md:79`, which carries the same claim spelled
       `500,000` and so escapes a grep for the source's spelling.
-- [ ] T4: Add a test reading the two calibration-domain sentences from the
+- [x] T4: Add a test reading the two calibration-domain sentences from the
       installed help page via `tools::Rd_db("circumplex")`, failing if either
       states its sample-size figure without its coefficient; prove it able to
       fail by restoring the current wording. Nothing in `tests/` pins these
@@ -87,6 +87,8 @@ typical, two do not.
 - 2026-08-24: T1 — the closing sentence now states both tenth-margin endpoints with their coefficients and which falls below the n ~ 1e4 published ceiling; the channel-3 line at :501 gained the anchor's value so its 5e5 names its coefficient too. Full suite clean (FAIL 0, PASS 8619).
 - 2026-08-24: T2 — both roxygen sites now carry the anchor and worst-measured endpoints with their coefficients, per the gate's choice to name both rather than drop the figures; `document()` regenerated `man/axes_reliability.Rd` and emitted no `resolve link` line.
 - 2026-08-24: T3 — the NEWS entry now gives both endpoints with their coefficients, and the paragraph is wrapped so the `500,000` figure and its `1/sqrt(2)` share a line; the AC2 sweep returns 9 lines and every one names the coefficient its figure belongs to.
+- 2026-08-24: T4 — a help-page guard at `tests/testthat/test-axes-reliability.R:3235+` cuts the Rd into sentences and requires each of the two `5e5` sentences to name `a = 1/sqrt(2)` and each `2e3` sentence to name `a = 0.045`, using the dual-source man/-or-`Rd_db()` read the file's other Rd guards use (under check only the `Rd_db()` arm runs). Proved able to fail on two planted defects: reverting both sites reddens 4 of 6 assertions, reverting only the unqualified `\value` site reddens 2 of 7 — the sentence count alone stays green on the first defect, which is why the per-sentence match carries the claim.
+- 2026-08-24: verification — `document()` no diff and no `resolve link` line; `devtools::test()` FAIL 0, PASS 8627 (8619 before, the 8 added being this guard's); `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. Status → review.
 
 ## Decisions
 
