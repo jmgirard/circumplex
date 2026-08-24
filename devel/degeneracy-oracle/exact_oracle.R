@@ -135,8 +135,22 @@ for (i in seq_along(dbl_se)) {
 # decades). The certificate is n-free and df-free by construction, so nothing
 # here hands it either.
 CERT_CEILING <- 1e3
+CERT_EXPECTED <- 12L   # six geometries x {SE, cval}
 cert_ok <- TRUE
+cert_n <- 0L
 cert_line <- function(lbl, cert, true_rel) {
+  cert_n <<- cert_n + 1L
+  if (true_rel == 0) {
+    # An exactly priced case: the shipped route committed no error, so there is
+    # no ratio to form and the certificate can only report its own floor. That
+    # is the certificate being RIGHT, not a failure -- before M108's AC2
+    # amendment the Inf ratio here printed FAIL.
+    ok <- cert > 0 && is.finite(cert)
+    cert_ok <<- cert_ok && ok
+    cat(sprintf("  %-10s true %9.3e | certificate %9.3e | exact case, floor only\n",
+                lbl, true_rel, cert))
+    return(invisible(NULL))
+  }
   ratio <- cert / true_rel
   cert_ok <<- cert_ok && is.finite(ratio) && ratio >= 1 && ratio <= CERT_CEILING
   cat(sprintf("  %-10s true %9.3e | certificate %9.3e | ratio %8.3g\n",
@@ -280,8 +294,12 @@ for (cs in reach_cases) {
   cert_line("  cval", crt$cval, cvr)
 }
 
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (ratio in [1, %.0e] at all six geometries): %s\n",
+# The count is asserted, not asserted-in-a-label: `cert_ok` starts TRUE and is
+# only ever falsified INSIDE cert_line(), so a truncated or empty case list
+# would otherwise print PASS at "all six geometries" having checked none.
+cert_ok <- cert_ok && identical(cert_n, CERT_EXPECTED)
+cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (%d of %d ratios checked, each in [1, %.0e], at all six geometries): %s\n",
             if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
             REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL",
-            CERT_CEILING, if (cert_ok) "PASS" else "FAIL"))
+            cert_n, CERT_EXPECTED, CERT_CEILING, if (cert_ok) "PASS" else "FAIL"))
 if (!ok || !sweep_ok || !reach_ok || !cert_ok) quit(status = 1L)
