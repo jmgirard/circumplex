@@ -520,23 +520,19 @@ test_that("M68 review F2: CFI is 1, not NaN, when neither model nor baseline mis
 
   # Against lavaan's own function on the same two scaled statistics, so the
   # agreement is with the reference implementation and not with our reading of
-  # it. `lav_fit_cfi()` is UNEXPORTED, so neither its existence nor its argument
-  # names are a contract: an earlier lavaan takes them positionally under
-  # different names, and calling it by name errored the whole test on CI while
-  # passing locally (M68 review round 2 -- the existence probe checked that the
-  # symbol resolved, not that it accepted these arguments). The call itself is
-  # therefore what is probed, and any failure to reach it SKIPS: the assertions
-  # above already pin the behaviour without lavaan's help, and this is
-  # corroboration against the reference implementation, not the check itself.
-  ref <- tryCatch({
-    f <- get("lav_fit_cfi", envir = asNamespace("lavaan"))
-    c(f(X2 = 200 / 0.95, df = 273, X2.null = 260 / 0.95, df.null = 276),
-      f(X2 = 400 / 0.95, df = 273, X2.null = 4000 / 0.95, df.null = 276))
-  }, error = function(e) NULL, warning = function(w) NULL)
-  skip_if(is.null(ref) || length(ref) != 2L || anyNA(ref),
-          "lavaan::lav_fit_cfi is not callable with these arguments")
-  expect_equal(got$fit$cfi, ref[[1]])
-  expect_equal(got2$fit$cfi, ref[[2]])
+  # it. Reached through lav_cfi_ref() (helper-lavaan-cfi.R), which probes both
+  # known argument spellings by CALL -- `lav_fit_cfi()` is UNEXPORTED, so
+  # neither its existence nor its argument names are a contract, and this
+  # comparison spent a release silently skipping after lavaan renamed them
+  # (M107). NULL means neither spelling worked, and then this SKIPS: the
+  # assertions above already pin the behaviour without lavaan's help, and this
+  # is corroboration, not the check itself.
+  r1 <- lav_cfi_ref(200 / 0.95, 273, 260 / 0.95, 276)
+  r2 <- lav_cfi_ref(400 / 0.95, 273, 4000 / 0.95, 276)
+  skip_if(is.null(r1) || is.null(r2),
+          "lavaan::lav_fit_cfi is not callable under either argument spelling")
+  expect_equal(got$fit$cfi, r1)
+  expect_equal(got2$fit$cfi, r2)
 })
 
 
@@ -1230,17 +1226,15 @@ test_that("AC4: the reported cfi IS the cfi.scaled definition, not cfi.robust", 
   expect_gt(abs(cfi_scaled - cfi_robust), 1e-4)
 
   # Corroboration only, against lavaan's own implementation of the definition
-  # the assertions above already pin. `lav_fit_cfi()` is UNEXPORTED, so neither
-  # its existence nor its argument names are a contract -- reached via get(),
-  # and any failure to call it skips rather than reddening (the M68 round-2
-  # lesson).
-  ref <- tryCatch({
-    f <- get("lav_fit_cfi", envir = asNamespace("lavaan"))
-    f(X2 = t_unscaled / cc, df = df, X2.null = tb_unscaled / cb, df.null = df_b)
-  }, error = function(e) NULL, warning = function(w) NULL)
-  skip_if(is.null(ref) || length(ref) != 1L || anyNA(ref),
-          "lavaan::lav_fit_cfi is not callable with these arguments")
-  expect_equal(res$fit$cfi, unname(ref), tolerance = 1e-10)
+  # the assertions above already pin. Reached through lav_cfi_ref()
+  # (helper-lavaan-cfi.R), which probes both known argument spellings by call;
+  # `lav_fit_cfi()` is UNEXPORTED, so neither its existence nor its argument
+  # names are a contract, and a failure to reach it skips rather than reddening
+  # (the M68 round-2 lesson).
+  ref <- lav_cfi_ref(t_unscaled / cc, df, tb_unscaled / cb, df_b)
+  skip_if(is.null(ref),
+          "lavaan::lav_fit_cfi is not callable under either argument spelling")
+  expect_equal(res$fit$cfi, ref, tolerance = 1e-10)
 })
 
 
@@ -1596,10 +1590,30 @@ test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at t
 
 
 test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 3", {
-  # The committed fixture is repo material, absent from an installed package;
-  # stated plainly because a silent skip is false coverage (the M7 lesson).
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  # Fixture provenance. The file is a list carrying the 3x3 correlation
+  # matrix `S`, the item angles `ia`, two fields `a` and `b`, and
+  # kappa = 6.65e6. Source: the RB18 brief's random search over
+  # near-collinear 3x3 correlation matrices at randomly drawn angles,
+  # keeping only draws the criterion accepted.
+  # `a` and `b` hold "NULL" and "indefinite" -- reasons recorded before the
+  # M89/M90 criterion changes, NOT what the current surfaces return. Nothing
+  # asserts them and nothing should: the assertions below state the expected
+  # reasons independently, in the test, which is the only place they are
+  # current. Measured 2026-08-24.
+  # NO GENERATOR AND NO SEED -- the search seed was never recorded, so
+  # nothing regenerates this matrix. That is the whole of the provenance gap;
+  # the file is NOT unwritable as code. Measured 2026-08-24:
+  # dput(S, control = c("all", "hexNumeric")) round-trips bit-identically,
+  # and even a default dput() round trip (max element difference 4.44e-16)
+  # still leaves axes_sigma_degenerate() returning "ill_conditioned". The
+  # bytes are shipped because they are what the cairn/ record holds and
+  # byte-identity is what test-fixture-drift.R can fence, not because code
+  # would lose the case. It is read from the package's own fixtures directory
+  # so these assertions run under R CMD check instead of skipping there
+  # (M107; the M7 lesson said a silent skip is false coverage, and until M107
+  # this site was one). The copy under the repo's cairn/reviews/ is the
+  # record of record; test-fixture-drift.R fences the two against each other.
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   S <- fx$S
 
@@ -1658,8 +1672,7 @@ test_that("M90 AC5: the one recorded negative-cval matrix is refused by the crit
   # doubles (true cval +0.0556, RR18), and the degeneracy criterion -- not
   # the backstop -- is what refuses it. Asserted at the criterion itself, so
   # the refusal's identity is pinned, not inferred from a shared literal.
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 })
@@ -1677,8 +1690,7 @@ test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRI
   # no accepted input reaching (never "unreachable"; see the backstop
   # comment). Under the stub the backstop is the only remaining site in this
   # function that can emit this literal, so the assertion is site-exclusive.
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   testthat::local_mocked_bindings(
     axes_sigma_degenerate = function(sigma) NULL
@@ -2082,8 +2094,7 @@ test_that("M106 AC2: the near-duplicate geometry computes and the RR18 fixture s
   expect_lt(m106_kappa(near), 3.0e4)
   expect_null(axes_sigma_degenerate(near))
 
-  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(fp))
+  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 })
