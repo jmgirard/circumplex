@@ -53,7 +53,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
       comparisons execute.
 - [x] The helper's older-spelling fallback is exercised by a test that fails
       when the fallback arm is deleted.
-- [ ] `PROFILE.md`'s verify slot clean, plus `devtools::check(manual = TRUE)`
+- [x] `PROFILE.md`'s verify slot clean, plus `devtools::check(manual = TRUE)`
       per CLAUDE.md's release check.
 
 ## Coverage
@@ -179,3 +179,26 @@ was needed before gathering evidence.
   The failure is the fallback's own, not a bare red: the discriminating
   companion test ("the current spelling is preferred over the older one")
   passes in both states.
+- **AC6 — pass.** Verify slot: `devtools::document()` produces no diff and zero
+  `resolve link` lines at `cli.width = 500`; `devtools::test()` FAIL 0 (the AC4
+  run). Release check `devtools::check(manual = TRUE)` at `2e6ea8db`:
+  **0 errors, 0 warnings, 0 notes**, 7m10.7s, both the PDF and HTML manual
+  steps OK. The implementer's run carried one NOTE from this machine's check
+  tooling; that NOTE is absent here, so the tooling gap it described no longer
+  applies on this host.
+
+### Consistency gate
+
+- `cairn_validate` exit 0 — every check PASS, including `scaffold present` and
+  `coverage complete`. 67 advisory `work-log format` WARNs, all pre-existing
+  wrapped work-log lines in M7 and M107; advisory, not gate failures.
+- No `DESIGN.md` principle changed in this diff, so `cairn_impact --changed`
+  does not apply.
+- Toolchain slot (`r-package`): `document()` no-diff and link-clean (above);
+  `pkgdown::check_pkgdown()` "No problems found"; README.Rmd unchanged; no NEWS
+  entry owed (internal tier, exported behaviour unchanged); no new top-level
+  files, so no `.Rbuildignore` entry owed; full check clean (above).
+- Master watches: newest push run on `master` reaching a verdict is `d285f7f8`
+  for both `R-CMD-check.yaml` (success) and `test-coverage.yaml` (success).
+- `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` (5/5
+  synthetic payloads ok) and `tools/check-branch-protection.R` all exit 0.
