@@ -736,10 +736,13 @@ test_that("AC7: the vignette's caveats match the corrected contract", {
   # NEWS all said they were calibrated.
   #
   # Guarded at SOURCE rather than in the rendered article: the .Rmd is what an
-  # author edits, it is present in the dev tree and in the built package's
-  # vignette sources, and a rendered-HTML guard would need the site built.
-  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
-  skip_if_not(file.exists(vig), "vignette source not available")
+  # author edits, and a rendered-HTML guard would need the site built. The .Rmd
+  # sits in vignettes/ in the dev tree and in inst/doc once installed, so the
+  # read goes through vignette_source(), which tries both -- a source-tree-only
+  # read skipped under R CMD check, which is the gate that ships.
+  vig <- vignette_source("axes-reliability.Rmd")
+  skip_if(!nzchar(vig),
+          "vignette source unavailable (build installed without vignettes)")
   txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
   expect_gt(nchar(txt), 1000L)
 

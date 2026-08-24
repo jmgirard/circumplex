@@ -86,7 +86,7 @@ behaviour and always skip.
 
 - [ ] T1: Run the enumerating grep, classify every returned line into the four
       classes, and commit the table to this file's `## Decisions` section.
-- [ ] T2: Repair the two vignette guards, following the `vignette_path()`
+- [x] T2: Repair the two vignette guards, following the `vignette_path()`
       helper at `tests/testthat/test-cpm_boundary_vignette.R:7-25` — candidate
       vector, `nzchar() & file.exists()` filter, `skip_if` on the empty case.
 - [ ] T3: Probe both repaired guards inside a check run, deletion and insertion
@@ -108,6 +108,7 @@ behaviour and always skip.
 - 2026-08-24: amendment (mini gate, all three recommended): Scope's tally corrected to the measured 50 lines / 24 files and its four classes; AC3's "one of the four dual-source Rd reads" census clause deleted and its `:1049` cite replaced by the test's own title; AC5's third class restated as `.Rbuildignore`-excluded or under `R/`, so the three `R/` reads it could not classify now sort.
 - 2026-08-24: amended AC3 and AC5 went to a fresh-context [O] reduced criteria audit (internal tier) that authored neither; it returned six findings. Its two narrowing repairs are the amended wording above. Its two instrument findings -- AC3's "proved by both plants", AC5's committed-ledger sentence -- were declined: the deliverable here is a check whose ability to fail is the shipped property, and the ledger is that classification's evidence.
 - 2026-08-24: T4 reworded to name the AC12 test rather than a line number, matching the amended AC3.
+- 2026-08-24: T2 done -- `tests/testthat/helper-vignette.R` adds `vignette_source(file)`, trying `vignettes/` then `system.file("doc", ...)`, and both repaired guards call it and `skip_if(!nzchar(vig))`. Suite clean: FAIL 0 | WARN 5 | SKIP 1 | PASS 8627.
 - 2026-08-24: the two guards AC1 names are the `AC7: the vignette's caveats match the corrected contract` test in `test-axes-corrected-se.R` and the `AC11: the vignette carries the same four claims` test in `test-axes-scaled-fit.R`; the line numbers AC1 cites move as this branch edits those files.
 
 ## Decisions

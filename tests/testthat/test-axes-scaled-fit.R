@@ -962,8 +962,12 @@ test_that("AC11: the Rd states the calibration sweep, the direction, and the FIM
 
 
 test_that("AC11: the vignette carries the same four claims", {
-  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
-  skip_if_not(file.exists(vig))
+  # Read through vignette_source(): vignettes/ in the dev tree, inst/doc once
+  # installed. Reading the source tree alone skipped this guard under R CMD
+  # check, where the vignette's claims are the ones that ship.
+  vig <- vignette_source("axes-reliability.Rmd")
+  skip_if(!nzchar(vig),
+          "vignette source unavailable (build installed without vignettes)")
   txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
   expect_gt(nchar(txt), 1000L)
 
