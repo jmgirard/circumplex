@@ -1,11 +1,11 @@
 # M108: Build and validate a per-fit accuracy certificate
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2
-- **Branch/PR:** m108-per-fit-certificate
+- **Branch/PR:** m108-per-fit-certificate / https://github.com/jmgirard/circumplex/pull/138
 
 ## Goal
 
@@ -37,7 +37,7 @@ though this milestone changes no exported return.
 
 ## Acceptance criteria
 
-- [ ] AC1: An internal function returns a finite, non-negative estimate of the
+- [x] AC1: An internal function returns a finite, non-negative estimate of the
       relative error carried by a fit's corrected component SEs and of its
       `cval`, for every matrix on which the `"singular"` and `"indefinite"`
       limbs of `axes_sigma_degenerate()` pass, and the quantity it estimates is
@@ -53,17 +53,17 @@ though this milestone changes no exported return.
       the a-priori bound this replaces overstates by 5 to 8 decades, so 1e3 is
       at least two decades of improvement and falsifies a certificate that only
       restates the old bound.
-- [ ] AC3: The estimate discriminates. On the five cases of AC2 every estimate
+- [x] AC3: The estimate discriminates. On the five cases of AC2 every estimate
       is below 1e-4; on the committed counterexample at
       `tests/testthat/fixtures/rb18-counterexample-b.rds`, whose corrected SEs
       the oracle measures 3.4% wrong, the estimate exceeds 1e-4.
-- [ ] AC4: The certificate is mutation-proved by at least three planted
+- [x] AC4: The certificate is mutation-proved by at least three planted
       defects varying in form as well as in location, each recorded with the
       AC2 or AC3 assertion it reddens.
-- [ ] AC5: `Rscript devel/degeneracy-oracle/exact_oracle.R` run from the repo
+- [x] AC5: `Rscript devel/degeneracy-oracle/exact_oracle.R` run from the repo
       root exits 0 while `cairn/` is moved aside, reading its fixture from
       `tests/testthat/fixtures/`.
-- [ ] AC6: No test in the base-commit suite observes changed exported behaviour
+- [x] AC6: No test in the base-commit suite observes changed exported behaviour
       — return values or printed output. Procedure: extract that commit's
       tests (`git archive 298747a5 tests | tar -x -C <dir>`), swap the
       extracted copy in for `tests/`, delete
@@ -77,7 +77,7 @@ though this milestone changes no exported return.
       copy's own presence stays asserted in
       `tests/testthat/test-axes-scaled-fit.R`. No other base-commit test file
       is modified, removed, or excluded.
-- [ ] AC7: `Rscript -e 'devtools::test()'` and
+- [x] AC7: `Rscript -e 'devtools::test()'` and
       `Rscript -e 'devtools::check(args = "--no-manual")'` clean (0 errors,
       0 warnings; any NOTE justified).
 
@@ -146,6 +146,10 @@ though this milestone changes no exported return.
 - 2026-08-24: T8 done — AC6 run by its stated procedure (base-commit tests less test-fixture-drift.R): FAIL 0 | PASS 8524, with the base commit's own 5 warnings and 1 skip and nothing else excluded. Discrimination probe: a 1e-6 relative change planted in the exported corrected SE vector reddened test-axes-corrected-se.R:896 and :924, the oracle comparisons at 1e-6 relative tolerance; plant reverted, tree clean.
 - 2026-08-24: AC7 — `devtools::test()` on the branch's own suite FAIL 0 | PASS 8615 (5 warnings, 1 skip, all pre-existing on master); `devtools::check(args = "--no-manual")` Status OK, 0 errors, 0 warnings, 0 notes; `devtools::document()` produces no diff and no unresolved-link warning.
 - 2026-08-24: status -> review.
+- 2026-08-24: review opened PR #138 (draft); master had not moved since the branch was cut, so no merge was needed.
+- 2026-08-24: consistency gate FAILED on the master watch — R-CMD-check run 32736668637 on master's ac7fd860 is red on ubuntu-latest devel and release, three failures at test-axes-scaled-fit.R:1698/1705/1706 (the M90 AC5 backstop-wiring test, which depends on the platform's BLAS). Pre-existing and outside this branch; cleared via /hotfix on master, not here. Status -> in-progress.
+- 2026-08-24: amendment return: AC2 — "the estimate is at least the exact-rational oracle's measured relative error for that case" — falsified on windows-latest (PR #138 run 32752082137, test-axes-certificate.R:86, cert$se 2e-12 against the frozen floor 3.004e-12) while the procedure AC2 names, devel/degeneracy-oracle/exact_oracle.R, passes with all six ratios in [1, 1e3]: the frozen figure is a macOS measurement of the shipped route's error used as a platform-invariant floor, and Windows' BLAS commits about 15x less error at that geometry. Route to /milestone-implement step 6.
+- 2026-08-24: review evidence for AC1, AC3, AC4, AC5, AC6, AC7 recorded in the Review section and their boxes ticked; AC2 left unticked. Thirteen findings from the three fresh-context reviewers logged there, triage deferred to the re-review gate.
 
 ## Decisions
 
@@ -216,3 +220,184 @@ though this milestone changes no exported return.
   oracle (defect D), not by the low word of a right one.
 
 ## Review
+
+Reviewed 2026-08-24 on PR #138 (branch head 9394c25b, master 298747a5 —
+master had not moved since the branch was cut, so no merge was needed).
+**Outcome: returned to `in-progress`.** Two failures, recorded below with the
+rest of the evidence: master's `R-CMD-check` push run is red (a pre-existing
+M107-merge red, not this branch's), and AC2's floor assertion reddens on
+`windows-latest` in this PR's own CI.
+
+### Acceptance criteria
+
+- **AC1 — verified.** `axes_accuracy_certificate()` returns finite,
+  non-negative `se` and `cval` on every case of the admitted domain the test
+  enumerates (well-conditioned, at the floor, past the floor,
+  machine-singular, roundoff-negative), each first shown to pass the
+  `"singular"` and `"indefinite"` limbs. `names(formals())` is `sigma, d` —
+  no `n`, so the two-`n` identity is structural; the estimand's own
+  n-invariance is measured at the worst reachable geometry (relative
+  difference between n = 100 and n = 5e5 below 1e-3). Green on macOS, ubuntu
+  and windows.
+- **AC2 — FAILED on windows.** Locally and under the oracle the window holds
+  at all six geometries: measured ratios 9.97, 10.0, 10.0, 10.0, 10.0 on the
+  five reachable cases and 9.83 (SE) / 10.0 (cval) at counterexample B, all
+  inside the pre-registered [1, 1e3]. `windows-latest (release)` in run
+  32752082137 reddens `test-axes-certificate.R:86` at the p = 8 / kappa 1e5
+  anchor: `cert$se` 2e-12 against the frozen floor 3.004e-12. The certificate
+  is not wrong there — Windows' BLAS commits about 15x less error at that
+  geometry, and the certificate reports what that platform actually committed
+  — but the frozen figure is a macOS measurement used as a platform-invariant
+  floor, which is what AC2's wording promises. See the amendment return below.
+- **AC3 — verified.** Every reachable-case estimate is at most 3.0e-11,
+  below `axes_degeneracy_delta_star` = 1e-4 by seven decades; at
+  counterexample B the estimates are 3.355e-01 (SE) and 4.890e+01 (cval),
+  above it. Green on all three platforms.
+- **AC4 — verified by re-running the plants.** Six defects planted one at a
+  time in `R/axes_certificate.R`, the certificate suite run against each,
+  each reverted before the next; the recorded per-defect results reproduce.
+  Reddened: dropping the correlation-Jacobian diagonal fold in the reference
+  route (AC2 ceiling + AC3 + the closed-form oracle), safety factor 10 -> 1
+  (AC2 floor at the anchors and at counterexample B, 7 assertions), tree
+  summation dropping its odd element (AC2 ceiling + AC3), the double-double
+  matrix product dropping a rank-one term (AC2 ceiling), and the
+  renormalization returning a zero low word (AC2's cval floor at
+  counterexample B, one assertion — the collapse RR21 predicted). The
+  recorded null probe reproduces as a null probe: zeroing `dd_mul`'s
+  correction word alone reddens nothing.
+- **AC5 — verified.** `Rscript devel/degeneracy-oracle/exact_oracle.R` from
+  the repo root with `cairn/` moved aside exits 0; all four flags PASS,
+  including the new `CERTIFICATE (ratio in [1, 1e3] at all six geometries)`.
+  It read its fixture from `tests/testthat/fixtures/`.
+- **AC6 — verified.** Run by the criterion's own procedure: base-commit tests
+  extracted with `git archive 298747a5 tests`, `test-fixture-drift.R` deleted
+  from the extracted copy, swapped in for `tests/`, `devtools::test()`,
+  restored. FAIL 0 | WARN 5 | SKIP 1 | PASS 8524; the single skip is
+  `test-axes-scaled-fit.R:918:3`, which the branch's own suite also skips, so
+  no skip was introduced. No other base-commit test file was modified,
+  removed or excluded. Discrimination probe re-run: a 1e-6 relative change
+  planted in the exported corrected SE vector reddens
+  `test-axes-corrected-se.R:896` and `:924` in the base-commit copy; plant
+  reverted.
+- **AC7 — verified as written.** `Rscript -e 'devtools::test()'` FAIL 0 |
+  WARN 5 | SKIP 1 | PASS 8615, the 5 warnings pre-existing on master.
+  `Rscript -e 'devtools::check(args = "--no-manual")'` Status OK — 0 errors,
+  0 warnings, 0 notes, 7m 43s. Recorded beside it because the criterion's two
+  commands do not see it: the same check ERRORs on `windows-latest` in CI,
+  on AC2's assertion above.
+
+### Consistency gate
+
+`cairn_validate.py` exit 0, every check PASS (47 advisory work-log-format
+WARNs, all in M7's legacy log). Coverage completeness PASS. No `DESIGN.md`
+principle changed, so `cairn_impact.py` does not apply.
+
+Toolchain slot (`r-package`): `document()` no diff and zero `resolve link`
+lines; `pkgdown::check_pkgdown()` no problems; README.md newer than
+README.Rmd; NEWS needs no entry (nothing exported changed); no new top-level
+files and 0 check NOTEs; `check-master-red-alert.R`,
+`master-red-alert-dryrun.R` and `check-branch-protection.R` all exit clean.
+
+**Master watch — FAILED.** The newest `R-CMD-check.yaml` push run on master
+reaching a verdict is 32736668637 on ac7fd860 (the M107 merge):
+`ubuntu-latest (devel)` and `ubuntu-latest (release)` both failure, the other
+three green. Three failures, all
+`test-axes-scaled-fit.R:1698/1705/1706` — the M90 AC5 backstop-wiring test,
+which needs exemplar B's double-precision `cval` to come out negative and so
+depends on the platform's BLAS. Pre-existing and outside this branch: cut
+from 298747a5, which is ac7fd860 plus a docs-only commit. Cleared via
+`/hotfix` on master, not here. `test-coverage.yaml` on the same commit:
+success.
+
+### Findings
+
+Three fresh-context reviewers, none having authored the work: [O] on the full
+diff against the criteria, DESIGN.md and DECISIONS.md; [S] on `git blame` /
+`git log` of the modified lines against the intent of the code they touch;
+[S] on the repo's prior review record. Ranked as reported; triage is deferred
+to the re-review gate, since the milestone returns before one is reached. The
+[S] prior-review lens confirmed the GitHub inline-comment probe returns empty
+(as M91 measured), so the archived `## Review` sections were its evidence.
+
+1. **[O] `dd_solve()` errors instead of returning its sentinel on an all-NaN
+   pivot column** (`R/axes_certificate.R:253`). `which.max()` on all-NaN
+   gives `integer(0)`, so the finiteness guard evaluates to `NA` and the `if`
+   errors. Reproduced directly: `dd_solve(dd_of(matrix(1e308, 2, 2)))` raises
+   "missing value where TRUE/FALSE needed". Contradicts the function's own
+   "never a guess" contract and the file's fail-closed sentinel promise, which
+   M111's gate is to depend on. Latent through the public seam — the shipped
+   `solve()` refuses first on every input tried.
+2. **[O] the stated reason for replaying only the corrected arm is false**
+   (`R/axes_certificate.R:335`). The comment says the `naive` arm is never
+   user-reported; but `fiml_ratio = std$corrected / std$naive` at
+   `cov2cor(Sigma-hat)` (`R/axes_corrected_se.R:373`) is returned and is
+   multiplied into the reported FIML-path SE at
+   `R/axes_reliability.R:1808`. Verified by reading both sites. The scope call
+   may still be right; the reason given for it is not, and it is what would
+   stop a later reader noticing that `fiml_ratio` is uncertified.
+3. **[O] the recorded cost figure is not reproducible.** The work log records
+   "0.234 s against 14.75 ms ... 16x" at p = 24 / q = 27. Re-measured at that
+   design: `axes_se_pricing()` 1.65 ms, certificate 0.178 s — **107.9x**,
+   at or just past D-051's "up to about 100 times" envelope, though well
+   inside its "no more than about half a second" half. Nothing at that design
+   measures 14.75 ms.
+4. **[O] + [S] blame + [S] prior-review (all three, independently):
+   `cairn/DECISIONS.md:1445` (D-044) cites `cairn/reviews/rb18-counterexample-b.rds`,
+   which this branch deletes.** The milestone's own work log already records
+   this as left open for review. The archived RB18/RB19/RR18/RB21 pages cite
+   the same path and are byte-untouched history.
+5. **[O] M109's AC4 cites the deleted `test-fixture-drift.R`**
+   (`cairn/milestones/M109-source-tree-test-reads.md:61`). The branch adds a
+   work-log line explaining that AC4 states the shape in full itself, but the
+   criterion text still points at a deleted file.
+6. **[O] `axes_accuracy_certificate()` warns when `d$n_comp == 0`**
+   (`R/axes_certificate.R:412`). Reproduced: `max()` over an empty vector
+   emits "no non-missing arguments to max". The file guards this exact hazard
+   at `:266` and misses it here. Not producible by `axes_se_derivs()` today.
+7. **[O] `dd_quick_two_sum`'s documented precondition is violated at both
+   `dd_add` call sites** (`R/axes_certificate.R:109`). The arithmetic is
+   still correct — it is QD's `AccurateDWPlusDW`, whose bound does not rest on
+   operand ordering, and the reviewer's 4,000-case exact-rational sweep found
+   no bound violation — but the stated justification is wrong in a file whose
+   claim is that its arithmetic is auditable.
+8. **[O] one vacuous assertion in the AC1 n-invariance test**
+   (`tests/testthat/test-axes-certificate.R:195`):
+   `expect_identical(f(x), f(x))` tests determinism, not n-invariance. The
+   criterion's real content — the formals assertion and the
+   `true_rel(100)` vs `true_rel(5e5)` comparison — is sound and survives.
+9. **[O] nothing catches an inflated safety factor.** Verified by planting
+   it: F = 10 -> 100 reddens no assertion; only F = 1000 reddens AC2's
+   ceiling. AC2's 1e3 window tolerates a 100x overstatement by construction,
+   so coverage is one-sided — only a lowered factor is caught (plant B).
+10. **[O] `cert_line()` reports FAIL where the certificate is right**
+    (`devel/degeneracy-oracle/exact_oracle.R:130`). At `true_rel == 0` the
+    ratio is `Inf` and the script exits 1. Not reached by the six committed
+    geometries; would bite the first exactly-priced case added.
+11. **[O] `double_cval()` turns a named refusal into an opaque error**
+    (`devel/degeneracy-oracle/exact_oracle.R:108`): `axes_u_pricing()` can
+    return a string, and `/ df` then errors. Dev-script only; the pre-split
+    code failed similarly, so not a regression.
+12. **[O] + [S] blame: what deleting `test-fixture-drift.R` gives up.** The
+    two-copy argument is sound — one copy, nothing to fence — but that file
+    carried the only bit-exactness assertion on the fixture. Everything still
+    asserting on it is tolerance-based, so a value-preserving re-save that
+    perturbs the last bits would now pass the whole suite. [S] adds that
+    M107 built the guard specifically so a deleted record would redden
+    rather than skip.
+13. **[O] namespace hygiene (style).** The eighteen `dd_*` helpers enter the
+    package namespace unprefixed where every other internal in this
+    subsystem, `axes_dd_selftest()` and `axes_dd_pricing()` included, carries
+    `axes_`.
+
+Checked and clean, reported as such by the reviewers: behavior preservation of
+the pricing split (bit-identical returns under `identical()` across 11
+geometries x 4 sample sizes and every refusal route, identical refusal strings,
+order and warning text); the double-double primitives against exact rationals
+(worst relative errors 4.2e-33 / 4.1e-32 / 2.2e-32 for add / mul / div, inside
+the published bounds); replay fidelity of `axes_dd_pricing()` expression by
+expression; the frozen `EXACT_*` literals' traceability to the committed
+builders; the closed-form oracle's hand derivation (97/128 and 5/8 confirmed
+independently); both updated cross-file line-range citations; the M89 reason
+vocabulary, the M90 `cval <= 0` backstop, the M71 one-warning contract and the
+three non-finite-diagonal doors, all untouched; and the CLAUDE.md angle
+invariants, which this diff does not reach.
