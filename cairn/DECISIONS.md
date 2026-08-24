@@ -1760,3 +1760,66 @@ that milestone's work log and in `devel/degeneracy-oracle/exact_oracle.R`.
 
 **Reopens:** nothing new. D-048's second trigger — field reports of this
 refusal on real data — is unchanged and still open.
+
+### D-051 (2026-08-24): the per-fit accuracy certificate prices the shipped arithmetic against a compensated double-double replay — annotates D-050's remedy clause, moves nothing D-048 or D-049 decided (M108, RR21)
+
+**Context:** D-050 recorded that D-048's first reopening trigger was met in
+full, making the a-posteriori per-fit error certificate due rather than
+conditional. It did not say how the certificate would work. RR20 named two
+candidate mechanisms without settling either, and tiered the choice for
+independent review because a certificate that is plausible but wrong would
+license reporting numbers the package cannot in fact certify — the failure
+IP3 exists to prevent.
+
+**Decision.** The certificate replays the shipped pricing pipeline once per
+fit in compensated double-double arithmetic — roughly 31 significant digits,
+written in base R with no new dependency — and reads the relative disagreement
+between the shipped double-precision values and the replayed ones, times a
+stated safety factor, as the estimate. It estimates the committed relative
+error of the corrected component SE vector, aggregated by its worst component,
+and of `cval`. It is computed from the pre-square-root quadratic forms, in
+which the sample size never appears, so the n-independence D-048 and D-049
+required is structural rather than tested into existence. Where either route
+fails to produce finite values, it returns a sentinel meaning no digits
+certified, which fails closed under GP2.
+
+This is the two-routes-compared idea of RR20 with the routes' precisions
+separated. That separation is the whole decision: the two routes' errors
+cannot correlate when one runs sixteen decades finer than the other, so the
+disagreement is the working route's committed error rather than a proxy for
+it.
+
+**Rejected, each on measured grounds** (measurements and their constructions
+in RR21 §1 and §3, archived at
+`cairn/reviews/archive/RR21-axes-degeneracy-per-fit-certificate.md`):
+
+- *Two same-precision factorization routes compared* — the disagreement is
+  dominated by whichever route is less accurate, so it overstated the shipped
+  route's SE error by three to four decades on every reachable case, and
+  under-reported the `cval` error at two of six anchor geometries including
+  the committed counterexample. Under-reporting is the licensing failure the
+  certificate exists to prevent.
+- *Runtime exact-rational recomputation* — not achievable in base R at
+  acceptable cost: it needs arbitrary-precision arithmetic base R does not
+  have, and a hand-rolled one is a larger correctness surface than the
+  certificate it serves. Routing through an optional package is separately
+  refused: what `axes_reliability()` refuses must not depend on which
+  packages the user has installed.
+- *A-posteriori residual or backward-error bounds, and condition estimates of
+  the reported functional* — each converts a residual into a forward-error
+  claim through an unproven error model for this composite pipeline, and each
+  returns a bound-shaped number, which is the overstatement this work exists
+  to remove.
+
+**Consequences:** no exported behavior changes in M108 — the certificate is
+internal and nothing consumes it yet. Re-keying the `"ill_conditioned"`
+refusal to the certificate is M111's work; until it ships, the a-priori floor
+stands unchanged. Removal of the ill-conditioning limb was weighed a fourth
+time and rejected again, now on a changed ground: the limb is to be shrunk to
+what the certificate cannot certify rather than kept as an a-priori floor, and
+removing it before the certificate ships would restore the silent 3.4%-wrong
+counterexample with nothing in front of it.
+
+**Reopens:** any matrix on which the certificate's estimate falls below the
+exact-rational oracle's measured error for that matrix — an under-report. That
+evidence reopens the mechanism, not the constants D-048 and D-049 fixed.
