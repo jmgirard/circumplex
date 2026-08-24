@@ -93,6 +93,66 @@ typical, two do not.
 - 2026-08-24: review round 1 — AC1 and AC2 verified with fresh evidence and ticked; `devtools::test()` FAIL 0, PASS 8627; AC3's check still running.
 - 2026-08-24: review round 1 — AC3 verified and ticked (`check(args = "--no-manual")` Status OK); consistency gate clean; three fresh-context lenses returned 12 findings, triage pending at the gate.
 
+**Independent review — three fresh-context lenses, 12 findings.**
+
+[O] diff-bug, [S] blame-history, [S] prior-review. Ranked as reported; text
+verbatim where quoted, disposition and reason per finding.
+
+- **[O] F1 — the `\value`-site half of the new guard is not sentence-local.**
+  "its 'sentence' is a 2,635-character block spanning the tail of
+  `\arguments` plus the entire `\value` section." Re-verified by running the
+  test's own splitter over `man/axes_reliability.Rd`: the two `5e5` chunks are
+  2,635 and 464 characters, so at the `\value` site the guard only requires
+  the coefficient to appear somewhere in that block, not beside its figure;
+  `expect_identical(length(anchor), 2L)` also counts chunks, not occurrences.
+  → FIX NOW.
+- **[O] F2 — the NEWS insertion leaves three unpaired em-dashes**, so "divided
+  by the factor of `10`" no longer reliably attaches to "the accuracy target
+  `1e-4`"; a reader can close the appositive early and read `1e-5` as being
+  asserted below published sample sizes. → FIX NOW.
+- **[O] F3 — `R/axes_corrected_se.R:537` computes its `6.5e-6` corner from
+  a = 0.046, not the 0.045 the block states.** Confirmed pre-existing (present
+  in `origin/master`, untouched by this diff) and confirmed arithmetically:
+  0.1*0.045/sqrt(5e5) = 6.36e-6, 0.1*0.046/sqrt(5e5) = 6.51e-6.
+  → FOLLOW-UP (the diff makes it more reachable but did not introduce it).
+- **[O] F4 — NEWS's "(coefficient `1/sqrt(2)`)" is unglossed**: NEWS never
+  says what the number is a coefficient of, so a NEWS-only reader gets a token
+  rather than the information. → FIX NOW, folded into F2's rewrite.
+- **[O] F5 — "The two tenth-margin endpoints" reifies a two-point set out of a
+  measured continuum** whose upper end (a = 1.38) reaches n = 1.9e6.
+  → REJECT: the phrase is anaphoric to the two endpoints the preceding
+  sentence computes, not a claim that only two exist.
+- **[O] F6 — the `\value` site newly calls a = 1/sqrt(2) "a typical design"**
+  when the source derives it analytically. → REJECT: the source itself calls
+  it "a fair TYPICAL value", so the roxygen matches its own authority.
+- **[O] F7 — no prose surface carries the "no theorem bounds a away from
+  zero" caveat**, so `2e3` can read as a floor rather than the worst
+  *measured* endpoint. → REJECT: general certification of the derivation
+  block's prose is explicitly Out of scope, and "measured" is stated at every
+  surface.
+- **[O] F8 / [S] blame-history F2 (same finding) — "Above the endpoint the
+  guarantee is the fixed target alone" is ambiguous** now that two endpoints
+  are in scope; the pre-diff text read "Above that" with one antecedent.
+  → FIX NOW.
+- **[O] F9 — NEWS drops the "up to about" both roxygen sites keep**, stating a
+  rounded model-derived boundary as if exact. → FIX NOW, folded into F2's
+  rewrite.
+- **[S] blame-history F1 — the AC checkboxes were unticked at review entry.**
+  → REJECT (no change needed): that is the AC-fencing protocol — review ticks
+  each box against its own recorded evidence, which this section does.
+- **[S] prior-review F1 — the new test's "(M106 review round 4, F4)" citation
+  is mislabeled**, the lens holding that F4 names a round-3 print()/summary()
+  finding. → REJECT: refuted against the record. `cairn/ROADMAP.md:29` states
+  "M110 repairs M106's parked round-4 F4 defect: the calibration-domain
+  paragraph closes on the anchor's endpoint a sentence after putting the worst
+  geometry's a decade below the published ceiling" — the citation in the test
+  matches the repo's own record of what F4 is.
+- **[S] prior-review, [S] blame-history — no regression found.** Both lenses
+  confirmed M106's round-2 F13 (the coverage-units fix) and round-3 F2 (the
+  paired-endpoint fix) survive untouched, and that no D-entry constant moved.
+  The GitHub inline-comment probe returned an empty array, so that surface was
+  skipped.
+
 ## Decisions
 
 ## Review
@@ -135,8 +195,9 @@ branch 4 ahead, 0 behind, no merge needed.
   and in sync at `7d258248`; `pkgdown::check_pkgdown()` "No problems found";
   `NEWS.md` carries this milestone's user-visible change and names no
   milestone number; no new top-level files, so no `.Rbuildignore` entry owed;
-  full `devtools::check()` (with manual) — running at the time of writing,
-  result recorded below. Master watches: newest
+  full `devtools::check()` Status OK (devtools defaults to `--no-manual`,
+  so this is the same invocation AC3 names; the `manual = TRUE` release check
+  is not owed here). Master watches: newest
   push-run verdict on `R-CMD-check.yaml` and on `test-coverage.yaml` is
   `success` at `096b7cda` (master's tip `9374d4e8` is docs-only and triggers
   no run). `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`
