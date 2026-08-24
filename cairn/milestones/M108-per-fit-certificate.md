@@ -112,6 +112,8 @@ though this milestone changes no exported return.
 - 2026-08-24: criteria audit ran in FULL mode ([O], fresh context, authored none of them) over M108 and M111 together; it returned twelve findings. Six with one clear right answer were fixed here before writing: the n-invariance omission that would have rebuilt the yardstick-dependence D-048 refused, the post-hoc "stated factor" ceilings that constrained nothing, the unscoped "finite bound" universal, the diff procedure banning edits to any existing test file, M111's five cases entering through a refit rather than the seam, and the absence of any planted-defect probe in either milestone. Six design calls were settled as planner decisions and recorded as rejected-alternative lines rather than reopened as questions.
 
 - 2026-08-24: implement started; branch m108-per-fit-certificate cut from master at 298747a5.
+- 2026-08-24: question gate chose escalating the certificate mechanism via /milestone-brief over settling it in-session, per the plan T1 tripwire tag.
+- 2026-08-24: question gate chose deleting cairn/reviews/rb18-counterexample-b.rds once the oracle reads the packaged copy, over keeping both; done at T4.
 
 ## Decisions
 
