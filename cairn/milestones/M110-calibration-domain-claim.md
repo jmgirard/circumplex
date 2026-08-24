@@ -49,7 +49,7 @@ typical, two do not.
 - [x] AC2: Every line that `grep -rnE '5e5|5\.0e5|500,000' R/ man/ NEWS.md`
       returns either names the coefficient its figure belongs to, or does not
       state that figure as the calibration domain.
-- [ ] AC3: `Rscript -e 'options(cli.width = 500); devtools::document()'`
+- [x] AC3: `Rscript -e 'options(cli.width = 500); devtools::document()'`
       produces no diff and emits no line matching `resolve link`;
       `Rscript -e 'devtools::test()'` and
       `Rscript -e 'devtools::check(args = "--no-manual")'` clean.
@@ -91,6 +91,7 @@ typical, two do not.
 - 2026-08-24: verification — `document()` no diff and no `resolve link` line; `devtools::test()` FAIL 0, PASS 8627 (8619 before, the 8 added being this guard's); `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. Status → review.
 - 2026-08-24: review opened — master in sync, branch pushed, draft PR #140; evidence gathering under way.
 - 2026-08-24: review round 1 — AC1 and AC2 verified with fresh evidence and ticked; `devtools::test()` FAIL 0, PASS 8627; AC3's check still running.
+- 2026-08-24: review round 1 — AC3 verified and ticked (`check(args = "--no-manual")` Status OK); consistency gate clean; three fresh-context lenses returned 12 findings, triage pending at the gate.
 
 ## Decisions
 
@@ -114,3 +115,29 @@ branch 4 ahead, 0 behind, no merge needed.
   returns 9 lines: `R/axes_reliability.R` 731, 1049; `R/axes_corrected_se.R`
   501, 508, 522, 539; `man/axes_reliability.Rd` 88, 233; `NEWS.md` 79. Each
   names the coefficient its figure belongs to (`a = 1/sqrt(2)` at all nine).
+- AC3 ✓ (2026-08-24). `Rscript -e 'options(cli.width = 500); devtools::document()'`
+  exit 0, zero lines matching `resolve link`, and `git status --porcelain`
+  showed no generated-file diff. `Rscript -e 'devtools::test()'`:
+  FAIL 0 | WARN 5 | SKIP 1 | PASS 8627.
+  `Rscript -e 'devtools::check(args = "--no-manual")'`: exit 0, Status: OK
+  (0 errors, 0 warnings, 0 notes).
+
+**Consistency gate.**
+
+- `cairn_validate.py` exit 0 — every check PASS, including `scaffold present`
+  and `coverage complete`; `release window` advisory silent. 47 `work-log
+  format` advisory WARNs, all pre-existing M7 lines, no gate failure.
+- `cairn_impact.py` skipped: the diff changes no `DESIGN.md` principle (IP1 is
+  touched, not amended; `DESIGN.md` is not in the diff).
+- Toolchain checks (`r-package` profile `consistency-gate`): `document()` no
+  diff and no unresolved-link warning (above); generated files unedited by
+  hand (same no-diff check); README.md/README.Rmd both untouched by the diff
+  and in sync at `7d258248`; `pkgdown::check_pkgdown()` "No problems found";
+  `NEWS.md` carries this milestone's user-visible change and names no
+  milestone number; no new top-level files, so no `.Rbuildignore` entry owed;
+  full `devtools::check()` (with manual) — running at the time of writing,
+  result recorded below. Master watches: newest
+  push-run verdict on `R-CMD-check.yaml` and on `test-coverage.yaml` is
+  `success` at `096b7cda` (master's tip `9374d4e8` is docs-only and triggers
+  no run). `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`
+  and `tools/check-branch-protection.R` all exit clean.
