@@ -1678,25 +1678,58 @@ test_that("M90 AC5: the one recorded negative-cval matrix is refused by the crit
 })
 
 
-test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRING only; the criterion is mocked away)", {
-  # This mock proves the branch's wiring, never the condition that selects
-  # it (the M62 mock doctrine): the degeneracy criterion is stubbed to
-  # accept everything, so exemplar B -- whose double-precision cval is
-  # negative (-0.216) while its exact value is +0.0556 (RR18) -- flows past
-  # the door it is really refused at and lands in the final backstop. The
-  # unmocked path is pinned by the smoke test above (accepted draws never
-  # get here) and by the exemplar-B criterion assertion; this test pins the
-  # literal the backstop itself emits -- a literal the recorded search found
-  # no accepted input reaching (never "unreachable"; see the backstop
-  # comment). Under the stub the backstop is the only remaining site in this
-  # function that can emit this literal, so the assertion is site-exclusive.
-  fp <- test_path("fixtures", "rb18-counterexample-b.rds")
-  fx <- readRDS(fp)
+test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRING only; the criterion and the derivative set are mocked away)", {
+  # These mocks prove the branch's wiring, never the condition that selects
+  # it (the M62 mock doctrine). Two are needed, and the second one replaced a
+  # driver that could not hold still.
+  #
+  # WHY NOT EXEMPLAR B, which drove this test until the flake was measured.
+  # Its double-precision cval is negative (-0.216) while its exact value is
+  # +0.0556 (RR18) -- so the sign this test needed was not a property of the
+  # matrix, it was the residue of inverting an information matrix whose
+  # condition number is 3.0e15. Two ~874 quantities are differenced to reach
+  # it. Measured: nudging one entry of that fixture by a SINGLE ULP, thirteen
+  # times, made the backstop fire 5 times, leave cval positive 6 times (this
+  # test red), and made solve() refuse outright twice. A different platform's
+  # BLAS moves further than one ulp, which is why this test passed on macOS
+  # and windows while failing intermittently on ubuntu -- red on master's own
+  # push run, and passing then failing across three runs of one branch.
+  #
+  # THE DRIVER THAT HOLDS STILL. At sigma = I with every derivative matrix
+  # purely off-diagonal, the arithmetic collapses to small integers exactly:
+  # the standardization fold zeroes each W's diagonal, which leaves B equal to
+  # the information matrix, so the projection term is sum(solve(info) * info) =
+  # q whatever the mats are, and trace{V Gamma_R} is the pair count p(p-1)/2.
+  # cval is therefore (3 - q)/df = -2 EXACTLY, with kappa(info) = 1 -- no
+  # cancellation anywhere, identical under every matprod mode. The set below is
+  # deliberately not a legitimate derivative set (two members are
+  # antisymmetric); it does not need to be, because what is under test is which
+  # literal the branch emits, and a legitimate set can never reach this branch
+  # at all -- that is the point of the backstop.
+  #
+  # What exemplar B is still asserted against is the test above: the criterion
+  # refuses it, which is a condition-number comparison and deterministic.
+  # Under these stubs the backstop is the only remaining site in this function
+  # that can emit this literal, so the assertion stays site-exclusive.
+  sig <- diag(3)
+  dimnames(sig) <- list(paste0("i", 1:3), paste0("i", 1:3))
+  off_sym <- function(i, j) {
+    m <- matrix(0, 3, 3); m[i, j] <- m[j, i] <- 1; m
+  }
+  off_asym <- function(i, j) {
+    m <- matrix(0, 3, 3); m[i, j] <- 1; m[j, i] <- -1; m
+  }
+  # q = 5 keeps df = 1 and baseline_df = 3, the values this test always used.
+  mats <- list(off_sym(1, 2), off_sym(1, 3), off_sym(2, 3),
+               off_asym(1, 2), off_asym(1, 3))
   testthat::local_mocked_bindings(
-    axes_sigma_degenerate = function(sigma) NULL
+    axes_sigma_degenerate = function(sigma) NULL,
+    axes_se_derivs = function(...) {
+      list(mats = mats, components = "m", n_comp = 1L)
+    }
   )
   expect_warning(
-    got <- axes_scaling_factor(fx$S, rownames(fx$S), as.numeric(fx$ia),
+    got <- axes_scaling_factor(sig, rownames(sig), c(90, 180, 270),
                                c("A", "B", "C"),
                                fit_zeta1 = FALSE, fit_zeta2 = FALSE,
                                df = 1, baseline_df = 3),
