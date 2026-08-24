@@ -106,6 +106,7 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 - 2026-08-24: plan chose asserting the five reachable cases at the `axes_fitted_cov()` seam over routing them through `axes_reliability()`, because the oracle enumerates matrices while the exported path refits and would price a different matrix than the one enumerated; falsified by a fit whose refitted Sigma-hat lands on the other side of the certificate from the matrix it was built from.
 - 2026-08-24: criteria audit findings for this milestone are recorded in M108's work log, which covers the joint audit run.
 - 2026-08-24: RR21 (M108's mechanism review) routes four items here: re-key the `"ill_conditioned"` refusal to the certificate and carry the fit's own estimate in the warning (rec 4, the shape D-051's consequences state); surfacing the estimate on computed fits as well as refused ones (rec 5, a design call); emitting the exact oracle's values as hex double pairs so a reference route can be pinned below double resolution (B3); and extending the certificate's worst-component maximum to the FIML ratio vector, which the same pricing call already computes (B4). None is adopted by M108.
+- 2026-08-24: M108's review routes its remainder here, headed by the packaged bracket asserting on macOS only (all six cases skip on ubuntu and windows) with nothing failing when that domain empties; thirteen lower-ranked findings ride with it. Text and disposition for each are in the M108 archive's Review; the ROADMAP degeneracy candidate row carries the promotion clause.
 
 ## Decisions
 
