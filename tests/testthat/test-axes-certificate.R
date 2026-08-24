@@ -203,12 +203,26 @@ cert_skip_unless_reproduced <- function(id, sigma, d) {
   fz <- cert_frozen[[id]]
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
+  # A REFUSAL from the shipped pricing is NOT a failure to reproduce. Every
+  # one of these six geometries is admitted -- axes_sigma_degenerate() passes
+  # on each -- so a refusal here is a regression in axes_pricing_core(), and
+  # folding it into the skip below would turn that red green. Fail on it, and
+  # let the caller carry on: the certificate returns its sentinel at a refusal,
+  # which reddens the bracket too.
+  if (is.character(v) || is.character(u)) {
+    testthat::fail(paste0(
+      "the shipped pricing REFUSES at case '", id, "' (",
+      paste(Filter(is.character, list(v, u)), collapse = ", "),
+      ") -- an admitted geometry, so this is a regression, not a platform ",
+      "difference"
+    ))
+    return(invisible(FALSE))
+  }
   bad <- character(0)
   if (!identical(cert_hex(sigma[upper.tri(sigma)]), fz$sig)) {
     bad <- c(bad, "the anchor matrix")
   }
-  if (is.character(v) || is.character(u) ||
-      !identical(c(cert_hex(v$corrected), cert_hex(u)), fz$dbl)) {
+  if (!identical(c(cert_hex(v$corrected), cert_hex(u)), fz$dbl)) {
     bad <- c(bad, "the shipped double pricing")
   }
   if (length(bad) == 0L) return(invisible(TRUE))
@@ -261,6 +275,13 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   # test-axes-scaled-fit.R.
   fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
   d <- axes_se_derivs(fx$ia, c("A", "B", "C"), NULL, FALSE, FALSE)
+  # OUTSIDE the precondition, for the same reason kappa is outside it at the
+  # five anchors: where the gate below fires this test would otherwise assert
+  # nothing at all -- not even that the fixture is still the 3.4%-wrong matrix
+  # the frozen figures were measured on. The literal is committed here rather
+  # than read from the fixture's own `kappa` field, which would be blind in
+  # the dimension it derives.
+  expect_equal(m106_kappa(fx$S), 6654372.506, tolerance = 1e-6)
   cert_skip_unless_reproduced("cxb", fx$S, d)
   cert <- axes_accuracy_certificate(fx$S, d)
 
@@ -379,6 +400,20 @@ test_that("the sentinel is returned where there is nothing to certify", {
     .package = "circumplex"
   )
   expect_identical(axes_accuracy_certificate(r, d), list(se = 1, cval = 1))
+})
+
+
+test_that("dd_solve() returns its sentinel, never a condition, on a column
+           with no finite pivot", {
+  # Regression, M108 review: which.max() on an all-NA column returns
+  # integer(0), so the finiteness test on the selected pivot evaluated to NA
+  # and the `if` errored -- the sentinel path raising a condition instead of
+  # taking it. Two ways in: NaN directly, and an overflow to NaN produced by
+  # the dd arithmetic itself on finite input (1e308 + 1e308).
+  expect_null(dd_solve(dd_of(matrix(NaN, 2, 2))))
+  expect_null(dd_solve(dd_of(matrix(1e308, 2, 2))))
+  # ... and the ordinary path still inverts.
+  expect_identical(dd_solve(dd_of(diag(2)))$hi, diag(2))
 })
 
 

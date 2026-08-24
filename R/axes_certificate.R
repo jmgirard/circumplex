@@ -250,7 +250,14 @@ dd_solve <- function(a) {
   hi <- cbind(a$hi, diag(n))
   lo <- cbind(a$lo, matrix(0, n, n))
   for (k in seq_len(n)) {
-    piv <- which.max(abs(hi[k:n, k])) + k - 1L
+    # which.max() returns integer(0) on an all-NA column, and the finiteness
+    # test below would then evaluate to NA and error -- the sentinel path
+    # raising a condition instead of returning, which is what this guard
+    # stops. A column with no finite entry has no usable pivot, so it is the
+    # sentinel either way.
+    cand <- abs(hi[k:n, k])
+    if (!any(is.finite(cand))) return(NULL)
+    piv <- which.max(cand) + k - 1L
     if (!is.finite(hi[piv, k]) || hi[piv, k] == 0) return(NULL)
     if (piv != k) {
       hi[c(k, piv), ] <- hi[c(piv, k), ]

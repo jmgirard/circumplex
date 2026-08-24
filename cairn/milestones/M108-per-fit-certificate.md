@@ -190,6 +190,7 @@ though this milestone changes no exported return.
 - 2026-08-24: post-merge re-verification on the merged head — `devtools::check(args = "--no-manual")` Status OK, 0 errors, 0 warnings, 0 notes, 7m 33s; `Rscript devel/degeneracy-oracle/exact_oracle.R` from the repo root exits 0 with all four flags PASS and the ten reachable-case ratios at 9.97, 9.96, 10, 10, 10, 10, 10, 10, 10, 10.
 - 2026-08-24: status -> review (second time; the first was reverted by the master-watch red the review gate found, and the amendment return that followed).
 - 2026-08-24: re-review round 2 — all seven criteria re-executed with fresh evidence and ticked; master watch now PASSES on 7f4e9186; consistency gate clean. Twelve new findings plus twelve of round 1's thirteen still standing, all logged in the Review section; triage at the merge gate.
+- 2026-08-24: merge gate triaged all 24 findings — three fixed on the branch (the dd_solve sentinel crash and the two skips that should have been reds), each proved able to fail before its repair; the macOS-only bracket reach and thirteen others routed to follow-up; two dangling citations recorded without edit (IP4 / plan-owned); one declined on the merits. Full battery re-run clean after the fixes.
 
 ## Decisions
 
@@ -635,3 +636,57 @@ mechanism, its sentinel contract, both rejected alternatives and its
 reopening trigger; `axes_degeneracy_delta_star`, the calibration ceiling and
 `tau` untouched (D-048/D-049); no NAMESPACE, `man/`, export or `src/` change;
 and the CLAUDE.md angle invariants, which this diff does not reach.
+
+#### Triage (merge gate, 2026-08-24)
+
+**Fixed now on the branch**, each proved able to fail before its repair:
+
+- Round-1 finding 1 — `dd_solve()` raising a condition where its contract
+  promises the sentinel. `abs(hi[k:n, k])` is tested for any finite entry
+  before `which.max()` runs; a column with none returns `NULL`. Regression
+  test added at both doors (a NaN matrix directly, and finite input that
+  overflows to NaN inside the dd arithmetic) plus an ordinary-inversion
+  control. Proved: with the guard reverted the test ERRORs (95 passing -> 92
+  passing + 1 error); with it, 95 passing.
+- New findings 3 and 4 — the two skips that should have been reds. A
+  refusal from the shipped pricing now calls `testthat::fail()` naming the
+  refusal string and the case, instead of folding into the
+  non-reproduction skip; and counterexample B's test asserts its geometry's
+  kappa against a committed literal OUTSIDE the precondition, as the five
+  anchors already did. Proved both ways: with a refusal planted in
+  `axes_pricing_core()` the fixed suite reddens all six cases with 0 skips,
+  while the pre-fix helper skips all six under the misleading "does not
+  reproduce the shipped double pricing" reason; and with the cxb precondition
+  forced to fire and the committed kappa made wrong, the test REDDENS on the
+  kappa assertion and skips afterwards.
+
+**Follow-up** (maintainer's call at the gate): new finding 1, the packaged
+bracket asserting on macOS only, goes to the degeneracy candidate row and
+into M111, which reopens this surface. New findings 2, 5, 6, 7, 8, 10 and 12
+and round-1 findings 2, 3, 6, 7, 8, 9, 11 and 13 ride with it as the same
+row's remainder — none is a defect in a shipped return value, and several
+(2 and the oracle's flag hygiene) are the same reach question stated from a
+different side.
+
+**Recorded, no edit** — round-1 findings 4 and 5, the two citations to files
+this branch deletes. D-044 and the archived RB/RR pages are history and are
+superseded, never edited (IP4); M109's AC4 is plan-owned and amend-via-gate,
+so its wording is repaired in M109's own phase, where its work log already
+carries the note. Round-1 finding 12 (the lost bit-exactness assertion) is
+declined on the merits at the gate: the fence existed to hold two copies
+identical and there is now one copy, and new finding 4's un-gated kappa
+assertion restores a machine-independent identity check on it.
+
+**Not actioned:** round-1 finding 10, fixed in f39a1a0a and confirmed closed
+by the prior-review lens.
+
+#### Post-fix re-verification
+
+`Rscript -e 'devtools::test()'` FAIL 0 | WARN 5 | SKIP 1 | PASS 8619 (the 4
+added assertions). `Rscript -e 'devtools::check(args = "--no-manual")'`
+Status OK, 0 errors, 0 warnings, 0 notes, 8m 2s. `document()` no diff, zero
+`resolve link` lines. `Rscript devel/degeneracy-oracle/exact_oracle.R` with
+`cairn/` moved aside exits 0, all four flags PASS, `CERTIFICATE (12 of 12
+ratios checked ...)`. AC4's six plants re-run against the fixed tree: the
+same mapping, 0 skips and 0 errors in every one (A 12 failures, B 7, C 14,
+D 28, E 1, F the null probe at 0).
