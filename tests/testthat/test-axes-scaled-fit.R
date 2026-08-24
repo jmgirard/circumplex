@@ -1606,13 +1606,14 @@ test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 
   # dput(S, control = c("all", "hexNumeric")) round-trips bit-identically,
   # and even a default dput() round trip (max element difference 4.44e-16)
   # still leaves axes_sigma_degenerate() returning "ill_conditioned". The
-  # bytes are shipped because they are what the cairn/ record holds and
-  # byte-identity is what test-fixture-drift.R can fence, not because code
-  # would lose the case. It is read from the package's own fixtures directory
-  # so these assertions run under R CMD check instead of skipping there
-  # (M107; the M7 lesson said a silent skip is false coverage, and until M107
-  # this site was one). The copy under the repo's cairn/reviews/ is the
-  # record of record; test-fixture-drift.R fences the two against each other.
+  # bytes are shipped because they are what the search produced, not because
+  # code would lose the case. It is read from the package's own fixtures
+  # directory so these assertions run under R CMD check instead of skipping
+  # there (M107; the M7 lesson said a silent skip is false coverage, and until
+  # M107 this site was one). THIS IS NOW THE ONLY COPY: M108 repointed the
+  # exact-rational oracle at it and deleted the duplicate under cairn/reviews/
+  # along with test-fixture-drift.R, the byte-identity guard that fenced the
+  # two against each other -- with one copy there is no drift left to fence.
   fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   S <- fx$S

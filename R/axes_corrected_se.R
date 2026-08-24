@@ -585,7 +585,8 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # p = 4, 8 and 9 -- the form every lavaan-fitted Sigma-hat has -- the actual SE
 # relative error sits 5 to 8 decades BELOW the bound, attainment ratios at most
 # 4e-6. The bound's only measured attainment is the committed fixture
-# cairn/reviews/rb18-counterexample-b.rds, which no exported call can produce:
+# tests/testthat/fixtures/rb18-counterexample-b.rds, which no exported call
+# can produce:
 # it is p = 3 with df = 1 while axes_reliability() requires four scales (the
 # minimum reachable df is 4), and it sits 25 units off the model manifold at
 # its own stated configuration. What drives the error is coupling of near-null

@@ -13,10 +13,14 @@
 # its inputs and checks its output against the pinned anchors.
 #
 # EVERY SETTING THE ANCHORS DEPEND ON IS NAMED HERE. The committed fixture
-# cairn/reviews/rb18-counterexample-b.rds carries only the matrix `S` and the
-# item angles `ia`; the rest of the model is not in it, and the anchors are not
-# reproducible without these (M89 AC6):
-FIXTURE      <- "cairn/reviews/rb18-counterexample-b.rds"
+# tests/testthat/fixtures/rb18-counterexample-b.rds carries only the matrix `S`
+# and the item angles `ia`; the rest of the model is not in it, and the anchors
+# are not reproducible without these (M89 AC6). The fixture read is the PACKAGED
+# copy, and since M108 it is the only copy: the duplicate under cairn/reviews/
+# was deleted with the byte-identity guard that fenced the two against each
+# other, so this script reads nothing under cairn/ and runs with that directory
+# absent (M108 AC5).
+FIXTURE      <- "tests/testthat/fixtures/rb18-counterexample-b.rds"
 ITEM_SCALE   <- c("A", "B", "C")  # one item per scale, p = 3
 ITEM_BLOCK   <- NULL              # no blocks; only consulted when FIT_ZETA2
 FIT_ZETA1    <- FALSE             # so q = 5 (xi1, xi2, and p error matrices)
@@ -95,26 +99,12 @@ dbl_sf <- suppressWarnings(
 # The cval the shipped double-precision code computes BEFORE its refusal
 # discards it. axes_scaling_factor() returns a reason and no number wherever
 # the criterion trips, so a refused case has no other route to the double
-# value being priced (M106 T11). Same arithmetic as R/axes_scaled_fit.R's.
-double_cval <- function(S, d, df) {
-  si <- solve(S); sim <- lapply(d$mats, function(m) si %*% m)
-  q <- length(sim)
-  info <- matrix(0, q, q)
-  for (s in seq_len(q)) for (t in s:q)
-    info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
-  acov <- solve(info)
-  up <- upper.tri(S); rho <- S[up]
-  tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
-  ys <- lapply(sim, function(sm) {
-    w <- 0.5 * sm %*% si
-    diag(w) <- diag(w) - diag(S %*% w)
-    w %*% S
-  })
-  b <- matrix(0, q, q)
-  for (s in seq_len(q)) for (t in s:q)
-    b[s, t] <- b[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
-  (tr_vg - sum(acov * b)) / df
-}
+# value being priced (M106 T11). This used to be a transcribed copy of
+# R/axes_scaled_fit.R's arithmetic, kept in step by a comment; since M108 that
+# arithmetic has one definition -- axes_u_pricing(), which the shipped path and
+# the certificate's reference route both read -- so the copy is gone and this
+# calls it. The `/ df` is what axes_scaling_factor() does with the numerator.
+double_cval <- function(S, d, df) axes_u_pricing(S, d) / df
 
 cat(sprintf("\ncval   exact %+.12g | double %+.12g | shipped reason: %s\n",
             ex[["EXACT_CVAL"]], double_cval(S, d, DF),
@@ -126,11 +116,38 @@ cat(sprintf("       (exact tr_vg %.10g - proj %.10g; amplification %.4g)\n",
               abs(ex[["EXACT_TR_VG"]] - ex[["EXACT_PROJ"]])))
 
 cat("\ncorrected SEs (reported with reason NULL):\n")
+b_se_rel <- 0
 for (i in seq_along(dbl_se)) {
   e <- ex[[sprintf("EXACT_SE%d", i)]]
+  b_se_rel <- max(b_se_rel, abs(e - dbl_se[[i]]) / e)
   cat(sprintf("  comp %d: exact %.12g | double %.12g | rel.err %.3e\n",
               i, e, dbl_se[[i]], abs(e - dbl_se[[i]]) / e))
 }
+
+# --- M108: the per-fit certificate beside the error it estimates -------------
+#
+# axes_accuracy_certificate() never sees the exact values; it reads the shipped
+# double pricing against its own double-double replay of the same pipeline.
+# What this section measures is whether that estimate brackets the error the
+# exact-rational oracle MEASURES -- at or above it (no under-report, which is
+# the licensing failure) and within CERT_CEILING of it (M108 AC2's
+# pre-registered window, which the a-priori bound it replaces misses by 5 to 8
+# decades). The certificate is n-free and df-free by construction, so nothing
+# here hands it either.
+CERT_CEILING <- 1e3
+cert_ok <- TRUE
+cert_line <- function(lbl, cert, true_rel) {
+  ratio <- cert / true_rel
+  cert_ok <<- cert_ok && is.finite(ratio) && ratio >= 1 && ratio <= CERT_CEILING
+  cat(sprintf("  %-10s true %9.3e | certificate %9.3e | ratio %8.3g\n",
+              lbl, true_rel, cert, ratio))
+}
+
+cat("\ncertificate at counterexample B:\n")
+cert_b <- axes_accuracy_certificate(S, d)
+cert_line("SE", cert_b$se, b_se_rel)
+cert_line("cval", cert_b$cval,
+          abs(ex[["EXACT_CVAL"]] - double_cval(S, d, DF)) / abs(ex[["EXACT_CVAL"]]))
 
 # --- anchor checks (M89 AC4/AC6) --------------------------------------------
 ok <- abs(ex[["EXACT_CVAL"]] - ANCHOR_CVAL[["value"]]) <= ANCHOR_CVAL[["tol"]]
@@ -258,9 +275,13 @@ for (cs in reach_cases) {
   reach_ok <- reach_ok && rat <= REACHABLE_WINDOW
   cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e   %9.3e\n",
               cs$lbl, pr, kappa_of(g$S), rel, bnd, rat, cvr))
+  crt <- axes_accuracy_certificate(g$S, dr)
+  cert_line("  SE", crt$se, rel)
+  cert_line("  cval", crt$cval, cvr)
 }
 
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\n",
+cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (ratio in [1, %.0e] at all six geometries): %s\n",
             if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
-            REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL"))
-if (!ok || !sweep_ok || !reach_ok) quit(status = 1L)
+            REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL",
+            CERT_CEILING, if (cert_ok) "PASS" else "FAIL"))
+if (!ok || !sweep_ok || !reach_ok || !cert_ok) quit(status = 1L)

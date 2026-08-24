@@ -91,7 +91,7 @@ though this milestone changes no exported return.
       construction. `axes_se_pricing()` (`R/axes_corrected_se.R:153-207`) is
       already callable at two different matrices and is the existing
       price-it-twice-and-compare primitive.
-- [ ] T4: Repoint `exact_oracle.R`'s `FIXTURE` (`:19`) at the packaged copy and
+- [x] T4: Repoint `exact_oracle.R`'s `FIXTURE` (`:19`) at the packaged copy and
       extend its per-case output to emit the certificate beside the exact
       relative error, for the five reachable cases and counterexample B.
 - [ ] T5: Write the AC2/AC3 tests at the `axes_fitted_cov()` injection seam,
@@ -121,6 +121,8 @@ though this milestone changes no exported return.
 - 2026-08-24: question gate chose a certificate that takes neither `n` nor `df` over one that takes `df`, because `df` is an exact integer divisor that cancels from a relative error exactly as `n` does; the one rounding it adds sits under the 2-epsilon floor.
 - 2026-08-24: T3 done — `axes_accuracy_certificate()` in R/axes_certificate.R: vectorized double-double arithmetic (two-sum, Dekker two-product, tree summation, pivoted Gauss-Jordan) replaying the shipped pricing, estimate = 10*max(delta/2, 2*eps), sentinel 1 on any route failure, known-answer self-test of the error-free transforms. The shipped pre-root pricing split into axes_pricing_core()/axes_v_pricing()/axes_u_pricing(); two cross-file line-range citations updated to follow the moved code. devtools::test() 0 failures, 8526 passes (5 warnings pre-existing, in ci_accuracy and ssm_sem).
 - 2026-08-24: cost measured at the largest reachable design (p = 24, q = 27): 0.234 s against 14.75 ms for the double pricing — 16x, inside the envelope this file's Decisions section records (up to ~100x, ≤ ~0.5 s).
+- 2026-08-24: T4 done — the oracle reads tests/testthat/fixtures/, emits the certificate beside each measured error at all six geometries, and fails if any ratio leaves [1, 1e3]; its transcribed copy of the shipped cval arithmetic replaced by the axes_u_pricing() call. AC5 verified: `Rscript devel/degeneracy-oracle/exact_oracle.R` from the repo root with cairn/ moved aside exits 0, all four flags PASS.
+- 2026-08-24: T4 deleted cairn/reviews/rb18-counterexample-b.rds and tests/testthat/test-fixture-drift.R (the byte-identity guard between the two copies) per the recorded gate; the fixture's provenance comment in test-axes-scaled-fit.R and one prose path in R/axes_corrected_se.R updated, and M109's work log notes that its AC4 cites the deleted file for a shape AC4 states in full itself.
 
 ## Decisions
 
