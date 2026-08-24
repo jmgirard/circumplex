@@ -94,9 +94,9 @@ though this milestone changes no exported return.
 - [x] T4: Repoint `exact_oracle.R`'s `FIXTURE` (`:19`) at the packaged copy and
       extend its per-case output to emit the certificate beside the exact
       relative error, for the five reachable cases and counterexample B.
-- [ ] T5: Write the AC2/AC3 tests at the `axes_fitted_cov()` injection seam,
+- [x] T5: Write the AC2/AC3 tests at the `axes_fitted_cov()` injection seam,
       using the builders in `tests/testthat/helper-m106-degeneracy.R`.
-- [ ] T6: Satisfy IP3's two-independent-oracle-types bar for the certificate's
+- [x] T6: Satisfy IP3's two-independent-oracle-types bar for the certificate's
       number, each oracle recorded at its asserting test per DESIGN.md's
       Oracle records convention; the second type is settled by T2's RR.
 - [ ] T7: Mutation-prove (AC4) — three planted defects varying form and
@@ -123,6 +123,8 @@ though this milestone changes no exported return.
 - 2026-08-24: cost measured at the largest reachable design (p = 24, q = 27): 0.234 s against 14.75 ms for the double pricing — 16x, inside the envelope this file's Decisions section records (up to ~100x, ≤ ~0.5 s).
 - 2026-08-24: T4 done — the oracle reads tests/testthat/fixtures/, emits the certificate beside each measured error at all six geometries, and fails if any ratio leaves [1, 1e3]; its transcribed copy of the shipped cval arithmetic replaced by the axes_u_pricing() call. AC5 verified: `Rscript devel/degeneracy-oracle/exact_oracle.R` from the repo root with cairn/ moved aside exits 0, all four flags PASS.
 - 2026-08-24: T4 deleted cairn/reviews/rb18-counterexample-b.rds and tests/testthat/test-fixture-drift.R (the byte-identity guard between the two copies) per the recorded gate; the fixture's provenance comment in test-axes-scaled-fit.R and one prose path in R/axes_corrected_se.R updated, and M109's work log notes that its AC4 cites the deleted file for a shape AC4 states in full itself.
+- 2026-08-24: T5 done — tests/testthat/test-axes-certificate.R asserts AC2's floor and its 1e3 ceiling at the five reachable geometries and at counterexample B, AC3's discrimination against delta_star, AC1's finiteness across the admitted domain (including machine-singular and roundoff-negative matrices) and its no-n formals, and the sentinel on both routes. Each geometry is fingerprinted by its condition number so a builder edit cannot silently leave the frozen oracle figures describing a different matrix.
+- 2026-08-24: T6 done — two independent oracle types recorded at the asserting test: the frozen exact-rational Python oracle (generator named, regeneration command given) and a hand-derived closed-form oracle at a dyadic-rational p = 2 configuration whose exact values (v = 97/128, u = 5/8) the reference route reproduces bit for bit with a zero low word. A planted-perturbation sensitivity invariant ships beside them and is not counted as a type.
 
 ## Decisions
 
