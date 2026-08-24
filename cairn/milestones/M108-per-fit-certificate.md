@@ -1,6 +1,6 @@
 # M108: Build and validate a per-fit accuracy certificate
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -187,6 +187,8 @@ though this milestone changes no exported return.
 - 2026-08-24: blocked on the same defect the review gate flagged, now measured as INTERMITTENT rather than platform-fixed: test-axes-scaled-fit.R:1699/1706/1707 (M90 AC5 backstop wiring, one line down from master's 1698/1705/1706 because this branch's diff to that file added a line) passed on ubuntu-latest in runs 32752082137 and 32755444168 and failed in 32760276060, on three commits none of which touch R/axes_scaled_fit.R's backstop or that test. The same three assertions are red on master's own push run 32736668637 (ac7fd860, ubuntu devel and release). The test needs exemplar B's double-precision cval to come out negative, which run-to-run summation order on a threaded ubuntu BLAS does not guarantee.
 - 2026-08-24: M108's own tasks are all done and its local verify is clean; nothing further can be verified here, because the branch inherits that test from master and a red on the default branch is cleared via /hotfix, never on a milestone branch. Unblocks when the hotfix merges and master is merged into this branch.
 - 2026-08-24: blocker cleared — the M90 backstop-wiring hotfix merged to master as 7f4e9186 (PR #139); master merged into this branch (one file, tests/testthat/test-axes-scaled-fit.R, auto-merged) and `devtools::test()` re-run: FAIL 0 | WARN 5 | SKIP 1 | PASS 8615, the same 5 warnings and 1 skip master carries. Status -> in-progress.
+- 2026-08-24: post-merge re-verification on the merged head — `devtools::check(args = "--no-manual")` Status OK, 0 errors, 0 warnings, 0 notes, 7m 33s; `Rscript devel/degeneracy-oracle/exact_oracle.R` from the repo root exits 0 with all four flags PASS and the ten reachable-case ratios at 9.97, 9.96, 10, 10, 10, 10, 10, 10, 10, 10.
+- 2026-08-24: status -> review (second time; the first was reverted by the master-watch red the review gate found, and the amendment return that followed).
 
 ## Decisions
 
