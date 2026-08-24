@@ -99,6 +99,7 @@ for them by construction. Exactly two assert shipped behaviour and always skip.
 - 2026-08-24: created by /milestone-plan.
 - 2026-08-24: plan gate chose leaving the 38 no-counterpart reads in place over relocating the norms-audit checkers to a developer script, because they cannot run under a package check by construction and most already say so in a comment; falsified by evidence a maintainer path reaches them expecting check coverage.
 - 2026-08-24: criteria audit ran in FULL mode ([O], fresh context, authored none of them) over M109 and M110 together — M110's user-facing tier mandates full, and M109 was audited at the same bar though its internal tier and tripwire-free criteria would have allowed the reduced mode. Fixed here before writing: the classification trichotomy could not classify the 11 never-collected `_problems/` lines nor the dev-only builder-script reads, so a fourth class was added and the runtime-half clause dropped; and the mutation probe was deletion-only, which provably cannot exercise the five `expect_no_match` assertions in the AC7 test, so an insertion arm was added.
+- 2026-08-24: M108 deleted `tests/testthat/test-fixture-drift.R` with the second copy of the exemplar-B fixture; AC4 cites it as the shape to follow, and AC4 states that shape in full itself (gate on `dir.exists()` of the tracking directory, not on the status file). The worked example now lives in the M107 archive and in git.
 
 ## Decisions
 

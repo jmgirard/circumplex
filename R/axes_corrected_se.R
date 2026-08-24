@@ -150,7 +150,18 @@ axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
 # to what it guards.
 #
 # Returns a list of the two SE vectors, or a single string naming the failure.
-axes_se_pricing <- function(sigma, d, n) {
+#
+# SPLIT INTO THREE (M108). The arithmetic below is now also replayed in
+# compensated double-double precision by axes_accuracy_certificate() in
+# R/axes_certificate.R, whose whole claim is that it prices THIS pipeline. So
+# the pipeline has exactly one definition and both routes read it: the two
+# inversions common to this surface and the scaling surface are
+# axes_pricing_core(); the pre-square-root quadratic forms -- the quantities in
+# which the sample size does not appear at all -- are axes_v_pricing(); and the
+# n-carrying tail (divide by n, take the root) is what stays here. The split is
+# expression-for-expression, so every returned number is bit-identical to the
+# single function this was before (M108 AC6).
+axes_pricing_core <- function(sigma, d) {
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return("singular")
 
@@ -167,7 +178,22 @@ axes_se_pricing <- function(sigma, d, n) {
   acov <- tryCatch(solve(info), error = function(e) NULL)
   if (is.null(acov) || !all(is.finite(acov))) return("unidentified")
 
-  out <- vapply(seq_len(d$n_comp), function(r) {
+  list(si = si, sim = sim, acov = acov)
+}
+
+
+# The two asymptotic VARIANCES per component -- v_r, the quantity the reported
+# SE is sqrt(v_r / n) of. Returned pre-root and pre-division deliberately: n
+# cancels exactly from a relative error (|sqrt(v_hat/n)/sqrt(v/n) - 1| does not
+# contain n at all), which is what lets the certificate be n-free by
+# construction rather than by test (D-051; RR21 section 2).
+axes_v_pricing <- function(sigma, d) {
+  core <- axes_pricing_core(sigma, d)
+  if (is.character(core)) return(core)
+  si <- core$si
+  acov <- core$acov
+
+  v <- vapply(seq_len(d$n_comp), function(r) {
     # W for component r: the derivative structure weighted by that component's
     # row of (Delta'V Delta)^-1, sandwiched by Sigma^-1.
     w <- 0.5 * si %*% Reduce(`+`, Map(`*`, d$mats, acov[r, ])) %*% si
@@ -184,8 +210,17 @@ axes_se_pricing <- function(sigma, d, n) {
     diag(wc) <- -rowSums(wc * sigma)
     wcs <- wc %*% sigma
     corrected <- 2 * sum(wcs * t(wcs))
-    c(sqrt(naive / n), sqrt(corrected / n))
+    c(naive, corrected)
   }, numeric(2))
+
+  list(naive = v[1, ], corrected = v[2, ])
+}
+
+
+axes_se_pricing <- function(sigma, d, n) {
+  v <- axes_v_pricing(sigma, d)
+  if (is.character(v)) return(v)
+  out <- rbind(sqrt(v$naive / n), sqrt(v$corrected / n))
 
   # Belt-and-braces on the contract stated above, NOT a fixed bug -- and the
   # distinction is recorded because the evidence is thinner than it looks.
@@ -550,7 +585,8 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # p = 4, 8 and 9 -- the form every lavaan-fitted Sigma-hat has -- the actual SE
 # relative error sits 5 to 8 decades BELOW the bound, attainment ratios at most
 # 4e-6. The bound's only measured attainment is the committed fixture
-# cairn/reviews/rb18-counterexample-b.rds, which no exported call can produce:
+# tests/testthat/fixtures/rb18-counterexample-b.rds, which no exported call
+# can produce:
 # it is p = 3 with df = 1 while axes_reliability() requires four scales (the
 # minimum reachable df is 4), and it sits 25 units off the model manifold at
 # its own stated configuration. What drives the error is coupling of near-null
