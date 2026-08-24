@@ -40,13 +40,13 @@ typical, two do not.
 
 ## Acceptance criteria
 
-- [ ] AC1: The calibration-domain paragraph closes by stating the domain
+- [x] AC1: The calibration-domain paragraph closes by stating the domain
       endpoint at the worst measured coefficient (a = 0.045, tenth-margin
       n = 2.0e3) alongside the anchor's (a = 1/sqrt(2), n = 5.0e5), and says
       which of the two lies below the n ~ 1e4 ceiling of published circumplex
       correlation matrices. The source's own spelling of the coefficient
       (0.045) is used; the archived review spells it 0.046 and is not edited.
-- [ ] AC2: Every line that `grep -rnE '5e5|5\.0e5|500,000' R/ man/ NEWS.md`
+- [x] AC2: Every line that `grep -rnE '5e5|5\.0e5|500,000' R/ man/ NEWS.md`
       returns either names the coefficient its figure belongs to, or does not
       state that figure as the calibration domain.
 - [ ] AC3: `Rscript -e 'options(cli.width = 500); devtools::document()'`
@@ -90,7 +90,27 @@ typical, two do not.
 - 2026-08-24: T4 — a help-page guard at `tests/testthat/test-axes-reliability.R:3235+` cuts the Rd into sentences and requires each of the two `5e5` sentences to name `a = 1/sqrt(2)` and each `2e3` sentence to name `a = 0.045`, using the dual-source man/-or-`Rd_db()` read the file's other Rd guards use (under check only the `Rd_db()` arm runs). Proved able to fail on two planted defects: reverting both sites reddens 4 of 6 assertions, reverting only the unqualified `\value` site reddens 2 of 7 — the sentence count alone stays green on the first defect, which is why the per-sentence match carries the claim.
 - 2026-08-24: verification — `document()` no diff and no `resolve link` line; `devtools::test()` FAIL 0, PASS 8627 (8619 before, the 8 added being this guard's); `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. Status → review.
 - 2026-08-24: review opened — master in sync, branch pushed, draft PR #140; evidence gathering under way.
+- 2026-08-24: review round 1 — AC1 and AC2 verified with fresh evidence and ticked; `devtools::test()` FAIL 0, PASS 8627; AC3's check still running.
 
 ## Decisions
 
 ## Review
+
+Round 1. PR #140 (draft at evidence time). Master in sync at `9374d4e8`;
+branch 4 ahead, 0 behind, no merge needed.
+
+**Acceptance criteria — fresh evidence.**
+
+- AC1 ✓ (2026-08-24). Read `R/axes_corrected_se.R:519-527`: the paragraph
+  closes "The two tenth-margin endpoints fall on opposite sides of the
+  n ~ 1e4 ceiling of published circumplex correlation matrices: the anchor's
+  n = 5.0e5 (a = 1/sqrt(2)) is 1.7 decades past that ceiling, while the worst
+  measured geometry's n = 2.0e3 (a = 0.045) is below it". Both endpoints
+  carry their coefficients, and it says which lies below the ceiling.
+  Arithmetic re-derived from the block's own `n = 1e6 * a^2`: a = 0.045 gives
+  2025, a = 1/sqrt(2) gives 5.0e5, log10(5e5/1e4) = 1.699. `grep -rn 0.046 R/
+  man/ NEWS.md` returns nothing — the source's own `0.045` is used throughout.
+- AC2 ✓ (2026-08-24). `grep -rnE '5e5|5\.0e5|500,000' R/ man/ NEWS.md`
+  returns 9 lines: `R/axes_reliability.R` 731, 1049; `R/axes_corrected_se.R`
+  501, 508, 522, 539; `man/axes_reliability.Rd` 88, 233; `NEWS.md` 79. Each
+  names the coefficient its figure belongs to (`a = 1/sqrt(2)` at all nine).
