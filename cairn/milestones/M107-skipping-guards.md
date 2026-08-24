@@ -202,3 +202,75 @@ was needed before gathering evidence.
   for both `R-CMD-check.yaml` (success) and `test-coverage.yaml` (success).
 - `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` (5/5
   synthetic payloads ok) and `tools/check-branch-protection.R` all exit 0.
+
+### Independent review
+
+Three fresh-context reviewers, none having seen the implementation, each on a
+distinct evidence base.
+
+- **[S] blame-history** — zero findings. Read the commits behind the deleted
+  `skip_if_not` guards and the deleted `tryCatch` probe and found the diff
+  applies the M7 and M68 lessons rather than undoing them.
+- **[S] prior-PR-comments** — zero findings. The `gh api .../pulls/comments`
+  probe returned `[]`, so the GitHub thread surface was not walked; the
+  archived record's bearing lesson is the same M7/M69/M70 one, complied with.
+- **[O] diff-bug** — ten findings, below. Five carry checkable factual claims;
+  all five were re-verified against the implementation by this session and
+  every one reproduces.
+
+None demonstrates an acceptance criterion failing, and none is a defect in
+what the package does for its users, so none trips the return floor.
+
+Findings, as ranked by the reviewer, with disposition:
+
+1. The relocated fixture violates `PROFILE.md`'s fixture-provenance rule: a
+   committed test fixture must carry a `data-raw/` generator that regenerates
+   it plus any seed, and this one has neither, by its own comment. No D-entry
+   waives it. Moving the file from `cairn/` into `tests/testthat/fixtures/` is
+   what brought it inside the rule. — *Disposition: pending triage.*
+2. The comment at `test-axes-scaled-fit.R:1597-1599` is false in both halves,
+   and it is the claim that justifies shipping a binary blob. Verified:
+   `dput(S, control = c("all", "hexNumeric"))` round-trips **bit-identically**
+   (`identical()` TRUE), so the matrix *can* be written as code; and a plain
+   `dput()` round-trip, while it does perturb bits (max diff 4.44e-16), leaves
+   `axes_sigma_degenerate()` returning `"ill_conditioned"` — the case does not
+   flip to NULL. `test-fixture-drift.R` repeats the same false claim.
+   — *Disposition: pending triage.*
+3. `helper-lavaan-cfi.R:26-27` evaluates `length(out)` and `is.finite(out)`
+   outside the `tryCatch`, so an unusable return type errors instead of
+   yielding NULL. Verified: `lav_cfi_ref(200, 100, 400, 150, f = function(...)
+   list(0.9))` raises "default method not implemented for type 'list'". This
+   contradicts the helper's own stated contract and would redden CI for a
+   reason unrelated to the package — the M68 round-2 failure mode.
+   — *Disposition: pending triage.*
+4. The record says three `lav_fit_cfi()` call sites were repointed; `master`
+   had two. Verified: `git show master:... | grep -n lav_fit_cfi` gives calls
+   at 532 and 1238 only. Line 922, named in T4 and in the T4/T5 work-log line,
+   is the M68 environment gate and never held a call. AC4's "three
+   comparisons" is still correct — two at the first site, one at the second.
+   — *Disposition: pending triage.*
+5. Nothing detects the recurrence M107 exists to fix: if a future lavaan
+   renames again, both probes fail, both comparisons skip, the suite stays
+   FAIL 0, and only a human reading a skip listing would notice.
+   — *Disposition: pending triage.*
+6. `helper-lavaan-cfi.R:25` maps a warning to NULL, discarding a correct
+   value. Verified: a stand-in that warns and returns 0.9 yields NULL. A
+   deprecation warning added to `lav_fit_cfi()` would silently kill the
+   cross-check — finding 5's mechanism with a likelier trigger.
+   — *Disposition: pending triage.*
+7. `test-fixture-drift.R:26-27` cannot distinguish "running in a tarball" from
+   "someone deleted the record", so deleting or renaming
+   `cairn/reviews/rb18-counterexample-b.rds` silently disarms the guard in the
+   source tree too. — *Disposition: pending triage.*
+8. The fixture's `a`/`b` fields are described as "the two observed reasons" but
+   hold `"NULL"` and `"indefinite"` (verified), contradicting the
+   `"ill_conditioned"` asserted three lines below. Nothing asserts them, and
+   byte-identity now freezes them. — *Disposition: pending triage.*
+9. The T2 work-log line says the drift guard was split out "so that file names
+   `cairn` nowhere", but line 1605 does name it. AC2 as written still holds;
+   only the parenthetical intent is overstated. — *Disposition: pending
+   triage.*
+10. `devel/degeneracy-oracle/exact_oracle.R:16` still reads the `cairn/` copy,
+    so the two copies are load-bearing in different places. Pre-existing;
+    M107 makes the duplication newly relevant. — *Disposition: pending
+    triage.*
