@@ -309,3 +309,17 @@ Maintainer chose "fix five, then merge". Dispositions:
   provenance; no detection if lavaan renames again; the second copy read by
   the devel oracle).
 
+**Re-verification after the fixes** (`dc99bfcd`). `devtools::test()`:
+FAIL 0 / WARN 5 / SKIP 1 / PASS 8526 — the same single pre-existing skip at
+`test-axes-scaled-fit.R:918`, and 6 more passes than the AC4 run (the new
+helper tests). Fresh `R CMD build` + `R CMD check --no-manual` of the tarball:
+Status OK, FAIL 0 / WARN 4 / SKIP 146 / PASS 7513. AC1 still holds: no skip
+names the fixture, and the only `test-axes-scaled-fit.R` skips remain `:918`,
+`:966`, `:1140`. The drift guard now skips under check for its new reason
+("no cairn/ tracking dir"), which is the designed behaviour inside a tarball.
+
+Findings 1, 5 and 10 are folded into the existing M107-remainder candidate
+row at the post-merge hygiene pass rather than added as separate rows:
+`ROADMAP.md` stood at 23,995 of 24,000 bytes and 59 of 60 lines, so new rows
+had to wait for the same pass that prunes terminal rows (search-first: the
+existing row already carries M107's deferred test-infrastructure work).
