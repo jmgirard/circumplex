@@ -1,6 +1,6 @@
 # M108: Build and validate a per-fit accuracy certificate
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -114,6 +114,7 @@ though this milestone changes no exported return.
 - 2026-08-24: implement started; branch m108-per-fit-certificate cut from master at 298747a5.
 - 2026-08-24: question gate chose escalating the certificate mechanism via /milestone-brief over settling it in-session, per the plan T1 tripwire tag.
 - 2026-08-24: question gate chose deleting cairn/reviews/rb18-counterexample-b.rds once the oracle reads the packaged copy, over keeping both; done at T4.
+- 2026-08-24: blocked on RB21 (certificate mechanism; fourth escalation of the ill-conditioning limb, removal listed as question 6).
 
 ## Decisions
 
