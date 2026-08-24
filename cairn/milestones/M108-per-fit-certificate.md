@@ -1,6 +1,6 @@
 # M108: Build and validate a per-fit accuracy certificate
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -183,6 +183,9 @@ though this milestone changes no exported return.
 - 2026-08-24: AC4 re-taken against the moved assertions — all six plants re-run one at a time, 0 cases skipped by the precondition in every one. A reddens AC2's ceiling, AC3 and the closed-form oracle; B AC2's floor at the anchors and at counterexample B; C AC2's ceiling and AC3; D AC2 at the anchors; E the counterexample-B cval floor alone; F still the null probe. Same mapping the pre-amendment run recorded.
 - 2026-08-24: exact_oracle.R now counts its ratio lines and asserts 12 before printing the certificate flag, and reports an exactly priced case (true error 0) as floor-only rather than FAIL (review finding 10). Proved able to fail: with the reachable case list emptied the flag reads "2 of 12 ratios checked" and the script exits 1. Its other three flags keep the same vacuous-pass shape and are left for review to triage — they are M89's and AC5's instrument, not AC2's.
 - 2026-08-24: AC2 leg (a) re-run with cairn/ moved aside — exit 0, all ten reachable-case ratios in [1, 1e3] (9.97, 9.96, 10, 10, 10, 10, 10, 10, 10, 10), CERTIFICATE flag "12 of 12 ratios checked ... PASS". devtools::test() FAIL 0 | WARN 5 | SKIP 1 | PASS 8615.
+- 2026-08-24: AC2's defect is repaired — windows-latest passes on run 32760276060 (f39a1a0a), where it failed on 32752082137 and 32755444168. macOS passes; devtools::check(args = "--no-manual") Status OK locally, 8m 10s.
+- 2026-08-24: blocked on the same defect the review gate flagged, now measured as INTERMITTENT rather than platform-fixed: test-axes-scaled-fit.R:1699/1706/1707 (M90 AC5 backstop wiring, one line down from master's 1698/1705/1706 because this branch's diff to that file added a line) passed on ubuntu-latest in runs 32752082137 and 32755444168 and failed in 32760276060, on three commits none of which touch R/axes_scaled_fit.R's backstop or that test. The same three assertions are red on master's own push run 32736668637 (ac7fd860, ubuntu devel and release). The test needs exemplar B's double-precision cval to come out negative, which run-to-run summation order on a threaded ubuntu BLAS does not guarantee.
+- 2026-08-24: M108's own tasks are all done and its local verify is clean; nothing further can be verified here, because the branch inherits that test from master and a red on the default branch is cleared via /hotfix, never on a milestone branch. Unblocks when the hotfix merges and master is merged into this branch.
 
 ## Decisions
 
