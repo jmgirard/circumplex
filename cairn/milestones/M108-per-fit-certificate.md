@@ -99,7 +99,7 @@ though this milestone changes no exported return.
 - [x] T6: Satisfy IP3's two-independent-oracle-types bar for the certificate's
       number, each oracle recorded at its asserting test per DESIGN.md's
       Oracle records convention; the second type is settled by T2's RR.
-- [ ] T7: Mutation-prove (AC4) — three planted defects varying form and
+- [x] T7: Mutation-prove (AC4) — three planted defects varying form and
       location, each verified to redden a named assertion.
 - [ ] T8: Run the base-commit test suite against the branch head (AC6); run the
       profile verify slot and the check (AC7).
@@ -125,6 +125,7 @@ though this milestone changes no exported return.
 - 2026-08-24: T4 deleted cairn/reviews/rb18-counterexample-b.rds and tests/testthat/test-fixture-drift.R (the byte-identity guard between the two copies) per the recorded gate; the fixture's provenance comment in test-axes-scaled-fit.R and one prose path in R/axes_corrected_se.R updated, and M109's work log notes that its AC4 cites the deleted file for a shape AC4 states in full itself.
 - 2026-08-24: T5 done — tests/testthat/test-axes-certificate.R asserts AC2's floor and its 1e3 ceiling at the five reachable geometries and at counterexample B, AC3's discrimination against delta_star, AC1's finiteness across the admitted domain (including machine-singular and roundoff-negative matrices) and its no-n formals, and the sentinel on both routes. Each geometry is fingerprinted by its condition number so a builder edit cannot silently leave the frozen oracle figures describing a different matrix.
 - 2026-08-24: T6 done — two independent oracle types recorded at the asserting test: the frozen exact-rational Python oracle (generator named, regeneration command given) and a hand-derived closed-form oracle at a dyadic-rational p = 2 configuration whose exact values (v = 97/128, u = 5/8) the reference route reproduces bit for bit with a zero low word. A planted-perturbation sensitivity invariant ships beside them and is not counted as a type.
+- 2026-08-24: T7 done — six planted defects run one at a time; five redden at least one AC2 or AC3 assertion, the sixth reddens nothing and is recorded as a null probe. Per-defect results in this file's Decisions section.
 
 ## Decisions
 
@@ -171,5 +172,27 @@ though this milestone changes no exported return.
   the largest reachable design. The recommended mechanism was measured inside
   it. The two-word arithmetic is vectorized from the start rather than written
   as scalar loops, which is where the measured difference lies.
+
+- 2026-08-24 (AC4, planted defects): six defects were planted one at a time in
+  `R/axes_certificate.R`, the certificate suite run against each, and each
+  reverted before the next. **A — the correlation-Jacobian diagonal fold
+  dropped in the reference route only**, so the replay prices a different
+  quantity than the shipped route: reddens AC2's 1e3 ceiling on the reachable
+  geometries, AC3's below-target assertion, and the closed-form oracle.
+  **B — the safety factor dropped** (10 to 1): reddens AC2's floor at the
+  reachable anchors and at counterexample B, which is what makes the factor
+  load-bearing rather than decorative. **C — the tree summation drops its odd
+  element** instead of carrying it: reddens AC2's ceiling and AC3. **D — the
+  double-double matrix product drops its last rank-one term**: reddens AC1's
+  n-invariance check, AC2 at the reachable anchors and at B, AC3, and the
+  closed-form oracle. **E — the reference route stops carrying low-order words
+  at all**, its renormalization returning a zero low word so the replay
+  degrades to double precision: reddens AC2's floor for `cval` at
+  counterexample B, the collapse-toward-zero RR21 predicted. **F — a null
+  probe, recorded because it found nothing:** zeroing the low word of the
+  double-double MULTIPLICATION alone reddens no assertion at these six
+  geometries. What the replay's accuracy rests on here is its additions, where
+  the cancellation is; a wrong multiplication is caught by the closed-form
+  oracle (defect D), not by the low word of a right one.
 
 ## Review
