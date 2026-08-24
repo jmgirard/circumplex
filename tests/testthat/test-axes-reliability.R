@@ -3250,29 +3250,40 @@ test_that("M110 AC1/AC2: every help-page calibration-domain figure names the coe
   expect_gt(nchar(rd), 1000L)
 
   # Strip the \code{} wrappers so a figure and its coefficient are compared as
-  # the reader sees them, then cut into sentences. A period followed by
-  # whitespace ends a sentence; `.Machine`, `1e-5`, `0.045` and the like carry
-  # no space after the period and so survive intact.
+  # the reader sees them.
   txt <- gsub("\\\\code\\{([^}]*)\\}", "\\1", gsub("\\s+", " ", rd))
-  sentences <- unlist(strsplit(txt, "(?<=\\.)\\s+", perl = TRUE))
+
+  # Each figure must be named WITHIN A BOUNDED WINDOW of its coefficient, not
+  # merely somewhere in the same Rd section. An earlier form of this guard cut
+  # the page into sentences, but the \value site carries no sentence break
+  # before its parenthetical, so its "sentence" ran 2,635 characters -- wide
+  # enough for the coefficient to sit in an unrelated clause and still pass.
+  # The measured gaps are 25/32 characters for the anchor and 46/34 for the
+  # worst geometry, so 120 leaves headroom without restoring that slack.
+  expect_named_within <- function(figure, coefficient, window = 120L) {
+    at <- gregexpr(figure, txt, fixed = TRUE)[[1]]
+    # The domain this sweep runs over is non-empty and is the size the two
+    # help-page sites make it -- otherwise the loop below is green on nothing,
+    # which is how a renamed or re-wrapped Rd would go quiet. Occurrences, not
+    # chunks: a third bare figure added anywhere reddens this.
+    expect_identical(length(at), 2L)
+    for (i in at) {
+      near <- substr(txt, max(1L, i - window), i + window)
+      expect_match(near, coefficient, fixed = TRUE)
+    }
+  }
 
   # The noise-dominance reading holds only out to n = 1e6 * a^2, so a
   # sample-size endpoint stated without the coefficient a it belongs to reads
   # as the whole domain. Both help-page sites state the anchor's endpoint; the
   # defect this pins is either one stating it alone (M106 review round 4, F4).
-  anchor <- grep("5e5", sentences, fixed = TRUE, value = TRUE)
-  # The domain this sweep runs over is non-empty -- otherwise the loop below
-  # is green on nothing, which is how a renamed or re-wrapped Rd would go quiet.
-  expect_identical(length(anchor), 2L)
-  for (s in anchor) expect_match(s, "a = 1/sqrt(2)", fixed = TRUE)
+  expect_named_within("5e5", "a = 1/sqrt(2)")
 
   # And the worst measured geometry's endpoint travels with its own
   # coefficient, at both sites: it is the figure that falls BELOW the n ~ 1e4
   # of published circumplex correlation matrices, which is the whole point of
   # stating it.
-  worst <- grep("2e3", sentences, fixed = TRUE, value = TRUE)
-  expect_identical(length(worst), 2L)
-  for (s in worst) expect_match(s, "a = 0.045", fixed = TRUE)
+  expect_named_within("2e3", "a = 0.045")
 
   # The published-ceiling comparison itself, without which a reader has both
   # endpoints and no reason to care which one they are at.

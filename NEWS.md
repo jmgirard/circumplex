@@ -76,10 +76,10 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   from the coverage of a nominal 95% Wald interval, and corroborated by the
   standard error's own sampling variability, under which a numerical error at
   the target is about a tenth of the statistical noise already in the number
-  for a typical design (coefficient `1/sqrt(2)`) at sample sizes to 500,000,
-  and at the least favorable geometry measured (coefficient `0.045`) only to
-  about 2,000 — below the sample sizes typical of published circumplex
-  correlation matrices — divided by the
+  at sample sizes up to about 500,000 for `1/sqrt(2)`, the typical relative
+  sampling coefficient, and only up to about 2,000 for `0.045`, the least
+  favorable geometry measured (below the sample sizes typical of published
+  circumplex correlation matrices) — divided by the
   factor of `10` by which the criterion's error bound may undershoot the error
   it stands for. Where this criterion refuses for ill-conditioning, the
   warning also names the conditioning — the condition number where the

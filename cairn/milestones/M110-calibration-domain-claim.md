@@ -153,6 +153,31 @@ verbatim where quoted, disposition and reason per finding.
   The GitHub inline-comment probe returned an empty array, so that surface was
   skipped.
 
+**Gate-directed fixes (2026-08-24).** Jeff chose "fix five, then merge".
+
+- F1 repaired: the guard now requires each figure within a 120-character
+  window of its coefficient (measured gaps 25/32 for the anchor, 46/34 for the
+  worst geometry) and asserts occurrences rather than chunks. Proved
+  discriminating on F1's own scenario — the `\value` figure stated bare with
+  the coefficients surviving elsewhere in the same 2,635-character block, no
+  sentence boundary introduced: the pre-fix sentence-splitting form stays
+  green (both `all(grepl(...))` TRUE), the window form reddens with 2
+  failures.
+- F2, F4, F9 repaired together in one NEWS rewrite: the inserted clause is
+  parenthesized so the em-dash pair around the appositive is restored (two
+  em-dashes now, not four), "up to about" is restored at both figures, and
+  `1/sqrt(2)` is glossed as "the typical relative sampling coefficient".
+- F8 repaired: "Above the endpoint" → "Above whichever endpoint the design's
+  own coefficient sets"; Rd regenerated.
+- F3 routed to a follow-up on the existing degeneracy candidate row, into
+  M111, which reopens `R/axes_corrected_se.R`.
+
+Post-fix re-verification: AC2 sweep still returns 9 lines, each naming its
+coefficient; `document()` exit 0, zero `resolve link` lines, no further
+generated-file drift; `devtools::test()` FAIL 0 | WARN 5 | SKIP 1 | PASS 8627;
+`devtools::check(args = "--no-manual")` exit 0, Status: OK.
+- 2026-08-24: gate — Jeff chose fix-five-then-merge; F1/F2/F4/F8/F9 fixed on the branch and re-verified clean, F3 routed to M111, six findings rejected with reasons in the Review section.
+
 ## Decisions
 
 ## Review

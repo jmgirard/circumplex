@@ -234,9 +234,9 @@ sampling coefficient \code{a = 1/sqrt(2)}) at \code{n} up to about \code{5e5}. T
 endpoint scales as \code{1e6 * a^2}, so at the least favorable geometry
 measured, \code{a = 0.045}, it falls to \code{n} of about \code{2e3} -- below the \code{n} of
 about \code{1e4} typical of published circumplex correlation matrices. Above
-the endpoint the guarantee is the fixed target alone, not noise
-dominance. The derivation and the premises it rests on are stated
-beside the constant in the source. The refusal
+whichever endpoint the design's own coefficient sets, the guarantee is the
+fixed target alone, not noise dominance. The derivation and the premises
+it rests on are stated beside the constant in the source. The refusal
 says which degeneracy happened: \code{"indefinite"} when the smallest
 eigenvalue is decisively negative (below
 \code{-lambda_max * sqrt(p * .Machine$double.eps)} -- beyond the fit's own
