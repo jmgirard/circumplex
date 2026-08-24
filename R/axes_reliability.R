@@ -1953,7 +1953,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # axes_se_pricing()'s cov2cor call
       # as backstops behind it). M71 audited the list against the source;
       # the PRICING "indefinite" backstop has never been observed to fire
-      # (R/axes_corrected_se.R:185-198), so this enumerates what the helper
+      # (R/axes_corrected_se.R:225-239), so this enumerates what the helper
       # CONTAINS, not what a user has been shown -- the criterion's
       # "indefinite", by contrast, fires on any decisively indefinite
       # fitted matrix (tested).

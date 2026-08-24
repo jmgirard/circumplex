@@ -41,6 +41,80 @@
 # from an integer count of overidentifying restrictions into a fitted quantity.
 
 
+# The scaling factor's NUMERATOR, trace{U Gamma_R}, before the division by df.
+#
+# Split out at M108 for the reason axes_v_pricing() is split out in
+# R/axes_corrected_se.R. axes_accuracy_certificate() replays this arithmetic in
+# compensated double-double precision, and one definition of it is what makes
+# the replay a replay rather than a second implementation. `df` stays with the
+# caller because it cancels exactly out of a relative error -- it is an exact
+# integer divisor, so |(u_hat/df)/(u/df) - 1| is |u_hat/u - 1| -- which is what
+# lets the certificate take neither n nor df (D-051; RR21 section 2).
+#
+# Returns the numerator, or a string naming the failure.
+axes_u_pricing <- function(sigma, d) {
+  core <- axes_pricing_core(sigma, d)
+  if (is.character(core)) return(core)
+  si <- core$si
+  sim <- core$sim
+  acov <- core$acov
+  q <- length(sim)
+
+  # --- trace{V Gamma_R}, in closed form ---------------------------------------
+  #
+  # The p* x p* product is never formed. Writing the operators on symmetric
+  # matrices -- V: E -> 0.5 Sigma^-1 E Sigma^-1, Gamma_S: E -> 2 Sigma E Sigma,
+  # and the standardization Jacobian J: E -> E - 0.5 (diag(E) Sigma + Sigma
+  # diag(E)) with Gamma_R = J Gamma_S J' -- and taking the trace over an
+  # orthonormal basis of symmetric matrices collapses to one sum over item
+  # pairs:
+  #
+  #   trace{V Gamma_R} = sum_{k<l} [ 1 - (Sigma^-1)_kl rho_kl (1 - rho_kl^2) ]
+  #
+  # Two things check it. Substituting Gamma_S for Gamma_R gives p* exactly (the
+  # operators are inverses), and the identity reduces to tr(Sigma^-1 Sigma) = p
+  # when the two derivations of it are equated. The vech-space oracle in
+  # tests/testthat/test-axes-scaled-fit.R recomputes it from literal matrices
+  # and agrees to 1e-15 on the probe maps.
+  up <- upper.tri(sigma)
+  rho <- sigma[up]
+  tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
+
+  # --- the projection term ----------------------------------------------------
+  #
+  # trace{V Delta (Delta'V Delta)^-1 Delta'V Gamma_R} = sum_st A_st B_st with
+  # A = (Delta'V Delta)^-1 -- since M108 literally the same matrix the SE
+  # surface prices with, both taken from axes_pricing_core() -- and
+  # B_st = 2 tr(Wc_s Sigma Wc_t Sigma), where Wc is W with the
+  # covariance-to-correlation Jacobian folded in exactly as it is there
+  # (R/axes_corrected_se.R:202-210): off the diagonal W is unchanged, and the
+  # diagonal absorbs the standardization because a sample correlation's diagonal
+  # does not vary at all.
+  #
+  # "Exactly as it is there" is now literally true on BOTH sides. Until M69 it
+  # was not: this file normalized with cov2cor() at line 104 while
+  # axes_corrected_se() folded at the raw Sigma-hat, so the two surfaces priced
+  # the same construction at different matrices. Both are at cov2cor(Sigma-hat)
+  # now (D-037). A guard in tests/testthat/test-axes-scaled-fit.R parses the
+  # line range out of this comment and asserts it still lands on the fold, so
+  # this citation reddens rather than rotting the next time the code moves --
+  # which is how it came to be stale in the first place.
+  ys <- lapply(sim, function(sm) {
+    w <- 0.5 * sm %*% si
+    diag(w) <- diag(w) - diag(sigma %*% w)
+    w %*% sigma
+  })
+  bmat <- matrix(0, q, q)
+  for (s in seq_len(q)) {
+    for (t in s:q) {
+      bmat[s, t] <- bmat[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
+    }
+  }
+
+  tr_vg - sum(acov * bmat)
+}
+
+
 # The scaling factor at the fitted Sigma-hat, and the independence model's own
 # factor for CFI.
 #
@@ -172,70 +246,11 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
     }))
   }
 
-  si <- tryCatch(solve(sigma), error = function(e) NULL)
-  if (is.null(si) || !all(is.finite(si))) return(na_out("singular"))
-
-  # --- trace{V Gamma_R}, in closed form ---------------------------------------
-  #
-  # The p* x p* product is never formed. Writing the operators on symmetric
-  # matrices -- V: E -> 0.5 Sigma^-1 E Sigma^-1, Gamma_S: E -> 2 Sigma E Sigma,
-  # and the standardization Jacobian J: E -> E - 0.5 (diag(E) Sigma + Sigma
-  # diag(E)) with Gamma_R = J Gamma_S J' -- and taking the trace over an
-  # orthonormal basis of symmetric matrices collapses to one sum over item
-  # pairs:
-  #
-  #   trace{V Gamma_R} = sum_{k<l} [ 1 - (Sigma^-1)_kl rho_kl (1 - rho_kl^2) ]
-  #
-  # Two things check it. Substituting Gamma_S for Gamma_R gives p* exactly (the
-  # operators are inverses), and the identity reduces to tr(Sigma^-1 Sigma) = p
-  # when the two derivations of it are equated. The vech-space oracle in
-  # tests/testthat/test-axes-scaled-fit.R recomputes it from literal matrices
-  # and agrees to 1e-15 on the probe maps.
+  u <- axes_u_pricing(sigma, d)
+  if (is.character(u)) return(na_out(u))
   up <- upper.tri(sigma)
   rho <- sigma[up]
-  tr_vg <- sum(1 - si[up] * rho * (1 - rho^2))
-
-  # --- the projection term ----------------------------------------------------
-  #
-  # trace{V Delta (Delta'V Delta)^-1 Delta'V Gamma_R} = sum_st A_st B_st with
-  # A = (Delta'V Delta)^-1 -- the same information matrix axes_se_pricing()
-  # builds -- and B_st = 2 tr(Wc_s Sigma Wc_t Sigma), where Wc is W with the
-  # covariance-to-correlation Jacobian folded in exactly as it is there
-  # (R/axes_corrected_se.R:176-184): off the diagonal W is unchanged, and the
-  # diagonal absorbs the standardization because a sample correlation's diagonal
-  # does not vary at all.
-  #
-  # "Exactly as it is there" is now literally true on BOTH sides. Until M69 it
-  # was not: this file normalized with cov2cor() at line 104 while
-  # axes_corrected_se() folded at the raw Sigma-hat, so the two surfaces priced
-  # the same construction at different matrices. Both are at cov2cor(Sigma-hat)
-  # now (D-037). A guard in tests/testthat/test-axes-scaled-fit.R parses the
-  # line range out of this comment and asserts it still lands on the fold, so
-  # this citation reddens rather than rotting the next time the code moves --
-  # which is how it came to be stale in the first place.
-  sim <- lapply(d$mats, function(m) si %*% m)
-  info <- matrix(0, q, q)
-  for (s in seq_len(q)) {
-    for (t in s:q) {
-      info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
-    }
-  }
-  acov <- tryCatch(solve(info), error = function(e) NULL)
-  if (is.null(acov) || !all(is.finite(acov))) return(na_out("unidentified"))
-
-  ys <- lapply(sim, function(sm) {
-    w <- 0.5 * sm %*% si
-    diag(w) <- diag(w) - diag(sigma %*% w)
-    w %*% sigma
-  })
-  bmat <- matrix(0, q, q)
-  for (s in seq_len(q)) {
-    for (t in s:q) {
-      bmat[s, t] <- bmat[t, s] <- 2 * sum(ys[[s]] * t(ys[[t]]))
-    }
-  }
-
-  cval <- (tr_vg - sum(acov * bmat)) / df
+  cval <- u / df
 
   # --- the baseline (independence) model's factor -----------------------------
   #

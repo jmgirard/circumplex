@@ -87,7 +87,7 @@ though this milestone changes no exported return.
       Fable. Escalate via `/milestone-brief`. (RB tripwire: ip-touching)
 - [x] T2: Ingest the RR; record the chosen mechanism, the rejected one, and the
       evidence class that would falsify the choice, as a D-entry.
-- [ ] T3: Implement the certificate as an internal function, n-free by
+- [x] T3: Implement the certificate as an internal function, n-free by
       construction. `axes_se_pricing()` (`R/axes_corrected_se.R:153-207`) is
       already callable at two different matrices and is the existing
       price-it-twice-and-compare primitive.
@@ -117,6 +117,10 @@ though this milestone changes no exported return.
 - 2026-08-24: T1 done — RB21 authored and reviewed; the brief listed removal of the ill-conditioning limb as its question 6, this mechanism's fourth escalation.
 - 2026-08-24: T2 done — RR21 ingested. Mechanism promoted to D-051; the estimand, sentinel contract, second oracle type, planted-defect set and cost envelope recorded in this file's Decisions section. RB21/RR21 archived.
 - 2026-08-24: RR21 recommendations triaged — 1, 2, 3 apply here (T3-T7); 4 and 5 route to M111 and are logged there; 6 (hex-precision oracle output; extending the estimate to the FIML ratio vector) is not adopted, because both would widen what M108's criteria promise for no gain M108's validation needs, and is logged to M111 with the rest; 7, 8, 9 are the rejections D-051 records.
+- 2026-08-24: question gate chose splitting the shipped pre-square-root pricing into internal kernels both the shipped path and the certificate call, over a second copy of that arithmetic inside the certificate, so the certificate prices what ships by construction; AC6 is what checks no returned number moved.
+- 2026-08-24: question gate chose a certificate that takes neither `n` nor `df` over one that takes `df`, because `df` is an exact integer divisor that cancels from a relative error exactly as `n` does; the one rounding it adds sits under the 2-epsilon floor.
+- 2026-08-24: T3 done — `axes_accuracy_certificate()` in R/axes_certificate.R: vectorized double-double arithmetic (two-sum, Dekker two-product, tree summation, pivoted Gauss-Jordan) replaying the shipped pricing, estimate = 10*max(delta/2, 2*eps), sentinel 1 on any route failure, known-answer self-test of the error-free transforms. The shipped pre-root pricing split into axes_pricing_core()/axes_v_pricing()/axes_u_pricing(); two cross-file line-range citations updated to follow the moved code. devtools::test() 0 failures, 8526 passes (5 warnings pre-existing, in ci_accuracy and ssm_sem).
+- 2026-08-24: cost measured at the largest reachable design (p = 24, q = 27): 0.234 s against 14.75 ms for the double pricing — 16x, inside the envelope this file's Decisions section records (up to ~100x, ≤ ~0.5 s).
 
 ## Decisions
 
