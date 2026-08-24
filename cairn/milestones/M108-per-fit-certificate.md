@@ -1,11 +1,11 @@
 # M108: Build and validate a per-fit accuracy certificate
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2
-- **Branch/PR:** —
+- **Branch/PR:** m108-per-fit-certificate
 
 ## Goal
 
@@ -110,6 +110,8 @@ though this milestone changes no exported return.
 - 2026-08-24: plan gate chose splitting the certificate into mechanism (M108) then rewiring (M111) over one milestone with the design task first, because criteria written before the design review exists took two gated amendment returns in M106; falsified by an RR that changes nothing M111's criteria assume.
 - 2026-08-24: plan chose validating against the exact-rational oracle plus a second internal route over runtime exact-rational recomputation as the default shape put to the RB, because the oracle's exact arithmetic is Python and a runtime path would need a new dependency under GP3; falsified by an R rational route cheap enough to run per fit. The RR settles it, not this line.
 - 2026-08-24: criteria audit ran in FULL mode ([O], fresh context, authored none of them) over M108 and M111 together; it returned twelve findings. Six with one clear right answer were fixed here before writing: the n-invariance omission that would have rebuilt the yardstick-dependence D-048 refused, the post-hoc "stated factor" ceilings that constrained nothing, the unscoped "finite bound" universal, the diff procedure banning edits to any existing test file, M111's five cases entering through a refit rather than the seam, and the absence of any planted-defect probe in either milestone. Six design calls were settled as planner decisions and recorded as rejected-alternative lines rather than reopened as questions.
+
+- 2026-08-24: implement started; branch m108-per-fit-certificate cut from master at 298747a5.
 
 ## Decisions
 
