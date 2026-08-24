@@ -1,6 +1,6 @@
 # M108: Build and validate a per-fit accuracy certificate
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -113,7 +113,7 @@ though this milestone changes no exported return.
       Oracle records convention; the second type is settled by T2's RR.
 - [x] T7: Mutation-prove (AC4) — three planted defects varying form and
       location, each verified to redden a named assertion.
-- [ ] T8: Run the base-commit test suite against the branch head, less
+- [x] T8: Run the base-commit test suite against the branch head, less
       `test-fixture-drift.R`, by AC6's stated extract-swap-run-restore
       procedure; prove that run able to see what AC6 promises by planting one
       changed exported return and confirming it reddens; run the profile verify
@@ -143,6 +143,9 @@ though this milestone changes no exported return.
 - 2026-08-24: T7 done — six planted defects run one at a time; five redden at least one AC2 or AC3 assertion, the sixth reddens nothing and is recorded as a null probe. Per-defect results in this file's Decisions section.
 - 2026-08-24: AC6 amended at a mini gate. The base-commit suite run against the branch head failed exactly one test — test-fixture-drift.R:33:5, the byte-identity fence on the duplicate exemplar-B fixture this milestone's earlier gate chose to delete — with 8525 passes and the base commit's own 5 warnings and 1 skip. Gate chose amending over restoring the duplicate or leaving the criterion unmet.
 - 2026-08-24: the amended AC6 wording went to a fresh-context [O] reader that authored none of it, in FULL mode (user-facing tier), before it was written to this file; it returned eight findings. Fixed in the wording: the deleted file mischaracterized as an existence check when its load-bearing assertion is byte-identity; a no-test-skipped clause the cited run contradicts; no named procedure materializing the base tree; and the headline's universal over every exported function narrowed to what the one named run enumerates, extended to printed output. Moved to T8 rather than into the criterion: a discrimination probe for the base suite. Left open for review: D-044 still cites the deleted cairn/reviews/ path, and DECISIONS.md is superseded rather than edited.
+- 2026-08-24: T8 done — AC6 run by its stated procedure (base-commit tests less test-fixture-drift.R): FAIL 0 | PASS 8524, with the base commit's own 5 warnings and 1 skip and nothing else excluded. Discrimination probe: a 1e-6 relative change planted in the exported corrected SE vector reddened test-axes-corrected-se.R:896 and :924, the oracle comparisons at 1e-6 relative tolerance; plant reverted, tree clean.
+- 2026-08-24: AC7 — `devtools::test()` on the branch's own suite FAIL 0 | PASS 8615 (5 warnings, 1 skip, all pre-existing on master); `devtools::check(args = "--no-manual")` Status OK, 0 errors, 0 warnings, 0 notes; `devtools::document()` produces no diff and no unresolved-link warning.
+- 2026-08-24: status -> review.
 
 ## Decisions
 
