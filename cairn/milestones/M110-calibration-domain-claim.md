@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1
-- **Branch/PR:** `m110-calibration-domain-claim`
+- **Branch/PR:** `m110-calibration-domain-claim` — https://github.com/jmgirard/circumplex/pull/140
 
 ## Goal
 
@@ -89,6 +89,7 @@ typical, two do not.
 - 2026-08-24: T3 — the NEWS entry now gives both endpoints with their coefficients, and the paragraph is wrapped so the `500,000` figure and its `1/sqrt(2)` share a line; the AC2 sweep returns 9 lines and every one names the coefficient its figure belongs to.
 - 2026-08-24: T4 — a help-page guard at `tests/testthat/test-axes-reliability.R:3235+` cuts the Rd into sentences and requires each of the two `5e5` sentences to name `a = 1/sqrt(2)` and each `2e3` sentence to name `a = 0.045`, using the dual-source man/-or-`Rd_db()` read the file's other Rd guards use (under check only the `Rd_db()` arm runs). Proved able to fail on two planted defects: reverting both sites reddens 4 of 6 assertions, reverting only the unqualified `\value` site reddens 2 of 7 — the sentence count alone stays green on the first defect, which is why the per-sentence match carries the claim.
 - 2026-08-24: verification — `document()` no diff and no `resolve link` line; `devtools::test()` FAIL 0, PASS 8627 (8619 before, the 8 added being this guard's); `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes. Status → review.
+- 2026-08-24: review opened — master in sync, branch pushed, draft PR #140; evidence gathering under way.
 
 ## Decisions
 
