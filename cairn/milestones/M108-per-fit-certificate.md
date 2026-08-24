@@ -63,8 +63,20 @@ though this milestone changes no exported return.
 - [ ] AC5: `Rscript devel/degeneracy-oracle/exact_oracle.R` run from the repo
       root exits 0 while `cairn/` is moved aside, reading its fixture from
       `tests/testthat/fixtures/`.
-- [ ] AC6: No exported return value changes: the test suite as it stood at this
-      branch's base commit passes unmodified against the branch head.
+- [ ] AC6: No test in the base-commit suite observes changed exported behaviour
+      — return values or printed output. Procedure: extract that commit's
+      tests (`git archive 298747a5 tests | tar -x -C <dir>`), swap the
+      extracted copy in for `tests/`, delete
+      `tests/testthat/test-fixture-drift.R` from it, run
+      `Rscript -e 'devtools::test()'`, restore. It passes with no failures and
+      causes no test to skip that the base commit did not already skip. That
+      one file fences the packaged exemplar-B fixture against a duplicate
+      under `cairn/` by byte-identity; this milestone deletes the duplicate,
+      so there is nothing left to fence, and the file makes no assertion about
+      any exported function's return value or printed output — the packaged
+      copy's own presence stays asserted in
+      `tests/testthat/test-axes-scaled-fit.R`. No other base-commit test file
+      is modified, removed, or excluded.
 - [ ] AC7: `Rscript -e 'devtools::test()'` and
       `Rscript -e 'devtools::check(args = "--no-manual")'` clean (0 errors,
       0 warnings; any NOTE justified).
@@ -101,8 +113,11 @@ though this milestone changes no exported return.
       Oracle records convention; the second type is settled by T2's RR.
 - [x] T7: Mutation-prove (AC4) — three planted defects varying form and
       location, each verified to redden a named assertion.
-- [ ] T8: Run the base-commit test suite against the branch head (AC6); run the
-      profile verify slot and the check (AC7).
+- [ ] T8: Run the base-commit test suite against the branch head, less
+      `test-fixture-drift.R`, by AC6's stated extract-swap-run-restore
+      procedure; prove that run able to see what AC6 promises by planting one
+      changed exported return and confirming it reddens; run the profile verify
+      slot and the check (AC7).
 
 ## Work log
 
@@ -126,6 +141,8 @@ though this milestone changes no exported return.
 - 2026-08-24: T5 done — tests/testthat/test-axes-certificate.R asserts AC2's floor and its 1e3 ceiling at the five reachable geometries and at counterexample B, AC3's discrimination against delta_star, AC1's finiteness across the admitted domain (including machine-singular and roundoff-negative matrices) and its no-n formals, and the sentinel on both routes. Each geometry is fingerprinted by its condition number so a builder edit cannot silently leave the frozen oracle figures describing a different matrix.
 - 2026-08-24: T6 done — two independent oracle types recorded at the asserting test: the frozen exact-rational Python oracle (generator named, regeneration command given) and a hand-derived closed-form oracle at a dyadic-rational p = 2 configuration whose exact values (v = 97/128, u = 5/8) the reference route reproduces bit for bit with a zero low word. A planted-perturbation sensitivity invariant ships beside them and is not counted as a type.
 - 2026-08-24: T7 done — six planted defects run one at a time; five redden at least one AC2 or AC3 assertion, the sixth reddens nothing and is recorded as a null probe. Per-defect results in this file's Decisions section.
+- 2026-08-24: AC6 amended at a mini gate. The base-commit suite run against the branch head failed exactly one test — test-fixture-drift.R:33:5, the byte-identity fence on the duplicate exemplar-B fixture this milestone's earlier gate chose to delete — with 8525 passes and the base commit's own 5 warnings and 1 skip. Gate chose amending over restoring the duplicate or leaving the criterion unmet.
+- 2026-08-24: the amended AC6 wording went to a fresh-context [O] reader that authored none of it, in FULL mode (user-facing tier), before it was written to this file; it returned eight findings. Fixed in the wording: the deleted file mischaracterized as an existence check when its load-bearing assertion is byte-identity; a no-test-skipped clause the cited run contradicts; no named procedure materializing the base tree; and the headline's universal over every exported function narrowed to what the one named run enumerates, extended to printed output. Moved to T8 rather than into the criterion: a discrimination probe for the base suite. Left open for review: D-044 still cites the deleted cairn/reviews/ path, and DECISIONS.md is superseded rather than edited.
 
 ## Decisions
 
