@@ -1591,19 +1591,28 @@ test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at t
 
 test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 3", {
   # Fixture provenance. The file is a list carrying the 3x3 correlation
-  # matrix `S`, the item angles `ia`, the two observed reasons, and
+  # matrix `S`, the item angles `ia`, two fields `a` and `b`, and
   # kappa = 6.65e6. Source: the RB18 brief's random search over
   # near-collinear 3x3 correlation matrices at randomly drawn angles,
   # keeping only draws the criterion accepted.
+  # `a` and `b` hold "NULL" and "indefinite" -- reasons recorded before the
+  # M89/M90 criterion changes, NOT what the current surfaces return. Nothing
+  # asserts them and nothing should: the assertions below state the expected
+  # reasons independently, in the test, which is the only place they are
+  # current. Measured 2026-08-24.
   # NO GENERATOR AND NO SEED -- the search seed was never recorded, so
-  # nothing regenerates this matrix, and it cannot be rewritten as code
-  # either: dput() round-tripping loses the last bits and the case flips to
-  # NULL. The bytes ARE the artifact, which is why it is committed and read
-  # from the package's own fixtures directory -- so these assertions run
-  # under R CMD check instead of skipping there (M107; the M7 lesson said a
-  # silent skip is false coverage, and until M107 this site was one).
-  # The copy under the repo's cairn/reviews/ is the record of record;
-  # test-fixture-drift.R fences the two against each other.
+  # nothing regenerates this matrix. That is the whole of the provenance gap;
+  # the file is NOT unwritable as code. Measured 2026-08-24:
+  # dput(S, control = c("all", "hexNumeric")) round-trips bit-identically,
+  # and even a default dput() round trip (max element difference 4.44e-16)
+  # still leaves axes_sigma_degenerate() returning "ill_conditioned". The
+  # bytes are shipped because they are what the cairn/ record holds and
+  # byte-identity is what test-fixture-drift.R can fence, not because code
+  # would lose the case. It is read from the package's own fixtures directory
+  # so these assertions run under R CMD check instead of skipping there
+  # (M107; the M7 lesson said a silent skip is false coverage, and until M107
+  # this site was one). The copy under the repo's cairn/reviews/ is the
+  # record of record; test-fixture-drift.R fences the two against each other.
   fp <- test_path("fixtures", "rb18-counterexample-b.rds")
   fx <- readRDS(fp)
   S <- fx$S

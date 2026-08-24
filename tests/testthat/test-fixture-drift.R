@@ -13,18 +13,27 @@
 
 test_that("M107 T2: the packaged exemplar B is byte-identical to the repo's record", {
   # rb18-counterexample-b.rds has no seed and no generator (provenance at its
-  # first read site in test-axes-scaled-fit.R): the bytes ARE the artifact, so
-  # a copy is the only way to ship it and byte-identity is the only check that
-  # means anything. Compared as raw bytes rather than as deserialized objects,
-  # because it is the bytes the assertions downstream depend on -- the case
-  # flips to NULL under a value-preserving round trip that loses the last bits.
+  # first read site in test-axes-scaled-fit.R), so a copy is how it ships and
+  # byte-identity is what can be fenced. Compared as raw bytes rather than as
+  # deserialized objects because byte-identity is the whole claim: a
+  # value-preserving round trip that perturbs the last bits would pass an
+  # all.equal() comparison while leaving the two copies different files.
   packaged <- test_path("fixtures", "rb18-counterexample-b.rds")
   expect_true(file.exists(packaged))
 
   root <- test_path("..", "..")
   record <- file.path(root, "cairn", "reviews", "rb18-counterexample-b.rds")
-  skip_if_not(file.exists(record),
-              "repo tracking record absent (running against a built package)")
+  # Gate on the tracking DIRECTORY, not on the record file. Skipping on the
+  # file's absence cannot tell "there is no cairn/ here, we are in a tarball"
+  # from "someone deleted the record" -- and the second is one of the drifts
+  # this test exists to catch, so it must redden, not skip (M107 review).
+  skip_if_not(dir.exists(file.path(root, "cairn")),
+              "no cairn/ tracking dir (running against a built package)")
+  if (!file.exists(record)) {
+    fail(paste("the cairn/ tracking record is gone but cairn/ is present:",
+               record))
+    return(invisible(NULL))
+  }
 
   read_bytes <- function(f) readBin(f, "raw", n = file.size(f))
   expect_identical(read_bytes(packaged), read_bytes(record))

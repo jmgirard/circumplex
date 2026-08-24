@@ -10,9 +10,11 @@
 # same failure the M68 round-2 lesson names, one rename later).
 #
 # So the CALL is what is probed, both spellings tried, and the helper reports
-# only what it actually got. It never assumes: a spelling that errors, warns,
-# or returns a non-finite value is treated as not available and the next one
-# is tried. NULL means neither worked, and the caller skips -- the assertions
+# only what it actually got. It never assumes: a spelling that errors, or
+# returns anything that is not a single finite number, is treated as not
+# available and the next one is tried; a spelling that merely WARNS while
+# returning a usable number is used, its warning muffled.
+# NULL means neither worked, and the caller skips -- the assertions
 # at each call site already pin the behaviour without lavaan's help, and this
 # is a second opinion against the reference implementation, not the check.
 #
@@ -23,8 +25,30 @@
 lav_cfi_ref <- function(x2, df, x2_null, df_null, f = lav_fit_cfi_fn()) {
   if (!is.function(f)) return(NULL)
   probe <- function(thunk) {
-    out <- tryCatch(thunk(), error = function(e) NULL, warning = function(w) NULL)
-    if (is.null(out) || length(out) != 1L || !is.finite(out)) NULL else unname(out)
+    # The SHAPE checks run inside the tryCatch too. Outside it, a length-one
+    # list or any other type is.finite() has no method for turns an
+    # unavailable spelling into an error in the caller -- reddening the suite
+    # for a reason that is not about this package, which is exactly what the
+    # skip design exists to prevent (M107 review).
+    #
+    # A warning is DEMOTED, not treated as unavailability: withCallingHandlers
+    # muffles it and keeps the value. A deprecation warning on a function
+    # still returning the right number must not silently kill the
+    # corroboration -- the M107 failure with a likelier trigger (M107 review).
+    tryCatch(
+      withCallingHandlers(
+        {
+          out <- thunk()
+          if (length(out) != 1L || !is.numeric(out) || !is.finite(out)) {
+            NULL
+          } else {
+            unname(out)
+          }
+        },
+        warning = function(w) invokeRestart("muffleWarning")
+      ),
+      error = function(e) NULL
+    )
   }
   got <- probe(function() {
     f(x2 = x2, df = df, x2_null = x2_null, df_null = df_null)

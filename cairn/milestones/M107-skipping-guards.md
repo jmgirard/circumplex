@@ -123,6 +123,7 @@ landed 2026-08-23 as `d285f7f8`, before this milestone was planned.
 - 2026-08-23: T6 — verify slot clean (`devtools::test()`: FAIL 0 / WARN 5 / SKIP 1 / PASS 8520; the one skip is the pre-existing fixture-environment gate at `test-axes-scaled-fit.R:918`). Release check `devtools::check(manual = TRUE)` clean: 0 errors, 0 warnings, 1 NOTE, 8m38s. The NOTE is this machine's check tooling, not the package — `/usr/bin/tidy` is Apple's 2006 build, whose `--version` carries no version triple for R's `.find_tidy_cmd` pattern, and the `V8` package is not installed, so R skips HTML validation and math rendering. Both are present on CRAN's machines; remedy on this Mac is `brew install tidy-html5`, `R_TIDYCMD=/opt/homebrew/bin/tidy` in `~/.Renviron` (needed because `/usr/bin` precedes `/opt/homebrew/bin` on PATH), and `install.packages("V8")`.
 - 2026-08-23: AC1 evidence — a separate clean `R CMD check` of the built tarball, kept so its skip listing is readable (`devtools::check` prints none on a passing run): FAIL 0 / SKIP 153 / PASS 7462. No skip in that listing names `rb18-counterexample-b.rds`, and none of the four sites appears in it; the file's only skips are `:918` (fixture environment), `:966` (vignette source) and `:1140` (R/ sources absent), all outside the four. Two skips still name an absent `cairn/` directory (`test-norms-provenance.R:581,703`) — the deferred sites the amended criterion no longer reaches — and one is the T2 drift guard skipping as designed.
 - 2026-08-23: no NEWS entry — internal tier, exported behaviour unchanged; the deliverable is test coverage under `R CMD check`.
+- 2026-08-24: **supersedes the T4/T5 entry above on one point.** That entry says three `lav_fit_cfi()` call sites were repointed, and T4's text names lines 536, 922 and 1241. `master` had two calls, at 532 and 1238; line 922 is the M68 environment gate and never held one. What was repointed is two call sites carrying three comparisons (`r1` and `r2` at the first, `ref` at the second), which is what AC4 promises and what the AC4 evidence measures. Also supersedes the T2 entry's parenthetical "that file names `cairn` nowhere": line 1605 names it in prose; AC2, which is about lines carrying `test_path`, holds regardless.
 
 ## Review
 
@@ -274,3 +275,37 @@ Findings, as ranked by the reviewer, with disposition:
     so the two copies are load-bearing in different places. Pre-existing;
     M107 makes the duplication newly relevant. — *Disposition: pending
     triage.*
+
+### Triage and fixes at the gate
+
+Maintainer chose "fix five, then merge". Dispositions:
+
+- **Findings 2 + 8 — fixed.** The provenance comment in
+  `test-axes-scaled-fit.R` and the byte-comparison comment in
+  `test-fixture-drift.R` no longer claim the matrix cannot be written as code
+  or that the case flips to NULL. Both now record what was measured on
+  2026-08-24 and why the bytes are shipped anyway (they are what the `cairn/`
+  record holds, and byte-identity is what the drift guard can fence). The
+  fixture's `a`/`b` fields are named as pre-M89/M90 values that nothing
+  asserts.
+- **Finding 3 — fixed.** `lav_cfi_ref()`'s shape checks moved inside the
+  `tryCatch`. Proved able to fail: putting them back outside reddens the new
+  return-type test with `is.finite(out): default method not implemented for
+  type 'list'` (FAIL 1 / PASS 9); restored, 12 pass.
+- **Finding 6 — fixed.** A warning is now muffled via `withCallingHandlers`
+  and its value kept, instead of being read as unavailability. Proved able to
+  fail: restoring warning-to-NULL reddens `test-lavaan-cfi-helper.R:55` alone
+  (FAIL 1 / PASS 11). A control test asserts a warning still does not rescue
+  an unusable value, so demoting warnings did not weaken the shape check.
+- **Finding 7 — fixed.** The drift guard gates on `dir.exists(cairn)` rather
+  than on the record file, and calls `fail()` naming the record when `cairn/`
+  is present but the file is not. Proved able to fail: moving the record aside
+  gives FAIL 1 / PASS 1 with "the cairn/ tracking record is gone but cairn/ is
+  present"; restored, 2 pass. It still skips cleanly inside a tarball.
+- **Findings 4 + 9 — record corrected** by the superseding work-log line
+  below; no code change (the criterion's "three comparisons" was already
+  correct).
+- **Findings 1, 5, 10 — follow-up ROADMAP candidate rows** (fixture
+  provenance; no detection if lavaan renames again; the second copy read by
+  the devel oracle).
+
