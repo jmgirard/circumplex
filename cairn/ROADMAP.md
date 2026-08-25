@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-24 (M109 done and archived; the M105 terminal row pruned to hold the five-row retention; one lesson added on guards that skip in the gate that ships.)_
+_Last hygiene check: 2026-08-24 (M111 done and archived; the M106 terminal row pruned to hold the five-row retention; three candidate rows compressed to bring ROADMAP.md back under its byte budget; the M108 platform-specific-values lesson extended with M111's instance.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M106 | Price the degeneracy refusal region on a stated statistical argument | done | — | high | milestones/archive/M106-degeneracy-accuracy-target.md |
 | M107 | Make the exemplar-B guards run in the gate that ships a release | done | — | high | milestones/archive/M107-skipping-guards.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
 | M108 | Build and validate a per-fit accuracy certificate | done | — | normal | milestones/archive/M108-per-fit-certificate.md |
 | M109 | Repair the test guards that skip on the surface that ships | done | — | normal | milestones/archive/M109-source-tree-test-reads.md |
 | M110 | Correct the calibration-domain claim in the accuracy target and its shipped surfaces | done | — | high | milestones/archive/M110-calibration-domain-claim.md |
-| M111 | Shrink the ill-conditioning refusal to what the certificate cannot certify | review | M108 | normal | milestones/M111-certificate-refusal-region.md |
+| M111 | Shrink the ill-conditioning refusal to what the certificate cannot certify | done | — | normal | milestones/archive/M111-certificate-refusal-region.md |
 
 ## Candidates
 
