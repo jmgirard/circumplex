@@ -727,7 +727,10 @@ axes_sigma_degenerate <- function(sigma) {
 #                     literal, "uncertified".
 #   NULL              computes, and pays nothing: the certificate runs only on
 #                     the floor's own side, so an ordinary fit never buys the
-#                     16-108x replay (M108).
+#                     16-108x replay (M108). A fit that IS checked buys it
+#                     twice, once per surface: both call this helper on the
+#                     same matrix with the same derivative set, and nothing
+#                     memoizes between them (M111 review F14).
 #
 # ONE PREDICATE, BOTH SURFACES (M111 gate). The certificate reports two
 # estimates -- the corrected component SEs' (worst component) and the scaling
@@ -787,7 +790,10 @@ axes_degeneracy_note <- function(refusal, sigma) {
 }
 
 
-# The actionable half of an "ill_conditioned" refusal (M106; RR19 section 6).
+# The actionable half of the refusal an ill-conditioned matrix draws (M106;
+# RR19 section 6). That refusal is "uncertified" since M111, reached only from
+# the criterion's "ill_conditioned" answer, so this function's precondition is
+# unchanged and the scope note below still reads on the same set of matrices.
 # Returns a clause naming the conditioning, plus every item pair collinear
 # enough to force the refusal on its own -- otherwise the conditioning alone.
 # Deliberately a separate function called at the warning sites rather than

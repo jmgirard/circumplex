@@ -99,8 +99,10 @@ is what tripped it -- \code{naive_reason}, \code{NULL} unless the internal
 uncorrected arm (the diagnostic tie to lavaan's own standard errors)
 was refused while every reported number computed, whether by the same
 criterion evaluated on the raw fitted matrix or by that arm's own
-pricing (\code{"singular"}, \code{"unidentified"}, \code{"indefinite"}); it carries
-the same reason vocabulary and is
+pricing (\code{"singular"}, \code{"unidentified"}, \code{"indefinite"}, and
+\code{"ill_conditioned"} -- the raw arm is refused by the floor itself and
+never reaches the per-fit check, so this is the one field on which that
+literal still appears); it is
 deliberately silent -- no warning or printed note accompanies it --
 \code{fit_uncorrected}, the six fit statistics as
 lavaan reports them
@@ -225,9 +227,9 @@ at or below \code{sqrt(p * .Machine$double.eps / 1e-5)} is not refused for that
 alone; it is \emph{checked}. The check replays this fit's own arithmetic in
 roughly 31-digit precision and estimates the relative error the numbers it
 produced actually carry, and the fit computes whenever that estimate is
-within the accuracy target \code{1e-4}. Most fits below the floor do compute:
-over the reachable geometries measured, their estimated errors run around
-\code{1e-11}. A fit whose estimate exceeds the target, or that the check cannot
+within the accuracy target \code{1e-4}. Of the reachable geometries measured
+below the floor, all but one committed counterexample estimate around
+\code{1e-11} and compute. A fit whose estimate exceeds the target, or that the check cannot
 price at all, is refused as \code{"uncertified"}, and its warning names the
 estimate. That \code{1e-5} in the floor is not itself the tolerance: it is the
 accuracy target \code{1e-4}, the largest relative error a reported standard
@@ -251,7 +253,8 @@ eigenvalue is decisively negative (below
 \code{-lambda_max * sqrt(p * .Machine$double.eps)} -- beyond the fit's own
 numerical noise band, so it is a statement about the model, which no
 arithmetic check can license), \code{"singular"} when the matrix carries
-non-finite entries, and \code{"uncertified"} when the per-fit check could not
+non-finite entries or a nonpositive fitted variance, and \code{"uncertified"}
+when the per-fit check could not
 place this fit's numbers inside the accuracy target -- roundoff-level
 negativity, exact singularity and severe ill-conditioning all arrive here
 (a numerical caution). Either way the corrected standard errors and the four

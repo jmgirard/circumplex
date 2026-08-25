@@ -2522,7 +2522,10 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
   expect_true(res8$details$converged)
 
   # Case 3 -- p = 24, three items per octant scale. kappa 7.2e5 against a floor
-  # of 4.33e4: strictly above, refused. This construction cannot reach the
+  # of 4.33e4: strictly above, so the criterion still calls it ill-conditioned.
+  # Since M111 that no longer refuses on its own -- the assertions below expect
+  # this case to COMPUTE, its per-fit certificate placing it inside the
+  # accuracy target. This construction cannot reach the
   # criterion through a real fit -- lavaan does not converge on it, measured
   # here on 2026-08-23 and not assumed of fits in general (case 2 above IS a
   # converged fit at kappa 1.0e5) -- so it is injected at the axes_fitted_cov

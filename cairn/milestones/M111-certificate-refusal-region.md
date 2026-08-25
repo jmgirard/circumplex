@@ -130,6 +130,7 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 - 2026-08-24: T5 mutation-proved the new path (AC6). Comparison inverted (`<=` to `>=`): 20 assertions redden, including AC2's `se_correction_failed`/`fit_scaling_failed` NULL checks at a5 and b9b and AC3's `"uncertified"` checks at both routes. Threshold removed (the certified branch taken unconditionally): 10 redden, all in AC3 -- the sentinel route's two failure fields and the graded route's six.
 - 2026-08-24: T6 rewrote the `WHY THE LIMB EXISTS AT ALL` span (AC5); T8 corrected the stale `6.5e-6` corner to 6.36e-6 and pinned every figure in that paragraph to its own 0.1*a/sqrt(n) derivation.
 - 2026-08-24: T7 landed the NEWS and exported-doc rewrites and closed the verify slot: `devtools::document()` no diff and no unresolved-link warning, `devtools::test()` 8755 pass / 0 fail / 1 pre-existing skip, `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status to review.
+- 2026-08-24: review gate triaged 17 findings; eight documentation, comment and test-assertion defects fixed on the branch (F5-F11, F14), five routed to the ROADMAP degeneracy row as follow-ups (F1+F2, F3, F4, F12, F13), three rejected with reasons in the Review section.
 
 ## Decisions
 
@@ -337,3 +338,37 @@ Ranked as the reviewers ranked them. Dispositions recorded at the gate.
   partition fence; contributes nothing to the mutation proof.
 - **F17 [O] The milestone's `## Decisions` section is empty** while the work
   log records four gate decisions and the change alters exported behaviour.
+
+**Dispositions** (maintainer's triage at the gate, 2026-08-24: "fix the
+documentation and comment defects, then merge"). Fixed on the branch before
+approval: F5 (both AC3 cases now assert which route they take — the sentinel's
+`1` and the graded case's `49` — so the two cannot silently collapse onto one
+route), F6 (`naive_reason`'s enumeration names `"ill_conditioned"` and says
+why the raw arm keeps it), F7 (both internal enumerations name `"uncertified"`
+and the scaling list's count moves 8 to 9, with the surviving
+`"ill_conditioned"` attributed to the cval cancellation door), F8 (the
+population claim narrowed to the geometries actually measured), F9
+(`"singular"` also names the nonpositive-diagonal door, verified at
+`axes_corrected_se.R:292` and `axes_scaled_fit.R:222`), F10 (the case-3 header
+comment now says the case computes), F11 (the hint's header re-keyed to the
+refusal it actually serves, precondition noted unchanged), F14 (the cost
+comment records the two calls per checked fit). Re-verified after the fixes:
+`document()` no diff and no link warnings, `test()` FAIL 0 / PASS 8758,
+`check()` 0/0/0.
+
+Follow-up, absorbed into the ROADMAP's degeneracy candidate row: F1 and F2 as
+one item (the cov2cor naive arm is a reported number's denominator, uncertified
+and misdescribed at two sites; RR21 B4 is the remedy), F3 (the naive-arm
+`"indefinite"` backstop as a nestedness hazard M111 first makes reachable), F4
+(no test discriminates the shared predicate from the per-surface alternative),
+F12 (the AC8 nestedness gate's literal set), F13 (the unguarded certificate
+call on a refusal path).
+
+Rejected: F15 — the shared predicate reporting the worse estimate at both
+surfaces is the gate decision recorded in the work log, and the fail-closed
+direction is the intended one (GP2); an intentional change the plan called for.
+F16 — the inside-band assertions are a partition fence and were never meant to
+carry the mutation proof, which AC6's own mutants do. F17 — the four gate
+decisions are in the work log, which is where a milestone-local decision that
+supersedes nothing belongs; D-051 pre-authorized the re-keying, so no D-entry
+is owed.

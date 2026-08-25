@@ -721,9 +721,9 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' alone; it is *checked*. The check replays this fit's own arithmetic in
 #' roughly 31-digit precision and estimates the relative error the numbers it
 #' produced actually carry, and the fit computes whenever that estimate is
-#' within the accuracy target `1e-4`. Most fits below the floor do compute:
-#' over the reachable geometries measured, their estimated errors run around
-#' `1e-11`. A fit whose estimate exceeds the target, or that the check cannot
+#' within the accuracy target `1e-4`. Of the reachable geometries measured
+#' below the floor, all but one committed counterexample estimate around
+#' `1e-11` and compute. A fit whose estimate exceeds the target, or that the check cannot
 #' price at all, is refused as `"uncertified"`, and its warning names the
 #' estimate. That `1e-5` in the floor is not itself the tolerance: it is the
 #' accuracy target `1e-4`, the largest relative error a reported standard
@@ -747,7 +747,8 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' `-lambda_max * sqrt(p * .Machine$double.eps)` -- beyond the fit's own
 #' numerical noise band, so it is a statement about the model, which no
 #' arithmetic check can license), `"singular"` when the matrix carries
-#' non-finite entries, and `"uncertified"` when the per-fit check could not
+#' non-finite entries or a nonpositive fitted variance, and `"uncertified"`
+#' when the per-fit check could not
 #' place this fit's numbers inside the accuracy target -- roundoff-level
 #' negativity, exact singularity and severe ill-conditioning all arrive here
 #' (a numerical caution). Either way the corrected standard errors and the four
@@ -1069,8 +1070,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   uncorrected arm (the diagnostic tie to lavaan's own standard errors)
 #'   was refused while every reported number computed, whether by the same
 #'   criterion evaluated on the raw fitted matrix or by that arm's own
-#'   pricing (`"singular"`, `"unidentified"`, `"indefinite"`); it carries
-#'   the same reason vocabulary and is
+#'   pricing (`"singular"`, `"unidentified"`, `"indefinite"`, and
+#'   `"ill_conditioned"` -- the raw arm is refused by the floor itself and
+#'   never reaches the per-fit check, so this is the one field on which that
+#'   literal still appears); it is
 #'   deliberately silent -- no warning or printed note accompanies it --
 #'   `fit_uncorrected`, the six fit statistics as
 #'   lavaan reports them
@@ -1959,9 +1962,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       se_uncorrected = se_uncorrected,
       # NULL when the correction succeeded; otherwise why every corrected SE
       # is NA ("singular" from the nonpositive-diagonal door or non-finite
-      # entries, "infinite_diagonal", "ill_conditioned"/"indefinite" from the
-      # stated degeneracy criterion's M90 partition -- M89/M90,
-      # axes_sigma_degenerate(); since M91 the criterion sets this field
+      # entries, "infinite_diagonal", "indefinite" from the stated degeneracy
+      # criterion's M90 partition, and since M111 "uncertified" where the
+      # partition's third answer sent the fit to the per-fit certificate and
+      # the certificate could not place it inside the accuracy target --
+      # M89/M90/M111, axes_sigma_degenerate() and axes_degeneracy_refusal();
+      # since M91 the criterion sets this field
       # only through its correlation-metric evaluation, the raw arm's
       # refusals landing in `naive_reason` below, while the metric-blind
       # doors above (nonpositive diagonal, +Inf, non-finite entries) still
@@ -2002,12 +2008,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # Both are NA together when the scaling failed.
       scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
       # NULL when the scaling succeeded; otherwise why the four chi-square-
-      # derived statistics are NA ("singular", "ill_conditioned"/"indefinite"
-      # from the shared degeneracy criterion's M90 partition (M89/M90),
+      # derived statistics are NA ("singular", "indefinite" from the shared
+      # degeneracy criterion's M90 partition (M89/M90), "uncertified" from the
+      # per-fit certificate M111 put behind that partition's third answer,
+      # "ill_conditioned" from this surface's own cval cancellation door
+      # (which the certificate never sees),
       # "saturated", "unidentified", "df_mismatch", "baseline_df_mismatch",
       # "infinite_diagonal"), enumerated from the source the same way as the
       # SE list above, and carrying the same caveat: it enumerates what the
-      # helper CONTAINS, not what a user has been shown. All eight are
+      # helper CONTAINS, not what a user has been shown. All nine are
       # reachable at the helper's contract boundary; what a call through
       # axes_reliability() can actually reach is a strictly smaller set,
       # because this assembly refuses upstream several of the shapes that

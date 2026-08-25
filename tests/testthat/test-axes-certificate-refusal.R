@@ -154,6 +154,12 @@ test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses throug
   expect_true(any(grepl("standard errors could not be computed", w)))
   expect_true(any(grepl("scaled fit statistics could not be computed", w)))
   expect_length(grep("estimated relative error", w, fixed = TRUE), 2L)
+  # WHICH route this case takes, asserted rather than described (M111 review
+  # F5). The certificate's sentinel is exactly 1 and prints as "1" at the
+  # note's two significant digits; a graded estimate could not. Without this
+  # the file's two AC3 cases could drift onto the same route with every other
+  # assertion still green, collapsing "one on each route" silently.
+  expect_length(grep("estimated relative error 1;", w, fixed = TRUE), 2L)
 
   # A unit refusal: the one reason speaks for all three SE vectors (M91).
   expect_null(res$details$naive_reason)
@@ -189,15 +195,22 @@ test_that("M111 AC3 (graded route): the committed counterexample refuses at both
   expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
   S <- fx$S
   scl <- c("A", "B", "C")
-  se <- suppressWarnings(
-    axes_corrected_se(S, rownames(S), as.numeric(fx$ia), scl,
-                      n = 600, fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  wse <- testthat::capture_warnings(
+    se <- axes_corrected_se(S, rownames(S), as.numeric(fx$ia), scl,
+                            n = 600, fit_zeta1 = FALSE, fit_zeta2 = FALSE)
   )
-  sf <- suppressWarnings(
-    axes_scaling_factor(S, rownames(S), as.numeric(fx$ia), scl,
-                        fit_zeta1 = FALSE, fit_zeta2 = FALSE,
-                        df = 1, baseline_df = 3)
+  wsf <- testthat::capture_warnings(
+    sf <- axes_scaling_factor(S, rownames(S), as.numeric(fx$ia), scl,
+                              fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                              df = 1, baseline_df = 3)
   )
+  # WHICH route, asserted rather than described (M111 review F5). This one is
+  # GRADED: the shared predicate reads the worse of the two estimates, which
+  # here is cval's 4.9e+1, decades past the target and nothing like the
+  # sentinel the case above takes. A drift onto the sentinel would leave both
+  # AC3 cases on one route with every other assertion still green.
+  expect_length(grep("estimated relative error 49;", wse, fixed = TRUE), 1L)
+  expect_length(grep("estimated relative error 49;", wsf, fixed = TRUE), 1L)
   # One shared literal, both surfaces, distinct from the two that refuse
   # without the certificate -- M89's nestedness contract holding across it.
   expect_identical(se$reason, "uncertified")
