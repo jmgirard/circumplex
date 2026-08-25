@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M108 | Build and validate a per-fit accuracy certificate | done | — | normal | milestones/archive/M108-per-fit-certificate.md |
 | M109 | Repair the test guards that skip on the surface that ships | done | — | normal | milestones/archive/M109-source-tree-test-reads.md |
 | M110 | Correct the calibration-domain claim in the accuracy target and its shipped surfaces | done | — | high | milestones/archive/M110-calibration-domain-claim.md |
-| M111 | Shrink the ill-conditioning refusal to what the certificate cannot certify | in-progress | M108 | normal | milestones/M111-certificate-refusal-region.md |
+| M111 | Shrink the ill-conditioning refusal to what the certificate cannot certify | review | M108 | normal | milestones/M111-certificate-refusal-region.md |
 
 ## Candidates
 

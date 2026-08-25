@@ -1,6 +1,6 @@
 # M111: Shrink the ill-conditioning refusal to what the certificate cannot certify
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M108
 - **Driving RR:** —
@@ -104,7 +104,7 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
       means of certifying the number to delta_star" (`:574`) and "its first
       trigger is partly met on the record already" (`:581`), the latter already
       stale since D-050 recorded that trigger met in full.
-- [ ] T7: NEWS entry, document, verify and check.
+- [x] T7: NEWS entry, document, verify and check.
 - [x] T8: Correct the stale `6.5e-6` corner figure in the accuracy-target
       block (`R/axes_corrected_se.R`), which derives from a = 0.046 while the
       block states a = 0.045 (0.1*0.045/sqrt(5e5) = 6.36e-6). Comment-only;
@@ -129,6 +129,7 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 - 2026-08-24: T4 fenced the two limbs the certificate is never asked about at the SURFACES (AC4), two p and two spectral forms (rotated planted eigenvalue, rank-one projector), both sides of the M90 partition boundary plus the non-finite route.
 - 2026-08-24: T5 mutation-proved the new path (AC6). Comparison inverted (`<=` to `>=`): 20 assertions redden, including AC2's `se_correction_failed`/`fit_scaling_failed` NULL checks at a5 and b9b and AC3's `"uncertified"` checks at both routes. Threshold removed (the certified branch taken unconditionally): 10 redden, all in AC3 -- the sentinel route's two failure fields and the graded route's six.
 - 2026-08-24: T6 rewrote the `WHY THE LIMB EXISTS AT ALL` span (AC5); T8 corrected the stale `6.5e-6` corner to 6.36e-6 and pinned every figure in that paragraph to its own 0.1*a/sqrt(n) derivation.
+- 2026-08-24: T7 landed the NEWS and exported-doc rewrites and closed the verify slot: `devtools::document()` no diff and no unresolved-link warning, `devtools::test()` 8755 pass / 0 fail / 1 pre-existing skip, `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status to review.
 
 ## Decisions
 
