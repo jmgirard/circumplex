@@ -224,7 +224,9 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
 
   # The stated degeneracy criterion (M89), shared with axes_corrected_se() --
   # see axes_sigma_degenerate() in R/axes_corrected_se.R for the criterion and
-  # its rationale. It prices cov2cor(sigma) deliberately (M89 re-cut, RR18):
+  # its rationale, and axes_degeneracy_refusal() beside it for the per-fit
+  # certificate M111 put between the floor and the refusal.
+  # It prices cov2cor(sigma) deliberately (M89 re-cut, RR18):
   # every quantity this surface computes is a function of the correlation
   # matrix alone, so raw-metric conditioning is not the error model of
   # anything computed here -- the first cut priced the raw matrix and refused
@@ -236,14 +238,14 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # so hoisting it moves no refusal across the two arms' boundary.
   if (!all(is.finite(sigma))) return(na_out("singular"))
   sigma <- stats::cov2cor(sigma)
-  degenerate <- axes_sigma_degenerate(sigma)
-  if (!is.null(degenerate)) {
-    # Only the ill-conditioning literal gets the diagnostic -- see the scope
-    # note at axes_degeneracy_hint() in R/axes_corrected_se.R. The sibling
-    # surface gates identically, so the two warnings stay in agreement.
-    return(na_out(degenerate, if (identical(degenerate, "ill_conditioned")) {
-      axes_degeneracy_hint(sigma)
-    }))
+  degenerate <- axes_degeneracy_refusal(sigma, d)
+  if (!is.null(degenerate$reason)) {
+    # Only the "uncertified" literal gets the diagnostic -- see the scope note
+    # at axes_degeneracy_hint() in R/axes_corrected_se.R. The sibling surface
+    # calls the SAME decision helper on the same matrix and the same derivative
+    # set, so the two warnings stay in agreement.
+    return(na_out(degenerate$reason,
+                  axes_degeneracy_note(degenerate, sigma)))
   }
 
   u <- axes_u_pricing(sigma, d)

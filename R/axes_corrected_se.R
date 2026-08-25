@@ -301,7 +301,10 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))
 
   # The stated degeneracy criterion (M89) -- see axes_sigma_degenerate() at the
-  # end of this file for the criterion and its rationale. Checked before any
+  # end of this file for the criterion and its rationale, and
+  # axes_degeneracy_refusal() beside it for what M111 made of it: below the
+  # floor the refusal is now the per-fit certificate's, not the floor's.
+  # Checked before any
   # pricing so that what refuses a degenerate matrix is a stated contract, not
   # whichever solve() call happens to give up first on this platform's LAPACK.
   # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) (the
@@ -334,14 +337,14 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # refusal across the arms' boundary).
   if (!all(is.finite(sigma))) return(na_out("singular"))
   cor_sigma <- stats::cov2cor(sigma)
-  degenerate <- axes_sigma_degenerate(cor_sigma)
-  if (!is.null(degenerate)) {
-    # Only the ill-conditioning literal gets the diagnostic -- see the scope
-    # note at axes_degeneracy_hint(). The sibling surface gates identically, so
-    # the two warnings stay in agreement (M89's nestedness contract).
-    return(na_out(degenerate, if (identical(degenerate, "ill_conditioned")) {
-      axes_degeneracy_hint(cor_sigma)
-    }))
+  degenerate <- axes_degeneracy_refusal(cor_sigma, d)
+  if (!is.null(degenerate$reason)) {
+    # Only the "uncertified" literal gets the diagnostic -- see the scope note
+    # at axes_degeneracy_hint(). The sibling surface calls the SAME decision
+    # helper on the same matrix and the same derivative set, so the two
+    # warnings stay in agreement (M89's nestedness contract).
+    return(na_out(degenerate$reason,
+                  axes_degeneracy_note(degenerate, cor_sigma)))
   }
 
   # The whole cov2cor arm -- criterion above, pricing here -- resolves before
@@ -533,12 +536,17 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #     path's n has no ceiling. It rejects 1e-6 exactly as it rejects 1e-4. A
 #     criterion that must produce a fixed constant cannot rest on that frame,
 #     which is why channels 1 and 2 carry the target and channel 3 corroborates
-#     it. The corner where the corrected sampling arithmetic lands at 6.5e-6
+#     it. The corner where the corrected sampling arithmetic lands at 6.36e-6
 #     needs both conservatisms stacked -- the worst measured geometry AND a
-#     sample size 1.7 decades past the published ceiling. Neither alone gets
-#     near it: the n conservatism alone (a = 1/sqrt(2), n = 5e5) lands at
-#     exactly 1.0e-4, and the geometry conservatism alone (a = 0.045 at the
-#     published ceiling n = 1e4) at 4.5e-5, a factor of 2.22 below.
+#     sample size 1.7 decades past the published ceiling. EVERY figure in this
+#     paragraph is 0.1*a/sqrt(n) at the stated (a, n), so each is checkable
+#     from the pair beside it; the corner is 0.1*0.045/sqrt(5e5). It read
+#     6.5e-6 until M111, which is that expression at a = 0.046 rather than at
+#     the a = 0.045 this block states everywhere else (M110 review F3, outside
+#     M110's own diff). Neither conservatism alone gets near it: the n
+#     conservatism alone (a = 1/sqrt(2), n = 5e5) lands at exactly 1.0e-4, and
+#     the geometry conservatism alone (a = 0.045 at the published ceiling
+#     n = 1e4) at 4.5e-5, a factor of 2.22 below.
 #
 #   C = 10 -- THE CALIBRATION CEILING: how far the enforced bound
 #     p * kappa(cov2cor(Sigma-hat))^2 * eps may sit below the error it stands
@@ -611,22 +619,39 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # while buying only n^(1/4) of threshold movement, since the floor moves as
 # sqrt(tau). p already appears inside the bound, where it belongs.
 #
-# WHY THE LIMB EXISTS AT ALL (RR19 section 5; re-affirmed at RR20 section 5,
-# this mechanism's third escalation). Removal was weighed and rejected: past
-# the floor the
-# package has no shipped means of certifying the number to delta_star (IP3),
-# and the only a-priori error estimate a replacement caution could carry is
-# this same bound, which overstates the actual error by 5 to 8 decades in every
-# geometry users occupy -- it would cry "up to 3% error" over numbers accurate
-# to 1e-13. RR20 adds one point in favour of keeping: the noise yardstick does
-# not collapse at the floor (premise 7), so refusal there is not sitting where
-# the statistical ground itself gives way. The reopening evidence is recorded
-# in the D-entry superseding D-044, and its first trigger is partly met on the
-# record already -- a converged fit this criterion refuses whose SEs an exact
-# oracle measures eight decades inside delta_star. The remedy that evidence
-# schedules is an a-posteriori per-fit error certificate, never another decade
-# on tau. Changing delta_star or C is an escalation (RB, no-oracle), never a
-# silent edit.
+# WHAT THE FLOOR NOW DOES, AND WHY IT NO LONGER REFUSES (M111). RR19 section 5
+# and RR20 section 5 are the record of the two escalations that kept this limb
+# refusing before this one, and both kept it on ONE ground: past the floor
+# there was no shipped means of certifying a computed answer to delta_star
+# (IP3), so the only a-priori estimate a replacement caution could carry was
+# this same bound -- which overstates the actual error by 5 to 8 decades in
+# every geometry users occupy, and would cry "up to 3% error" over numbers
+# accurate to 1e-13.
+#
+# That ground is gone. D-050 records the reopening trigger met in full: a
+# converged fit this criterion refused, whose SEs an exact oracle measures
+# eight decades inside delta_star. The remedy that evidence schedules -- an
+# a-posteriori per-fit error certificate, never another decade on tau -- was
+# built at M108 (R/axes_certificate.R; D-051) and is what M111 put here.
+#
+# So the floor decides WHICH QUESTION is asked of a matrix, not whether it is
+# refused. Above the floor nothing is asked and the fit computes, as before.
+# Below it the fit's own certificate is asked whether the numbers this fit
+# actually produced sit inside delta_star, and only a fit that fails that
+# question is refused -- under "uncertified", its own literal, with the
+# estimate carried in the warning. axes_degeneracy_refusal() just below is the
+# one place either surface makes that call. The two literals that never rested
+# on the bound are untouched by the move: "indefinite" is a statement about the
+# user's MODEL and no arithmetic certificate can license it, and "singular"
+# names entries eigen() cannot decompose and the certificate cannot price.
+#
+# WHAT M111 DID NOT MOVE. delta_star and C are unchanged -- what changed is
+# which quantity is compared against delta_star, not the target -- and changing
+# either is still an escalation (RB, no-oracle), never a silent edit. tau is
+# unchanged too, and RR20's point in the floor's favour still holds of the
+# question it now asks: the noise yardstick does not collapse there (premise
+# 7), so the certificate is not being consulted at a place where the
+# statistical ground itself gives way.
 axes_degeneracy_delta_star <- 1e-4
 axes_degeneracy_calibration_ceiling <- 10
 axes_degeneracy_tau <-
@@ -672,6 +697,93 @@ axes_sigma_degenerate <- function(sigma) {
     return("ill_conditioned")
   }
   NULL
+}
+
+
+# THE REFUSAL DECISION both surfaces make (M111), and the one place either of
+# them makes it. axes_sigma_degenerate() above still answers what the matrix
+# looks like a priori; this function answers whether the fit is refused, which
+# since M111 are two different questions.
+#
+# WHAT CHANGED. Until M111 the criterion's floor WAS the refusal: a matrix
+# below it was refused whatever its fit's actual arithmetic did. That floor
+# stands on p*kappa^2*eps, a conservative envelope measured 5 to 8 decades
+# above the error committed in reachable geometry (RR19 section 3), so the
+# refusal region contained fits whose reported numbers were exact to 1e-11 --
+# the evidence D-048's reopening trigger names and D-050 records met in full.
+# The remedy it schedules is an a-posteriori per-fit certificate, and M108
+# built it. Here it is consulted:
+#
+#   "indefinite"      refused unchanged -- a statement about the user's MODEL
+#                     (M90), not a claim about arithmetic, so no arithmetic
+#                     certificate can license it.
+#   "singular"        refused unchanged -- non-finite entries, which eigen()
+#                     cannot decompose and the certificate cannot price.
+#   "ill_conditioned" the floor alone no longer refuses. The certificate
+#                     replays this fit's own pricing in double-double
+#                     arithmetic and estimates the relative error the reported
+#                     numbers actually carry; within the accuracy target the
+#                     fit COMPUTES, past it the refusal stands under its own
+#                     literal, "uncertified".
+#   NULL              computes, and pays nothing: the certificate runs only on
+#                     the floor's own side, so an ordinary fit never buys the
+#                     16-108x replay (M108).
+#
+# ONE PREDICATE, BOTH SURFACES (M111 gate). The certificate reports two
+# estimates -- the corrected component SEs' (worst component) and the scaling
+# factor's cval -- and the decision reads the WORSE of the two at both call
+# sites, rather than each surface reading its own. Gating each surface on its
+# own field would let one surface compute while the other refuses the same
+# matrix, which is exactly the split M89's nestedness contract exists to
+# prevent and which the shared-literal tests pin. The cost of the shared
+# predicate is that a fit whose SEs are certified but whose cval is not
+# refuses both; that direction is the fail-closed one (GP2).
+#
+# THE THRESHOLD is delta_star, the accuracy target itself -- not tau. tau is
+# the a-priori bound's implementation constant, discounted by the calibration
+# ceiling C precisely because that bound may undershoot the error it stands
+# for. The certificate does not stand for the error; it estimates it directly
+# from the fit's own numbers, so it is compared against the target the target
+# is defined as. The sentinel value 1 the certificate returns on any route
+# failure -- exact singularity among them, where the reference route's
+# elimination hits a zero pivot -- sits four decades past delta_star, so an
+# uncertifiable fit refuses (GP2).
+#
+# NOT APPLIED TO THE RAW ARM. axes_corrected_se()'s `naive` arm evaluates the
+# criterion on the raw Sigma-hat and keeps doing so unchanged: the certificate
+# replays the CORRECTED arm only (the naive arm is never user-reported -- it is
+# the lavaan tie, D-037), so there is nothing certifying it would license.
+axes_degeneracy_refusal <- function(sigma, d) {
+  reason <- axes_sigma_degenerate(sigma)
+  if (!identical(reason, "ill_conditioned")) {
+    return(list(reason = reason, cert = NULL))
+  }
+  cert <- axes_accuracy_certificate(sigma, d)
+  if (max(cert$se, cert$cval) <= axes_degeneracy_delta_star) {
+    return(list(reason = NULL, cert = cert))
+  }
+  list(reason = "uncertified", cert = cert)
+}
+
+# The diagnostic clause attached to a refusal warning, at both surfaces (M111).
+# Only "uncertified" gets one -- the scope note at axes_degeneracy_hint() below
+# gives the grounds, and they are unchanged by M111: "uncertified" is reached
+# only from "ill_conditioned", so the hint's precondition (lambda_min bounded
+# below by -lambda_max*sqrt(p*eps)) still holds wherever this fires.
+#
+# The estimate leads (M111 gate; RR21 rec 4): a bare refusal tells the user
+# the matrix is degenerate, which the conditioning clause already said, while
+# the certificate says how far off THIS fit's numbers were estimated to be --
+# the actionable half. Reported to two significant digits because it is an
+# estimate of an error, not a measurement of one; the sentinel prints as 1,
+# which reads as "no digits certified" and is what it means.
+axes_degeneracy_note <- function(refusal, sigma) {
+  if (!identical(refusal$reason, "uncertified")) return(NULL)
+  paste0(
+    sprintf("estimated relative error %.2g",
+            max(refusal$cert$se, refusal$cert$cval)),
+    "; ", axes_degeneracy_hint(sigma)
+  )
 }
 
 

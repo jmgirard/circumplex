@@ -3112,15 +3112,20 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
 
   # Each surface's own warning names the SHARED reason -- one from the
   # corrected-SE surface, one from the scaled-fit surface, same literal.
-  expect_length(grep("ill_conditioned", w, fixed = TRUE), 2L)
+  # The shared literal moved at M111: the criterion still calls this matrix
+  # ill-conditioned, but that no longer refuses on its own -- the per-fit
+  # certificate does, returning its sentinel on a matrix this close to
+  # rank-deficient. What M89 AC6 asserts here is unchanged: ONE literal, both
+  # surfaces, everything NA together.
+  expect_length(grep("uncertified", w, fixed = TRUE), 2L)
   expect_true(any(grepl("standard errors could not be computed", w)))
   expect_true(any(grepl("scaled fit statistics could not be computed", w)))
 
   # Both failure fields carry the shared literal; on a unit refusal like this
   # one the one reason speaks for all three vectors, so the raw arm's own
   # field stays NULL (M91).
-  expect_identical(res$details$se_correction_failed, "ill_conditioned")
-  expect_identical(res$details$fit_scaling_failed, "ill_conditioned")
+  expect_identical(res$details$se_correction_failed, "uncertified")
+  expect_identical(res$details$fit_scaling_failed, "uncertified")
   expect_null(res$details$naive_reason)
 
   # The corrected component SEs are all NA together...

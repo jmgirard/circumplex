@@ -6,8 +6,10 @@
 # reachable geometry. This file is the other instrument: given the matrix a fit
 # is priced at, it ESTIMATES the relative error that fit's own corrected
 # component SEs and its `cval` carry, after the fact, from that fit's own
-# numbers. Nothing consumes it yet -- re-keying the "ill_conditioned" refusal
-# to it is M111's work -- so no exported behaviour depends on this file.
+# numbers. Since M111 it is what decides the refusal below that floor:
+# axes_degeneracy_refusal() (R/axes_corrected_se.R) consults it wherever the
+# criterion says "ill_conditioned", and a fit whose worse estimate exceeds the
+# accuracy target refuses as "uncertified" at both surfaces.
 #
 # THE MECHANISM (D-051). The shipped pricing pipeline is replayed once in
 # compensated double-double arithmetic -- two doubles carrying an unevaluated

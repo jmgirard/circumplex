@@ -786,11 +786,16 @@ test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a n
   expect_true(all(is.na(got$corrected)))
   expect_true(all(is.na(got$naive)))
   # NA, never NaN, and never a fallback to the uncorrected value. The literal
-  # moved at M89: an exactly singular matrix is now refused by the stated
-  # degeneracy criterion (its smallest eigenvalue is 0), before the solve()
-  # that used to fail on it emergently as "singular".
+  # moved twice. At M89 an exactly singular matrix became a refusal of the
+  # stated degeneracy criterion (its smallest eigenvalue is 0), ahead of the
+  # solve() that used to fail on it emergently as "singular". At M111 the
+  # criterion's floor stopped refusing on its own: this matrix now reaches the
+  # per-fit certificate, whose reference route hits a zero pivot on it and
+  # returns the sentinel, so the refusal stands under the certificate's own
+  # literal. Exact singularity refuses on every one of those three routes --
+  # what M111 changed is which one says so.
   expect_false(any(is.nan(got$corrected)))
-  expect_identical(got$reason, "ill_conditioned")
+  expect_identical(got$reason, "uncertified")
 })
 
 
@@ -1195,12 +1200,23 @@ test_that("AC10: the na_out() calls are the only non-success returns (BC5 enumer
 
   reasons <- regmatches(src, regexpr('return\\("[a-z_]+"\\)', src))
   reasons <- sub('return\\("', "", sub('"\\)', "", reasons))
+  # Since M111 one literal is not returned bare: axes_degeneracy_refusal()
+  # carries its reason in a list field beside the certificate that decided it,
+  # so the enumeration reads that shape too or would miss the newest literal
+  # entirely -- which is the failure this test exists to prevent. The NULL arm
+  # of that same field is not a literal and does not match.
+  named <- regmatches(src, regexpr('reason = "[a-z_]+"', src))
+  reasons <- c(reasons, sub('reason = "', "", sub('"$', "", named)))
   # axes_se_pricing()'s three, plus the two axes_sigma_degenerate() returns
   # (M89): its finiteness arm reuses "singular", and the stated criterion
-  # itself is "ill_conditioned".
+  # itself is "ill_conditioned" -- which since M111 is a description of the
+  # matrix rather than a refusal on its own. The refusal past the floor is
+  # "uncertified", named by axes_degeneracy_refusal() when the per-fit
+  # certificate cannot place the fit inside the accuracy target.
   expect_setequal(
     reasons,
-    c("singular", "unidentified", "indefinite", "ill_conditioned")
+    c("singular", "unidentified", "indefinite", "ill_conditioned",
+      "uncertified")
   )
   # Plus the guards' own reasons, which route through na_out() directly: the
   # nonpositive-diagonal door (relabeled "nonpositive_diagonal" -> "singular"
@@ -1379,14 +1395,22 @@ test_that("M106 review round 2 F4: only the SE surface's ill-conditioning refusa
   # The control, on the same surface: an ill-conditioned matrix DOES carry the
   # clause, so the assertion above is about the literal and not about whether
   # this call site ever attaches a hint.
+  # The radius moved at M111. m106_family_b(2e-5) -- kappa 1.01e5, the old
+  # exemplar -- now COMPUTES: its certificate estimates 2.6e-11, seven decades
+  # inside the accuracy target, which is precisely the class of fit M111
+  # stopped refusing. The control needs a matrix the certificate actually
+  # refuses, so it moves down to pair_eps 1e-8 (kappa 2.01e8), where the
+  # reference route fails and the sentinel refuses. The named pair is
+  # unchanged, which is the point of the control.
   nm9 <- paste0("i", 1:9)
   ang9 <- c(as.numeric(octants()), as.numeric(octants())[1L])
   wc <- testthat::capture_warnings(
-    gc <- axes_corrected_se(m106_family_b(2e-5), nm9, ang9,
+    gc <- axes_corrected_se(m106_family_b(1e-8), nm9, ang9,
                             as.character(c(1:8, 1L)),
                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
   )
-  expect_identical(gc$reason, "ill_conditioned")
-  expect_length(grep("condition number 1.01e+05", wc, fixed = TRUE), 1L)
+  expect_identical(gc$reason, "uncertified")
+  expect_length(grep("condition number 2.01e+08", wc, fixed = TRUE), 1L)
   expect_length(grep("items i1 and i9 are nearly collinear", wc, fixed = TRUE), 1L)
+  expect_length(grep("estimated relative error", wc, fixed = TRUE), 1L)
 })

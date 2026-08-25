@@ -87,25 +87,25 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 
 ## Tasks
 
-- [ ] T1: Wire M108's certificate into both surfaces, keeping the floor as the
+- [x] T1: Wire M108's certificate into both surfaces, keeping the floor as the
       indefinite/singular partition only.
-- [ ] T2: Add the certificate-failure literal to the refusal vocabulary and to
+- [x] T2: Add the certificate-failure literal to the refusal vocabulary and to
       the enumeration test at `tests/testthat/test-axes-corrected-se.R:1179`.
-- [ ] T3: Write the AC2/AC3 tests at the `axes_fitted_cov()` seam, using the
+- [x] T3: Write the AC2/AC3 tests at the `axes_fitted_cov()` seam, using the
       builders in `tests/testthat/helper-m106-degeneracy.R`.
-- [ ] T4: Re-fence the partition (AC4). The pinned tests at
+- [x] T4: Re-fence the partition (AC4). The pinned tests at
       `test-axes-scaled-fit.R:1906` and `:1944` assert the criterion function's
       own return, which T1 leaves intact; assert the surfaces' behaviour beside
       them rather than editing them.
-- [ ] T5: Mutation-prove the new path (AC6), recording which assertion each
+- [x] T5: Mutation-prove the new path (AC6), recording which assertion each
       mutant reddens.
-- [ ] T6: Rewrite the `WHY THE LIMB EXISTS AT ALL` span. Two claims in it are
+- [x] T6: Rewrite the `WHY THE LIMB EXISTS AT ALL` span. Two claims in it are
       falsified by this milestone and by D-050: "the package has no shipped
       means of certifying the number to delta_star" (`:574`) and "its first
       trigger is partly met on the record already" (`:581`), the latter already
       stale since D-050 recorded that trigger met in full.
 - [ ] T7: NEWS entry, document, verify and check.
-- [ ] T8: Correct the stale `6.5e-6` corner figure in the accuracy-target
+- [x] T8: Correct the stale `6.5e-6` corner figure in the accuracy-target
       block (`R/axes_corrected_se.R`), which derives from a = 0.046 while the
       block states a = 0.045 (0.1*0.045/sqrt(5e5) = 6.36e-6). Comment-only;
       routed here by the M110 review, outside its own diff.
@@ -122,6 +122,13 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 - 2026-08-24: gate chose one shared refusal predicate at both surfaces (the worse of the certificate's two estimates against delta_star) over per-surface fields, the literal `"uncertified"`, the certificate's estimate carried in the refusal warning, and folding the M110-review stale-figure correction in as T8.
 - 2026-08-24: AC3 amended (mini gate). Its "injected at the same seam" step is unsatisfiable: the p = 3 fixture carries three item names and `axes_reliability()` refuses fewer than four scales, so the seam's realignment errors `subscript out of bounds`. Amended text prices the fixture directly and adds a p = 24 near-duplicate matrix at the seam so the exported surface is pinned.
 - 2026-08-24: criteria audit of the amended AC3 ran in full mode (user-facing tier), two fresh-context [O] readers, neither an author of the wording. Findings disposed: the first draft's `naive_reason` clause was unfalsifiable and misattributed (dropped); the second draft's opening clause quantified over all certificate failures while the certificate gates only the ill-conditioned arm (narrowed to two enumerated matrices); the exported surface was named only as coverage prose (rewritten as the promise it carries).
+- 2026-08-24: T1 wired the certificate in at both surfaces through one shared decision helper, `axes_degeneracy_refusal()`; the floor now selects which fits are checked, and only a fit whose worse certificate estimate exceeds delta_star refuses, as `"uncertified"`.
+- 2026-08-24: T2 added `"uncertified"` to the refusal vocabulary and to the BC5 enumeration test, which now also reads the list-field shape the shared decision helper returns its literal in.
+- 2026-08-24: T3 added `tests/testthat/test-axes-certificate-refusal.R` (AC2, AC3). AC2's five geometries are fit on well-conditioned siblings of the same design and injected at the seam: lavaan does not converge on the p = 8 kappa 1e5 anchor itself. Two of the five (a5, b9b) were refused before this milestone and now compute.
+- 2026-08-24: T1/T2/T3 moved 28 assertions in four existing test files onto the new behaviour. Two classes: eleven sites where the surfaces still refuse under the new literal, and seventeen where the fit now computes -- the M106 floor-bracket tests (AC4 case 2 at p = 8, case 3 at p = 24, AC5 radius 2) and the two diagnostic-hint controls, whose refusing exemplars moved down to kappa 2.0e8 and 7.2e8 where the certificate's reference route fails.
+- 2026-08-24: T4 fenced the two limbs the certificate is never asked about at the SURFACES (AC4), two p and two spectral forms (rotated planted eigenvalue, rank-one projector), both sides of the M90 partition boundary plus the non-finite route.
+- 2026-08-24: T5 mutation-proved the new path (AC6). Comparison inverted (`<=` to `>=`): 20 assertions redden, including AC2's `se_correction_failed`/`fit_scaling_failed` NULL checks at a5 and b9b and AC3's `"uncertified"` checks at both routes. Threshold removed (the certified branch taken unconditionally): 10 redden, all in AC3 -- the sentinel route's two failure fields and the graded route's six.
+- 2026-08-24: T6 rewrote the `WHY THE LIMB EXISTS AT ALL` span (AC5); T8 corrected the stale `6.5e-6` corner to 6.36e-6 and pinned every figure in that paragraph to its own 0.1*a/sqrt(n) derivation.
 
 ## Decisions
 
