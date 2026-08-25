@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m109-source-tree-test-reads`
+- **Branch/PR:** `m109-source-tree-test-reads` / PR #141 (https://github.com/jmgirard/circumplex/pull/141)
 
 ## Goal
 
@@ -41,29 +41,29 @@ behaviour and always skip.
 
 ## Acceptance criteria
 
-- [ ] AC1: The vignette test at `tests/testthat/test-axes-corrected-se.R:733`
+- [x] AC1: The vignette test at `tests/testthat/test-axes-corrected-se.R:733`
       and the one at `tests/testthat/test-axes-scaled-fit.R:964` each obtain the
       vignette through `system.file("doc", "axes-reliability.Rmd", package =
       "circumplex")` when the source-tree path is absent, and each executes
       rather than skips in a `devtools::check()` run. A residual skip remains
       for the build that installs no vignettes, which `covr` does.
-- [ ] AC2: Both tests are proved able to fail inside a `devtools::check()` run
+- [x] AC2: Both tests are proved able to fail inside a `devtools::check()` run
       by a probe deleting a sentence each requires present. The `AC7: the
       vignette's caveats match the corrected contract` guard is additionally
       proved by a probe inserting a sentence it requires absent; the `AC11: the
       vignette carries the same four claims` guard is not, because a deletion
       probe cannot exercise an `expect_no_match` assertion and, of the two
       guards' bodies, only the former carries any.
-- [ ] AC3: The dual-source Rd read in `tests/testthat/test-axes-scaled-fit.R`'s
+- [x] AC3: The dual-source Rd read in `tests/testthat/test-axes-scaled-fit.R`'s
       "AC12: the Rd fences the scaling against the robustness misreading" test
       carries a vacuity fence that fails both when its source yields empty text
       and when it yields a truncated read, proved by both plants.
-- [ ] AC4: The two guards at `tests/testthat/test-norms-provenance.R:581` and
+- [x] AC4: The two guards at `tests/testthat/test-norms-provenance.R:581` and
       `:703` gate on `dir.exists()` of the tracking directory rather than on
       the status file, so a deleted `norms-audit.md` in a source checkout fails
       those tests rather than skipping them; proved by deleting it in a scratch
       copy. This is the shape M107 established at `test-fixture-drift.R`.
-- [ ] AC5: Running `grep -rn 'test_path("\.\."' tests/testthat/` classifies
+- [x] AC5: Running `grep -rn 'test_path("\.\."' tests/testthat/` classifies
       every line it returns into exactly one of: runs under `R CMD check`
       today; repaired by this milestone; development-only by construction,
       because the artifact it reads is absent from the tree a check-time test
@@ -72,7 +72,7 @@ behaviour and always skip.
       because testthat does not collect it. The classification
       is committed in this file's `## Decisions` section, one row per returned
       line.
-- [ ] AC6: `Rscript -e 'devtools::test()'` and
+- [x] AC6: `Rscript -e 'devtools::test()'` and
       `Rscript -e 'devtools::check(args = "--no-manual")'` clean.
 
 ## Coverage
@@ -175,13 +175,144 @@ appears anywhere in a `devtools::test()` run's output.
 | `test-norms-provenance.R:464` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
 | `test-norms-provenance.R:473` | `cairn/references` | dev-only | `cairn/` is `.Rbuildignore`d |
 | `test-norms-provenance.R:527` | `man/.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
-| `test-norms-provenance.R:583` | `cairn/references` | repaired here | now gates on `dir.exists()` of `cairn/references`, so a deleted `norms-audit.md` fails rather than skips |
+| `test-norms-provenance.R:583` | `cairn/references` | repaired here | now gates on `dir.exists()` of `cairn/references`, so a deleted `norms-audit.md` fails rather than skips; `cairn/` is `.Rbuildignore`d, so the read itself stays development-only and the repair buys the developer run, not the check run |
 | `test-norms-provenance.R:616` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
 | `test-norms-provenance.R:651` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
-| `test-norms-provenance.R:711` | `cairn/references` | repaired here | now gates on `dir.exists()` of `cairn/references`, so a deleted `norms-audit.md` fails rather than skips |
+| `test-norms-provenance.R:711` | `cairn/references` | repaired here | now gates on `dir.exists()` of `cairn/references`, so a deleted `norms-audit.md` fails rather than skips; `cairn/` is `.Rbuildignore`d, so the read itself stays development-only and the repair buys the developer run, not the check run |
 | `test-rd-latex-safe.R:36` | `man` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
 | `test-ssm_occasions.R:446` | `devel` | dev-only | `devel/` is `.Rbuildignore`d |
 | `test-ssm_occasions.R:849` | `devel` | dev-only | `devel/` is `.Rbuildignore`d |
 | `test-ssm_occasions.R:881` | `devel` | dev-only | `devel/` is `.Rbuildignore`d |
 
 ## Review
+
+Reviewed 2026-08-24 on branch `m109-source-tree-test-reads`, PR #141. `master`
+sat at fe8cf0ad, unmoved since the branch was cut, so no merge into the branch
+was needed. Every figure below comes from a run made during this review.
+
+### Acceptance-criteria evidence
+
+- **AC2** — `devtools::check(args = "--no-manual")` on a scratch copy with one
+  required sentence deleted per guard (the `**corrected** for it` sentence, and
+  the `| rejection rate | .092 | .079 | .062 | .054 |` table row): FAIL 2, both
+  guards red inside the check — `test-axes-corrected-se.R:757` on its
+  `expect_match` of the corrected-SE sentence, `test-axes-scaled-fit.R:974` on
+  its `expect_match` of the table row, each failure message printing the
+  vignette text it read. Insertion arm (`Treat them as order-of-magnitude
+  guidance.` added, same scratch shape): FAIL 1 — `test-axes-corrected-se.R:750`
+  red on `expect_no_match("order-of-magnitude")`; the AC11 guard stayed green,
+  its four assertions all positives.
+
+- **AC3** — three `devtools::test(filter = "axes-scaled-fit")` runs on a scratch
+  copy. Unmutated control: FAIL 0 | SKIP 1 | PASS 1871. Emptied
+  `man/axes_reliability.Rd`: the fence at `test-axes-scaled-fit.R:1066` red,
+  `nchar(rd)` 0. Truncated to 400 bytes: same fence red, `nchar(rd)` 382. Both
+  plants fail it; the control passes with it exercised.
+
+- **AC4** — `cairn/references/norms-audit.md` deleted in a scratch copy,
+  `devtools::test(filter = "norms-provenance")`: FAIL 4 | SKIP 0. Both guards
+  red on their own named assertion — `test-norms-provenance.R:588` and `:716`,
+  `expect_true(file.exists(status))`, each carrying the
+  `cairn/references/norms-audit.md is missing` info string — and each followed
+  by `readLines()`'s connection error on the next statement. Neither skipped.
+
+- **AC5** — the enumerating grep returns 49 lines in 25 files at this commit.
+  The 49 table keys in the `## Decisions` classification, sorted, `diff` clean
+  against the grep's own sorted output: every returned line appears exactly
+  once, and the table names no line the grep does not return. Class tallies
+  11 + 5 + 22 + 11 = 49. The third class checks out against the tree:
+  `.Rbuildignore` carries `^devel$`, `^data-raw$` and `^cairn$`, covering 19 of
+  the 22, and the remaining three read files under `R/`. The never-collected
+  class checks out against a run: no `_problems/` path appears anywhere in the
+  `devtools::test()` output.
+
+- **AC6** — `devtools::test()` on the branch: FAIL 0 | WARN 5 | SKIP 1 |
+  PASS 8630, the one skip at `test-axes-scaled-fit.R:918` and pre-existing.
+  `devtools::check(args = "--no-manual")` on the branch: Status OK, 0 errors /
+  0 warnings / 0 notes, 10m5s.
+
+- **AC1** — both guards execute under `devtools::check(args = "--no-manual")`:
+  in the AC2 deletion arm each reddened inside the check run, its failure
+  message printing the vignette prose it had read, which a skipped test cannot
+  do. The read came through the fallback, not the source tree: a check runs the
+  tests from `<pkg>.Rcheck/tests`, whose `../../vignettes` does not exist, so
+  `system.file("doc", "axes-reliability.Rmd", package = "circumplex")` is the
+  candidate that resolved. Discrimination control — the same deleted sentences
+  with `master`'s pre-repair guards restored and `helper-vignette.R` removed:
+  Status OK, 0 errors / 0 warnings / 0 notes, 11m19s. The repair is what makes
+  them run. Residual skip confirmed rather than assumed: reproducing `covr`'s
+  own path (`R CMD INSTALL --install-tests` of the source directory, then
+  `tools::testInstalledPackage(types = "tests")`) skips exactly these two —
+  `test-axes-corrected-se.R:744`, `test-axes-scaled-fit.R:969`, reason
+  `vignette source unavailable (build installed without vignettes)`.
+
+### Consistency gate
+
+`cairn_validate.py` exit 0, all checks passed; 47 advisory warnings, every one
+M7's multi-line work-log entries, none from this milestone. No `DESIGN.md`
+principle changed, so `cairn_impact.py` did not run. Toolchain slot
+(`r-package`): `document()` produced no diff and zero `resolve link` lines at
+`cli.width = 500`; no generated file hand-edited; `README.md` newer than
+`README.Rmd`; `pkgdown::check_pkgdown()` clean; no NEWS entry owed, the diff
+changing test-suite code only; no new top-level file, so no `.Rbuildignore`
+entry owed; full check clean (AC6). Master watches: the newest push run on
+`master` reaching a verdict is e1f405e1, `success` on both `R-CMD-check.yaml`
+and `test-coverage.yaml` (fe8cf0ad is `cairn/`-only and ran neither).
+`check-master-red-alert.R`, `master-red-alert-dryrun.R` (5/5 synthetic
+payloads) and `check-branch-protection.R` all exit clean.
+
+### Review findings and triage
+
+Three fresh-context reviewers, none having authored the work: [O] on the diff,
+[S] on `git blame`/`log` history, [S] on the prior-review record. The history
+lens returned no findings, confirming the cited precedents hold: the
+`vignette_source()` shape copies `test-cpm_boundary_vignette.R:7-25`, and the
+`dir.exists()` gating is M107's shape at `test-fixture-drift.R` (deleted by M108
+for an unrelated reason). The prior-review lens found no regression of a past
+lesson; its `gh api .../pulls/comments` probe returned `[]`, so the PR-thread
+walk was skipped. [O] returned nine ranked findings.
+
+Fixed on the branch:
+
+- **F1** (ranked 1) — the fence comment at `test-axes-scaled-fit.R:1066` claimed
+  "every expect_no_match below is satisfied by an empty read", but that block
+  holds four `expect_match` assertions and no `expect_no_match`, so both plants
+  would have reddened it without the fence. Comment rewritten to what the fence
+  actually buys here. Checking the finding's own premise turned up a further
+  correction: none of the five sibling reads carries an `expect_no_match`
+  either, so the rewritten comment does not claim they do.
+- **F2** (ranked 2) — the comment at `test-norms-provenance.R:587`/`:716` claimed
+  a deleted record "fails as itself rather than as `readLines()`'s connection
+  error"; `expect_true()` does not halt the block, so both are emitted, as the
+  AC4 run shows. Comment corrected; the assertion stays, since it is what names
+  the missing file. The prior-review lens raised the same point independently.
+- **F4** (ranked 4) — the two `test-norms-provenance.R` ledger rows read
+  `cairn/`, which is `.Rbuildignore`d, so "repaired here" alone could read as
+  "now runs under check". Both rows' `why` cells now say the read stays
+  development-only and what the repair bought.
+
+Rejected, with reason:
+
+- **F3** (ranked 3) — that AC1's residual-skip clause is wrong about `covr`.
+  Refuted against the implementation, not the account of it: `covr` installs the
+  source directory and runs `tools::testInstalledPackage()`, whose working
+  directory is the installed tree, and the repo carries no `inst/doc`.
+  Reproducing that path skips exactly the two guards, reason `vignette source
+  unavailable (build installed without vignettes)` (AC1 evidence above).
+- **F5** — a third inline copy of the lookup at `test-axes-reliability.R:3062`.
+  Pre-existing, outside the diff, and already classified `runs under check`; it
+  is not defective, only unshared.
+- **F6** — Scope's "the one dual-source Rd read missing its vacuity fence" does
+  not count `test-cpm_boundary_vignette.R:214`, a sixth unfenced read. Scope is
+  plan-owned and was gated; the read is positives-only, so nothing is at risk.
+- **F7** — the census rests on one literal grep pattern with no validator. AC5
+  defines the census by that grep; the reviewer searched the alternate spellings
+  and found none at this commit.
+- **F8** — four added lines exceed 80 columns. Formatter class.
+- **F9** — the fence sits after the whitespace collapse where the siblings put
+  it before. Numerically immaterial.
+
+No finding demonstrated an acceptance criterion failing, and none is a defect in
+what the package does for its users; status stays `review`. `devtools::test()`
+re-run over both touched files after the three fixes: FAIL 0 | SKIP 1 |
+PASS 2073.

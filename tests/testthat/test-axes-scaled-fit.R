@@ -1059,10 +1059,12 @@ test_that("AC12: the Rd fences the scaling against the robustness misreading", {
     paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
   }
   rd <- gsub("\\s+", " ", rd)
-  # Fail loudly rather than pass vacuously if neither source yielded anything:
-  # every expect_no_match below is satisfied by an empty read, and a truncated
-  # one satisfies whichever assertions fall past the cut. The five sibling
-  # dual-source reads of this Rd carry the same fence.
+  # Fail loudly rather than pass vacuously if neither source yielded anything.
+  # This block's four content assertions are all expect_match, so an empty or
+  # truncated read reddens them anyway; what the fence adds here is a failure
+  # that names the READ rather than the Rd's wording, and cover for any
+  # expect_no_match added later, which an empty read would satisfy silently.
+  # The five sibling dual-source reads of this Rd carry the same fence.
   expect_gt(nchar(rd), 1000L)
 
   # A Satorra-Bentler scaled statistic is best known as the fix for

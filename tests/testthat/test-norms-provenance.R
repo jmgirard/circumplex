@@ -583,8 +583,9 @@ test_that("norms-audit.md's verdicts and the pin list bind in both directions (M
   refs <- testthat::test_path("..", "..", "cairn", "references")
   skip_if_not(dir.exists(refs), "cairn/references/ not present (installed package)")
   status <- file.path(refs, "norms-audit.md")
-  # Named, so a deleted record fails as itself rather than as readLines()'s
-  # connection error two lines down.
+  # Named, so a deleted record fails as itself. expect_true() does not halt the
+  # block, so readLines() below still errors on the missing file -- this
+  # assertion is what says WHICH file is missing, ahead of that error.
   expect_true(file.exists(status), info = "cairn/references/norms-audit.md is missing")
 
   lines <- readLines(status, warn = FALSE)
@@ -711,8 +712,9 @@ test_that("norms-audit.md lists every shipped instrument (M72)", {
   refs <- testthat::test_path("..", "..", "cairn", "references")
   skip_if_not(dir.exists(refs), "cairn/references/ not present (installed package)")
   status <- file.path(refs, "norms-audit.md")
-  # Named, so a deleted record fails as itself rather than as readLines()'s
-  # connection error two lines down.
+  # Named, so a deleted record fails as itself. expect_true() does not halt the
+  # block, so readLines() below still errors on the missing file -- this
+  # assertion is what says WHICH file is missing, ahead of that error.
   expect_true(file.exists(status), info = "cairn/references/norms-audit.md is missing")
 
   lines <- readLines(status, warn = FALSE)
