@@ -360,16 +360,19 @@ test_that("AC1: the factor refuses rather than guessing when its inputs are wron
   # A singular sigma-hat: both factors NA together, with a named reason, and
   # never a silent fall back to 1 (which would relabel the uncorrected
   # statistic as corrected -- the one failure a user could not detect). The
-  # literal moved at M89: an exactly singular matrix is now refused by the
-  # stated degeneracy criterion (its smallest eigenvalue is 0), before the
-  # solve() that used to fail on it emergently as "singular".
+  # literal moved twice: at M89 to the stated degeneracy criterion (an exactly
+  # singular matrix has smallest eigenvalue 0), ahead of the solve() that used
+  # to fail on it emergently as "singular"; and at M111 to the per-fit
+  # certificate, whose reference route hits a zero pivot here and returns the
+  # sentinel. Exact singularity refuses on all three routes -- what M111
+  # changed is which one names it.
   sing <- ff$sigma
   sing[, 2] <- sing[, 1]
   sing[2, ] <- sing[1, ]
   got <- suppressWarnings(
     do.call(axes_scaling_factor, utils::modifyList(args, list(sigma = sing)))
   )
-  expect_identical(got$reason, "ill_conditioned")
+  expect_identical(got$reason, "uncertified")
   expect_true(is.na(got$scale))
   expect_true(is.na(got$baseline))
 
@@ -1403,7 +1406,8 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     check_nested <- function(sig, what) {
       r <- m89_reasons(sig, pp, df, bdf, m$zeta1)
       if (!is.null(r$sf) &&
-          r$sf %in% c("ill_conditioned", "indefinite", "singular")) {
+          r$sf %in% c("ill_conditioned", "uncertified", "indefinite",
+                      "singular")) {
         expect_identical(
           r$se, r$sf,
           label = sprintf("%s: SE helper reason", what),
@@ -1468,10 +1472,14 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     ns[2L, ] <- ns[1L, ]
     ns[, 2L] <- ns[, 1L]
     ns <- ns + 1e-9 * diag(p)
+    # The literal moved at M111: the criterion still says "ill_conditioned"
+    # here, but that alone no longer refuses -- the certificate does, returning
+    # its sentinel at all three p. The nestedness contract is what this asserts
+    # and it is unchanged: one literal, both surfaces.
     r <- check_nested(ns, sprintf("p %d near-singular", p))
-    expect_identical(r$sf, "ill_conditioned",
+    expect_identical(r$sf, "uncertified",
                      label = sprintf("p %d near-singular, scaling surface", p))
-    expect_identical(r$se, "ill_conditioned",
+    expect_identical(r$se, "uncertified",
                      label = sprintf("p %d near-singular, SE helper", p))
   }
 })
@@ -1646,8 +1654,14 @@ test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 
                         fit_zeta1 = FALSE, fit_zeta2 = FALSE,
                         df = 1, baseline_df = 3)
   )
-  expect_identical(se$reason, "ill_conditioned")
-  expect_identical(sf$reason, "ill_conditioned")
+  # The literal moved at M111. The criterion still calls this matrix
+  # ill-conditioned, but the refusal is now the per-fit certificate's: it
+  # estimates this fit's relative error at 3.4e-1 for the SEs and 4.9e+1 for
+  # cval, decades past the 1e-4 accuracy target. This is the matrix that makes
+  # the certificate's job visible -- the reported SEs really were wrong by
+  # 3.4% here (RR18) -- and it is the one place M111's shrink does not reach.
+  expect_identical(se$reason, "uncertified")
+  expect_identical(sf$reason, "uncertified")
 })
 
 
@@ -2340,16 +2354,20 @@ test_that("M106 review F1: only the ill-conditioning refusal carries the diagnos
 
   # The control: the SAME surface on an ill-conditioned matrix DOES carry it,
   # so the assertion above is about the literal and not about the call site.
+  # The radius moved at M111, for the reason the sibling control in
+  # test-axes-corrected-se.R states: kappa 1.01e5 now computes (certificate
+  # 2.6e-11), so the control moves to pair_eps 1e-8 (kappa 2.01e8), where the
+  # certificate returns its sentinel and the refusal stands.
   ang9 <- c(as.numeric(octants()), as.numeric(octants())[1L])
   sc9 <- as.character(c(1:8, 1L))
   dc <- dfs(9L, ang9, sc9)
   wc <- testthat::capture_warnings(
-    axes_scaling_factor(m106_family_b(2e-5), paste0("i", 1:9), ang9, sc9, NULL,
+    axes_scaling_factor(m106_family_b(1e-8), paste0("i", 1:9), ang9, sc9, NULL,
                         fit_zeta1 = TRUE, fit_zeta2 = FALSE,
                         df = dc$df, baseline_df = dc$baseline_df)
   )
-  expect_length(grep("ill_conditioned", wc, fixed = TRUE), 1L)
-  expect_length(grep("condition number 1.01e+05", wc, fixed = TRUE), 1L)
+  expect_length(grep("uncertified", wc, fixed = TRUE), 1L)
+  expect_length(grep("condition number 2.01e+08", wc, fixed = TRUE), 1L)
 })
 
 
@@ -2415,22 +2433,50 @@ test_that("M106 AC5: both cormat radii resolve as the recalibrated target implie
   priced <- res$components$SE[res$components$Symbol != "epsilon"]
   expect_true(all(is.finite(priced)))
 
-  # Radius 2 -- r = .9999714, kappa 1.01e5, ABOVE it. Brackets the threshold
-  # from the other side: refused, both surfaces naming the shared literal, and
-  # both warnings carrying the actionable clause rather than a bare reason code.
-  # 2e-5 rather than a deeper pair because lavaan stops converging past about
-  # r = .99999 -- at 7e-6 the function errors before the criterion is reached,
-  # so a deeper radius would test nothing about the refusal.
-  refuses <- m106_family_b(2e-5)
-  dimnames(refuses) <- list(inames, inames)
-  w <- testthat::capture_warnings(
+  # Radius 2 -- r = .9999714, kappa 1.01e5, ABOVE the floor. Until M111 this
+  # was the refusing half of the bracket. It now COMPUTES, through a real
+  # converged fit: the floor still classifies it "ill_conditioned", but the
+  # per-fit certificate estimates its relative error at 2.6e-11 -- seven
+  # decades inside the 1e-4 accuracy target -- and a fit inside the target is
+  # not refused. This assertion IS M111's claim, on the geometry the
+  # recalibrated floor was set against.
+  computes2 <- m106_family_b(2e-5)
+  dimnames(computes2) <- list(inames, inames)
+  expect_identical(axes_sigma_degenerate(computes2), "ill_conditioned")
+  w2 <- testthat::capture_warnings(
     res2 <- suppressMessages(
-      axes_reliability(cormat = refuses, items = items, angles = oct, n = 600L)
+      axes_reliability(cormat = computes2, items = items, angles = oct,
+                       n = 600L)
     )
   )
-  expect_identical(res2$details$se_correction_failed, "ill_conditioned")
-  expect_identical(res2$details$fit_scaling_failed, "ill_conditioned")
-  expect_length(grep("ill_conditioned", w, fixed = TRUE), 2L)
+  expect_null(res2$details$se_correction_failed)
+  expect_null(res2$details$fit_scaling_failed)
+  expect_length(grep("could not be computed", w2), 0L)
+  # From a converged fit, so the computed result is not a non-convergence
+  # refusal wearing a different face.
+  expect_true(res2$details$converged)
+  expect_true(all(is.finite(
+    res2$components$SE[res2$components$Symbol != "epsilon"]
+  )))
+
+  # Radius 3 -- pair_eps 1e-8, kappa 2.01e8. The bracket's refusing half now
+  # sits here, where the certificate's reference route fails and its sentinel
+  # refuses. Injected at the axes_fitted_cov() seam rather than fitted:
+  # lavaan stops converging past about r = .99999, so a fitted radius this
+  # deep would error before either surface was reached. The carrier is
+  # radius 1, already fitted above.
+  refuses <- m106_family_b(1e-8)
+  dimnames(refuses) <- list(inames, inames)
+  local_mocked_bindings(axes_fitted_cov = function(fit) refuses)
+  w <- testthat::capture_warnings(
+    res3 <- suppressMessages(
+      axes_reliability(cormat = computes, items = items, angles = oct,
+                       n = 600L)
+    )
+  )
+  expect_identical(res3$details$se_correction_failed, "uncertified")
+  expect_identical(res3$details$fit_scaling_failed, "uncertified")
+  expect_length(grep("uncertified", w, fixed = TRUE), 2L)
   expect_length(grep("nearly collinear", w, fixed = TRUE), 2L)
   expect_length(grep("items i1 and i9", w, fixed = TRUE), 2L)
 })
@@ -2463,15 +2509,23 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
     cormat = r8, items = split(paste0("i", 1:8), seq_along(oct)),
     angles = oct, n = 600L
   )))
-  expect_identical(res8$details$se_correction_failed, "ill_conditioned")
-  expect_identical(res8$details$fit_scaling_failed, "ill_conditioned")
-  # The literal must come from the CRITERION, not from a fit that never
-  # converged: non-convergence has its own refusal, and without this the two
-  # routes to the same reported reason are indistinguishable here.
+  # Refused until M111, computed since: the floor still classifies it, but the
+  # certificate estimates 3.0e-11 against a 1e-4 target. What the case still
+  # discriminates is where the FLOOR sits -- asserted at the criterion, which
+  # M111 left intact -- while the surfaces no longer refuse on it.
+  expect_identical(axes_sigma_degenerate(r8), "ill_conditioned")
+  expect_null(res8$details$se_correction_failed)
+  expect_null(res8$details$fit_scaling_failed)
+  # From a converged fit, so the computed result is not non-convergence
+  # wearing a different face: non-convergence has its own refusal, and without
+  # this the two routes to the same reported state are indistinguishable here.
   expect_true(res8$details$converged)
 
   # Case 3 -- p = 24, three items per octant scale. kappa 7.2e5 against a floor
-  # of 4.33e4: strictly above, refused. This construction cannot reach the
+  # of 4.33e4: strictly above, so the criterion still calls it ill-conditioned.
+  # Since M111 that no longer refuses on its own -- the assertions below expect
+  # this case to COMPUTE, its per-fit certificate placing it inside the
+  # accuracy target. This construction cannot reach the
   # criterion through a real fit -- lavaan does not converge on it, measured
   # here on 2026-08-23 and not assumed of fits in general (case 2 above IS a
   # converged fit at kappa 1.0e5) -- so it is injected at the axes_fitted_cov
@@ -2501,11 +2555,33 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
       cormat = r24_ok, items = pp$items, angles = oct, n = 600L
     ))
   )
-  expect_identical(res24$details$se_correction_failed, "ill_conditioned")
-  expect_identical(res24$details$fit_scaling_failed, "ill_conditioned")
-  expect_length(grep("ill_conditioned", w, fixed = TRUE), 2L)
+  # Refused until M111, computed since -- certificate 1.3e-10 against the 1e-4
+  # target. The criterion's own classification is asserted separately, so what
+  # the case pins about the floor's location survives the change.
+  expect_identical(axes_sigma_degenerate(r24_bad), "ill_conditioned")
+  expect_null(res24$details$se_correction_failed)
+  expect_null(res24$details$fit_scaling_failed)
+  expect_length(grep("could not be computed", w), 0L)
 
-  # All three sit inside the band M89's tightening newly refused.
+  # Case 4 -- the same p = 24 construction driven three decades deeper, to
+  # kappa 7.2e8, where the certificate's reference route fails and its
+  # sentinel refuses. Without it this test would assert only that the band
+  # computes, and nothing here would still exercise a refusal at p = 24.
+  r24_worse <- m106_family_a(1e-8, per_scale = 3L)
+  dimnames(r24_worse) <- dimnames(r24_ok)
+  expect_gt(m106_kappa(r24_worse), 1e8)
+  local_mocked_bindings(axes_fitted_cov = function(fit) r24_worse)
+  w4 <- testthat::capture_warnings(
+    res24w <- suppressMessages(axes_reliability(
+      cormat = r24_ok, items = pp$items, angles = oct, n = 600L
+    ))
+  )
+  expect_identical(res24w$details$se_correction_failed, "uncertified")
+  expect_identical(res24w$details$fit_scaling_failed, "uncertified")
+  expect_length(grep("uncertified", w4, fixed = TRUE), 2L)
+
+  # The first three sit inside the band M89's tightening newly refused and
+  # M111's certificate gave back.
   for (k in c(m106_kappa(r4), m106_kappa(r8), m106_kappa(r24_bad))) {
     expect_gt(k, 1e4)
     expect_lt(k, 1e7)
