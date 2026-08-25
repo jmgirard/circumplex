@@ -1059,6 +1059,11 @@ test_that("AC12: the Rd fences the scaling against the robustness misreading", {
     paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
   }
   rd <- gsub("\\s+", " ", rd)
+  # Fail loudly rather than pass vacuously if neither source yielded anything:
+  # every expect_no_match below is satisfied by an empty read, and a truncated
+  # one satisfies whichever assertions fall past the cut. The five sibling
+  # dual-source reads of this Rd carry the same fence.
+  expect_gt(nchar(rd), 1000L)
 
   # A Satorra-Bentler scaled statistic is best known as the fix for
   # NON-NORMALITY, which this one is not: the factor is normal-theory

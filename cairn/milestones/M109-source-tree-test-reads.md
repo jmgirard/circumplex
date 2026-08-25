@@ -91,10 +91,10 @@ behaviour and always skip.
       vector, `nzchar() & file.exists()` filter, `skip_if` on the empty case.
 - [ ] T3: Probe both repaired guards inside a check run, deletion and insertion
       arms, and record which assertion each reddens.
-- [ ] T4: Add the vacuity fence to `test-axes-scaled-fit.R`'s AC12 test,
+- [x] T4: Add the vacuity fence to `test-axes-scaled-fit.R`'s AC12 test,
       matching the `expect_gt(nchar(rd), 1000L)` the other five dual-source
       reads of `axes_reliability.Rd` carry; plant an empty and a truncated read.
-- [ ] T5: Repair the two `norms-provenance.R` guards to `dir.exists()`; prove
+- [x] T5: Repair the two `norms-provenance.R` guards to `dir.exists()`; prove
       by scratch-copy deletion that a missing record reddens.
 - [ ] T6: Run the profile verify slot and the check.
 
@@ -109,6 +109,8 @@ behaviour and always skip.
 - 2026-08-24: amended AC3 and AC5 went to a fresh-context [O] reduced criteria audit (internal tier) that authored neither; it returned six findings. Its two narrowing repairs are the amended wording above. Its two instrument findings -- AC3's "proved by both plants", AC5's committed-ledger sentence -- were declined: the deliverable here is a check whose ability to fail is the shipped property, and the ledger is that classification's evidence.
 - 2026-08-24: T4 reworded to name the AC12 test rather than a line number, matching the amended AC3.
 - 2026-08-24: T2 done -- `tests/testthat/helper-vignette.R` adds `vignette_source(file)`, trying `vignettes/` then `system.file("doc", ...)`, and both repaired guards call it and `skip_if(!nzchar(vig))`. Suite clean: FAIL 0 | WARN 5 | SKIP 1 | PASS 8627.
+- 2026-08-24: T4 done -- the AC12 test's dual-source Rd read now carries `expect_gt(nchar(rd), 1000L)`. Planted in a scratch copy of the repo: an emptied `man/axes_reliability.Rd` reddens it at nchar 0, a 400-byte truncation at nchar 382; the unmutated control passes with the fence exercised.
+- 2026-08-24: T5 done -- both `norms-audit.md` guards gate on `dir.exists("cairn/references")` and then assert `file.exists()` of the record itself, so a deleted record fails as itself rather than as readLines()'s connection error. Planted by deleting the record in the scratch copy: both tests failed, neither skipped. Suite clean: FAIL 0 | WARN 5 | SKIP 1 | PASS 8630.
 - 2026-08-24: the two guards AC1 names are the `AC7: the vignette's caveats match the corrected contract` test in `test-axes-corrected-se.R` and the `AC11: the vignette carries the same four claims` test in `test-axes-scaled-fit.R`; the line numbers AC1 cites move as this branch edits those files.
 
 ## Decisions
