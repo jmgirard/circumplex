@@ -962,8 +962,12 @@ test_that("AC11: the Rd states the calibration sweep, the direction, and the FIM
 
 
 test_that("AC11: the vignette carries the same four claims", {
-  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
-  skip_if_not(file.exists(vig))
+  # Read through vignette_source(): vignettes/ in the dev tree, inst/doc once
+  # installed. Reading the source tree alone skipped this guard under R CMD
+  # check, where the vignette's claims are the ones that ship.
+  vig <- vignette_source("axes-reliability.Rmd")
+  skip_if(!nzchar(vig),
+          "vignette source unavailable (build installed without vignettes)")
   txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
   expect_gt(nchar(txt), 1000L)
 
@@ -1055,6 +1059,13 @@ test_that("AC12: the Rd fences the scaling against the robustness misreading", {
     paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
   }
   rd <- gsub("\\s+", " ", rd)
+  # Fail loudly rather than pass vacuously if neither source yielded anything.
+  # This block's four content assertions are all expect_match, so an empty or
+  # truncated read reddens them anyway; what the fence adds here is a failure
+  # that names the READ rather than the Rd's wording, and cover for any
+  # expect_no_match added later, which an empty read would satisfy silently.
+  # The five sibling dual-source reads of this Rd carry the same fence.
+  expect_gt(nchar(rd), 1000L)
 
   # A Satorra-Bentler scaled statistic is best known as the fix for
   # NON-NORMALITY, which this one is not: the factor is normal-theory

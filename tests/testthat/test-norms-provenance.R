@@ -576,9 +576,17 @@ test_that("norms-audit.md's verdicts and the pin list bind in both directions (M
   # verdict still reads `unaudited` claims a guard the audit never established.
   # Assert the IFF, not either implication: a one-directional check passes over
   # exactly the half it does not look at.
-  status <- testthat::test_path("..", "..", "cairn", "references",
-                                "norms-audit.md")
-  skip_if_not(file.exists(status), "cairn/ not present (installed package)")
+  # Gate on the DIRECTORY, not on the file: cairn/references/ is absent from an
+  # installed package, which is what this guard means to skip; a deleted
+  # norms-audit.md in a source checkout is the failure it exists to catch, and
+  # gating on the file skipped that too (the shape M107 established).
+  refs <- testthat::test_path("..", "..", "cairn", "references")
+  skip_if_not(dir.exists(refs), "cairn/references/ not present (installed package)")
+  status <- file.path(refs, "norms-audit.md")
+  # Named, so a deleted record fails as itself. expect_true() does not halt the
+  # block, so readLines() below still errors on the missing file -- this
+  # assertion is what says WHICH file is missing, ahead of that error.
+  expect_true(file.exists(status), info = "cairn/references/norms-audit.md is missing")
 
   lines <- readLines(status, warn = FALSE)
   starts <- grep("^## ", lines)
@@ -699,8 +707,15 @@ test_that("norms-audit.md lists every shipped instrument (M72)", {
   # cannot run under R CMD check. It is split out from the runtime assertions
   # above deliberately -- a whole-test skip here would silently take the pins
   # with it (the M70 lesson).
-  status <- testthat::test_path("..", "..", "cairn", "references", "norms-audit.md")
-  skip_if_not(file.exists(status), "cairn/ not present (installed package)")
+  # Gate on the DIRECTORY, not on the file -- see the sibling guard above: a
+  # deleted norms-audit.md must redden this test, not skip it.
+  refs <- testthat::test_path("..", "..", "cairn", "references")
+  skip_if_not(dir.exists(refs), "cairn/references/ not present (installed package)")
+  status <- file.path(refs, "norms-audit.md")
+  # Named, so a deleted record fails as itself. expect_true() does not halt the
+  # block, so readLines() below still errors on the missing file -- this
+  # assertion is what says WHICH file is missing, ahead of that error.
+  expect_true(file.exists(status), info = "cairn/references/norms-audit.md is missing")
 
   lines <- readLines(status, warn = FALSE)
   # Scoped to the status table's own section: every audited instrument also
