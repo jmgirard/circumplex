@@ -1,6 +1,6 @@
 # M109: Repair the test guards that skip on the surface that ships
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,11 +47,13 @@ behaviour and always skip.
       "circumplex")` when the source-tree path is absent, and each executes
       rather than skips in a `devtools::check()` run. A residual skip remains
       for the build that installs no vignettes, which `covr` does.
-- [ ] AC2: Each of those two tests is proved able to fail inside a
-      `devtools::check()` run by two probes of differing form — one deleting a
-      sentence the test requires present, one inserting a sentence the test
-      requires absent — because a deletion probe cannot exercise the
-      `expect_no_match` half at all.
+- [ ] AC2: Both tests are proved able to fail inside a `devtools::check()` run
+      by a probe deleting a sentence each requires present. The `AC7: the
+      vignette's caveats match the corrected contract` guard is additionally
+      proved by a probe inserting a sentence it requires absent; the `AC11: the
+      vignette carries the same four claims` guard is not, because a deletion
+      probe cannot exercise an `expect_no_match` assertion and, of the two
+      guards' bodies, only the former carries any.
 - [ ] AC3: The dual-source Rd read in `tests/testthat/test-axes-scaled-fit.R`'s
       "AC12: the Rd fences the scaling against the robustness misreading" test
       carries a vacuity fence that fails both when its source yields empty text
@@ -89,14 +91,14 @@ behaviour and always skip.
 - [x] T2: Repair the two vignette guards, following the `vignette_path()`
       helper at `tests/testthat/test-cpm_boundary_vignette.R:7-25` — candidate
       vector, `nzchar() & file.exists()` filter, `skip_if` on the empty case.
-- [ ] T3: Probe both repaired guards inside a check run, deletion and insertion
+- [x] T3: Probe both repaired guards inside a check run, deletion and insertion
       arms, and record which assertion each reddens.
 - [x] T4: Add the vacuity fence to `test-axes-scaled-fit.R`'s AC12 test,
       matching the `expect_gt(nchar(rd), 1000L)` the other five dual-source
       reads of `axes_reliability.Rd` carry; plant an empty and a truncated read.
 - [x] T5: Repair the two `norms-provenance.R` guards to `dir.exists()`; prove
       by scratch-copy deletion that a missing record reddens.
-- [ ] T6: Run the profile verify slot and the check.
+- [x] T6: Run the profile verify slot and the check.
 
 ## Work log
 
@@ -112,6 +114,9 @@ behaviour and always skip.
 - 2026-08-24: T4 done -- the AC12 test's dual-source Rd read now carries `expect_gt(nchar(rd), 1000L)`. Planted in a scratch copy of the repo: an emptied `man/axes_reliability.Rd` reddens it at nchar 0, a 400-byte truncation at nchar 382; the unmutated control passes with the fence exercised.
 - 2026-08-24: T5 done -- both `norms-audit.md` guards gate on `dir.exists("cairn/references")` and then assert `file.exists()` of the record itself, so a deleted record fails as itself rather than as readLines()'s connection error. Planted by deleting the record in the scratch copy: both tests failed, neither skipped. Suite clean: FAIL 0 | WARN 5 | SKIP 1 | PASS 8630.
 - 2026-08-24: T1 done -- all 49 lines the grep now returns are classified in the Decisions table above (11 run under check, 5 repaired here, 22 development-only, 11 never collected). Scope's tally is marked as the pre-repair state at the mini gate's recommended option; the table carries the current one.
+- 2026-08-24: T3 done -- three `devtools::check()` runs. Baseline on the branch: Status OK, 0 errors / 0 warnings / 0 notes, 8m43s. Deletion arm (one required sentence removed per guard, scratch copy): both reddened -- `test-axes-corrected-se.R:757` on `expect_match("The component standard errors are **corrected** for it")` and `test-axes-scaled-fit.R:974` on `expect_match("| .092 | .079 | .062 | .054 |")`, which is also the proof both execute under check rather than skipping. Insertion arm ("Treat them as order-of-magnitude guidance." added): `test-axes-corrected-se.R:750` reddened on `expect_no_match("order-of-magnitude")`; the AC11 guard did not, carrying no such assertion.
+- 2026-08-24: amendment (mini gate, recommended option): AC2 narrowed to what the probes can prove -- both guards by the deletion arm, the AC7 guard alone by the insertion arm, because the AC11 guard's five assertions are all positives. A fresh-context [O] reduced audit of the amended wording returned one finding, applied here: the asymmetry now names the two `test_that` blocks rather than their files, since both files carry `expect_no_match` assertions elsewhere.
+- 2026-08-24: T6 done -- `devtools::test()` FAIL 0 | WARN 5 | SKIP 1 | PASS 8630 and `devtools::check(args = "--no-manual")` 0/0/0 on the branch; no code changed after either run.
 - 2026-08-24: the two guards AC1 names are the `AC7: the vignette's caveats match the corrected contract` test in `test-axes-corrected-se.R` and the `AC11: the vignette carries the same four claims` test in `test-axes-scaled-fit.R`; the line numbers AC1 cites move as this branch edits those files.
 
 ## Decisions
