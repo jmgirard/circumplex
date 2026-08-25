@@ -131,6 +131,7 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 - 2026-08-24: T6 rewrote the `WHY THE LIMB EXISTS AT ALL` span (AC5); T8 corrected the stale `6.5e-6` corner to 6.36e-6 and pinned every figure in that paragraph to its own 0.1*a/sqrt(n) derivation.
 - 2026-08-24: T7 landed the NEWS and exported-doc rewrites and closed the verify slot: `devtools::document()` no diff and no unresolved-link warning, `devtools::test()` 8755 pass / 0 fail / 1 pre-existing skip, `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status to review.
 - 2026-08-24: review gate triaged 17 findings; eight documentation, comment and test-assertion defects fixed on the branch (F5-F11, F14), five routed to the ROADMAP degeneracy row as follow-ups (F1+F2, F3, F4, F12, F13), three rejected with reasons in the Review section.
+- 2026-08-24: CI red on ubuntu and windows at the review gate, macOS green: the F5 fix pinned the graded route's estimate to its two printed digits (49), which is the fixture's own arithmetic and reproduces bit for bit only on the platform that produced it. Repinned to the route itself -- the note is present and is not the sentinel's -- with the digits deliberately unpinned.
 
 ## Decisions
 
@@ -372,3 +373,13 @@ carry the mutation proof, which AC6's own mutants do. F17 — the four gate
 decisions are in the work log, which is where a milestone-local decision that
 supersedes nothing belongs; D-051 pre-authorized the re-keying, so no D-entry
 is owed.
+
+**CI at the gate.** The first ready-for-review run was red on ubuntu-latest
+and windows-latest and green on macos-latest, both failures at the F5
+assertion added in this phase: it pinned the graded route's estimate to its
+two printed digits, and the fixture's arithmetic reproduces bit for bit only
+on the platform that produced it — the same platform dependence the M108
+review recorded for the exact-oracle bracket. The assertion now fences the
+route rather than the value (the note is present, and it is not the
+sentinel's), with the digits deliberately unpinned and the reason recorded at
+the assertion. Re-verified locally: `test()` FAIL 0 / PASS 8760.

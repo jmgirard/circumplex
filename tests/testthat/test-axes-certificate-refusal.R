@@ -206,11 +206,18 @@ test_that("M111 AC3 (graded route): the committed counterexample refuses at both
   )
   # WHICH route, asserted rather than described (M111 review F5). This one is
   # GRADED: the shared predicate reads the worse of the two estimates, which
-  # here is cval's 4.9e+1, decades past the target and nothing like the
-  # sentinel the case above takes. A drift onto the sentinel would leave both
-  # AC3 cases on one route with every other assertion still green.
-  expect_length(grep("estimated relative error 49;", wse, fixed = TRUE), 1L)
-  expect_length(grep("estimated relative error 49;", wsf, fixed = TRUE), 1L)
+  # on the platform this was authored on is cval's 4.9e+1 -- decades past the
+  # target and nothing like the sentinel the case above takes. A drift onto
+  # the sentinel would leave both AC3 cases on one route with every other
+  # assertion still green, so what is asserted is the ROUTE: the note is
+  # present, and it is not the sentinel's. The digits themselves are NOT
+  # pinned -- they are the fixture's own arithmetic, which reproduces bit for
+  # bit only on the platform that produced it (pinning 49 reddened ubuntu and
+  # windows at this milestone's own review gate, macOS green).
+  expect_length(grep("estimated relative error ", wse, fixed = TRUE), 1L)
+  expect_length(grep("estimated relative error ", wsf, fixed = TRUE), 1L)
+  expect_length(grep("estimated relative error 1;", wse, fixed = TRUE), 0L)
+  expect_length(grep("estimated relative error 1;", wsf, fixed = TRUE), 0L)
   # One shared literal, both surfaces, distinct from the two that refuse
   # without the certificate -- M89's nestedness contract holding across it.
   expect_identical(se$reason, "uncertified")
