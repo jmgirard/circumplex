@@ -18,8 +18,8 @@ suite contains.
 Surface tier: **internal** — the deliverable is test-suite code, which no
 external consumer of the package relies on.
 
-Running the enumerating grep over `tests/testthat/` returns 50 lines in 24
-files. Eleven already resolve under check through a dual-source fallback; four
+Running the enumerating grep over `tests/testthat/`, before these repairs,
+returned 50 lines in 24 files. Eleven already resolve under check through a dual-source fallback; four
 are the guards this milestone repairs and two more are the read AC3 fences; 22
 read artifacts no check-time test can reach (19 excluded from the build, 3
 reading `R/` sources absent from the installed package); 11 sit in
@@ -84,7 +84,7 @@ behaviour and always skip.
 
 ## Tasks
 
-- [ ] T1: Run the enumerating grep, classify every returned line into the four
+- [x] T1: Run the enumerating grep, classify every returned line into the four
       classes, and commit the table to this file's `## Decisions` section.
 - [x] T2: Repair the two vignette guards, following the `vignette_path()`
       helper at `tests/testthat/test-cpm_boundary_vignette.R:7-25` — candidate
@@ -111,8 +111,72 @@ behaviour and always skip.
 - 2026-08-24: T2 done -- `tests/testthat/helper-vignette.R` adds `vignette_source(file)`, trying `vignettes/` then `system.file("doc", ...)`, and both repaired guards call it and `skip_if(!nzchar(vig))`. Suite clean: FAIL 0 | WARN 5 | SKIP 1 | PASS 8627.
 - 2026-08-24: T4 done -- the AC12 test's dual-source Rd read now carries `expect_gt(nchar(rd), 1000L)`. Planted in a scratch copy of the repo: an emptied `man/axes_reliability.Rd` reddens it at nchar 0, a 400-byte truncation at nchar 382; the unmutated control passes with the fence exercised.
 - 2026-08-24: T5 done -- both `norms-audit.md` guards gate on `dir.exists("cairn/references")` and then assert `file.exists()` of the record itself, so a deleted record fails as itself rather than as readLines()'s connection error. Planted by deleting the record in the scratch copy: both tests failed, neither skipped. Suite clean: FAIL 0 | WARN 5 | SKIP 1 | PASS 8630.
+- 2026-08-24: T1 done -- all 49 lines the grep now returns are classified in the Decisions table above (11 run under check, 5 repaired here, 22 development-only, 11 never collected). Scope's tally is marked as the pre-repair state at the mini gate's recommended option; the table carries the current one.
 - 2026-08-24: the two guards AC1 names are the `AC7: the vignette's caveats match the corrected contract` test in `test-axes-corrected-se.R` and the `AC11: the vignette carries the same four claims` test in `test-axes-scaled-fit.R`; the line numbers AC1 cites move as this branch edits those files.
 
 ## Decisions
+
+### Classification of every source-tree read (T1, AC5)
+
+`grep -rn 'test_path("\.\."' tests/testthat/` returns **49 lines in 25 files**
+after this milestone's repairs (50 in 24 before them: the two vignette guards'
+own `test_path()` calls collapsed into the single call in the new
+`helper-vignette.R`). Every returned line sits in exactly one class below --
+11 run under `R CMD check` today, 5 are repaired here, 22 are development-only
+by construction, and 11 are never collected at all. The never-collected class
+is not a reading of the `.Rbuildignore` entry alone: no `_problems/` file
+appears anywhere in a `devtools::test()` run's output.
+
+| line | reads | class | why |
+|---|---|---|---|
+| `_problems/test-norms-audit-batch-118.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-batch-122.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-batch-124.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-coverage-320.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-coverage-320.R:14` | `cairn/references` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-coverage-324.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-coverage-324.R:14` | `cairn/references` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-coverage-332.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-coverage-332.R:14` | `cairn/references` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-markers-496.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `_problems/test-norms-audit-markers-509.R:5` | `data-raw/audit-norms.R` | never collected | testthat collects `test-*.R` in `tests/testthat/` only, never a subdirectory; `_problems/` is `.Rbuildignore`d as well |
+| `helper-norms-audit-script.R:38` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `helper-vignette.R:15` | `vignettes` | repaired here | the shared lookup's first candidate; it falls back to `system.file("doc", ...)`, which is what an installed package carries |
+| `test-axes-corrected-se.R:581` | `man/axes_reliability.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-axes-corrected-se.R:1192` | `R/axes_corrected_se.R` | dev-only | `R/` sources ship in the tarball but an installed package carries none, and this read has no installed counterpart |
+| `test-axes-reliability.R:2870` | `man/axes_reliability.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-axes-reliability.R:3025` | `man/axes_reliability.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-axes-reliability.R:3062` | `vignettes/axes-reliability.Rmd` | runs under check | dual source: `vignettes/` in the source tree, `system.file("doc", ...)` once installed |
+| `test-axes-reliability.R:3242` | `man/axes_reliability.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-axes-scaled-fit.R:934` | `man/axes_reliability.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-axes-scaled-fit.R:935` | `man/axes_reliability.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-axes-scaled-fit.R:1054` | `man/axes_reliability.Rd` | repaired here | dual-source Rd read; ran under check already, and now carries the vacuity fence its five siblings carry |
+| `test-axes-scaled-fit.R:1055` | `man/axes_reliability.Rd` | repaired here | dual-source Rd read; ran under check already, and now carries the vacuity fence its five siblings carry |
+| `test-axes-scaled-fit.R:1147` | `R/axes_scaled_fit.R` | dev-only | `R/` sources ship in the tarball but an installed package carries none, and this read has no installed counterpart |
+| `test-axes-scaled-fit.R:1148` | `R/axes_corrected_se.R` | dev-only | `R/` sources ship in the tarball but an installed package carries none, and this read has no installed counterpart |
+| `test-cpm_boundary_vignette.R:11` | `vignettes/evaluating-circumplex-structure.Rmd` | runs under check | dual source: `vignettes/` in the source tree, `system.file("doc", ...)` once installed |
+| `test-cpm_boundary_vignette.R:214` | `man/summary.circumplex_cpm.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-fit_structure.R:255` | `data-raw/structure-test-cutoffs.rds` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-batch.R:19` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-compare.R:20` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-coverage.R:19` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-coverage.R:29` | `cairn/references` | dev-only | `cairn/` is `.Rbuildignore`d |
+| `test-norms-audit-coverage.R:390` | `data-raw` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-manifest.R:21` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-markers.R:31` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-roster.R:14` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-audit-roster.R:24` | `cairn/references` | dev-only | `cairn/` is `.Rbuildignore`d |
+| `test-norms-audit-sample-key.R:17` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-provenance.R:464` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-provenance.R:473` | `cairn/references` | dev-only | `cairn/` is `.Rbuildignore`d |
+| `test-norms-provenance.R:527` | `man/.Rd` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-norms-provenance.R:583` | `cairn/references` | repaired here | now gates on `dir.exists()` of `cairn/references`, so a deleted `norms-audit.md` fails rather than skips |
+| `test-norms-provenance.R:616` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-provenance.R:651` | `data-raw/audit-norms.R` | dev-only | `data-raw/` is `.Rbuildignore`d |
+| `test-norms-provenance.R:711` | `cairn/references` | repaired here | now gates on `dir.exists()` of `cairn/references`, so a deleted `norms-audit.md` fails rather than skips |
+| `test-rd-latex-safe.R:36` | `man` | runs under check | dual source: `man/` in the source tree, `tools::Rd_db("circumplex")` once installed |
+| `test-ssm_occasions.R:446` | `devel` | dev-only | `devel/` is `.Rbuildignore`d |
+| `test-ssm_occasions.R:849` | `devel` | dev-only | `devel/` is `.Rbuildignore`d |
+| `test-ssm_occasions.R:881` | `devel` | dev-only | `devel/` is `.Rbuildignore`d |
 
 ## Review
