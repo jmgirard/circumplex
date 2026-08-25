@@ -1,11 +1,11 @@
 # M111: Shrink the ill-conditioning refusal to what the certificate cannot certify
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M108
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2
-- **Branch/PR:** —
+- **Branch/PR:** `m111-certificate-refusal-region`
 
 ## Goal
 
@@ -46,12 +46,19 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
       `axes_fitted_cov()` seam, yields finite corrected component SEs and a
       finite `cval`, with `details$se_correction_failed` and
       `details$fit_scaling_failed` both NULL.
-- [ ] AC3: The committed counterexample at
-      `tests/testthat/fixtures/rb18-counterexample-b.rds`, injected at the same
-      seam, is refused at both surfaces with one shared literal distinct from
-      `"indefinite"` and `"singular"`, and both surfaces report that same
-      literal for it — the nestedness contract at
-      `R/axes_corrected_se.R:363-377` holding across the new literal.
+- [ ] AC3: Each of two matrices whose accuracy certificate fails — one on each
+      of the certificate's two failure routes — is refused at both surfaces
+      under one shared literal distinct from `"indefinite"` and `"singular"`,
+      both surfaces reporting that same literal for it (M89's nestedness
+      contract, holding across the new literal). The graded route is the
+      committed counterexample at
+      `tests/testthat/fixtures/rb18-counterexample-b.rds`, priced directly by
+      `axes_corrected_se()` and `axes_scaling_factor()` because at p = 3 it
+      cannot ride the `axes_fitted_cov()` seam — `axes_reliability()` refuses
+      fewer than four scales. The sentinel route is a p = 24
+      near-duplicate-item matrix injected at that seam, where
+      `axes_reliability()` itself reports the literal in
+      `details$se_correction_failed` and `details$fit_scaling_failed`.
 - [ ] AC4: The `"indefinite"` and `"singular"` limbs still refuse with their
       own literals at both surfaces, on both sides of the partition boundary,
       at two values of p and two spectral forms.
@@ -98,6 +105,10 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
       trigger is partly met on the record already" (`:581`), the latter already
       stale since D-050 recorded that trigger met in full.
 - [ ] T7: NEWS entry, document, verify and check.
+- [ ] T8: Correct the stale `6.5e-6` corner figure in the accuracy-target
+      block (`R/axes_corrected_se.R`), which derives from a = 0.046 while the
+      block states a = 0.045 (0.1*0.045/sqrt(5e5) = 6.36e-6). Comment-only;
+      routed here by the M110 review, outside its own diff.
 
 ## Work log
 
@@ -107,6 +118,10 @@ dev line as D-048's own threshold move did, not through a deprecation cycle.
 - 2026-08-24: criteria audit findings for this milestone are recorded in M108's work log, which covers the joint audit run.
 - 2026-08-24: RR21 (M108's mechanism review) routes four items here: re-key the `"ill_conditioned"` refusal to the certificate and carry the fit's own estimate in the warning (rec 4, the shape D-051's consequences state); surfacing the estimate on computed fits as well as refused ones (rec 5, a design call); emitting the exact oracle's values as hex double pairs so a reference route can be pinned below double resolution (B3); and extending the certificate's worst-component maximum to the FIML ratio vector, which the same pricing call already computes (B4). None is adopted by M108.
 - 2026-08-24: M108's review routes its remainder here, headed by the packaged bracket asserting on macOS only (all six cases skip on ubuntu and windows) with nothing failing when that domain empties; thirteen lower-ranked findings ride with it. Text and disposition for each are in the M108 archive's Review; the ROADMAP degeneracy candidate row carries the promotion clause.
+- 2026-08-24: implement started; branch `m111-certificate-refusal-region` cut from master.
+- 2026-08-24: gate chose one shared refusal predicate at both surfaces (the worse of the certificate's two estimates against delta_star) over per-surface fields, the literal `"uncertified"`, the certificate's estimate carried in the refusal warning, and folding the M110-review stale-figure correction in as T8.
+- 2026-08-24: AC3 amended (mini gate). Its "injected at the same seam" step is unsatisfiable: the p = 3 fixture carries three item names and `axes_reliability()` refuses fewer than four scales, so the seam's realignment errors `subscript out of bounds`. Amended text prices the fixture directly and adds a p = 24 near-duplicate matrix at the seam so the exported surface is pinned.
+- 2026-08-24: criteria audit of the amended AC3 ran in full mode (user-facing tier), two fresh-context [O] readers, neither an author of the wording. Findings disposed: the first draft's `naive_reason` clause was unfalsifiable and misattributed (dropped); the second draft's opening clause quantified over all certificate failures while the certificate gates only the ill-conditioned arm (narrowed to two enumerated matrices); the exported surface was named only as coverage prose (rewritten as the promise it carries).
 
 ## Decisions
 
