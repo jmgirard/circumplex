@@ -115,25 +115,29 @@ standard errors as normal-theory maximum likelihood reports them before
 the correlation-structure correction, `se_correction_failed`, `NULL`
 when that correction succeeded or a string naming why the reported SEs
 are `NA` – notably the shared degeneracy criterion's two literals
-(smallest eigenvalue relative to largest at or below
-`sqrt(p * .Machine$double.eps / 1e-5)`, evaluated on
-[`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the fitted covariance
-matrix, where the `1e-5` is the `1e-4` accuracy target divided by the
-criterion's factor-of-`10` calibration ceiling, and the target's
-noise-dominance reading is calibrated for `n` up to about `5e5` at a
-typical design (`a = 1/sqrt(2)`) and only to about `2e3` at the least
-favorable geometry measured (`a = 0.045`)): `"indefinite"` for a
-decisively negative smallest eigenvalue (below
+(evaluated on [`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the
+fitted covariance matrix; the eigenvalue floor
+`sqrt(p * .Machine$double.eps / 1e-5)` decides which fits are *checked*
+by the per-fit accuracy check rather than which are refused, where the
+`1e-5` is the `1e-4` accuracy target divided by the floor's
+factor-of-`10` calibration ceiling, and the target's noise-dominance
+reading is calibrated for `n` up to about `5e5` at a typical design
+(`a = 1/sqrt(2)`) and only to about `2e3` at the least favorable
+geometry measured (`a = 0.045`)): `"indefinite"` for a decisively
+negative smallest eigenvalue (below
 `-lambda_max * sqrt(p * .Machine$double.eps)`), a statement about the
-model, and `"ill_conditioned"` for roundoff-level negativity,
-singularity, or ill-conditioning, a numerical caution – which also sets
+model, and `"uncertified"` where the check could not place this fit's
+numbers inside the accuracy target, a numerical caution whose warning
+names the estimated relative error – which also sets
 `fit_scaling_failed` when the shared criterion is what tripped it –
 `naive_reason`, `NULL` unless the internal uncorrected arm (the
 diagnostic tie to lavaan's own standard errors) was refused while every
 reported number computed, whether by the same criterion evaluated on the
 raw fitted matrix or by that arm's own pricing (`"singular"`,
-`"unidentified"`, `"indefinite"`); it carries the same reason vocabulary
-and is deliberately silent – no warning or printed note accompanies it –
+`"unidentified"`, `"indefinite"`, and `"ill_conditioned"` – the raw arm
+is refused by the floor itself and never reaches the per-fit check, so
+this is the one field on which that literal still appears); it is
+deliberately silent – no warning or printed note accompanies it –
 `fit_uncorrected`, the six fit statistics as lavaan reports them before
 the correlation-metric scaling, `scaling_factor`, the two
 Satorra-Bentler factors (`model` and `baseline`), and
@@ -243,44 +247,54 @@ factor cannot be computed, all four are `NA` with the reason in
 place. One refusal is shared with the component-SE correction, under one
 stated criterion evaluated in the metric the reported numbers are
 computed in: a fitted covariance matrix whose correlation form
-[`cov2cor()`](https://rdrr.io/r/stats/cor.html) is degenerate –
-indefinite, singular, or so ill-conditioned that its smallest
-eigenvalue, relative to its largest, falls at or below
-`sqrt(p * .Machine$double.eps / 1e-5)` – is refused by both surfaces.
-That `1e-5` is not itself the tolerance: it is the accuracy target
-`1e-4`, the largest relative error a reported standard error may carry,
-divided by the factor of `10` by which the criterion's error bound may
-undershoot the error it stands for. Past the floor a reported standard
-error could carry relative error above the target. The accuracy target
-is set from two channels that do not depend on the sample size – the
-resolution the standard errors are printed at, and the coverage of a
-nominal 95% Wald interval – and is corroborated by a third, the standard
-error's own sampling variability, under which a numerical error at the
-target is about a tenth of the statistical noise already in the number
-for a typical design (relative sampling coefficient `a = 1/sqrt(2)`) at
-`n` up to about `5e5`. That endpoint scales as `1e6 * a^2`, so at the
-least favorable geometry measured, `a = 0.045`, it falls to `n` of about
-`2e3` – below the `n` of about `1e4` typical of published circumplex
-correlation matrices. Above whichever endpoint the design's own
-coefficient sets, the guarantee is the fixed target alone, not noise
-dominance. The derivation and the premises it rests on are stated beside
-the constant in the source. The refusal says which degeneracy happened:
-`"indefinite"` when the smallest eigenvalue is decisively negative
-(below `-lambda_max * sqrt(p * .Machine$double.eps)` – beyond the fit's
-own numerical noise band, so it is a statement about the model),
-`"ill_conditioned"` for roundoff-level negativity, exact singularity, or
-mere ill-conditioning (a numerical caution). Either way the corrected
-standard errors and the four scaled statistics go `NA` together (each
-with its own warning naming that reason) rather than one surface
-refusing while the other silently scales. The standard-error surface
-additionally applies the same criterion to the raw fitted matrix, which
-one internal arm of its computation – the uncorrected normal-theory
-pricing, kept only as a diagnostic tie to lavaan's own standard errors –
-inverts. A matrix degenerate only in the raw metric (wildly unequal
-fitted variances over a well-conditioned correlation structure) refuses
-that internal arm alone: the reported standard errors and scaled fit
-statistics all compute – `details$se_correction_failed` and
-`details$fit_scaling_failed` are both `NULL`, and no warning or note
+[`cov2cor()`](https://rdrr.io/r/stats/cor.html) is degenerate is refused
+by both surfaces. Which degeneracies those are is settled in two steps.
+A matrix whose smallest eigenvalue, relative to its largest, falls at or
+below `sqrt(p * .Machine$double.eps / 1e-5)` is not refused for that
+alone; it is *checked*. The check replays this fit's own arithmetic in
+roughly 31-digit precision and estimates the relative error the numbers
+it produced actually carry, and the fit computes whenever that estimate
+is within the accuracy target `1e-4`. Of the reachable geometries
+measured below the floor, all but one committed counterexample estimate
+around `1e-11` and compute. A fit whose estimate exceeds the target, or
+that the check cannot price at all, is refused as `"uncertified"`, and
+its warning names the estimate. That `1e-5` in the floor is not itself
+the tolerance: it is the accuracy target `1e-4`, the largest relative
+error a reported standard error may carry, divided by the factor of `10`
+by which the floor's a-priori error bound may undershoot the error it
+stands for. The accuracy target is set from two channels that do not
+depend on the sample size – the resolution the standard errors are
+printed at, and the coverage of a nominal 95% Wald interval – and is
+corroborated by a third, the standard error's own sampling variability,
+under which a numerical error at the target is about a tenth of the
+statistical noise already in the number for a typical design (relative
+sampling coefficient `a = 1/sqrt(2)`) at `n` up to about `5e5`. That
+endpoint scales as `1e6 * a^2`, so at the least favorable geometry
+measured, `a = 0.045`, it falls to `n` of about `2e3` – below the `n` of
+about `1e4` typical of published circumplex correlation matrices. Above
+whichever endpoint the design's own coefficient sets, the guarantee is
+the fixed target alone, not noise dominance. The derivation and the
+premises it rests on are stated beside the constant in the source. The
+refusal says which degeneracy happened: `"indefinite"` when the smallest
+eigenvalue is decisively negative (below
+`-lambda_max * sqrt(p * .Machine$double.eps)` – beyond the fit's own
+numerical noise band, so it is a statement about the model, which no
+arithmetic check can license), `"singular"` when the matrix carries
+non-finite entries or a nonpositive fitted variance, and `"uncertified"`
+when the per-fit check could not place this fit's numbers inside the
+accuracy target – roundoff-level negativity, exact singularity and
+severe ill-conditioning all arrive here (a numerical caution). Either
+way the corrected standard errors and the four scaled statistics go `NA`
+together (each with its own warning naming that reason) rather than one
+surface refusing while the other silently scales. The standard-error
+surface additionally applies the same criterion to the raw fitted
+matrix, which one internal arm of its computation – the uncorrected
+normal-theory pricing, kept only as a diagnostic tie to lavaan's own
+standard errors – inverts. A matrix degenerate only in the raw metric
+(wildly unequal fitted variances over a well-conditioned correlation
+structure) refuses that internal arm alone: the reported standard errors
+and scaled fit statistics all compute – `details$se_correction_failed`
+and `details$fit_scaling_failed` are both `NULL`, and no warning or note
 fires, because every reported number is present and priced in the metric
 the criterion cleared – and the internal refusal is recorded, silently,
 in `details$naive_reason` under the same reason vocabulary. Under the

@@ -76,51 +76,59 @@ on a real ggplot2 coordinate system.
 - [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
   now refuses a degenerate fitted covariance matrix under a single
   stated criterion, evaluated in the metric every reported number is
-  computed in: when the smallest eigenvalue of
-  [`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the fitted matrix,
+  computed in. Where it refuses, both surfaces refuse: the component
+  standard errors and the four scaled statistics (`chisq`, `pvalue`,
+  `rmsea`, `cfi`) are `NA` together, each surface’s warning names that
+  shared reason, and `df` and `srmr` still report. Which fits it refuses
+  is settled in two steps. A fitted matrix whose smallest eigenvalue,
   relative to its largest, falls at or below
-  `sqrt(p * .Machine$double.eps / 1e-5)`, both surfaces refuse, the
-  component standard errors and the four scaled statistics (`chisq`,
-  `pvalue`, `rmsea`, `cfi`) are `NA` together, and each surface’s
-  warning names that shared reason; `df` and `srmr` still report. The
-  shared reason is `"ill_conditioned"` for a numerically degenerate
-  correlation structure, `"indefinite"` where the smallest eigenvalue is
-  negative by more than the fit’s own convergence noise — a statement
-  about the model rather than about arithmetic — and `"singular"` where
-  the matrix carries non-finite entries. The `1e-5` is the accuracy
-  target `1e-4` — the largest relative error a reported standard error
-  may carry, set from the resolution those standard errors are printed
-  at and from the coverage of a nominal 95% Wald interval, and
-  corroborated by the standard error’s own sampling variability, under
-  which a numerical error at the target is about a tenth of the
-  statistical noise already in the number at sample sizes up to about
-  500,000 for `1/sqrt(2)`, the typical relative sampling coefficient,
-  and only up to about 2,000 for `0.045`, the least favorable geometry
-  measured (below the sample sizes typical of published circumplex
-  correlation matrices) — divided by the factor of `10` by which the
-  criterion’s error bound may undershoot the error it stands for. Where
-  this criterion refuses for ill-conditioning, the warning also names
-  the conditioning — the condition number where the smallest eigenvalue
-  is positive, and otherwise that the matrix is numerically
-  rank-deficient, which is what a duplicate item pair makes it — and
-  names item pairs correlated tightly enough to force the refusal on
-  their own: one pair with advice to drop one of them, several with the
-  count and up to three of them named. That diagnosis rides the warning;
-  the stored result’s reason fields, and the note
+  `sqrt(p * .Machine$double.eps / 1e-5)` is not refused for that alone —
+  it is checked. The check replays that fit’s own arithmetic in roughly
+  31-digit precision and estimates the relative error the numbers it
+  produced actually carry; a fit whose estimate is within the accuracy
+  target `1e-4` computes normally. Most fits below the floor do: over
+  the geometries measured, their estimated errors run around `1e-11`. A
+  fit whose estimate exceeds the target, or that the check cannot price
+  at all, is refused as `"uncertified"`, and its warning names the
+  estimate. The other two reasons never reach the check: `"indefinite"`
+  where the smallest eigenvalue is negative by more than the fit’s own
+  convergence noise — a statement about the model rather than about
+  arithmetic, which no arithmetic check can license — and `"singular"`
+  where the matrix carries non-finite entries, which the check cannot
+  price. The `1e-5` is the accuracy target `1e-4` — the largest relative
+  error a reported standard error may carry, set from the resolution
+  those standard errors are printed at and from the coverage of a
+  nominal 95% Wald interval, and corroborated by the standard error’s
+  own sampling variability, under which a numerical error at the target
+  is about a tenth of the statistical noise already in the number at
+  sample sizes up to about 500,000 for `1/sqrt(2)`, the typical relative
+  sampling coefficient, and only up to about 2,000 for `0.045`, the
+  least favorable geometry measured (below the sample sizes typical of
+  published circumplex correlation matrices) — divided by the factor of
+  `10` by which the criterion’s error bound may undershoot the error it
+  stands for. Where this criterion refuses a fit as `"uncertified"`, the
+  warning also names the estimated relative error, and then the
+  conditioning — the condition number where the smallest eigenvalue is
+  positive, and otherwise that the matrix is numerically rank-deficient,
+  which is what a duplicate item pair makes it — and names item pairs
+  correlated tightly enough to force the refusal on their own: one pair
+  with advice to drop one of them, several with the count and up to
+  three of them named. That diagnosis rides the warning; the stored
+  result’s reason fields, and the note
   [`print()`](https://rdrr.io/r/base/print.html) shows for them, still
   carry the bare code. (The scaled-fit surface has a second, separate
-  refusal that reports the same reason for a numerical cancellation
-  rather than for conditioning; that one carries no such diagnosis,
-  because it is reached only by a matrix this criterion accepted, whose
-  conditioning is therefore not the reason.) The standard-error surface
-  additionally applies the same criterion to the raw fitted matrix,
-  which one internal arm of its computation — the uncorrected
-  normal-theory pricing kept only as a diagnostic tie to lavaan’s own
-  standard errors — inverts. A matrix degenerate only in the raw metric
-  (wildly unequal fitted variances over a well-conditioned correlation
-  structure) refuses that internal arm alone: the reported standard
-  errors and scaled fit statistics all compute, with no warning, and the
-  internal refusal is recorded silently in `details$naive_reason` (a new
+  refusal, `"ill_conditioned"`, for a numerical cancellation rather than
+  for conditioning; that one carries no such diagnosis, because it is
+  reached only by a matrix this criterion accepted, whose conditioning
+  is therefore not the reason.) The standard-error surface additionally
+  applies the same criterion to the raw fitted matrix, which one
+  internal arm of its computation — the uncorrected normal-theory
+  pricing kept only as a diagnostic tie to lavaan’s own standard errors
+  — inverts. A matrix degenerate only in the raw metric (wildly unequal
+  fitted variances over a well-conditioned correlation structure)
+  refuses that internal arm alone: the reported standard errors and
+  scaled fit statistics all compute, with no warning, and the internal
+  refusal is recorded silently in `details$naive_reason` (a new
   `details` field, `NULL` whenever that arm computed) under the same
   reason vocabulary. Under the shared criterion the two surfaces’
   user-facing refusals therefore agree exactly, and on a unit-diagonal
@@ -138,9 +146,9 @@ on a real ggplot2 coordinate system.
   `"nonpositive_diagonal"`, and a positive-infinite one reports
   `"infinite_diagonal"` rather than `"unidentified"`. On
   `details$se_correction_failed` and `details$fit_scaling_failed` alike:
-  an exactly singular fitted matrix reports `"ill_conditioned"` where
-  both previously reported `"singular"`, and an indefinite one reports
-  `"indefinite"` deliberately or `"ill_conditioned"` at the numerical
+  an exactly singular fitted matrix reports `"uncertified"` where both
+  previously reported `"singular"`, and an indefinite one reports
+  `"indefinite"` deliberately or `"uncertified"` at the numerical
   margin, per the refusal-vocabulary split in the next entry. Code that
   branches on any of these reason strings needs updating.
 
@@ -149,11 +157,12 @@ on a real ggplot2 coordinate system.
   degeneracy criterion’s refusal region, a fitted correlation structure
   whose smallest eigenvalue is decisively negative — beyond the fit’s
   own numerical noise band — reports `"indefinite"`, a statement about
-  the model; roundoff-level negativity, exact singularity, and mere
-  ill-conditioning report `"ill_conditioned"`, a numerical caution. A
-  saturated model (zero degrees of freedom) is refused as `"saturated"`
-  before any scaling arithmetic runs, where it previously surfaced as
-  `"indefinite"` through an internal division by zero; and the final
+  the model; roundoff-level negativity, exact singularity, and
+  ill-conditioning severe enough to fail the per-fit accuracy check
+  report `"uncertified"`, a numerical caution. A saturated model (zero
+  degrees of freedom) is refused as `"saturated"` before any scaling
+  arithmetic runs, where it previously surfaced as `"indefinite"`
+  through an internal division by zero; and the final
   nonpositive-scaling-factor backstop likewise reports
   `"ill_conditioned"` rather than `"indefinite"`, an indefiniteness it
   cannot diagnose. When the standard-error surface’s two internal arms
