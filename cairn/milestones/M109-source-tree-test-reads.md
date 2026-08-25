@@ -118,6 +118,7 @@ behaviour and always skip.
 - 2026-08-24: amendment (mini gate, recommended option): AC2 narrowed to what the probes can prove -- both guards by the deletion arm, the AC7 guard alone by the insertion arm, because the AC11 guard's five assertions are all positives. A fresh-context [O] reduced audit of the amended wording returned one finding, applied here: the asymmetry now names the two `test_that` blocks rather than their files, since both files carry `expect_no_match` assertions elsewhere.
 - 2026-08-24: T6 done -- `devtools::test()` FAIL 0 | WARN 5 | SKIP 1 | PASS 8630 and `devtools::check(args = "--no-manual")` 0/0/0 on the branch; no code changed after either run.
 - 2026-08-24: the two guards AC1 names are the `AC7: the vignette's caveats match the corrected contract` test in `test-axes-corrected-se.R` and the `AC11: the vignette carries the same four claims` test in `test-axes-scaled-fit.R`; the line numbers AC1 cites move as this branch edits those files.
+- 2026-08-24: review ran all six criteria with fresh evidence, including a pre-repair discrimination control and a reproduction of covr's install-and-test path; three [O] findings fixed on the branch (two false comments, two ledger rows), six rejected with reason; no criterion failed, so status stayed `review`.
 
 ## Decisions
 
