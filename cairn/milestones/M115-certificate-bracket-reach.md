@@ -1,0 +1,101 @@
+# M115: Make the packaged accuracy bracket assert where the shipped pricing differs
+
+- **Status:** planned
+- **Priority:** normal
+- **Depends on:** M113
+- **Driving RR:** —
+- **Principles touched:** IP3
+- **Branch/PR:** —
+
+## Goal
+
+Replace the frozen macOS pricing yardstick with a committed exact value, so
+the packaged bracket measures the running machine's own error instead of
+skipping wherever that machine is not the one the figures were frozen on.
+
+## Scope
+
+Surface tier: **internal** — the deliverable is the validation apparatus, a
+test file and a `devel/` script, on which no external consumer of the package
+relies.
+
+**In:** RR21 B3 — `exact_oracle.py` emitting each case's exact `v` and `u` as
+hi/lo double pairs, committed in `tests/testthat/test-axes-certificate.R` — so
+the bracket's bit-identity precondition
+(`tests/testthat/test-axes-certificate.R:202-234`) can drop its
+shipped-pricing half and keep only the anchor-matrix half, which reproduces
+everywhere; a non-empty-domain assertion in the packaged file; a
+safety-factor sensitivity plant; `cert_n` counting ratios rather than
+`cert_line()` calls; and `sweep_ok` and `reach_ok` simplified so neither can
+report PASS having checked nothing.
+
+**Out:** extending the bracket to M113's third certificate field → M113. The
+shared-predicate and nestedness fences → M114. The recorded cost figure, the
+`dd_*` namespace prefixing, the certificate's double evaluation per fit and
+the rest of the M108/M111 cosmetic residue → the ROADMAP degeneracy candidate
+row.
+
+## Acceptance criteria
+
+- [ ] AC1 `exact_oracle.py` emits, for each certificate case, the exact `v` and
+      `u` as hi/lo double pairs via `%a`, and those pairs are committed in
+      `tests/testthat/test-axes-certificate.R`.
+- [ ] AC2 The bracket's precondition no longer reads the shipped double
+      pricing: on this machine, with that pricing perturbed so it no longer
+      matches the figures the frozen values were measured on,
+      `devtools::test(filter = "axes-certificate")` reports zero skips and the
+      bracket assertions still run.
+- [ ] AC3 `tests/testthat/test-axes-certificate.R` reddens, rather than passing
+      green, when its certificate case list is emptied.
+- [ ] AC4 Raising `axes_certificate_safety_factor` from 10 to 100 reddens at
+      least one assertion in the packaged suite.
+- [ ] AC5 `exact_oracle.R` reports the number of ratios it formed rather than
+      the number of `cert_line()` calls it made, and `sweep_ok` and `reach_ok`
+      are each replaced by a form derived from the values their own loop
+      collects, so neither can report PASS on an empty domain; each of the two
+      is shown to fail with its domain emptied.
+- [ ] AC6 `devtools::test()` clean; `devtools::document()` no diff and no
+      unresolved-link warning at pinned `cli.width`;
+      `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes.
+
+## Coverage
+
+- AC1 → T1
+- AC2 → T2
+- AC3 → T3
+- AC4 → T4
+- AC5 → T5
+- AC6 → T6
+
+## Tasks
+
+- [ ] T1 Extend `exact_oracle.py` to emit each case's exact `v` and `u` as
+      hi/lo double pairs; commit them in the test file beside the existing
+      frozen figures.
+- [ ] T2 Rewrite `cert_skip_unless_reproduced()` to compute each case's true
+      relative error on the running machine from the committed exact pair, and
+      drop the shipped-pricing half of the precondition; run the AC2
+      perturbation and record the skip count.
+- [ ] T3 Add the non-empty-domain assertion; prove it by emptying the case
+      list, then restore.
+- [ ] T4 Run the safety-factor plant against the packaged suite; record which
+      assertions redden, revert and verify the tree clean.
+- [ ] T5 Fix `cert_n` to count formed ratios; replace `sweep_ok` and
+      `reach_ok` with forms derived from their loops' collected values; empty
+      each domain in turn and record the failure.
+- [ ] T6 Read the PR's CI run and record which platforms the bracket asserted
+      on — a gate observation, not a criterion; then the profile verify and
+      consistency-gate slot.
+
+## Work log
+
+- 2026-08-30: created by /milestone-plan.
+- 2026-08-30: criteria audit ran in REDUCED mode (declared internal tier), one fresh-context [O] reader that authored none of the criteria, as part of the joint M113/M114/M115 run. Two findings fixed before writing: AC4's "packaged suite **or** the oracle run" disjunction let the devel script carry the promise this milestone exists to restore, and was narrowed to the packaged bracket; AC3's recording and restoration clauses moved to T3 as instrument bookkeeping. Its note that no criterion verifies the title's off-macOS claim is deliberate and recorded below.
+- 2026-08-30: the internal-tier criteria standard is why AC2 is scoped to this machine rather than to the three CI platforms: a demonstration family spanning environment boundaries is itself a finding at that tier. The cross-platform observation is T6's gate step. Residual risk recorded: a green local AC2 with the CI run unread would leave the milestone's own goal unverified.
+- 2026-08-30: plan gate chose retiring the precondition's shipped-pricing half via RR21 B3's exact emission over widening the frozen floor by a platform tolerance, because M108's mini gate measured a 100x slack as exceeding the 10x the dropped-safety-factor plant moves, so the tolerance would retire that plant's coverage; falsified by the exact hi/lo pair proving insufficient to recover a case's true error.
+- 2026-08-30: plan gate chose simplifying `sweep_ok` and `reach_ok` to forms derived from their loops' collected values over adding a `cert_ok`-style accumulator count, on the user's answer at the checker-regress question, which took the subtractive option; falsified by the derived form proving unable to express either flag's condition.
+- 2026-08-30: `Depends on: M113` because M113 extends the oracle's certificate case list, which T1 and T2 both read.
+
+## Decisions
+
+## Review

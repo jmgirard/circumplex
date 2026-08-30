@@ -1871,3 +1871,58 @@ metric, or a second source printing those descriptives — the same class D-040
 named. Either re-adds the sample with corrected values under D-039's
 numeric-change gate; adding a normative sample is not a GP4 break, so the
 withdrawal costs nothing that a reply cannot restore.
+
+### D-053 (2026-08-30): the accuracy certificate's estimand extends to `fiml_ratio`, priced as a ratio rather than as its two arms — annotates D-051's estimand clause, moves nothing D-048 or D-049 decided (M113 plan gate)
+
+**Context:** D-051 fixed the certificate's estimand as the committed relative
+error of the corrected component SE vector, aggregated by its worst component,
+and of `cval`. It rested on a scope claim recorded in the code
+(`R/axes_certificate.R:343`): that only the corrected arm is replayed because
+"the `naive` arm is never user-reported". Both rounds of M108's review and
+M111's review found that claim false as stated. `axes_corrected_se()` builds
+`fiml_ratio = std$corrected / std$naive` with both arms at `cov2cor(Σ̂)`
+(`R/axes_corrected_se.R:376`), and on `missing = "fiml"` the reported standard
+error is `se_uncorrected * fiml_ratio` (`R/axes_reliability.R:1830`) — so the
+naive-at-`cov2cor` arm is user-reported, as that denominator. Before M111 the
+a-priori floor refused every fit that could reach this; since M111 the
+certificate releases such fits on an estimate covering neither the ratio nor
+its denominator, while the exported documentation
+(`R/axes_reliability.R:721-723`) promises the check "estimates the relative
+error the numbers it produced actually carry". RR21 B4 recommended a remedy
+and it was routed to M111, where it was neither adopted nor declined in
+writing.
+
+**Decision.** The certificate gains a third field estimating the committed
+relative error of `fiml_ratio` itself, computed from the same double-double
+replay as the other two, and `axes_degeneracy_refusal()` takes its refusal
+predicate as the max over all three fields. The estimand D-051 fixed is
+extended, not replaced: both existing fields keep their meaning and their
+constants.
+
+**Rejected:** *RR21 B4 as written* — folding the naive vector's standalone
+relative error into the existing `se` max. B4's own ground is that the ratio's
+error "is bounded by roughly the sum of the two arms'", which makes it an upper
+proxy rather than the quantity reported. The two arms' errors partially cancel
+in the quotient, so the proxy over-prices what the user is shown and would
+refuse fits whose reported FIML standard error is accurate. Licensing a wrong
+number and refusing a right one are both failures; D-048 and D-049's history is
+about the second, and a bound-shaped number is the overstatement D-051's own
+rejections exist to remove. The measured margin is thin — a reviewer replayed
+the naive forms at family-A κ 1e5/1e6/1e7 and got 1.1e-11 / 5.8e-11 / 4.1e-10
+against certified 3.0e-11 / 1.2e-10 / 4.5e-10, the same decade — so this
+decision is about which quantity is certified, not about a measured
+divergence between the two options.
+
+**Consequences:** the certificate's estimate can only rise, so fits move from
+computed toward refused and never the reverse; that direction is fail-closed
+under GP2. The new field is a shipped numeric result — it appears in the
+refusal warning's estimate — so IP3 binds it: M113's AC3 requires a second
+independent oracle type for it. The false scope comment at
+`R/axes_certificate.R:343` is corrected in the same milestone, leaving the
+true raw-arm claim at `R/axes_corrected_se.R:757` standing and distinct.
+
+**Reopens:** a geometry at which the measured relative error of `fiml_ratio`
+exceeds both arms' own — which would show the cancellation argument wrong and
+put B4's conservative max back in contention. Also, as under D-051, any matrix
+on which the certificate's estimate falls below the exact-rational oracle's
+measured error for it.
