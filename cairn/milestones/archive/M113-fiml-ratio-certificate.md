@@ -1,0 +1,11 @@
+# M113: Certify the ratio the reported FIML standard error is multiplied by
+
+**Status:** done (2026-08-30, PR #144 https://github.com/jmgirard/circumplex/pull/144)
+
+**Goal:** Extend the per-fit accuracy certificate to `fiml_ratio`, so every quantity a reported standard error is composed from is priced by the check whose estimate the refusal warning names.
+
+**Outcome:** `axes_accuracy_certificate()` returns a third field, `fiml_ratio`, priced pre-square-root on the quotient of the shipped arms against the quotient of the replayed arms; `axes_dd_pricing()` replays the naive arm at cov2cor(Sigma-hat) too, and the sentinel carries three elements from one definition, `axes_certificate_sentinel()`. `axes_degeneracy_refusal()` and `axes_degeneracy_note()` both read `axes_certificate_worst()`, so the predicate and the printed estimate cannot drift apart; the certificate call is fenced on `error` only. `exact_oracle.py`/`.R` emit and bracket the quotient at all six geometries (eighteen lines, per-field ceilings, `CERT_CEILING_RATIO`); a second closed-form oracle pins the replay at a hand-derived dyadic configuration carrying nonzero committed error. Five comment sites now name the arm they mean.
+
+**Decisions:** M113-D1 (the quotient's error is bounded by neither arm's, so it needs its own replay), M113-D2 (the naive-only non-finiteness divergence left uncorrected; none found in 12,127 candidates). Cross-cutting: D-054.
+
+**Review:** Three-lens fan-out; [S] blame-history and [S] prior-PR-comments both clean. [O] diff-bug returned ten ranked findings. F4, F5, F7, F9 fixed on the branch: one sentinel definition, the bit-identity guard now pinning the naive arm, the emptiness threshold moved to the certificate's real floor, and the roxygen naming all three quantities. F1 and F2 rejected as defects at the gate — the max over three fields is what AC1 requires and the reachable widening measured 0.46-2.1x — and filed with F3, F6, F8, F10 on the ROADMAP degeneracy row, pointed at M114 and M115. First CI run red on windows-latest: the AC3 closed-form case's shipped-error half had nothing to bracket where the shipped route is exact. Fixed at the gate — that half now skips with a stated reason, the replay half staying unconditional — and the gap noted for M115. Nothing graduated or retired.
