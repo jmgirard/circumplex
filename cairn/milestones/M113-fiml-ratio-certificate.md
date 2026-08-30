@@ -164,6 +164,7 @@ degeneracy candidate row.
 - 2026-08-30: review opened; branch pushed and draft PR #144 created. Evidence gathering in progress.
 - 2026-08-30: all seven criteria executed with fresh evidence and ticked; consistency gate clean; three fresh-context lenses ran, the [O] diff-bug lens returning ten ranked findings.
 - 2026-08-30: gate triage — findings 1, 2 rejected as defects and filed; 4, 5, 7, 9 fixed on the branch; 3, 6, 8, 10 filed as follow-ups on the ROADMAP degeneracy candidate row. Suite, check and oracle re-run green after the fixes.
+- 2026-08-30: first CI run red on windows-latest — the AC3 closed-form test's shipped-error half had nothing to bracket there (true_rel 0 against 5.6e-13 locally). Fixed at the gate on the maintainer's choice: the shipped-error half now skips with a stated reason where the shipped route is exact, the replay half staying unconditional.
 
 ## Decisions
 
@@ -447,3 +448,33 @@ Re-verified after the fixes: `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 /
 PASS 8822; `devtools::check(args = "--no-manual")` Status OK, 0/0/0 (14m 25s);
 `options(cli.width = 500); devtools::document()` no diff beyond the regenerated
 `.Rd` and zero `resolve link` lines; `exact_oracle.R` exit 0.
+
+#### Windows CI red, and its repair (2026-08-30)
+
+The first CI run on PR #144 (run 33329301066) was red on `windows-latest`; the
+two other platforms and both non-matrix checks passed. Cause: the AC3
+closed-form test asserts the shipped double route is WRONG at the hand-derived
+configuration, and windows-latest prices that matrix EXACTLY -- `true_rel` 0
+there, against 5.6e-13 on macOS and ubuntu. Three assertions reddened for a
+platform being more accurate than the one the case was derived on
+(`test-axes-certificate.R:684`, `:691`, `:700`). Not caused by the F7 threshold
+change: `true_rel == 0` fails the original `2 * eps` form identically. The five
+anchor-case skips on windows in the same run are pre-existing and by design
+(M108's bit-identity precondition).
+
+Repaired at the gate on the maintainer's choice among three options. The
+platform-independent half -- the double-double replay landing on the
+hand-derived exact values, R-level arithmetic throughout -- stays
+unconditional and passed on windows already. The shipped-error half now sits
+behind a precondition: where `true_rel <= 4 * eps` (the certificate's own floor)
+the test skips naming that reason rather than asserting a floor against a floor.
+`expect_gt(true_rel, 4 * eps)` is removed, the skip predicate replacing it --
+the predicate cannot pass vacuously as the expectation could.
+
+Discrimination shown both ways: on this tree the case runs every assertion and
+skips nothing (certificate file 146 pass / 0 skip); with `axes_v_pricing()`
+mocked to return the hand-derived exact values at that configuration -- the
+state windows-latest is actually in -- the case reports skipped, not failed.
+
+This is the platform-reach problem M115 already exists to widen, reached at a
+second surface; it is noted on the ROADMAP row beside finding 8.

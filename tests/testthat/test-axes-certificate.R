@@ -674,29 +674,49 @@ test_that("the quotient's replay lands on hand-derived exact values where the sh
   hat <- axes_v_pricing(s, d)
   true_rel <- abs(sqrt(hat$corrected / hat$naive) - sqrt(q_exact)) /
     sqrt(q_exact)
-  # Asserted, not skipped-around: a platform on which the shipped route became
-  # exact here would leave this test asserting a floor, which is the emptiness
-  # the case exists to avoid. It must be a REAL error, meaning one the
-  # certificate's own floor does not swallow. That floor is
-  # `fac * max(delta_q / 2, 2 * eps)`, so it bites until delta_q exceeds
-  # 4 * eps -- the threshold is that one, not the 2 * eps the floor's own
-  # expression reads (M113 review, [O] F7).
-  expect_gt(true_rel, 4 * .Machine$double.eps)
-
-  # ... and the field brackets it: at least the measured error (an estimate
-  # below it is the under-report the certificate exists to prevent) and within
-  # the same pre-registered decade the other two fields carry.
+  # The corrected arm and the cval numerator are both priced to within a
+  # floor's worth here on every platform measured, which is what makes the
+  # estimate this fit gets come from the new field alone. Asserted before the
+  # precondition below, so they still run where that one steps aside.
   cert <- axes_accuracy_certificate(s, d)
-  expect_gte(cert$fiml_ratio, true_rel)
-  expect_lte(cert$fiml_ratio, 1e3 * true_rel)
-
-  # The case DISCRIMINATES: the corrected arm and the cval numerator are both
-  # priced to within a floor's worth here, so the estimate the certificate
-  # reports for this fit comes from the new field alone. Before M113 this
-  # configuration was certified at 4.4e-15 with a quotient wrong by 5.6e-13.
   floor_est <- axes_certificate_safety_factor * 2 * .Machine$double.eps
   expect_identical(cert$se, floor_est)
   expect_identical(cert$cval, floor_est)
+
+  # THE PRECONDITION ON THE SHIPPED-ERROR HALF (M113 review; the windows-latest
+  # red on CI run 33329301066). The replay half above needs no platform
+  # agreement -- it is R-level `+`, `-`, `*` and `/` throughout -- but the half
+  # below needs the shipped route to be WRONG here, and that is a property of
+  # the machine's LAPACK, not of the configuration. windows-latest prices this
+  # matrix EXACTLY (true_rel 0, against 5.6e-13 on macOS and ubuntu), so the
+  # three assertions below had nothing to bracket and reddened the package for
+  # a platform being more accurate than the one the case was derived on.
+  #
+  # Skipping is the honest report and not a widening: a machine with a real
+  # error still runs every assertion, and asserting a floor against a floor is
+  # the emptiness this case exists to avoid, so it is not worth reddening for.
+  # The threshold is the certificate's own floor, `fac * max(delta_q/2, 2*eps)`,
+  # which bites until delta_q exceeds 4 * eps -- not the 2 * eps its expression
+  # reads. This is the platform-reach problem M115 exists to widen, reached at
+  # a second surface; a run in which this half skips does not satisfy AC3.
+  if (true_rel <= 4 * .Machine$double.eps) {
+    testthat::skip(paste0(
+      "the shipped double route is exact at this configuration on this ",
+      "machine (measured relative error ", format(true_rel), "), so there is ",
+      "no committed error for the `fiml_ratio` field to bracket here; the ",
+      "replay half above is asserted unconditionally and has run"
+    ))
+  }
+
+  # The field brackets a REAL error: at least the measured one (an estimate
+  # below it is the under-report the certificate exists to prevent) and within
+  # the same pre-registered decade the other two fields carry.
+  expect_gte(cert$fiml_ratio, true_rel)
+  expect_lte(cert$fiml_ratio, 1e3 * true_rel)
+
+  # ... and the case DISCRIMINATES: the estimate this fit gets comes from the
+  # new field alone. Before M113 this configuration was certified at 4.4e-15
+  # with a quotient wrong by 5.6e-13.
   expect_gt(cert$fiml_ratio, floor_est)
   expect_identical(axes_certificate_worst(cert), cert$fiml_ratio)
 })
