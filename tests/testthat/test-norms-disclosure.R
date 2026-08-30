@@ -128,9 +128,9 @@ test_that("the message reads Size and description by Sample, not by row position
 # AC8 (RR16 BC2) --------------------------------------------------------
 
 test_that("every shipped sample's message carries its Population value verbatim", {
-  # Quantified over all 24 (instrument, sample) pairs rather than over the 15
+  # Quantified over all 23 (instrument, sample) pairs rather than over the 15
   # instruments: the value varies per sample, and `sample` defaults to 1, so an
-  # instrument-level sweep would never emit a message for 9 of the 24.
+  # instrument-level sweep would never emit a message for 8 of the 23.
   seen <- 0L
   for (nm in shipped_instruments()) {
     obj <- shipped_instrument(nm)
@@ -142,7 +142,9 @@ test_that("every shipped sample's message carries its Population value verbatim"
       seen <- seen + 1L
     }
   }
-  # 24 shipped samples less the one refused for leaving its anchor range.
+  # All 23 shipped samples. It was 24 less the one refused for leaving its
+  # anchor range until M112 withdrew that sample; the count is unchanged and
+  # the reason it holds is not.
   expect_identical(seen, 23L)
 })
 
@@ -283,16 +285,28 @@ test_that("an NA sample is refused by the same check, not by a later one", {
 })
 
 test_that("the other-samples clause counts only samples that can be used", {
-  # cais carries two samples but sample 2 is refused for leaving its anchor
-  # range (D-040), so there is no other sample a reader of sample 1's message
-  # could act on. Advertising it points at a call that errors.
-  obj <- shipped_instrument("cais")
+  # The clause must count what norm_standardize() would ACCEPT, not rows of
+  # Norms[[2]]: a sample refused for leaving its anchor range (D-040) is one a
+  # reader could not act on, and advertising it points at a call that errors.
+  #
+  # No shipped instrument exercises that any more -- cais was the case, and
+  # M112 withdrew the offending sample rather than leaving it refused -- so the
+  # unusable sample is constructed here, by pushing one octant mean of iipsc's
+  # second sample out of the instrument's own range. Everything else about the
+  # object is the shipped one's.
+  obj <- shipped_instrument("iipsc")
   expect_identical(nrow(obj$Norms[[2]]), 2L)
+  values <- obj$Norms[[1]]
+  row <- which(values$Sample == 2)[[1]]
+  values$M[[row]] <- max(obj$Anchors$Value) + 1
+  obj$Norms[[1]] <- values
   expect_false(disclosure_usable(obj, 2))
   msg <- capture_messages(standardize_probe(obj, 1))
   expect_false(grepl("other sample", msg[[1]], fixed = TRUE))
 
-  # And the converse: iipsc's second sample IS usable, so it is still offered.
+  # And the converse, on the shipped object: iipsc's second sample IS usable,
+  # so it is still offered. Same instrument as above, so what separates the two
+  # cases is the one mean, not anything else about the object.
   ok <- shipped_instrument("iipsc")
   expect_true(disclosure_usable(ok, 2))
   msg2 <- capture_messages(standardize_probe(ok, 1))

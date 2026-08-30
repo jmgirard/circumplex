@@ -82,23 +82,23 @@ stands.
 
 ## Tasks
 
-- [ ] T1: Tests first. Rewrite `tests/testthat/test-norms-anchor-range.R`:
+- [x] T1: Tests first. Rewrite `tests/testthat/test-norms-anchor-range.R`:
       violation set expected empty, sweep domain asserted non-empty, and the
       two shipped-cais cases (refusal message, usable-count) rebuilt on
       constructed off-metric instrument objects — each shown to fail when its
       predicate is inverted, the inversion evidence recorded in the work log.
       Add the AC2 unmatched-sample case. Red before T2.
-- [ ] T2: Drop sample 2 from `cais_norms` and `cais_norms_src` in
+- [x] T2: Drop sample 2 from `cais_norms` and `cais_norms_src` in
       `data-raw/cais.R:95`-ish, recording the withdrawal and its ground in the
       script's comment block (IP5); rerun the script; verify the artifact by
       `load()`ing `data/cais.rda` directly, not via `load_all()` (LESSONS).
-- [ ] T3: Update the shipped-roster pins: `test-norms-kind.R:17` (16 → 15
+- [x] T3: Update the shipped-roster pins: `test-norms-kind.R:17` (16 → 15
       samples) and `:189`, `test-norms-audit-roster.R:46`,
       `test-norms-provenance.R:216`, `test-norms-disclosure.R:285`.
-- [ ] T4: Rewrite `?cais`'s adult-sample note (`R/instrument_data.R:5`) as a
+- [x] T4: Rewrite `?cais`'s adult-sample note (`R/instrument_data.R:5`) as a
       withdrawal note, and NEWS.md:193-202's "will be corrected or withdrawn"
       sentence as what happened; `devtools::document()`.
-- [ ] T5: Rerun `data-raw/audit-norms.R` to regenerate both CSVs; update
+- [x] T5: Rerun `data-raw/audit-norms.R` to regenerate both CSVs; update
       `cairn/references/norms-audit.md`'s roster, citekey-map and
       reference-kind tables; append the withdrawal note to
       `cairn/references/sodano2006.md` leaving its extracted block untouched.
@@ -116,6 +116,13 @@ stands.
 - 2026-08-29: plan gate chose withdrawal-on-unusability over keeping the sample refused until Sodano replies, because v2.0.0 has not shipped and D-040 itself names that as the cheap moment, while a "swapped" reply needs a fresh numeric gate whether or not the wrong values are still shipped; falsified by a reply or second source identifying the adult sample's metric, which would make this a correction rather than a withdrawal.
 - 2026-08-29: plan gate chose keeping D-040's refusal with its controls moved to constructed objects over deleting the now-unexercised sweep, because the sweep is what would catch a future off-metric sample entering the roster; falsified by evidence that no path adds norms without passing through the audit.
 - 2026-08-29: T1 tests written red. The violation set now expects `character(0)` with the sweep's domain asserted non-empty, the refusal and offending-scale cases are rebuilt on constructed off-metric objects (both the `Scale`- and `Abbrev`-labelled column names), and the AC2 unmatched-sample case is added. Inversion evidence, each run against the current tree: an empty sweep domain fails `expect_gt`; an in-range constructed object raises no error, failing `expect_error`; a message naming only the pushed scale (DE) fails an assertion demanding a non-offending one (BC). The violation-set and unmatched-sample assertions are red now against the still-shipped sample 2, which is their inversion.
+- 2026-08-30: T2 done. `data-raw/cais.R` now builds one sample; the withdrawal, its ground and the pointer to `cairn/references/sodano2006.md` are in the script's comment block, with no second copy of the withdrawn numbers (gate choice: one place holds them, so nothing can drift). Artifact verified by `load()`ing `data/cais.rda` directly: `Norms[[1]]` carries eight `Sample == 1` rows, `Norms[[2]]` one.
+- 2026-08-30: gate choice — `test-norms-kind.R`'s `expect_false("cais:2" %in% ...)` was rebuilt as a constructed off-metric control rather than deleted, because the setequal above it passes against an always-TRUE predicate and that line is what stopped it.
+- 2026-08-30: T3 done, over more sites than the plan named. Beyond the five listed: `test-norms-kind.R:94`-ish (24 -> 23 samples, published 16 -> 15), `test-norms-audit-roster.R:119` (roster 24 -> 23) and its four `omits N` message pins, `test-norms-audit-coverage.R:346`-ish, `test-norms-provenance.R:482`, and `data-raw/audit-norms.R`'s `AUDIT_BATCH`, which named cais sample 2 and aborted the audit run without the edit. Minor amendment: discovered sub-tasks, no criterion changed.
+- 2026-08-30: T4 done. `?cais`'s note is now a withdrawal note naming neither `sample = 2` nor the three off-range means; NEWS.md leads the 2.0.0 norms items with the withdrawal and rewrites the refusal item as a check no shipped sample now exercises. One further NEWS repair: the M72-M75 audit item's "all nine normative samples" now says "the nine those four instruments carried at the time", which the withdrawal would otherwise have contradicted two items above it. `devtools::document()` ran warning-free, rewriting `man/cais.Rd`.
+- 2026-08-30: T5 done. Audit rerun regenerates `norms-audit-ledger.csv` (cais rows 4 -> 2) and `norms-audit-coverage.csv`; the two orphaned cais sample-2 rows were removed from `norms-audit-dispositions.csv`, which the script reads rather than writes. `norms-audit.md`'s roster verdict, citekey map and reference-kind table updated; `derive-norms-kind.R` reports 23 audit-table rows against 23 shipped samples, zero disagreements. `sodano2006.md` records the withdrawal, its ground and what a reply reopens; its extracted-values block is byte-identical to master (md5 03f6e573bffe88f299c4657c3eddd71c both sides). D-040 gained a forward annotation naming D-052.
+- 2026-08-30: gate choice — the audit's coverage sweep now reports one standing non-exempt gap, because sodano2006.md still tables the withdrawn sample and no batch pass claims it. Pinned by identity (side, instrument, citekey, sample) rather than exempted, keeping AC6's byte-identity and the record's per-scale granularity; a call-site withdrawal exemption in `audit-norms.R` and relabelling the block's rows `note-only` were the alternatives. Falsified by a second standing gap appearing, which the identity pin would catch.
+- 2026-08-30: the standing gap made two guards vacuous and both were repaired, not just re-pinned: `test-norms-audit-roster.R`'s M79 drop-every-batch-row fence counted raw gaps, so every drop would have looked noticed, and `test-norms-audit-coverage.R`'s M80 unaudited-note-sample assertions would have had to loosen into membership tests. Both now assert the standing row by identity and subtract it.
 
 ## Decisions
 

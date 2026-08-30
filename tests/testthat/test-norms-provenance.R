@@ -215,18 +215,15 @@ audited_objects <- list(
   ),
   cais = list(
     Norms = 
-      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
-      2, 2), Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO", "PA", 
-      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
-      270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), M = c(3.39, 2.11, 
-      1.85, 1.99, 2.08, 2.76, 3.62, 3.75, 5.19, 3.97, 2.34, 2.76, 3.87, 4.16, 
-      6.52, 6.14), SD = c(0.84, 0.85, 0.77, 0.74, 0.64, 0.81, 0.86, 0.73, 0.89, 
-      1.08, 0.98, 1.11, 1.12, 0.99, 0.93, 0.87)), class = "data.frame", row.names = c(NA, 
-      -16L)), structure(list(Sample = c(1, 2), Size = c(204, 194), Population = c("American fourth and sixth graders (aged 9 to 13)", 
-      "American college students (aged 17 to 50)"), Reference = c("Sodano & Tracey (2006)", 
-      "Sodano & Tracey (2006)"), URL = c("https://doi.org/10.1207/s15327752jpa8703_12", 
-      "https://doi.org/10.1207/s15327752jpa8703_12"), Kind = c("published", "published")), class = "data.frame", row.names = c(NA, 
-      -2L)))
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1), Scale = c("PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 
+      180, 225, 270, 315, 360, 45), M = c(3.39, 2.11, 1.85, 1.99, 2.08, 
+      2.76, 3.62, 3.75), SD = c(0.84, 0.85, 0.77, 0.74, 0.64, 0.81, 
+      0.86, 0.73)), class = "data.frame", row.names = c(NA, -8L)), 
+      structure(list(Sample = 1, Size = 204, Population = "American fourth and sixth graders (aged 9 to 13)", 
+          Reference = "Sodano & Tracey (2006)", URL = "https://doi.org/10.1207/s15327752jpa8703_12", 
+          Kind = "published"), class = "data.frame", row.names = c(NA, 
+      -1L)))
     ,
     Scales = 
       structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
@@ -482,7 +479,16 @@ test_that("a source-note block no batch row audits is reported (M75)", {
   # roster are the same SET, or name what is missing when they are not; that is
   # test-norms-audit-roster.R's "the batch covers the shipped roster exactly".
   full <- audit_norms(batch, dir)
-  expect_identical(sum(!full$coverage$exempt), 0L)
+  gaps <- full$coverage[!full$coverage$exempt, , drop = FALSE]
+  # One gap, and it is the withdrawn CAIS adult sample (M112): sodano2006.md
+  # still tables its M and SD rows -- the record of a sample the package no
+  # longer ships -- and no batch pass claims them. Asserted by identity, not
+  # by count: a second gap, or this one changing shape, still reddens.
+  expect_identical(nrow(gaps), 1L)
+  expect_identical(gaps$side, "note-sample-not-audited")
+  expect_identical(gaps$instrument, "cais")
+  expect_identical(gaps$citekey, "sodano2006")
+  expect_identical(gaps$sample, "2")
 
   # Drop one instrument's rows and its note block is orphaned. Before M75's
   # block-level sweep this returned a completely clean report -- the ledger,

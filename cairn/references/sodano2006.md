@@ -22,9 +22,11 @@ childhood: Development of the Child and Adolescent Interpersonal Survey.
 (see the URL row below); its running copyright line reads "Copyright © 2006,
 Lawrence Erlbaum Associates, Inc."
 
-**Role.** The published source for every shipped CAIS norm value, for both of
-the instrument's norm samples: sample 1 is the child sample (Table 2, p. 323)
-and sample 2 the adult sample (Table 4, p. 325).
+**Role.** The published source for every shipped CAIS norm value. The package
+shipped two samples until 2026-08-30 — sample 1, the child sample (Table 2,
+p. 323), and sample 2, the adult sample (Table 4, p. 325) — and now ships only
+sample 1; see "Withdrawn" below. Both samples' extracted values are recorded
+here regardless: this note records the source, not the roster.
 
 **On the two sample sizes.** The article gives the child sample as 213 twice —
 "consisted of 213 students (125 fourth graders and 88 sixth graders)" (p. 320)
@@ -105,10 +107,26 @@ asking whether the two rows are transposed, and carrying the Table 2 *N*
 question above. A "swapped" reply makes the block printed under IAS the correct
 sample-2 M and SD, which is a numeric change to shipped norms and needs its own
 gate (IP5, D-039). A "correct as printed" reply leaves the adult sample
-irreconcilable with a 5-point CAIS, and it should then be withdrawn or hard-
-flagged. Until either arrives, every reading agrees the shipped sample-2 values
-are unusable as CAIS norms, so a fail-closed refusal at `norm_standardize()`
-does not depend on the answer.
+irreconcilable with a 5-point CAIS. Until either arrives, every reading agrees
+the sample-2 values printed under the CAIS columns are unusable as CAIS norms.
+The query is still unanswered.
+
+**Withdrawn (2026-08-30, M112).** The adult sample no longer ships. The ground
+is unusability, not the metric question being settled: from 2026-08-08 a
+fail-closed refusal at `norm_standardize()` (D-040) made the sample data no
+call could accept, and 22 days on, neither disposition D-040 named — a reply
+identifying the sample's metric, or a second source printing the descriptives —
+had arrived, so it shipped as unusable data carrying explanatory prose at three
+user-facing surfaces. It was removed from `data-raw/cais.R` and `data/cais.rda`
+rather than corrected (D-052); `data-raw/cais.R` keeps no copy of the numbers,
+so this note is the only place they live.
+
+What a reply reopens: a "swapped" reply re-adds the IAS-printed block as the
+adult sample's M and SD, which is a numeric change to shipped norms and enters
+under D-039's numeric-change gate — a fresh gate either way, whether or not the
+wrong values were still shipped when it arrived. A "correct as printed" reply
+leaves the withdrawal standing. The extracted values below are unchanged by the
+withdrawal and are what such a gate would be argued from.
 
 ## Extracted values
 
@@ -189,6 +207,8 @@ ordering — Table 1 identifies its items by content, not by number.
   comparison this note backs is what found the defect (corrected 2026-08-07;
   the paragraph previously described the pre-M74 key in the present tense).
 - `data-raw/audit-norms.R` — parses the block above as the source side of the
-  cais comparison, one pass per sample.
+  cais comparison, one pass per shipped sample. Since the 2026-08-30
+  withdrawal that is sample 1 alone; the block's sample-2 rows are the record
+  of a sample the package no longer ships, and no audit pass reads them.
 - `cairn/references/norms-audit.md` — carries cais's audit verdict and this
   file's shelf-manifest row.

@@ -10,7 +10,7 @@
 #
 # From M112 the shipped roster exhibits no violation. Its one violator, the
 # cais adult sample, was withdrawn rather than corrected: its source prints
-# three CAIS octant means above the instrument's own 1-5 maximum, and 21 days
+# three CAIS octant means above the instrument's own 1-5 maximum, and 22 days
 # after the author query neither of the two dispositions D-040 named was
 # available, so the sample shipped as data no call could use (D-052). The
 # transcription, the evidence that sodano2006's Table 4 has its M and SD rows

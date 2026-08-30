@@ -35,7 +35,7 @@ seeing it. Per-row detail is in `data-raw/norms-audit-ledger.csv`.
 | csip | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M72 | [boudreaux2018.md](boudreaux2018.md) | 2026-08-06 |
 | csiv | verified: M, SD, Size, item map, angles, Reference, URL; Population deviates by design | M72 | [locke2000.md](locke2000.md) | 2026-08-06 |
 | iitc | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M72 | [bliton2019.md](bliton2019.md) | 2026-08-06 |
-| cais | verified: M, SD, angles, item map, Size, Reference (2 samples); the item map and the sample-1 Size were wrong and are corrected here; Population deviates by design (URL not published in source) | M74 | [sodano2006.md](sodano2006.md) | 2026-08-07 |
+| cais | verified: M, SD, angles, item map, Size, Reference (2 samples as audited; the adult sample was withdrawn from the roster on 2026-08-30 under M112/D-052 and only sample 1 now ships); the item map and the sample-1 Size were wrong and are corrected here; Population deviates by design (URL not published in source) | M74 | [sodano2006.md](sodano2006.md) | 2026-08-07 |
 | iei | verified: M, SD, Size, Reference (2 samples); URL repointed here at the pages that publish the values; Population deviates by design (no angles, no item map) | M74 | [horner2024.md](horner2024.md) | 2026-08-07 |
 | igicr | verified: M, SD, Size, angles, item map, Reference, URL (3 samples); Population deviates by design | M74 | [trucco2013.md](trucco2013.md) | 2026-08-07 |
 | iip32 | verified: M, SD, item map, Reference (3 samples); `Size` is **derived**, not printed — Table F.5 gives no group sizes, so the shipped 800/400/400 carries over the IIP-64 standardization sample on the manual's own p. 24 grounds; Population deviates by design (no angles, no URL published) | M75 | [horowitz2003.md](horowitz2003.md) | 2026-08-07 |
@@ -63,7 +63,6 @@ the mapping the audit script joins on.
 | ipipipc | 1 | markey2009 | **nowhere identified** — the article publishes octant statistics only for a different sample |
 | isc | 1 | hopwood2011 | the article (inside Figure 2) |
 | cais | 1 | sodano2006 | the article (Table 2, child sample) |
-| cais | 2 | sodano2006 | the article (Table 4, adult sample) |
 | iei | 1 | horner2024 | the article (Table 1, Study 1) **and** the author's IEI norms page |
 | iei | 2 | horner2024 | the article (Table 1, Study 2) |
 | igicr | 1 | trucco2013 | the article (Table 3, Combined column) |
@@ -100,12 +99,16 @@ statistics appear in no identified source, whatever is known about the sample
 itself; ipipipc sample 1 is the case that forces the wording, its study being
 identified (markey2009 Study 2, n = 274) while its M and SD are not.
 
-Assignment covers all 24 shipped samples with no residue — observed 2026-08-08.
+Assignment covers all shipped samples with no residue — 24 of them when
+observed 2026-08-08, and 23 since the cais adult sample was withdrawn on
+2026-08-30 (M112, D-052). The withdrawn sample's row is removed rather than
+kept-and-annotated: `data-raw/derive-norms-kind.R` diffs this table against the
+builders' `Kind` columns, so a row for a sample no builder ships would not
+match anything.
 
 | instrument | sample | kind | basis |
 |---|---|---|---|
 | cais | 1 | published | sodano2006 Table 2 (child sample) |
-| cais | 2 | published | sodano2006 Table 4 (adult sample); off-metric and refused at `norm_standardize()` under D-040, which does not change what kind of reference it is |
 | csie | 1 | published | locke2007 — the author's website norms table |
 | csig | 1 | published | locke2014 Figure 2 (p. 436) |
 | csip | 1 | published | boudreaux2018 Table 1 |

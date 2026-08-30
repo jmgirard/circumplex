@@ -43,7 +43,7 @@ roster_notes <- function() {
 # intended cost -- shipped norms changing unnoticed is the hazard the whole
 # audit exists for.
 SHIPPED_ROSTER_PAIRS <- c(
-  "cais", "1",    "cais", "2",    "csie", "1",    "csig", "1",
+  "cais", "1",    "csie", "1",    "csig", "1",
   "csip", "1",    "csiv", "1",    "iei", "1",     "iei", "2",
   "igicr", "1",   "igicr", "2",   "igicr", "3",   "iip32", "1",
   "iip32", "2",   "iip32", "3",   "iip64", "1",   "iip64", "2",
@@ -72,12 +72,27 @@ test_that("dropping any batch row is visible in the run (M79)", {
   # Measured 2026-08-08. Before the roster sweep: 6 abort, 8 report a gap, and
   # 10 -- the 9 single-sample rows and iipsc sample 1 -- are silent. After:
   # 6 abort, 18 report a gap, 0 silent. The silent 10 are what this fences.
+  #
+  # Every run now carries one standing gap that no dropped row causes:
+  # sodano2006.md still tables the cais adult sample the package withdrew in
+  # M112, and no batch pass claims it. Counting raw gaps would therefore make
+  # this fence vacuous -- every drop would look noticed. It is subtracted, and
+  # its presence asserted first, so the subtraction cannot quietly become a
+  # subtraction of nothing.
+  standing <- function(cov) {
+    cov$side == "note-sample-not-audited" & cov$instrument == "cais" &
+      cov$sample == "2"
+  }
+  base <- env$audit_norms(batch, dir = dir)$coverage
+  expect_identical(sum(standing(base) & !base$exempt), 1L)
+
   silent <- character(0)
   for (i in seq_len(nrow(batch))) {
     res <- tryCatch(env$audit_norms(batch[-i, , drop = FALSE], dir = dir),
                     error = function(e) NULL)
     if (is.null(res)) next
-    if (sum(!res$coverage$exempt) == 0L) {
+    cov <- res$coverage
+    if (sum(!cov$exempt & !standing(cov)) == 0L) {
       silent <- c(silent, paste(batch$instrument[[i]], batch$sample[[i]]))
     }
   }
@@ -114,9 +129,10 @@ test_that("the batch covers the shipped roster exactly (M79)", {
     paste(batch$instrument, batch$sample)
   )
   # And that the comparison ranged over something: 15 shipped instruments,
-  # 24 (instrument, sample) pairs, measured 2026-08-08 at cef9d36f. A roster
-  # that came back empty would satisfy expect_setequal against an empty batch.
-  expect_identical(nrow(roster), 24L)
+  # 23 (instrument, sample) pairs -- 24 when measured 2026-08-08 at cef9d36f,
+  # one fewer since M112 withdrew the cais adult sample. A roster that came
+  # back empty would satisfy expect_setequal against an empty batch.
+  expect_identical(nrow(roster), 23L)
   expect_identical(length(unique(roster$instrument)), 15L)
 })
 
@@ -218,7 +234,7 @@ test_that("injecting one object does not shrink the audited world (M79)", {
 # uncovered sample invisible. Measured 2026-08-14 with validate_roster() bound
 # to a no-op: the csie slice below reported 0 non-exempt gaps against a
 # capitalised-column roster and 0 against an empty one, where the shipped
-# roster reports 23.
+# roster reports 22 (23 at that measurement; M112 withdrew one sample).
 
 test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
   env <- roster_defs()
@@ -267,20 +283,22 @@ test_that("a roster touching `data/` must cover all of it (M86)", {
   slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
   # Measured 2026-08-15 before this guard: the roster below audits the csie
   # slice with 0 non-exempt shipped-sample gaps where the shipped roster
-  # reports 23 -- a clean run over 23 samples nothing read. It is already a
+  # reports 22 -- 23 at that measurement, one fewer since M112 withdrew the
+  # cais adult sample -- a clean run over every sample nothing read. It is already a
   # superset of the slice's own batch pairs, and csie ships exactly one sample
   # so it is also complete for the only instrument it names: neither weaker
   # rule sees it, which is why the rule is all-or-nothing.
   narrow <- data.frame(instrument = "csie", sample = "1",
                        stringsAsFactors = FALSE)
   expect_error(env$audit_norms(slice, dir = dir, roster = narrow),
-               "omits 23 shipped (instrument, sample) pair(s)", fixed = TRUE)
+               "omits 22 shipped (instrument, sample) pair(s)", fixed = TRUE)
   # The exemption is asked for at the call site, so no spelling of an
   # instrument can buy it. Through M86's first pass it was INFERRED, by testing
   # the roster's instruments against circumplex:::instrument_names(); each
   # spelling below missed that list and was taken for a fixture's own world,
   # and each then audited the csie slice at 1 non-exempt shipped-sample gap
-  # where the shipped roster reports 23 (all three measured 2026-08-15).
+  # where the shipped roster reports 22 (all three measured 2026-08-15 at 23,
+  # one fewer since M112 withdrew the cais adult sample).
   # They are regression fixtures for a rule that no longer reads the column:
   # what makes them refused is that they omit shipped pairs, which is why the
   # near-miss family needs no enumerating.
@@ -288,7 +306,7 @@ test_that("a roster touching `data/` must cover all of it (M86)", {
     evasion <- data.frame(instrument = spelling, sample = "1",
                           stringsAsFactors = FALSE)
     expect_error(env$audit_norms(slice, dir = dir, roster = evasion),
-                 "omits 24 shipped (instrument, sample) pair(s)", fixed = TRUE)
+                 "omits 23 shipped (instrument, sample) pair(s)", fixed = TRUE)
   }
   # The four cells of (exemption asked | not asked) x (real | fake instrument).
   # Not asked + fake is the one that changed: a roster over instruments that do
@@ -298,7 +316,7 @@ test_that("a roster touching `data/` must cover all of it (M86)", {
   fake <- data.frame(instrument = c("fx", "fy"), sample = c("1", "1"),
                      stringsAsFactors = FALSE)
   expect_error(env$validate_roster(fake),
-               "omits 24 shipped (instrument, sample) pair(s)", fixed = TRUE)
+               "omits 23 shipped (instrument, sample) pair(s)", fixed = TRUE)
   expect_identical(env$validate_roster(fake, fixture_world = TRUE), TRUE)
   # Asked + real is the declared lie the exemption deliberately does not
   # police: a caller who says out loud that this run is not about `data/` is
