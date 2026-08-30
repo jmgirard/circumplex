@@ -681,3 +681,67 @@ test_that("the quotient's replay lands on hand-derived exact values where the sh
   expect_gt(cert$fiml_ratio, floor_est)
   expect_identical(axes_certificate_worst(cert), cert$fiml_ratio)
 })
+
+
+test_that("AC6: a condition inside the certificate refuses at both surfaces, never errors", {
+  # The certificate is consulted from inside two helpers whose contract is to
+  # REFUSE -- a named reason, NA numbers, exactly one warning -- on a matrix
+  # they cannot price. It is a large arithmetic surface (a hand-rolled inverse,
+  # a compensated arithmetic, and the shipped pricing it replays), and until
+  # M113 it was called bare: a condition raised anywhere inside it propagated
+  # out as an error neither caller has a handler for. The fence turns that into
+  # the sentinel, which refuses (the sentinel is four decades past the accuracy
+  # target).
+  #
+  # TWO ROUTES, run one at a time, because they take different paths through
+  # the fence: a `stop()` reaches the tryCatch handler, while a route failure
+  # returns the sentinel normally and never raises at all. Both must land on
+  # the same refusal at both surfaces, or the two surfaces could disagree about
+  # whether this fit is certified.
+  r <- m106_family_b(7e-7)
+  nm9 <- paste0("i", 1:9)
+  ang9 <- c(as.numeric(octants()), as.numeric(octants())[[1L]])
+  sid9 <- as.character(c(1:8, 1L))
+  dimnames(r) <- list(nm9, nm9)
+  expect_identical(axes_sigma_degenerate(r), "ill_conditioned")
+
+  both_surfaces_refuse <- function(lbl) {
+    w_se <- testthat::capture_warnings(
+      got <- axes_corrected_se(r, nm9, ang9, sid9, n = 600,
+                               fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+    )
+    expect_identical(got$reason, "uncertified", label = lbl)
+    expect_true(all(is.na(got$corrected)), label = lbl)
+    expect_length(w_se, 1L)
+
+    w_sf <- testthat::capture_warnings(
+      gsf <- axes_scaling_factor(r, nm9, ang9, sid9, fit_zeta1 = TRUE,
+                                 fit_zeta2 = FALSE, df = 33L,
+                                 baseline_df = 36L)
+    )
+    expect_identical(gsf$reason, "uncertified", label = lbl)
+    expect_length(w_sf, 1L)
+  }
+
+  # ROUTE 1 -- a raised error from inside the certificate's own body.
+  local({
+    testthat::local_mocked_bindings(
+      axes_accuracy_certificate = function(sigma, d) {
+        stop("planted condition from inside the certificate", call. = FALSE)
+      },
+      .package = "circumplex"
+    )
+    both_surfaces_refuse("stop()")
+  })
+
+  # ROUTE 2 -- a non-error route failure: the self-test reports that this
+  # machine's arithmetic defeats the error-free transforms, so the certificate
+  # returns its sentinel without raising anything at all.
+  local({
+    testthat::local_mocked_bindings(
+      axes_dd_selftest = function() FALSE,
+      .package = "circumplex"
+    )
+    both_surfaces_refuse("route failure")
+  })
+})

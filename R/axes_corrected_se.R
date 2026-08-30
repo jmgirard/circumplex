@@ -765,7 +765,20 @@ axes_degeneracy_refusal <- function(sigma, d) {
   if (!identical(reason, "ill_conditioned")) {
     return(list(reason = reason, cert = NULL))
   }
-  cert <- axes_accuracy_certificate(sigma, d)
+  # FENCED (M113). This helper's contract is to REFUSE, never to error: it is
+  # called from inside axes_corrected_se() and axes_scaling_factor(), both of
+  # which owe the user a named refusal and exactly one warning on a matrix
+  # they cannot price. The certificate is a large arithmetic surface -- a
+  # hand-rolled inverse, an 18-function compensated arithmetic, and the
+  # shipped pricing it replays -- and any condition raised anywhere in it
+  # would otherwise propagate out of here as an error the caller has no
+  # handler for. A condition means the fit could not be certified, which is
+  # exactly what the sentinel says, and the sentinel refuses (GP2). The
+  # handler is on `error` and on nothing else: a warning raised inside the
+  # certificate must still reach the user, or the one-warning-per-refusal
+  # contract would be met by swallowing rather than by not emitting.
+  cert <- tryCatch(axes_accuracy_certificate(sigma, d),
+                   error = function(e) list(se = 1, cval = 1, fiml_ratio = 1))
   if (axes_certificate_worst(cert) <= axes_degeneracy_delta_star) {
     return(list(reason = NULL, cert = cert))
   }
