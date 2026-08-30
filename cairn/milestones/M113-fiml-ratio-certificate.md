@@ -40,22 +40,37 @@ degeneracy candidate row.
 
 - [ ] AC1 `axes_accuracy_certificate()` returns a third element estimating the
       committed relative error of `fiml_ratio`, computed from the same
-      double-double replay as the other two, and `axes_degeneracy_refusal()`
-      refuses `"uncertified"` on the max over all three against
-      `axes_degeneracy_delta_star`.
+      double-double replay as the other two and finite and non-negative on
+      every input — its sentinel gaining a third element, so no route failure
+      leaves the field `NaN` for `axes_degeneracy_refusal()`'s comparison to
+      raise on. `axes_degeneracy_refusal()` refuses `"uncertified"` on the max
+      over all three fields against `axes_degeneracy_delta_star`, and
+      `axes_degeneracy_note()` prints that same max as the warning's estimated
+      relative error, so no fit is refused against a target its warning reports
+      it inside.
 - [ ] AC2 At every geometry `devel/degeneracy-oracle/exact_oracle.R`'s
       certificate case list holds, the new field is at least the oracle's
-      measured relative error of `fiml_ratio` there; the script prints that
-      ratio per geometry, records the ceiling at its measured value, and exits
-      non-zero if any ratio falls below 1 or if it formed fewer ratios than
-      `CERT_EXPECTED`.
+      measured relative error of `fiml_ratio` there and at most a ceiling of
+      its own, measured once on a clean tree and thereafter frozen as a
+      constant no plant run re-measures; `CERT_CEILING`, which bounds the `se`
+      and `cval` lines, is unchanged. The script emits eighteen certificate
+      lines — six geometries by three fields — and exits non-zero if it emits
+      fewer, if any ratio falls below 1, or if any exceeds its own field's
+      ceiling.
 - [ ] AC3 The new field is validated against a second independent oracle type,
-      recorded at the asserting test, sharing no code and no pipeline with the
-      exact-rational oracle (IP3). `(RB tripwire: ip-touching)`
-- [ ] AC4 Two planted defects, run one at a time, each redden at least one
-      assertion in `exact_oracle.R`'s certificate flag: one substituting the
-      corrected arm's error for the ratio's (a location plant), one scaling the
-      ratio's estimate down by a factor of 10 (a magnitude plant).
+      recorded at the asserting test, sharing no code, no library and no
+      pipeline with `exact_oracle.py` or with the route under test (IP3) — the
+      independence M108 already records at
+      `tests/testthat/test-axes-certificate.R:29-30`.
+      `(RB tripwire: ip-touching)`
+- [ ] AC4 Three planted defects, run one at a time against the frozen ceilings,
+      each redden the new field's own ratio line at a named geometry in
+      `exact_oracle.R`: the field's safety factor dropped from 10 to 1 (an
+      under-report, against the floor), the ratio replayed at the raw `Σ̂`
+      rather than `cov2cor(Σ̂)` (the D-044 metric split), and the double-double
+      replay of the naive arm truncated to double precision (a collapse of the
+      reference route). The three vary magnitude, metric and route, not one
+      axis three times.
 - [ ] AC5 The comment sites `R/axes_certificate.R:343`,
       `R/axes_corrected_se.R:311`, `:359`, `:757` and
       `R/axes_reliability.R:1989` each state the arm relationship correctly:
@@ -86,15 +101,19 @@ degeneracy candidate row.
       ratio's relative error against each arm's. Settles whether the ratio needs
       its own replay or is bounded by the arms.
 - [ ] T2 Add the `fiml_ratio` field to `axes_dd_pricing()` and
-      `axes_accuracy_certificate()` (`R/axes_certificate.R`); extend
+      `axes_accuracy_certificate()` (`R/axes_certificate.R`), with its own
+      denominator guard and a third sentinel element; extend
       `axes_degeneracy_refusal()`'s max to three fields
-      (`R/axes_corrected_se.R:765`).
+      (`R/axes_corrected_se.R:765`) and `axes_degeneracy_note()`'s printed
+      estimate to the same max (`R/axes_corrected_se.R:786-793`).
 - [ ] T3 Extend `exact_oracle.py` / `exact_oracle.R` to emit and bracket the
-      ratio's true relative error; record the ceiling at its measured value.
+      ratio's true relative error; measure the new field's ceiling once on a
+      clean tree and freeze it as its own constant beside `CERT_CEILING`.
 - [ ] T4 Second independent oracle type for the new field, recorded at the
       asserting test. `(RB tripwire: ip-touching)`
-- [ ] T5 Plant the two AC4 defects one at a time; record per-defect results,
-      revert each and verify the tree clean.
+- [ ] T5 Plant the three AC4 defects one at a time against the frozen
+      ceilings; record per-defect results naming the reddened line and its
+      geometry, revert each and verify the tree clean.
 - [ ] T6 Correct the five AC5 comment sites; sweep `man/`, `NEWS.md`,
       `vignettes/` and `tests/` for paraphrases of the same claim.
 - [ ] T7 `tryCatch` the certificate call at `R/axes_corrected_se.R:764`,
@@ -113,7 +132,7 @@ degeneracy candidate row.
 - 2026-08-30: plan gate chose certifying `fiml_ratio` in its own field over RR21 B4's max over the two arms' standalone errors, because the arms' errors partially cancel in the ratio and B4's bound would refuse fits whose reported SE is accurate — the false-refusal failure D-048/D-049's history is about; falsified by a geometry at which the ratio's measured relative error exceeds both arms'.
 - 2026-08-30: plan gate chose demoting M111 review F3 to a recorded characterisation (T8) over an acceptance criterion requiring the two surfaces to agree, because agreement is reachable only by the SE surface reporting a non-finite `fiml_ratio` on the FIML path, against GP2's fail-closed clause; falsified by an admitted matrix whose naive row alone is non-finite and whose reported FIML SE is nonetheless finite.
 - 2026-08-30: plan gate chose three milestones over folding M114's predicate fences into this one, because the straddle fixture may not be constructible and that uncertainty should not ride in the same PR as the estimand change; falsified by the fixture proving trivial to construct.
-- 2026-08-30: OPEN — the criteria the gate changed (AC1, AC2, AC3, AC4) were sent back through the audit's questions in FULL mode, to a second fresh-context [O] reader, but that re-audit had not returned when this plan was committed. Its findings are to be disposed, and this line replaced with the result, BEFORE /milestone-implement starts on this milestone. An absent replacement means the re-audit was never read, not that it was silent.
+- 2026-08-30: the criteria the gate changed (AC1, AC2, AC3, AC4) went back through the audit's questions in FULL mode, to a second fresh-context [O] reader that authored none of them; it returned nine findings. Eight were fixed here: the AC4 location plant could not redden, because under the plan gate's own cancellation hypothesis substituting an arm's error OVER-estimates and AC2 let the ceiling be re-measured — the ceiling is now frozen and the plant set replaced by three varying magnitude, metric and route; `axes_degeneracy_note()` still printed `max(se, cval)`, so a fit refused on the ratio field would have warned a number below the target it was refused against; AC1 permitted a non-finite third field, whose `NaN` would raise in `axes_degeneracy_refusal()`'s comparison OUTSIDE T7's tryCatch, against GP2; AC3's "no code and no pipeline" was unsatisfiable as worded and is narrowed to M108's own phrasing; AC2's count was pinned to `CERT_EXPECTED`, a constant the implementer sets after the fact, and to `cert_n`, which counts lines rather than ratios — now eighteen lines stated in the criterion; the single shared `CERT_CEILING` could have been loosened for the two already-audited fields and is now per-field; and AC4's redden is tied to the new field's own line at a named geometry. The ninth (F8 — AC3 is satisfiable by extending the zero-committed-error dyadic oracle, which would validate the new field only where there is no error to catch) is a genuine two-way call and is open at the user gate.
 
 ## Decisions
 
