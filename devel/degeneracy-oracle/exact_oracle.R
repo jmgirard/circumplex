@@ -141,9 +141,10 @@ for (i in seq_along(dbl_se)) {
 # frozen here as a constant. A plant run never re-measures either: a ceiling
 # re-fitted to a planted defect would pass the plant it exists to catch.
 CERT_CEILING <- 1e3
-# Measured 2026-08-30 on a clean tree by this script: the quotient's ratios ran
-# 1.05 to 122 across the six geometries, so 1e3 leaves an order of magnitude
-# over the worst and stays the same pre-registered decade as the other two.
+# Measured 2026-08-30 on a clean tree by this script: the quotient's six ratios
+# ran 9.97 to 10.00 -- the safety factor itself, the O(delta^2) term being
+# negligible at these errors -- so 1e3 sits two decades over the worst measured
+# and is the same pre-registered window the other two fields carry.
 CERT_CEILING_RATIO <- 1e3
 CERT_EXPECTED <- 18L   # six geometries x {SE, cval, ratio}
 cert_ok <- TRUE

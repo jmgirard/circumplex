@@ -109,7 +109,7 @@ degeneracy candidate row.
       `axes_degeneracy_refusal()`'s max to three fields
       (`R/axes_corrected_se.R:765`) and `axes_degeneracy_note()`'s printed
       estimate to the same max (`R/axes_corrected_se.R:786-793`).
-- [ ] T3 Extend `exact_oracle.py` / `exact_oracle.R` to emit and bracket the
+- [x] T3 Extend `exact_oracle.py` / `exact_oracle.R` to emit and bracket the
       ratio's true relative error; measure the new field's ceiling once on a
       clean tree and freeze it as its own constant beside `CERT_CEILING`.
 - [ ] T4 Construct a dyadic-rational configuration ill-conditioned enough
@@ -143,6 +143,7 @@ degeneracy candidate row.
 - 2026-08-30: plan gate chose requiring AC3's second oracle type to pin the ratio at a configuration carrying a NONZERO committed error over extending the existing dyadic closed-form oracle, whose configuration is priced exactly and where the certificate is only asserted to report its floor, because a second type that never meets an error validates IP3 in letter and not in substance for a number printed to users; falsified by no dyadic-rational configuration existing that is ill-conditioned enough to commit measurable error and still hand-derivable, which would force the weaker claim at a mini gate.
 - 2026-08-30: T1 measured, ahead of the question gate because the gate rests on it: at the six geometries `exact_oracle.R` prices, the quotient's committed relative error exceeds BOTH arms' own at four of them (worst factor 1.85), and falls 76x below their sum only at counterexample B. D-053's first reopening condition is therefore met; the disposition is M113-D1 below.
 - 2026-08-30: T2 — the certificate returns a third field, `fiml_ratio`, priced pre-square-root on the quotient of the shipped arms against the quotient of the replayed arms (n cancels, as for `se`); `axes_dd_pricing()` now replays the naive arm at the same matrix; the refusal predicate and the warning's printed estimate both read one new helper, `axes_certificate_worst()`, so they cannot drift apart again. Suite: 0 failures, 8789 passing.
+- 2026-08-30: T3 — the exact-rational oracle emits the quotient per component and the driver brackets the new field at all six geometries; the run prints eighteen certificate lines and passes, the quotient's ratios measuring 9.97 to 10.00, so its own ceiling is frozen at 1e3 (`CERT_CEILING_RATIO`), the window the other two already carry. The six measured errors are frozen at the anchors in `tests/testthat/test-axes-certificate.R`.
 
 ## Decisions
 

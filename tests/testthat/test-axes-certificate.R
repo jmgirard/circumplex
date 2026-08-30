@@ -17,9 +17,11 @@
 #     measurements are frozen here as literals, each tagged with the case that
 #     produced it. Regenerate with, from the repo root:
 #       Rscript devel/degeneracy-oracle/exact_oracle.R
-#     Values below are that script's output on 2026-08-24; it prints the true
-#     relative error and the certificate side by side and fails if any of the
-#     six ratios leaves [1, 1e3]. Each frozen error is a measurement of ONE
+#     Values below are that script's output on 2026-08-24, extended on
+#     2026-08-30 with the `fiml_ratio` field's measured error at each case
+#     (M113); it prints the true relative error and the certificate side by
+#     side and fails if any of the eighteen ratios leaves [1, its field's
+#     ceiling]. Each frozen error is a measurement of ONE
 #     matrix priced on ONE machine, so every assertion that reads one sits
 #     behind the bit-identity precondition below -- see the block at
 #     `cert_frozen` for what that pins and why (M108 AC2, amended).
@@ -46,23 +48,28 @@ cert_anchors <- function() {
     list(id = "a4", lbl = "family A, p = 8, kappa 1e4",
          r = m106_family_a(2.4e-4, 1L), scale = as.character(1:8),
          ang = as.numeric(octants()),
-         kappa = 1.000e4, se = 5.889e-14, cval = 2.096e-14),
+         kappa = 1.000e4, se = 5.889e-14, cval = 2.096e-14,
+         ratio = 5.964e-14),
     list(id = "a5", lbl = "family A, p = 8, kappa 1e5",
          r = m106_family_a(2.4e-5, 1L), scale = as.character(1:8),
          ang = as.numeric(octants()),
-         kappa = 1.000e5, se = 3.004e-12, cval = 2.205e-13),
+         kappa = 1.000e5, se = 3.004e-12, cval = 2.205e-13,
+         ratio = 1.938e-12),
     list(id = "c4", lbl = "family C, p = 4 minimum",
          r = m106_family_c(1.2e-5), scale = as.character(1:4),
          ang = c(90, 180, 270, 360),
-         kappa = 1.000e5, se = 6.459e-13, cval = 1.124e-08),
+         kappa = 1.000e5, se = 6.459e-13, cval = 1.124e-08,
+         ratio = 5.681e-13),
     list(id = "b9a", lbl = "near-duplicate r = .9999",
          r = m106_family_b(7e-5), scale = as.character(c(1:8, 1L)),
          ang = c(as.numeric(octants()), as.numeric(octants())[[1L]]),
-         kappa = 2.874e4, se = 6.302e-13, cval = 7.245e-14),
+         kappa = 2.874e4, se = 6.302e-13, cval = 7.245e-14,
+         ratio = 1.069e-12),
     list(id = "b9b", lbl = "near-duplicate r = .99999",
          r = m106_family_b(7e-6), scale = as.character(c(1:8, 1L)),
          ang = c(as.numeric(octants()), as.numeric(octants())[[1L]]),
-         kappa = 2.874e5, se = 1.126e-11, cval = 1.488e-12)
+         kappa = 2.874e5, se = 1.126e-11, cval = 1.488e-12,
+         ratio = 6.682e-12)
   )
 }
 
@@ -256,12 +263,14 @@ for (cert_case in cert_anchors()) {
     # evidence class D-051 records as reopening the mechanism.
     expect_gte(cert$se, cs$se)
     expect_gte(cert$cval, cs$cval)
+    expect_gte(cert$fiml_ratio, cs$ratio)
     # ... and at most 1e3 times it, the ceiling M108 pre-registered before any
     # measurement. The a-priori bound this replaces overstates by 5 to 8
     # decades, so this half is what falsifies a certificate that merely
     # restates that bound.
     expect_lte(cert$se, 1e3 * cs$se)
     expect_lte(cert$cval, 1e3 * cs$cval)
+    expect_lte(cert$fiml_ratio, 1e3 * cs$ratio)
   })
 }
 
@@ -289,6 +298,8 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   expect_lte(cert$se, 1e3 * 3.413e-02)
   expect_gte(cert$cval, 4.890)
   expect_lte(cert$cval, 1e3 * 4.890)
+  expect_gte(cert$fiml_ratio, 8.712e-04)
+  expect_lte(cert$fiml_ratio, 1e3 * 8.712e-04)
 })
 
 
