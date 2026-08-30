@@ -38,7 +38,7 @@ degeneracy candidate row.
 
 ## Acceptance criteria
 
-- [ ] AC1 `axes_accuracy_certificate()` returns a third element estimating the
+- [x] AC1 `axes_accuracy_certificate()` returns a third element estimating the
       committed relative error of `fiml_ratio`, computed from the same
       double-double replay as the other two and finite and non-negative on
       every input — its sentinel gaining a third element, so no route failure
@@ -48,7 +48,7 @@ degeneracy candidate row.
       `axes_degeneracy_note()` prints that same max as the warning's estimated
       relative error, so no fit is refused against a target its warning reports
       it inside.
-- [ ] AC2 At every geometry `devel/degeneracy-oracle/exact_oracle.R`'s
+- [x] AC2 At every geometry `devel/degeneracy-oracle/exact_oracle.R`'s
       certificate case list holds, the new field is at least the oracle's
       measured relative error of `fiml_ratio` there and at most a ceiling of
       its own, measured once on a clean tree and thereafter frozen as a
@@ -57,7 +57,7 @@ degeneracy candidate row.
       lines — six geometries by three fields — and exits non-zero if it emits
       fewer, if any ratio falls below 1, or if any exceeds its own field's
       ceiling.
-- [ ] AC3 The new field is validated against a second independent oracle type,
+- [x] AC3 The new field is validated against a second independent oracle type,
       recorded at the asserting test, sharing no code, no library and no
       pipeline with `exact_oracle.py` or with the route under test (IP3) — the
       independence M108 already records at
@@ -66,7 +66,7 @@ degeneracy candidate row.
       whose shipped double route carries a NONZERO committed error, so the
       field is validated where there is an error to catch and not only at its
       floor. `(RB tripwire: ip-touching)`
-- [ ] AC4 Three planted defects, run one at a time against the frozen
+- [x] AC4 Three planted defects, run one at a time against the frozen
       ceilings, vary magnitude, metric and route rather than one axis three
       times, and each is caught by a check present on the clean tree before
       the plant is applied. The new field's safety factor dropped from 10 to 1
@@ -82,16 +82,16 @@ degeneracy candidate row.
       at `tests/testthat/test-axes-certificate.R`, while every
       `exact_oracle.R` ratio line stays inside its window at all six
       geometries.
-- [ ] AC5 The comment sites `R/axes_certificate.R:343`,
+- [x] AC5 The comment sites `R/axes_certificate.R:343`,
       `R/axes_corrected_se.R:311`, `:359`, `:757` and
       `R/axes_reliability.R:1989` each state the arm relationship correctly:
       none claims the certificate omits an arm because that arm is never
       user-reported, except where the arm it names is the raw-`Σ̂` one.
-- [ ] AC6 Two conditions raised inside `axes_accuracy_certificate()`, run one
+- [x] AC6 Two conditions raised inside `axes_accuracy_certificate()`, run one
       at a time — a `stop()` and a non-error route failure — each reach
       `axes_corrected_se()` and `axes_scaling_factor()` as
       `reason = "uncertified"` with exactly one warning and no error.
-- [ ] AC7 `devtools::test()` clean; `devtools::document()` no diff and no
+- [x] AC7 `devtools::test()` clean; `devtools::document()` no diff and no
       unresolved-link warning at pinned `cli.width`;
       `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes.
 
@@ -229,3 +229,174 @@ no longer split on this. Outside that band the divergence stays reachable in
 principle and unexhibited in fact.
 
 ## Review
+
+PR: https://github.com/jmgirard/circumplex/pull/144 (draft opened 2026-08-30).
+Branch 9 ahead / 0 behind `origin/master` at review start; no merge needed.
+
+### Acceptance-criteria evidence (fresh, 2026-08-30)
+
+- **AC1** — `axes_accuracy_certificate()` returns `fiml_ratio` from the same
+  `axes_dd_pricing()` replay as the other two (`ref$v / ref$v_naive`,
+  `R/axes_certificate.R`), and its sentinel carries three elements at every
+  early return. The finiteness/non-negativity assertion runs over the admitted
+  domain in "AC1: the estimate is finite and non-negative across the admitted
+  domain". `axes_certificate_worst()` is the single definition read by both
+  `axes_degeneracy_refusal()` and `axes_degeneracy_note()`; the test "AC1: the
+  refusal predicate and its warning both read the quotient" drives a
+  certificate whose first two fields sit inside the target and whose third sits
+  outside, gets `reason = "uncertified"`, and matches the warning text
+  `estimated relative error 0.01`. Suite green (below).
+- **AC2** — `Rscript devel/degeneracy-oracle/exact_oracle.R` re-run on a clean
+  tree: exit 0, `CERTIFICATE (18 of 18 lines checked ...): PASS`, ratio lines
+  9.83 to 10.00 at the six geometries. `CERT_CEILING` is unchanged at 1e3;
+  `CERT_CEILING_RATIO` is its own constant, frozen, and no plant run
+  re-measures it. The non-zero exits are exercised, not asserted: plant (i)
+  drove a ratio line below 1 and plant (ii) drove six above the ceiling, each
+  exiting 1 (AC4 below).
+- **AC3** — second oracle type at `tests/testthat/test-axes-certificate.R`,
+  test "the quotient's replay lands on hand-derived exact values where the
+  shipped route is WRONG (closed-form oracle)": the configuration
+  `S = [[1, 3/8], [3/8, 147469/2^20]]` with `M = [[0,0],[0,1]]`, derived by
+  hand and committed as literal fractions, sharing no code, library or pipeline
+  with `exact_oracle.py` or the route under test — the independence M108
+  records at that file's header. The committed error is nonzero and asserted so
+  (`expect_gt(true_rel, 2 * .Machine$double.eps)`; measured ~5.6e-13), and
+  `se` and `cval` both sit at their floor there, so the estimate for that fit
+  comes from the new field alone. Passed in the green run.
+- **AC4** — the three plants re-run one at a time on this tree, each reverted
+  and the tree verified clean after it (`git status` empty, certificate tests
+  147 passing again at the end). (i) Safety factor 10 -> 1 on the new field:
+  `exact_oracle.R` exit 1, the counterexample-B ratio line falling under 1
+  while every SE and cval line stayed at 9.83-10. (ii) The quotient's
+  denominator replayed at the non-identity congruence
+  `diag(sqrt(1..p)) %*% sigma %*% diag(sqrt(1..p))`: exit 1, all six ratio
+  lines above the 1e3 ceiling (5.3e4 to 1.5e15), SE and cval lines untouched.
+  (iii) The naive arm's replay collapsed onto the shipped double route in its
+  maximal form (`ref$v_naive <- dd_of(vn_hat)`): `exact_oracle.R` exit 0 with
+  all six ratio lines inside their window, while
+  `expect_gte(cert$fiml_ratio, true_rel)` at
+  `tests/testthat/test-axes-certificate.R:671` reddened (4e-15 against a true
+  5.6e-13), as did the discrimination assertion at `:681`. All three checks
+  existed on the clean tree and were seen green there before each plant.
+- **AC5** — the five sites read directly: `R/axes_certificate.R` (the replay
+  scope) names the RAW Sigma-hat arm; `R/axes_corrected_se.R:311` names
+  cov2cor as the matrix every user-reported number depends on;
+  `R/axes_corrected_se.R:362` and `:763` and `R/axes_reliability.R:1990` each
+  name the raw-metric arm explicitly. None claims the certificate omits an arm
+  because that arm is never user-reported except where the arm named is the
+  raw one. A `grep` over `R/`, `man/`, `NEWS.md`, `vignettes/` and `tests/`
+  for the claim found two further paraphrases, both in tests, both already
+  naming the raw arm.
+- **AC6** — test "AC6: a condition inside the certificate refuses at both
+  surfaces, never errors" runs a `stop()` and a non-error route failure one at
+  a time, each asserting `reason = "uncertified"`, `expect_length(w, 1L)` and
+  no error at both `axes_corrected_se()` and `axes_scaling_factor()`. Passed in
+  the green run.
+- **AC7** — `devtools::test()`: FAIL 0 / WARN 5 / SKIP 1 / PASS 8822 (the five
+  warnings are lavaan's own and pre-existing; the skip is the fixture-version
+  guard). `options(cli.width = 500); devtools::document()`: exit 0, no working-
+  tree diff, zero lines matching `resolve link`.
+  `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings /
+  0 notes (11m 38s).
+
+### Consistency gate
+
+Universal: `cairn_validate.py` exit 0, all checks pass (47 advisory work-log
+warnings, all pre-existing in M7). `cairn_impact.py` skipped — no DESIGN.md
+principle changed. Toolchain (`r-package` `consistency-gate` slot):
+`document()` no diff and no unresolved-link warning; no generated file
+hand-edited; README.md not stale against README.Rmd (neither touched);
+`pkgdown::check_pkgdown()` clean; NEWS.md entry present (amended, the check
+being unreleased); no new top-level files; `check()` clean; master watches
+`R-CMD-check.yaml` and `test-coverage.yaml` both `success` on the newest push
+run of `master`; `tools/check-master-red-alert.R`,
+`tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` each
+exit 0.
+
+### Independent review — three fresh-context lenses
+
+Executable surface touched, so the full three-lens fan-out ran.
+
+**[S] blame-history** — no findings. Verified that M89's nestedness contract,
+M91's decoupled-refusal contract, M108/D-051's scope claim and M111's shared
+predicate are extended rather than undone, and that D-054 annotates D-053
+rather than editing it. One cosmetic note: a stray line-wrap in `NEWS.md`
+leaves an orphaned one-word line.
+
+**[S] prior-PR-comments** — no findings. The
+`gh api repos/jmgirard/circumplex/pulls/comments` probe returned empty, so the
+PR-thread walk was skipped and archived `## Review` sections were the surface
+(M89, M90, M91, M106, M108, M110, M111, plus RR21). Nothing in the diff walks
+back a recorded disposition.
+
+**[O] diff-bug** — ten findings, ranked; listed with disposition below. The
+reviewer independently re-ran `exact_oracle.R` (18/18, exit 0) and the
+certificate tests (all pass, no skips) before reporting.
+
+#### [O] diff-bug findings, as reported (disposition recorded at the gate)
+
+1. **The widened predicate refuses fits on a field inert for three of the four
+   reported-quantity paths.** `fiml_ratio` reaches a user only at
+   `R/axes_reliability.R:1827`, i.e. only when `missing == "fiml"`; on listwise
+   and cormat fits, and for all four scaled statistics on every path, it is
+   computed and discarded. An ill-conditioned listwise fit with `se = 4e-5`,
+   `cval = 2e-5`, `fiml_ratio = 1.5e-4` now returns every corrected SE and all
+   four scaled statistics as `NA`/`"uncertified"` although every number it
+   would have reported carries at most 4e-5. Reachable: the reviewer measured
+   `fiml_ratio/se` from 0.46 to 2.1 over the `m106` families, and this branch's
+   own closed-form test exhibits `se` at its floor with `fiml_ratio` 2500x
+   higher.
+2. **The refusal warning attributes the printed estimate to the corrected
+   standard errors.** `R/axes_corrected_se.R:270-276` composes "The corrected
+   component standard errors could not be computed (uncertified: estimated
+   relative error ...)", filled from the three-field max, so a user can read
+   the FIML ratio's number as the SEs' accuracy. Same text is reached from
+   `axes_scaling_factor()`, where the ratio is not a term in anything computed.
+3. **`axes_certificate_worst()` drops a missing field silently and fails OPEN
+   on an empty certificate.** `axes_certificate_worst(list(se, cval))` returns
+   the two-field max with no error; `axes_certificate_worst(NULL)` returns
+   `-Inf` with a warning, which certifies the fit (against GP2) and emits a
+   second warning. Unreachable from shipped code today -- both producers return
+   three fields -- so this is a latent gap in the helper that exists to make
+   the field set impossible to get wrong.
+4. **The `tryCatch` handler duplicates the sentinel literal.**
+   `R/axes_corrected_se.R:788` writes `list(se = 1, cval = 1, fiml_ratio = 1)`
+   rather than calling the certificate's own sentinel, so a fourth field would
+   drift between the two -- the drift `axes_certificate_worst()` was added
+   thirteen lines below to prevent.
+5. **The bit-identity precondition does not pin the shipped naive arm the new
+   anchors depend on.** `tests/testthat/test-axes-certificate.R:236` compares
+   `c(cert_hex(v$corrected), cert_hex(u))` against the frozen hex; the frozen
+   `ratio` anchors are a function of `axes_v_pricing()$naive` too. A platform
+   reproducing `corrected` and `u` bit for bit but not `naive` does not skip,
+   and `expect_gte(cert$fiml_ratio, cs$ratio)` is then evaluated against
+   another machine's yardstick.
+6. **The planted-perturbation sensitivity layer was not extended to the third
+   field.** `tests/testthat/test-axes-certificate.R:472-511` perturbs only
+   `out$corrected` and `u` and asserts only `cert$se` and `cert$cval`; nothing
+   plants `out$naive` -- the new field's denominator -- and nothing asserts
+   `cert$fiml_ratio` responds.
+7. **The "this is a real error" guard uses a threshold that is not the floor it
+   names.** `tests/testthat/test-axes-certificate.R:665` tests
+   `true_rel > 2 * eps`, while the floor that would swallow it bites until
+   `delta_q > 4 * eps`. Harmless as committed (`true_rel` ~5.6e-13) and the
+   neighbouring `expect_gt(cert$fiml_ratio, floor_est)` does pin it correctly.
+8. **`CERT_CEILING_RATIO` was set to the inherited 1e3 rather than to the
+   measurement.** Every measured ratio line is 9.97-10.00, so two decades of
+   slack means a planted defect inflating the field up to 50x still passes
+   every ratio line; T5's plant (ii) only reddened because it overshot by 5e4x.
+9. **The exported help still describes a single estimate.**
+   `R/axes_reliability.R:722-729` says the check "estimates the relative error
+   the numbers it produced actually carry"; `NEWS.md` was widened to name all
+   three quantities and to say a fit can be refused on the ratio alone, and the
+   roxygen was not -- so no user-facing help tells a non-FIML user their fit
+   can be refused on a ratio their fit never reports (finding 1).
+10. **The oracle's `ratio_rel()` measures an n-dependent quantity against an
+    n-free exact value.** `devel/degeneracy-oracle/exact_oracle.R:174-181`
+    forms `pr$corrected / pr$naive` at `n = 600` (as the shipped route does),
+    while `exact_oracle.py` computes `sqrt(v_c/v_n)` n-free and the certificate
+    is n-free by construction; a future geometry whose true error lands near
+    1 ulp would have its anchor set by the choice of `n`.
+
+One further cosmetic note from the [S] blame-history lens: `NEWS.md` carries a
+stray line-wrap leaving an orphaned one-word line ("reasons").
