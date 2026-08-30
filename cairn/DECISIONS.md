@@ -1308,6 +1308,13 @@ change in NEWS.md and `?cais`. A future sample that is merely *unrepresentative*
 rather than off-metric is a different question and does not inherit this;
 that is the norms-fitness candidate row's territory.
 
+**Annotated by D-052 (2026-08-30, M112):** the withdrawal clause above was
+taken, on a ground this entry did not weigh — the sample shipping as data no
+call can accept — rather than on either piece of evidence named as the class
+that reopens this. The refusal itself is untouched and stays roster-wide; only
+the sample it refused is gone. The reopening class is unchanged, and D-052
+records what a reply now re-adds.
+
 ### D-041 (2026-08-08): the reference-statistics vocabulary keeps its names — `norm_standardize()`, `norms()`, `$Norms`, `Population` (M76, M77, RR16)
 
 **Context:** The M72–M75 provenance audit established what the 24 shipped

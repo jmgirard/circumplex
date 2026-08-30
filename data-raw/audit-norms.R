@@ -34,17 +34,17 @@
 AUDIT_BATCH <- data.frame(
   instrument = c("csie", "csig", "csip", "csiv", "iitc",
                  "iis32", "iis64", "ipipipc", "isc",
-                 "cais", "cais", "iei", "iei",
+                 "cais", "iei", "iei",
                  "igicr", "igicr", "igicr", "iipsc", "iipsc",
                  "iip32", "iip32", "iip32", "iip64", "iip64", "iip64"),
   sample     = c(rep(1, 9),
-                 1, 2, 1, 2,
+                 1, 1, 2,
                  1, 2, 3, 1, 2,
                  1, 2, 3, 1, 2, 3),
   citekey    = c("locke2007", "locke2014", "boudreaux2018", "locke2000",
                  "bliton2019", "hatcher2012", "hatcher2009", "markey2009",
                  "hopwood2011",
-                 "sodano2006", "sodano2006", "horner2024", "horner2024",
+                 "sodano2006", "horner2024", "horner2024",
                  "trucco2013", "trucco2013", "trucco2013",
                  "hopwood2008", "soldz1995",
                  "horowitz2003", "horowitz2003", "horowitz2003",
@@ -61,14 +61,14 @@ AUDIT_BATCH <- data.frame(
   # pp. 27-29). One source note, one citekey, two instruments: the note tags its
   # two audit-values blocks and parse_source_note() picks by instrument.
   divisor    = c(1, 1, 8, 1, 1, 1, 1, 1, 1,
-                 1, 1, 1, 1,
+                 1, 1, 1,
                  1, 1, 1, 4, 1,
                  4, 4, 4, 8, 8, 8),
   # The `scales` entry per multi-sample instrument is the pass whose note
   # actually carries the instrument-level rows. For iipsc that is SAMPLE 2:
   # soldz1995 prints the item-to-octant grouping and hopwood2008 does not.
   scales     = c(rep(TRUE, 9),
-                 TRUE, FALSE, TRUE, FALSE,
+                 TRUE, TRUE, FALSE,
                  TRUE, FALSE, FALSE, FALSE, TRUE,
                  TRUE, FALSE, FALSE, TRUE, FALSE, FALSE),
   stringsAsFactors = FALSE
@@ -178,7 +178,7 @@ validate_roster <- function(roster, fixture_world = FALSE) {
   # instruments is the same silent clean run one shape over: measured
   # 2026-08-15, `data.frame(instrument = "csie", sample = "1")` audits a csie
   # batch slice with 0 non-exempt shipped-sample gaps where the shipped roster
-  # reports 23. Neither "a superset of the batch" nor "complete per instrument"
+  # reports 23 -- 22 since M112 withdrew the cais adult sample. Neither "a superset of the batch" nor "complete per instrument"
   # catches it -- csie ships exactly one sample, so that roster satisfies both.
   # So a roster the caller has not declared a fixture world must cover the
   # whole of `data/` (M86).
@@ -190,7 +190,7 @@ validate_roster <- function(roster, fixture_world = FALSE) {
   # every near miss bought the exemption -- measured 2026-08-15, `"CSIE"`,
   # `"csie "` and `NA` each passed this validator and then audited the csie
   # batch slice at 1 non-exempt shipped-sample gap where the shipped roster
-  # reports 23. Repairing it by matching more spellings fixes the exempt set by
+  # reports 23 -- 22 since M112 withdrew the cais adult sample. Repairing it by matching more spellings fixes the exempt set by
   # what an author recalled, so the rule is total instead and the fixture says
   # so at its own call site. Nothing below reads an instrument name to decide
   # whether to check, which is what makes the spelling irrelevant.

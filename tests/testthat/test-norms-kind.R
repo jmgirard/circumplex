@@ -14,19 +14,19 @@ KIND_TOKENS <- c("standardization", "published", "unsourced")
 # instrument, sample, expected kind.
 expected_kinds <- data.frame(
   instrument = c(
-    "cais", "cais", "csie", "csig", "csip", "csiv", "iei", "iei",
+    "cais", "csie", "csig", "csip", "csiv", "iei", "iei",
     "igicr", "igicr", "igicr", "iip32", "iip32", "iip32",
     "iip64", "iip64", "iip64", "iipsc", "iipsc", "iis32", "iis64",
     "ipipipc", "isc", "iitc"
   ),
   sample = c(
-    1, 2, 1, 1, 1, 1, 1, 2,
+    1, 1, 1, 1, 1, 1, 2,
     1, 2, 3, 1, 2, 3,
     1, 2, 3, 1, 2, 1, 1,
     1, 1, 1
   ),
   kind = c(
-    "published", "published", "published", "published", "published",
+    "published", "published", "published", "published",
     "published", "published", "published",
     "published", "published", "published",
     "standardization", "standardization", "standardization",
@@ -82,18 +82,21 @@ test_that("the shipped kinds are the ones the audit record assigns", {
   }
 })
 
-test_that("the shipped roster partitions 6 / 16 / 2 across the three kinds", {
+test_that("the shipped roster partitions 6 / 15 / 2 across the three kinds", {
   # RR16 BC3's counts, asserted as literals rather than as a re-tally of the
   # expectation map -- the map and the shipped column already agree by the test
   # above, so tallying either one here would restate that agreement instead of
-  # pinning the partition the review bound.
+  # pinning the partition the review bound. RR16 bound 6 / 16 / 2 over 24
+  # samples; M112 withdrew one `published` sample, the cais adult one, and the
+  # partition is 6 / 15 / 2 over 23. The other two counts are unmoved, which is
+  # what a withdrawal of exactly one published sample should look like.
   kinds <- unlist(lapply(shipped_instruments(), function(nm) {
     shipped_instrument(nm)$Norms[[2]]$Kind
   }), use.names = FALSE)
 
-  expect_identical(length(kinds), 24L)
+  expect_identical(length(kinds), 23L)
   expect_identical(sum(kinds == "standardization"), 6L)
-  expect_identical(sum(kinds == "published"), 16L)
+  expect_identical(sum(kinds == "published"), 15L)
   expect_identical(sum(kinds == "unsourced"), 2L)
 })
 
@@ -184,9 +187,17 @@ test_that("every accepted call discloses its sample's kind, in message and attri
     pair_key(expected$instrument, expected$sample),
     pair_key(pairs$instrument, pairs$sample)
   )
-  # And the one pair the predicate excludes is excluded for D-040's reason,
-  # not by an empty predicate that would vacuously satisfy the setequal above.
-  expect_false("cais:2" %in% pair_key(pairs$instrument, pairs$sample))
+  # And the predicate is not vacuously permissive: no shipped sample is
+  # off-metric any more (M112 withdrew the one that was), so what the setequal
+  # above compares is two lists that agree because nothing is excluded. The
+  # exclusion D-040 performs is fenced here on a constructed off-metric
+  # object instead -- without this, an always-TRUE predicate would satisfy
+  # the setequal.
+  obj <- shipped_instrument("cais")
+  values <- obj$Norms[[1]]
+  values$M[[1]] <- max(obj$Anchors$Value) + 1
+  obj$Norms[[1]] <- values
+  expect_false(norm_sample_usable(obj, 1))
 
   for (i in seq_len(nrow(expected))) {
     obj <- shipped_instrument(expected$instrument[[i]])

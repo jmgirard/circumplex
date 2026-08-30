@@ -174,10 +174,12 @@ test_that("norm_standardize runs on every shipped instrument and sample", {
   #
   # A sample whose means fall outside its instrument's response range is
   # refused rather than standardized (see test-norms-anchor-range.R for the
-  # invariant and the one shipped violation). The expectation below is derived
-  # from that same predicate rather than hand-listing the exception, so it
-  # stays correct when the CAIS adult sample is corrected or withdrawn, and
-  # when a new instrument is added.
+  # invariant). Since M112 withdrew the CAIS adult sample no shipped sample
+  # violates it, so the refusal arm below is unreachable today and this file
+  # exercises only the standardizing arm; the constructed positive controls
+  # live in test-norms-anchor-range.R. The expectation is derived from the
+  # predicate rather than hand-listing exceptions, so the refusal arm becomes
+  # live again on its own if an off-metric sample is ever added.
   probe <- as.data.frame(matrix(2, nrow = 2, ncol = 8))
   for (nm in shipped_instruments()) {
     obj <- get(nm)

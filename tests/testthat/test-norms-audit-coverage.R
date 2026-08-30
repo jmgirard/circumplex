@@ -343,6 +343,14 @@ test_that("an unaudited note sample names the claiming instrument (M80)", {
   res <- env$audit_norms(b[!(b$instrument == "igicr" & b$sample == 3), ], dir)
   hit <- res$coverage[res$coverage$side == "note-sample-not-audited", ,
                       drop = FALSE]
+  # sodano2006.md tables the cais adult sample M112 withdrew, which no batch
+  # pass claims, so this side carries one standing row on every run. Asserted
+  # by identity and then set aside, rather than loosening the assertions
+  # below into membership tests that a wrong igicr row would also satisfy.
+  standing <- hit$instrument == "cais" & hit$sample == "2"
+  expect_identical(sum(standing), 1L)
+  expect_identical(hit$citekey[standing], "sodano2006")
+  hit <- hit[!standing, , drop = FALSE]
   expect_identical(hit$instrument, "igicr")
   expect_identical(hit$citekey, "trucco2013")
   expect_identical(hit$sample, "3")

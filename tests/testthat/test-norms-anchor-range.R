@@ -8,20 +8,34 @@
 # (M72-M75) could not catch this: it compares shipped against source, and here
 # the two agree.
 #
-# The one known violation is cais sample 2, whose source prints three CAIS
-# octant means above the instrument's own 1-5 maximum. The evidence that
-# sodano2006's Table 4 has its M and SD rows transposed with the IAS block,
-# what was ruled out, and the author query outstanding on it are recorded in
-# cairn/references/sodano2006.md ("On the adult sample's M and SD").
+# From M112 the shipped roster exhibits no violation. Its one violator, the
+# cais adult sample, was withdrawn rather than corrected: its source prints
+# three CAIS octant means above the instrument's own 1-5 maximum, and 22 days
+# after the author query neither of the two dispositions D-040 named was
+# available, so the sample shipped as data no call could use (D-052). The
+# transcription, the evidence that sodano2006's Table 4 has its M and SD rows
+# transposed with the IAS block, and what a reply would reopen are recorded in
+# cairn/references/sodano2006.md.
 #
-# It is pinned as an exact expected set rather than skipped, so the test fails
-# in both directions that matter: a NEW violation appears, or this one
-# disappears (which would mean the norms were corrected and this pin, and the
-# refusal in norm_standardize(), should both be revisited).
+# So the expected violation set is empty, and the two things that could make
+# that emptiness meaningless are fenced separately: the sweep's domain is
+# asserted non-empty here, and the refusal itself is exercised below on
+# constructed off-metric objects rather than on a shipped sample.
 
 # Every shipped sample of every shipped instrument, swept by the same
 # enumeration the provenance pins use -- not a hand-list, which would only
 # cover what its author remembered to name.
+anchor_range_pairs <- function() {
+  out <- character(0)
+  for (nm in shipped_instruments()) {
+    obj <- shipped_instrument(nm)
+    values <- obj$Norms[[1]]
+    if (is.null(obj$Anchors) || is.null(values) || nrow(values) == 0) next
+    out <- c(out, paste0(nm, " sample ", unique(values$Sample)))
+  }
+  sort(out)
+}
+
 anchor_range_violations <- function() {
   out <- character(0)
   for (nm in shipped_instruments()) {
@@ -41,26 +55,67 @@ anchor_range_violations <- function() {
   sort(out)
 }
 
+# A shipped instrument with exactly one of its means pushed out of its own
+# declared range -- the off-metric case the roster no longer carries. Built
+# from a shipped object so the refusal meets a real Norms/Scales/Anchors
+# shape rather than a hand-written stub that could diverge from one.
+off_metric_instrument <- function(nm, sample = 1, which_row = 1) {
+  obj <- shipped_instrument(nm)
+  values <- obj$Norms[[1]]
+  rows <- which(values$Sample == sample)
+  values$M[[rows[[which_row]]]] <- max(obj$Anchors$Value) + 1
+  obj$Norms[[1]] <- values
+  obj
+}
+
+# The refusal's message names the offending scales between "mean score for "
+# and " falls outside". Asserting over that span rather than the whole message
+# keeps a scale abbreviation appearing elsewhere in the sentence from reading
+# as an accusation.
+named_scales <- function(msg) {
+  sub(".*mean score for (.*) falls outside.*", "\\1", msg)
+}
+
 test_that("no shipped norm sample's mean falls outside its instrument's anchors", {
-  expect_identical(anchor_range_violations(), "cais sample 2")
+  # Domain first: an empty sweep would satisfy the emptiness below without
+  # having looked at anything (M108).
+  # Pinned, not merely non-empty: `> 0` is satisfied by a sweep that reached
+  # one instrument, while this test's own comment claims every shipped sample
+  # of every shipped instrument. The sibling roster tests pin the same 23.
+  expect_identical(length(anchor_range_pairs()), 23L)
+  expect_identical(anchor_range_violations(), character(0))
 })
 
-test_that("the cais anchor-range violation is the three octants on record", {
-  values <- cais$Norms[[1]]
-  s2 <- values[values$Sample == 2, ]
-  hi <- max(cais$Anchors$Value)
-  expect_identical(sort(s2$Scale[s2$M > hi]), c("LM", "NO", "PA"))
+# The withdrawn sample is gone from the roster, not merely refused. Asking for
+# it must report the argument at fault and what the instrument does carry --
+# the unmatched-sample message, not the anchor-range one, which would mean the
+# rows were still shipped.
+
+test_that("the withdrawn cais adult sample is absent, not present-and-refused", {
+  data("jz2017")
+  msg <- tryCatch(
+    norm_standardize(jz2017, scales = 2:9, instrument = cais, sample = 2),
+    error = conditionMessage
+  )
+  expect_match(msg, "No normative data for sample 2", fixed = TRUE)
+  expect_match(msg, "CAIS carries sample 1", fixed = TRUE)
+  expect_false(grepl("response range", msg, fixed = TRUE))
 })
 
-# norm_standardize() must refuse the sample rather than return z-scores whose
-# unit is undefined. Refusal, not a warning: there is no metric under which the
-# returned numbers are correct, so this blocks no defensible analysis (GP2,
-# fail closed on the undecidable rather than guessing).
+# norm_standardize() must refuse an off-metric sample rather than return
+# z-scores whose unit is undefined. Refusal, not a warning: there is no metric
+# under which the returned numbers are correct, so this blocks no defensible
+# analysis (GP2, fail closed on the undecidable rather than guessing). No
+# shipped sample exercises this path any more, so the case is constructed.
 
 test_that("norm_standardize() refuses a norm sample outside the anchor range", {
   data("jz2017")
+  obj <- off_metric_instrument("cais")
   expect_error(
-    norm_standardize(jz2017, scales = 2:9, instrument = cais, sample = 2),
+    norm_standardize(
+      jz2017, scales = 2:9, angles = obj$Scales$Angle, instrument = obj,
+      sample = 1
+    ),
     "outside .* response range",
     fixed = FALSE
   )
@@ -68,11 +123,15 @@ test_that("norm_standardize() refuses a norm sample outside the anchor range", {
 
 test_that("norm_standardize()'s refusal names the sample and points somewhere useful", {
   data("jz2017")
+  obj <- off_metric_instrument("cais")
   msg <- tryCatch(
-    norm_standardize(jz2017, scales = 2:9, instrument = cais, sample = 2),
+    norm_standardize(
+      jz2017, scales = 2:9, angles = obj$Scales$Angle, instrument = obj,
+      sample = 1
+    ),
     error = conditionMessage
   )
-  expect_match(msg, "sample 2")
+  expect_match(msg, "sample 1")
   expect_match(msg, "CAIS")
   expect_match(msg, "norms\\(\\)")
 })
@@ -108,9 +167,8 @@ test_that("the refusal does not disturb instruments with no violation", {
 
 # The refusal names the offending scales by reading the second column of
 # Norms[[1]], which is labelled `Scale` on 8 shipped instruments and `Abbrev`
-# on 7. cais -- the only shipped violator -- is `Scale`-labelled, so the
-# shipped roster cannot exhibit the `Abbrev` case at all: a constructed
-# violator is the only way to fence it.
+# on 7. Both cases are constructed: no shipped sample is off-metric, so
+# neither label can be exercised by the roster.
 
 test_that("the refusal names the offending scales on an Abbrev-labelled instrument", {
   data("jz2017")
@@ -137,4 +195,44 @@ test_that("the refusal names the offending scales on an Abbrev-labelled instrume
   # pins that shape, so the assertion above cannot pass on a message that
   # merely happens to contain the abbreviation somewhere else.
   expect_false(grepl("mean score for  falls", msg, fixed = TRUE))
+  # And the converse, which naming-the-offender alone does not fence: the
+  # message must name ONLY the octant that is out of range. Without this,
+  # dropping the `outside` subset in the refusal -- blaming all eight octants
+  # for one bad mean -- leaves this file green (measured 2026-08-30 by
+  # mutating R/tidying_functions.R:265: 22 passed, 0 failed).
+  expect_false(any(vapply(
+    setdiff(as.character(values$Abbrev), offender),
+    function(other) grepl(other, named_scales(msg), fixed = TRUE),
+    logical(1)
+  )))
+})
+
+test_that("the refusal names the offending scales on a Scale-labelled instrument", {
+  data("jz2017")
+  base <- shipped_instrument("cais")
+  expect_true("Scale" %in% names(base$Norms[[1]]))
+  values <- base$Norms[[1]]
+  # Read the offender through the same index expression off_metric_instrument()
+  # mutates -- the row that is pushed, not the third row of the whole frame.
+  # The two coincide only while cais ships a single sample listed first, and a
+  # reply from Sodano re-adding the adult sample could end that.
+  offender <- as.character(values$Scale[[which(values$Sample == 1)[[3]]]])
+  obj <- off_metric_instrument("cais", which_row = 3)
+  msg <- tryCatch(
+    norm_standardize(
+      jz2017, scales = 2:9, angles = obj$Scales$Angle, instrument = obj,
+      sample = 1
+    ),
+    error = conditionMessage
+  )
+  expect_match(msg, "response range")
+  expect_match(msg, offender, fixed = TRUE)
+  expect_false(grepl("mean score for  falls", msg, fixed = TRUE))
+  # Only the pushed octant is named; see the Abbrev case above for why
+  # naming-the-offender alone does not fence this.
+  expect_false(any(vapply(
+    setdiff(as.character(values$Scale[values$Sample == 1]), offender),
+    function(other) grepl(other, named_scales(msg), fixed = TRUE),
+    logical(1)
+  )))
 })

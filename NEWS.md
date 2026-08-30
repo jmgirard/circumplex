@@ -190,16 +190,27 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   measure-zero floating-point corner for real data, so numeric results are
   otherwise unchanged.
 
+* The CAIS's second normative sample has been **withdrawn**, and `cais` now
+  ships one sample, the child sample. The CAIS is rated on a 5-point scale, but
+  three of the octant means its source publishes for the second sample's
+  respondents fall above 5, so that sample is not on the metric of the scores
+  it would standardize and the z-scores it produced were wrong in an undefined
+  unit. It was therefore refused rather than used (see the next item), which
+  left it shipping as data no call could accept. The transcription was faithful
+  — the discrepancy originates in the source's own table — so the values
+  survive, with the evidence and what a reply from the authors would reopen, in
+  the package's source repository under `cairn/references/sodano2006.md`.
+  Code that passed `sample = 2` to `norm_standardize()` for the CAIS was
+  already erroring and now errors saying the sample does not exist. The CAIS
+  child sample and every other instrument are unaffected. See `?cais`.
+
 * `norm_standardize()` now refuses a normative sample whose mean scores fall
   outside the instrument's own response range, instead of returning z-scores
   computed from it. Such a sample cannot be on the same metric as the scores
   being standardized, so the values it produced were wrong in an undefined
-  unit, with nothing in the output to indicate it. One shipped sample is
-  affected: the CAIS adult sample (`sample = 2`), three of whose octant means
-  exceed the CAIS's 1–5 response range. The CAIS child sample (`sample = 1`)
-  and every other instrument are unaffected. See `?cais`; the source of those
-  values is under query with its authors, and the sample will be corrected or
-  withdrawn once that is settled.
+  unit, with nothing in the output to indicate it. No shipped sample is now
+  affected — the one that was is the withdrawn CAIS sample above — and the
+  check stands so that no future sample can enter the roster off-metric.
 
 * `norm_standardize()` now reports which normative sample it used. Every
   successful call prints the sample number, its size, its description and its
@@ -805,8 +816,10 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   correct throughout.
 * The normative data shipped with `cais`, `iei`, `igicr` and `iipsc` has now
   been re-verified against its published sources the same way as the other nine.
-  Every mean and standard deviation of all nine normative samples was confirmed
-  correct, as was every scale angle the sources publish. Four shipped values did
+  Every mean and standard deviation of the nine normative samples those four
+  instruments carried at the time was confirmed correct, as was every scale
+  angle the sources publish. (One of the nine, the CAIS's second sample, has
+  since been withdrawn — see above.) Four shipped values did
   not match their source and are corrected: the `cais` item-to-scale key above,
   and the three provenance records below.
 * Three provenance records changed with that verification. The `cais` sample
