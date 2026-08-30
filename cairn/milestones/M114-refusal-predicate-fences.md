@@ -1,11 +1,11 @@
 # M114: Pin the shared refusal predicate, and assert the dead literal rather than dropping it
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M113
 - **Driving RR:** —
 - **Principles touched:** GP2
-- **Branch/PR:** —
+- **Branch/PR:** `m114-refusal-predicate-fences`
 
 ## Goal
 
@@ -63,7 +63,7 @@ performance residue → the ROADMAP degeneracy candidate row.
 - [ ] T2 Commit the straddling input (or the stub), assert `"uncertified"` at
       both surfaces, mutate the predicate to per-surface fields, record the
       redden, revert and verify the tree clean.
-- [ ] T3 Add the AC8 grid assertion, keeping `"ill_conditioned"` in the guard
+- [x] T3 Add the AC8 grid assertion, keeping `"ill_conditioned"` in the guard
       set; prove it able to fail by planting that return.
 - [ ] T4 NEWS entry if any user-visible behaviour moved; profile verify and
       consistency-gate slot.
@@ -74,6 +74,9 @@ performance residue → the ROADMAP degeneracy candidate row.
 - 2026-08-30: criteria audit ran in FULL mode (declared user-facing tier) as part of the joint M113/M114/M115 run; its finding on AC2 is disposed in the gate line below, and its instrument-property finding on AC1's "the search that failed is recorded" clause was fixed by moving that clause to T1.
 - 2026-08-30: plan gate chose keeping `"ill_conditioned"` in `check_nested()`'s set and asserting its deadness on the AC8 grid over dropping it as M111 review F12 proposed, because `axes_scaling_factor()`'s `cval <= 0` backstop still emits that literal (`R/axes_scaled_fit.R:302`, asserted at `test-axes-scaled-fit.R:1764`), so dropping it would silently retire nestedness coverage there; falsified by that backstop being removed or proved unreachable.
 - 2026-08-30: `Depends on: M113` because M113 adds a third certificate field, which changes what a straddling set means for AC1.
+- 2026-08-30: pre-implementation gate: the per-surface alternative AC1 must redden against is `max(se, fiml_ratio)` at the SE helper and `cval` at the scaling surface — the partition each function's own return defines; the M113 review's F3 fail-open on a short certificate was declined for this milestone and stays on the ROADMAP degeneracy row.
+- 2026-08-30: T3 run ahead of T1/T2 (minor reorder — the AC2 assertion is independent of AC1's input search, which runs long).
+- 2026-08-30: T3 done. `check_nested()` now asserts `reason` is not `"ill_conditioned"` at both surfaces on every matrix the AC8 grid drives, with the literal kept in the guard set; planting `list(reason = "ill_conditioned", ...)` in `axes_degeneracy_refusal()` reddened both new assertions (`actual TRUE` at the near-singular matrix, all three p), reverted and green at 348 passing.
 
 ## Decisions
 
