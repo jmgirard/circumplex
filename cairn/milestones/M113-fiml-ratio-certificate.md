@@ -66,14 +66,22 @@ degeneracy candidate row.
       whose shipped double route carries a NONZERO committed error, so the
       field is validated where there is an error to catch and not only at its
       floor. `(RB tripwire: ip-touching)`
-- [ ] AC4 Three planted defects, run one at a time against the frozen ceilings,
-      each redden the new field's own ratio line at a named geometry in
-      `exact_oracle.R`: the field's safety factor dropped from 10 to 1 (an
-      under-report, against the floor), the ratio replayed at the raw `Σ̂`
-      rather than `cov2cor(Σ̂)` (the D-044 metric split), and the double-double
-      replay of the naive arm truncated to double precision (a collapse of the
-      reference route). The three vary magnitude, metric and route, not one
-      axis three times.
+- [ ] AC4 Three planted defects, run one at a time against the frozen
+      ceilings, vary magnitude, metric and route rather than one axis three
+      times, and each is caught by a check present on the clean tree before
+      the plant is applied. The new field's safety factor dropped from 10 to 1
+      (an under-report against the floor), and the quotient's denominator
+      replayed one non-identity diagonal congruence away from the priced
+      matrix (the D-044 metric split, expressed as a congruence because the
+      certificate is handed only `cov2cor(Σ̂)` and never the raw `Σ̂`), each
+      redden the new field's own ratio line at a named geometry in
+      `exact_oracle.R`. The double-double replay of the naive arm collapsed
+      onto the shipped double route — the maximal form of that defect, the
+      only form this criterion claims — reddens
+      `expect_gte(cert$fiml_ratio, true_rel)` in the closed-form oracle test
+      at `tests/testthat/test-axes-certificate.R`, while every
+      `exact_oracle.R` ratio line stays inside its window at all six
+      geometries.
 - [ ] AC5 The comment sites `R/axes_certificate.R:343`,
       `R/axes_corrected_se.R:311`, `:359`, `:757` and
       `R/axes_reliability.R:1989` each state the arm relationship correctly:
@@ -117,9 +125,9 @@ degeneracy candidate row.
       while the exact ratio stays hand-derivable; derive it, commit it as
       literal fractions at the asserting test, and record the oracle type
       there. `(RB tripwire: ip-touching)`
-- [ ] T5 Plant the three AC4 defects one at a time against the frozen
-      ceilings; record per-defect results naming the reddened line and its
-      geometry, revert each and verify the tree clean.
+- [x] T5 Plant the three AC4 defects one at a time against the frozen
+      ceilings; record per-defect results naming the check that reddened and
+      its site, revert each and verify the tree clean.
 - [ ] T6 Correct the five AC5 comment sites; sweep `man/`, `NEWS.md`,
       `vignettes/` and `tests/` for paraphrases of the same claim.
 - [ ] T7 `tryCatch` the certificate call at `R/axes_corrected_se.R:764`,
@@ -145,6 +153,8 @@ degeneracy candidate row.
 - 2026-08-30: T2 — the certificate returns a third field, `fiml_ratio`, priced pre-square-root on the quotient of the shipped arms against the quotient of the replayed arms (n cancels, as for `se`); `axes_dd_pricing()` now replays the naive arm at the same matrix; the refusal predicate and the warning's printed estimate both read one new helper, `axes_certificate_worst()`, so they cannot drift apart again. Suite: 0 failures, 8789 passing.
 - 2026-08-30: T3 — the exact-rational oracle emits the quotient per component and the driver brackets the new field at all six geometries; the run prints eighteen certificate lines and passes, the quotient's ratios measuring 9.97 to 10.00, so its own ceiling is frozen at 1e3 (`CERT_CEILING_RATIO`), the window the other two already carry. The six measured errors are frozen at the anchors in `tests/testthat/test-axes-certificate.R`.
 - 2026-08-30: T4 — the construction the plan gate's falsifier was aimed at exists. At `S = [[1, 3/8], [3/8, 147469/2^20]]` with the single derivative matrix `[[0,0],[0,1]]` (kappa 1.0e5, admitted), the hand-derived exact arm variances are `65784995034489/2^51` and `169/2^39`, both exact doubles; the replay lands on both, while the shipped route is wrong by 1.1e-12 on the quotient and by less than a floor's worth on the corrected arm and `cval` — so the new field alone carries the estimate there. Derivation and independence recorded at the asserting test in `tests/testthat/test-axes-certificate.R`. No weaker claim and no mini gate needed.
+- 2026-08-30: T5 — the three plants run one at a time, each reverted and the tree verified clean after it. (i) The new field's safety factor 10 → 1: `exact_oracle.R` exits 1, the counterexample-B ratio line falling to 0.9995 while every SE and cval line stays at 9.83–10. (ii) The quotient's denominator replayed at `diag(sqrt(1..p)) %*% sigma %*% diag(sqrt(1..p))`: exits 1, all six ratio lines above the 1e3 ceiling (5.3e4 to 1.5e15) with the SE and cval lines untouched. (iii) The naive arm's replay collapsed onto the shipped double route: `exact_oracle.R` exits 0 with all six ratio lines inside their window — measured, in three forms (low word dropped, last matrix product in plain double, full collapse) — while the collapse reddens three assertions in `tests/testthat/test-axes-certificate.R`, `expect_gte(cert$fiml_ratio, true_rel)` among them.
+- 2026-08-30: amendment (substantive, mini gate): AC4 rewritten. Two of its three plants do not redden the check it named — the raw-`Σ̂` replay is not writable inside a certificate handed only `cov2cor(Σ̂)`, and the route collapse is invisible to all six `exact_oracle.R` geometries because the corrected arm's error sits within an order of magnitude of the quotient's there. The amended wording pins each plant to the check that does catch it, requires that check to exist on the clean tree before the plant, excludes the identity congruence, and claims only the maximal form of the route defect. It went to a fresh-context [O] reader that authored none of it, running the criteria audit's questions in FULL mode (the milestone's declared tier); the reader returned six findings and the amended text is its recommended narrower repair, which fixed all six — the unpinned detector, the prose-satisfiable escape clause, the recording clause the first audit had already moved to T5, the unbounded causal claim, the identity congruence, and the unclaimed partial-precision forms. The gate adopted it.
 
 ## Decisions
 
