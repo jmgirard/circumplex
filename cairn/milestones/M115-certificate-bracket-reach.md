@@ -83,9 +83,10 @@ row.
 - [x] T5 Fix `cert_n` to count formed ratios; replace `sweep_ok` and
       `reach_ok` with forms derived from their loops' collected values; empty
       each domain in turn and record the failure.
-- [ ] T6 Read the PR's CI run and record which platforms the bracket asserted
-      on — a gate observation, not a criterion; then the profile verify and
-      consistency-gate slot.
+- [ ] T6 Run the profile's verify and consistency-gate slot. Then, at the
+      review gate — where the PR and therefore the CI run exist — read that run
+      and record which platforms the bracket asserted on: a gate observation,
+      not a criterion.
 
 ## Work log
 
@@ -100,6 +101,7 @@ row.
 - 2026-08-30: T3 — the non-empty-domain assertion (`AC3: the anchor case list is not empty`) shipped in the T1-T2 commit, since it lives in the same helper block; proved here by replacing `cert_anchors()`'s body with `list()`: it reddens with two failures naming the expected length and the expected ids, where before the change an emptied list generated no per-case tests at all and the file reported PASS. Two further errors surfaced in the n-invariance and planted-perturbation tests, which index the list directly. List restored, file green.
 - 2026-08-30: T4 — the safety-factor plant. Before this milestone nothing reddened: every assertion mentioning the factor computed its expectation from `axes_certificate_safety_factor` itself, so estimate and expectation moved together. Writing 10 down at the three sites (`cert_floor`, and `f` in the planted-perturbation test) makes `axes_certificate_safety_factor <- 100` fail 13 assertions in 3 tests, all in `test-axes-certificate.R`: 8 in the planted-perturbation test (the `se` and `cval` upper bounds at each of the four deltas), 3 in the dyadic closed-form test and 2 in the quotient closed-form test (each field asserted at the floor). Plant reverted, tree clean against HEAD, file green.
 - 2026-08-30: T5 — `cert_n` now increments where the ratio is formed, not on entry to `cert_line()`, so a case going exact would report 17 of 18 and redden instead of printing eighteen comparisons it had not made; `sweep_ok` and `reach_ok` are derived from the ratio vectors their own loops collect, checked against written-down counts (3 and 5) rather than against the domain's own length, which would go on matching with both emptied. The two verdict lines now name how many ratios they compared. Measured: with both domains emptied the pre-M115 accumulator form printed SWEEP PASS and REACHABLE PASS having compared nothing, while the new form prints `0 of 3` FAIL and `0 of 5` FAIL and the script exits 1. Emptying the reachable domain alone also drops the certificate count to 3 of 18, FAIL. Domains restored, script exits 0.
+- 2026-08-30: minor amendment to T6 — the CI read is moved to the review gate. `R-CMD-check.yaml` triggers only on push to the default branch or on `pull_request`, and `/milestone-review` is what opens the PR, so no CI run exists while implement is running. Nothing in AC6 or any other criterion moves; the CI read was already recorded as a gate observation rather than a criterion.
 - 2026-08-30: `Depends on: M113` because M113 extends the oracle's certificate case list, which T1 and T2 both read.
 
 ## Decisions
