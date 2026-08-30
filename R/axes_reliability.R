@@ -720,12 +720,17 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' at or below `sqrt(p * .Machine$double.eps / 1e-5)` is not refused for that
 #' alone; it is *checked*. The check replays this fit's own arithmetic in
 #' roughly 31-digit precision and estimates the relative error the numbers it
-#' produced actually carry, and the fit computes whenever that estimate is
-#' within the accuracy target `1e-4`. Of the reachable geometries measured
+#' produced actually carry -- three of them: the corrected standard errors,
+#' the factor the scaled statistics are divided by, and the ratio that
+#' multiplies the reported standard error on the `missing = "fiml"` path. The
+#' fit computes whenever the WORST of those three is within the accuracy target
+#' `1e-4`. Of the reachable geometries measured
 #' below the floor, all but one committed counterexample estimate around
-#' `1e-11` and compute. A fit whose estimate exceeds the target, or that the check cannot
-#' price at all, is refused as `"uncertified"`, and its warning names the
-#' estimate. That `1e-5` in the floor is not itself the tolerance: it is the
+#' `1e-11` and compute. A fit whose worst estimate exceeds the target, or that
+#' the check cannot price at all, is refused as `"uncertified"`, and its warning
+#' names that same worst estimate. The three are read as one because both
+#' surfaces refuse as a unit, so a fit on any path can be refused on the FIML
+#' ratio's estimate even where that ratio is not part of what it reports. That `1e-5` in the floor is not itself the tolerance: it is the
 #' accuracy target `1e-4`, the largest relative error a reported standard
 #' error may carry, divided by the factor of `10` by which the floor's
 #' a-priori error bound may undershoot the error it stands for. The accuracy
@@ -1985,9 +1990,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # (D-037) -- was refused while every reported number computed (M91;
       # RR18 rec 7). Carries the same refusal vocabulary as
       # `se_correction_failed`. Deliberately silent: no warning and no
-      # printed note accompany it, because the refused quantity is never
-      # user-reported and the reported SEs beside it are present and correct
-      # (M91-D1).
+      # printed note accompany it, because the refused quantity -- the raw
+      # arm named above, never the cov2cor-metric naive arm the reported
+      # `fiml_ratio` divides by -- is never user-reported, and the reported
+      # SEs beside it are present and correct (M91-D1).
       naive_reason = corrected$naive_reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for

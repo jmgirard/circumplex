@@ -204,7 +204,11 @@ axes_v_pricing <- function(sigma, d) {
     # carries dr_ij = ds_ij - 0.5*rho_ij*(ds_ii + ds_jj). Off the diagonal W is
     # unchanged; the diagonal absorbs the standardization. The substitution of
     # `sigma` for rho is exact only at a unit diagonal, so `corrected` and
-    # `fiml_ratio` are priced at cov2cor(Sigma-hat) while `naive` is priced raw.
+    # `fiml_ratio` are priced at cov2cor(Sigma-hat) while the REPORTED `naive`
+    # vector is priced raw. Both arms are computed here at whichever matrix
+    # this call was handed: axes_corrected_se() calls it twice, and the
+    # cov2cor call's `naive` -- not reported itself -- is what `fiml_ratio`
+    # divides by, which is why the certificate prices that arm too (M113).
     wc <- w
     diag(wc) <- 0
     diag(wc) <- -rowSums(wc * sigma)
@@ -307,9 +311,10 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # Checked before any
   # pricing so that what refuses a degenerate matrix is a stated contract, not
   # whichever solve() call happens to give up first on this platform's LAPACK.
-  # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) (the
-  # corrected arm, and the only matrix anything user-reported depends on) and
-  # the raw realigned Sigma-hat (the `naive` arm below inverts it). The two
+  # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) -- the
+  # matrix every user-reported number depends on, `corrected` and BOTH of the
+  # `fiml_ratio` quotient's arms alike -- and the raw realigned Sigma-hat,
+  # which only the reported `naive` vector below inverts. The two
   # arms no longer refuse as a unit (M91; RR18 rec 7): the cov2cor arm
   # tripping refuses all three vectors under `reason` -- relabelling one arm's
   # number as the other's stays the undetectable failure -- while a failure
@@ -356,7 +361,9 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 
   # The raw arm, decoupled (M91): a criterion trip or a pricing failure here
   # touches `naive` alone. No warning is emitted for it -- the refused
-  # quantity is never user-reported (it exists as the lavaan tie, D-037) and
+  # quantity is the RAW-metric naive vector, never the cov2cor-metric naive
+  # arm the quotient above divides by, and it is never user-reported (it
+  # exists as the lavaan tie, D-037) and
   # every reported number is present and correct; the refusal is carried in
   # `naive_reason` (surfaced as details$naive_reason; M91-D1) under the same
   # vocabulary every other refusal uses (M91-D2).
@@ -732,15 +739,16 @@ axes_sigma_degenerate <- function(sigma) {
 #                     same matrix with the same derivative set, and nothing
 #                     memoizes between them (M111 review F14).
 #
-# ONE PREDICATE, BOTH SURFACES (M111 gate). The certificate reports two
-# estimates -- the corrected component SEs' (worst component) and the scaling
-# factor's cval -- and the decision reads the WORSE of the two at both call
-# sites, rather than each surface reading its own. Gating each surface on its
+# ONE PREDICATE, BOTH SURFACES (M111 gate). The certificate reports three
+# estimates -- the corrected component SEs' (worst component), the scaling
+# factor's cval, and since M113 the corrected/naive quotient's -- and the
+# decision reads the WORST of the three at both call sites, rather than each
+# surface reading its own. Gating each surface on its
 # own field would let one surface compute while the other refuses the same
 # matrix, which is exactly the split M89's nestedness contract exists to
 # prevent and which the shared-literal tests pin. The cost of the shared
-# predicate is that a fit whose SEs are certified but whose cval is not
-# refuses both; that direction is the fail-closed one (GP2).
+# predicate is that a fit certified on one field but not another refuses at
+# both surfaces; that direction is the fail-closed one (GP2).
 #
 # THE THRESHOLD is delta_star, the accuracy target itself -- not tau. tau is
 # the a-priori bound's implementation constant, discounted by the calibration
@@ -752,20 +760,45 @@ axes_sigma_degenerate <- function(sigma) {
 # elimination hits a zero pivot -- sits four decades past delta_star, so an
 # uncertifiable fit refuses (GP2).
 #
-# NOT APPLIED TO THE RAW ARM. axes_corrected_se()'s `naive` arm evaluates the
-# criterion on the raw Sigma-hat and keeps doing so unchanged: the certificate
-# replays the CORRECTED arm only (the naive arm is never user-reported -- it is
-# the lavaan tie, D-037), so there is nothing certifying it would license.
+# NOT APPLIED TO THE RAW ARM. axes_corrected_se()'s REPORTED `naive` vector is
+# priced at the raw Sigma-hat, evaluates the criterion there, and keeps doing
+# so unchanged: the certificate never sees that matrix, and the quantity is
+# never user-reported (it is the lavaan tie, D-037), so there is nothing
+# certifying it would license. What M113 added is a different arm entirely --
+# the naive quadratic forms at cov2cor(Sigma-hat), which are `fiml_ratio`'s
+# denominator and reach the user through it.
 axes_degeneracy_refusal <- function(sigma, d) {
   reason <- axes_sigma_degenerate(sigma)
   if (!identical(reason, "ill_conditioned")) {
     return(list(reason = reason, cert = NULL))
   }
-  cert <- axes_accuracy_certificate(sigma, d)
-  if (max(cert$se, cert$cval) <= axes_degeneracy_delta_star) {
+  # FENCED (M113). This helper's contract is to REFUSE, never to error: it is
+  # called from inside axes_corrected_se() and axes_scaling_factor(), both of
+  # which owe the user a named refusal and exactly one warning on a matrix
+  # they cannot price. The certificate is a large arithmetic surface -- a
+  # hand-rolled inverse, an 18-function compensated arithmetic, and the
+  # shipped pricing it replays -- and any condition raised anywhere in it
+  # would otherwise propagate out of here as an error the caller has no
+  # handler for. A condition means the fit could not be certified, which is
+  # exactly what the sentinel says, and the sentinel refuses (GP2). The
+  # handler is on `error` and on nothing else: a warning raised inside the
+  # certificate must still reach the user, or the one-warning-per-refusal
+  # contract would be met by swallowing rather than by not emitting.
+  cert <- tryCatch(axes_accuracy_certificate(sigma, d),
+                   error = function(e) axes_certificate_sentinel())
+  if (axes_certificate_worst(cert) <= axes_degeneracy_delta_star) {
     return(list(reason = NULL, cert = cert))
   }
   list(reason = "uncertified", cert = cert)
+}
+
+# The one definition of "the certificate's estimate for this fit", read by the
+# refusal predicate above and printed by axes_degeneracy_note() below. Kept in
+# one place deliberately: until M113 the two computed the max independently and
+# over different field sets, so a fit refused on a field the note did not read
+# would have been warned a number BELOW the target it was refused against.
+axes_certificate_worst <- function(cert) {
+  max(cert$se, cert$cval, cert$fiml_ratio)
 }
 
 # The diagnostic clause attached to a refusal warning, at both surfaces (M111).
@@ -784,7 +817,7 @@ axes_degeneracy_note <- function(refusal, sigma) {
   if (!identical(refusal$reason, "uncertified")) return(NULL)
   paste0(
     sprintf("estimated relative error %.2g",
-            max(refusal$cert$se, refusal$cert$cval)),
+            axes_certificate_worst(refusal$cert)),
     "; ", axes_degeneracy_hint(sigma)
   )
 }
