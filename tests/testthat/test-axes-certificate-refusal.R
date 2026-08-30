@@ -324,3 +324,206 @@ test_that("M111 AC4: 'indefinite' and 'singular' still refuse at both surfaces, 
     expect_identical(r$sf, "singular", label = sprintf("p %d, non-finite", p))
   }
 })
+
+
+# ---- M114 AC1: the shared predicate, fenced against the per-surface split ----
+#
+# WHAT IS UNDER TEST. axes_degeneracy_refusal() reads ONE number for both
+# surfaces -- axes_certificate_worst(), the max over the certificate's three
+# fields -- rather than letting each surface read the field it produces. That
+# was the M111 gate's choice over the per-surface alternative, on the grounds
+# that gating each surface on its own field would let one surface compute while
+# the other refuses the same matrix, which is the split M89's nestedness
+# contract exists to prevent. Nothing failed if the max were replaced by that
+# alternative (M111 review F4): every case committed before this milestone has
+# all three fields on one side of the target, so both readings agree on all of
+# them.
+#
+# WHERE THE STRADDLE COMES FROM. T1 searched the three anchor families' stated
+# parameter space and a neighbourhood of the committed counterexample for an
+# input whose fields land on opposite sides of the target. Families A and B do
+# not produce one at any parameter tried: their fields climb together to ~1e-7
+# and then both pricing routes fail at once, so all three become the sentinel 1
+# with nothing in between. Family C does, and not marginally. At p = 4 -- the
+# minimum design the exported API accepts -- the cval sum cancels decades
+# earlier than the SE quadratic forms do, so across a band of item-error
+# variances the scaling factor's estimate is past the target while the SE
+# vector's and the quotient's are three decades inside it. The margins are what
+# make this worth committing rather than stubbing: a platform whose arithmetic
+# differs would have to move a field by three decades to unmake the straddle.
+m114_straddle_eps <- c(3e-9, 5e-9, 8e-9)
+m114_straddle_sigma <- function(eps) m106_family_c(eps, xi1 = 0.1, xi2 = 0.3)
+
+test_that("M114 AC1: an input whose fields straddle the target refuses at BOTH surfaces", {
+  ang <- c(90, 180, 270, 360)
+  scl <- as.character(1:4)
+  d <- axes_se_derivs(ang, scl, NULL, FALSE, FALSE)
+  ds <- axes_degeneracy_delta_star
+
+  # WHICH members of the band straddle HERE, named rather than counted. The
+  # certificate's fields are this machine's own arithmetic, and a platform that
+  # prices these matrices differently could push a member onto the sentinel
+  # route, where all three fields become 1 and the straddle is gone (the M113
+  # windows-latest lesson, reached at a third surface). So the band is measured
+  # first and the assertions below run over what it actually yields.
+  straddling <- character()
+  for (eps in m114_straddle_eps) {
+    sigma <- m114_straddle_sigma(eps)
+    # The precondition: the criterion routes this matrix to the certificate,
+    # rather than to one of the two literals that refuse without consulting it.
+    expect_identical(axes_sigma_degenerate(sigma), "ill_conditioned",
+                     label = sprintf("eps %g: criterion verdict", eps))
+    cert <- axes_accuracy_certificate(sigma, d)
+    if (cert$cval > ds && cert$se <= ds && cert$fiml_ratio <= ds) {
+      straddling <- c(straddling, format(eps))
+    }
+  }
+  # The domain is not allowed to empty silently. If every member degenerated,
+  # this criterion has nothing to assert on this machine and must say so rather
+  # than pass vacuously.
+  expect_false(identical(straddling, character()),
+               label = "band members straddling the target, as a set")
+
+  for (eps in m114_straddle_eps[format(m114_straddle_eps) %in% straddling]) {
+    lab <- sprintf("family C p = 4, eps %g", eps)
+    sigma <- m114_straddle_sigma(eps)
+    cert <- axes_accuracy_certificate(sigma, d)
+
+    # The straddle itself, stated as the two facts that make it one: the
+    # scaling surface's own field is past the target, and BOTH of the SE
+    # helper's own fields are inside it. This is the configuration on which the
+    # shared max and the per-surface reading disagree.
+    expect_gt(cert$cval, ds)
+    expect_lte(cert$se, ds)
+    expect_lte(cert$fiml_ratio, ds)
+
+    wse <- testthat::capture_warnings(
+      se <- axes_corrected_se(sigma, rownames(sigma), ang, scl, NULL, n = 600,
+                              fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+    )
+    wsf <- testthat::capture_warnings(
+      sf <- axes_scaling_factor(sigma, rownames(sigma), ang, scl, NULL,
+                                fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                                df = 4L * 5L / 2L - length(d$mats),
+                                baseline_df = 4L * 3L / 2L)
+    )
+
+    # BOTH surfaces refuse, under one literal. The SE helper is the one the
+    # per-surface reading would let compute: neither of the fields it produces
+    # is past the target, and it refuses anyway because the decision is not
+    # its own field's to make.
+    expect_identical(se$reason, "uncertified", label = sprintf("%s: SE helper", lab))
+    expect_identical(sf$reason, "uncertified", label = sprintf("%s: scaling", lab))
+    expect_true(all(is.na(se$corrected)), label = lab)
+    expect_identical(sf$scale, NA_real_, label = lab)
+    # A unit refusal: the one reason speaks for all three SE vectors (M91).
+    expect_null(se$naive_reason, label = lab)
+
+    # One warning each, and the estimate each carries is the field the refusal
+    # was actually made on -- the note reads axes_certificate_worst() too, so a
+    # surface cannot be refused on one number and shown another. Asserted as
+    # the route rather than the digits, which are this machine's arithmetic:
+    # the note is present and it is NOT the sentinel's 1.
+    expect_length(wse, 1L)
+    expect_length(wsf, 1L)
+    expect_length(grep("estimated relative error ", wse, fixed = TRUE), 1L)
+    expect_length(grep("estimated relative error ", wsf, fixed = TRUE), 1L)
+    expect_length(grep("estimated relative error 1;", wse, fixed = TRUE), 0L)
+    expect_length(grep("estimated relative error 1;", wsf, fixed = TRUE), 0L)
+  }
+})
+
+
+# The same fence, per field, on a stubbed certificate. The case above is the
+# real input AC1 asks for and it exercises exactly one of the three fields --
+# `cval`, the only one the search found on the far side alone. This one covers
+# the other two, and covers all three with fields that are exact rather than
+# measured, so what it pins is the PREDICATE's arithmetic and not some
+# machine's rounding near a threshold.
+test_that("M114 AC1: a straddling certificate refuses at BOTH surfaces, whichever field is the bad one", {
+  # The matrix only has to reach the certificate branch and be one BOTH
+  # surfaces can otherwise price; the stub supplies the numbers. That rules out
+  # the committed counterexample, whose scaling surface trips the `cval <= 0`
+  # backstop whatever the certificate says. Reachable geometry a5 -- family A
+  # at p = 8, kappa 1e5 -- is below the criterion's floor and computes at both
+  # surfaces, which is what AC2 above asserts of it end-to-end.
+  sigma <- m106_family_a(2.4e-5, 1L)
+  ang <- as.numeric(octants())
+  scl <- as.character(1:8)
+  di <- m111_dfs(nrow(sigma), ang, scl)
+  expect_identical(axes_sigma_degenerate(sigma), "ill_conditioned")
+
+  ds <- axes_degeneracy_delta_star
+  lo <- ds / 1e4                       # four decades inside the target
+  hi <- ds * 1e2                       # two decades past it
+
+  both <- function(cert) {
+    local_mocked_bindings(axes_accuracy_certificate = function(sigma, d) cert)
+    wse <- testthat::capture_warnings(
+      se <- axes_corrected_se(sigma, rownames(sigma), ang, scl, NULL,
+                              n = 600, fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+    )
+    wsf <- testthat::capture_warnings(
+      sf <- axes_scaling_factor(sigma, rownames(sigma), ang, scl, NULL,
+                                fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                                df = di$df, baseline_df = di$baseline_df)
+    )
+    list(se = se$reason, sf = sf$reason, wse = wse, wsf = wsf)
+  }
+
+  # THE STUB IS LIVE, and shown to be by the direction that cannot be the
+  # matrix's own doing: this geometry COMPUTES at both surfaces unstubbed (AC2
+  # above), and with every field stubbed past the target it refuses at both.
+  # Without this the cases below could be reading the matrix rather than the
+  # certificate and stay green under any predicate at all.
+  r <- both(list(se = hi, cval = hi, fiml_ratio = hi))
+  expect_identical(r$se, "uncertified", label = "all three past: SE helper")
+  expect_identical(r$sf, "uncertified", label = "all three past: scaling")
+
+  # The baseline in the other direction: every field inside the target and
+  # both surfaces compute, so a refusal below is a refusal the stub caused.
+  r <- both(list(se = lo, cval = lo, fiml_ratio = lo))
+  expect_null(r$se, label = "all three inside: SE helper")
+  expect_null(r$sf, label = "all three inside: scaling surface")
+
+  # THE STRADDLES, one per field. In each, exactly one field is past the target
+  # and the other two are four decades inside it, so the shared max refuses and
+  # a per-surface reading would not. The FIELDS ARE NAMED, not counted: which
+  # field is bad is the whole content of the case, because each one belongs to
+  # a different surface under the alternative this fences.
+  #
+  #   `cval`        the scaling surface's own field. Under the alternative the
+  #                 SE helper reads max(se, fiml_ratio) and COMPUTES -- so this
+  #                 case is what reddens at the SE helper.
+  #   `se`          the SE helper's own. The scaling surface reads cval alone
+  #                 and computes -- this case reddens at the scaling surface.
+  #   `fiml_ratio`  also the SE helper's (axes_corrected_se() returns the
+  #                 quotient). Same redden as `se`, at the scaling surface, and
+  #                 it is asserted separately because a mutation could easily
+  #                 carry `se` and drop the quotient.
+  straddles <- list(
+    list(field = "cval",
+         cert = list(se = lo, cval = hi, fiml_ratio = lo)),
+    list(field = "se",
+         cert = list(se = hi, cval = lo, fiml_ratio = lo)),
+    list(field = "fiml_ratio",
+         cert = list(se = lo, cval = lo, fiml_ratio = hi))
+  )
+  for (case in straddles) {
+    lab <- sprintf("only `%s` past the target", case$field)
+    r <- both(case$cert)
+
+    # One shared literal, both surfaces -- M89's nestedness contract, which is
+    # what the shared max buys.
+    expect_identical(r$se, "uncertified", label = sprintf("%s: SE helper", lab))
+    expect_identical(r$sf, "uncertified",
+                     label = sprintf("%s: scaling surface", lab))
+
+    # And the number the user is shown is the same one the refusal was made
+    # against -- the note reads axes_certificate_worst() too, so a field the
+    # predicate refused on cannot be a field the note declines to print. `hi`
+    # is 0.01, which is what "%.2g" makes of it.
+    expect_length(grep("estimated relative error 0.01", r$wse, fixed = TRUE), 1L)
+    expect_length(grep("estimated relative error 0.01", r$wsf, fixed = TRUE), 1L)
+  }
+})

@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
-| M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | in-progress | M113 | normal | milestones/M114-refusal-predicate-fences.md |
+| M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | review | M113 | normal | milestones/M114-refusal-predicate-fences.md |
 | M115 | Make the packaged accuracy bracket assert where the shipped pricing differs | planned | M113 | normal | milestones/M115-certificate-bracket-reach.md |
 | M109 | Repair the test guards that skip on the surface that ships | done | — | normal | milestones/archive/M109-source-tree-test-reads.md |
 | M110 | Correct the calibration-domain claim in the accuracy target and its shipped surfaces | done | — | high | milestones/archive/M110-calibration-domain-claim.md |
