@@ -358,6 +358,10 @@ test_that("M114 AC1: an input whose fields straddle the target refuses at BOTH s
   ang <- c(90, 180, 270, 360)
   scl <- as.character(1:4)
   d <- axes_se_derivs(ang, scl, NULL, FALSE, FALSE)
+  # Computed by the same helper the M111 cases use, not hard-coded: a p change
+  # must not silently turn a refusal into the scaling surface's df_mismatch
+  # door and pass for the wrong reason (M114 review [O] F8).
+  di <- m111_dfs(4L, ang, scl)
   ds <- axes_degeneracy_delta_star
 
   # WHICH members of the band straddle HERE, named rather than counted. The
@@ -366,25 +370,35 @@ test_that("M114 AC1: an input whose fields straddle the target refuses at BOTH s
   # route, where all three fields become 1 and the straddle is gone (the M113
   # windows-latest lesson, reached at a third surface). So the band is measured
   # first and the assertions below run over what it actually yields.
-  straddling <- character()
-  for (eps in m114_straddle_eps) {
+  # The band this test runs over, asserted rather than assumed, per this file's
+  # convention at "M111 AC2" above: a shortened band would quietly reduce what
+  # the loop below covers.
+  expect_length(m114_straddle_eps, 3L)
+
+  # A LOGICAL MASK, not a set of formatted numbers (M114 review [O] F1). Round-
+  # tripping eps through format() would compare a scalar's rendering with a
+  # vector's, and format() pads a numeric VECTOR to a common mantissa width --
+  # so on a widened band the membership test could match nothing while the
+  # non-emptiness guard below still passed, emptying the assertion loop
+  # silently. Indexing by mask cannot drift that way.
+  straddling <- logical(length(m114_straddle_eps))
+  for (i in seq_along(m114_straddle_eps)) {
+    eps <- m114_straddle_eps[[i]]
     sigma <- m114_straddle_sigma(eps)
     # The precondition: the criterion routes this matrix to the certificate,
     # rather than to one of the two literals that refuse without consulting it.
     expect_identical(axes_sigma_degenerate(sigma), "ill_conditioned",
                      label = sprintf("eps %g: criterion verdict", eps))
     cert <- axes_accuracy_certificate(sigma, d)
-    if (cert$cval > ds && cert$se <= ds && cert$fiml_ratio <= ds) {
-      straddling <- c(straddling, format(eps))
-    }
+    straddling[[i]] <- cert$cval > ds && cert$se <= ds && cert$fiml_ratio <= ds
   }
   # The domain is not allowed to empty silently. If every member degenerated,
   # this criterion has nothing to assert on this machine and must say so rather
   # than pass vacuously.
-  expect_false(identical(straddling, character()),
-               label = "band members straddling the target, as a set")
+  expect_true(any(straddling),
+              label = "at least one band member straddles the target")
 
-  for (eps in m114_straddle_eps[format(m114_straddle_eps) %in% straddling]) {
+  for (eps in m114_straddle_eps[straddling]) {
     lab <- sprintf("family C p = 4, eps %g", eps)
     sigma <- m114_straddle_sigma(eps)
     cert <- axes_accuracy_certificate(sigma, d)
@@ -404,8 +418,7 @@ test_that("M114 AC1: an input whose fields straddle the target refuses at BOTH s
     wsf <- testthat::capture_warnings(
       sf <- axes_scaling_factor(sigma, rownames(sigma), ang, scl, NULL,
                                 fit_zeta1 = FALSE, fit_zeta2 = FALSE,
-                                df = 4L * 5L / 2L - length(d$mats),
-                                baseline_df = 4L * 3L / 2L)
+                                df = di$df, baseline_df = di$baseline_df)
     )
 
     # BOTH surfaces refuse, under one literal. The SE helper is the one the
@@ -446,12 +459,25 @@ test_that("M114 AC1: a straddling certificate refuses at BOTH surfaces, whicheve
   # the committed counterexample, whose scaling surface trips the `cval <= 0`
   # backstop whatever the certificate says. Reachable geometry a5 -- family A
   # at p = 8, kappa 1e5 -- is below the criterion's floor and computes at both
-  # surfaces, which is what AC2 above asserts of it end-to-end.
+  # surfaces, which is what the M111 AC2 test above asserts of it end-to-end.
+  # That test is not what makes this one honest, though: it can skip when
+  # lavaan is absent, so the liveness argument rests on the all-fields-inside
+  # baseline below, which is run here (M114 review [O] F7).
   sigma <- m106_family_a(2.4e-5, 1L)
   ang <- as.numeric(octants())
   scl <- as.character(1:8)
   di <- m111_dfs(nrow(sigma), ang, scl)
   expect_identical(axes_sigma_degenerate(sigma), "ill_conditioned")
+
+  # THE FIELD SET THE STUBS BELOW MUST COVER, pinned to the certificate's own
+  # sentinel rather than to this file's memory of it (M114 review [O] F2).
+  # axes_certificate_worst() is a max over the fields it is handed, and
+  # `max(1, 2, NULL)` is 2 -- so a fourth field added the way M113 added
+  # `fiml_ratio` would leave every hand-written stub here silently short, the
+  # new field pinned by nothing while all six straddle assertions stayed green.
+  # This is the same drift axes_certificate_sentinel() exists to prevent at the
+  # call site; asserting against it makes a field addition redden HERE.
+  expect_named(axes_certificate_sentinel(), c("se", "cval", "fiml_ratio"))
 
   ds <- axes_degeneracy_delta_star
   lo <- ds / 1e4                       # four decades inside the target
@@ -509,6 +535,9 @@ test_that("M114 AC1: a straddling certificate refuses at BOTH surfaces, whicheve
     list(field = "fiml_ratio",
          cert = list(se = lo, cval = lo, fiml_ratio = hi))
   )
+  # One case per field, asserted rather than assumed: a dropped entry would
+  # retire a field's coverage with nothing to show for it.
+  expect_length(straddles, 3L)
   for (case in straddles) {
     lab <- sprintf("only `%s` past the target", case$field)
     r <- both(case$cert)
@@ -519,11 +548,24 @@ test_that("M114 AC1: a straddling certificate refuses at BOTH surfaces, whicheve
     expect_identical(r$sf, "uncertified",
                      label = sprintf("%s: scaling surface", lab))
 
+    # One warning per refusal, at each surface -- the contract M90 AC7 states,
+    # asserted here too so a second warning carrying the note could not pass
+    # for the one (M114 review [O] F9).
+    expect_identical(length(r$wse), 1L,
+                     label = sprintf("%s: SE helper warning count", lab))
+    expect_identical(length(r$wsf), 1L,
+                     label = sprintf("%s: scaling warning count", lab))
+
     # And the number the user is shown is the same one the refusal was made
     # against -- the note reads axes_certificate_worst() too, so a field the
-    # predicate refused on cannot be a field the note declines to print. `hi`
-    # is 0.01, which is what "%.2g" makes of it.
-    expect_length(grep("estimated relative error 0.01", r$wse, fixed = TRUE), 1L)
-    expect_length(grep("estimated relative error 0.01", r$wsf, fixed = TRUE), 1L)
+    # predicate refused on cannot be a field the note declines to print. The
+    # expected text is DERIVED from `hi` rather than spelled "0.01", so a
+    # change to axes_degeneracy_delta_star cannot fail these greps for a reason
+    # that has nothing to do with what they test (M114 review [O] F5).
+    note <- sprintf("estimated relative error %.2g", hi)
+    expect_identical(length(grep(note, r$wse, fixed = TRUE)), 1L,
+                     label = sprintf("%s: SE helper note", lab))
+    expect_identical(length(grep(note, r$wsf, fixed = TRUE)), 1L,
+                     label = sprintf("%s: scaling note", lab))
   }
 })

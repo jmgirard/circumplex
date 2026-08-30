@@ -199,3 +199,34 @@ comments verified true except as noted. Findings and dispositions:
 Return floor: none of the ten demonstrates an acceptance criterion failing, and
 the diff changes no shipped behaviour, so none is a load-bearing defect in what
 the package does for users. No status return.
+
+### Fix-now work at the gate
+
+The maintainer chose "fix six, then merge" at the approval chip, so findings 1,
+2, 3, 5, 7, 8 and 9 were repaired on the branch (seven changes; 3 and 9 are one
+sitting each at two sites). Findings 4, 6 and 10 stand rejected as recorded
+above. Changes, all in `tests/testthat/test-axes-certificate-refusal.R`:
+
+- F1: the band-membership set is now a logical mask indexed positionally, so no
+  `format()` round-trip stands between the straddle test and the loop it feeds;
+  the non-emptiness guard is `expect_true(any(straddling))`.
+- F2: `expect_named(axes_certificate_sentinel(), c("se", "cval", "fiml_ratio"))`
+  now precedes the stubs, so adding a fourth certificate field reddens here
+  rather than leaving the hand-written stubs silently short.
+- F3: `expect_length(m114_straddle_eps, 3L)` and `expect_length(straddles, 3L)`.
+- F5: the expected note text is built with `sprintf("estimated relative error
+  %.2g", hi)` rather than the literal `"0.01"`.
+- F7: the comment now names the M111 AC2 test and says outright that the
+  liveness argument rests on the all-fields-inside baseline run in this test,
+  not on a case that can skip without lavaan.
+- F8: the AC1 df pair comes from `m111_dfs(4L, ang, scl)`.
+- F9: one warning per refusal asserted at both surfaces in the stub test.
+
+`expect_length()` takes no `label`, so the two count assertions are
+`expect_identical(length(...), 1L, label = ...)`.
+
+Re-verified after the fixes: the two touched files 0 failures / 2,288 passing
+(up 9 from the pre-fix 2,279); the AC1 per-surface mutation still reddens, at
+`test-axes-certificate-refusal.R:428/430/433/440/442` across the band, reverted
+with `R/` clean; `devtools::check(args = "--no-manual")` Status OK — 0 errors,
+0 warnings, 0 notes, 7m 44.2s.
