@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M112: Withdraw the CAIS adult normative sample
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -39,26 +39,26 @@ stands.
 
 ## Acceptance criteria
 
-- [ ] AC1: `cais$Norms[[1]]` carries rows for sample 1 only, and
+- [x] AC1: `cais$Norms[[1]]` carries rows for sample 1 only, and
       `cais$Norms[[2]]` carries exactly one row, with `Sample == 1`.
-- [ ] AC2: `norm_standardize(jz2017, scales = 2:9, instrument = cais,
+- [x] AC2: `norm_standardize(jz2017, scales = 2:9, instrument = cais,
       sample = 2)` errors with the unmatched-sample message — naming sample 2
       and reporting that the CAIS carries sample 1 — and not with the
       anchor-range message.
-- [ ] AC3: No shipped norm sample's octant mean falls outside its instrument's
+- [x] AC3: No shipped norm sample's octant mean falls outside its instrument's
       declared anchor range, over the sweep `anchor_range_violations()`
       performs (every name `shipped_instruments()` returns × every `Sample`
       value in that instrument's `Norms[[1]]`); the sweep's domain is asserted
       non-empty in the same test, so an empty roster cannot pass it (M108).
-- [ ] AC4: `norm_standardize()` still refuses any normative sample whose means
+- [x] AC4: `norm_standardize()` still refuses any normative sample whose means
       leave its instrument's anchor range, and the standardization message's
       other-samples clause still counts only samples that would be accepted —
       both holding when no shipped sample exercises either path.
-- [ ] AC5: `git grep -inE 'adult sample|sample ?= ?2|sample 2|5\.19|6\.52|6\.14'
+- [x] AC5: `git grep -inE 'adult sample|sample ?= ?2|sample 2|5\.19|6\.52|6\.14'
       -- R man NEWS.md vignettes README.md` returns no site describing the CAIS
       adult sample as shipped; `?cais` and NEWS.md's 2.0.0 section each state
       that the sample was withdrawn, why, and where its transcription survives.
-- [ ] AC6: The record of the withdrawn sample survives and agrees with the
+- [x] AC6: The record of the withdrawn sample survives and agrees with the
       roster: `cairn/references/sodano2006.md`'s `<!-- audit-values-begin -->`
       … `<!-- audit-values-end -->` block is byte-identical to its
       pre-milestone content and the file records the withdrawal (date, ground,
@@ -66,7 +66,7 @@ stands.
       the post-removal roster reproduces the committed
       `norms-audit-ledger.csv` and `norms-audit-dispositions.csv`, neither of
       which contains a cais sample-2 row.
-- [ ] AC7: `devtools::test()` passes and `devtools::check(args =
+- [x] AC7: `devtools::test()` passes and `devtools::check(args =
       "--no-manual")` is clean (PROFILE.md verify slot), including a
       warning-free `devtools::document()`.
 
@@ -102,7 +102,7 @@ stands.
       `cairn/references/norms-audit.md`'s roster, citekey-map and
       reference-kind tables; append the withdrawal note to
       `cairn/references/sodano2006.md` leaving its extracted block untouched.
-- [ ] T6: Run AC5's grep; full `devtools::test()` and
+- [x] T6: Run AC5's grep; full `devtools::test()` and
       `devtools::check(args = "--no-manual")`; rewrite the ROADMAP cais candidate
       row's reopening
       condition from "promote on a reply" to "a reply re-adds corrected values
@@ -123,6 +123,8 @@ stands.
 - 2026-08-30: T5 done. Audit rerun regenerates `norms-audit-ledger.csv` (cais rows 4 -> 2) and `norms-audit-coverage.csv`; the two orphaned cais sample-2 rows were removed from `norms-audit-dispositions.csv`, which the script reads rather than writes. `norms-audit.md`'s roster verdict, citekey map and reference-kind table updated; `derive-norms-kind.R` reports 23 audit-table rows against 23 shipped samples, zero disagreements. `sodano2006.md` records the withdrawal, its ground and what a reply reopens; its extracted-values block is byte-identical to master (md5 03f6e573bffe88f299c4657c3eddd71c both sides). D-040 gained a forward annotation naming D-052.
 - 2026-08-30: gate choice — the audit's coverage sweep now reports one standing non-exempt gap, because sodano2006.md still tables the withdrawn sample and no batch pass claims it. Pinned by identity (side, instrument, citekey, sample) rather than exempted, keeping AC6's byte-identity and the record's per-scale granularity; a call-site withdrawal exemption in `audit-norms.R` and relabelling the block's rows `note-only` were the alternatives. Falsified by a second standing gap appearing, which the identity pin would catch.
 - 2026-08-30: the standing gap made two guards vacuous and both were repaired, not just re-pinned: `test-norms-audit-roster.R`'s M79 drop-every-batch-row fence counted raw gaps, so every drop would have looked noticed, and `test-norms-audit-coverage.R`'s M80 unaudited-note-sample assertions would have had to loosen into membership tests. Both now assert the standing row by identity and subtract it.
+- 2026-08-30: T6 done. AC5's grep returns one hit, NEWS.md:203, which says a call passing `sample = 2` for the CAIS now errors saying the sample does not exist — a site describing it as absent, not shipped. `devtools::test()`: FAIL 0 | WARN 5 | SKIP 1 | PASS 8768, warnings and skip unchanged from master. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes (7m52s). ROADMAP's cais candidate row rewritten: it is no longer promoted by a reply arriving; a "swapped" reply enters under D-039's numeric-change gate whether or not the wrong values were still shipped, a "correct as printed" reply closes the row.
+- 2026-08-30: AC6's audit half verified by re-running `data-raw/audit-norms.R` against the committed CSVs — identical except the three stamp columns (`generated`, `script_commit`, `data_commit`), which every run rewrites from the current date and HEAD, so the committed copy is always one commit behind by construction. Not a milestone effect; noted for review.
 
 ## Decisions
 
