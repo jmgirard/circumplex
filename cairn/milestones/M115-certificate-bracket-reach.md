@@ -78,7 +78,7 @@ row.
       perturbation and record the skip count.
 - [x] T3 Add the non-empty-domain assertion; prove it by emptying the case
       list, then restore.
-- [ ] T4 Run the safety-factor plant against the packaged suite; record which
+- [x] T4 Run the safety-factor plant against the packaged suite; record which
       assertions redden, revert and verify the tree clean.
 - [ ] T5 Fix `cert_n` to count formed ratios; replace `sweep_ok` and
       `reach_ok` with forms derived from their loops' collected values; empty
@@ -98,6 +98,7 @@ row.
 - 2026-08-30: T2 — the precondition's shipped-pricing half is gone; `cert_true_error()` measures the running machine's own relative error against the committed exact pairs, and `cert_bracket()` asserts on both branches (at the floor: the machine's error is below what the floor certifies; above it: the [1, 1e3] bracket), so no case can report PASS having asserted nothing. The M113 closed-form case's `fiml_ratio` skip is replaced by the same two-branch form, closing the second surface of the platform-reach gap.
 - 2026-08-30: AC2 demonstration — with `axes_v_pricing()`'s corrected arm perturbed by a relative 3e-13, the pre-M115 test file skipped all six cases naming the shipped pricing, while the new file reported zero skips and every bracket assertion ran (its four failures are the two dyadic closed-form cases, which the plant makes non-exact by construction). Plant reverted, `devtools::test()` clean at FAIL 0 / SKIP 1, that skip pre-existing in `test-axes-scaled-fit.R`.
 - 2026-08-30: T3 — the non-empty-domain assertion (`AC3: the anchor case list is not empty`) shipped in the T1-T2 commit, since it lives in the same helper block; proved here by replacing `cert_anchors()`'s body with `list()`: it reddens with two failures naming the expected length and the expected ids, where before the change an emptied list generated no per-case tests at all and the file reported PASS. Two further errors surfaced in the n-invariance and planted-perturbation tests, which index the list directly. List restored, file green.
+- 2026-08-30: T4 — the safety-factor plant. Before this milestone nothing reddened: every assertion mentioning the factor computed its expectation from `axes_certificate_safety_factor` itself, so estimate and expectation moved together. Writing 10 down at the three sites (`cert_floor`, and `f` in the planted-perturbation test) makes `axes_certificate_safety_factor <- 100` fail 13 assertions in 3 tests, all in `test-axes-certificate.R`: 8 in the planted-perturbation test (the `se` and `cval` upper bounds at each of the four deltas), 3 in the dyadic closed-form test and 2 in the quotient closed-form test (each field asserted at the floor). Plant reverted, tree clean against HEAD, file green.
 - 2026-08-30: `Depends on: M113` because M113 extends the oracle's certificate case list, which T1 and T2 both read.
 
 ## Decisions
