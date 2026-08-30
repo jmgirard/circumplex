@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
-| M113 | Certify the ratio the reported FIML standard error is multiplied by | planned | — | high | milestones/M113-fiml-ratio-certificate.md |
+| M113 | Certify the ratio the reported FIML standard error is multiplied by | in-progress | — | high | milestones/M113-fiml-ratio-certificate.md |
 | M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | planned | M113 | normal | milestones/M114-refusal-predicate-fences.md |
 | M115 | Make the packaged accuracy bracket assert where the shipped pricing differs | planned | M113 | normal | milestones/M115-certificate-bracket-reach.md |
 | M108 | Build and validate a per-fit accuracy certificate | done | — | normal | milestones/archive/M108-per-fit-certificate.md |

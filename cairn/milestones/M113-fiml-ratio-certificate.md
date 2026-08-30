@@ -1,11 +1,11 @@
 # M113: Certify the ratio the reported FIML standard error is multiplied by
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2
-- **Branch/PR:** —
+- **Branch/PR:** `m113-fiml-ratio-certificate`
 
 ## Goal
 
@@ -99,7 +99,7 @@ degeneracy candidate row.
 
 ## Tasks
 
-- [ ] T1 Measure the cancellation: replay `corrected`, `naive` and their ratio
+- [x] T1 Measure the cancellation: replay `corrected`, `naive` and their ratio
       in double-double at each of the oracle's certificate cases and record the
       ratio's relative error against each arm's. Settles whether the ratio needs
       its own replay or is bounded by the arms.
@@ -141,7 +141,45 @@ degeneracy candidate row.
 - 2026-08-30: the criteria the gate changed (AC1, AC2, AC3, AC4) went back through the audit's questions in FULL mode, to a second fresh-context [O] reader that authored none of them; it returned nine findings. Eight were fixed here: the AC4 location plant could not redden, because under the plan gate's own cancellation hypothesis substituting an arm's error OVER-estimates and AC2 let the ceiling be re-measured — the ceiling is now frozen and the plant set replaced by three varying magnitude, metric and route; `axes_degeneracy_note()` still printed `max(se, cval)`, so a fit refused on the ratio field would have warned a number below the target it was refused against; AC1 permitted a non-finite third field, whose `NaN` would raise in `axes_degeneracy_refusal()`'s comparison OUTSIDE T7's tryCatch, against GP2; AC3's "no code and no pipeline" was unsatisfiable as worded and is narrowed to M108's own phrasing; AC2's count was pinned to `CERT_EXPECTED`, a constant the implementer sets after the fact, and to `cert_n`, which counts lines rather than ratios — now eighteen lines stated in the criterion; the single shared `CERT_CEILING` could have been loosened for the two already-audited fields and is now per-field; and AC4's redden is tied to the new field's own line at a named geometry. The ninth (F8 — AC3 was satisfiable by extending the zero-committed-error dyadic oracle, which would have validated the new field only where there is no error to catch) went to the user gate and was closed by requiring a nonzero committed error; see the gate line below.
 
 - 2026-08-30: plan gate chose requiring AC3's second oracle type to pin the ratio at a configuration carrying a NONZERO committed error over extending the existing dyadic closed-form oracle, whose configuration is priced exactly and where the certificate is only asserted to report its floor, because a second type that never meets an error validates IP3 in letter and not in substance for a number printed to users; falsified by no dyadic-rational configuration existing that is ill-conditioned enough to commit measurable error and still hand-derivable, which would force the weaker claim at a mini gate.
+- 2026-08-30: T1 measured, ahead of the question gate because the gate rests on it: at the six geometries `exact_oracle.R` prices, the quotient's committed relative error exceeds BOTH arms' own at four of them (worst factor 1.85), and falls 76x below their sum only at counterexample B. D-053's first reopening condition is therefore met; the disposition is M113-D1 below.
 
 ## Decisions
+
+### M113-D1 (2026-08-30): the quotient's committed error is bounded by neither arm's own, which settles that it needs its own replay and removes the "conservative" reading of the rejected alternative
+
+**Measurement (T1).** `v_corrected`, `v_naive` and their quotient replayed in
+double-double at the six geometries `devel/degeneracy-oracle/exact_oracle.R`
+prices, each read against the shipped double route. Maxima over fitted
+components, relative errors of the pre-square-root quantities:
+
+| case | e(v_corrected) | e(v_naive) | e(quotient) | e(v_corrected)+e(v_naive) |
+|---|---|---|---|---|
+| a4 (family A, kappa 1e4) | 1.174e-13 | 8.378e-14 | 1.194e-13 | 2.012e-13 |
+| a5 (family A, kappa 1e5) | 6.008e-12 | 2.131e-12 | 3.877e-12 | 8.139e-12 |
+| c4 (family C, p = 4) | 1.292e-12 | 1.388e-12 | 1.136e-12 | 2.680e-12 |
+| b9a (near-duplicate .9999) | 1.260e-12 | 8.785e-13 | 2.139e-12 | 2.139e-12 |
+| b9b (near-duplicate .99999) | 2.253e-11 | 2.090e-11 | 1.336e-11 | 4.343e-11 |
+| cxb (counterexample B) | 6.710e-02 | 6.547e-02 | 1.742e-03 | 1.326e-01 |
+
+Per fitted component, the quotient's error exceeds both arms' own at a4, c4,
+b9a and b9b -- worst factor 1.85 (b9b, the `zeta1` component: 1.336e-11 against
+7.216e-12 and 6.148e-12). Reproducible from the tree once T2 lands: the replay is
+`axes_dd_pricing()`'s and the shipped values are `axes_v_pricing()`'s, read at
+the case builders in `tests/testthat/helper-m106-degeneracy.R`.
+
+**What it settles.** The quotient is not bounded by either arm, so it cannot be
+certified by reading an arm's field -- the plan's T1 question is answered in
+favour of its own replay, which is what AC1 requires.
+
+**What it corrects.** D-053 rejected RR21 B4 (the max over the two arms'
+standalone errors) as an over-price that would refuse accurate fits, and named
+"a geometry at which the measured relative error of `fiml_ratio` exceeds both
+arms' own" as the finding that would put B4's max back in contention. Four of
+six geometries are that finding, and they point the other way: a max over the
+arms UNDER-reports the quotient's error by up to 1.85x, so B4 is not the
+conservative option D-053 called it. The two-sided cancellation claim holds
+only at counterexample B, where the arms' errors are four decades larger than
+anywhere reachable. D-053's decision -- price the quotient itself -- is
+unchanged and now rests on the stronger ground that no arm-wise bound is safe.
 
 ## Review
