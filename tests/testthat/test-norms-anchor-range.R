@@ -68,10 +68,21 @@ off_metric_instrument <- function(nm, sample = 1, which_row = 1) {
   obj
 }
 
+# The refusal's message names the offending scales between "mean score for "
+# and " falls outside". Asserting over that span rather than the whole message
+# keeps a scale abbreviation appearing elsewhere in the sentence from reading
+# as an accusation.
+named_scales <- function(msg) {
+  sub(".*mean score for (.*) falls outside.*", "\\1", msg)
+}
+
 test_that("no shipped norm sample's mean falls outside its instrument's anchors", {
   # Domain first: an empty sweep would satisfy the emptiness below without
   # having looked at anything (M108).
-  expect_gt(length(anchor_range_pairs()), 0L)
+  # Pinned, not merely non-empty: `> 0` is satisfied by a sweep that reached
+  # one instrument, while this test's own comment claims every shipped sample
+  # of every shipped instrument. The sibling roster tests pin the same 23.
+  expect_identical(length(anchor_range_pairs()), 23L)
   expect_identical(anchor_range_violations(), character(0))
 })
 
@@ -184,13 +195,28 @@ test_that("the refusal names the offending scales on an Abbrev-labelled instrume
   # pins that shape, so the assertion above cannot pass on a message that
   # merely happens to contain the abbreviation somewhere else.
   expect_false(grepl("mean score for  falls", msg, fixed = TRUE))
+  # And the converse, which naming-the-offender alone does not fence: the
+  # message must name ONLY the octant that is out of range. Without this,
+  # dropping the `outside` subset in the refusal -- blaming all eight octants
+  # for one bad mean -- leaves this file green (measured 2026-08-30 by
+  # mutating R/tidying_functions.R:265: 22 passed, 0 failed).
+  expect_false(any(vapply(
+    setdiff(as.character(values$Abbrev), offender),
+    function(other) grepl(other, named_scales(msg), fixed = TRUE),
+    logical(1)
+  )))
 })
 
 test_that("the refusal names the offending scales on a Scale-labelled instrument", {
   data("jz2017")
-  obj <- shipped_instrument("cais")
-  expect_true("Scale" %in% names(obj$Norms[[1]]))
-  offender <- as.character(obj$Norms[[1]]$Scale[[3]])
+  base <- shipped_instrument("cais")
+  expect_true("Scale" %in% names(base$Norms[[1]]))
+  values <- base$Norms[[1]]
+  # Read the offender through the same index expression off_metric_instrument()
+  # mutates -- the row that is pushed, not the third row of the whole frame.
+  # The two coincide only while cais ships a single sample listed first, and a
+  # reply from Sodano re-adding the adult sample could end that.
+  offender <- as.character(values$Scale[[which(values$Sample == 1)[[3]]]])
   obj <- off_metric_instrument("cais", which_row = 3)
   msg <- tryCatch(
     norm_standardize(
@@ -202,4 +228,11 @@ test_that("the refusal names the offending scales on a Scale-labelled instrument
   expect_match(msg, "response range")
   expect_match(msg, offender, fixed = TRUE)
   expect_false(grepl("mean score for  falls", msg, fixed = TRUE))
+  # Only the pushed octant is named; see the Abbrev case above for why
+  # naming-the-offender alone does not fence this.
+  expect_false(any(vapply(
+    setdiff(as.character(values$Scale[values$Sample == 1]), offender),
+    function(other) grepl(other, named_scales(msg), fixed = TRUE),
+    logical(1)
+  )))
 })

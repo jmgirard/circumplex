@@ -15,6 +15,22 @@ this repo's own state, so each carries its observation date; the shelf is
 gitignored and live, so the manifest is re-verified at review rather than
 trusted from write time.
 
+## What a clean audit run looks like
+
+A run of `data-raw/audit-norms.R` reports **one** non-exempt coverage gap, not
+zero — observed 2026-08-30. It is `cais` / sodano2006 / sample 2: the source
+note still tables the CAIS adult sample's transcribed values, and since M112
+withdrew that sample no batch pass claims them, so the coverage sweep sees a
+note sample nothing audited. This is the expected steady state, not a defect,
+and the row is neither exempted at the call site nor removed from the note:
+the transcription is the record M112 withdrew the sample in order to preserve,
+and an exemption would re-vacuate the drop-detection fences (M79, M80) that
+were repaired around it. `test-norms-audit-roster.R` and
+`test-norms-audit-coverage.R` assert this row by identity — instrument,
+citekey, side and sample — and subtract it, so a **second** gap appearing is a
+real finding rather than noise. Reopened by a reply from the source's authors:
+see `sodano2006.md`.
+
 ## Audit status (all 15 shipped instruments)
 
 `verified` = every audited field either matched its source or carries a

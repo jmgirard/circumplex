@@ -13,7 +13,8 @@
 #' the discrepancy, so the values are not lost — they are recorded, with the
 #' evidence about what went wrong in the source and what a reply from its
 #' authors would reopen, in the package's source repository under
-#' `cairn/references/sodano2006.md`. The query to the authors is still open.
+#' `cairn/references/sodano2006.md`, which also records the state of the query
+#' to the source's authors.
 #'
 #' @source Sodano, S. M., & Tracey, T. J. G. (2006). Interpersonal traits in
 #'   childhood: Development of the Child and Adolescent Interpersonal Survey.

@@ -32,7 +32,8 @@ The transcription was faithful and the source's own table is the origin of
 the discrepancy, so the values are not lost — they are recorded, with the
 evidence about what went wrong in the source and what a reply from its
 authors would reopen, in the package's source repository under
-\code{cairn/references/sodano2006.md}. The query to the authors is still open.
+\code{cairn/references/sodano2006.md}, which also records the state of the query
+to the source's authors.
 }
 
 \examples{

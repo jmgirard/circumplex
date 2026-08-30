@@ -178,7 +178,7 @@ validate_roster <- function(roster, fixture_world = FALSE) {
   # instruments is the same silent clean run one shape over: measured
   # 2026-08-15, `data.frame(instrument = "csie", sample = "1")` audits a csie
   # batch slice with 0 non-exempt shipped-sample gaps where the shipped roster
-  # reports 23. Neither "a superset of the batch" nor "complete per instrument"
+  # reports 23 -- 22 since M112 withdrew the cais adult sample. Neither "a superset of the batch" nor "complete per instrument"
   # catches it -- csie ships exactly one sample, so that roster satisfies both.
   # So a roster the caller has not declared a fixture world must cover the
   # whole of `data/` (M86).
@@ -190,7 +190,7 @@ validate_roster <- function(roster, fixture_world = FALSE) {
   # every near miss bought the exemption -- measured 2026-08-15, `"CSIE"`,
   # `"csie "` and `NA` each passed this validator and then audited the csie
   # batch slice at 1 non-exempt shipped-sample gap where the shipped roster
-  # reports 23. Repairing it by matching more spellings fixes the exempt set by
+  # reports 23 -- 22 since M112 withdrew the cais adult sample. Repairing it by matching more spellings fixes the exempt set by
   # what an author recalled, so the rule is total instead and the fixture says
   # so at its own call site. Nothing below reads an instrument name to decide
   # whether to check, which is what makes the spelling irrelevant.

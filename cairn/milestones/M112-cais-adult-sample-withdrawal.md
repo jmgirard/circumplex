@@ -325,3 +325,50 @@ The seven acceptance-criterion boxes arrived ticked by the T6 implement
 commit. AC fencing gives review the tick; an implement-side tick with no
 evidence is an unverified state. No criterion turned out to be wrong — all
 seven verify — so this is a process note, not a return.
+
+#### Disposition, applied at the gate (2026-08-30)
+
+The maintainer chose "fix the eight, then merge". F8 rejected as proposed;
+F1-F7 and F9 fixed on the branch before the approval marker.
+
+- F1 fixed in `test-norms-anchor-range.R`, both the Abbrev and Scale cases: a
+  `named_scales()` helper reads the span the refusal names, and each case now
+  asserts every non-offending scale is absent from it. **Proven able to fail**:
+  with `R/tidying_functions.R:265` mutated to drop the `outside` subset, the
+  file goes from 24 passed / 0 failed to 22 passed / **2 failed**, where before
+  the fix the same mutant passed 22 / 0.
+- F2 fixed: `cairn/references/norms-audit.md` gains a "What a clean audit run
+  looks like" section stating that one non-exempt gap is the expected steady
+  state, naming the row by identity, and saying why neither exempting it nor
+  deleting the note's rows is the repair.
+- F3 fixed: the count re-measured to five of 23, the multi-sample instruments
+  named, and the superseded "six of 24" kept as the dated observation it is.
+- F4 fixed: the comment now says no shipped sample violates the invariant, that
+  the refusal arm is unreachable today, and where the constructed controls live.
+- F5 fixed: the domain assertion is now `expect_identical(..., 23L)`.
+- F6 fixed: both `data-raw/audit-norms.R` sites carry the same historical gloss
+  the test mirrors already had.
+- F7 fixed: `offender` is read through `which(values$Sample == 1)[[3]]`, the
+  same index the mutation uses.
+- F9 fixed: `?cais` no longer asserts the query's state; it points at
+  `sodano2006.md`, which records it.
+- F8 rejected: `?cais` naming `cairn/references/sodano2006.md` is deliberate.
+  AC5's grep forbids the withdrawn numerals on the shipped surfaces, and both
+  texts say "the package's source repository", so the pointer is accurate about
+  where it leads.
+
+Re-verified after the fixes: `devtools::test()` FAIL 0 | WARN 5 | SKIP 1 |
+PASS 8770 (the two new assertions); `devtools::document()` warning-free and
+its only diff is `man/cais.Rd`, regenerated from the F9 edit; a fresh
+`data-raw/audit-norms.R` run still reproduces all three CSVs (the ledger
+modulo its stamp columns); `cairn_validate.py` exit 0. The full
+`devtools::check()` was clean before these fixes, which touch comments, two
+test files and one roxygen block; the PR's three-platform CI is the check over
+the fixed tree.
+
+### One stray file, caught and reverted
+
+The consistency gate runs `devtools::build_readme()`, whose plot re-renders
+non-deterministically, and a `git add -A` swept the new
+`man/figures/README-plot-1.png` into the review checkpoint (6fd86ae7). Reverted
+to master's copy in the next commit; M112 does not touch the README.

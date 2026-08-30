@@ -62,8 +62,10 @@ test_that("dropping any batch row is visible in the run (M79)", {
   dir <- roster_notes()
   batch <- env$AUDIT_BATCH
 
-  # Abort-or-gap, not gap alone. Six of the 24 rows are the `scales = TRUE`
-  # entry of a multi-sample instrument, and removing one leaves that
+  # Abort-or-gap, not gap alone. Five of the 23 rows are the `scales = TRUE`
+  # entry of a multi-sample instrument (iei, igicr, iip32, iip64, iipsc;
+  # measured 2026-08-30 -- six of 24 until M112 withdrew the cais adult
+  # sample, which left cais single-sample), and removing one leaves that
   # instrument with no `scales` entry, which validate_batch() refuses before
   # any coverage count exists -- so demanding a gap from all 24 would be
   # demanding one from a run that never returns. What must hold of every row
