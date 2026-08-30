@@ -112,7 +112,7 @@ degeneracy candidate row.
 - [x] T3 Extend `exact_oracle.py` / `exact_oracle.R` to emit and bracket the
       ratio's true relative error; measure the new field's ceiling once on a
       clean tree and freeze it as its own constant beside `CERT_CEILING`.
-- [ ] T4 Construct a dyadic-rational configuration ill-conditioned enough
+- [x] T4 Construct a dyadic-rational configuration ill-conditioned enough
       that the shipped double route commits measurable error on `fiml_ratio`
       while the exact ratio stays hand-derivable; derive it, commit it as
       literal fractions at the asserting test, and record the oracle type
@@ -144,6 +144,7 @@ degeneracy candidate row.
 - 2026-08-30: T1 measured, ahead of the question gate because the gate rests on it: at the six geometries `exact_oracle.R` prices, the quotient's committed relative error exceeds BOTH arms' own at four of them (worst factor 1.85), and falls 76x below their sum only at counterexample B. D-053's first reopening condition is therefore met; the disposition is M113-D1 below.
 - 2026-08-30: T2 — the certificate returns a third field, `fiml_ratio`, priced pre-square-root on the quotient of the shipped arms against the quotient of the replayed arms (n cancels, as for `se`); `axes_dd_pricing()` now replays the naive arm at the same matrix; the refusal predicate and the warning's printed estimate both read one new helper, `axes_certificate_worst()`, so they cannot drift apart again. Suite: 0 failures, 8789 passing.
 - 2026-08-30: T3 — the exact-rational oracle emits the quotient per component and the driver brackets the new field at all six geometries; the run prints eighteen certificate lines and passes, the quotient's ratios measuring 9.97 to 10.00, so its own ceiling is frozen at 1e3 (`CERT_CEILING_RATIO`), the window the other two already carry. The six measured errors are frozen at the anchors in `tests/testthat/test-axes-certificate.R`.
+- 2026-08-30: T4 — the construction the plan gate's falsifier was aimed at exists. At `S = [[1, 3/8], [3/8, 147469/2^20]]` with the single derivative matrix `[[0,0],[0,1]]` (kappa 1.0e5, admitted), the hand-derived exact arm variances are `65784995034489/2^51` and `169/2^39`, both exact doubles; the replay lands on both, while the shipped route is wrong by 1.1e-12 on the quotient and by less than a floor's worth on the corrected arm and `cval` — so the new field alone carries the estimate there. Derivation and independence recorded at the asserting test in `tests/testthat/test-axes-certificate.R`. No weaker claim and no mini gate needed.
 
 ## Decisions
 

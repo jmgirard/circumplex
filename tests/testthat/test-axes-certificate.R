@@ -26,10 +26,14 @@
 #     behind the bit-identity precondition below -- see the block at
 #     `cert_frozen` for what that pins and why (M108 AC2, amended).
 #
-#   CLOSED-FORM -- the dyadic-rational configuration in the last test of this
-#     file, derived by hand from the definitions and committed as exact
-#     fractions. It shares no code, no library and no pipeline with the Python
-#     oracle or with the route under test.
+#   CLOSED-FORM -- the hand-derived configurations in the last two tests of
+#     this file, derived from the definitions and committed as exact fractions.
+#     Neither shares code, library or pipeline with the Python oracle or with
+#     the route under test. The first is dyadic throughout, so the shipped
+#     route is exact there and the certificate is pinned at its floor; the
+#     second (M113) sits at a configuration whose shipped route is wrong by
+#     about 1e-12 on the quotient, so the `fiml_ratio` field is checked where
+#     there is an error to catch and not only at its floor.
 #
 # A third layer ships alongside and is deliberately NOT counted as a type: the
 # planted-perturbation invariants below assert the comparison's sensitivity
@@ -575,4 +579,105 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   expect_identical(cert$se, floor_est)
   expect_identical(cert$cval, floor_est)
   expect_identical(cert$fiml_ratio, floor_est)
+})
+
+
+test_that("the quotient's replay lands on hand-derived exact values where the shipped route is WRONG (closed-form oracle)", {
+  # THE SECOND ORACLE TYPE FOR THE `fiml_ratio` FIELD (M113 AC3; IP3). Same
+  # type as the test above -- one configuration priced by hand from the
+  # definitions in R/axes_corrected_se.R, committed as literal fractions,
+  # sharing no code, no library and no pipeline with the Python exact-rational
+  # oracle or with the route under test -- but at a configuration the shipped
+  # double route gets WRONG. The test above sits where every intermediate is
+  # dyadic, so the shipped error is zero and the certificate can only be
+  # asserted to report its floor; a second type that never meets an error
+  # validates the field in letter and not in substance for a number printed to
+  # users. Here the shipped quotient is off by about 1e-12 and the field has
+  # something to catch.
+  #
+  # THE DERIVATION, by hand, for the whole family S = [[1, r], [r, r^2 + D]]
+  # with the single derivative matrix M = [[0, 0], [0, 1]] (q = 1, and that one
+  # matrix is also the one fitted component). Write s = r^2 + D, so det S = D:
+  #
+  #   S^-1  = (1/D) [[s, -r], [-r, 1]]
+  #   X     = S^-1 M = (1/D) [[0, -r], [0, 1]]
+  #   info  = 0.5*sum(X * t(X)) = 0.5*(2*(-r/D)*0 + (1/D)^2) = 1/(2 D^2)
+  #   acov  = 2 D^2
+  #   W     = 0.5 * S^-1 (M*acov) S^-1 = D^2 * X S^-1 = [[r^2, -r], [-r, 1]]
+  #
+  #   NAIVE arm -- W itself, no Jacobian substitution:
+  #   W S   = [[0, r^3 - r s], [0, s - r^2]] = [[0, -r D], [0, D]]
+  #   v_naive = 2*sum(WS * t(WS)) = 2*(0 + (-rD)*0 + 0*(-rD) + D^2) = 2 D^2
+  #
+  #   CORRECTED arm -- Wc is W with its diagonal replaced by
+  #   -rowSums(Wc0 * S), Wc0 being W less its diagonal:
+  #   Wc0 * S has off-diagonal -r*r, so rowSums = (-r^2, -r^2) and
+  #   Wc    = [[r^2, -r], [-r, r^2]]
+  #   Wc S  = [[0, -r D], [r(r^2 - 1), r^2 (s - 1)]]
+  #   v = 2*sum(WcS * t(WcS)) = 2*(2*(-rD)*r(r^2 - 1) + r^4 (s-1)^2)
+  #     = 2*(2 r^2 D (1 - r^2) + r^4 (s - 1)^2)
+  #
+  # AT r = 3/8 AND D = 13/2^20 -- so s = 9/64 + 13/2^20 = 147469/2^20, and
+  # kappa(S) is about 1.0e5, inside the admitted domain:
+  #
+  #   v_naive = 2 * (13/2^20)^2 = 169/2^39
+  #   2 r^2 D (1 - r^2) = 2*(9/64)*(13/2^20)*(55/64) = 12870/2^32
+  #   s - 1 = -901107/2^20, and 901107^2 = 811993825449, so
+  #   r^4 (s-1)^2 = (81/2^12)*(811993825449/2^40) = 65771499861369/2^52
+  #   v = 12870/2^31 + 65771499861369/2^51
+  #     = (12870*2^20 + 65771499861369)/2^51
+  #     = (13495173120 + 65771499861369)/2^51 = 65784995034489/2^51
+  #
+  # Both numerators are under 2^53, so both exact values are exact DOUBLES --
+  # which is what lets the replay be checked against them directly. Their
+  # QUOTIENT is not: 65784995034489/692224 has a factor of 169 in its
+  # denominator, and that is the point. The shipped route divides by an inexact
+  # 1/D at every entry of S^-1 and lands off the truth.
+  s_val <- 147469 / 2^20
+  s <- rbind(c(1, 3 / 8), c(3 / 8, s_val))
+  d <- list(mats = list(rbind(c(0, 0), c(0, 1))), components = "m",
+            n_comp = 1L)
+  v_exact <- 65784995034489 / 2^51
+  v_naive_exact <- 169 / 2^39
+  # Admitted: the certificate is not being asked about a matrix the criterion
+  # would have refused outright.
+  expect_null(axes_sigma_degenerate(s))
+
+  # THE REPLAY, against the hand-derived truth. The dd route touches no LAPACK
+  # and no BLAS -- it is R-level `+`, `-`, `*` and `/` on doubles throughout --
+  # so this half is deterministic and platform-independent, and it is asserted
+  # unconditionally. The low words are not zero here (the exact quotient is not
+  # dyadic), so what is pinned is the value the route delivers.
+  ref <- axes_dd_pricing(s, d)
+  expect_identical(dd_to_double(ref$v), v_exact)
+  expect_identical(dd_to_double(ref$v_naive), v_naive_exact)
+
+  # THE SHIPPED ROUTE, against the same truth: it is wrong, and it is wrong on
+  # the naive arm -- the quotient's DENOMINATOR, which no other field prices.
+  q_exact <- v_exact / v_naive_exact
+  hat <- axes_v_pricing(s, d)
+  true_rel <- abs(sqrt(hat$corrected / hat$naive) - sqrt(q_exact)) /
+    sqrt(q_exact)
+  # Asserted, not skipped-around: a platform on which the shipped route became
+  # exact here would leave this test asserting a floor, which is the emptiness
+  # the case exists to avoid. It must be a REAL error, meaning one the
+  # certificate's own 2*eps floor does not swallow.
+  expect_gt(true_rel, 2 * .Machine$double.eps)
+
+  # ... and the field brackets it: at least the measured error (an estimate
+  # below it is the under-report the certificate exists to prevent) and within
+  # the same pre-registered decade the other two fields carry.
+  cert <- axes_accuracy_certificate(s, d)
+  expect_gte(cert$fiml_ratio, true_rel)
+  expect_lte(cert$fiml_ratio, 1e3 * true_rel)
+
+  # The case DISCRIMINATES: the corrected arm and the cval numerator are both
+  # priced to within a floor's worth here, so the estimate the certificate
+  # reports for this fit comes from the new field alone. Before M113 this
+  # configuration was certified at 4.4e-15 with a quotient wrong by 5.6e-13.
+  floor_est <- axes_certificate_safety_factor * 2 * .Machine$double.eps
+  expect_identical(cert$se, floor_est)
+  expect_identical(cert$cval, floor_est)
+  expect_gt(cert$fiml_ratio, floor_est)
+  expect_identical(axes_certificate_worst(cert), cert$fiml_ratio)
 })
