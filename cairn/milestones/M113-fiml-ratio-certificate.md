@@ -160,6 +160,7 @@ degeneracy candidate row.
 - 2026-08-30: T8 — no matrix whose naive arm alone is non-finite was found in 12,127 candidates; recorded as M113-D2 below, with what M113 changes about the hazard's reach.
 - 2026-08-30: T9 — the NEWS entry for the check now names all three quantities it prices and says the refusal reads the worst of them, so a fit can be refused on the FIML ratio while its standard errors alone would have passed; the entry is amended rather than added, the check itself being unreleased. Gate slot: `devtools::document()` no diff and zero `resolve link` lines at `cli.width = 500`; `devtools::test()` 0 failures / 8822 passing / 1 skip (a fixture-version skip) / 5 warnings (all lavaan's own, pre-existing); `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes.
 - 2026-08-30: all tasks complete; status → review.
+- 2026-08-30: the T1 finding is recorded at project level as D-054, annotating D-053's Rejected clause; the gate chose that over leaving the correction milestone-local.
 
 ## Decisions
 

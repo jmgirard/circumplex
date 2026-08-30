@@ -1926,3 +1926,39 @@ exceeds both arms' own — which would show the cancellation argument wrong and
 put B4's conservative max back in contention. Also, as under D-051, any matrix
 on which the certificate's estimate falls below the exact-rational oracle's
 measured error for it.
+
+### D-054 (2026-08-30): the quotient's committed error is bounded by neither arm's own, so the rejected arm-wise alternative under-reports rather than over-reports — annotates D-053's Rejected clause, moves nothing it decided (M113)
+
+**Context.** D-053 decided that the accuracy certificate prices `fiml_ratio`
+itself rather than bounding it by its two arms, and rejected RR21 B4 — the max
+over the two arms' standalone relative errors — as an over-price that "would
+refuse fits whose reported FIML standard error is accurate". It named, as the
+finding that would put B4's max back in contention, "a geometry at which the
+measured relative error of `fiml_ratio` exceeds both arms' own".
+
+**What was measured.** M113's first task replayed both arms and their quotient
+in double-double at the six geometries the exact-rational oracle prices, and
+read the shipped double route against each. The finding D-053 named is present
+at four of the six, per fitted component. The figures are in
+`cairn/milestones/M113-fiml-ratio-certificate.md`, entry M113-D1.
+
+**Decision.** D-053's decision stands unchanged; its Rejected clause is
+corrected. The reopening condition fired, and it points the opposite way from
+what D-053 anticipated: where the quotient's error exceeds both arms' own, a
+max over the arms sits BELOW the quantity it stands in for, so B4 is not the
+conservative option D-053 called it and is not back in contention. The
+cancellation the rejection rested on holds only at counterexample B, whose arm
+errors are four decades above anything reachable; in reachable geometry the
+two arms' roundoff adds about as often as it cancels. Pricing the quotient
+itself keeps the decision and gains a stronger ground: no arm-wise bound is
+safe in either direction.
+
+**Consequences.** None operational — the shipped estimand is the one D-053
+fixed and M113 built. What changes is what a later reader may rely on: the
+claim that the two arms' errors partially cancel in the quotient holds at
+counterexample B and nowhere else measured, and cannot carry an arm-wise
+bound.
+
+**Reopens.** A measurement in which a max over the two arms' standalone errors
+is at or above the quotient's own at every fitted component across the
+oracle's case list — which would restore B4 as a safe upper proxy.
