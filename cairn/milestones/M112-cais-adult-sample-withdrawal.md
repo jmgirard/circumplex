@@ -4,12 +4,12 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M112: Withdraw the CAIS adult normative sample
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5, GP2, GP4, GP7
-- **Branch/PR:** —
+- **Branch/PR:** m112-cais-adult-sample-withdrawal
 
 ## Goal
 
@@ -115,6 +115,7 @@ stands.
 - 2026-08-29: criteria audit ran in FULL mode (user-facing tier), self-read rather than by a fresh-context [O] reader — this session is instructed not to spawn subagents, and the deviation was disclosed at the gate. Three findings, all fixed before the questions: AC4 bound a test property (constructed controls, inversion evidence) and was narrowed to the deliverable behavior with the construction moved to T1; AC5 promised "every shipped surface" over an author-recalled pattern list and was narrowed to what its named grep returns plus two named sites; AC1's "rebuilt by running data-raw/cais.R" was a process claim and moved to T2. AC7's audit-run/roster agreement was considered under the instrument question and kept: IP5 makes roster-record agreement part of the shipped data's contract.
 - 2026-08-29: plan gate chose withdrawal-on-unusability over keeping the sample refused until Sodano replies, because v2.0.0 has not shipped and D-040 itself names that as the cheap moment, while a "swapped" reply needs a fresh numeric gate whether or not the wrong values are still shipped; falsified by a reply or second source identifying the adult sample's metric, which would make this a correction rather than a withdrawal.
 - 2026-08-29: plan gate chose keeping D-040's refusal with its controls moved to constructed objects over deleting the now-unexercised sweep, because the sweep is what would catch a future off-metric sample entering the roster; falsified by evidence that no path adds norms without passing through the audit.
+- 2026-08-29: T1 tests written red. The violation set now expects `character(0)` with the sweep's domain asserted non-empty, the refusal and offending-scale cases are rebuilt on constructed off-metric objects (both the `Scale`- and `Abbrev`-labelled column names), and the AC2 unmatched-sample case is added. Inversion evidence, each run against the current tree: an empty sweep domain fails `expect_gt`; an in-range constructed object raises no error, failing `expect_error`; a message naming only the pushed scale (DE) fails an assertion demanding a non-offending one (BC). The violation-set and unmatched-sample assertions are red now against the still-shipped sample 2, which is their inversion.
 
 ## Decisions
 
