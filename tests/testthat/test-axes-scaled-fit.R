@@ -1403,6 +1403,23 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
 
     # The nested contract, pointwise: wherever the scaling surface refuses for
     # degeneracy, the SE helper refuses with the same literal.
+    #
+    # WHY "ill_conditioned" IS STILL IN THE GUARD SET, AND WHY THE ASSERTION
+    # BELOW SAYS IT IS DEAD HERE (M114; M111 review F12). Since M111 that
+    # literal reaches no `reason` field on this grid: axes_degeneracy_refusal()
+    # hands every "ill_conditioned" verdict to the certificate, which either
+    # certifies the fit (reason NULL) or refuses it under "uncertified". F12
+    # proposed dropping the literal from the set on that ground. It stays,
+    # because axes_scaling_factor()'s `cval <= 0` backstop still emits it
+    # (`return(na_out("ill_conditioned"))` in R/axes_scaled_fit.R, asserted by
+    # "M90 AC5: the backstop's own literal ..." below), so dropping it
+    # would retire this guard's coverage of that route without saying so. The
+    # deadness F12 observed is instead ASSERTED, on every matrix this grid
+    # drives -- which is what makes the retained set-member honest rather than
+    # merely unfalsified. The two fields are separate claims: the RAW arm's
+    # `naive_reason` still carries "ill_conditioned" at high inflation (the
+    # k = 16 case below asserts exactly that), so only `reason` is asserted
+    # dead here.
     check_nested <- function(sig, what) {
       r <- m89_reasons(sig, pp, df, bdf, m$zeta1)
       if (!is.null(r$sf) &&
@@ -1414,6 +1431,14 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
           expected.label = "the scaling surface's literal"
         )
       }
+      expect_false(
+        identical(r$sf, "ill_conditioned"),
+        label = sprintf("%s: scaling surface reason is \"ill_conditioned\"", what)
+      )
+      expect_false(
+        identical(r$se, "ill_conditioned"),
+        label = sprintf("%s: SE helper reason is \"ill_conditioned\"", what)
+      )
       r
     }
 
