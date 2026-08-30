@@ -61,8 +61,11 @@ degeneracy candidate row.
       recorded at the asserting test, sharing no code, no library and no
       pipeline with `exact_oracle.py` or with the route under test (IP3) — the
       independence M108 already records at
-      `tests/testthat/test-axes-certificate.R:29-30`.
-      `(RB tripwire: ip-touching)`
+      `tests/testthat/test-axes-certificate.R:29-30`. That type pins the
+      replayed ratio against a hand-derived exact value at a configuration
+      whose shipped double route carries a NONZERO committed error, so the
+      field is validated where there is an error to catch and not only at its
+      floor. `(RB tripwire: ip-touching)`
 - [ ] AC4 Three planted defects, run one at a time against the frozen ceilings,
       each redden the new field's own ratio line at a named geometry in
       `exact_oracle.R`: the field's safety factor dropped from 10 to 1 (an
@@ -109,8 +112,11 @@ degeneracy candidate row.
 - [ ] T3 Extend `exact_oracle.py` / `exact_oracle.R` to emit and bracket the
       ratio's true relative error; measure the new field's ceiling once on a
       clean tree and freeze it as its own constant beside `CERT_CEILING`.
-- [ ] T4 Second independent oracle type for the new field, recorded at the
-      asserting test. `(RB tripwire: ip-touching)`
+- [ ] T4 Construct a dyadic-rational configuration ill-conditioned enough
+      that the shipped double route commits measurable error on `fiml_ratio`
+      while the exact ratio stays hand-derivable; derive it, commit it as
+      literal fractions at the asserting test, and record the oracle type
+      there. `(RB tripwire: ip-touching)`
 - [ ] T5 Plant the three AC4 defects one at a time against the frozen
       ceilings; record per-defect results naming the reddened line and its
       geometry, revert each and verify the tree clean.
@@ -132,7 +138,9 @@ degeneracy candidate row.
 - 2026-08-30: plan gate chose certifying `fiml_ratio` in its own field over RR21 B4's max over the two arms' standalone errors, because the arms' errors partially cancel in the ratio and B4's bound would refuse fits whose reported SE is accurate — the false-refusal failure D-048/D-049's history is about; falsified by a geometry at which the ratio's measured relative error exceeds both arms'.
 - 2026-08-30: plan gate chose demoting M111 review F3 to a recorded characterisation (T8) over an acceptance criterion requiring the two surfaces to agree, because agreement is reachable only by the SE surface reporting a non-finite `fiml_ratio` on the FIML path, against GP2's fail-closed clause; falsified by an admitted matrix whose naive row alone is non-finite and whose reported FIML SE is nonetheless finite.
 - 2026-08-30: plan gate chose three milestones over folding M114's predicate fences into this one, because the straddle fixture may not be constructible and that uncertainty should not ride in the same PR as the estimand change; falsified by the fixture proving trivial to construct.
-- 2026-08-30: the criteria the gate changed (AC1, AC2, AC3, AC4) went back through the audit's questions in FULL mode, to a second fresh-context [O] reader that authored none of them; it returned nine findings. Eight were fixed here: the AC4 location plant could not redden, because under the plan gate's own cancellation hypothesis substituting an arm's error OVER-estimates and AC2 let the ceiling be re-measured — the ceiling is now frozen and the plant set replaced by three varying magnitude, metric and route; `axes_degeneracy_note()` still printed `max(se, cval)`, so a fit refused on the ratio field would have warned a number below the target it was refused against; AC1 permitted a non-finite third field, whose `NaN` would raise in `axes_degeneracy_refusal()`'s comparison OUTSIDE T7's tryCatch, against GP2; AC3's "no code and no pipeline" was unsatisfiable as worded and is narrowed to M108's own phrasing; AC2's count was pinned to `CERT_EXPECTED`, a constant the implementer sets after the fact, and to `cert_n`, which counts lines rather than ratios — now eighteen lines stated in the criterion; the single shared `CERT_CEILING` could have been loosened for the two already-audited fields and is now per-field; and AC4's redden is tied to the new field's own line at a named geometry. The ninth (F8 — AC3 is satisfiable by extending the zero-committed-error dyadic oracle, which would validate the new field only where there is no error to catch) is a genuine two-way call and is open at the user gate.
+- 2026-08-30: the criteria the gate changed (AC1, AC2, AC3, AC4) went back through the audit's questions in FULL mode, to a second fresh-context [O] reader that authored none of them; it returned nine findings. Eight were fixed here: the AC4 location plant could not redden, because under the plan gate's own cancellation hypothesis substituting an arm's error OVER-estimates and AC2 let the ceiling be re-measured — the ceiling is now frozen and the plant set replaced by three varying magnitude, metric and route; `axes_degeneracy_note()` still printed `max(se, cval)`, so a fit refused on the ratio field would have warned a number below the target it was refused against; AC1 permitted a non-finite third field, whose `NaN` would raise in `axes_degeneracy_refusal()`'s comparison OUTSIDE T7's tryCatch, against GP2; AC3's "no code and no pipeline" was unsatisfiable as worded and is narrowed to M108's own phrasing; AC2's count was pinned to `CERT_EXPECTED`, a constant the implementer sets after the fact, and to `cert_n`, which counts lines rather than ratios — now eighteen lines stated in the criterion; the single shared `CERT_CEILING` could have been loosened for the two already-audited fields and is now per-field; and AC4's redden is tied to the new field's own line at a named geometry. The ninth (F8 — AC3 was satisfiable by extending the zero-committed-error dyadic oracle, which would have validated the new field only where there is no error to catch) went to the user gate and was closed by requiring a nonzero committed error; see the gate line below.
+
+- 2026-08-30: plan gate chose requiring AC3's second oracle type to pin the ratio at a configuration carrying a NONZERO committed error over extending the existing dyadic closed-form oracle, whose configuration is priced exactly and where the certificate is only asserted to report its floor, because a second type that never meets an error validates IP3 in letter and not in substance for a number printed to users; falsified by no dyadic-rational configuration existing that is ill-conditioned enough to commit measurable error and still hand-derivable, which would force the weaker claim at a mini gate.
 
 ## Decisions
 
