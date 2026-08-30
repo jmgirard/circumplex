@@ -5,7 +5,7 @@
 - **Depends on:** M113
 - **Driving RR:** —
 - **Principles touched:** GP2
-- **Branch/PR:** `m114-refusal-predicate-fences`
+- **Branch/PR:** `m114-refusal-predicate-fences` / https://github.com/jmgirard/circumplex/pull/145
 
 ## Goal
 
