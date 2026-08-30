@@ -8,23 +8,22 @@
 # ORACLE RECORDS (DESIGN.md "Oracle records"; IP3's two-independent-types bar).
 # The certificate's number is backed by two independent oracle TYPES:
 #
-#   FROZEN -- the exact-rational oracle. devel/degeneracy-oracle/exact_oracle.py
-#     prices this model in Python `fractions` (exact integer arithmetic, no
-#     floating point anywhere), driven by devel/degeneracy-oracle/exact_oracle.R,
-#     which is the committed generator for every EXACT_* figure pinned below and
-#     reproduces them from committed material alone. It cannot run in this suite
-#     (python3 is not a package dependency and devel/ does not ship), so its
-#     measurements are frozen here as literals, each tagged with the case that
-#     produced it. Regenerate with, from the repo root:
-#       Rscript devel/degeneracy-oracle/exact_oracle.R
-#     Values below are that script's output on 2026-08-24, extended on
-#     2026-08-30 with the `fiml_ratio` field's measured error at each case
-#     (M113); it prints the true relative error and the certificate side by
-#     side and fails if any of the eighteen ratios leaves [1, its field's
-#     ceiling]. Each frozen error is a measurement of ONE
-#     matrix priced on ONE machine, so every assertion that reads one sits
-#     behind the bit-identity precondition below -- see the block at
-#     `cert_frozen` for what that pins and why (M108 AC2, amended).
+#   EXACT-RATIONAL -- devel/degeneracy-oracle/exact_oracle.py prices this model
+#     in Python `fractions` (exact integer arithmetic, no floating point
+#     anywhere), driven by devel/degeneracy-oracle/exact_oracle.R, which is the
+#     committed generator for every value pinned below and reproduces them from
+#     committed material alone. It cannot run in this suite (python3 is not a
+#     package dependency and devel/ does not ship), so what is committed here
+#     is its output.
+#
+#     WHAT is committed changed at M115. Until then it was a relative ERROR per
+#     case -- one machine's measurement, so every assertion reading one sat
+#     behind a bit-identity gate on the shipped pricing and skipped wherever
+#     that pricing moved. Since M115 it is the EXACT quadratic forms
+#     themselves, as hi/lo double pairs: those describe the matrix rather than
+#     a machine, so each machine measures its OWN error against them and the
+#     bracket asserts everywhere. See the block at `cert_frozen` for the one
+#     precondition that survives and why.
 #
 #   CLOSED-FORM -- the hand-derived configurations in the last two tests of
 #     this file, derived from the definitions and committed as exact fractions.
@@ -51,29 +50,21 @@ cert_anchors <- function() {
   list(
     list(id = "a4", lbl = "family A, p = 8, kappa 1e4",
          r = m106_family_a(2.4e-4, 1L), scale = as.character(1:8),
-         ang = as.numeric(octants()),
-         kappa = 1.000e4, se = 5.889e-14, cval = 2.096e-14,
-         ratio = 5.964e-14),
+         ang = as.numeric(octants()), kappa = 1.000e4),
     list(id = "a5", lbl = "family A, p = 8, kappa 1e5",
          r = m106_family_a(2.4e-5, 1L), scale = as.character(1:8),
-         ang = as.numeric(octants()),
-         kappa = 1.000e5, se = 3.004e-12, cval = 2.205e-13,
-         ratio = 1.938e-12),
+         ang = as.numeric(octants()), kappa = 1.000e5),
     list(id = "c4", lbl = "family C, p = 4 minimum",
          r = m106_family_c(1.2e-5), scale = as.character(1:4),
-         ang = c(90, 180, 270, 360),
-         kappa = 1.000e5, se = 6.459e-13, cval = 1.124e-08,
-         ratio = 5.681e-13),
+         ang = c(90, 180, 270, 360), kappa = 1.000e5),
     list(id = "b9a", lbl = "near-duplicate r = .9999",
          r = m106_family_b(7e-5), scale = as.character(c(1:8, 1L)),
          ang = c(as.numeric(octants()), as.numeric(octants())[[1L]]),
-         kappa = 2.874e4, se = 6.302e-13, cval = 7.245e-14,
-         ratio = 1.069e-12),
+         kappa = 2.874e4),
     list(id = "b9b", lbl = "near-duplicate r = .99999",
          r = m106_family_b(7e-6), scale = as.character(c(1:8, 1L)),
          ang = c(as.numeric(octants()), as.numeric(octants())[[1L]]),
-         kappa = 2.874e5, se = 1.126e-11, cval = 1.488e-12,
-         ratio = 6.682e-12)
+         kappa = 2.874e5)
   )
 }
 
@@ -87,138 +78,197 @@ cert_derivs <- function(cs) {
 }
 
 
-# ---- the bit-identity precondition (M108 AC2, amended) ----------------------
+# ---- the exact quadratic forms, and the one precondition left --------------
 #
-# A frozen relative error describes ONE matrix priced on ONE machine. Neither
-# half of it is bit-portable: the anchor matrices are built through `cos()`,
-# and the shipped pricing runs through `solve()` and `%*%`. The branch measured
-# both halves moving -- windows-latest read 2e-12 against this file's 3.004e-12
-# floor at the p = 8 / kappa 1e5 anchor (CI run 32752082137), and on one machine
-# a 1-ulp perturbation of that anchor moves the estimate by two decades. So the
-# bracket below is asserted only where the running machine reproduces, EXACTLY,
-# the numbers the frozen figures were measured against. Where it does not, the
-# case skips naming that reason: the certificate is not wrong there, the frozen
-# yardstick simply is not that machine's yardstick.
+# WHAT CHANGED AT M115, and why. Until M115 this file committed a relative
+# ERROR per case: a number measured on ONE machine, and a yardstick for no
+# other. Every case therefore sat behind a bit-identity gate on the shipped
+# double pricing and SKIPPED wherever that pricing differed by a bit -- so the
+# bracket asserted on the machine that froze the figures and reported nothing
+# at all on windows-latest (CI run 32752082137), which is the reach this
+# milestone exists to restore.
 #
-# Three things are pinned per case, all as `%a` hex, which round-trips through
-# `as.numeric()` bit for bit:
+# What is committed instead is the EXACT `v`, `v_naive` and `u` -- properties
+# of the MATRIX, not of a machine -- each as a hi/lo double pair carrying about
+# 106 significant bits, ten decades finer than the double-precision errors
+# measured against them. Every machine now prices its own doubles against those
+# and brackets ITS OWN error, which is what the bracket claimed to do all
+# along. Produced by the exact-rational oracle in
+# devel/degeneracy-oracle/exact_oracle.py; that script and its R driver remain
+# the committed generator.
 #
-#   sig  the anchor matrix's upper triangle -- the input, directly.
-#   dbl  the shipped double-precision `v` and `u` -- the numerator of the
-#        frozen error, and the one quantity a different LAPACK moves.
+# ONE HALF OF THE OLD PRECONDITION SURVIVES: `sig`, the anchor matrix's upper
+# triangle. The exact values describe THAT matrix, so a machine whose `cos()`
+# builds a different one has no yardstick here and the case skips naming that
+# reason. Unlike the shipped pricing this half is not expected to move -- these
+# matrices are `cos()` at octant angles plus simple arithmetic -- and whether it
+# ever fires off the authoring machine is read from the pull request's CI run,
+# not assumed here.
 #
-# The DERIVATIVE SET is pinned through `dbl` rather than directly. It is too
-# large to commit entry by entry (27 matrices of 8x8 at the p = 8 anchors), and
-# `cos()` reaches it too -- but the shipped `v` and `u` are computed FROM it, so
-# a derivative set that drifted would have to drift in a way that cancels
-# exactly out of both to leave `dbl` bit-identical.
+# THE DERIVATIVE SET is pinned through `sig` and the exact values together. It
+# is too large to commit entry by entry (27 matrices of 8x8 at the p = 8
+# anchors), but the committed `v`, `v_naive` and `u` were priced from a
+# derivative set the oracle builds from the same closed forms, so a derivative
+# set that drifted here would move this machine's doubles AWAY from them and
+# redden the bracket rather than hide inside it.
 #
-# What is deliberately NOT pinned here is the double-double reference route.
+# What is still deliberately NOT pinned is the double-double reference route.
 # That route is the artifact under test, and an expectation derived from the
 # artifact under test is blind in the dimension it derives: an earlier draft of
-# this gate did pin it, and the planted defect that stops the route carrying
+# the old gate did pin it, and the planted defect that stops the route carrying
 # low-order words then made these cases SKIP instead of redden -- the defect
-# hid inside the precondition meant to protect the comparison. Measured, not
-# reasoned: that plant reddens again with the route unpinned.
+# hid inside the precondition meant to protect the comparison.
 #
-# Reproduce both and the certificate is determined, so the bracket holds
-# deterministically rather than by luck. Regenerate after any deliberate change
-# to a builder or to the pricing, from the repo root:
-#   Rscript devel/degeneracy-oracle/exact_oracle.R   (re-measures the errors)
-# and re-emit these literals with `sprintf("%a", ...)` at the two sites above.
+# This block does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
+# the precondition, so a builder edit that moved a geometry still REDDENS.
 #
-# This gate does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
-# it, so a builder edit that moved a geometry still REDDENS; only last-bit
-# drift skips. A run in which every case skips does not satisfy AC2.
+# REGENERATE the whole block -- matrix and exact values in one pass, so the two
+# cannot come to describe different matrices -- from the repo root with:
+#   CERT_EMIT=1 Rscript devel/degeneracy-oracle/exact_oracle.R
+# and paste its trailing `cert_frozen` block over the one below.
+#
+# Measured on the authoring machine (macOS, arm64) on 2026-08-30 by that
+# script, for orientation only -- no assertion reads these figures, which is
+# the whole point of the change: the six geometries' certificate-over-true-
+# error ratios ran 9.83 to 10.00 against a ceiling of 1e3, and the true SE
+# errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
 
 cert_frozen <- list(
   a4 = list(
-    sig = c("0x1.b4d8379580e2p-1", "0x1.ffcb979800d1bp-2",
-    "0x1.b4d8379580e2p-1", "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2",
-    "0x1.b4d8379580e2p-1", "0x0p+0", "0x1.2bcd8009ffbebp-3",
-    "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", "0x1.2bcd8009ffbe6p-3",
-    "0x0p+0", "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2",
-    "0x1.b4d8379580e2p-1", "0x1.ffcb979800d1ap-2", "0x1.2bcd8009ffbe6p-3",
-    "0x0p+0", "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2",
-    "0x1.b4d8379580e2p-1", "0x1.b4d8379580e2p-1", "0x1.ffcb979800d1bp-2",
-    "0x1.2bcd8009ffbebp-3", "0x0p+0", "0x1.2bcd8009ffbe6p-3",
-    "0x1.ffcb979800d1ap-2", "0x1.b4d8379580e2p-1"),
-    dbl = c("0x1.7fb171557680fp-3", "0x1.7fe5cdf0c5074p-3",
-    "0x1.136add72cea5bp+11"),
-    naive = c("0x1.ffcb9978a7d92p-3", "0x1.ffb16679a59cdp-2")
+    sig = c("0x1.b4d8379580e2p-1", "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", 
+    "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", 
+    "0x0p+0", "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", 
+    "0x1.2bcd8009ffbe6p-3", "0x0p+0", "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2", 
+    "0x1.b4d8379580e2p-1", "0x1.ffcb979800d1ap-2", "0x1.2bcd8009ffbe6p-3", 
+    "0x0p+0", "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", 
+    "0x1.b4d8379580e2p-1", "0x1.ffcb979800d1bp-2", "0x1.2bcd8009ffbebp-3", 
+    "0x0p+0", "0x1.2bcd8009ffbe6p-3", "0x1.ffcb979800d1ap-2", "0x1.b4d8379580e2p-1"
+    ),
+    v_hi = c("0x1.7fb171557665bp-3", "0x1.7fe5cdf0c4d5bp-3"),
+    v_lo = c("-0x1.a352bdd9f74f6p-64", "0x1.b53cb2eed0db5p-60"),
+    vn_hi = c("0x1.ffcb9978a7aa0p-3", "0x1.ffb16679a59dfp-2"),
+    vn_lo = c("-0x1.21464d4a961bep-57", "-0x1.d0e261a64002ep-57"),
+    u_hi = "0x1.136add72ce9f6p+11",
+    u_lo = "-0x1.21c8c1ce2e1b1p-44"
   ),
   a5 = list(
-    sig = c("0x1.b50079a0feb12p-1", "0x1.fffac1e05c131p-2",
-    "0x1.b50079a0feb12p-1", "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2",
-    "0x1.b50079a0feb12p-1", "0x0p+0", "0x1.2be920fd7587ep-3",
-    "0x1.fffac1e05c131p-2", "0x1.b50079a0feb12p-1", "0x1.2be920fd75879p-3",
-    "0x0p+0", "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2",
-    "0x1.b50079a0feb12p-1", "0x1.fffac1e05c12fp-2", "0x1.2be920fd75879p-3",
-    "0x0p+0", "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2",
-    "0x1.b50079a0feb12p-1", "0x1.b50079a0feb12p-1", "0x1.fffac1e05c131p-2",
-    "0x1.2be920fd7587ep-3", "0x0p+0", "0x1.2be920fd75879p-3",
-    "0x1.fffac1e05c12fp-2", "0x1.b50079a0feb12p-1"),
-    dbl = c("0x1.7ff822f445536p-3", "0x1.7ffd60f5b7113p-3",
-    "0x1.560b55f7e7e06p+14"),
-    naive = c("0x1.fffac1e52ba79p-3", "0x1.fff822d875bccp-2")
+    sig = c("0x1.b50079a0feb12p-1", "0x1.fffac1e05c131p-2", "0x1.b50079a0feb12p-1", 
+    "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2", "0x1.b50079a0feb12p-1", 
+    "0x0p+0", "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2", "0x1.b50079a0feb12p-1", 
+    "0x1.2be920fd75879p-3", "0x0p+0", "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2", 
+    "0x1.b50079a0feb12p-1", "0x1.fffac1e05c12fp-2", "0x1.2be920fd75879p-3", 
+    "0x0p+0", "0x1.2be920fd7587ep-3", "0x1.fffac1e05c131p-2", "0x1.b50079a0feb12p-1", 
+    "0x1.b50079a0feb12p-1", "0x1.fffac1e05c131p-2", "0x1.2be920fd7587ep-3", 
+    "0x0p+0", "0x1.2be920fd75879p-3", "0x1.fffac1e05c12fp-2", "0x1.b50079a0feb12p-1"
+    ),
+    v_hi = c("0x1.7ff822f445090p-3", "0x1.7ffd60f5ad28bp-3"),
+    v_lo = c("-0x1.936d3acc2b778p-60", "-0x1.d0ddf75c29bcep-57"),
+    vn_hi = c("0x1.fffac1e52b6ddp-3", "0x1.fff822d8710d2p-2"),
+    vn_lo = c("-0x1.4c20a635f2019p-60", "-0x1.2d8da398995fep-56"),
+    u_hi = "0x1.560b55f7e8335p+14",
+    u_lo = "-0x1.8089fbf774868p-41"
   ),
   c4 = list(
-    sig = c("0x1.fffd60ecbe7bp-2", "0x0p+0", "0x1.fffd60ecbe7bp-2",
-    "0x1.fffd60ecbe7aep-2", "0x0p+0", "0x1.fffd60ecbe7bp-2"),
-    dbl = c("0x1.7ffd60fdec1a2p-3", "0x1.8000000371affp-3",
-    "0x1.4001f78982p+1"),
-    naive = c("0x1.0000000370ae4p-2", "0x1.fffd60ee7951cp-2")
+    sig = c("0x1.fffd60ecbe7bp-2", "0x0p+0", "0x1.fffd60ecbe7bp-2", "0x1.fffd60ecbe7aep-2", 
+    "0x0p+0", "0x1.fffd60ecbe7bp-2"),
+    v_hi = c("0x1.7ffd60fdec50dp-3", "0x1.800000036f8e8p-3"),
+    v_lo = c("0x1.659fc12469cbep-57", "-0x1.d8e8dce3de8afp-57"),
+    vn_hi = c("0x1.000000036f930p-2", "0x1.fffd60ee76447p-2"),
+    vn_lo = c("-0x1.a2bab17f99d60p-56", "0x1.2ea2a74033150p-56"),
+    u_hi = "0x1.4001f74d274cbp+1",
+    u_lo = "-0x1.e2f9fd70264fcp-53"
   ),
   b9a = list(
-    sig = c("0x1.f86394ae0e824p-2", "0x1.e98a8996b5f8ap-3",
-    "0x1.a605f0a4c5714p-2", "-0x1.db2162eb1137p-7", "0x1.999999999999bp-3",
-    "0x1.a605f0a4c5714p-2", "-0x1.e98a8996b5f86p-4", "-0x1.8d8ae1657af4p-7",
-    "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", "-0x1.db2162eb113aap-7",
-    "-0x1.9999999999998p-4", "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3",
-    "0x1.a605f0a4c5714p-2", "0x1.e98a8996b5f86p-3", "-0x1.8d8ae1657af7p-7",
-    "-0x1.9999999999998p-4", "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3",
-    "0x1.a605f0a4c5714p-2", "0x1.f86394ae0e824p-2", "0x1.999999999999bp-3",
-    "-0x1.8d8ae1657af4p-7", "-0x1.9999999999998p-4", "-0x1.8d8ae1657af7p-7",
-    "0x1.9999999999998p-3", "0x1.a605f0a4c5714p-2", "0x1.fff2e4e46e7a8p-1",
-    "0x1.f86394ae0e824p-2", "0x1.e98a8996b5f8ap-3", "-0x1.db2162eb1137p-7",
-    "-0x1.e98a8996b5f86p-4", "-0x1.db2162eb113aap-7", "0x1.e98a8996b5f86p-3",
-    "0x1.f86394ae0e824p-2"),
-    dbl = c("0x1.eecf3c6f253c2p-4", "0x1.ad14d01e89aecp-4",
-    "0x1.dd93c7c700ce1p-2", "0x1.dd66dd08b94e4p+4"),
-    naive = c("0x1.8be3fa47badbcp-3", "0x1.2aa9076ab6738p-3",
-    "0x1.47c7f04c47c7cp-1")
+    sig = c("0x1.f86394ae0e824p-2", "0x1.e98a8996b5f8ap-3", "0x1.a605f0a4c5714p-2", 
+    "-0x1.db2162eb1137p-7", "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", 
+    "-0x1.e98a8996b5f86p-4", "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3", 
+    "0x1.a605f0a4c5714p-2", "-0x1.db2162eb113aap-7", "-0x1.9999999999998p-4", 
+    "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", 
+    "0x1.e98a8996b5f86p-3", "-0x1.8d8ae1657af7p-7", "-0x1.9999999999998p-4", 
+    "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", 
+    "0x1.f86394ae0e824p-2", "0x1.999999999999bp-3", "-0x1.8d8ae1657af4p-7", 
+    "-0x1.9999999999998p-4", "-0x1.8d8ae1657af7p-7", "0x1.9999999999998p-3", 
+    "0x1.a605f0a4c5714p-2", "0x1.fff2e4e46e7a8p-1", "0x1.f86394ae0e824p-2", 
+    "0x1.e98a8996b5f8ap-3", "-0x1.db2162eb1137p-7", "-0x1.e98a8996b5f86p-4", 
+    "-0x1.db2162eb113aap-7", "0x1.e98a8996b5f86p-3", "0x1.f86394ae0e824p-2"
+    ),
+    v_hi = c("0x1.eecf3c6f2786bp-4", "0x1.ad14d01e8a4b2p-4", "0x1.dd93c7c70363ep-2"
+    ),
+    v_lo = c("-0x1.010402a050219p-59", "-0x1.463576282f2f1p-59", "0x1.49f589c2481b9p-59"
+    ),
+    vn_hi = c("0x1.8be3fa47bb758p-3", "0x1.2aa9076ab71a7p-3", "0x1.47c7f04c468b2p-1"
+    ),
+    vn_lo = c("0x1.ee5c78f087d78p-57", "0x1.f6c3bae380ad2p-57", "0x1.37f6e0038c159p-56"
+    ),
+    u_hi = "0x1.dd66dd08b9283p+4",
+    u_lo = "0x1.b39ce6efa592dp-51"
   ),
   b9b = list(
-    sig = c("0x1.f86964229da49p-2", "0x1.e9902d41e6beep-3",
-    "0x1.a605f0a4c5714p-2", "-0x1.db26dc16dcb8p-7", "0x1.999999999999bp-3",
-    "0x1.a605f0a4c5714p-2", "-0x1.e9902d41e6bebp-4", "-0x1.8d8ae1657af4p-7",
-    "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", "-0x1.db26dc16dcbb9p-7",
-    "-0x1.9999999999998p-4", "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3",
-    "0x1.a605f0a4c5714p-2", "0x1.e9902d41e6bebp-3", "-0x1.8d8ae1657af7p-7",
-    "-0x1.9999999999998p-4", "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3",
-    "0x1.a605f0a4c5714p-2", "0x1.f86964229da49p-2", "0x1.999999999999bp-3",
-    "-0x1.8d8ae1657af4p-7", "-0x1.9999999999998p-4", "-0x1.8d8ae1657af7p-7",
-    "0x1.9999999999998p-3", "0x1.a605f0a4c5714p-2", "0x1.fffeb07583584p-1",
-    "0x1.f86964229da49p-2", "0x1.e9902d41e6beep-3", "-0x1.db26dc16dcb8p-7",
-    "-0x1.e9902d41e6bebp-4", "-0x1.db26dc16dcbb9p-7", "0x1.e9902d41e6bebp-3",
-    "0x1.f86964229da49p-2"),
-    dbl = c("0x1.eed0c2cfe3ae3p-4", "0x1.ad1652334a978p-4",
-    "0x1.dda97a1176d68p-2", "0x1.dd66a60c14724p+4"),
-    naive = c("0x1.8be582ecd2207p-3", "0x1.2aaa260c9ef1cp-3",
-    "0x1.47c9e3d753337p-1")
+    sig = c("0x1.f86964229da49p-2", "0x1.e9902d41e6beep-3", "0x1.a605f0a4c5714p-2", 
+    "-0x1.db26dc16dcb8p-7", "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", 
+    "-0x1.e9902d41e6bebp-4", "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3", 
+    "0x1.a605f0a4c5714p-2", "-0x1.db26dc16dcbb9p-7", "-0x1.9999999999998p-4", 
+    "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", 
+    "0x1.e9902d41e6bebp-3", "-0x1.8d8ae1657af7p-7", "-0x1.9999999999998p-4", 
+    "-0x1.8d8ae1657af4p-7", "0x1.999999999999bp-3", "0x1.a605f0a4c5714p-2", 
+    "0x1.f86964229da49p-2", "0x1.999999999999bp-3", "-0x1.8d8ae1657af4p-7", 
+    "-0x1.9999999999998p-4", "-0x1.8d8ae1657af7p-7", "0x1.9999999999998p-3", 
+    "0x1.a605f0a4c5714p-2", "0x1.fffeb07583584p-1", "0x1.f86964229da49p-2", 
+    "0x1.e9902d41e6beep-3", "-0x1.db26dc16dcb8p-7", "-0x1.e9902d41e6bebp-4", 
+    "-0x1.db26dc16dcbb9p-7", "0x1.e9902d41e6bebp-3", "0x1.f86964229da49p-2"
+    ),
+    v_hi = c("0x1.eed0c2cfd9376p-4", "0x1.ad165233741c0p-4", "0x1.dda97a116808fp-2"
+    ),
+    v_lo = c("-0x1.d0ee322f62ab4p-58", "0x1.e441ae46cfc85p-59", "0x1.2a1c6d337b0e1p-56"
+    ),
+    vn_hi = c("0x1.8be582ecd5915p-3", "0x1.2aaa260cb9c24p-3", "0x1.47c9e3d75bdb6p-1"
+    ),
+    vn_lo = c("-0x1.f8a3754824057p-57", "0x1.2f8ab83d3d8bfp-60", "-0x1.dbf1617a6c6cdp-56"
+    ),
+    u_hi = "0x1.dd66a60c11651p+4",
+    u_lo = "0x1.a97ef4aa07aebp-50"
   ),
   cxb = list(
-    sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1",
-    "-0x1.ffb4667563093p-1"),
-    dbl = c("0x1.86663bff23322p+3", "0x1.758572325cbeep+3",
-    "-0x1.ba7d520282p-3"),
-    naive = c("0x1.b90291590661cp+5", "0x1.a03bff6d802f8p+5")
+    sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1", "-0x1.ffb4667563093p-1"
+    ),
+    v_hi = c("0x1.a27aa6fa81289p+3", "0x1.9033b1b503c27p+3"),
+    v_lo = c("0x1.14a44927d1499p-52", "0x1.6dd7ad9921fd4p-54"),
+    vn_hi = c("0x1.d7e81cc594451p+5", "0x1.bd654f98f5a5bp+5"),
+    vn_lo = c("-0x1.8bc7343b184ebp-49", "0x1.df2138cd8f0a9p-50"),
+    u_hi = "0x1.c70c587f1f6ecp-5",
+    u_lo = "-0x1.af973c7509042p-59"
   )
 )
 
 cert_hex <- function(x) sprintf("%a", as.vector(x))
 
-cert_skip_unless_reproduced <- function(id, sigma, d) {
+# The relative error of one shipped double against the exact value hi + lo.
+# Written as ((hat - hi) - lo) so no precision is thrown away: wherever the two
+# agree to within a factor of two -- every quantity here bar the sign-flipped
+# `u` at counterexample B -- `hat - hi` is exact, and the low word then lands
+# on a difference that still has all its bits. At B the subtraction is ordinary
+# and loses nothing that matters against a relative error of 4.9.
+cert_rel <- function(hat, hi, lo) ((hat - hi) - lo) / (hi + lo)
+
+# A variance's relative error converted to its square root's. This is the exact
+# identity sqrt(1 + e) - 1, written with the cancellation at small `e` removed
+# rather than the first-order e/2 -- the conversion between what is committed
+# above (pre-root quadratic forms) and what users are handed (an SE, and the
+# quotient of two SEs). `n` cancels out of both exactly, so none appears.
+cert_root_rel <- function(e) abs(e / (sqrt(1 + e) + 1))
+
+# The certificate's floor, `safety factor * 2 * eps`, with the factor WRITTEN
+# DOWN rather than read from axes_certificate_safety_factor (M115 AC4). An
+# expectation derived from the constant it is checking cannot notice that
+# constant move: with the factor read from the package, raising it from 10 to
+# 100 shifted estimate and expectation together and every assertion in this
+# file stayed green. Every other site that needs the floor reads this one.
+cert_floor <- 10 * 2 * .Machine$double.eps
+
+# THIS MACHINE's own relative error at one case, against the committed exact
+# values. Returns NULL only where the shipped pricing refused, having already
+# failed; skips where this machine builds a different matrix.
+cert_true_error <- function(id, sigma, d) {
   fz <- cert_frozen[[id]]
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
@@ -235,30 +285,66 @@ cert_skip_unless_reproduced <- function(id, sigma, d) {
       ") -- an admitted geometry, so this is a regression, not a platform ",
       "difference"
     ))
-    return(invisible(FALSE))
+    return(NULL)
   }
-  bad <- character(0)
   if (!identical(cert_hex(sigma[upper.tri(sigma)]), fz$sig)) {
-    bad <- c(bad, "the anchor matrix")
+    testthat::skip(paste0(
+      "this machine does not build the anchor matrix at case '", id, "' bit ",
+      "for bit, so the exact quadratic forms committed for that matrix are ",
+      "not a yardstick for this one"
+    ))
   }
-  if (!identical(c(cert_hex(v$corrected), cert_hex(u)), fz$dbl)) {
-    bad <- c(bad, "the shipped double pricing")
-  }
-  # The NAIVE arm is pinned too (M113 review, [O] F5). It is not part of the
-  # `se` or `cval` yardsticks, so M108 had no reason to freeze it; the `ratio`
-  # anchors this file gained are a function of it, and a machine reproducing
-  # `corrected` and `u` bit for bit but not `naive` would have compared them
-  # against another machine's measurement instead of skipping.
-  if (!identical(cert_hex(v$naive), fz$naive)) {
-    bad <- c(bad, "the shipped naive arm")
-  }
-  if (length(bad) == 0L) return(invisible(TRUE))
-  testthat::skip(paste0(
-    "this machine does not reproduce ", paste(bad, collapse = " or "),
-    " bit for bit at case '", id, "', so the frozen relative error measured ",
-    "on the oracle's machine is not a yardstick for it"
-  ))
+  dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
+  dn <- cert_rel(v$naive, as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))
+  du <- cert_rel(u, as.numeric(fz$u_hi), as.numeric(fz$u_lo))
+  list(
+    # Aggregated by MAX over components, as the certificate's own estimands
+    # are: the reported SE vector refuses as a unit, so the worst component is
+    # what a gate has to protect.
+    se = max(cert_root_rel(dv)),
+    # `cval` is the numerator divided by df, and df divides out of a relative
+    # error, so the numerator's error IS cval's.
+    cval = abs(du),
+    # The quotient's own error, formed from the two arms' rather than from a
+    # quotient of doubles: (1 + dv)/(1 + dn) - 1 = (dv - dn)/(1 + dn), which
+    # takes no difference between two nearly equal large numbers.
+    ratio = max(cert_root_rel((dv - dn) / (1 + dn)))
+  )
 }
+
+# The bracket, for one field, against an error measured on the running machine.
+#
+# Two branches, and NEITHER is a skip -- that is the change (M115). Where the
+# certificate sits at its floor it is reporting that the fit committed no error
+# worth stating, and there is no ratio to form; what is asserted there is that
+# the machine agrees, because a true error ABOVE what the floor certifies is
+# exactly the under-report this instrument exists to prevent. Where it sits
+# above its floor both halves of the bracket run: at least the measured error,
+# and at most 1e3 times it, the ceiling M108 pre-registered before any
+# measurement was taken.
+cert_bracket <- function(est, true_rel, lbl) {
+  if (identical(est, cert_floor)) {
+    expect_lte(true_rel, cert_floor)
+  } else {
+    expect_gte(est, true_rel)
+    expect_lte(est, 1e3 * true_rel)
+  }
+}
+
+
+test_that("AC3: the anchor case list is not empty", {
+  # Without this, emptying cert_anchors() would take every bracket assertion in
+  # this file with it -- the per-case tests below are GENERATED from that list,
+  # and a loop over nothing generates nothing and reports PASS. The count is
+  # written down rather than derived from the list it is checking.
+  expect_length(cert_anchors(), 5L)
+  expect_identical(vapply(cert_anchors(), `[[`, "", "id"),
+                   c("a4", "a5", "c4", "b9a", "b9b"))
+  # ... and every one of them, plus counterexample B, has exact values to be
+  # priced against.
+  expect_identical(sort(names(cert_frozen)),
+                   sort(c("a4", "a5", "c4", "b9a", "b9b", "cxb")))
+})
 
 
 # One test PER CASE, deliberately: `skip()` abandons the whole `test_that()` it
@@ -266,31 +352,22 @@ cert_skip_unless_reproduced <- function(id, sigma, d) {
 # four with it -- and the criterion's "a skip on some platform is expected"
 # only means anything if the cases skip independently.
 for (cert_case in cert_anchors()) {
-  test_that(paste0("AC2: the estimate brackets the exact oracle's error -- ",
+  test_that(paste0("AC2: the estimate brackets THIS machine's own error -- ",
                    cert_case$lbl), {
     cs <- cert_case
     d <- cert_derivs(cs)
     # OUTSIDE the precondition: a builder edit that moved this geometry must
-    # redden here, never skip, because then the frozen figures below would be
-    # describing a matrix this file no longer builds.
+    # redden here, never skip, because then the exact values committed above
+    # would be describing a matrix this file no longer builds.
     expect_equal(m106_kappa(cs$r), cs$kappa, tolerance = 1e-3, label = cs$lbl)
 
-    cert_skip_unless_reproduced(cs$id, cs$r, d)
+    true_rel <- cert_true_error(cs$id, cs$r, d)
+    if (is.null(true_rel)) return()
     cert <- axes_accuracy_certificate(cs$r, d)
 
-    # AT LEAST the measured error: an estimate below it is an under-report,
-    # which is the licensing failure the certificate exists to prevent and the
-    # evidence class D-051 records as reopening the mechanism.
-    expect_gte(cert$se, cs$se)
-    expect_gte(cert$cval, cs$cval)
-    expect_gte(cert$fiml_ratio, cs$ratio)
-    # ... and at most 1e3 times it, the ceiling M108 pre-registered before any
-    # measurement. The a-priori bound this replaces overstates by 5 to 8
-    # decades, so this half is what falsifies a certificate that merely
-    # restates that bound.
-    expect_lte(cert$se, 1e3 * cs$se)
-    expect_lte(cert$cval, 1e3 * cs$cval)
-    expect_lte(cert$fiml_ratio, 1e3 * cs$ratio)
+    cert_bracket(cert$se, true_rel$se, "se")
+    cert_bracket(cert$cval, true_rel$cval, "cval")
+    cert_bracket(cert$fiml_ratio, true_rel$ratio, "fiml_ratio")
   })
 }
 
@@ -311,15 +388,25 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   # than read from the fixture's own `kappa` field, which would be blind in
   # the dimension it derives.
   expect_equal(m106_kappa(fx$S), 6654372.506, tolerance = 1e-6)
-  cert_skip_unless_reproduced("cxb", fx$S, d)
+
+  true_rel <- cert_true_error("cxb", fx$S, d)
+  if (is.null(true_rel)) return()
   cert <- axes_accuracy_certificate(fx$S, d)
 
-  expect_gte(cert$se, 3.413e-02)
-  expect_lte(cert$se, 1e3 * 3.413e-02)
-  expect_gte(cert$cval, 4.890)
-  expect_lte(cert$cval, 1e3 * 4.890)
-  expect_gte(cert$fiml_ratio, 8.712e-04)
-  expect_lte(cert$fiml_ratio, 1e3 * 8.712e-04)
+  cert_bracket(cert$se, true_rel$se, "se")
+  cert_bracket(cert$cval, true_rel$cval, "cval")
+  cert_bracket(cert$fiml_ratio, true_rel$ratio, "fiml_ratio")
+
+  # The wrongness itself, asserted rather than described: this is the one
+  # committed matrix whose shipped SEs are wrong in the SECOND decimal place
+  # while the pre-M89 criterion reported them with reason NULL, and whose
+  # double-precision cval comes out sign-flipped. Written as decades rather
+  # than as one machine's figure, so it says what makes the case worth having
+  # without becoming a yardstick again: percent-level on the SE, order-unity
+  # on the cval.
+  expect_gt(true_rel$se, 1e-2)
+  expect_lt(true_rel$se, 1e-1)
+  expect_gt(true_rel$cval, 1)
 })
 
 
@@ -513,7 +600,10 @@ test_that("the estimate tracks a planted perturbation of the shipped values", {
       .package = "circumplex"
     )
     cert <- axes_accuracy_certificate(cs$r, d)
-    f <- axes_certificate_safety_factor
+    # The safety factor WRITTEN DOWN, not read from the package: an
+    # expectation computed from the constant it is checking moves with it and
+    # can never notice it change (M115 AC4).
+    f <- 10
     # Two slacks, both derived rather than tuned: the (1 +/- delta) factor is
     # the cross term (perturbing by (1 + delta) scales the error already there
     # by the same factor), and f*eps covers the single rounding the planted
@@ -591,7 +681,7 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   expect_identical(axes_v_pricing(s, d)$naive, 2)
   expect_identical(axes_u_pricing(s, d), 5 / 8)
   cert <- axes_accuracy_certificate(s, d)
-  floor_est <- axes_certificate_safety_factor * 2 * .Machine$double.eps
+  floor_est <- cert_floor
   expect_identical(cert$se, floor_est)
   expect_identical(cert$cval, floor_est)
   expect_identical(cert$fiml_ratio, floor_est)
@@ -679,46 +769,40 @@ test_that("the quotient's replay lands on hand-derived exact values where the sh
   # estimate this fit gets come from the new field alone. Asserted before the
   # precondition below, so they still run where that one steps aside.
   cert <- axes_accuracy_certificate(s, d)
-  floor_est <- axes_certificate_safety_factor * 2 * .Machine$double.eps
+  floor_est <- cert_floor
   expect_identical(cert$se, floor_est)
   expect_identical(cert$cval, floor_est)
 
-  # THE PRECONDITION ON THE SHIPPED-ERROR HALF (M113 review; the windows-latest
-  # red on CI run 33329301066). The replay half above needs no platform
-  # agreement -- it is R-level `+`, `-`, `*` and `/` throughout -- but the half
-  # below needs the shipped route to be WRONG here, and that is a property of
-  # the machine's LAPACK, not of the configuration. windows-latest prices this
-  # matrix EXACTLY (true_rel 0, against 5.6e-13 on macOS and ubuntu), so the
-  # three assertions below had nothing to bracket and reddened the package for
-  # a platform being more accurate than the one the case was derived on.
+  # THE SHIPPED-ERROR HALF, AND WHY IT IS PLATFORM-DEPENDENT (M113 review; the
+  # windows-latest red on CI run 33329301066). The replay half above needs no
+  # platform agreement -- it is R-level `+`, `-`, `*` and `/` throughout -- but
+  # the half below reads whatever error the shipped route commits here, and
+  # that is a property of the machine's LAPACK, not of the configuration.
+  # windows-latest prices this matrix EXACTLY (true_rel 0, against 5.6e-13 on
+  # macOS and ubuntu), which is why the assertions cannot be written as a
+  # bracket around a fixed error.
   #
-  # Skipping is the honest report and not a widening: a machine with a real
-  # error still runs every assertion, and asserting a floor against a floor is
-  # the emptiness this case exists to avoid, so it is not worth reddening for.
-  # The threshold is the certificate's own floor, `fac * max(delta_q/2, 2*eps)`,
-  # which bites until delta_q exceeds 4 * eps -- not the 2 * eps its expression
-  # reads. This is the platform-reach problem M115 exists to widen, reached at
-  # a second surface; a run in which this half skips does not satisfy AC3.
-  if (true_rel <= 4 * .Machine$double.eps) {
-    testthat::skip(paste0(
-      "the shipped double route is exact at this configuration on this ",
-      "machine (measured relative error ", format(true_rel), "), so there is ",
-      "no committed error for the `fiml_ratio` field to bracket here; the ",
-      "replay half above is asserted unconditionally and has run"
-    ))
+  # M113 SKIPPED here, which left this half asserting nothing on the platform
+  # that most needed watching. M115 replaces the skip with the same two-branch
+  # bracket the anchors use: where the machine committed an error the field
+  # brackets it, and where the machine was exact the floor is asserted against
+  # the machine's own measured zero. Neither branch is empty, and a run in
+  # which this test asserts nothing is no longer reachable.
+  cert_bracket(cert$fiml_ratio, true_rel, "fiml_ratio")
+
+  # ... and what the case DISCRIMINATES, on each branch. Where there is an
+  # error, the estimate this fit gets comes from the new field alone: before
+  # M113 this configuration was certified at 4.4e-15 with a quotient wrong by
+  # 5.6e-13. Where there is none, the three fields must agree at the floor --
+  # a worst-of that disagreed with its own inputs would be the drift
+  # axes_certificate_worst() exists to prevent, and it is asserted on both
+  # branches rather than only on the one this machine happens to take.
+  if (identical(cert$fiml_ratio, cert_floor)) {
+    expect_identical(axes_certificate_worst(cert), cert_floor)
+  } else {
+    expect_gt(cert$fiml_ratio, floor_est)
+    expect_identical(axes_certificate_worst(cert), cert$fiml_ratio)
   }
-
-  # The field brackets a REAL error: at least the measured one (an estimate
-  # below it is the under-report the certificate exists to prevent) and within
-  # the same pre-registered decade the other two fields carry.
-  expect_gte(cert$fiml_ratio, true_rel)
-  expect_lte(cert$fiml_ratio, 1e3 * true_rel)
-
-  # ... and the case DISCRIMINATES: the estimate this fit gets comes from the
-  # new field alone. Before M113 this configuration was certified at 4.4e-15
-  # with a quotient wrong by 5.6e-13.
-  expect_gt(cert$fiml_ratio, floor_est)
-  expect_identical(axes_certificate_worst(cert), cert$fiml_ratio)
 })
 
 

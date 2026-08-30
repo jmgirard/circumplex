@@ -1,11 +1,11 @@
 # M115: Make the packaged accuracy bracket assert where the shipped pricing differs
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M113
 - **Driving RR:** —
 - **Principles touched:** IP3
-- **Branch/PR:** —
+- **Branch/PR:** `m115-certificate-bracket-reach`
 
 ## Goal
 
@@ -69,10 +69,10 @@ row.
 
 ## Tasks
 
-- [ ] T1 Extend `exact_oracle.py` to emit each case's exact `v` and `u` as
+- [x] T1 Extend `exact_oracle.py` to emit each case's exact `v` and `u` as
       hi/lo double pairs; commit them in the test file beside the existing
       frozen figures.
-- [ ] T2 Rewrite `cert_skip_unless_reproduced()` to compute each case's true
+- [x] T2 Rewrite `cert_skip_unless_reproduced()` to compute each case's true
       relative error on the running machine from the committed exact pair, and
       drop the shipped-pricing half of the precondition; run the AC2
       perturbation and record the skip count.
@@ -94,6 +94,9 @@ row.
 - 2026-08-30: the internal-tier criteria standard is why AC2 is scoped to this machine rather than to the three CI platforms: a demonstration family spanning environment boundaries is itself a finding at that tier. The cross-platform observation is T6's gate step. Residual risk recorded: a green local AC2 with the CI run unread would leave the milestone's own goal unverified.
 - 2026-08-30: plan gate chose retiring the precondition's shipped-pricing half via RR21 B3's exact emission over widening the frozen floor by a platform tolerance, because M108's mini gate measured a 100x slack as exceeding the 10x the dropped-safety-factor plant moves, so the tolerance would retire that plant's coverage; falsified by the exact hi/lo pair proving insufficient to recover a case's true error.
 - 2026-08-30: plan gate chose simplifying `sweep_ok` and `reach_ok` to forms derived from their loops' collected values over adding a `cert_ok`-style accumulator count, on the user's answer at the checker-regress question, which took the subtractive option; falsified by the derived form proving unable to express either flag's condition.
+- 2026-08-30: T1 — `exact_oracle.py` emits each case's exact `v`, `v_naive` and `u` as hi/lo hex double pairs; `exact_oracle.R` parses them and, under `CERT_EMIT=1`, prints a paste-ready `cert_frozen` block carrying matrix and exact values from one construction, so the two cannot describe different matrices. `v_naive` travels beside `v` because it is the `fiml_ratio` field's denominator and AC2 brackets all three fields.
+- 2026-08-30: T2 — the precondition's shipped-pricing half is gone; `cert_true_error()` measures the running machine's own relative error against the committed exact pairs, and `cert_bracket()` asserts on both branches (at the floor: the machine's error is below what the floor certifies; above it: the [1, 1e3] bracket), so no case can report PASS having asserted nothing. The M113 closed-form case's `fiml_ratio` skip is replaced by the same two-branch form, closing the second surface of the platform-reach gap.
+- 2026-08-30: AC2 demonstration — with `axes_v_pricing()`'s corrected arm perturbed by a relative 3e-13, the pre-M115 test file skipped all six cases naming the shipped pricing, while the new file reported zero skips and every bracket assertion ran (its four failures are the two dyadic closed-form cases, which the plant makes non-exact by construction). Plant reverted, `devtools::test()` clean at FAIL 0 / SKIP 1, that skip pre-existing in `test-axes-scaled-fit.R`.
 - 2026-08-30: `Depends on: M113` because M113 extends the oracle's certificate case list, which T1 and T2 both read.
 
 ## Decisions
