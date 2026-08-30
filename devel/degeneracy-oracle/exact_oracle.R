@@ -197,11 +197,17 @@ CERT_CEILING <- 1e3
 # negligible at these errors -- so 1e3 sits two decades over the worst measured
 # and is the same pre-registered window the other two fields carry.
 CERT_CEILING_RATIO <- 1e3
+# The count is of RATIOS FORMED, not of cert_line() calls (M115). The two used
+# to be the same number only because no case happened to be priced exactly; a
+# case that was would take the floor-only branch below, form no ratio, and
+# still increment -- so the count would report eighteen comparisons made while
+# the ceiling had been applied to fewer. Counting the ratios makes the label
+# state what was actually checked, and makes a case going exact redden here
+# rather than pass quietly.
 CERT_EXPECTED <- 18L   # six geometries x {SE, cval, ratio}
 cert_ok <- TRUE
 cert_n <- 0L
 cert_line <- function(lbl, cert, true_rel, ceiling = CERT_CEILING) {
-  cert_n <<- cert_n + 1L
   if (true_rel == 0) {
     # An exactly priced case: the shipped route committed no error, so there is
     # no ratio to form and the certificate can only report its own floor. That
@@ -214,6 +220,7 @@ cert_line <- function(lbl, cert, true_rel, ceiling = CERT_CEILING) {
     return(invisible(NULL))
   }
   ratio <- cert / true_rel
+  cert_n <<- cert_n + 1L
   cert_ok <<- cert_ok && is.finite(ratio) && ratio >= 1 && ratio <= ceiling
   cat(sprintf("  %-10s true %9.3e | certificate %9.3e | ratio %8.3g\n",
               lbl, true_rel, cert, ratio))
@@ -247,8 +254,16 @@ for (i in 1:2) {
 # --- RR18 Q4 sweep: does the double error track p*kappa^2*eps? ---------------
 cat("\n== Q4 sweep: S_t = t*S_B + (1-t)*I ==\n")
 cat("       t          kappa(R)     rel.err     p*kappa^2*eps   ratio\n")
-sweep_ok <- TRUE
-for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
+# Collected rather than accumulated (M115). `sweep_ok <- sweep_ok && ...` inside
+# the loop starts TRUE and is only ever falsified by a body that runs, so an
+# emptied or truncated sweep printed PASS having compared nothing. The verdict
+# below is derived from the ratios themselves, against a count written down
+# rather than read off the domain -- `length(x) == length(SWEEP_T)` would go on
+# holding with both emptied.
+SWEEP_T <- c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)
+SWEEP_EXPECTED <- 3L
+sweep_ratios <- numeric(0)
+for (tt in SWEEP_T) {
   St <- tt * S + (1 - tt) * diag(nrow(S))
   dimnames(St) <- dimnames(S)
   ext <- exact(St, d)
@@ -257,10 +272,13 @@ for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
                c(ext[["EXACT_SE1"]], ext[["EXACT_SE2"]]))
   bound <- nrow(S) * kappa_of(St)^2 * .Machine$double.eps
   ratio <- rel / bound
-  sweep_ok <- sweep_ok && ratio <= 10 && ratio >= 0.1
+  sweep_ratios <- c(sweep_ratios, ratio)
   cat(sprintf("  %.7f   %10.4g   %9.3e   %11.3e   %6.3g\n",
               tt, kappa_of(St), rel, bound, ratio))
 }
+
+sweep_ok <- length(sweep_ratios) == SWEEP_EXPECTED &&
+  all(is.finite(sweep_ratios) & sweep_ratios <= 10 & sweep_ratios >= 0.1)
 
 # --- M106 / RR19 B2: the REACHABLE-geometry family ---------------------------
 #
@@ -322,7 +340,9 @@ near_duplicate_family <- function(pair_eps, xi1 = 0.3, xi2 = 0.2,
 
 cat("\n== M106 reachable-geometry family: is the bound decades LOOSE here? ==\n")
 cat("  construction                p     kappa(R)     rel.err     bound        ratio     cval rel.err\n")
-reach_ok <- TRUE
+# Collected, for the reason stated at the sweep above.
+REACH_EXPECTED <- 5L
+reach_ratios <- numeric(0)
 reach_cases <- list(
   list(id = "a4", lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-4, 1L)),
   list(id = "a5", lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-5, 1L)),
@@ -361,7 +381,7 @@ for (cs in reach_cases) {
   # is priced against the exact oracle in the same reachable geometries.
   cvr <- abs(exr[["EXACT_CVAL"]] - double_cval(g$S, dr, dfr)) /
     abs(exr[["EXACT_CVAL"]])
-  reach_ok <- reach_ok && rat <= REACHABLE_WINDOW
+  reach_ratios <- c(reach_ratios, rat)
   cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e   %9.3e\n",
               cs$lbl, pr, kappa_of(g$S), rel, bnd, rat, cvr))
   crt <- axes_accuracy_certificate(g$S, dr)
@@ -370,14 +390,23 @@ for (cs in reach_cases) {
   cert_line("  ratio", crt$fiml_ratio, ratio_rel(g$S, dr, exr), CERT_CEILING_RATIO)
 }
 
+reach_ok <- length(reach_ratios) == REACH_EXPECTED &&
+  all(is.finite(reach_ratios) & reach_ratios <= REACHABLE_WINDOW)
+
 # The count is asserted, not asserted-in-a-label: `cert_ok` starts TRUE and is
 # only ever falsified INSIDE cert_line(), so a truncated or empty case list
-# would otherwise print PASS at "all six geometries" having checked none. The
-# count is eighteen since M113 -- six geometries by three fields.
+# would otherwise print PASS at "all six geometries" having checked none. Since
+# M115 the count is of RATIOS formed -- eighteen, six geometries by three
+# fields, all eighteen of which have a real error to divide by. A case going
+# exact would form seventeen and redden here, which is the report being honest
+# about what it compared rather than about how many lines it printed.
 cert_ok <- cert_ok && identical(cert_n, CERT_EXPECTED)
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (%d of %d lines checked, each in [1, its field's ceiling: %.0e for SE/cval, %.0e for the ratio], at all six geometries): %s\n",
-            if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
-            REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL",
+cat(sprintf("\nANCHORS: %s\nSWEEP (%d of %d ratios, each within a factor of 10 of the bound): %s\nREACHABLE (%d of %d ratios, each attaining below %.0e): %s\nCERTIFICATE (%d of %d ratios formed and checked, each in [1, its field's ceiling: %.0e for SE/cval, %.0e for the ratio], at all six geometries): %s\n",
+            if (ok) "PASS" else "FAIL",
+            length(sweep_ratios), SWEEP_EXPECTED,
+            if (sweep_ok) "PASS" else "FAIL",
+            length(reach_ratios), REACH_EXPECTED, REACHABLE_WINDOW,
+            if (reach_ok) "PASS" else "FAIL",
             cert_n, CERT_EXPECTED, CERT_CEILING, CERT_CEILING_RATIO,
             if (cert_ok) "PASS" else "FAIL"))
 if (nzchar(Sys.getenv("CERT_EMIT"))) cert_emit_block()
