@@ -785,7 +785,7 @@ axes_degeneracy_refusal <- function(sigma, d) {
   # certificate must still reach the user, or the one-warning-per-refusal
   # contract would be met by swallowing rather than by not emitting.
   cert <- tryCatch(axes_accuracy_certificate(sigma, d),
-                   error = function(e) list(se = 1, cval = 1, fiml_ratio = 1))
+                   error = function(e) axes_certificate_sentinel())
   if (axes_certificate_worst(cert) <= axes_degeneracy_delta_star) {
     return(list(reason = NULL, cert = cert))
   }

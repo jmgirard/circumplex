@@ -162,6 +162,8 @@ degeneracy candidate row.
 - 2026-08-30: all tasks complete; status → review.
 - 2026-08-30: the T1 finding is recorded at project level as D-054, annotating D-053's Rejected clause; the gate chose that over leaving the correction milestone-local.
 - 2026-08-30: review opened; branch pushed and draft PR #144 created. Evidence gathering in progress.
+- 2026-08-30: all seven criteria executed with fresh evidence and ticked; consistency gate clean; three fresh-context lenses ran, the [O] diff-bug lens returning ten ranked findings.
+- 2026-08-30: gate triage — findings 1, 2 rejected as defects and filed; 4, 5, 7, 9 fixed on the branch; 3, 6, 8, 10 filed as follow-ups on the ROADMAP degeneracy candidate row. Suite, check and oracle re-run green after the fixes.
 
 ## Decisions
 
@@ -333,7 +335,7 @@ back a recorded disposition.
 reviewer independently re-ran `exact_oracle.R` (18/18, exit 0) and the
 certificate tests (all pass, no skips) before reporting.
 
-#### [O] diff-bug findings, as reported (disposition recorded at the gate)
+#### [O] diff-bug findings, as reported, with the gate's disposition
 
 1. **The widened predicate refuses fits on a field inert for three of the four
    reported-quantity paths.** `fiml_ratio` reaches a user only at
@@ -400,3 +402,48 @@ certificate tests (all pass, no skips) before reporting.
 
 One further cosmetic note from the [S] blame-history lens: `NEWS.md` carries a
 stray line-wrap leaving an orphaned one-word line ("reasons").
+
+#### Dispositions (maintainer, at the gate, 2026-08-30)
+
+- **1 and 2 — rejected as defects, filed as a follow-up.** The max over three
+  fields is what AC1 requires and what the M111 gate chose; the direction is
+  the fail-closed one (GP2). In reachable geometry the widening is bounded:
+  the reviewer measured `fiml_ratio/se` between 0.46 and 2.1 over the `m106`
+  families, so few additional fits are refused, and the 2500x separation cited
+  is the contrived dyadic test configuration. Both are handed to the ROADMAP
+  degeneracy candidate row, whose promotion condition names M114 (already
+  planned, `Depends on: M113`, and scoped to this predicate).
+- **4, 5, 7, 9 — fixed on this branch** (see below).
+- **3, 6, 8, 10 — filed as follow-ups** on the same candidate row: 3 is
+  unreachable from shipped code today and belongs with M114's predicate work;
+  6 is real test work; 8 wants the ratio ceiling tightened toward the measured
+  9.97-10.00 and belongs with M115, which opens the bracket; 10's direction is
+  conservative (the oracle measures the n-dependent quantity the user actually
+  gets, which the n-free certificate must cover) and it is sub-ulp at every
+  measured geometry.
+- The **[S] cosmetic NEWS line-wrap** was fixed with the F9 documentation pass,
+  the two being the same user-facing text.
+
+#### Fix-now work, and its re-verification
+
+- **F4** — `axes_certificate_sentinel()` added in `R/axes_certificate.R` as the
+  one definition; `axes_accuracy_certificate()` and the `tryCatch` handler in
+  `axes_degeneracy_refusal()` both call it, so the field set cannot drift
+  across the fence.
+- **F5** — `cert_frozen` gained a `naive` element at all six cases, and
+  `cert_skip_unless_reproduced()` pins `cert_hex(v$naive)` against it. Measured
+  on this machine, which reproduces the existing `dbl` anchors bit for bit and
+  is the machine the `ratio` anchors were measured on. No case skips as a
+  result: SKIP is still 1 (the unrelated fixture-version guard).
+- **F7** — the emptiness guard's threshold moved from `2 * eps` to `4 * eps`,
+  which is where the certificate's floor `fac * max(delta_q / 2, 2 * eps)`
+  actually stops biting.
+- **F9** — `R/axes_reliability.R`'s roxygen now names the three quantities, says
+  the worst governs, and states that a fit on any path can be refused on the
+  FIML ratio's estimate even where that ratio is not part of what it reports.
+  `man/axes_reliability.Rd` regenerated.
+
+Re-verified after the fixes: `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 /
+PASS 8822; `devtools::check(args = "--no-manual")` Status OK, 0/0/0 (14m 25s);
+`options(cli.width = 500); devtools::document()` no diff beyond the regenerated
+`.Rd` and zero `resolve link` lines; `exact_oracle.R` exit 0.

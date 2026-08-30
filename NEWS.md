@@ -77,8 +77,7 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   the check cannot price at all, is refused as `"uncertified"`, and its
   warning names that same worst estimate — so a fit can be refused on that
   ratio while its standard errors alone would have passed. The other two
-  reasons
-  never reach the check: `"indefinite"` where the smallest eigenvalue is
+  reasons never reach the check: `"indefinite"` where the smallest eigenvalue is
   negative by more than the fit's own convergence noise — a statement about
   the model rather than about arithmetic, which no arithmetic check can
   license — and `"singular"` where the matrix carries non-finite entries,

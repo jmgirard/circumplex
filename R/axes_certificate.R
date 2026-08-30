@@ -429,8 +429,14 @@ axes_dd_pricing <- function(sigma, d) {
 # they estimate, what they are not, and what the sentinel value 1 means.
 axes_certificate_safety_factor <- 10
 
+# The one definition of the sentinel, so the certificate's own early returns
+# and the fence around its call site (axes_degeneracy_refusal()) cannot come to
+# disagree about the field set -- the drift axes_certificate_worst() exists to
+# prevent, on the other side of the same call (M113 review, [O] F4).
+axes_certificate_sentinel <- function() list(se = 1, cval = 1, fiml_ratio = 1)
+
 axes_accuracy_certificate <- function(sigma, d) {
-  sentinel <- list(se = 1, cval = 1, fiml_ratio = 1)
+  sentinel <- axes_certificate_sentinel()
   if (!axes_dd_selftest()) return(sentinel)
   if (!all(is.finite(sigma))) return(sentinel)
 

@@ -144,7 +144,8 @@ cert_frozen <- list(
     "0x1.2bcd8009ffbebp-3", "0x0p+0", "0x1.2bcd8009ffbe6p-3",
     "0x1.ffcb979800d1ap-2", "0x1.b4d8379580e2p-1"),
     dbl = c("0x1.7fb171557680fp-3", "0x1.7fe5cdf0c5074p-3",
-    "0x1.136add72cea5bp+11")
+    "0x1.136add72cea5bp+11"),
+    naive = c("0x1.ffcb9978a7d92p-3", "0x1.ffb16679a59cdp-2")
   ),
   a5 = list(
     sig = c("0x1.b50079a0feb12p-1", "0x1.fffac1e05c131p-2",
@@ -158,13 +159,15 @@ cert_frozen <- list(
     "0x1.2be920fd7587ep-3", "0x0p+0", "0x1.2be920fd75879p-3",
     "0x1.fffac1e05c12fp-2", "0x1.b50079a0feb12p-1"),
     dbl = c("0x1.7ff822f445536p-3", "0x1.7ffd60f5b7113p-3",
-    "0x1.560b55f7e7e06p+14")
+    "0x1.560b55f7e7e06p+14"),
+    naive = c("0x1.fffac1e52ba79p-3", "0x1.fff822d875bccp-2")
   ),
   c4 = list(
     sig = c("0x1.fffd60ecbe7bp-2", "0x0p+0", "0x1.fffd60ecbe7bp-2",
     "0x1.fffd60ecbe7aep-2", "0x0p+0", "0x1.fffd60ecbe7bp-2"),
     dbl = c("0x1.7ffd60fdec1a2p-3", "0x1.8000000371affp-3",
-    "0x1.4001f78982p+1")
+    "0x1.4001f78982p+1"),
+    naive = c("0x1.0000000370ae4p-2", "0x1.fffd60ee7951cp-2")
   ),
   b9a = list(
     sig = c("0x1.f86394ae0e824p-2", "0x1.e98a8996b5f8ap-3",
@@ -181,7 +184,9 @@ cert_frozen <- list(
     "-0x1.e98a8996b5f86p-4", "-0x1.db2162eb113aap-7", "0x1.e98a8996b5f86p-3",
     "0x1.f86394ae0e824p-2"),
     dbl = c("0x1.eecf3c6f253c2p-4", "0x1.ad14d01e89aecp-4",
-    "0x1.dd93c7c700ce1p-2", "0x1.dd66dd08b94e4p+4")
+    "0x1.dd93c7c700ce1p-2", "0x1.dd66dd08b94e4p+4"),
+    naive = c("0x1.8be3fa47badbcp-3", "0x1.2aa9076ab6738p-3",
+    "0x1.47c7f04c47c7cp-1")
   ),
   b9b = list(
     sig = c("0x1.f86964229da49p-2", "0x1.e9902d41e6beep-3",
@@ -198,13 +203,16 @@ cert_frozen <- list(
     "-0x1.e9902d41e6bebp-4", "-0x1.db26dc16dcbb9p-7", "0x1.e9902d41e6bebp-3",
     "0x1.f86964229da49p-2"),
     dbl = c("0x1.eed0c2cfe3ae3p-4", "0x1.ad1652334a978p-4",
-    "0x1.dda97a1176d68p-2", "0x1.dd66a60c14724p+4")
+    "0x1.dda97a1176d68p-2", "0x1.dd66a60c14724p+4"),
+    naive = c("0x1.8be582ecd2207p-3", "0x1.2aaa260c9ef1cp-3",
+    "0x1.47c9e3d753337p-1")
   ),
   cxb = list(
     sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1",
     "-0x1.ffb4667563093p-1"),
     dbl = c("0x1.86663bff23322p+3", "0x1.758572325cbeep+3",
-    "-0x1.ba7d520282p-3")
+    "-0x1.ba7d520282p-3"),
+    naive = c("0x1.b90291590661cp+5", "0x1.a03bff6d802f8p+5")
   )
 )
 
@@ -235,6 +243,14 @@ cert_skip_unless_reproduced <- function(id, sigma, d) {
   }
   if (!identical(c(cert_hex(v$corrected), cert_hex(u)), fz$dbl)) {
     bad <- c(bad, "the shipped double pricing")
+  }
+  # The NAIVE arm is pinned too (M113 review, [O] F5). It is not part of the
+  # `se` or `cval` yardsticks, so M108 had no reason to freeze it; the `ratio`
+  # anchors this file gained are a function of it, and a machine reproducing
+  # `corrected` and `u` bit for bit but not `naive` would have compared them
+  # against another machine's measurement instead of skipping.
+  if (!identical(cert_hex(v$naive), fz$naive)) {
+    bad <- c(bad, "the shipped naive arm")
   }
   if (length(bad) == 0L) return(invisible(TRUE))
   testthat::skip(paste0(
@@ -661,8 +677,11 @@ test_that("the quotient's replay lands on hand-derived exact values where the sh
   # Asserted, not skipped-around: a platform on which the shipped route became
   # exact here would leave this test asserting a floor, which is the emptiness
   # the case exists to avoid. It must be a REAL error, meaning one the
-  # certificate's own 2*eps floor does not swallow.
-  expect_gt(true_rel, 2 * .Machine$double.eps)
+  # certificate's own floor does not swallow. That floor is
+  # `fac * max(delta_q / 2, 2 * eps)`, so it bites until delta_q exceeds
+  # 4 * eps -- the threshold is that one, not the 2 * eps the floor's own
+  # expression reads (M113 review, [O] F7).
+  expect_gt(true_rel, 4 * .Machine$double.eps)
 
   # ... and the field brackets it: at least the measured error (an estimate
   # below it is the under-report the certificate exists to prevent) and within
