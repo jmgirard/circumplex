@@ -1823,3 +1823,44 @@ counterexample with nothing in front of it.
 **Reopens:** any matrix on which the certificate's estimate falls below the
 exact-rational oracle's measured error for that matrix — an under-report. That
 evidence reopens the mechanism, not the constants D-048 and D-049 fixed.
+
+### D-052 (2026-08-29): the CAIS adult sample is withdrawn on unusability, not on its metric question being settled — annotates D-040's withdrawal clause (M112 plan gate)
+
+**Context:** D-040 refused `cais` sample 2 at `norm_standardize()` and named
+the class of evidence that would dispose of the sample itself: "a reply
+identifying the adult sample's metric, or a second source printing those
+descriptives. Either would turn the refusal into a repair … or into a
+withdrawal of the sample." The author query went to Sodano (Tracey copied) on
+2026-08-08 and is unanswered 21 days later; no second source has appeared. So
+neither disposition is available on D-040's own terms, while the sample ships
+as data no call can use, carrying explanatory prose at three user-facing
+surfaces. GP7 forbids reopening a decision on anything but its stated evidence
+class, which is why this is recorded rather than done silently.
+
+**Decision:** Withdraw the sample from the shipped roster in M112, on a ground
+D-040 did not weigh: an unusable sample should not ship, independent of what
+its numbers turn out to mean. Two facts make that ground sufficient on its
+own. A "swapped" reply makes sodano2006's IAS block the correct sample-2 M and
+SD, which is a numeric change needing its own gate under D-039's carve-out
+whether or not the wrong values are still shipped — so keeping them buys the
+repair path nothing. And v2.0.0 has not shipped, which is what D-040 itself
+identified as the cheap moment for a user-visible change; after 2.0.0,
+removing a shipped data column is a GP4 break requiring a deprecation cycle.
+Silence is explicitly **not** treated as evidence about the metric: this entry
+decides what ships, and decides nothing about what Table 4 means.
+
+**Consequences:** D-040's refusal is untouched and stays roster-wide, with its
+positive controls moved onto constructed off-metric instrument objects because
+no shipped sample exercises them any more; the anchor-range sweep asserts an
+empty violation set and a non-empty domain. The transcription record survives
+in `cairn/references/sodano2006.md`, its extracted-values block byte-identical.
+`?cais` and NEWS.md state the withdrawal and its reason rather than removing
+the sample silently. The correspondence continues; the ROADMAP row's promotion
+condition changes from "promote on a reply and not before" to a reply re-adding
+corrected values under a fresh gate.
+
+**Reopens:** a reply from Sodano or Tracey identifying the adult sample's
+metric, or a second source printing those descriptives — the same class D-040
+named. Either re-adds the sample with corrected values under D-039's
+numeric-change gate; adding a normative sample is not a GP4 break, so the
+withdrawal costs nothing that a reply cannot restore.
