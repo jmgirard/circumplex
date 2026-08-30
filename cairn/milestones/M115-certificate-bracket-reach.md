@@ -76,7 +76,7 @@ row.
       relative error on the running machine from the committed exact pair, and
       drop the shipped-pricing half of the precondition; run the AC2
       perturbation and record the skip count.
-- [ ] T3 Add the non-empty-domain assertion; prove it by emptying the case
+- [x] T3 Add the non-empty-domain assertion; prove it by emptying the case
       list, then restore.
 - [ ] T4 Run the safety-factor plant against the packaged suite; record which
       assertions redden, revert and verify the tree clean.
@@ -97,6 +97,7 @@ row.
 - 2026-08-30: T1 — `exact_oracle.py` emits each case's exact `v`, `v_naive` and `u` as hi/lo hex double pairs; `exact_oracle.R` parses them and, under `CERT_EMIT=1`, prints a paste-ready `cert_frozen` block carrying matrix and exact values from one construction, so the two cannot describe different matrices. `v_naive` travels beside `v` because it is the `fiml_ratio` field's denominator and AC2 brackets all three fields.
 - 2026-08-30: T2 — the precondition's shipped-pricing half is gone; `cert_true_error()` measures the running machine's own relative error against the committed exact pairs, and `cert_bracket()` asserts on both branches (at the floor: the machine's error is below what the floor certifies; above it: the [1, 1e3] bracket), so no case can report PASS having asserted nothing. The M113 closed-form case's `fiml_ratio` skip is replaced by the same two-branch form, closing the second surface of the platform-reach gap.
 - 2026-08-30: AC2 demonstration — with `axes_v_pricing()`'s corrected arm perturbed by a relative 3e-13, the pre-M115 test file skipped all six cases naming the shipped pricing, while the new file reported zero skips and every bracket assertion ran (its four failures are the two dyadic closed-form cases, which the plant makes non-exact by construction). Plant reverted, `devtools::test()` clean at FAIL 0 / SKIP 1, that skip pre-existing in `test-axes-scaled-fit.R`.
+- 2026-08-30: T3 — the non-empty-domain assertion (`AC3: the anchor case list is not empty`) shipped in the T1-T2 commit, since it lives in the same helper block; proved here by replacing `cert_anchors()`'s body with `list()`: it reddens with two failures naming the expected length and the expected ids, where before the change an emptied list generated no per-case tests at all and the file reported PASS. Two further errors surfaced in the n-invariance and planted-perturbation tests, which index the list directly. List restored, file green.
 - 2026-08-30: `Depends on: M113` because M113 extends the oracle's certificate case list, which T1 and T2 both read.
 
 ## Decisions
