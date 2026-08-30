@@ -20,27 +20,29 @@ childhood: Development of the Child and Adolescent Interpersonal Survey.
 
 [doi:10.1207/s15327752jpa8703_12](https://doi.org/10.1207/s15327752jpa8703_12)
 
-## Note on the adult normative sample
+## Note on the withdrawn second normative sample
 
-The CAIS is rated on a 5-point scale, but three of the octant means the
-source publishes for its adult sample (`sample = 2`) fall above 5: PA
-5.19, LM 6.52, and NO 6.14. The package transcribes them faithfully, and
-the source's own table is the origin of the discrepancy rather than the
-transcription. Because a sample whose means lie outside the response
-range cannot be on the same metric as the scores being standardized,
+The package ships one CAIS normative sample, the child sample. A second,
+drawn from the source's adult respondents, was shipped until version
+2.0.0 and has been withdrawn. The CAIS is rated on a 5-point scale, but
+three of the octant means the source publishes for those respondents
+fall above 5, so that sample cannot be on the same metric as the scores
+it would standardize:
 [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
-refuses `sample = 2` rather than returning z-scores in an undefined
-unit. The child sample (`sample = 1`) is unaffected and its means all
-sit inside the response range. The discrepancy is under query with the
-instrument's authors; this sample will be corrected or withdrawn once
-that is resolved.
+refused it, which left it as data no call could use. The transcription
+was faithful and the source's own table is the origin of the
+discrepancy, so the values are not lost — they are recorded, with the
+evidence about what went wrong in the source and what a reply from its
+authors would reopen, in the package's source repository under
+`cairn/references/sodano2006.md`, which also records the state of the
+query to the source's authors.
 
 ## Examples
 
 ``` r
 summary(cais)
 #> CAIS: Child and Adolescent Interpersonal Survey
-#> 37 items, 8 scales, 2 normative data sets
+#> 37 items, 8 scales, 1 normative data sets
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>
 #> 
@@ -100,12 +102,8 @@ summary(cais)
 #> 36. I share
 #> 37. I have a lot of friends
 #> 
-#> The CAIS currently has 2 normative data set(s):
+#> The CAIS currently has 1 normative data set(s):
 #> 1. 204 American fourth and sixth graders (aged 9 to 13)
-#> Reference kind: identified published source
-#> Sodano & Tracey (2006)
-#> <https://doi.org/10.1207/s15327752jpa8703_12>
-#> 2. 194 American college students (aged 17 to 50)
 #> Reference kind: identified published source
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>

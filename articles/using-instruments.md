@@ -561,8 +561,8 @@ n_standardization <- sum(samples$Kind == "standardization")
 n_unsourced <- sum(samples$Kind == "unsourced")
 ```
 
-The package ships 24 reference samples across 15 instruments. 11 of them
-describe college or undergraduate students, and 7 have fewer than 300
+The package ships 23 reference samples across 15 instruments. 10 of them
+describe college or undergraduate students, and 6 have fewer than 300
 participants. Most are the single study sample that was available to the
 researchers who published the instrument — people recruited at one
 institution, at one time — rather than a group assembled to represent
