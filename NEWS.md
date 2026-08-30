@@ -68,11 +68,16 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   falls at or below `sqrt(p * .Machine$double.eps / 1e-5)` is not refused for
   that alone — it is checked. The check replays that fit's own arithmetic in
   roughly 31-digit precision and estimates the relative error the numbers it
-  produced actually carry; a fit whose estimate is within the accuracy target
-  `1e-4` computes normally. Most fits below the floor do: over the geometries
-  measured, their estimated errors run around `1e-11`. A fit whose estimate
-  exceeds the target, or that the check cannot price at all, is refused as
-  `"uncertified"`, and its warning names the estimate. The other two reasons
+  produced actually carry — the corrected standard errors, the factor the
+  scaled statistics are divided by, and the ratio that multiplies the
+  reported standard error on the `missing = "fiml"` path; a fit whose worst
+  estimate is within the accuracy target `1e-4` computes normally. Most fits
+  below the floor do: over the geometries measured, their estimated errors
+  run around `1e-11`. A fit whose worst estimate exceeds the target, or that
+  the check cannot price at all, is refused as `"uncertified"`, and its
+  warning names that same worst estimate — so a fit can be refused on that
+  ratio while its standard errors alone would have passed. The other two
+  reasons
   never reach the check: `"indefinite"` where the smallest eigenvalue is
   negative by more than the fit's own convergence noise — a statement about
   the model rather than about arithmetic, which no arithmetic check can

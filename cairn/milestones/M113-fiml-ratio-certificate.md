@@ -1,6 +1,6 @@
 # M113: Certify the ratio the reported FIML standard error is multiplied by
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -136,7 +136,7 @@ degeneracy candidate row.
       F3): exhibit an admitted matrix whose naive row alone is non-finite at
       `R/axes_corrected_se.R:239`, or record that none was found. No behaviour
       change here — a change to which literal a user sees goes to a D-entry.
-- [ ] T9 NEWS entry for the widened refusal basis; profile verify and
+- [x] T9 NEWS entry for the widened refusal basis; profile verify and
       consistency-gate slot.
 
 ## Work log
@@ -158,6 +158,8 @@ degeneracy candidate row.
 - 2026-08-30: T7 — the certificate call in `axes_degeneracy_refusal()` is fenced on `error` only (a warning raised inside it must still reach the user), returning the sentinel. Both condition routes tested at both surfaces: a `stop()` and a self-test failure each give `reason = "uncertified"` with exactly one warning and no error at `axes_corrected_se()` and at `axes_scaling_factor()`. The fence is shown load-bearing: removed, the `stop()` route propagates out as `Error: planted condition from inside the certificate`.
 - 2026-08-30: T6 — the five comment sites now each name the arm they mean. The two the change made stale were fixed with the code (the certificate's replay scope, and the refusal helper's raw-arm note); the three remaining were narrowed to say raw-metric where the distinction is now load-bearing, and the site inside `axes_v_pricing()` gained the clause that the cov2cor call's own naive arm is what `fiml_ratio` divides by. The sweep of `man/`, `NEWS.md`, `vignettes/` and `tests/` for paraphrases found two, both in tests, both already naming the raw arm correctly. The comment growth pushed the Wc fold out of the range `R/axes_scaled_fit.R` cites, which reddened the M69 citation guard; the citation is repointed to 202-214 (span 12, under its 15-line cap).
 - 2026-08-30: T8 — no matrix whose naive arm alone is non-finite was found in 12,127 candidates; recorded as M113-D2 below, with what M113 changes about the hazard's reach.
+- 2026-08-30: T9 — the NEWS entry for the check now names all three quantities it prices and says the refusal reads the worst of them, so a fit can be refused on the FIML ratio while its standard errors alone would have passed; the entry is amended rather than added, the check itself being unreleased. Gate slot: `devtools::document()` no diff and zero `resolve link` lines at `cli.width = 500`; `devtools::test()` 0 failures / 8822 passing / 1 skip (a fixture-version skip) / 5 warnings (all lavaan's own, pre-existing); `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes.
+- 2026-08-30: all tasks complete; status → review.
 
 ## Decisions
 
