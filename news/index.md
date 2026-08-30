@@ -85,36 +85,40 @@ on a real ggplot2 coordinate system.
   `sqrt(p * .Machine$double.eps / 1e-5)` is not refused for that alone —
   it is checked. The check replays that fit’s own arithmetic in roughly
   31-digit precision and estimates the relative error the numbers it
-  produced actually carry; a fit whose estimate is within the accuracy
-  target `1e-4` computes normally. Most fits below the floor do: over
-  the geometries measured, their estimated errors run around `1e-11`. A
-  fit whose estimate exceeds the target, or that the check cannot price
-  at all, is refused as `"uncertified"`, and its warning names the
-  estimate. The other two reasons never reach the check: `"indefinite"`
-  where the smallest eigenvalue is negative by more than the fit’s own
-  convergence noise — a statement about the model rather than about
-  arithmetic, which no arithmetic check can license — and `"singular"`
-  where the matrix carries non-finite entries, which the check cannot
-  price. The `1e-5` is the accuracy target `1e-4` — the largest relative
-  error a reported standard error may carry, set from the resolution
-  those standard errors are printed at and from the coverage of a
-  nominal 95% Wald interval, and corroborated by the standard error’s
-  own sampling variability, under which a numerical error at the target
-  is about a tenth of the statistical noise already in the number at
-  sample sizes up to about 500,000 for `1/sqrt(2)`, the typical relative
-  sampling coefficient, and only up to about 2,000 for `0.045`, the
-  least favorable geometry measured (below the sample sizes typical of
-  published circumplex correlation matrices) — divided by the factor of
-  `10` by which the criterion’s error bound may undershoot the error it
-  stands for. Where this criterion refuses a fit as `"uncertified"`, the
-  warning also names the estimated relative error, and then the
-  conditioning — the condition number where the smallest eigenvalue is
-  positive, and otherwise that the matrix is numerically rank-deficient,
-  which is what a duplicate item pair makes it — and names item pairs
-  correlated tightly enough to force the refusal on their own: one pair
-  with advice to drop one of them, several with the count and up to
-  three of them named. That diagnosis rides the warning; the stored
-  result’s reason fields, and the note
+  produced actually carry — the corrected standard errors, the factor
+  the scaled statistics are divided by, and the ratio that multiplies
+  the reported standard error on the `missing = "fiml"` path; a fit
+  whose worst estimate is within the accuracy target `1e-4` computes
+  normally. Most fits below the floor do: over the geometries measured,
+  their estimated errors run around `1e-11`. A fit whose worst estimate
+  exceeds the target, or that the check cannot price at all, is refused
+  as `"uncertified"`, and its warning names that same worst estimate —
+  so a fit can be refused on that ratio while its standard errors alone
+  would have passed. The other two reasons never reach the check:
+  `"indefinite"` where the smallest eigenvalue is negative by more than
+  the fit’s own convergence noise — a statement about the model rather
+  than about arithmetic, which no arithmetic check can license — and
+  `"singular"` where the matrix carries non-finite entries, which the
+  check cannot price. The `1e-5` is the accuracy target `1e-4` — the
+  largest relative error a reported standard error may carry, set from
+  the resolution those standard errors are printed at and from the
+  coverage of a nominal 95% Wald interval, and corroborated by the
+  standard error’s own sampling variability, under which a numerical
+  error at the target is about a tenth of the statistical noise already
+  in the number at sample sizes up to about 500,000 for `1/sqrt(2)`, the
+  typical relative sampling coefficient, and only up to about 2,000 for
+  `0.045`, the least favorable geometry measured (below the sample sizes
+  typical of published circumplex correlation matrices) — divided by the
+  factor of `10` by which the criterion’s error bound may undershoot the
+  error it stands for. Where this criterion refuses a fit as
+  `"uncertified"`, the warning also names the estimated relative error,
+  and then the conditioning — the condition number where the smallest
+  eigenvalue is positive, and otherwise that the matrix is numerically
+  rank-deficient, which is what a duplicate item pair makes it — and
+  names item pairs correlated tightly enough to force the refusal on
+  their own: one pair with advice to drop one of them, several with the
+  count and up to three of them named. That diagnosis rides the warning;
+  the stored result’s reason fields, and the note
   [`print()`](https://rdrr.io/r/base/print.html) shows for them, still
   carry the bare code. (The scaled-fit surface has a second, separate
   refusal, `"ill_conditioned"`, for a numerical cancellation rather than
