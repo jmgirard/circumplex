@@ -32,12 +32,27 @@
 # realigned cov2cor(Sigma-hat) both surfaces consume -- and se_r(P), cval(P)
 # the exact-real-arithmetic values of the shipped formulas at P:
 #
-#   E_SE   = max over fitted components r of |se_r_hat - se_r(P)| / se_r(P)
-#   E_cval = |cval_hat - cval(P)| / |cval(P)|
+#   E_SE    = max over fitted components r of |se_r_hat - se_r(P)| / se_r(P)
+#   E_cval  = |cval_hat - cval(P)| / |cval(P)|
+#   E_ratio = max over fitted components r of
+#               |ratio_r_hat - ratio_r(P)| / ratio_r(P)
 #
 # The SE side is aggregated by MAX because the reported vector refuses as a
 # unit (the M62/M66 contract): a gate must protect the worst component, and a
-# per-component certificate would license nothing the max does not.
+# per-component certificate would license nothing the max does not. E_ratio is
+# aggregated the same way and for the same reason.
+#
+# E_ratio IS THE THIRD ESTIMAND (M113; D-053). ratio_r is `fiml_ratio`, the
+# per-component quotient sqrt(v_r_corrected / v_r_naive) that
+# axes_corrected_se() forms with BOTH arms priced at P, and which on
+# `missing = "fiml"` multiplies the reported standard error
+# (R/axes_reliability.R). So it is user-reported arithmetic, and neither
+# existing field covers it: its denominator is the naive-at-P arm, which E_SE
+# does not price at all. Nor would an arm-wise bound cover it -- M113 T1
+# measured the quotient's committed error ABOVE both arms' own at four of the
+# six oracle geometries (factor up to 1.85), so a max over the two arms
+# under-reports rather than over-reports it. It is priced here as its own
+# quantity, from the same replay, for that reason.
 #
 # These are estimates of the COMMITTED ERROR, NOT proven upper bounds -- no
 # theorem converts the disagreement into a bound. The safety factor F = 10 and
@@ -68,15 +83,15 @@
 # indefiniteness band prices optimizer error separately (M90).
 #
 # THE SENTINEL (RR21 section 5). Where either route fails to produce finite
-# values, or a quadratic form is nonpositive, or a denominator is zero, both
-# estimates are 1 -- "no digits certified". It is finite and non-negative like
-# any other return, and it sits four decades above the accuracy target, so a
+# values, or a quadratic form is nonpositive, or a denominator is zero, all
+# three estimates are 1 -- "no digits certified". It is finite and non-negative
+# like any other return, and it sits four decades above the accuracy target, so a
 # gate keyed to the certificate fails closed on it (GP2). Measured along the
 # degradation path (RR21 section 5): past kappa ~ 3e8 the shipped pricing's own
 # solve() refuses "unidentified" before the certificate matters -- there is no
-# reported number left to certify. The sentinel is returned as a unit for both
-# quantities, never one field at a time, so the two surfaces cannot disagree
-# about whether this fit is certified (M89's nestedness contract).
+# reported number left to certify. The sentinel is returned as a unit for all
+# three quantities, never one field at a time, so the two surfaces cannot
+# disagree about whether this fit is certified (M89's nestedness contract).
 
 
 # ---- compensated (double-double) arithmetic ---------------------------------
@@ -315,9 +330,10 @@ axes_dd_selftest <- function() {
 # ---- the reference route ----------------------------------------------------
 #
 # The same pipeline axes_v_pricing() and axes_u_pricing() run, expression for
-# expression, in dd arithmetic. Returns the corrected quadratic forms `v` (one
-# per fitted component) and the scaling factor's numerator `u`, both as dd
-# values, or NULL where the route cannot produce them.
+# expression, in dd arithmetic. Returns the corrected quadratic forms `v` and
+# the naive ones `v_naive` (one per fitted component each) and the scaling
+# factor's numerator `u`, all as dd values, or NULL where the route cannot
+# produce them.
 axes_dd_pricing <- function(sigma, d) {
   ss <- dd_of(sigma)
   si <- dd_solve(ss)
@@ -339,11 +355,18 @@ axes_dd_pricing <- function(sigma, d) {
   acov <- dd_solve(list(hi = info_hi, lo = info_lo))
   if (is.null(acov)) return(NULL)
 
-  # The component quadratic forms. Only the CORRECTED arm is replayed: the
-  # `naive` arm is never user-reported (it exists as the tie to lavaan's own
-  # SE, D-037), so there is nothing about it to certify.
+  # The component quadratic forms, BOTH arms (M113). The corrected arm is the
+  # reported SE's; the naive arm AT THIS SAME MATRIX is `fiml_ratio`'s
+  # denominator, and on the FIML path the reported SE is that quotient times
+  # lavaan's own -- so it is replayed here too, and E_ratio prices it. What is
+  # still not replayed is the naive arm at the RAW Sigma-hat: a different
+  # matrix, priced by a separate axes_v_pricing() call in axes_corrected_se(),
+  # whose result is never user-reported (it exists as the tie to lavaan's own
+  # SE, D-037), so there is nothing about that one to certify.
   v_hi <- numeric(d$n_comp)
   v_lo <- numeric(d$n_comp)
+  vn_hi <- numeric(d$n_comp)
+  vn_lo <- numeric(d$n_comp)
   for (r in seq_len(d$n_comp)) {
     acc <- dd_of(matrix(0, nrow(sigma), ncol(sigma)))
     for (k in seq_len(q)) {
@@ -351,6 +374,10 @@ axes_dd_pricing <- function(sigma, d) {
                                 list(hi = acov$hi[r, k], lo = acov$lo[r, k])))
     }
     w <- dd_scale2(dd_matmul(dd_matmul(si, acc), si), 0.5)
+    ws <- dd_matmul(w, ss)
+    vn <- dd_scale2(dd_sum(dd_mul(ws, dd_t(ws))), 2)
+    vn_hi[[r]] <- vn$hi
+    vn_lo[[r]] <- vn$lo
     wc <- dd_set_diag(w, dd_of(numeric(nrow(sigma))))
     wc <- dd_set_diag(wc, dd_neg(dd_rowsums(dd_mul(wc, ss))))
     wcs <- dd_matmul(wc, ss)
@@ -383,23 +410,27 @@ axes_dd_pricing <- function(sigma, d) {
   }
   u <- dd_sub(tr_vg, dd_sum(dd_mul(acov, list(hi = b_hi, lo = b_lo))))
 
-  if (!all(is.finite(c(v_hi, v_lo, u$hi, u$lo)))) return(NULL)
-  list(v = list(hi = v_hi, lo = v_lo), u = u)
+  if (!all(is.finite(c(v_hi, v_lo, vn_hi, vn_lo, u$hi, u$lo)))) return(NULL)
+  list(v = list(hi = v_hi, lo = v_lo),
+       v_naive = list(hi = vn_hi, lo = vn_lo),
+       u = u)
 }
 
 
 # ---- the certificate --------------------------------------------------------
 #
 # `sigma` is the priced matrix -- the realigned cov2cor(Sigma-hat) -- and `d`
-# the derivative set from axes_se_derivs(). Returns a list of two finite,
+# the derivative set from axes_se_derivs(). Returns a list of THREE finite,
 # non-negative numbers: `se`, the estimated relative error of the corrected
-# component SE vector (worst component), and `cval`, the estimated relative
-# error of the scaling factor. See this file's header for what they estimate,
-# what they are not, and what the sentinel value 1 means.
+# component SE vector (worst component); `cval`, the estimated relative error
+# of the scaling factor; and `fiml_ratio`, the estimated relative error of the
+# per-component quotient corrected/naive that the FIML path multiplies the
+# reported standard error by (M113; D-053). See this file's header for what
+# they estimate, what they are not, and what the sentinel value 1 means.
 axes_certificate_safety_factor <- 10
 
 axes_accuracy_certificate <- function(sigma, d) {
-  sentinel <- list(se = 1, cval = 1)
+  sentinel <- list(se = 1, cval = 1, fiml_ratio = 1)
   if (!axes_dd_selftest()) return(sentinel)
   if (!all(is.finite(sigma))) return(sentinel)
 
@@ -409,14 +440,23 @@ axes_accuracy_certificate <- function(sigma, d) {
   ref <- axes_dd_pricing(sigma, d)
   if (is.null(ref)) return(sentinel)
 
+  vn_hat <- v_hat$naive
   v_hat <- v_hat$corrected
-  if (!all(is.finite(v_hat)) || !is.finite(u_hat)) return(sentinel)
-  # Nonpositive quadratic forms and a vanished cval numerator are the two
+  if (!all(is.finite(v_hat)) || !all(is.finite(vn_hat)) ||
+      !is.finite(u_hat)) {
+    return(sentinel)
+  }
+  # Nonpositive quadratic forms and a vanished cval numerator are the
   # denominators that can fail here: the first is the cancellation the
   # "indefinite" backstop in axes_se_pricing() exists for, the second the one
   # the scaling surface's cval <= 0 backstop exists for. Neither is a matrix
-  # about which a relative error can be stated at all.
-  if (any(ref$v$hi <= 0) || ref$u$hi == 0) return(sentinel)
+  # about which a relative error can be stated at all. The naive arm is
+  # checked on BOTH routes (M113): it is the quotient's denominator, and the
+  # shipped one divides by its own value, not by the replayed one.
+  if (any(ref$v$hi <= 0) || any(ref$v_naive$hi <= 0) ||
+      any(vn_hat <= 0) || ref$u$hi == 0) {
+    return(sentinel)
+  }
 
   delta_v <- max(abs(dd_to_double(
     dd_div(dd_sub(dd_of(v_hat), ref$v), ref$v)
@@ -424,15 +464,33 @@ axes_accuracy_certificate <- function(sigma, d) {
   delta_u <- abs(dd_to_double(
     dd_div(dd_sub(dd_of(u_hat), ref$u), ref$u)
   ))
+  # The quotient is priced PRE-SQUARE-ROOT, like the other two, on
+  # q_r = v_r_corrected / v_r_naive: the shipped fiml_ratio is
+  # sqrt(v_c/n)/sqrt(v_n/n) = sqrt(q_r), in which n cancels exactly, so the
+  # certificate stays n-free by construction and the two square roots and two
+  # divisions the shipped tail actually performs add ~2 ulp -- the same tail
+  # the 2*eps floor already covers for `se`. It is the quotient of the SHIPPED
+  # arms against the quotient of the REPLAYED arms, never a combination of the
+  # two arms' own estimates: those errors are correlated in sign, and M113 T1
+  # measured the quotient's own error above both arms' at four of the six
+  # oracle geometries.
+  ref_q <- dd_div(ref$v, ref$v_naive)
+  delta_q <- max(abs(dd_to_double(
+    dd_div(dd_sub(dd_of(v_hat / vn_hat), ref_q), ref_q)
+  )))
 
   # delta_v / 2 converts a variance's relative error to its square root's, to
   # first order; the O(delta^2) that conversion drops is what the safety factor
   # covers, and covers with two decades to spare at every geometry measured
-  # (RR21 section 3).
+  # (RR21 section 3). delta_q / 2 is the same conversion on the quotient.
   eps <- .Machine$double.eps
   fac <- axes_certificate_safety_factor
   out <- list(se = fac * max(delta_v / 2, 2 * eps),
-              cval = fac * max(delta_u, 2 * eps))
-  if (!is.finite(out$se) || !is.finite(out$cval)) return(sentinel)
+              cval = fac * max(delta_u, 2 * eps),
+              fiml_ratio = fac * max(delta_q / 2, 2 * eps))
+  if (!is.finite(out$se) || !is.finite(out$cval) ||
+      !is.finite(out$fiml_ratio)) {
+    return(sentinel)
+  }
   out
 }

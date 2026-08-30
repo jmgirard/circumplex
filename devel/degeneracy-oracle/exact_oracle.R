@@ -134,11 +134,21 @@ for (i in seq_along(dbl_se)) {
 # pre-registered window, which the a-priori bound it replaces misses by 5 to 8
 # decades). The certificate is n-free and df-free by construction, so nothing
 # here hands it either.
+#
+# THE CEILINGS ARE PER FIELD (M113). CERT_CEILING is M108's pre-registered
+# window for the `se` and `cval` lines and is unchanged; the quotient's field
+# carries its own, measured once on a clean tree at every geometry below and
+# frozen here as a constant. A plant run never re-measures either: a ceiling
+# re-fitted to a planted defect would pass the plant it exists to catch.
 CERT_CEILING <- 1e3
-CERT_EXPECTED <- 12L   # six geometries x {SE, cval}
+# Measured 2026-08-30 on a clean tree by this script: the quotient's ratios ran
+# 1.05 to 122 across the six geometries, so 1e3 leaves an order of magnitude
+# over the worst and stays the same pre-registered decade as the other two.
+CERT_CEILING_RATIO <- 1e3
+CERT_EXPECTED <- 18L   # six geometries x {SE, cval, ratio}
 cert_ok <- TRUE
 cert_n <- 0L
-cert_line <- function(lbl, cert, true_rel) {
+cert_line <- function(lbl, cert, true_rel, ceiling = CERT_CEILING) {
   cert_n <<- cert_n + 1L
   if (true_rel == 0) {
     # An exactly priced case: the shipped route committed no error, so there is
@@ -152,9 +162,20 @@ cert_line <- function(lbl, cert, true_rel) {
     return(invisible(NULL))
   }
   ratio <- cert / true_rel
-  cert_ok <<- cert_ok && is.finite(ratio) && ratio >= 1 && ratio <= CERT_CEILING
+  cert_ok <<- cert_ok && is.finite(ratio) && ratio >= 1 && ratio <= ceiling
   cat(sprintf("  %-10s true %9.3e | certificate %9.3e | ratio %8.3g\n",
               lbl, true_rel, cert, ratio))
+}
+
+# The quotient the FIML path multiplies the reported SE by (M113): its shipped
+# value is the two arms priced at the SAME matrix, exactly as axes_corrected_se()
+# forms it, and its exact value comes from the oracle's own two arms.
+ratio_rel <- function(S, d, ex, n = N) {
+  pr <- axes_se_pricing(S, d, n)
+  hat <- pr$corrected / pr$naive
+  exv <- vapply(seq_along(hat),
+                function(i) ex[[sprintf("EXACT_RATIO%d", i)]], 0)
+  max(abs(exv - hat) / abs(exv))
 }
 
 cat("\ncertificate at counterexample B:\n")
@@ -162,6 +183,7 @@ cert_b <- axes_accuracy_certificate(S, d)
 cert_line("SE", cert_b$se, b_se_rel)
 cert_line("cval", cert_b$cval,
           abs(ex[["EXACT_CVAL"]] - double_cval(S, d, DF)) / abs(ex[["EXACT_CVAL"]]))
+cert_line("ratio", cert_b$fiml_ratio, ratio_rel(S, d, ex), CERT_CEILING_RATIO)
 
 # --- anchor checks (M89 AC4/AC6) --------------------------------------------
 ok <- abs(ex[["EXACT_CVAL"]] - ANCHOR_CVAL[["value"]]) <= ANCHOR_CVAL[["tol"]]
@@ -292,14 +314,17 @@ for (cs in reach_cases) {
   crt <- axes_accuracy_certificate(g$S, dr)
   cert_line("  SE", crt$se, rel)
   cert_line("  cval", crt$cval, cvr)
+  cert_line("  ratio", crt$fiml_ratio, ratio_rel(g$S, dr, exr), CERT_CEILING_RATIO)
 }
 
 # The count is asserted, not asserted-in-a-label: `cert_ok` starts TRUE and is
 # only ever falsified INSIDE cert_line(), so a truncated or empty case list
-# would otherwise print PASS at "all six geometries" having checked none.
+# would otherwise print PASS at "all six geometries" having checked none. The
+# count is eighteen since M113 -- six geometries by three fields.
 cert_ok <- cert_ok && identical(cert_n, CERT_EXPECTED)
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (%d of %d ratios checked, each in [1, %.0e], at all six geometries): %s\n",
+cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (%d of %d lines checked, each in [1, its field's ceiling: %.0e for SE/cval, %.0e for the ratio], at all six geometries): %s\n",
             if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
             REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL",
-            cert_n, CERT_EXPECTED, CERT_CEILING, if (cert_ok) "PASS" else "FAIL"))
+            cert_n, CERT_EXPECTED, CERT_CEILING, CERT_CEILING_RATIO,
+            if (cert_ok) "PASS" else "FAIL"))
 if (!ok || !sweep_ok || !reach_ok || !cert_ok) quit(status = 1L)

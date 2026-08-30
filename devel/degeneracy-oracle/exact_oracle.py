@@ -71,7 +71,7 @@ def sum_prod_t(A, B):
 
 
 def pipeline(S, mats, n_comp, n, df, baseline_df):
-    """Returns (corrected SEs, cval, baseline) exactly.
+    """Returns (corrected SEs, FIML ratios, cval, baseline) exactly.
 
     Mirrors axes_se_pricing() and axes_scaling_factor() line for line. Both are
     evaluated at S: the caller passes cov2cor(Sigma-hat), which for a
@@ -88,6 +88,7 @@ def pipeline(S, mats, n_comp, n, df, baseline_df):
     acov = inv(info)
 
     ses = []
+    ratios = []
     for r in range(n_comp):
         acc = [[sum((acov[r][s] * mats[s][i][j] for s in range(Q)), F(0))
                 for j in range(p)] for i in range(p)]
@@ -101,7 +102,15 @@ def pipeline(S, mats, n_comp, n, df, baseline_df):
         for i in range(p):
             wc[i][i] = -rs[i]
         wcs = mm(wc, S)
-        ses.append(math.sqrt(float(F(2) * sum_prod_t(wcs, wcs)) / n))
+        v_corrected = F(2) * sum_prod_t(wcs, wcs)
+        ses.append(math.sqrt(float(v_corrected) / n))
+        # The naive arm at this SAME matrix -- W itself, without the Jacobian
+        # substitution above -- and the quotient the FIML path multiplies the
+        # reported SE by (M113). n cancels out of the quotient exactly, which
+        # is why it is formed here from the pre-root variances.
+        ws = mm(w, S)
+        v_naive = F(2) * sum_prod_t(ws, ws)
+        ratios.append(math.sqrt(float(v_corrected / v_naive)))
 
     up = [(i, j) for i in range(p) for j in range(p) if j > i]
     tr_vg = sum((F(1) - si[i][j] * S[i][j] * (F(1) - S[i][j] ** 2) for (i, j) in up),
@@ -120,7 +129,7 @@ def pipeline(S, mats, n_comp, n, df, baseline_df):
     proj = sum((acov[s][t] * bmat[s][t] for s in range(Q) for t in range(Q)), F(0))
     cval = (tr_vg - proj) / F(df)
     cb = sum(((F(1) - S[i][j] ** 2) ** 2 for (i, j) in up), F(0)) / F(baseline_df)
-    return ses, cval, cb, tr_vg, proj
+    return ses, ratios, cval, cb, tr_vg, proj
 
 
 def main(path):
@@ -134,13 +143,15 @@ def main(path):
     S = _mat(d["S"], p)
     mats = [_mat(d["M%d" % (i + 1)], p) for i in range(Q)]
 
-    ses, cval, cb, tr_vg, proj = pipeline(S, mats, n_comp, n, df, bdf)
+    ses, ratios, cval, cb, tr_vg, proj = pipeline(S, mats, n_comp, n, df, bdf)
     print("EXACT_CVAL: %.17g" % float(cval))
     print("EXACT_BASELINE: %.17g" % float(cb))
     print("EXACT_TR_VG: %.17g" % float(tr_vg))
     print("EXACT_PROJ: %.17g" % float(proj))
     for i, se in enumerate(ses):
         print("EXACT_SE%d: %.17g" % (i + 1, se))
+    for i, rt in enumerate(ratios):
+        print("EXACT_RATIO%d: %.17g" % (i + 1, rt))
 
 
 if __name__ == "__main__":

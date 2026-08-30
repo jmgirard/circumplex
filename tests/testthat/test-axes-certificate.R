@@ -300,6 +300,7 @@ test_that("AC3: the estimate discriminates the reachable cases from counterexamp
     cert <- axes_accuracy_certificate(cs$r, cert_derivs(cs))
     expect_lt(cert$se, axes_degeneracy_delta_star)
     expect_lt(cert$cval, axes_degeneracy_delta_star)
+    expect_lt(cert$fiml_ratio, axes_degeneracy_delta_star)
   }
 
   fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
@@ -344,6 +345,11 @@ test_that("AC1: the estimate is finite and non-negative across the admitted doma
     cert <- axes_accuracy_certificate(r, d)
     expect_true(is.finite(cert$se) && cert$se >= 0, label = nm)
     expect_true(is.finite(cert$cval) && cert$cval >= 0, label = nm)
+    # The third field is asserted here for the same reason as the other two,
+    # and for one more: axes_degeneracy_refusal() compares the MAX over all
+    # three against the target, and a NaN there would make that comparison NA
+    # and raise from inside a helper obliged to refuse rather than error.
+    expect_true(is.finite(cert$fiml_ratio) && cert$fiml_ratio >= 0, label = nm)
   }
 })
 
@@ -376,6 +382,36 @@ test_that("AC1: the estimate cannot depend on the typed sample size", {
 })
 
 
+test_that("AC1: the refusal predicate and its warning both read the quotient", {
+  # The failure this pins is a SPLIT between the two: until M113 the predicate
+  # and the note each took their own max, and the note's set was the smaller
+  # one. A fit refused on a field the note did not read would be told an
+  # "estimated relative error" BELOW the target it had just been refused
+  # against -- a warning contradicting its own refusal.
+  #
+  # Driven by a certificate whose first two fields sit INSIDE the target and
+  # whose third sits outside it, so only the third can produce the refusal.
+  r <- m106_family_b(7e-7)
+  d <- axes_se_derivs(c(as.numeric(octants()), as.numeric(octants())[[1L]]),
+                      as.character(c(1:8, 1L)), NULL, TRUE, FALSE)
+  # The certificate is consulted only on this limb, so the case must reach it.
+  expect_identical(axes_sigma_degenerate(r), "ill_conditioned")
+
+  planted <- list(se = 1e-9, cval = 1e-9, fiml_ratio = 1e-2)
+  expect_lt(max(planted$se, planted$cval), axes_degeneracy_delta_star)
+  expect_gt(planted$fiml_ratio, axes_degeneracy_delta_star)
+  testthat::local_mocked_bindings(
+    axes_accuracy_certificate = function(sigma, d) planted,
+    .package = "circumplex"
+  )
+  got <- axes_degeneracy_refusal(r, d)
+  expect_identical(got$reason, "uncertified")
+  # ... and the warning names the field that refused it, not a smaller max.
+  expect_match(axes_degeneracy_note(got, r), "estimated relative error 0.01",
+               fixed = TRUE)
+})
+
+
 test_that("the sentinel is returned where there is nothing to certify", {
   # 1 means "no digits certified": finite, non-negative, and four decades above
   # delta_star, so a gate keyed to the certificate fails closed on it (GP2).
@@ -390,7 +426,8 @@ test_that("the sentinel is returned where there is nothing to certify", {
   d_dup <- d
   d_dup$mats[[length(d_dup$mats)]] <- d_dup$mats[[1L]]
   expect_identical(axes_v_pricing(r, d_dup), "unidentified")
-  expect_identical(axes_accuracy_certificate(r, d_dup), list(se = 1, cval = 1))
+  expect_identical(axes_accuracy_certificate(r, d_dup),
+                   list(se = 1, cval = 1, fiml_ratio = 1))
 
   # And through the self-test: an arithmetic that defeats the error-free
   # transforms must degrade to the sentinel, never to a certificate computed
@@ -399,7 +436,8 @@ test_that("the sentinel is returned where there is nothing to certify", {
     axes_dd_selftest = function() FALSE,
     .package = "circumplex"
   )
-  expect_identical(axes_accuracy_certificate(r, d), list(se = 1, cval = 1))
+  expect_identical(axes_accuracy_certificate(r, d),
+                   list(se = 1, cval = 1, fiml_ratio = 1))
 })
 
 
@@ -489,6 +527,12 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   #   v = 2*sum(WcS * t(WcS)) = 2*(0 + 2*(-1/2)(-3/8) + 1/256)
   #     = 2*(3/8 + 1/256) = 97/128
   #
+  #   The naive arm skips the Jacobian substitution -- W itself, not Wc:
+  #   W S = [[1/4 - 1/4, 1/8 - 5/8], [-1/2 + 1/2, -1/4 + 5/4]]
+  #       = [[0, -1/2], [0, 1]]
+  #   v_naive = 2*sum(WS * t(WS)) = 2*(0 + (-1/2)(0) + (0)(-1/2) + 1) = 2
+  #   so the quotient v/v_naive = 97/256, dyadic like everything else.
+  #
   #   rho = S[1,2] = 1/2,  (S^-1)[1,2] = -1/2
   #   tr_vg = 1 - (-1/2)(1/2)(1 - 1/4) = 1 + 3/16 = 19/16
   #   Wy = 0.5 * X S^-1 = [[1/8, -1/4], [-1/4, 1/2]]; diag(S Wy) = (0, 1/2),
@@ -502,6 +546,8 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   ref <- axes_dd_pricing(s, d)
   expect_identical(ref$v$hi, 97 / 128)
   expect_identical(ref$v$lo, 0)
+  expect_identical(ref$v_naive$hi, 2)
+  expect_identical(ref$v_naive$lo, 0)
   expect_identical(ref$u$hi, 5 / 8)
   expect_identical(ref$u$lo, 0)
 
@@ -511,8 +557,11 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   # level assertion this type exists to make: a reference route drifting off
   # the truth would move the estimate off the floor.
   expect_identical(axes_v_pricing(s, d)$corrected, 97 / 128)
+  expect_identical(axes_v_pricing(s, d)$naive, 2)
   expect_identical(axes_u_pricing(s, d), 5 / 8)
   cert <- axes_accuracy_certificate(s, d)
-  expect_identical(cert$se, axes_certificate_safety_factor * 2 * .Machine$double.eps)
-  expect_identical(cert$cval, axes_certificate_safety_factor * 2 * .Machine$double.eps)
+  floor_est <- axes_certificate_safety_factor * 2 * .Machine$double.eps
+  expect_identical(cert$se, floor_est)
+  expect_identical(cert$cval, floor_est)
+  expect_identical(cert$fiml_ratio, floor_est)
 })

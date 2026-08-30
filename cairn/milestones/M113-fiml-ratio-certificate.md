@@ -103,7 +103,7 @@ degeneracy candidate row.
       in double-double at each of the oracle's certificate cases and record the
       ratio's relative error against each arm's. Settles whether the ratio needs
       its own replay or is bounded by the arms.
-- [ ] T2 Add the `fiml_ratio` field to `axes_dd_pricing()` and
+- [x] T2 Add the `fiml_ratio` field to `axes_dd_pricing()` and
       `axes_accuracy_certificate()` (`R/axes_certificate.R`), with its own
       denominator guard and a third sentinel element; extend
       `axes_degeneracy_refusal()`'s max to three fields
@@ -142,6 +142,7 @@ degeneracy candidate row.
 
 - 2026-08-30: plan gate chose requiring AC3's second oracle type to pin the ratio at a configuration carrying a NONZERO committed error over extending the existing dyadic closed-form oracle, whose configuration is priced exactly and where the certificate is only asserted to report its floor, because a second type that never meets an error validates IP3 in letter and not in substance for a number printed to users; falsified by no dyadic-rational configuration existing that is ill-conditioned enough to commit measurable error and still hand-derivable, which would force the weaker claim at a mini gate.
 - 2026-08-30: T1 measured, ahead of the question gate because the gate rests on it: at the six geometries `exact_oracle.R` prices, the quotient's committed relative error exceeds BOTH arms' own at four of them (worst factor 1.85), and falls 76x below their sum only at counterexample B. D-053's first reopening condition is therefore met; the disposition is M113-D1 below.
+- 2026-08-30: T2 — the certificate returns a third field, `fiml_ratio`, priced pre-square-root on the quotient of the shipped arms against the quotient of the replayed arms (n cancels, as for `se`); `axes_dd_pricing()` now replays the naive arm at the same matrix; the refusal predicate and the warning's printed estimate both read one new helper, `axes_certificate_worst()`, so they cannot drift apart again. Suite: 0 failures, 8789 passing.
 
 ## Decisions
 
