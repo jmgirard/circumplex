@@ -77,6 +77,15 @@ fourth — the `repel = TRUE` branch hand-computing canvas coordinates, D-019's
 flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
 corrected 2026-08-06.)
 
+**Accepted limitations** (no fix planned; no candidate row): a withdrawn norm
+sample's values are reachable only from the source repository. `?cais` and
+NEWS.md point at `cairn/references/sodano2006.md` for the CAIS adult sample
+withdrawn by M112, and `.Rbuildignore` excludes `cairn/` from the tarball, so a
+user reproducing a pre-2.0.0 analysis has no route from an installed copy.
+Accepted at the M112 review gate 2026-08-30: reprinting the values on a shipped
+surface is what the withdrawal removed, and both texts say "the package's source
+repository", so the pointer is accurate about where it leads.
+
 ## Design Principles
 
 _Adopted at the 2026-08-04 design interview (D-038). IP = inviolable (never
