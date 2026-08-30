@@ -1985,9 +1985,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # (D-037) -- was refused while every reported number computed (M91;
       # RR18 rec 7). Carries the same refusal vocabulary as
       # `se_correction_failed`. Deliberately silent: no warning and no
-      # printed note accompany it, because the refused quantity is never
-      # user-reported and the reported SEs beside it are present and correct
-      # (M91-D1).
+      # printed note accompany it, because the refused quantity -- the raw
+      # arm named above, never the cov2cor-metric naive arm the reported
+      # `fiml_ratio` divides by -- is never user-reported, and the reported
+      # SEs beside it are present and correct (M91-D1).
       naive_reason = corrected$naive_reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for

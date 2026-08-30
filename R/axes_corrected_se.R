@@ -204,7 +204,11 @@ axes_v_pricing <- function(sigma, d) {
     # carries dr_ij = ds_ij - 0.5*rho_ij*(ds_ii + ds_jj). Off the diagonal W is
     # unchanged; the diagonal absorbs the standardization. The substitution of
     # `sigma` for rho is exact only at a unit diagonal, so `corrected` and
-    # `fiml_ratio` are priced at cov2cor(Sigma-hat) while `naive` is priced raw.
+    # `fiml_ratio` are priced at cov2cor(Sigma-hat) while the REPORTED `naive`
+    # vector is priced raw. Both arms are computed here at whichever matrix
+    # this call was handed: axes_corrected_se() calls it twice, and the
+    # cov2cor call's `naive` -- not reported itself -- is what `fiml_ratio`
+    # divides by, which is why the certificate prices that arm too (M113).
     wc <- w
     diag(wc) <- 0
     diag(wc) <- -rowSums(wc * sigma)
@@ -307,9 +311,10 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # Checked before any
   # pricing so that what refuses a degenerate matrix is a stated contract, not
   # whichever solve() call happens to give up first on this platform's LAPACK.
-  # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) (the
-  # corrected arm, and the only matrix anything user-reported depends on) and
-  # the raw realigned Sigma-hat (the `naive` arm below inverts it). The two
+  # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) -- the
+  # matrix every user-reported number depends on, `corrected` and BOTH of the
+  # `fiml_ratio` quotient's arms alike -- and the raw realigned Sigma-hat,
+  # which only the reported `naive` vector below inverts. The two
   # arms no longer refuse as a unit (M91; RR18 rec 7): the cov2cor arm
   # tripping refuses all three vectors under `reason` -- relabelling one arm's
   # number as the other's stays the undetectable failure -- while a failure
@@ -356,7 +361,9 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 
   # The raw arm, decoupled (M91): a criterion trip or a pricing failure here
   # touches `naive` alone. No warning is emitted for it -- the refused
-  # quantity is never user-reported (it exists as the lavaan tie, D-037) and
+  # quantity is the RAW-metric naive vector, never the cov2cor-metric naive
+  # arm the quotient above divides by, and it is never user-reported (it
+  # exists as the lavaan tie, D-037) and
   # every reported number is present and correct; the refusal is carried in
   # `naive_reason` (surfaced as details$naive_reason; M91-D1) under the same
   # vocabulary every other refusal uses (M91-D2).

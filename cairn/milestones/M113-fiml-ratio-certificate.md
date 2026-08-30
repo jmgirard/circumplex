@@ -128,11 +128,11 @@ degeneracy candidate row.
 - [x] T5 Plant the three AC4 defects one at a time against the frozen
       ceilings; record per-defect results naming the check that reddened and
       its site, revert each and verify the tree clean.
-- [ ] T6 Correct the five AC5 comment sites; sweep `man/`, `NEWS.md`,
+- [x] T6 Correct the five AC5 comment sites; sweep `man/`, `NEWS.md`,
       `vignettes/` and `tests/` for paraphrases of the same claim.
 - [x] T7 `tryCatch` the certificate call at `R/axes_corrected_se.R:764`,
       returning the sentinel; test both condition routes.
-- [ ] T8 Characterise the naive-only non-finiteness divergence (M111 review
+- [x] T8 Characterise the naive-only non-finiteness divergence (M111 review
       F3): exhibit an admitted matrix whose naive row alone is non-finite at
       `R/axes_corrected_se.R:239`, or record that none was found. No behaviour
       change here — a change to which literal a user sees goes to a D-entry.
@@ -156,6 +156,8 @@ degeneracy candidate row.
 - 2026-08-30: T5 — the three plants run one at a time, each reverted and the tree verified clean after it. (i) The new field's safety factor 10 → 1: `exact_oracle.R` exits 1, the counterexample-B ratio line falling to 0.9995 while every SE and cval line stays at 9.83–10. (ii) The quotient's denominator replayed at `diag(sqrt(1..p)) %*% sigma %*% diag(sqrt(1..p))`: exits 1, all six ratio lines above the 1e3 ceiling (5.3e4 to 1.5e15) with the SE and cval lines untouched. (iii) The naive arm's replay collapsed onto the shipped double route: `exact_oracle.R` exits 0 with all six ratio lines inside their window — measured, in three forms (low word dropped, last matrix product in plain double, full collapse) — while the collapse reddens three assertions in `tests/testthat/test-axes-certificate.R`, `expect_gte(cert$fiml_ratio, true_rel)` among them.
 - 2026-08-30: amendment (substantive, mini gate): AC4 rewritten. Two of its three plants do not redden the check it named — the raw-`Σ̂` replay is not writable inside a certificate handed only `cov2cor(Σ̂)`, and the route collapse is invisible to all six `exact_oracle.R` geometries because the corrected arm's error sits within an order of magnitude of the quotient's there. The amended wording pins each plant to the check that does catch it, requires that check to exist on the clean tree before the plant, excludes the identity congruence, and claims only the maximal form of the route defect. It went to a fresh-context [O] reader that authored none of it, running the criteria audit's questions in FULL mode (the milestone's declared tier); the reader returned six findings and the amended text is its recommended narrower repair, which fixed all six — the unpinned detector, the prose-satisfiable escape clause, the recording clause the first audit had already moved to T5, the unbounded causal claim, the identity congruence, and the unclaimed partial-precision forms. The gate adopted it.
 - 2026-08-30: T7 — the certificate call in `axes_degeneracy_refusal()` is fenced on `error` only (a warning raised inside it must still reach the user), returning the sentinel. Both condition routes tested at both surfaces: a `stop()` and a self-test failure each give `reason = "uncertified"` with exactly one warning and no error at `axes_corrected_se()` and at `axes_scaling_factor()`. The fence is shown load-bearing: removed, the `stop()` route propagates out as `Error: planted condition from inside the certificate`.
+- 2026-08-30: T6 — the five comment sites now each name the arm they mean. The two the change made stale were fixed with the code (the certificate's replay scope, and the refusal helper's raw-arm note); the three remaining were narrowed to say raw-metric where the distinction is now load-bearing, and the site inside `axes_v_pricing()` gained the clause that the cov2cor call's own naive arm is what `fiml_ratio` divides by. The sweep of `man/`, `NEWS.md`, `vignettes/` and `tests/` for paraphrases found two, both in tests, both already naming the raw arm correctly. The comment growth pushed the Wc fold out of the range `R/axes_scaled_fit.R` cites, which reddened the M69 citation guard; the citation is repointed to 202-214 (span 12, under its 15-line cap).
+- 2026-08-30: T8 — no matrix whose naive arm alone is non-finite was found in 12,127 candidates; recorded as M113-D2 below, with what M113 changes about the hazard's reach.
 
 ## Decisions
 
@@ -195,5 +197,31 @@ conservative option D-053 called it. The two-sided cancellation claim holds
 only at counterexample B, where the arms' errors are four decades larger than
 anywhere reachable. D-053's decision -- price the quotient itself -- is
 unchanged and now rests on the stronger ground that no arm-wise bound is safe.
+
+### M113-D2 (2026-08-30): the naive-only non-finiteness divergence is left uncorrected, and no matrix exhibiting it was found
+
+**What was looked for (T8).** `axes_se_pricing()` returns `"indefinite"` when
+either arm's quadratic form is nonpositive, so a matrix whose NAIVE row alone
+is nonpositive at `cov2cor(Σ̂)` would refuse the SE surface while the scaling
+surface, which never prices that arm, computed — the split the M111 review's
+F3 names.
+
+**Search.** 12,127 matrices: the three `m106_*` builders swept across nine
+decades of their conditioning parameter; planted spectra at
+`lambda_min` in {0, ±0.5, ±1, ±2} × `sqrt(p*eps)` at p = 4, 8, 12, 24; and
+12,000 random correlation matrices at p = 4, 8, 12 with eigenvalues
+log-uniform over nine decades. The predicate: the naive forms nonpositive or
+non-finite while every corrected form is finite and positive. **None was
+found**, at any conditioning, admitted or refused. That is consistent with the
+standing record at `R/axes_corrected_se.R` — the guard has never fired, and an
+earlier 3,822-matrix indefinite sweep did not reach it either.
+
+**Disposition.** No behaviour change, as T8 states. What M113 changes is the
+hazard's reach rather than its remedy: the certificate now returns its
+sentinel on a nonpositive or non-finite naive arm at the priced matrix, and
+the sentinel refuses at both surfaces together — so inside the criterion's
+ill-conditioned band, where the certificate is consulted, the two surfaces can
+no longer split on this. Outside that band the divergence stays reachable in
+principle and unexhibited in fact.
 
 ## Review
