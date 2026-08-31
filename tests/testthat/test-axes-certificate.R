@@ -29,7 +29,8 @@
 #     this file, derived from the definitions and committed as exact fractions.
 #     Neither shares code, library or pipeline with the Python oracle or with
 #     the route under test. The first is dyadic throughout, so the shipped
-#     route is exact there and the certificate is pinned at its floor; the
+#     route can be exact there -- on every machine measured so far it is, and
+#     the certificate lands on its floor (nothing pins it there; M116); the
 #     second (M113) sits at a configuration whose shipped route is wrong by
 #     about 1e-12 on the quotient, so the `fiml_ratio` field is checked where
 #     there is an error to catch and not only at its floor.
@@ -130,7 +131,7 @@ cert_derivs <- function(cs) {
 # Measured on the authoring machine (macOS, arm64) on 2026-08-30 by that
 # script, for orientation only -- no assertion reads these figures, which is
 # the whole point of the change: the six geometries' certificate-over-true-
-# error ratios ran 9.83 to 10.00 against the ceiling of that day, 1e3 --
+# error ratios ran 9.83 to 10.0025 against the ceiling of that day, 1e3 --
 # since lowered to the `cert_ceiling` of 100 committed below -- and the true
 # SE errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
 
@@ -369,7 +370,8 @@ cert_bracket <- function(est, true_rel, lbl) {
   } else {
     expect_gte(est, true_rel, label = paste0(lbl, ": estimate"))
     # The upper end never sits below the certificate's own floor: every field
-    # is fac * max(delta, 2 * eps), so the floor is the smallest value the
+    # is fac * max(delta, 2 * eps) -- delta halved first for the two
+    # root-converted fields -- so the floor is the smallest value the
     # certificate can report and asking for less is asking for a value it
     # cannot produce. Without this, a measured error of zero degenerates the
     # bound to `est <= 0`, and a broken platform's sentinel then reports

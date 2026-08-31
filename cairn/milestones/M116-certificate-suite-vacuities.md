@@ -305,3 +305,110 @@ Maintainer's disposition, over the ranked list above:
 **Outcome: returned to `in-progress`.** Nothing merged; PR #147 stays open as a
 draft. First defect return on this milestone (the 2026-08-31 AC2 amendment
 return runs on its own track and is not counted here).
+
+### Second review (2026-08-31)
+
+Re-reviewed on the same branch and PR after the return work, against
+origin/master at `8320367c` (branch 9 ahead / 0 behind, no merge owed).
+Machine: aarch64-apple-darwin23, R 4.6.1. Line anchors below are post-fix-now.
+
+#### Acceptance criteria, fresh evidence
+
+- **AC1 — met.** `cert_ceiling <- 100` at :291, read only by the ceiling half
+  of `cert_bracket()` at :383; `grep axes_certificate_safety_factor` over the
+  file returns prose comments only; no `1e3` in any assertion position.
+- **AC2 — met.** With `50 *` on the three fields `axes_accuracy_certificate()`
+  returns and nothing else changed, the criterion's command printed
+  `Expected b9b se: estimate <= max(cert_ceiling * true_rel, cert_floor)` —
+  the labelled failure it names. Plant reverted, tree clean.
+- **AC3 — met.** The dyadic site's three brackets at :802-804 are fed by
+  `cert_rel()` errors against the committed 97/128, 2 and 5/8; the quotient
+  `se` bracket at :896-897 measures against `v_exact`; the `cval` identity is
+  deleted with its recording comment. `grep -n 'expect_identical(cert\$'` over
+  the file exits 1 with no output.
+- **AC4 — met.** With `c4`'s builder call sliced to `[1:3, 1:3]`,
+  `devtools::test()` reported FAIL 3 / SKIP 2 / PASS 9139 and printed
+  `Expected c4 matrix dim to be identical to rep(cert_shape[[cs$id]][[1L]],
+  2L)` (3 3 vs 4 4) — the shape test naming that case — while the `c4`
+  per-case test skipped, the behavior the pin replaces. Reverted.
+- **AC5 — met.** Unplanted: `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 /
+  PASS 9158 (warnings and skip pre-existing, lavaan and scaled-fit suites);
+  `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes,
+  8m19s.
+- **Return repair proved able to fail.** With `dv`'s yardstick shifted by
+  `2^-40`, the floor branch reddened at `closed-form dyadic se: true error`
+  (4.55e-13 > 4.44e-15) — the branch the first return proved unfailable.
+  Reverted.
+
+No Driving RR, so no projection-vs-outcome pairs are owed.
+
+#### Consistency gate — passes
+
+`cairn_validate.py` exit 0 (only the pre-existing M7 work-log advisories);
+`cairn_impact.py` skipped, no principle changed; `document()` no diff, zero
+`resolve link` lines; generated files untouched; `pkgdown::check_pkgdown()`
+clean; NEWS not owed (no shipped code); check clean (AC5); master watches:
+newest verdict-reaching push runs green on both `R-CMD-check.yaml` and
+`test-coverage.yaml` (M115, 2026-08-31T03:02:32Z); both alert audits and the
+branch-protection check exit 0. PR #147 CI green on the reviewed head — all
+five checks pass (matrix, pkgdown, ubuntu/macos/windows release).
+
+#### Independent review, second round
+
+Full three-lens fan-out again (executable test surface), all fresh-context.
+[S] prior-review: zero findings — verified each first-round disposition landed
+(F1/F2 fixed, F3 filed to the ROADMAP row, F4/F5 corrected); the GitHub
+inline-comment probe returned `[]`, walk skipped. [S] blame-history: one
+finding (B1 below); traced the identity removal to the recorded return-gate
+decision, not a silent undo, M108's bit-identity precondition untouched.
+[O] diff-bug: eleven, ranked R1–R11 as the reviewer ranked them.
+
+- **R1** — claims all four closed-form brackets are still unfailable: the
+  retained dd-route identities pin the certificate's internal yardstick to the
+  test's, so `est/true_rel` is structurally ~10 (exactly 10 for `cval`) and
+  neither branch can red on any shipped-route state short of a ~361x variance
+  error. **Verified in part, rejected as a defect.** The ratio arithmetic is
+  correct, and immunity to correctly-priced shipped drift is the certificate's
+  contract — the test tests the certificate, not the route. The failure class
+  the deleted identities asserted (the certificate's own value here) does
+  redden: verified fresh, the ×50 certificate-side plant reds all four bracket
+  lines (:802-804, :896), and on a drifted machine an under-reporting
+  certificate reds the floor branch. The real residue — shipped-route drift at
+  this configuration is no longer watched by anything — is R5, filed.
+- **R2** — the T6 plant (yardstick shift) demonstrates the assertion
+  mechanism, not a reachable defect class. **Rejected as a defect**; the
+  certificate-side discrimination is the one that matters and was verified
+  fresh (R1). Recorded.
+- **R3** — the floored upper bound changes no pass/fail outcome, so it "does
+  not repair F2". **Recorded, no action**: arithmetic correct and already
+  stated in the work log ("failure set unchanged"); the repair's object was
+  the degenerate printed comparison (`est <= 0` → a bound naming the floor).
+- **R4** — if `axes_certificate_safety_factor` ever drops below 10, the
+  hard-coded `cert_floor` opens a silent pass window. **Follow-up** →
+  degeneracy row (adjacent to the existing `identical(est, cert_floor)`
+  value-coincidence item).
+- **R5** — with the shipped-route identities gone, nothing anywhere pins
+  `axes_v_pricing()`/`axes_u_pricing()` at the dyadic configuration; a
+  correctly-priced shipped regression is green suite-wide. The F3-analogous
+  window, not filed by the return. **Follow-up** → degeneracy row.
+- **R6** — the new sites add two more unpinned-length `cert_rel()` uses
+  (scalar yardstick recycles), and the `cval` bracket alone is unaggregated.
+  **Follow-up** → absorbed into the degeneracy row's existing recycle item.
+- **R7** — counterexample B's dimension pin is artifact-against-table.
+  **Rejected**: the plan gate chose including the fixture; the pin still
+  catches a fixture swap, and the five built anchors carry the builder class.
+- **R8** — a 98-character comment line. **Rejected**: style nitpick.
+- **R9** — :133's "9.83 to 10.00" understates the corrected maximum 10.0025.
+  **Fixed now** (comment edit).
+- **R10** — `cert_bracket()`'s floor comment omitted the `delta/2` halving on
+  the two root-converted fields. **Fixed now** (comment edit).
+- **R11** — first-round Review line references drifted after T6/T7.
+  **Moot**: history stands (IP4); this section carries current anchors.
+- **B1** — the ORACLE RECORDS header still said the dyadic site's certificate
+  "is pinned at its floor", the mechanism this branch deleted. **Fixed now**
+  (comment edit: the certificate *lands* on its floor; nothing pins it).
+
+Fix-now work is three comment-only edits; certificate file re-run green
+(FAIL 0 / PASS 384) after them. No finding demonstrates a criterion failing or
+a load-bearing defect in the deliverable, so no return; defect-return count
+stays at one.
