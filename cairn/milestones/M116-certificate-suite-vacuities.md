@@ -92,7 +92,7 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - [x] T2: Apply the ×50 plant to `axes_accuracy_certificate()`'s three returned
       fields, run the suite with the display cap raised, confirm the
       `"b9b se: estimate"` failure, revert. Summarize the run in the work log.
-- [ ] T3: Rewrite the :728-730 and :816-817 assertions per AC3, deleting the
+- [x] T3: Rewrite the :728-730 and :816-817 assertions per AC3, deleting the
       `cval` one with a comment recording that the test's hand derivation covers
       `v` and `v_naive` only. Run the grep.
 - [ ] T4: Add the dimension assertion to the shape test at :355. Plant a
@@ -113,6 +113,7 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - 2026-08-31: AC2 amended at a mini gate — its command gains `options(testthat.progress.max_fails = 200)`, and a sentence saying why. As written the criterion was unsatisfiable: the ×50 plant reddens 32 assertions in this file and testthat prints labels for only the first 10, so `"b9b se: estimate"` was counted and never named. Nothing in the tree changes; the promise is what it was.
 - 2026-08-31: criteria audit re-ran on the amended AC2 in **reduced** mode (internal tier), fresh-context [O] reader that did not author the wording — no finding on any of the three questions.
 - 2026-08-31: T2 — with the ×50 plant on `axes_accuracy_certificate()`'s three fields, `devtools::test(filter = "axes-certificate")` reported FAIL 32 / PASS 350, `"b9b se: estimate"` among them (`Expected b9b se: estimate <= cert_ceiling * true_rel`); `b9b cval` and `b9b fiml_ratio` too. Plant reverted, the file back to FAIL 0 / PASS 382.
+- 2026-08-31: T3 — the three floor identities in the dyadic closed-form test are now `cert_bracket()` calls fed by errors measured against 97/128, 2 and 5/8; the `se` identity in the quotient closed-form test is a `cert_bracket()` call against `v_exact`, and the `cval` identity is gone with a comment saying the hand derivation there covers `v` and `v_naive` only. `grep -n 'expect_identical(cert\$' tests/testthat/test-axes-certificate.R` returns nothing anywhere in the file. Full suite FAIL 0 / PASS 9155.
 
 ## Decisions
 

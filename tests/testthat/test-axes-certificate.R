@@ -735,18 +735,37 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   expect_identical(ref$u$lo, 0)
 
   # Every intermediate being dyadic, the SHIPPED double route is exact here
-  # too -- so the committed error at this configuration is known to be zero,
-  # and the certificate must report its floor and nothing more. That is the
-  # level assertion this type exists to make: a reference route drifting off
-  # the truth would move the estimate off the floor.
+  # too, and these three pin it against the same hand-derived fractions. They
+  # are the one claim in this file about a machine rather than a matrix, and
+  # they are left standing deliberately (M116 scope): the certificate's own
+  # assertions below no longer depend on them.
   expect_identical(axes_v_pricing(s, d)$corrected, 97 / 128)
   expect_identical(axes_v_pricing(s, d)$naive, 2)
   expect_identical(axes_u_pricing(s, d), 5 / 8)
+  # THE CERTIFICATE, against THIS MACHINE's error rather than against an
+  # asserted zero (M116). What stood here was three identity checks, one per
+  # certificate field, each against `cert_floor` -- saying the machine running
+  # them commits no error at all at this configuration, a claim about the
+  # machine made without measuring it. On the authoring machine
+  # the shipped route is indeed exact here, so those three passed while
+  # checking nothing about the estimate: the floor is the certificate's own
+  # constant, and reporting it is what the certificate does whenever its
+  # bound is small, exact route or not.
+  #
+  # The same two-branch bracket the anchors use replaces them, fed by errors
+  # measured against the fractions committed above -- the only exact values
+  # in scope here, and derived by hand rather than from any route. Where the
+  # machine is exact the floor branch asserts its measured error is under the
+  # floor; where it is not, both halves of the bracket run.
+  hat <- axes_v_pricing(s, d)
+  dv <- cert_rel(hat$corrected, 97 / 128, 0)
+  dn <- cert_rel(hat$naive, 2, 0)
+  du <- cert_rel(axes_u_pricing(s, d), 5 / 8, 0)
   cert <- axes_accuracy_certificate(s, d)
-  floor_est <- cert_floor
-  expect_identical(cert$se, floor_est)
-  expect_identical(cert$cval, floor_est)
-  expect_identical(cert$fiml_ratio, floor_est)
+  cert_bracket(cert$se, max(cert_root_rel(dv)), "closed-form dyadic se")
+  cert_bracket(cert$cval, abs(du), "closed-form dyadic cval")
+  cert_bracket(cert$fiml_ratio, max(cert_root_rel((dv - dn) / (1 + dn))),
+               "closed-form dyadic fiml_ratio")
 })
 
 
@@ -826,14 +845,29 @@ test_that("the quotient's replay lands on hand-derived exact values where the sh
   hat <- axes_v_pricing(s, d)
   true_rel <- abs(sqrt(hat$corrected / hat$naive) - sqrt(q_exact)) /
     sqrt(q_exact)
-  # The corrected arm and the cval numerator are both priced to within a
-  # floor's worth here on every platform measured, which is what makes the
-  # estimate this fit gets come from the new field alone. Asserted before the
-  # precondition below, so they still run where that one steps aside.
+  # THE SE FIELD, against THIS MACHINE's error on the corrected arm (M116).
+  # An identity check of the `se` field against `cert_floor` stood here,
+  # saying the machine running it prices the corrected arm exactly -- which
+  # the authoring machine does not: it commits 1.19e-16 there (measured 2026-08-30, aarch64-apple-
+  # darwin23), under the floor but not zero. The line passed anyway, because
+  # reporting the floor is what the certificate does whenever its bound is
+  # small; it never touched the arm it named. The bracket does, against
+  # `v_exact` -- the hand-derived value committed above, the one exact
+  # quantity this configuration has for that arm.
   cert <- axes_accuracy_certificate(s, d)
   floor_est <- cert_floor
-  expect_identical(cert$se, floor_est)
-  expect_identical(cert$cval, floor_est)
+  cert_bracket(cert$se, max(cert_root_rel(cert_rel(hat$corrected, v_exact, 0))),
+               "closed-form quotient se")
+
+  # `cval` gets NO assertion here, and that is the deliberate half. The hand
+  # derivation above covers `v` and `v_naive` only -- there is no exact `u`
+  # committed for this configuration -- so there is nothing to measure the
+  # machine's cval error against, and the identity check of the `cval` field
+  # against `cert_floor` that stood here asserted a zero it could not have
+  # checked.
+  # Pricing cval here needs its own hand derivation, which is its own
+  # correctness surface; the five anchors and counterexample B already price
+  # the field against exact values.
 
   # THE SHIPPED-ERROR HALF, AND WHY IT IS PLATFORM-DEPENDENT (M113 review; the
   # windows-latest red on CI run 33329301066). The replay half above needs no
