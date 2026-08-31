@@ -243,10 +243,14 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # certificate is not priced again here after the sibling surface (M117).
   # Every guard above -- the df pair, saturation, the diagonal doors and
   # finiteness -- stays ahead of this seam, so the refusal precedence is
-  # unchanged whether or not the argument is passed.
+  # unchanged whether or not the argument is passed; the first three of those
+  # the helper does not mirror at all, and discard the precomputed decision
+  # unread. The consumption guard pins the decision to THIS matrix: see
+  # axes_check_shared_refusal() in R/axes_corrected_se.R.
   degenerate <- if (is.null(refusal)) {
     axes_degeneracy_refusal(sigma, d)
   } else {
+    axes_check_shared_refusal(refusal, sigma)
     refusal
   }
   if (!is.null(degenerate$reason)) {

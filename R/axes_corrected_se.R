@@ -352,6 +352,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   degenerate <- if (is.null(refusal)) {
     axes_degeneracy_refusal(cor_sigma, d)
   } else {
+    axes_check_shared_refusal(refusal, cor_sigma)
     refusal
   }
   if (!is.null(degenerate$reason)) {
@@ -815,23 +816,57 @@ axes_degeneracy_refusal <- function(sigma, d) {
 # (M117 plan gate).
 #
 # Returns NULL -- "nothing precomputed; decide at your own doors", the
-# `refusal` argument's default -- whenever the matrix would be refused by
-# either surface's door guards BEFORE the degeneracy seam (missing dimnames,
-# a nonpositive or infinite diagonal, non-finite entries): those doors keep
-# their own precedence and literals, they cost nothing, and cov2cor() must
-# not run on such a matrix here for exactly the reasons documented at the
-# guards themselves (NaN laundering, double warnings). The guard expressions
-# mirror the callees' own doors verbatim; the callees remain authoritative.
+# `refusal` argument's default -- whenever the matrix would be refused by the
+# MATRIX door guards the two surfaces share BEFORE the degeneracy seam
+# (missing dimnames, a nonpositive or infinite diagonal, non-finite entries):
+# those doors keep their own precedence and literals, they cost nothing, and
+# cov2cor() must not run on such a matrix here for exactly the reasons
+# documented at the guards themselves (NaN laundering, double warnings). Those
+# expressions, and the order they run in against the derivative build, mirror
+# axes_corrected_se()'s own doors; the callees remain authoritative.
+#
+# NOT mirrored, deliberately: axes_scaling_factor()'s `df_mismatch`,
+# `baseline_df_mismatch` and `saturated` doors, which read arguments this
+# helper is not given. A non-NULL return therefore does NOT promise that
+# surface reaches the seam -- those three doors stay ahead of it and discard
+# the precomputed decision unread, exactly as they discarded the surface's own
+# before M117. (M117 review F2.)
+#
+# The realigned cov2cor matrix the decision was priced FOR travels with it in
+# `$priced`, and each surface checks it against the matrix in hand before
+# consuming the decision: nothing else ties the argument to the matrix, and a
+# mismatched pair would otherwise report numbers for a matrix the criterion
+# refuses, silently and with no warning (M117 review F1). `axes_reliability()`
+# passes a matched pair, so the check is an internal invariant, not a
+# user-reachable condition.
 axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
-                                item_block, fit_zeta1, fit_zeta2) {
+                                item_block = NULL, fit_zeta1, fit_zeta2) {
   if (is.null(rownames(sigma)) || is.null(colnames(sigma))) return(NULL)
   sigma <- sigma[item_names, item_names, drop = FALSE]
+  d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
+                      fit_zeta1, fit_zeta2)
   if (any(diag(sigma) <= 0, na.rm = TRUE)) return(NULL)
   if (any(is.infinite(diag(sigma)))) return(NULL)
   if (!all(is.finite(sigma))) return(NULL)
-  d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
-                      fit_zeta1, fit_zeta2)
-  axes_degeneracy_refusal(stats::cov2cor(sigma), d)
+  cor_sigma <- stats::cov2cor(sigma)
+  out <- axes_degeneracy_refusal(cor_sigma, d)
+  out$priced <- cor_sigma
+  out
+}
+
+# The `refusal` argument's consumption guard, one definition for both surfaces
+# (M117 review F1). A precomputed decision is consumed only when it was priced
+# for exactly this matrix; anything else is a caller pairing two matrices, and
+# aborting is the only honest answer, since the alternative is a reported
+# number for a matrix the criterion refuses.
+axes_check_shared_refusal <- function(refusal, cor_sigma) {
+  if (!identical(refusal$priced, cor_sigma)) {
+    stop(
+      "`refusal` was priced for a different matrix than the one in hand.",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
 }
 
 # The one definition of "the certificate's estimate for this fit", read by the

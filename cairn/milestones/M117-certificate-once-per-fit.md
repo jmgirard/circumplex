@@ -174,34 +174,59 @@ Findings, ranked as reported, with disposition:
   estimate from one matrix beside a condition number from the other, because
   `axes_degeneracy_note()` mixes the passed refusal with the local matrix.
   Unreachable through the exported API today — `axes_reliability()` is the only
-  caller and passes a matched pair. Disposition: TBD at gate.
+  caller and passes a matched pair. Disposition: FIXED at the gate. The
+  decision now carries the realigned cov2cor matrix it was priced for in
+  `$priced`, and one shared `axes_check_shared_refusal()` aborts at both
+  consumption sites when it does not `identical()` the matrix in hand.
+  Discrimination proven: deleting both guard calls reddens the new test's two
+  `expect_error()` assertions; the plant was reverted.
 - F2 [O], echoed by [S] blame: `axes_shared_refusal()`'s header claims it
   returns NULL whenever *either* surface's pre-seam doors would refuse and that
   the guards mirror the callees "verbatim", but `axes_scaling_factor()`'s
   `df_mismatch`, `baseline_df_mismatch` and `saturated` doors are not mirrored
   (`R/axes_corrected_se.R:817-824` vs `R/axes_scaled_fit.R:174-185`). No
   behavior consequence — those doors stay ahead of the seam — but the stated
-  contract is false as written. Disposition: TBD at gate.
+  contract is false as written. Disposition: FIXED at the gate. The header now
+  scopes its NULL promise to the matrix doors the two surfaces share, names the
+  three scaling-only doors it does not mirror, and says a non-NULL return does
+  not promise that surface reaches the seam.
 - F3 [O] the derivative set is built after the matrix guards in the helper and
   before them in both callees, so a malformed derivative spec now aborts from
   `axes_shared_refusal()` rather than from the callee: same condition,
   different call context, and a second way the "verbatim mirror" claim fails.
-  Disposition: TBD at gate.
+  Disposition: FIXED at the gate by reordering rather than by documenting — the
+  helper now builds the derivative set immediately after realignment, where
+  both callees build theirs, so the abort surfaces from the same position.
 - F4 [O] a third `axes_se_derivs()` build is constructed and discarded on every
   call, including the common non-degenerate one. Measured at review on the
   clean p = 24 fit (same machine and date as T1/T4): branch 0.042 s and 0.049 s
   across two runs of 7 reps, master's code in the same tree 0.046 s — the
   branch-vs-master gap sits inside this measurement's own run-to-run spread, so
-  no clean-fit regression is demonstrated. Disposition: TBD at gate.
+  no clean-fit regression is demonstrated. Disposition: REJECTED at the gate on
+  that measurement — the cost is real but below what this fit can resolve, and
+  threading the derivative set through both surfaces would widen the seam the
+  milestone deliberately kept to one argument.
 - F5 [O] `item_block` carries no `= NULL` default in the helper, unlike both
   functions it mirrors, so the natural named-argument spelling errors and the
   new test has to pass NULL positionally (`R/axes_corrected_se.R:826`).
-  Disposition: TBD at gate.
+  Disposition: FIXED at the gate — `item_block = NULL`, asserted by the new
+  test calling the helper with the named-argument spelling.
 - F6 [S] prior-review, surfaced as low-confidence: `axes_shared_refusal()` is a
   third hand-copied instance of the door-guard sequence already duplicated
   between the two surfaces, the divergence class M69 A1 and M71 F1 both hit.
   The lens judged it an acknowledged tradeoff, not a reintroduced defect.
-  Disposition: TBD at gate.
+  Disposition: REJECTED at the gate — the duplication is what keeps each
+  surface's doors authoritative over its own refusal literals, which is the
+  property M69 and M71 were about; the header now says so.
+
+### Re-verification after the gate fixes
+
+`Rscript -e 'devtools::test()'`: 0 failed / 9192 passed (was 9185 before the
+fixes; the seven are the new F1 guard test), 5 warnings / 1 skip, all
+pre-existing; `git status --short tests/testthat/_snaps/` printed nothing.
+`Rscript -e 'devtools::check(args = "--no-manual")'`: Status OK, 0 errors /
+0 warnings / 0 notes, 8m 22s. AC1-AC5 therefore stand on the merged tree, not
+only on the pre-fix one.
 
 Return floor: no finding demonstrates an acceptance criterion failing, and F1
 — the only one with a wrong-number scenario — is unreachable through the

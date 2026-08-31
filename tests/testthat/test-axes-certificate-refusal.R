@@ -718,3 +718,60 @@ test_that("M117 AC2 + AC3 (both sides of the seam): standalone surfaces price th
             m117_estimate(wse2), m117_estimate(wsf2))
   expect_identical(unique(ests), ests[[1L]])
 })
+
+
+test_that("M117 review F1: a refusal priced for a different matrix is refused, not consumed", {
+  # Without the consumption guard this pairing is silent and fail-open: the
+  # degenerate matrix's own criterion refuses it "uncertified", but a clean
+  # matrix's precomputed decision carries reason = NULL, so both surfaces
+  # would report populated numbers with no warning at all.
+  fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
+  S <- fx$S
+  ang <- as.numeric(fx$ia)
+  scl <- c("A", "B", "C")
+  clean <- diag(3)
+  clean[1, 2] <- clean[2, 1] <- 0.3
+  clean[1, 3] <- clean[3, 1] <- 0.2
+  clean[2, 3] <- clean[3, 2] <- 0.25
+  dimnames(clean) <- dimnames(S)
+
+  bad_ref <- axes_shared_refusal(clean, rownames(S), ang, scl,
+                                 fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  # The pairing is only dangerous because the two decisions DISAGREE: pin that
+  # the borrowed decision is the permissive one, so the guard is what stands
+  # between the caller and a reported number.
+  expect_null(bad_ref$reason)
+  own_ref <- axes_shared_refusal(S, rownames(S), ang, scl,
+                                 fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  expect_identical(own_ref$reason, "uncertified")
+
+  expect_error(
+    axes_corrected_se(S, rownames(S), ang, scl, n = 600,
+                      fit_zeta1 = FALSE, fit_zeta2 = FALSE, refusal = bad_ref),
+    "priced for a different matrix"
+  )
+  expect_error(
+    axes_scaling_factor(S, rownames(S), ang, scl,
+                        fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                        df = 1, baseline_df = 3, refusal = bad_ref),
+    "priced for a different matrix"
+  )
+
+  # The passing control: the MATCHED decision passes the guard and still
+  # refuses "uncertified" -- the guard rejects mispairing, not the seam.
+  expect_warning(
+    se <- axes_corrected_se(S, rownames(S), ang, scl, n = 600,
+                            fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                            refusal = own_ref),
+    "uncertified"
+  )
+  expect_identical(se$reason, "uncertified")
+
+  # F5: `item_block` takes a default, so the named-argument spelling both
+  # callees accept works here too.
+  expect_identical(
+    axes_shared_refusal(S, rownames(S), ang, scl,
+                        fit_zeta1 = FALSE, fit_zeta2 = FALSE),
+    own_ref
+  )
+})
