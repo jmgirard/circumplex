@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M117: Price the accuracy certificate once per checked fit
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -81,7 +81,7 @@ seam.
 - [x] T3: Write the trace test (AC1, both `missing` paths), the two standalone
       tests (AC2), and the agreement test on both sides of the seam (AC3).
 - [x] T4: Re-measure T1's fit after the change; record beside T1's figure.
-- [ ] T5: `devtools::test()` clean with no snapshot diff;
+- [x] T5: `devtools::test()` clean with no snapshot diff;
       `devtools::check(args = "--no-manual")` clean.
 
 ## Work log
@@ -95,6 +95,7 @@ seam.
 - 2026-08-31: T2 done — `refusal = NULL` argument on both surfaces, consulted only at the `axes_degeneracy_refusal()` seam (every door guard stays ahead); new `axes_shared_refusal()` beside the refusal helper mirrors the door guards and returns NULL when a door would refuse; `axes_reliability()` computes `axes_fitted_cov(fit)` and the refusal once and passes both to the two call sites. test-axes-corrected-se.R, test-axes-scaled-fit.R and test-axes-certificate-refusal.R pass under load_all.
 - 2026-08-31: T3 done — two tests appended to test-axes-certificate-refusal.R: an AC1 trace (counting wrapper around `axes_accuracy_certificate`, M89 AC6-style injection at `axes_fitted_cov`, exactly 1 evaluation per call on listwise and fiml, both surfaces still warning "uncertified") and a combined AC2+AC3 test on the committed p = 3 counterexample (each standalone surface moves the trace by one and warns the estimate re-derived independently from the certificate; with the shared refusal passed the trace does not move; one extracted estimate across all four warnings). Discrimination proven: planting the old double evaluation reddened AC1 on both paths (count 2), and a callee ignoring `refusal` reddened the seam-side count (4 vs 3); both plants reverted.
 - 2026-08-31: T4 done — same script, machine and date as T1: median 0.029 s per call after the change (was 0.033 s; the saved evaluation is the certificate's own ~0.002 s plus its setup on this p = 24 fit). Both "uncertified" warnings still emitted.
+- 2026-08-31: T5 done — `devtools::test()` 0 failed / 9185 passed, `git status --short tests/testthat/_snaps/` empty; `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes. Status → review.
 
 ## Decisions
 
