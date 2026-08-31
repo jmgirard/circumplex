@@ -267,6 +267,26 @@ cert_root_rel <- function(e) abs(e / (sqrt(1 + e) + 1))
 # file stayed green. Every other site that needs the floor reads this one.
 cert_floor <- 10 * 2 * .Machine$double.eps
 
+# The bracket's UPPER end: how far above a fit's true error the certificate is
+# allowed to sit before the estimate counts as an overstatement. Written down
+# here, and NOT read from axes_certificate_safety_factor, for the reason the
+# floor above is not: an expectation reading the constant it is checking moves
+# with it and notices nothing.
+#
+# 100 is ten times the safety factor `10` written down above. The certificate
+# is a bound times that factor, so a ratio at the factor is what it is built to
+# deliver and the room above it is what a machine rounding the other way needs.
+# M108 pre-registered 1e3 before any measurement existed; every measurement
+# since has come in three decades under it, which is a ceiling nothing can
+# reach. Measured 2026-08-30 on aarch64-apple-darwin23, R 4.6.1, reference
+# BLAS: eighteen estimate-over-true-error ratios across the six priced cases
+# and three fields, all between 9.829 (`cxb se`) and 10.000 (every anchor, all
+# three fields), reproduced by pricing each case through axes_v_pricing() and
+# axes_u_pricing() against the exact values committed below and dividing
+# axes_accuracy_certificate()'s field by the result -- the same two steps
+# cert_true_error() and the per-case tests below already take.
+cert_ceiling <- 100
+
 # THIS MACHINE's own relative error at one case, against the committed exact
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
@@ -335,8 +355,7 @@ cert_true_error <- function(id, sigma, d) {
 # the machine agrees, because a true error ABOVE what the floor certifies is
 # exactly the under-report this instrument exists to prevent. Where it sits
 # above its floor both halves of the bracket run: at least the measured error,
-# and at most 1e3 times it, the ceiling M108 pre-registered before any
-# measurement was taken.
+# and at most `cert_ceiling` times it.
 #
 # `lbl` names the field AND the case, and is carried into every expectation:
 # a cross-platform failure arrives as two bare numbers otherwise, naming
@@ -347,7 +366,7 @@ cert_bracket <- function(est, true_rel, lbl) {
     expect_lte(true_rel, cert_floor, label = paste0(lbl, ": true error"))
   } else {
     expect_gte(est, true_rel, label = paste0(lbl, ": estimate"))
-    expect_lte(est, 1e3 * true_rel, label = paste0(lbl, ": estimate"))
+    expect_lte(est, cert_ceiling * true_rel, label = paste0(lbl, ": estimate"))
   }
 }
 

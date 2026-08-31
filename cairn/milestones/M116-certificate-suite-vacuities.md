@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M116: Make three passing-without-checking assertions in the certificate suite redden
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP3, IP6
-- **Branch/PR:** —
+- **Branch/PR:** `m116-certificate-suite-vacuities`
 
 ## Goal
 
@@ -81,7 +81,7 @@ it should redden. Each repair is proved able to fail by a planted defect.
 
 ## Tasks
 
-- [ ] T1: Measure this machine's certificate estimate and true error for every
+- [x] T1: Measure this machine's certificate estimate and true error for every
       case × field, noting which sit at `cert_floor`. Record the figures with
       the date and the command that produced them in a comment beside the
       ceiling, and set the ceiling to ten times the safety factor already
@@ -104,6 +104,9 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - 2026-08-30: plan gate chose a ceiling of ten times the safety factor over three times it, because the measured ratios reach the factor exactly (9.83–10.00 against a factor of 10) and three times it leaves no room for a machine rounding the other way; falsified by a measured ratio above 100 on any machine, which would mean the certificate overstates by more than the factor alone.
 - 2026-08-30: plan gate declined sweeping the `axes_v_pricing()` exactness identities at :723-725 in the same pass, keeping the diff to the `cert$` assertions the roadmap disposition named; falsified by either identity reddening on a platform, which is the same class as the M108 trap.
 - 2026-08-30: criteria audit ran in **reduced** mode (internal tier), fresh-context [O] reader, two passes. First pass returned findings on five of six drafted criteria — three wrong line references, an unsatisfiable planted defect, five recording-act clauses binding instruments rather than the deliverable, and a demonstration arm spanning two revisions of the tree. Second pass over the post-gate wording returned four more — an inert exemption registry naming lines the criterion's own grep does not match, a plant whose multiplier only bites once the ceiling has landed, a shape-test line reference off by three, and a zero-skips clause the plant itself contradicts. All disposed before this file was written.
+
+- 2026-08-30: T1 — measured estimate/true-error on aarch64-apple-darwin23, R 4.6.1, reference BLAS: eighteen ratios across six priced cases x three fields, 9.829 (`cxb se`) to 10.000 (every anchor); the two closed-form configurations sit at the floor bar `cf2 fiml_ratio` (10.000), and `cf2`'s true SE error is 1.19e-16 rather than zero. Ceiling set to a named `cert_ceiling <- 100` beside `cert_floor`, comment recording range, extremes, date, machine and procedure. Gate chose the named constant over an inline literal, and the range-plus-extremes comment over a per-case table.
+- 2026-08-30: gate chose pinning all six cases' matrix dimensions in T4, the saved counterexample fixture included, over the five built anchors alone: the fixture takes the same skip-on-size-mismatch path and its size is already written down in the table the check reads.
 
 ## Decisions
 

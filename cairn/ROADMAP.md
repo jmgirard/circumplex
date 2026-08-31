@@ -10,7 +10,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
-| M116 | Make three passing-without-checking assertions in the certificate suite redden | planned | — | normal | milestones/M116-certificate-suite-vacuities.md |
+| M116 | Make three passing-without-checking assertions in the certificate suite redden | in-progress | — | normal | milestones/M116-certificate-suite-vacuities.md |
 | M117 | Price the accuracy certificate once per checked fit | planned | — | normal | milestones/M117-certificate-once-per-fit.md |
 | M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | done | M113 | normal | milestones/archive/M114-refusal-predicate-fences.md |
 | M115 | Make the packaged accuracy bracket assert where the shipped pricing differs | done | M113 | normal | milestones/archive/M115-certificate-bracket-reach.md |
