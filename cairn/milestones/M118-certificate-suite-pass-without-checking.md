@@ -1,11 +1,11 @@
 # M118: Close three ways the certificate suite can pass without checking
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP3
-- **Branch/PR:** —
+- **Branch/PR:** `m118-certificate-suite-pass-without-checking`
 
 ## Goal
 
@@ -84,7 +84,7 @@ and no external consumer of the package relies on any of it.
 
 ## Tasks
 
-- [ ] **T1** — Record each priced case's disposition as `cert_true_error()`
+- [x] **T1** — Record each priced case's disposition as `cert_true_error()`
       (`:296-351`) runs — priced, or skipped with its reason — in a
       file-local environment, and add a test after the per-case tests that
       fails when zero were priced. The per-case tests are one `test_that()`
@@ -120,6 +120,7 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: plan gate chose fixing the all-skip detector, the dyadic pin and the safety-factor pin over fixing only the all-skip detector, over also hand-deriving `cval`, and over planning nothing and closing the row outright, because the three chosen items each make a currently-green regression red at a cost that needs no new derivation; falsified by any of the three proving to need a hand derivation of its own.
 - 2026-08-31: plan gate chose a written-down literal tolerance for the dyadic pin over a tolerance read from `cert_floor` and over leaving the configuration unpinned, because an expectation reading the constant it sits beside moves with that constant and notices nothing — the failure M115 AC4 already recorded for the floor itself; falsified by a machine committing a legitimate error above `4 * 2^-53` at a configuration where every intermediate is dyadic.
 - 2026-08-31: plan gate chose accepting the quotient configuration's missing `cval` check over hand-deriving an exact `u` there and over an indirect worst-of assertion, because the field is already priced against exact values at six other configurations and a new hand derivation is its own correctness surface; falsified by a `cval` regression that the six priced cases miss.
+- 2026-08-31: T1 — each case records its disposition (priced / skipped-with-reason / refused) into a file-local environment from inside `cert_true_error()`, and a test after the per-case tests fails when none was priced. Discrimination proved by forcing the matrix precondition to mismatch for every case: 6 skips, and the new test the only failure, its label naming each case's reason. `devtools::test()` 0 failures, 9194 passes.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
 
 ## Decisions

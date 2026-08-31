@@ -10,7 +10,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
-| M118 | Close three ways the certificate suite can pass without checking | planned | — | normal | milestones/M118-certificate-suite-pass-without-checking.md |
+| M118 | Close three ways the certificate suite can pass without checking | in-progress | — | normal | milestones/M118-certificate-suite-pass-without-checking.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |
 | M117 | Price the accuracy certificate once per checked fit | done | — | normal | milestones/archive/M117-certificate-once-per-fit.md |
 | M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | done | M113 | normal | milestones/archive/M114-refusal-predicate-fences.md |

@@ -290,6 +290,36 @@ cert_floor <- 10 * 2 * .Machine$double.eps
 # cert_true_error() and the per-case tests below already take.
 cert_ceiling <- 100
 
+# ---- WHAT ACTUALLY GOT PRICED (M118) ---------------------------------------
+#
+# Every bracket assertion in this file is reached through cert_true_error(),
+# and that function SKIPS a case whose anchor matrix this machine does not
+# build bit for bit. The per-case tests below are one test_that() each so that
+# those skips are independent -- but a machine on which all six skip runs this
+# file green with not one bracket asserted, and nothing in the file says so.
+# Until now the only detector was a human reading the pull request's CI log
+# for skip counts.
+#
+# So each case records what became of it, on every path, and a test after the
+# per-case tests reads the record back. The environment is file-local and
+# written from INSIDE cert_true_error(): a case that skips leaves its reason
+# here before skip() unwinds its test_that(), and a case that is priced says
+# so only after every value it prices has been computed.
+cert_dispositions <- new.env(parent = emptyenv())
+
+cert_record <- function(id, disposition) {
+  assign(id, disposition, envir = cert_dispositions)
+  invisible(disposition)
+}
+
+cert_disposition <- function(id) {
+  if (exists(id, envir = cert_dispositions, inherits = FALSE)) {
+    get(id, envir = cert_dispositions, inherits = FALSE)
+  } else {
+    "never reached"
+  }
+}
+
 # THIS MACHINE's own relative error at one case, against the committed exact
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
@@ -309,11 +339,15 @@ cert_true_error <- function(id, sigma, d) {
   # formatter, and round-trips every value committed here exactly (none is a
   # denormal, the one place that parse loses bits).
   if (!identical(sigma[upper.tri(sigma)], as.numeric(fz$sig))) {
-    testthat::skip(paste0(
+    reason <- paste0(
       "this machine does not build the anchor matrix at case '", id, "' bit ",
       "for bit, so the exact quadratic forms committed for that matrix are ",
       "not a yardstick for this one"
-    ))
+    )
+    # RECORDED BEFORE skip(), which unwinds this case's test_that() and would
+    # otherwise leave the case looking like one that was never reached.
+    cert_record(id, paste0("skipped -- ", reason))
+    testthat::skip(reason)
   }
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
@@ -330,11 +364,15 @@ cert_true_error <- function(id, sigma, d) {
       ") -- an admitted geometry, so this is a regression, not a platform ",
       "difference"
     ))
+    cert_record(id, "refused by the shipped pricing")
     return(NULL)
   }
   dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
   dn <- cert_rel(v$naive, as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))
   du <- cert_rel(u, as.numeric(fz$u_hi), as.numeric(fz$u_lo))
+  # AFTER the pricing, not before: what is claimed is that this case was
+  # measured against its committed exact values, not that it was attempted.
+  cert_record(id, "priced")
   list(
     # Aggregated by MAX over components, as the certificate's own estimands
     # are: the reported SE vector refuses as a unit, so the worst component is
@@ -502,6 +540,37 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   # margin is three decades or more on both machines seen so far.
   expect_gt(true_rel$se, axes_degeneracy_delta_star)
   expect_gt(true_rel$cval, axes_degeneracy_delta_star)
+})
+
+
+test_that("AC1: at least one case was priced against its committed exact values", {
+  # THE ALL-SKIP DETECTOR (M118). Every bracket assertion above runs only for
+  # a case cert_true_error() actually priced; a case whose anchor matrix this
+  # machine builds differently skips instead, and each skip abandons only its
+  # own test_that(). So a machine on which all six skip reports six skips and
+  # zero failures -- a green file with nothing measured against the exact
+  # values it commits. That state is what this test turns red.
+  #
+  # It reads the dispositions the cases recorded as they ran, rather than
+  # re-pricing anything: re-pricing here would be a second copy of the
+  # precondition, and would skip in exactly the runs this test exists to
+  # catch.
+  #
+  # The case list is pinned at six -- five anchors plus counterexample B --
+  # because this test's own domain is a list that can empty: with no cases
+  # enumerated there would be nothing to count and no priced case to want.
+  ids <- c(vapply(cert_anchors(), `[[`, "", "id"), "cxb")
+  expect_length(ids, 6L)
+
+  dispositions <- vapply(ids, cert_disposition, "")
+  priced <- ids[dispositions == "priced"]
+  # The label carries every case's disposition, so a failure here says which
+  # cases skipped and why rather than reporting a bare zero.
+  expect_gt(length(priced), 0L,
+            label = paste0(
+              "cases priced (dispositions: ",
+              paste0(ids, " = ", dispositions, collapse = "; "), ")"
+            ))
 })
 
 
