@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP3
-- **Branch/PR:** `m118-certificate-suite-pass-without-checking`
+- **Branch/PR:** `m118-certificate-suite-pass-without-checking` / https://github.com/jmgirard/circumplex/pull/149
 
 ## Goal
 
@@ -129,6 +129,7 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: T5 — the candidate row that had absorbed findings since M108 was rewritten from 4,192 to 2,316 characters, keeping the three promotion conditions, the two standing rejections and pointers into the archives. `cairn/ROADMAP.md` 23,821 → 21,943 bytes. No code changed at T4 or T5, so the verify slot's result from T3 stands.
 - 2026-08-31: all five tasks done; `Rscript -e 'devtools::test()'` clean (0 failures, 5 pre-existing lavaan warnings, 1 skip, 9198 passes). Status → review.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
+- 2026-08-31: review opened; branch pushed and draft PR #149 created. Gate in progress — verify slot clean (0 failures, 9198 passes), `cairn_validate` exit 0, and the toolchain consistency-gate checks run so far all clean; AC discrimination proofs and the review fan-out still outstanding.
 
 ## Decisions
 
