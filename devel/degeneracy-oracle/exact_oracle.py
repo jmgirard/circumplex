@@ -89,6 +89,13 @@ def pipeline(S, mats, n_comp, n, df, baseline_df):
 
     ses = []
     ratios = []
+    # The pre-square-root quadratic forms themselves, kept as exact rationals.
+    # They are what the certificate is computed from and what the packaged
+    # bracket needs in order to price its own machine (M115): a relative error
+    # is a statement about the matrix, so the exact v and v_naive travel, while
+    # the doubles measured from them do not.
+    vs = []
+    vns = []
     for r in range(n_comp):
         acc = [[sum((acov[r][s] * mats[s][i][j] for s in range(Q)), F(0))
                 for j in range(p)] for i in range(p)]
@@ -111,6 +118,8 @@ def pipeline(S, mats, n_comp, n, df, baseline_df):
         ws = mm(w, S)
         v_naive = F(2) * sum_prod_t(ws, ws)
         ratios.append(math.sqrt(float(v_corrected / v_naive)))
+        vs.append(v_corrected)
+        vns.append(v_naive)
 
     up = [(i, j) for i in range(p) for j in range(p) if j > i]
     tr_vg = sum((F(1) - si[i][j] * S[i][j] * (F(1) - S[i][j] ** 2) for (i, j) in up),
@@ -129,7 +138,27 @@ def pipeline(S, mats, n_comp, n, df, baseline_df):
     proj = sum((acov[s][t] * bmat[s][t] for s in range(Q) for t in range(Q)), F(0))
     cval = (tr_vg - proj) / F(df)
     cb = sum(((F(1) - S[i][j] ** 2) ** 2 for (i, j) in up), F(0)) / F(baseline_df)
-    return ses, ratios, cval, cb, tr_vg, proj
+    return ses, ratios, cval, cb, tr_vg, proj, vs, vns, tr_vg - proj
+
+
+def dd_hex(x):
+    """Exact rational -> the (hi, lo) double pair whose unevaluated sum is x.
+
+    hi is x correctly rounded to a double (float(Fraction) rounds to nearest in
+    Python 3), and lo is the remainder x - hi rounded the same way, so hi + lo
+    carries the exact value to about 106 bits -- ten decades finer than the
+    double-precision errors the R side measures against it. Both words are
+    printed as C99 hex floats, which round-trip through R's as.numeric() bit
+    for bit; decimal printing does not.
+
+    This is what lets the packaged bracket measure the RUNNING machine's own
+    error (M115): a single frozen decimal error figure describes one machine,
+    while the exact value it was measured against describes the matrix, and
+    every machine can compare its own pricing to that.
+    """
+    hi = float(x)
+    lo = float(x - F(hi))
+    return hi.hex(), lo.hex()
 
 
 def main(path):
@@ -143,7 +172,8 @@ def main(path):
     S = _mat(d["S"], p)
     mats = [_mat(d["M%d" % (i + 1)], p) for i in range(Q)]
 
-    ses, ratios, cval, cb, tr_vg, proj = pipeline(S, mats, n_comp, n, df, bdf)
+    ses, ratios, cval, cb, tr_vg, proj, vs, vns, u = \
+        pipeline(S, mats, n_comp, n, df, bdf)
     print("EXACT_CVAL: %.17g" % float(cval))
     print("EXACT_BASELINE: %.17g" % float(cb))
     print("EXACT_TR_VG: %.17g" % float(tr_vg))
@@ -152,6 +182,19 @@ def main(path):
         print("EXACT_SE%d: %.17g" % (i + 1, se))
     for i, rt in enumerate(ratios):
         print("EXACT_RATIO%d: %.17g" % (i + 1, rt))
+
+    # The exact quadratic forms and the scaling factor's exact numerator, each
+    # as a hi/lo hex pair. `HEX_` rather than `EXACT_` because the R driver
+    # parses these as strings and the `EXACT_` lines as numbers.
+    v_hex = [dd_hex(x) for x in vs]
+    vn_hex = [dd_hex(x) for x in vns]
+    u_hex = dd_hex(u)
+    print("HEX_V_HI: %s" % " ".join(h for h, _ in v_hex))
+    print("HEX_V_LO: %s" % " ".join(l for _, l in v_hex))
+    print("HEX_VNAIVE_HI: %s" % " ".join(h for h, _ in vn_hex))
+    print("HEX_VNAIVE_LO: %s" % " ".join(l for _, l in vn_hex))
+    print("HEX_U_HI: %s" % u_hex[0])
+    print("HEX_U_LO: %s" % u_hex[1])
 
 
 if __name__ == "__main__":

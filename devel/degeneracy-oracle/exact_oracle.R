@@ -62,12 +62,62 @@ hex_dump <- function(S, mats, n_comp, df, baseline_df) {
 df_of <- function(S, d) nrow(S) * (nrow(S) + 1) / 2 - length(d$mats)
 baseline_df_of <- function(S) nrow(S) * (nrow(S) - 1) / 2
 
+# Two kinds of line come back. `EXACT_*` are decimal numbers -- the measured
+# quantities this script prints and compares. `HEX_*` are the exact quadratic
+# forms as hi/lo hex double PAIRS, kept as character so they reach the packaged
+# test file bit for bit (M115); they are what lets that file measure its own
+# machine's error instead of comparing against one frozen on this one.
 exact <- function(S, d, df = DF, baseline_df = BASELINE_DF) {
   out <- system2("python3",
                  c(py, hex_dump(S, d$mats, d$n_comp, df, baseline_df)),
                  stdout = TRUE)
-  vals <- as.numeric(sub("^[A-Z_0-9]+: ", "", out))
-  stats::setNames(vals, sub(":.*$", "", out))
+  key <- sub(":.*$", "", out)
+  val <- trimws(sub("^[A-Z_0-9]+:", "", out))
+  res <- as.list(stats::setNames(suppressWarnings(as.numeric(val)), key))
+  hexish <- startsWith(key, "HEX_")
+  res[hexish] <- lapply(val[hexish], function(s) strsplit(s, " +")[[1L]])
+  res
+}
+
+# --- M115: the exact quadratic forms the packaged bracket prices against -----
+#
+# The packaged test file used to carry a frozen relative ERROR per case -- one
+# machine's measurement, useless as a yardstick anywhere else, which is why
+# every case skipped off the machine that froze them. What travels instead is
+# the exact `v`, `v_naive` and `u` themselves, each as a hi/lo double pair:
+# those are properties of the MATRIX, so any machine can price its own doubles
+# against them and measure its own error. Collected here as each case is run,
+# and printed as a paste-ready block by CERT_EMIT=1 (see the regeneration note
+# in tests/testthat/test-axes-certificate.R).
+cert_emit <- list()
+cert_record <- function(id, S, ex) {
+  cert_emit[[id]] <<- list(
+    sig = sprintf("%a", as.vector(S[upper.tri(S)])),
+    v_hi = ex[["HEX_V_HI"]], v_lo = ex[["HEX_V_LO"]],
+    vn_hi = ex[["HEX_VNAIVE_HI"]], vn_lo = ex[["HEX_VNAIVE_LO"]],
+    u_hi = ex[["HEX_U_HI"]], u_lo = ex[["HEX_U_LO"]]
+  )
+}
+
+# The matrix goes out from THIS script's own construction, beside the exact
+# values priced from it, so the two cannot describe different matrices. The
+# packaged file's own builder is tied to it by the `sig` comparison there.
+cert_emit_block <- function() {
+  fld <- c("sig", "v_hi", "v_lo", "vn_hi", "vn_lo", "u_hi", "u_lo")
+  cat("\n# ---- cert_frozen, regenerated: paste into",
+      "tests/testthat/test-axes-certificate.R ----\ncert_frozen <- list(\n")
+  ids <- names(cert_emit)
+  for (k in seq_along(ids)) {
+    e <- cert_emit[[ids[[k]]]]
+    cat(sprintf("  %s = list(\n", ids[[k]]))
+    for (j in seq_along(fld)) {
+      body <- paste(deparse(e[[fld[[j]]]], width.cutoff = 60), collapse = "\n    ")
+      cat(sprintf("    %s = %s%s\n", fld[[j]], body,
+                  if (j < length(fld)) "," else ""))
+    }
+    cat(sprintf("  )%s\n", if (k < length(ids)) "," else ""))
+  }
+  cat(")\n")
 }
 
 kappa_of <- function(S) {
@@ -89,6 +139,7 @@ cat(sprintf("criterion accepts it: %s\n",
             is.null(axes_sigma_degenerate(S))))
 
 ex <- exact(S, d)
+cert_record("cxb", S, ex)
 dbl_se <- axes_se_pricing(S, d, N)$corrected
 dbl_sf <- suppressWarnings(
   axes_scaling_factor(S, nm, ang, ITEM_SCALE, ITEM_BLOCK,
@@ -146,11 +197,17 @@ CERT_CEILING <- 1e3
 # negligible at these errors -- so 1e3 sits two decades over the worst measured
 # and is the same pre-registered window the other two fields carry.
 CERT_CEILING_RATIO <- 1e3
+# The count is of RATIOS FORMED, not of cert_line() calls (M115). The two used
+# to be the same number only because no case happened to be priced exactly; a
+# case that was would take the floor-only branch below, form no ratio, and
+# still increment -- so the count would report eighteen comparisons made while
+# the ceiling had been applied to fewer. Counting the ratios makes the label
+# state what was actually checked, and makes a case going exact redden here
+# rather than pass quietly.
 CERT_EXPECTED <- 18L   # six geometries x {SE, cval, ratio}
 cert_ok <- TRUE
 cert_n <- 0L
 cert_line <- function(lbl, cert, true_rel, ceiling = CERT_CEILING) {
-  cert_n <<- cert_n + 1L
   if (true_rel == 0) {
     # An exactly priced case: the shipped route committed no error, so there is
     # no ratio to form and the certificate can only report its own floor. That
@@ -163,6 +220,7 @@ cert_line <- function(lbl, cert, true_rel, ceiling = CERT_CEILING) {
     return(invisible(NULL))
   }
   ratio <- cert / true_rel
+  cert_n <<- cert_n + 1L
   cert_ok <<- cert_ok && is.finite(ratio) && ratio >= 1 && ratio <= ceiling
   cat(sprintf("  %-10s true %9.3e | certificate %9.3e | ratio %8.3g\n",
               lbl, true_rel, cert, ratio))
@@ -196,8 +254,16 @@ for (i in 1:2) {
 # --- RR18 Q4 sweep: does the double error track p*kappa^2*eps? ---------------
 cat("\n== Q4 sweep: S_t = t*S_B + (1-t)*I ==\n")
 cat("       t          kappa(R)     rel.err     p*kappa^2*eps   ratio\n")
-sweep_ok <- TRUE
-for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
+# Collected rather than accumulated (M115). `sweep_ok <- sweep_ok && ...` inside
+# the loop starts TRUE and is only ever falsified by a body that runs, so an
+# emptied or truncated sweep printed PASS having compared nothing. The verdict
+# below is derived from the ratios themselves, against a count written down
+# rather than read off the domain -- `length(x) == length(SWEEP_T)` would go on
+# holding with both emptied.
+SWEEP_T <- c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)
+SWEEP_EXPECTED <- 3L
+sweep_ratios <- numeric(0)
+for (tt in SWEEP_T) {
   St <- tt * S + (1 - tt) * diag(nrow(S))
   dimnames(St) <- dimnames(S)
   ext <- exact(St, d)
@@ -206,10 +272,13 @@ for (tt in c(1 - 2.5e-5, 1 - 2.5e-4, 1 - 2.5e-3)) {
                c(ext[["EXACT_SE1"]], ext[["EXACT_SE2"]]))
   bound <- nrow(S) * kappa_of(St)^2 * .Machine$double.eps
   ratio <- rel / bound
-  sweep_ok <- sweep_ok && ratio <= 10 && ratio >= 0.1
+  sweep_ratios <- c(sweep_ratios, ratio)
   cat(sprintf("  %.7f   %10.4g   %9.3e   %11.3e   %6.3g\n",
               tt, kappa_of(St), rel, bound, ratio))
 }
+
+sweep_ok <- length(sweep_ratios) == SWEEP_EXPECTED &&
+  all(is.finite(sweep_ratios) & sweep_ratios <= 10 & sweep_ratios >= 0.1)
 
 # --- M106 / RR19 B2: the REACHABLE-geometry family ---------------------------
 #
@@ -271,19 +340,21 @@ near_duplicate_family <- function(pair_eps, xi1 = 0.3, xi2 = 0.2,
 
 cat("\n== M106 reachable-geometry family: is the bound decades LOOSE here? ==\n")
 cat("  construction                p     kappa(R)     rel.err     bound        ratio     cval rel.err\n")
-reach_ok <- TRUE
+# Collected, for the reason stated at the sweep above.
+REACH_EXPECTED <- 5L
+reach_ratios <- numeric(0)
 reach_cases <- list(
-  list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-4, 1L)),
-  list(lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-5, 1L)),
-  list(lbl = "family C, p = 4 minimum", g = local({
+  list(id = "a4", lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-4, 1L)),
+  list(id = "a5", lbl = "family A, 1 item/scale ", g = reachable_family(2.4e-5, 1L)),
+  list(id = "c4", lbl = "family C, p = 4 minimum", g = local({
     ang <- c(90, 180, 270, 360); rad <- ang * pi / 180
     cm <- outer(rad, rad, function(u, v) cos(u - v))
     sg <- 0.3 * cm + 0.3 * matrix(1, 4, 4) + 1.2e-5 * diag(4)
     nms <- paste0("i", 1:4); dimnames(sg) <- list(nms, nms)
     list(S = cov2cor(sg), ang = ang, scale = as.character(1:4))
   })),
-  list(lbl = "near-duplicate r=.9999 ", g = near_duplicate_family(7e-5)),
-  list(lbl = "near-duplicate r=.99999", g = near_duplicate_family(7e-6))
+  list(id = "b9a", lbl = "near-duplicate r=.9999 ", g = near_duplicate_family(7e-5)),
+  list(id = "b9b", lbl = "near-duplicate r=.99999", g = near_duplicate_family(7e-6))
 )
 for (cs in reach_cases) {
   g <- cs$g
@@ -298,6 +369,7 @@ for (cs in reach_cases) {
   dr <- axes_se_derivs(g$ang, g$scale, NULL, zr, FALSE)
   dfr <- df_of(g$S, dr)
   exr <- exact(g$S, dr, dfr, baseline_df_of(g$S))
+  cert_record(cs$id, g$S, exr)
   dtr <- axes_se_pricing(g$S, dr, N)$corrected
   exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)
   rel <- max(abs(exv - dtr) / abs(exv))
@@ -309,7 +381,7 @@ for (cs in reach_cases) {
   # is priced against the exact oracle in the same reachable geometries.
   cvr <- abs(exr[["EXACT_CVAL"]] - double_cval(g$S, dr, dfr)) /
     abs(exr[["EXACT_CVAL"]])
-  reach_ok <- reach_ok && rat <= REACHABLE_WINDOW
+  reach_ratios <- c(reach_ratios, rat)
   cat(sprintf("  %s  %3d  %10.4g   %9.3e   %10.3e   %8.2e   %9.3e\n",
               cs$lbl, pr, kappa_of(g$S), rel, bnd, rat, cvr))
   crt <- axes_accuracy_certificate(g$S, dr)
@@ -318,14 +390,25 @@ for (cs in reach_cases) {
   cert_line("  ratio", crt$fiml_ratio, ratio_rel(g$S, dr, exr), CERT_CEILING_RATIO)
 }
 
+reach_ok <- length(reach_ratios) == REACH_EXPECTED &&
+  all(is.finite(reach_ratios) & reach_ratios <= REACHABLE_WINDOW)
+
 # The count is asserted, not asserted-in-a-label: `cert_ok` starts TRUE and is
 # only ever falsified INSIDE cert_line(), so a truncated or empty case list
-# would otherwise print PASS at "all six geometries" having checked none. The
-# count is eighteen since M113 -- six geometries by three fields.
+# would otherwise print PASS at "all six geometries" having checked none. Since
+# M115 the count is of RATIOS formed -- eighteen, six geometries by three
+# fields, all eighteen of which have a real error to divide by. A case going
+# exact would form seventeen and redden here, which is the report being honest
+# about what it compared rather than about how many lines it printed.
 cert_ok <- cert_ok && identical(cert_n, CERT_EXPECTED)
-cat(sprintf("\nANCHORS: %s\nSWEEP (within a factor of 10 of the bound): %s\nREACHABLE (attainment below %.0e): %s\nCERTIFICATE (%d of %d lines checked, each in [1, its field's ceiling: %.0e for SE/cval, %.0e for the ratio], at all six geometries): %s\n",
-            if (ok) "PASS" else "FAIL", if (sweep_ok) "PASS" else "FAIL",
-            REACHABLE_WINDOW, if (reach_ok) "PASS" else "FAIL",
+cat(sprintf("\nANCHORS: %s\nSWEEP (%d of %d ratios, each within a factor of 10 of the bound): %s\nREACHABLE (%d of %d ratios, each attaining below %.0e): %s\nCERTIFICATE (%d of %d ratios formed and checked, each in [1, its field's ceiling: %.0e for SE/cval, %.0e for the ratio], at all six geometries): %s\n",
+            if (ok) "PASS" else "FAIL",
+            length(sweep_ratios), SWEEP_EXPECTED,
+            if (sweep_ok) "PASS" else "FAIL",
+            length(reach_ratios), REACH_EXPECTED, REACHABLE_WINDOW,
+            if (reach_ok) "PASS" else "FAIL",
             cert_n, CERT_EXPECTED, CERT_CEILING, CERT_CEILING_RATIO,
             if (cert_ok) "PASS" else "FAIL"))
+if (nzchar(Sys.getenv("CERT_EMIT"))) cert_emit_block()
+
 if (!ok || !sweep_ok || !reach_ok || !cert_ok) quit(status = 1L)
