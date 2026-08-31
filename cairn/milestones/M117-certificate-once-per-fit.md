@@ -78,7 +78,7 @@ seam.
       it; `axes_reliability()` computes it once and passes it to both. The
       finiteness / `"singular"` / `"infinite_diagonal"` precedence and the
       `naive_reason` decoupling stay ahead of the seam.
-- [ ] T3: Write the trace test (AC1, both `missing` paths), the two standalone
+- [x] T3: Write the trace test (AC1, both `missing` paths), the two standalone
       tests (AC2), and the agreement test on both sides of the seam (AC3).
 - [ ] T4: Re-measure T1's fit after the change; record beside T1's figure.
 - [ ] T5: `devtools::test()` clean with no snapshot diff;
@@ -93,6 +93,7 @@ seam.
 - 2026-08-31: implement started; branch m117-certificate-once-per-fit. Question gate skipped — both seam surfaces are internal (`NAMESPACE` exports only `axes_reliability`), the plan gate settled the design, no tripwire tags; the two minor choices made here: the argument is named `refusal` (the `axes_degeneracy_refusal()` return, default `NULL` = compute it), and `axes_reliability()` builds it once inline at the seam.
 - 2026-08-31: T1 done — scratchpad script (M89 AC6 injection shape: p = 24 octant matrix, item 2 duplicated + 1e-9 ridge, mocked at `axes_fitted_cov`), 5 timed reps after warm-up via `system.time`, Apple M5 Pro / R 4.6.1, 2026-08-31: median 0.033 s per `axes_reliability()` call; one `axes_accuracy_certificate()` evaluation on that matrix: median 0.002 s.
 - 2026-08-31: T2 done — `refusal = NULL` argument on both surfaces, consulted only at the `axes_degeneracy_refusal()` seam (every door guard stays ahead); new `axes_shared_refusal()` beside the refusal helper mirrors the door guards and returns NULL when a door would refuse; `axes_reliability()` computes `axes_fitted_cov(fit)` and the refusal once and passes both to the two call sites. test-axes-corrected-se.R, test-axes-scaled-fit.R and test-axes-certificate-refusal.R pass under load_all.
+- 2026-08-31: T3 done — two tests appended to test-axes-certificate-refusal.R: an AC1 trace (counting wrapper around `axes_accuracy_certificate`, M89 AC6-style injection at `axes_fitted_cov`, exactly 1 evaluation per call on listwise and fiml, both surfaces still warning "uncertified") and a combined AC2+AC3 test on the committed p = 3 counterexample (each standalone surface moves the trace by one and warns the estimate re-derived independently from the certificate; with the shared refusal passed the trace does not move; one extracted estimate across all four warnings). Discrimination proven: planting the old double evaluation reddened AC1 on both paths (count 2), and a callee ignoring `refusal` reddened the seam-side count (4 vs 3); both plants reverted.
 
 ## Decisions
 
