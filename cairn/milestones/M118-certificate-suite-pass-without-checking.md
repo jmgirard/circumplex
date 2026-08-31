@@ -103,11 +103,12 @@ and no external consumer of the package relies on any of it.
       `:264-270` that explains why `cert_floor` writes the factor down instead
       of reading it. Verify by setting the package constant to 100 and
       observing this assertion red.
-- [ ] **T4** — Write the accepted items into `cairn/DESIGN.md`: the missing
-      `cval` check at the quotient configuration and any residue that could
-      still justify work go under **Known fragilities** (`:71`); residue with
-      no fix planned goes under **Accepted limitations** (`:80`).
-- [ ] **T5** — Disposition the candidate row: delete the items T1–T3 fixed and
+- [x] **T4** — Write the accepted items into `cairn/DESIGN.md`: the missing
+      `cval` check at the quotient configuration goes under **Accepted
+      limitations** (`:80`), as the Scope section promises; residue that could
+      still justify work goes under **Known fragilities** (`:71`), residue with
+      no fix planned under **Accepted limitations**.
+- [x] **T5** — Disposition the candidate row: delete the items T1–T3 fixed and
       the items T4 relocated, leaving only still-open promotion conditions and
       cross-references into the M108/M110/M111/M113/M115/M116 archives.
       `cairn/ROADMAP.md` is at 23,821 of its 24,000-byte budget (measured
@@ -123,6 +124,9 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: T1 — each case records its disposition (priced / skipped-with-reason / refused) into a file-local environment from inside `cert_true_error()`, and a test after the per-case tests fails when none was priced. Discrimination proved by forcing the matrix precondition to mismatch for every case: 6 skips, and the new test the only failure, its label naming each case's reason. `devtools::test()` 0 failures, 9194 passes.
 - 2026-08-31: T2 — the dyadic configuration now pins `axes_v_pricing()$corrected`, `$naive` and `axes_u_pricing()` against 97/128, 2 and 5/8 at a literal `4 * 2^-53` relative tolerance, beside the brackets rather than in place of them. Each pin proved to redden alone under an `8 * 2^-53` relative perturbation of its own shipped value: one failure per run, at the perturbed value's own assertion, the other two green.
 - 2026-08-31: T3 — `test-axes-certificate.R` now asserts `axes_certificate_safety_factor` is identical to 10, in a test placed beside the `cert_floor`/`cert_ceiling` comments that explain why neither reads it. Proved by setting the package constant to 100: the new assertion is among the failures, at its own line. `devtools::test()` 0 failures, 9198 passes.
+- 2026-08-31: implementation gate resolved a contradiction between Scope and T4 over where the quotient configuration's unchecked `cval` is recorded — Scope said Accepted limitations, T4 said Known fragilities. Chosen: Accepted limitations, per Scope, so T4's wording was corrected to match (a minor task edit; no scope amendment). The same gate chose a compact rewrite of the six-milestone candidate row over a minimal prune.
+- 2026-08-31: T4 — `cairn/DESIGN.md` gains one Known-fragilities paragraph (six still-open latent defects in the certificate's validation layers, sharing one ROADMAP row) and one Accepted-limitations paragraph (the quotient `cval` gap, plus `cert_hex()`, `axes_certificate_worst()`'s empty-certificate fail-open, `ratio_rel()`'s n-dependent measurement, M108's nine residues and M111 F16). Two items the row still carried were verified stale before relocation and dropped instead: M110 F3's `6.5e-6` corner was corrected by M111, and the 1e3 bracket ceiling by M116.
+- 2026-08-31: T5 — the candidate row that had absorbed findings since M108 was rewritten from 4,192 to 2,316 characters, keeping the three promotion conditions, the two standing rejections and pointers into the archives. `cairn/ROADMAP.md` 23,821 → 21,943 bytes. No code changed at T4 or T5, so the verify slot's result from T3 stands.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
 
 ## Decisions
