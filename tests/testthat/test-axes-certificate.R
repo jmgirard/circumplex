@@ -401,6 +401,24 @@ test_that("AC3: the anchor case list is not empty", {
     expect_length(fz$u_hi, 1L)
     expect_length(fz$u_lo, 1L)
   }
+
+  # ... and each case's MATRIX is the size the table above says (M116). The
+  # `p` column was checked only against `cert_frozen`'s own committed arrays
+  # until now -- one committed artifact against another, with the thing that
+  # BUILDS the matrix never asked. cert_true_error()'s precondition compares
+  # upper triangles elementwise, so a builder returning a matrix of a
+  # different dimension makes that comparison unequal by length and the case
+  # SKIPS, calling a builder edit a platform difference. Asserted here,
+  # outside every precondition, it reddens instead. Counterexample B's saved
+  # matrix goes through the same precondition, so it is pinned too.
+  for (cs in cert_anchors()) {
+    expect_identical(dim(cs$r),
+                     rep(cert_shape[[cs$id]][[1L]], 2L),
+                     label = paste0(cs$id, " matrix dim"))
+  }
+  cxb_sigma <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))$S
+  expect_identical(dim(cxb_sigma), rep(cert_shape$cxb[[1L]], 2L),
+                   label = "cxb matrix dim")
 })
 
 
