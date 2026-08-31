@@ -29,7 +29,8 @@
 #     this file, derived from the definitions and committed as exact fractions.
 #     Neither shares code, library or pipeline with the Python oracle or with
 #     the route under test. The first is dyadic throughout, so the shipped
-#     route is exact there and the certificate is pinned at its floor; the
+#     route can be exact there -- on every machine measured so far it is, and
+#     the certificate lands on its floor (nothing pins it there; M116); the
 #     second (M113) sits at a configuration whose shipped route is wrong by
 #     about 1e-12 on the quotient, so the `fiml_ratio` field is checked where
 #     there is an error to catch and not only at its floor.
@@ -130,8 +131,9 @@ cert_derivs <- function(cs) {
 # Measured on the authoring machine (macOS, arm64) on 2026-08-30 by that
 # script, for orientation only -- no assertion reads these figures, which is
 # the whole point of the change: the six geometries' certificate-over-true-
-# error ratios ran 9.83 to 10.00 against a ceiling of 1e3, and the true SE
-# errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
+# error ratios ran 9.83 to 10.0025 against the ceiling of that day, 1e3 --
+# since lowered to the `cert_ceiling` of 100 committed below -- and the true
+# SE errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
 
 cert_frozen <- list(
   a4 = list(
@@ -267,6 +269,27 @@ cert_root_rel <- function(e) abs(e / (sqrt(1 + e) + 1))
 # file stayed green. Every other site that needs the floor reads this one.
 cert_floor <- 10 * 2 * .Machine$double.eps
 
+# The bracket's UPPER end: how far above a fit's true error the certificate is
+# allowed to sit before the estimate counts as an overstatement. Written down
+# here, and NOT read from axes_certificate_safety_factor, for the reason the
+# floor above is not: an expectation reading the constant it is checking moves
+# with it and notices nothing.
+#
+# 100 is ten times the safety factor `10` written down above. The certificate
+# is a bound times that factor, so a ratio at the factor is what it is built to
+# deliver and the room above it is what a machine rounding the other way needs.
+# M108 pre-registered 1e3 before any measurement existed; every measurement
+# since has come in two decades under it, which is a ceiling nothing can
+# reach. Measured 2026-08-30 on aarch64-apple-darwin23, R 4.6.1, reference
+# BLAS (range corrected 2026-08-31, M116 first return, F5): eighteen
+# estimate-over-true-error ratios across the six priced cases and three
+# fields, all between 9.829339 (`cxb se`) and 10.0025192 (`a4 fiml_ratio`),
+# reproduced by pricing each case through axes_v_pricing() and
+# axes_u_pricing() against the exact values committed below and dividing
+# axes_accuracy_certificate()'s field by the result -- the same two steps
+# cert_true_error() and the per-case tests below already take.
+cert_ceiling <- 100
+
 # THIS MACHINE's own relative error at one case, against the committed exact
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
@@ -335,8 +358,7 @@ cert_true_error <- function(id, sigma, d) {
 # the machine agrees, because a true error ABOVE what the floor certifies is
 # exactly the under-report this instrument exists to prevent. Where it sits
 # above its floor both halves of the bracket run: at least the measured error,
-# and at most 1e3 times it, the ceiling M108 pre-registered before any
-# measurement was taken.
+# and at most `cert_ceiling` times it.
 #
 # `lbl` names the field AND the case, and is carried into every expectation:
 # a cross-platform failure arrives as two bare numbers otherwise, naming
@@ -347,7 +369,19 @@ cert_bracket <- function(est, true_rel, lbl) {
     expect_lte(true_rel, cert_floor, label = paste0(lbl, ": true error"))
   } else {
     expect_gte(est, true_rel, label = paste0(lbl, ": estimate"))
-    expect_lte(est, 1e3 * true_rel, label = paste0(lbl, ": estimate"))
+    # The upper end never sits below the certificate's own floor: every field
+    # is fac * max(delta, 2 * eps) -- delta halved first for the two
+    # root-converted fields -- so the floor is the smallest value the
+    # certificate can report and asking for less is asking for a value it
+    # cannot produce. Without this, a measured error of zero degenerates the
+    # bound to `est <= 0`, and a broken platform's sentinel then reports
+    # "1 is not less than or equal to 0" -- a comparison against zero rather
+    # than against anything the certificate promises (M116 review, F2). The
+    # failure set is unchanged: where the bound was ceiling * true_rel it
+    # still is, and where it was below the floor no estimate could sit
+    # between the two anyway.
+    expect_lte(est, max(cert_ceiling * true_rel, cert_floor),
+               label = paste0(lbl, ": estimate"))
   }
 }
 
@@ -382,6 +416,24 @@ test_that("AC3: the anchor case list is not empty", {
     expect_length(fz$u_hi, 1L)
     expect_length(fz$u_lo, 1L)
   }
+
+  # ... and each case's MATRIX is the size the table above says (M116). The
+  # `p` column was checked only against `cert_frozen`'s own committed arrays
+  # until now -- one committed artifact against another, with the thing that
+  # BUILDS the matrix never asked. cert_true_error()'s precondition compares
+  # upper triangles elementwise, so a builder returning a matrix of a
+  # different dimension makes that comparison unequal by length and the case
+  # SKIPS, calling a builder edit a platform difference. Asserted here,
+  # outside every precondition, it reddens instead. Counterexample B's saved
+  # matrix goes through the same precondition, so it is pinned too.
+  for (cs in cert_anchors()) {
+    expect_identical(dim(cs$r),
+                     rep(cert_shape[[cs$id]][[1L]], 2L),
+                     label = paste0(cs$id, " matrix dim"))
+  }
+  cxb_sigma <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))$S
+  expect_identical(dim(cxb_sigma), rep(cert_shape$cxb[[1L]], 2L),
+                   label = "cxb matrix dim")
 })
 
 
@@ -715,19 +767,42 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   expect_identical(ref$u$hi, 5 / 8)
   expect_identical(ref$u$lo, 0)
 
-  # Every intermediate being dyadic, the SHIPPED double route is exact here
-  # too -- so the committed error at this configuration is known to be zero,
-  # and the certificate must report its floor and nothing more. That is the
-  # level assertion this type exists to make: a reference route drifting off
-  # the truth would move the estimate off the floor.
-  expect_identical(axes_v_pricing(s, d)$corrected, 97 / 128)
-  expect_identical(axes_v_pricing(s, d)$naive, 2)
-  expect_identical(axes_u_pricing(s, d), 5 / 8)
+  # THE CERTIFICATE, against THIS MACHINE's error rather than against an
+  # asserted zero (M116). What stood here was three identity checks, one per
+  # certificate field, each against `cert_floor` -- saying the machine running
+  # them commits no error at all at this configuration, a claim about the
+  # machine made without measuring it. On the authoring machine
+  # the shipped route is indeed exact here, so those three passed while
+  # checking nothing about the estimate: the floor is the certificate's own
+  # constant, and reporting it is what the certificate does whenever its
+  # bound is small, exact route or not.
+  #
+  # The same two-branch bracket the anchors use replaces them, fed by errors
+  # measured against the fractions committed above -- the only exact values
+  # in scope here, and derived by hand rather than from any route. Where the
+  # machine is exact the floor branch asserts its measured error is under the
+  # floor; where it is not, both halves of the bracket run.
+  #
+  # NO exactness identity on the shipped route stands here any more (M116
+  # first return, F1). Three did -- expect_identical() of $corrected, $naive
+  # and the u pricing against the fractions above -- and they were the one
+  # claim in this file about a machine rather than a matrix: on any run that
+  # reached the brackets they had already pinned every measured error to
+  # exactly zero, which reduced both bracket branches to the identity checks
+  # the brackets replaced. With them gone the brackets are the site's
+  # assertions: a machine whose shipped route drifts here is judged by its
+  # measured error -- green under the floor, red where the certificate
+  # under-reports -- instead of reddening on a bit-level platform difference
+  # the certificate prices correctly.
+  hat <- axes_v_pricing(s, d)
+  dv <- cert_rel(hat$corrected, 97 / 128, 0)
+  dn <- cert_rel(hat$naive, 2, 0)
+  du <- cert_rel(axes_u_pricing(s, d), 5 / 8, 0)
   cert <- axes_accuracy_certificate(s, d)
-  floor_est <- cert_floor
-  expect_identical(cert$se, floor_est)
-  expect_identical(cert$cval, floor_est)
-  expect_identical(cert$fiml_ratio, floor_est)
+  cert_bracket(cert$se, max(cert_root_rel(dv)), "closed-form dyadic se")
+  cert_bracket(cert$cval, abs(du), "closed-form dyadic cval")
+  cert_bracket(cert$fiml_ratio, max(cert_root_rel((dv - dn) / (1 + dn))),
+               "closed-form dyadic fiml_ratio")
 })
 
 
@@ -807,14 +882,29 @@ test_that("the quotient's replay lands on hand-derived exact values where the sh
   hat <- axes_v_pricing(s, d)
   true_rel <- abs(sqrt(hat$corrected / hat$naive) - sqrt(q_exact)) /
     sqrt(q_exact)
-  # The corrected arm and the cval numerator are both priced to within a
-  # floor's worth here on every platform measured, which is what makes the
-  # estimate this fit gets come from the new field alone. Asserted before the
-  # precondition below, so they still run where that one steps aside.
+  # THE SE FIELD, against THIS MACHINE's error on the corrected arm (M116).
+  # An identity check of the `se` field against `cert_floor` stood here,
+  # saying the machine running it prices the corrected arm exactly -- which
+  # the authoring machine does not: it commits 1.19e-16 there (measured 2026-08-30, aarch64-apple-
+  # darwin23), under the floor but not zero. The line passed anyway, because
+  # reporting the floor is what the certificate does whenever its bound is
+  # small; it never touched the arm it named. The bracket does, against
+  # `v_exact` -- the hand-derived value committed above, the one exact
+  # quantity this configuration has for that arm.
   cert <- axes_accuracy_certificate(s, d)
   floor_est <- cert_floor
-  expect_identical(cert$se, floor_est)
-  expect_identical(cert$cval, floor_est)
+  cert_bracket(cert$se, max(cert_root_rel(cert_rel(hat$corrected, v_exact, 0))),
+               "closed-form quotient se")
+
+  # `cval` gets NO assertion here, and that is the deliberate half. The hand
+  # derivation above covers `v` and `v_naive` only -- there is no exact `u`
+  # committed for this configuration -- so there is nothing to measure the
+  # machine's cval error against, and the identity check of the `cval` field
+  # against `cert_floor` that stood here asserted a zero it could not have
+  # checked.
+  # Pricing cval here needs its own hand derivation, which is its own
+  # correctness surface; the five anchors and counterexample B already price
+  # the field against exact values.
 
   # THE SHIPPED-ERROR HALF, AND WHY IT IS PLATFORM-DEPENDENT (M113 review; the
   # windows-latest red on CI run 33329301066). The replay half above needs no
