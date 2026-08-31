@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-31 (M117 done and archived; four of its six review findings fixed at the gate, two rejected with reasons, none deferred, so no candidate row was extended. M112's terminal row pruned under 5-row retention. No LESSONS line: the mispairing guard M117 shipped is test-enforced, and the file sits 3 bytes under its byte budget. test-craft.md untouched at 29 / 8,718 against 35 / 9,000. The graduate-or-prune pass over the remaining candidate rows is still owed.)_
+_Last hygiene check: 2026-08-31 (second pass, no tracking change: cairn_validate all green, tree clean, no milestone in flight. Master's R-CMD-check is green again since 2026-08-30, so issue #137's stated close condition is met and it is Jeff's to close. Byte headroom is nearly gone — ROADMAP.md 23,639 / 24,000 and LESSONS.md 19,997 / 20,000 — so the owed graduate-or-prune pass now also gates writing the next LESSONS line. M7's AC1/AC2 release evidence is 298 commits and 108 package files stale; re-verification belongs to the release walk, not to this audit. test-craft.md 29 / 8,718 against 35 / 9,000.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
