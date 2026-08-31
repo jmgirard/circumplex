@@ -98,7 +98,7 @@ and no external consumer of the package relies on any of it.
       the harness constant it sits beside weakens whenever that constant is
       raised. Verify each assertion reddens under an `8 * 2^-53` perturbation
       of its own shipped value alone, and that the other two stay green.
-- [ ] **T3** — Assert `axes_certificate_safety_factor`
+- [x] **T3** — Assert `axes_certificate_safety_factor`
       (`R/axes_certificate.R:430`) is identical to 10, beside the comment at
       `:264-270` that explains why `cert_floor` writes the factor down instead
       of reading it. Verify by setting the package constant to 100 and
@@ -122,6 +122,7 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: plan gate chose accepting the quotient configuration's missing `cval` check over hand-deriving an exact `u` there and over an indirect worst-of assertion, because the field is already priced against exact values at six other configurations and a new hand derivation is its own correctness surface; falsified by a `cval` regression that the six priced cases miss.
 - 2026-08-31: T1 — each case records its disposition (priced / skipped-with-reason / refused) into a file-local environment from inside `cert_true_error()`, and a test after the per-case tests fails when none was priced. Discrimination proved by forcing the matrix precondition to mismatch for every case: 6 skips, and the new test the only failure, its label naming each case's reason. `devtools::test()` 0 failures, 9194 passes.
 - 2026-08-31: T2 — the dyadic configuration now pins `axes_v_pricing()$corrected`, `$naive` and `axes_u_pricing()` against 97/128, 2 and 5/8 at a literal `4 * 2^-53` relative tolerance, beside the brackets rather than in place of them. Each pin proved to redden alone under an `8 * 2^-53` relative perturbation of its own shipped value: one failure per run, at the perturbed value's own assertion, the other two green.
+- 2026-08-31: T3 — `test-axes-certificate.R` now asserts `axes_certificate_safety_factor` is identical to 10, in a test placed beside the `cert_floor`/`cert_ceiling` comments that explain why neither reads it. Proved by setting the package constant to 100: the new assertion is among the failures, at its own line. `devtools::test()` 0 failures, 9198 passes.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
 
 ## Decisions

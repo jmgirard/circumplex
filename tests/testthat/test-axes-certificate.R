@@ -291,6 +291,19 @@ cert_floor <- 10 * 2 * .Machine$double.eps
 cert_ceiling <- 100
 
 
+# Both constants above are written against a package safety factor of 10, and
+# neither reads it -- deliberately, for the reason each comment gives. That
+# leaves the harness free to drift away from the package: raise
+# axes_certificate_safety_factor and cert_floor keeps certifying the old,
+# smaller floor while cert_ceiling keeps allowing the old, tighter
+# overstatement, and every assertion in this file stays green while both are
+# describing a certificate that no longer exists. This is the one assertion
+# that ties the two together (M118).
+test_that("AC3: the harness's written-down safety factor is the package's", {
+  expect_identical(axes_certificate_safety_factor, 10)
+})
+
+
 # ---- WHAT ACTUALLY GOT PRICED (M118) ---------------------------------------
 #
 # Every bracket assertion in this file is reached through cert_true_error(),
