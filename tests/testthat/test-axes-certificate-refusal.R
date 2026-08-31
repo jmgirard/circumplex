@@ -569,3 +569,209 @@ test_that("M114 AC1: a straddling certificate refuses at BOTH surfaces, whicheve
                      label = sprintf("%s: scaling note", lab))
   }
 })
+
+
+# ---- M117: the refusal decision is priced once per checked fit ---------------
+#
+# Both surfaces call axes_degeneracy_refusal() on the same realigned cov2cor
+# matrix with the same derivative set, so until M117 a fit the floor sent to
+# the certificate paid for the double-double replay twice, once per surface.
+# axes_reliability() now makes the decision once (axes_shared_refusal) and
+# hands it to both through their `refusal` argument. What is pinned here:
+# exactly ONE certificate evaluation per exported call (AC1), each surface
+# still pricing its own certificate when called standalone with the argument
+# absent (AC2), and one estimate in every warning on both sides of the seam
+# (AC3).
+
+# The estimate substring a refusal warning carries, extracted so two warnings
+# can be compared as numbers-as-printed rather than by whole-message identity.
+m117_estimate <- function(w) {
+  m <- regmatches(w, regexpr("estimated relative error [0-9.e+-]+", w))
+  expect_length(m, 1L)
+  m
+}
+
+test_that("M117 AC1: the certificate is evaluated exactly once per checked axes_reliability() call, on both missing paths", {
+  skip_if_not_installed("lavaan")
+  # The M89 AC6 injection idiom: the fit runs on clean data and the
+  # ill-conditioned matrix is injected at axes_fitted_cov(), the one seam both
+  # consumers read. The matrix is this file's own sentinel-route case, renamed
+  # to the fixture's item names so realignment lands.
+  oct <- octants()
+  set.seed(70)
+  dat <- axes_simulate(600L, oct, 3L, xi1 = .20, xi2 = .05, zeta1 = .08)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = 3L))
+  expect_length(inames, 24L)
+  bad <- m106_family_a(1.5e-9, 3L)
+  dimnames(bad) <- list(inames, inames)
+  # The precondition that routes this matrix to the certificate at all: the
+  # criterion answers "ill_conditioned" for it, the one arm M111 handed over.
+  expect_identical(axes_sigma_degenerate(bad), "ill_conditioned")
+
+  # Item-level holes so the fiml path exercises its own estimation route
+  # rather than degenerating to the listwise one.
+  holed <- dat
+  for (j in 1:6) holed[sample(seq_len(nrow(holed)), 40L), j] <- NA_real_
+
+  count <- 0L
+  real_cert <- axes_accuracy_certificate
+  local_mocked_bindings(
+    axes_fitted_cov = function(fit) bad,
+    axes_accuracy_certificate = function(sigma, d) {
+      count <<- count + 1L
+      real_cert(sigma, d)
+    }
+  )
+
+  for (path in c("listwise", "fiml")) {
+    count <- 0L
+    w <- testthat::capture_warnings(
+      suppressMessages(
+        if (path == "fiml") {
+          axes_reliability(holed, items = items, angles = oct,
+                           missing = "fiml")
+        } else {
+          axes_reliability(dat, items = items, angles = oct)
+        }
+      )
+    )
+    # BOTH surfaces still refuse -- proof the one evaluation fed two
+    # consumers, not that one consumer stopped consulting the certificate.
+    expect_length(grep("uncertified", w, fixed = TRUE), 2L)
+    expect_true(any(grepl("standard errors could not be computed", w)),
+                label = path)
+    expect_true(any(grepl("scaled fit statistics could not be computed", w)),
+                label = path)
+    expect_identical(count, 1L, label = path)
+  }
+})
+
+test_that("M117 AC2 + AC3 (both sides of the seam): standalone surfaces price their own certificate; every warning carries one estimate", {
+  # The committed graded-route matrix: p = 3, unreachable through the exported
+  # path, so the two surfaces are fired DIRECTLY -- which is exactly the
+  # standalone shape AC2 binds. Provenance documented at its other readers.
+  fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
+  S <- fx$S
+  ang <- as.numeric(fx$ia)
+  scl <- c("A", "B", "C")
+  expect_identical(axes_sigma_degenerate(S), "ill_conditioned")
+
+  count <- 0L
+  real_cert <- axes_accuracy_certificate
+  local_mocked_bindings(
+    axes_accuracy_certificate = function(sigma, d) {
+      count <<- count + 1L
+      real_cert(sigma, d)
+    }
+  )
+
+  # AC2: each surface, called WITHOUT the argument, evaluates the certificate
+  # itself (the trace moves by one per call) and refuses "uncertified".
+  wse <- testthat::capture_warnings(
+    se <- axes_corrected_se(S, rownames(S), ang, scl, n = 600,
+                            fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  )
+  expect_identical(count, 1L)
+  wsf <- testthat::capture_warnings(
+    sf <- axes_scaling_factor(S, rownames(S), ang, scl,
+                              fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                              df = 1, baseline_df = 3)
+  )
+  expect_identical(count, 2L)
+  expect_identical(se$reason, "uncertified")
+  expect_identical(sf$reason, "uncertified")
+
+  # The warned estimate is derived from THE certificate for this matrix and
+  # derivative set -- recomputed here independently of either surface -- not
+  # merely some number in the right format.
+  d <- axes_se_derivs(ang, scl, NULL, FALSE, FALSE)
+  want <- sprintf("estimated relative error %.2g",
+                  axes_certificate_worst(real_cert(stats::cov2cor(S), d)))
+  expect_match(wse, want, fixed = TRUE)
+  expect_match(wsf, want, fixed = TRUE)
+
+  # The seam side: axes_shared_refusal() decides once, both surfaces receive
+  # the decision, and the trace does not move -- neither reprices.
+  ref <- axes_shared_refusal(S, rownames(S), ang, scl, NULL,
+                             fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  expect_identical(count, 3L)  # the shared decision itself priced it once
+  expect_identical(ref$reason, "uncertified")
+  wse2 <- testthat::capture_warnings(
+    se2 <- axes_corrected_se(S, rownames(S), ang, scl, n = 600,
+                             fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                             refusal = ref)
+  )
+  wsf2 <- testthat::capture_warnings(
+    sf2 <- axes_scaling_factor(S, rownames(S), ang, scl,
+                               fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                               df = 1, baseline_df = 3, refusal = ref)
+  )
+  expect_identical(count, 3L)
+  expect_identical(se2$reason, "uncertified")
+  expect_identical(sf2$reason, "uncertified")
+
+  # AC3: one estimate, all four warnings -- across the two surfaces AND
+  # across the two sides of the seam.
+  ests <- c(m117_estimate(wse), m117_estimate(wsf),
+            m117_estimate(wse2), m117_estimate(wsf2))
+  expect_identical(unique(ests), ests[[1L]])
+})
+
+
+test_that("M117 review F1: a refusal priced for a different matrix is refused, not consumed", {
+  # Without the consumption guard this pairing is silent and fail-open: the
+  # degenerate matrix's own criterion refuses it "uncertified", but a clean
+  # matrix's precomputed decision carries reason = NULL, so both surfaces
+  # would report populated numbers with no warning at all.
+  fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
+  S <- fx$S
+  ang <- as.numeric(fx$ia)
+  scl <- c("A", "B", "C")
+  clean <- diag(3)
+  clean[1, 2] <- clean[2, 1] <- 0.3
+  clean[1, 3] <- clean[3, 1] <- 0.2
+  clean[2, 3] <- clean[3, 2] <- 0.25
+  dimnames(clean) <- dimnames(S)
+
+  bad_ref <- axes_shared_refusal(clean, rownames(S), ang, scl,
+                                 fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  # The pairing is only dangerous because the two decisions DISAGREE: pin that
+  # the borrowed decision is the permissive one, so the guard is what stands
+  # between the caller and a reported number.
+  expect_null(bad_ref$reason)
+  own_ref <- axes_shared_refusal(S, rownames(S), ang, scl,
+                                 fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  expect_identical(own_ref$reason, "uncertified")
+
+  expect_error(
+    axes_corrected_se(S, rownames(S), ang, scl, n = 600,
+                      fit_zeta1 = FALSE, fit_zeta2 = FALSE, refusal = bad_ref),
+    "priced for a different matrix"
+  )
+  expect_error(
+    axes_scaling_factor(S, rownames(S), ang, scl,
+                        fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                        df = 1, baseline_df = 3, refusal = bad_ref),
+    "priced for a different matrix"
+  )
+
+  # The passing control: the MATCHED decision passes the guard and still
+  # refuses "uncertified" -- the guard rejects mispairing, not the seam.
+  expect_warning(
+    se <- axes_corrected_se(S, rownames(S), ang, scl, n = 600,
+                            fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                            refusal = own_ref),
+    "uncertified"
+  )
+  expect_identical(se$reason, "uncertified")
+
+  # F5: `item_block` takes a default, so the named-argument spelling both
+  # callees accept works here too.
+  expect_identical(
+    axes_shared_refusal(S, rownames(S), ang, scl,
+                        fit_zeta1 = FALSE, fit_zeta2 = FALSE),
+    own_ref
+  )
+})
