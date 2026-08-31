@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M116: Make three passing-without-checking assertions in the certificate suite redden
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -99,6 +99,16 @@ it should redden. Each repair is proved able to fail by a planted defect.
       dimension change on one anchor's builder call, confirm the shape test
       fails naming that case, revert. Summarize in the work log.
 - [x] T5: `devtools::test()` and `devtools::check(args = "--no-manual")` clean.
+- [ ] T6: Make the dyadic closed-form site's three certificate assertions able
+      to fail where they cannot today (review F1/F2). The error they are
+      measured against is zero by construction while :760-762 stand, so the
+      repair has to change what is measured, what those identities do, or the
+      criterion — AC3 as written mandates the vacuous construction, so decide
+      at the step-6 amendment gate whether AC3 is amended before the code is.
+- [ ] T7: Correct the two comment defects (review F4/F5): :133's reference to
+      the removed 1e3 ceiling, and the :279-286 range, which is 9.829339 to
+      10.0025192 across the eighteen ratios (`a4 fiml_ratio` 10.002519 the
+      maximum) against a ceiling two decades above the measured 10, not three.
 
 ## Work log
 
@@ -116,6 +126,7 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - 2026-08-31: T3 — the three floor identities in the dyadic closed-form test are now `cert_bracket()` calls fed by errors measured against 97/128, 2 and 5/8; the `se` identity in the quotient closed-form test is a `cert_bracket()` call against `v_exact`, and the `cval` identity is gone with a comment saying the hand derivation there covers `v` and `v_naive` only. `grep -n 'expect_identical(cert\$' tests/testthat/test-axes-certificate.R` returns nothing anywhere in the file. Full suite FAIL 0 / PASS 9155.
 - 2026-08-31: T4 — the shape test now asserts each case's matrix `dim()` against the `p` in `cert_shape`, for the five built anchors and for counterexample B's saved matrix. Plant: `c4`'s builder call sliced to `[1:3, 1:3]`. The shape test failed at `"c4 matrix dim"`, and the `c4` per-case test SKIPPED under the same plant — the behavior this assertion exists to replace. Plant reverted; full suite FAIL 0 / PASS 9161.
 - 2026-08-31: T5 — `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 / PASS 9161 (all five warnings and the one skip pre-existing, in the lavaan and scaled-fit suites); `devtools::check(args = "--no-manual")` Status: OK, no errors, warnings or notes. No shipped code changed, so no NEWS entry is owed. Status → review.
+- 2026-08-31: review gate FAILED and returned M116 to in-progress (first defect return). What failed: at the dyadic closed-form site the three `cert_bracket()` calls at :783-785 are fed a `true_rel` that the retained identities at :760-762 pin to exactly zero, so the floor branch is `expect_lte(0, cert_floor)` and the ceiling branch is `expect_lte(est, 0)` — the pair reduces to `identical(est, cert_floor)`, the predicate of the assertions AC3 replaced, leaving one of the Goal's three sites as vacuous as before. Two comment defects ride with it: :133 cites the removed 1e3 ceiling, and the :279-286 ceiling comment's measured range is wrong (9.829339 to 10.0025192, not 9.829 to 10.000, and 10 against 1e3 is two decades). All five criteria passed as written and both gates were clean; the return is the maintainer's load-bearing-defect judgment, not a criterion failure. Dispositions in the Review section.
 
 ## Decisions
 
@@ -259,3 +270,32 @@ error arithmetic (`cert_root_rel`, the quotient form `(dv - dn)/(1 + dn)`)
 matches `cert_true_error()`; `cert_ceiling` carries ~10x headroom over every
 measured ratio; the dimension pin covers all six cases that reach the
 skip-on-size-mismatch precondition; `floor_est` at :876 is still live (:917).
+
+#### Triage at the gate (2026-08-31)
+
+Maintainer's disposition, over the ranked list above:
+
+- **F1 — fix now, and it returns the milestone.** Judged a load-bearing defect
+  in what this milestone's deliverable does: the dyadic site is one of the
+  three the Goal names, and its replacement has the failure set of what it
+  replaced, so the vacuity M116 exists to remove is still there. AC3 passes as
+  written, so this is a return under the maintainer's judgment rather than on a
+  failed criterion. AC3 as written mandates the construction that is vacuous —
+  a bracket against an error a retained identity pins to zero — so the repair
+  is likely to need a gated AC3 amendment alongside it (`/milestone-implement`
+  step 6); that call belongs to the implement gate, not to review.
+- **F2 — fix now**, with F1: the `est <= 0` degeneracy is the same defect seen
+  from its other branch, and it disappears with whatever repair F1 takes.
+- **F3 — follow-up.** The deletion is what AC3 mandates and the plan gate
+  weighed it, but the drift window is real and the work log's rationale does
+  not describe it. Files to the ROADMAP degeneracy row (search-first: that row
+  already carries the M115-deferred certificate items) when the return lands.
+- **F4 — fix now.** One stale line citing a constant the file no longer has.
+- **F5 — fix now.** The comment is the only record of the measurement it
+  states, and the measurement is wrong; the corrected range is 9.829339 to
+  10.0025192 across the eighteen ratios, `a4 fiml_ratio` at 10.002519 being the
+  maximum, and 10 against 1e3 is two decades, not three.
+
+**Outcome: returned to `in-progress`.** Nothing merged; PR #147 stays open as a
+draft. First defect return on this milestone (the 2026-08-31 AC2 amendment
+return runs on its own track and is not counted here).
