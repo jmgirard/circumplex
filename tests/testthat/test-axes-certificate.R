@@ -272,12 +272,32 @@ cert_floor <- 10 * 2 * .Machine$double.eps
 # failed; skips where this machine builds a different matrix.
 cert_true_error <- function(id, sigma, d) {
   fz <- cert_frozen[[id]]
+  # THE MATRIX CHECK COMES FIRST, before the shipped pricing is even called.
+  # The refusal branch below calls a refusal a regression, and that conclusion
+  # is only warranted once this machine is known to build the geometry the
+  # regression would be against.
+  #
+  # Compared as DOUBLES, not as the text `%a` prints. `?sprintf` states that
+  # `%a` is not uniquely defined across platforms -- trailing zeros and the
+  # leading digit are both at the C library's discretion -- so a machine
+  # agreeing on every bit but formatting differently would skip all six cases,
+  # which is exactly the vacuity M115 exists to remove. `as.numeric()` on a hex
+  # literal routes through R's own R_strtod rather than the platform's
+  # formatter, and round-trips every value committed here exactly (none is a
+  # denormal, the one place that parse loses bits).
+  if (!identical(sigma[upper.tri(sigma)], as.numeric(fz$sig))) {
+    testthat::skip(paste0(
+      "this machine does not build the anchor matrix at case '", id, "' bit ",
+      "for bit, so the exact quadratic forms committed for that matrix are ",
+      "not a yardstick for this one"
+    ))
+  }
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
   # A REFUSAL from the shipped pricing is NOT a failure to reproduce. Every
   # one of these six geometries is admitted -- axes_sigma_degenerate() passes
   # on each -- so a refusal here is a regression in axes_pricing_core(), and
-  # folding it into the skip below would turn that red green. Fail on it, and
+  # folding it into the skip above would turn that red green. Fail on it, and
   # let the caller carry on: the certificate returns its sentinel at a refusal,
   # which reddens the bracket too.
   if (is.character(v) || is.character(u)) {
@@ -288,13 +308,6 @@ cert_true_error <- function(id, sigma, d) {
       "difference"
     ))
     return(NULL)
-  }
-  if (!identical(cert_hex(sigma[upper.tri(sigma)]), fz$sig)) {
-    testthat::skip(paste0(
-      "this machine does not build the anchor matrix at case '", id, "' bit ",
-      "for bit, so the exact quadratic forms committed for that matrix are ",
-      "not a yardstick for this one"
-    ))
   }
   dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
   dn <- cert_rel(v$naive, as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))
@@ -324,12 +337,17 @@ cert_true_error <- function(id, sigma, d) {
 # above its floor both halves of the bracket run: at least the measured error,
 # and at most 1e3 times it, the ceiling M108 pre-registered before any
 # measurement was taken.
+#
+# `lbl` names the field AND the case, and is carried into every expectation:
+# a cross-platform failure arrives as two bare numbers otherwise, naming
+# neither -- which is how the ubuntu-latest failure that returned this
+# milestone at its first review gate had to be traced by line number.
 cert_bracket <- function(est, true_rel, lbl) {
   if (identical(est, cert_floor)) {
-    expect_lte(true_rel, cert_floor)
+    expect_lte(true_rel, cert_floor, label = paste0(lbl, ": true error"))
   } else {
-    expect_gte(est, true_rel)
-    expect_lte(est, 1e3 * true_rel)
+    expect_gte(est, true_rel, label = paste0(lbl, ": estimate"))
+    expect_lte(est, 1e3 * true_rel, label = paste0(lbl, ": estimate"))
   }
 }
 
@@ -346,6 +364,24 @@ test_that("AC3: the anchor case list is not empty", {
   # priced against.
   expect_identical(sort(names(cert_frozen)),
                    sort(c("a4", "a5", "c4", "b9a", "b9b", "cxb")))
+  # ... and each case's committed arrays are the length that case needs.
+  # cert_rel() is elementwise, so a regeneration pasted in truncated would be
+  # RECYCLED to length and every entry compared against the wrong exact value.
+  # Both counts are written down rather than read from cert_frozen: `p` from
+  # the matrix each case builds (28 = choose(8, 2), and so on down), and the
+  # component count from the case's design.
+  cert_shape <- list(a4 = c(8L, 2L), a5 = c(8L, 2L), c4 = c(4L, 2L),
+                     b9a = c(9L, 3L), b9b = c(9L, 3L), cxb = c(3L, 2L))
+  for (id in names(cert_shape)) {
+    fz <- cert_frozen[[id]]
+    expect_length(fz$sig, choose(cert_shape[[id]][[1L]], 2L))
+    for (fld in c("v_hi", "v_lo", "vn_hi", "vn_lo")) {
+      expect_identical(length(fz[[fld]]), cert_shape[[id]][[2L]],
+                       label = paste0(id, " ", fld, " length"))
+    }
+    expect_length(fz$u_hi, 1L)
+    expect_length(fz$u_lo, 1L)
+  }
 })
 
 
@@ -367,9 +403,9 @@ for (cert_case in cert_anchors()) {
     if (is.null(true_rel)) return()
     cert <- axes_accuracy_certificate(cs$r, d)
 
-    cert_bracket(cert$se, true_rel$se, "se")
-    cert_bracket(cert$cval, true_rel$cval, "cval")
-    cert_bracket(cert$fiml_ratio, true_rel$ratio, "fiml_ratio")
+    cert_bracket(cert$se, true_rel$se, paste0(cs$id, " se"))
+    cert_bracket(cert$cval, true_rel$cval, paste0(cs$id, " cval"))
+    cert_bracket(cert$fiml_ratio, true_rel$ratio, paste0(cs$id, " fiml_ratio"))
   })
 }
 
@@ -395,9 +431,9 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   if (is.null(true_rel)) return()
   cert <- axes_accuracy_certificate(fx$S, d)
 
-  cert_bracket(cert$se, true_rel$se, "se")
-  cert_bracket(cert$cval, true_rel$cval, "cval")
-  cert_bracket(cert$fiml_ratio, true_rel$ratio, "fiml_ratio")
+  cert_bracket(cert$se, true_rel$se, "cxb se")
+  cert_bracket(cert$cval, true_rel$cval, "cxb cval")
+  cert_bracket(cert$fiml_ratio, true_rel$ratio, "cxb fiml_ratio")
 
   # The wrongness itself, asserted rather than described: this is the one
   # committed matrix on which double precision misses the stated accuracy
