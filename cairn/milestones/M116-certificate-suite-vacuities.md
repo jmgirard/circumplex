@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M116: Make three passing-without-checking assertions in the certificate suite redden
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -98,7 +98,7 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - [x] T4: Add the dimension assertion to the shape test at :355. Plant a
       dimension change on one anchor's builder call, confirm the shape test
       fails naming that case, revert. Summarize in the work log.
-- [ ] T5: `devtools::test()` and `devtools::check(args = "--no-manual")` clean.
+- [x] T5: `devtools::test()` and `devtools::check(args = "--no-manual")` clean.
 
 ## Work log
 
@@ -115,6 +115,7 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - 2026-08-31: T2 — with the ×50 plant on `axes_accuracy_certificate()`'s three fields, `devtools::test(filter = "axes-certificate")` reported FAIL 32 / PASS 350, `"b9b se: estimate"` among them (`Expected b9b se: estimate <= cert_ceiling * true_rel`); `b9b cval` and `b9b fiml_ratio` too. Plant reverted, the file back to FAIL 0 / PASS 382.
 - 2026-08-31: T3 — the three floor identities in the dyadic closed-form test are now `cert_bracket()` calls fed by errors measured against 97/128, 2 and 5/8; the `se` identity in the quotient closed-form test is a `cert_bracket()` call against `v_exact`, and the `cval` identity is gone with a comment saying the hand derivation there covers `v` and `v_naive` only. `grep -n 'expect_identical(cert\$' tests/testthat/test-axes-certificate.R` returns nothing anywhere in the file. Full suite FAIL 0 / PASS 9155.
 - 2026-08-31: T4 — the shape test now asserts each case's matrix `dim()` against the `p` in `cert_shape`, for the five built anchors and for counterexample B's saved matrix. Plant: `c4`'s builder call sliced to `[1:3, 1:3]`. The shape test failed at `"c4 matrix dim"`, and the `c4` per-case test SKIPPED under the same plant — the behavior this assertion exists to replace. Plant reverted; full suite FAIL 0 / PASS 9161.
+- 2026-08-31: T5 — `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 / PASS 9161 (all five warnings and the one skip pre-existing, in the lavaan and scaled-fit suites); `devtools::check(args = "--no-manual")` Status: OK, no errors, warnings or notes. No shipped code changed, so no NEWS entry is owed. Status → review.
 
 ## Decisions
 
