@@ -1,6 +1,6 @@
 # M115: Make the packaged accuracy bracket assert where the shipped pricing differs
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M113
 - **Driving RR:** —
