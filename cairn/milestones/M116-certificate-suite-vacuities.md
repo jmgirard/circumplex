@@ -47,9 +47,12 @@ it should redden. Each repair is proved able to fail by a planted defect.
       `axes_certificate_safety_factor`.
 - [ ] AC2: With `axes_accuracy_certificate()`'s three returned fields each
       multiplied by 50 and nothing else in the tree changed,
-      `Rscript -e 'devtools::test()'` reports a failure whose label is
-      `"b9b se: estimate"`. (Depends on AC1 having landed: at the old 1e3
-      ceiling this plant reddens nothing.)
+      `Rscript -e 'options(testthat.progress.max_fails = 200); devtools::test()'`
+      reports a failure whose label is `"b9b se: estimate"`. (Depends on AC1
+      having landed: at the old 1e3 ceiling this plant reddens nothing. The
+      raised display cap is what the label needs to be visible: the plant
+      reddens 32 assertions in this file alone, and testthat's default stops
+      printing after 10.)
 - [ ] AC3: `expect_identical(cert$se, floor_est)`,
       `expect_identical(cert$cval, floor_est)` and
       `expect_identical(cert$fiml_ratio, floor_est)` at :728-730 are replaced by
@@ -86,9 +89,9 @@ it should redden. Each repair is proved able to fail by a planted defect.
       the date and the command that produced them in a comment beside the
       ceiling, and set the ceiling to ten times the safety factor already
       written down at :268.
-- [ ] T2: Apply the ×50 plant to `axes_accuracy_certificate()`'s three returned
-      fields, run `devtools::test()`, confirm the `"b9b se: estimate"` failure,
-      revert. Summarize the run in the work log.
+- [x] T2: Apply the ×50 plant to `axes_accuracy_certificate()`'s three returned
+      fields, run the suite with the display cap raised, confirm the
+      `"b9b se: estimate"` failure, revert. Summarize the run in the work log.
 - [ ] T3: Rewrite the :728-730 and :816-817 assertions per AC3, deleting the
       `cval` one with a comment recording that the test's hand derivation covers
       `v` and `v_naive` only. Run the grep.
@@ -107,6 +110,9 @@ it should redden. Each repair is proved able to fail by a planted defect.
 
 - 2026-08-30: T1 — measured estimate/true-error on aarch64-apple-darwin23, R 4.6.1, reference BLAS: eighteen ratios across six priced cases x three fields, 9.829 (`cxb se`) to 10.000 (every anchor); the two closed-form configurations sit at the floor bar `cf2 fiml_ratio` (10.000), and `cf2`'s true SE error is 1.19e-16 rather than zero. Ceiling set to a named `cert_ceiling <- 100` beside `cert_floor`, comment recording range, extremes, date, machine and procedure. Gate chose the named constant over an inline literal, and the range-plus-extremes comment over a per-case table.
 - 2026-08-30: gate chose pinning all six cases' matrix dimensions in T4, the saved counterexample fixture included, over the five built anchors alone: the fixture takes the same skip-on-size-mismatch path and its size is already written down in the table the check reads.
+- 2026-08-31: AC2 amended at a mini gate — its command gains `options(testthat.progress.max_fails = 200)`, and a sentence saying why. As written the criterion was unsatisfiable: the ×50 plant reddens 32 assertions in this file and testthat prints labels for only the first 10, so `"b9b se: estimate"` was counted and never named. Nothing in the tree changes; the promise is what it was.
+- 2026-08-31: criteria audit re-ran on the amended AC2 in **reduced** mode (internal tier), fresh-context [O] reader that did not author the wording — no finding on any of the three questions.
+- 2026-08-31: T2 — with the ×50 plant on `axes_accuracy_certificate()`'s three fields, `devtools::test(filter = "axes-certificate")` reported FAIL 32 / PASS 350, `"b9b se: estimate"` among them (`Expected b9b se: estimate <= cert_ceiling * true_rel`); `b9b cval` and `b9b fiml_ratio` too. Plant reverted, the file back to FAIL 0 / PASS 382.
 
 ## Decisions
 
