@@ -247,7 +247,8 @@ axes_se_pricing <- function(sigma, d, n) {
 
 
 axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
-                              item_block = NULL, n, fit_zeta1, fit_zeta2) {
+                              item_block = NULL, n, fit_zeta1, fit_zeta2,
+                              refusal = NULL) {
   if (is.null(rownames(sigma)) || is.null(colnames(sigma))) {
     stop(
       "`sigma` must carry dimnames so it can be realigned to the item map.",
@@ -342,7 +343,17 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # refusal across the arms' boundary).
   if (!all(is.finite(sigma))) return(na_out("singular"))
   cor_sigma <- stats::cov2cor(sigma)
-  degenerate <- axes_degeneracy_refusal(cor_sigma, d)
+  # `refusal`, when supplied, is axes_shared_refusal()'s answer for THIS
+  # matrix and derivative set, computed once by axes_reliability() so the
+  # certificate is not priced a second time by the sibling surface (M117).
+  # Every guard above stays ahead of this seam: a matrix those doors refuse
+  # never consults the argument, so the finiteness / "singular" /
+  # "infinite_diagonal" precedence is unchanged whether or not it is passed.
+  degenerate <- if (is.null(refusal)) {
+    axes_degeneracy_refusal(cor_sigma, d)
+  } else {
+    refusal
+  }
   if (!is.null(degenerate$reason)) {
     # Only the "uncertified" literal gets the diagnostic -- see the scope note
     # at axes_degeneracy_hint(). The sibling surface calls the SAME decision
@@ -734,10 +745,10 @@ axes_sigma_degenerate <- function(sigma) {
 #                     literal, "uncertified".
 #   NULL              computes, and pays nothing: the certificate runs only on
 #                     the floor's own side, so an ordinary fit never buys the
-#                     16-108x replay (M108). A fit that IS checked buys it
-#                     twice, once per surface: both call this helper on the
-#                     same matrix with the same derivative set, and nothing
-#                     memoizes between them (M111 review F14).
+#                     16-108x replay (M108). Until M117 a fit that WAS checked
+#                     bought it twice, once per surface (M111 review F14);
+#                     axes_reliability() now makes this decision once via
+#                     axes_shared_refusal() below and hands it to both.
 #
 # ONE PREDICATE, BOTH SURFACES (M111 gate). The certificate reports three
 # estimates -- the corrected component SEs' (worst component), the scaling
@@ -790,6 +801,37 @@ axes_degeneracy_refusal <- function(sigma, d) {
     return(list(reason = NULL, cert = cert))
   }
   list(reason = "uncertified", cert = cert)
+}
+
+# The refusal decision computed ONCE per checked fit (M117), for
+# axes_reliability() to hand to both surfaces through their `refusal`
+# argument. Both call axes_degeneracy_refusal() on the same matrix (the
+# realigned cov2cor(Sigma-hat)) with the same derivative set, so until M117 a
+# fit the floor sent to the certificate paid for the double-double replay
+# twice, once per surface, with nothing memoizing between them (M111 review
+# F14). This helper is deliberately NOT a cache: a per-call argument threads
+# the decision through one call's own dataflow, where a cache would have to
+# invent key identity for a floating-point matrix and would outlive the call
+# (M117 plan gate).
+#
+# Returns NULL -- "nothing precomputed; decide at your own doors", the
+# `refusal` argument's default -- whenever the matrix would be refused by
+# either surface's door guards BEFORE the degeneracy seam (missing dimnames,
+# a nonpositive or infinite diagonal, non-finite entries): those doors keep
+# their own precedence and literals, they cost nothing, and cov2cor() must
+# not run on such a matrix here for exactly the reasons documented at the
+# guards themselves (NaN laundering, double warnings). The guard expressions
+# mirror the callees' own doors verbatim; the callees remain authoritative.
+axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
+                                item_block, fit_zeta1, fit_zeta2) {
+  if (is.null(rownames(sigma)) || is.null(colnames(sigma))) return(NULL)
+  sigma <- sigma[item_names, item_names, drop = FALSE]
+  if (any(diag(sigma) <= 0, na.rm = TRUE)) return(NULL)
+  if (any(is.infinite(diag(sigma)))) return(NULL)
+  if (!all(is.finite(sigma))) return(NULL)
+  d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
+                      fit_zeta1, fit_zeta2)
+  axes_degeneracy_refusal(stats::cov2cor(sigma), d)
 }
 
 # The one definition of "the certificate's estimate for this fit", read by the

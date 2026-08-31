@@ -73,7 +73,7 @@ seam.
 - [x] T1: Measure the wall-clock cost of one `axes_reliability()` call on an
       ill-conditioned p = 24 fit before the change. Record the command, date,
       machine and figure in the work log.
-- [ ] T2: Add the optional pre-computed-refusal argument to
+- [x] T2: Add the optional pre-computed-refusal argument to
       `axes_corrected_se()` and `axes_scaling_factor()`, defaulting to computing
       it; `axes_reliability()` computes it once and passes it to both. The
       finiteness / `"singular"` / `"infinite_diagonal"` precedence and the
@@ -92,6 +92,7 @@ seam.
 
 - 2026-08-31: implement started; branch m117-certificate-once-per-fit. Question gate skipped — both seam surfaces are internal (`NAMESPACE` exports only `axes_reliability`), the plan gate settled the design, no tripwire tags; the two minor choices made here: the argument is named `refusal` (the `axes_degeneracy_refusal()` return, default `NULL` = compute it), and `axes_reliability()` builds it once inline at the seam.
 - 2026-08-31: T1 done — scratchpad script (M89 AC6 injection shape: p = 24 octant matrix, item 2 duplicated + 1e-9 ridge, mocked at `axes_fitted_cov`), 5 timed reps after warm-up via `system.time`, Apple M5 Pro / R 4.6.1, 2026-08-31: median 0.033 s per `axes_reliability()` call; one `axes_accuracy_certificate()` evaluation on that matrix: median 0.002 s.
+- 2026-08-31: T2 done — `refusal = NULL` argument on both surfaces, consulted only at the `axes_degeneracy_refusal()` seam (every door guard stays ahead); new `axes_shared_refusal()` beside the refusal helper mirrors the door guards and returns NULL when a door would refuse; `axes_reliability()` computes `axes_fitted_cov(fit)` and the refusal once and passes both to the two call sites. test-axes-corrected-se.R, test-axes-scaled-fit.R and test-axes-certificate-refusal.R pass under load_all.
 
 ## Decisions
 

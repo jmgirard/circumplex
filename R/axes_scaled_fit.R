@@ -148,7 +148,7 @@ axes_u_pricing <- function(sigma, d) {
 # is the single failure a user could not detect (the M66 contract).
 axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
                                 item_block = NULL, fit_zeta1, fit_zeta2,
-                                df, baseline_df) {
+                                df, baseline_df, refusal = NULL) {
   if (is.null(rownames(sigma)) || is.null(colnames(sigma))) {
     stop(
       "`sigma` must carry dimnames so it can be realigned to the item map.",
@@ -238,7 +238,17 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # so hoisting it moves no refusal across the two arms' boundary.
   if (!all(is.finite(sigma))) return(na_out("singular"))
   sigma <- stats::cov2cor(sigma)
-  degenerate <- axes_degeneracy_refusal(sigma, d)
+  # `refusal`, when supplied, is axes_shared_refusal()'s answer for this
+  # matrix and derivative set, computed once by axes_reliability() so the
+  # certificate is not priced again here after the sibling surface (M117).
+  # Every guard above -- the df pair, saturation, the diagonal doors and
+  # finiteness -- stays ahead of this seam, so the refusal precedence is
+  # unchanged whether or not the argument is passed.
+  degenerate <- if (is.null(refusal)) {
+    axes_degeneracy_refusal(sigma, d)
+  } else {
+    refusal
+  }
   if (!is.null(degenerate$reason)) {
     # Only the "uncertified" literal gets the diagnostic -- see the scope note
     # at axes_degeneracy_hint() in R/axes_corrected_se.R. The sibling surface

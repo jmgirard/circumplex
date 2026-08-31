@@ -1810,9 +1810,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   #
   # `n` is the sample size the SEs are priced at on each path: complete cases
   # for listwise, the supplied `n` for cormat.
+  # The degeneracy/certificate decision is made ONCE here (M117) and handed to
+  # both consumers below: they price the same realigned cov2cor matrix with
+  # the same derivative set, so before this seam a fit the floor sent to the
+  # certificate paid for the double-double replay twice, once per surface.
+  # NULL when the matrix would be refused at a door guard ahead of the seam --
+  # each consumer then decides at its own doors, unchanged and cheap.
+  fitted_sigma <- axes_fitted_cov(fit)
+  refusal <- axes_shared_refusal(
+    fitted_sigma, all_cols, item_angle, item_scale, item_block,
+    fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2
+  )
   corrected <- axes_corrected_se(
-    axes_fitted_cov(fit), all_cols, item_angle, item_scale, item_block,
-    n = n, fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2
+    fitted_sigma, all_cols, item_angle, item_scale, item_block,
+    n = n, fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2, refusal = refusal
   )
   se_reported <- if (missing == "fiml") {
     # The FIML path composes MULTIPLICATIVELY rather than by replacement
@@ -1920,9 +1931,9 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # this point, so no scaled statistic is ever computed against a saturated
   # model that was never reached.
   scaling <- axes_scaling_factor(
-    axes_fitted_cov(fit), all_cols, item_angle, item_scale, item_block,
+    fitted_sigma, all_cols, item_angle, item_scale, item_block,
     fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2,
-    df = fm[["df"]], baseline_df = fm[["baseline.df"]]
+    df = fm[["df"]], baseline_df = fm[["baseline.df"]], refusal = refusal
   )
   scaled <- axes_scale_fit_measures(fm, scaling)
 
