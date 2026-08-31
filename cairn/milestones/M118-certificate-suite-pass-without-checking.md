@@ -92,7 +92,7 @@ and no external consumer of the package relies on any of it.
       is written from inside `cert_true_error()` on both paths. Prove it by
       forcing the matrix check at `:311` to mismatch for every case and
       observing the new test red while the per-case tests skip.
-- [ ] **T2** — Add the three tolerance-based shipped-route assertions at
+- [x] **T2** — Add the three tolerance-based shipped-route assertions at
       `:797-800`, against 97/128, 2 and 5/8 at a literal `4 * 2^-53` relative.
       Do not read the tolerance from `cert_floor`: an expectation defined by
       the harness constant it sits beside weakens whenever that constant is
@@ -121,6 +121,7 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: plan gate chose a written-down literal tolerance for the dyadic pin over a tolerance read from `cert_floor` and over leaving the configuration unpinned, because an expectation reading the constant it sits beside moves with that constant and notices nothing — the failure M115 AC4 already recorded for the floor itself; falsified by a machine committing a legitimate error above `4 * 2^-53` at a configuration where every intermediate is dyadic.
 - 2026-08-31: plan gate chose accepting the quotient configuration's missing `cval` check over hand-deriving an exact `u` there and over an indirect worst-of assertion, because the field is already priced against exact values at six other configurations and a new hand derivation is its own correctness surface; falsified by a `cval` regression that the six priced cases miss.
 - 2026-08-31: T1 — each case records its disposition (priced / skipped-with-reason / refused) into a file-local environment from inside `cert_true_error()`, and a test after the per-case tests fails when none was priced. Discrimination proved by forcing the matrix precondition to mismatch for every case: 6 skips, and the new test the only failure, its label naming each case's reason. `devtools::test()` 0 failures, 9194 passes.
+- 2026-08-31: T2 — the dyadic configuration now pins `axes_v_pricing()$corrected`, `$naive` and `axes_u_pricing()` against 97/128, 2 and 5/8 at a literal `4 * 2^-53` relative tolerance, beside the brackets rather than in place of them. Each pin proved to redden alone under an `8 * 2^-53` relative perturbation of its own shipped value: one failure per run, at the perturbed value's own assertion, the other two green.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
 
 ## Decisions

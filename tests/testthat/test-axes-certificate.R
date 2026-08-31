@@ -290,6 +290,7 @@ cert_floor <- 10 * 2 * .Machine$double.eps
 # cert_true_error() and the per-case tests below already take.
 cert_ceiling <- 100
 
+
 # ---- WHAT ACTUALLY GOT PRICED (M118) ---------------------------------------
 #
 # Every bracket assertion in this file is reached through cert_true_error(),
@@ -864,9 +865,35 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   # under-reports -- instead of reddening on a bit-level platform difference
   # the certificate prices correctly.
   hat <- axes_v_pricing(s, d)
+  hat_u <- axes_u_pricing(s, d)
+
+  # THE SHIPPED VALUES THEMSELVES, pinned (M118). The brackets below judge
+  # this machine's MEASURED error, so they pass wherever the certificate
+  # prices that error correctly -- including where the shipped route has
+  # regressed and the certificate honestly reports how wrong it now is. With
+  # only the brackets here, a shipped pricing regression at this configuration
+  # is green across the whole file.
+  #
+  # What stood here before M116 was three expect_identical() checks against
+  # these same fractions. They were deleted because bit-identity pinned every
+  # measured error to exactly zero and so collapsed both bracket branches into
+  # themselves. A TOLERANCE avoids that: it admits the bit-level platform
+  # differences the brackets exist to price, while a real regression -- which
+  # moves these quantities by far more than a few units in the last place --
+  # reddens here.
+  #
+  # The tolerance is WRITTEN DOWN as `4 * 2^-53` (two units in the last place
+  # of a double) and deliberately NOT read from cert_floor or from
+  # axes_certificate_safety_factor: an expectation defined by the harness
+  # constant it sits beside weakens whenever that constant is raised, which is
+  # the failure M115 AC4 recorded for the floor itself.
+  expect_equal(hat$corrected, 97 / 128, tolerance = 4 * 2^-53)
+  expect_equal(hat$naive, 2, tolerance = 4 * 2^-53)
+  expect_equal(hat_u, 5 / 8, tolerance = 4 * 2^-53)
+
   dv <- cert_rel(hat$corrected, 97 / 128, 0)
   dn <- cert_rel(hat$naive, 2, 0)
-  du <- cert_rel(axes_u_pricing(s, d), 5 / 8, 0)
+  du <- cert_rel(hat_u, 5 / 8, 0)
   cert <- axes_accuracy_certificate(s, d)
   cert_bracket(cert$se, max(cert_root_rel(dv)), "closed-form dyadic se")
   cert_bracket(cert$cval, abs(du), "closed-form dyadic cval")
