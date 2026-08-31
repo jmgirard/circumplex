@@ -290,6 +290,59 @@ cert_floor <- 10 * 2 * .Machine$double.eps
 # cert_true_error() and the per-case tests below already take.
 cert_ceiling <- 100
 
+
+# Both constants above are written against a package safety factor of 10, and
+# neither reads it -- deliberately, for the reason each comment gives. That
+# leaves the harness free to drift away from the package: move
+# axes_certificate_safety_factor and cert_floor keeps certifying the old floor
+# while cert_ceiling keeps allowing the old overstatement, both describing a
+# certificate that no longer exists. This is the one assertion that ties the
+# two together, and the only one that names the cause when they part (M118).
+#
+# The drift is not silent today, in either direction -- measured 2026-08-31 on
+# aarch64-apple-darwin23 by setting the package constant and re-running this
+# file. At 100 the per-case brackets and both closed-form oracle tests go red
+# as well (8 failures); at 2 the planted-perturbation test does (9 failures).
+# What every one of those reports is a bracket or an oracle missing its
+# expected value, with the moved constant nowhere in the message; this
+# assertion is what turns that into "the safety factor is not 10". It is also
+# the layer that survives a future site being added whose own bracket happens
+# to absorb the move.
+test_that("AC3: the harness's written-down safety factor is the package's", {
+  expect_identical(axes_certificate_safety_factor, 10)
+})
+
+
+# ---- WHAT ACTUALLY GOT PRICED (M118) ---------------------------------------
+#
+# Every bracket assertion in this file is reached through cert_true_error(),
+# and that function SKIPS a case whose anchor matrix this machine does not
+# build bit for bit. The per-case tests below are one test_that() each so that
+# those skips are independent -- but a machine on which all six skip runs this
+# file green with not one bracket asserted, and nothing in the file says so.
+# Until now the only detector was a human reading the pull request's CI log
+# for skip counts.
+#
+# So each case records what became of it, on every path, and a test after the
+# per-case tests reads the record back. The environment is file-local and
+# written from INSIDE cert_true_error(): a case that skips leaves its reason
+# here before skip() unwinds its test_that(), and a case that is priced says
+# so only after every value it prices has been computed.
+cert_dispositions <- new.env(parent = emptyenv())
+
+cert_record <- function(id, disposition) {
+  assign(id, disposition, envir = cert_dispositions)
+  invisible(disposition)
+}
+
+cert_disposition <- function(id) {
+  if (exists(id, envir = cert_dispositions, inherits = FALSE)) {
+    get(id, envir = cert_dispositions, inherits = FALSE)
+  } else {
+    "never reached"
+  }
+}
+
 # THIS MACHINE's own relative error at one case, against the committed exact
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
@@ -309,11 +362,15 @@ cert_true_error <- function(id, sigma, d) {
   # formatter, and round-trips every value committed here exactly (none is a
   # denormal, the one place that parse loses bits).
   if (!identical(sigma[upper.tri(sigma)], as.numeric(fz$sig))) {
-    testthat::skip(paste0(
+    reason <- paste0(
       "this machine does not build the anchor matrix at case '", id, "' bit ",
       "for bit, so the exact quadratic forms committed for that matrix are ",
       "not a yardstick for this one"
-    ))
+    )
+    # RECORDED BEFORE skip(), which unwinds this case's test_that() and would
+    # otherwise leave the case looking like one that was never reached.
+    cert_record(id, paste0("skipped -- ", reason))
+    testthat::skip(reason)
   }
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
@@ -330,11 +387,15 @@ cert_true_error <- function(id, sigma, d) {
       ") -- an admitted geometry, so this is a regression, not a platform ",
       "difference"
     ))
+    cert_record(id, "refused by the shipped pricing")
     return(NULL)
   }
   dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
   dn <- cert_rel(v$naive, as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))
   du <- cert_rel(u, as.numeric(fz$u_hi), as.numeric(fz$u_lo))
+  # AFTER the pricing, not before: what is claimed is that this case was
+  # measured against its committed exact values, not that it was attempted.
+  cert_record(id, "priced")
   list(
     # Aggregated by MAX over components, as the certificate's own estimands
     # are: the reported SE vector refuses as a unit, so the worst component is
@@ -502,6 +563,37 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   # margin is three decades or more on both machines seen so far.
   expect_gt(true_rel$se, axes_degeneracy_delta_star)
   expect_gt(true_rel$cval, axes_degeneracy_delta_star)
+})
+
+
+test_that("AC1: at least one case was priced against its committed exact values", {
+  # THE ALL-SKIP DETECTOR (M118). Every bracket assertion above runs only for
+  # a case cert_true_error() actually priced; a case whose anchor matrix this
+  # machine builds differently skips instead, and each skip abandons only its
+  # own test_that(). So a machine on which all six skip reports six skips and
+  # zero failures -- a green file with nothing measured against the exact
+  # values it commits. That state is what this test turns red.
+  #
+  # It reads the dispositions the cases recorded as they ran, rather than
+  # re-pricing anything: re-pricing here would be a second copy of the
+  # precondition, and would skip in exactly the runs this test exists to
+  # catch.
+  #
+  # The case list is pinned at six -- five anchors plus counterexample B --
+  # because this test's own domain is a list that can empty: with no cases
+  # enumerated there would be nothing to count and no priced case to want.
+  ids <- c(vapply(cert_anchors(), `[[`, "", "id"), "cxb")
+  expect_length(ids, 6L)
+
+  dispositions <- vapply(ids, cert_disposition, "")
+  priced <- ids[dispositions == "priced"]
+  # The label carries every case's disposition, so a failure here says which
+  # cases skipped and why rather than reporting a bare zero.
+  expect_gt(length(priced), 0L,
+            label = paste0(
+              "cases priced (dispositions: ",
+              paste0(ids, " = ", dispositions, collapse = "; "), ")"
+            ))
 })
 
 
@@ -795,9 +887,46 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   # under-reports -- instead of reddening on a bit-level platform difference
   # the certificate prices correctly.
   hat <- axes_v_pricing(s, d)
+  hat_u <- axes_u_pricing(s, d)
+
+  # THE SHIPPED VALUES THEMSELVES, pinned (M118). The brackets below judge
+  # this machine's MEASURED error, so they pass wherever the certificate
+  # prices that error correctly -- including where the shipped route has
+  # regressed and the certificate honestly reports how wrong it now is. With
+  # only the brackets here, a shipped pricing regression at this configuration
+  # is green across the whole file.
+  #
+  # What stood here before M116 was three expect_identical() checks against
+  # these same fractions. They were deleted because bit-identity pinned every
+  # measured error to exactly zero and so collapsed both bracket branches into
+  # themselves. A TOLERANCE avoids that collapse -- the brackets below still
+  # run on their own measured error -- while a real regression, which moves
+  # these quantities by far more than a few units in the last place, reddens
+  # here.
+  #
+  # The tolerance is WRITTEN DOWN as `4 * 2^-53` (two units in the last place
+  # at 1.0) and deliberately NOT read from cert_floor or from
+  # axes_certificate_safety_factor: an expectation defined by the harness
+  # constant it sits beside weakens whenever that constant is raised, which is
+  # the failure M115 AC4 recorded for the floor itself.
+  #
+  # It is NOT, however, as wide as the brackets below. Measured 2026-08-31 on
+  # aarch64-apple-darwin23: this machine's shipped route is exact here (all
+  # three relative errors 0), so cert$se, cert$cval and cert$fiml_ratio are
+  # each identical() to cert_floor and all three cert_bracket() calls take the
+  # at-the-floor branch, whose live assertion is `true_rel <= cert_floor` =
+  # 4.4408921e-15. These pins redden at 4.4408921e-16 -- ten times tighter. A
+  # platform whose shipped route differs here by three to twenty ulp would
+  # pass the bracket, which prices that difference correctly, and fail these
+  # pins. Only this machine has been measured at this configuration; the size
+  # of the headroom these pins should carry is open (M118 review, [O] F1).
+  expect_equal(hat$corrected, 97 / 128, tolerance = 4 * 2^-53)
+  expect_equal(hat$naive, 2, tolerance = 4 * 2^-53)
+  expect_equal(hat_u, 5 / 8, tolerance = 4 * 2^-53)
+
   dv <- cert_rel(hat$corrected, 97 / 128, 0)
   dn <- cert_rel(hat$naive, 2, 0)
-  du <- cert_rel(axes_u_pricing(s, d), 5 / 8, 0)
+  du <- cert_rel(hat_u, 5 / 8, 0)
   cert <- axes_accuracy_certificate(s, d)
   cert_bracket(cert$se, max(cert_root_rel(dv)), "closed-form dyadic se")
   cert_bracket(cert$cval, abs(du), "closed-form dyadic cval")

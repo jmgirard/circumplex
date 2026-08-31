@@ -77,6 +77,28 @@ fourth — the `repel = TRUE` branch hand-computing canvas coordinates, D-019's
 flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
 corrected 2026-08-06.)
 
+Added 2026-08-31 (M118), sharing one ROADMAP row: six latent defects in the
+accuracy certificate's validation layers, none reachable by a passing test run
+today, each able to turn a real regression green once it is. (Two are latent in
+their misdiagnosis rather than in their branch: `cert_bracket()`'s at-the-floor
+branch is taken on every run at the closed-form dyadic configuration --
+measured 2026-08-31, where all three certificate fields sit exactly at the
+floor -- and the oracle driver's missing-key case is reachable by a maintainer
+regeneration, just not by a test.) In
+`tests/testthat/test-axes-certificate.R`, `cert_bracket()` selects its
+at-the-floor branch by `identical(est, cert_floor)`, a value coincidence rather
+than a statement about the fit; the measured side's component count is unpinned
+against the committed exact pair's length at three `cert_rel()` sites, and the
+dyadic `cval` bracket is unaggregated, so a regeneration pasted in truncated is
+recycled to length and compared against the wrong exact values;
+`cert_root_rel()` returns NaN rather than failing at a relative variance error
+at or below -100%; `cert_rel()` divides by `hi + lo`, which is zero exactly
+when the exact quantity is; and the planted-perturbation layer was never
+extended to the quotient field's denominator. In
+`devel/degeneracy-oracle/exact_oracle.R`, a missing oracle key becomes a silent
+NULL pasted into the regeneration. Full text in the M113, M115 and M116
+archives' Review sections.
+
 **Accepted limitations** (no fix planned; no candidate row): a withdrawn norm
 sample's values are reachable only from the source repository. `?cais` and
 NEWS.md point at `cairn/references/sodano2006.md` for the CAIS adult sample
@@ -85,6 +107,18 @@ user reproducing a pre-2.0.0 analysis has no route from an installed copy.
 Accepted at the M112 review gate 2026-08-30: reprinting the values on a shipped
 surface is what the withdrawal removed, and both texts say "the package's source
 repository", so the pointer is accurate about where it leads.
+
+Accepted 2026-08-31 (M118), all in the accuracy certificate's validation
+layers. The quotient configuration's `cval` is never checked against an exact
+value: hand-deriving one is its own correctness surface, and the field is
+already priced against exact values at the five anchors and counterexample B,
+so the gap is one configuration wide. Alongside it, residue with no fix
+planned: `cert_hex()` is dead code that still reads as the live precondition;
+`axes_certificate_worst()` fails open on an empty certificate, unreachable
+today and declined at the M114 gate; the oracle driver's `ratio_rel()` measures
+an n-dependent quantity against an n-free exact value, conservative and
+sub-ulp; and M108's nine cosmetic and performance residues plus M111's F16,
+whose texts are in those milestones' review histories.
 
 ## Design Principles
 
