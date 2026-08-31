@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M116: Make three passing-without-checking assertions in the certificate suite redden
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -132,6 +132,7 @@ replaced; they are removed so the measured brackets carry the site.
 - 2026-08-31: return gate — Scope amended: the `axes_v_pricing()` exactness identities move from Out to In and are removed, superseding the 2026-08-30 plan-gate retention (its falsifier was about spurious platform reds; the return showed the retention also made the brackets unfailable); AC3 and every other criterion unchanged. Same gate chose flooring `cert_bracket()`'s upper bound at `cert_floor` so a zero measured error no longer degenerates the bound to `est <= 0` (F2); failure set unchanged, every field being `fac * max(delta, 2 * eps) >= cert_floor`. Scope's "three decades" corrected to two (F5's phrasing note).
 - 2026-08-31: T6 — the three shipped-route exactness identities at the dyadic site are gone; the brackets carry it, with a comment recording why. Plant: dv's yardstick shifted to `97/128 * (1 + 2^-40)`; the floor branch failed at `closed-form dyadic se: true error` (4.55e-13 > 4.44e-15) and `closed-form dyadic fiml_ratio: true error` — the branch the return verified as unfailable. Plant reverted; file FAIL 0 / PASS 384.
 - 2026-08-31: T7 — :133 now cites the 1e3 ceiling as that day's, since lowered to `cert_ceiling` 100; the ceiling comment's measured range corrected to 9.829339 (`cxb se`) – 10.0025192 (`a4 fiml_ratio`), two decades under 1e3, marked corrected 2026-08-31. T6+T7 land in one checkpoint commit, both edits made in a single pass over the same file.
+- 2026-08-31: return work complete — F3's drift window filed to the ROADMAP degeneracy row (its :723-725 item marked removed by this return; row trimmed to stay under the 24,000-byte budget, now 23,991). Full suite FAIL 0 / WARN 5 / SKIP 1 / PASS 9158 (same pre-existing warnings and skip; 3 fewer passes, the removed identities); `devtools::check(args = "--no-manual")` Status: OK, 0/0/0, 12m54s. Status → review.
 
 ## Decisions
 
