@@ -21,17 +21,19 @@ Surface tier: **internal** — the deliverable is the package's own test suite,
 which no external consumer of the repo relies on. No shipped code changes.
 
 **In:** the bracket ceiling at `tests/testthat/test-axes-certificate.R:345-352`,
-three decades above anything the certificate delivers (measured ratios 9.83 to
+two decades above anything the certificate delivers (measured ratios 9.83 to
 10.00 against a ceiling of 1e3); the unconditional `expect_identical(cert$…,
 floor_est)` assertions at :728-730 and :816-817, which state that the running
 machine's shipped pricing commits zero error at those configurations; and the
 dimension half of `cert_true_error()`'s precondition at :288, which skips where
 it should redden. Each repair is proved able to fail by a planted defect.
+Also in, reversing the plan gate's retention at the 2026-08-31 return gate: the
+`axes_v_pricing()` exactness identities retained at :760-762, whose exact-zero
+pin left the replacement brackets with the failure set of the assertions they
+replaced; they are removed so the measured brackets carry the site.
 
 **Out:**
 - the certificate's double evaluation per fit → M117
-- the `axes_v_pricing()` exactness identities at :723-725, the same claim shape
-  one level down → ROADMAP degeneracy row (declined at this plan's gate)
 - the remaining M115-deferred items — `cert_hex()` dead code,
   `cert_root_rel()` at e ≤ -1, `cert_rel()`'s zero denominator,
   `exact_oracle.R:70-79`'s silent NULL, the `identical(est, cert_floor)` branch
@@ -99,13 +101,13 @@ it should redden. Each repair is proved able to fail by a planted defect.
       dimension change on one anchor's builder call, confirm the shape test
       fails naming that case, revert. Summarize in the work log.
 - [x] T5: `devtools::test()` and `devtools::check(args = "--no-manual")` clean.
-- [ ] T6: Make the dyadic closed-form site's three certificate assertions able
+- [x] T6: Make the dyadic closed-form site's three certificate assertions able
       to fail where they cannot today (review F1/F2). The error they are
       measured against is zero by construction while :760-762 stand, so the
       repair has to change what is measured, what those identities do, or the
       criterion — AC3 as written mandates the vacuous construction, so decide
       at the step-6 amendment gate whether AC3 is amended before the code is.
-- [ ] T7: Correct the two comment defects (review F4/F5): :133's reference to
+- [x] T7: Correct the two comment defects (review F4/F5): :133's reference to
       the removed 1e3 ceiling, and the :279-286 range, which is 9.829339 to
       10.0025192 across the eighteen ratios (`a4 fiml_ratio` 10.002519 the
       maximum) against a ceiling two decades above the measured 10, not three.
@@ -127,6 +129,9 @@ it should redden. Each repair is proved able to fail by a planted defect.
 - 2026-08-31: T4 — the shape test now asserts each case's matrix `dim()` against the `p` in `cert_shape`, for the five built anchors and for counterexample B's saved matrix. Plant: `c4`'s builder call sliced to `[1:3, 1:3]`. The shape test failed at `"c4 matrix dim"`, and the `c4` per-case test SKIPPED under the same plant — the behavior this assertion exists to replace. Plant reverted; full suite FAIL 0 / PASS 9161.
 - 2026-08-31: T5 — `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 / PASS 9161 (all five warnings and the one skip pre-existing, in the lavaan and scaled-fit suites); `devtools::check(args = "--no-manual")` Status: OK, no errors, warnings or notes. No shipped code changed, so no NEWS entry is owed. Status → review.
 - 2026-08-31: review gate FAILED and returned M116 to in-progress (first defect return). What failed: at the dyadic closed-form site the three `cert_bracket()` calls at :783-785 are fed a `true_rel` that the retained identities at :760-762 pin to exactly zero, so the floor branch is `expect_lte(0, cert_floor)` and the ceiling branch is `expect_lte(est, 0)` — the pair reduces to `identical(est, cert_floor)`, the predicate of the assertions AC3 replaced, leaving one of the Goal's three sites as vacuous as before. Two comment defects ride with it: :133 cites the removed 1e3 ceiling, and the :279-286 ceiling comment's measured range is wrong (9.829339 to 10.0025192, not 9.829 to 10.000, and 10 against 1e3 is two decades). All five criteria passed as written and both gates were clean; the return is the maintainer's load-bearing-defect judgment, not a criterion failure. Dispositions in the Review section.
+- 2026-08-31: return gate — Scope amended: the `axes_v_pricing()` exactness identities move from Out to In and are removed, superseding the 2026-08-30 plan-gate retention (its falsifier was about spurious platform reds; the return showed the retention also made the brackets unfailable); AC3 and every other criterion unchanged. Same gate chose flooring `cert_bracket()`'s upper bound at `cert_floor` so a zero measured error no longer degenerates the bound to `est <= 0` (F2); failure set unchanged, every field being `fac * max(delta, 2 * eps) >= cert_floor`. Scope's "three decades" corrected to two (F5's phrasing note).
+- 2026-08-31: T6 — the three shipped-route exactness identities at the dyadic site are gone; the brackets carry it, with a comment recording why. Plant: dv's yardstick shifted to `97/128 * (1 + 2^-40)`; the floor branch failed at `closed-form dyadic se: true error` (4.55e-13 > 4.44e-15) and `closed-form dyadic fiml_ratio: true error` — the branch the return verified as unfailable. Plant reverted; file FAIL 0 / PASS 384.
+- 2026-08-31: T7 — :133 now cites the 1e3 ceiling as that day's, since lowered to `cert_ceiling` 100; the ceiling comment's measured range corrected to 9.829339 (`cxb se`) – 10.0025192 (`a4 fiml_ratio`), two decades under 1e3, marked corrected 2026-08-31. T6+T7 land in one checkpoint commit, both edits made in a single pass over the same file.
 
 ## Decisions
 

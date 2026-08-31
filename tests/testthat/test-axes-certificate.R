@@ -130,8 +130,9 @@ cert_derivs <- function(cs) {
 # Measured on the authoring machine (macOS, arm64) on 2026-08-30 by that
 # script, for orientation only -- no assertion reads these figures, which is
 # the whole point of the change: the six geometries' certificate-over-true-
-# error ratios ran 9.83 to 10.00 against a ceiling of 1e3, and the true SE
-# errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
+# error ratios ran 9.83 to 10.00 against the ceiling of that day, 1e3 --
+# since lowered to the `cert_ceiling` of 100 committed below -- and the true
+# SE errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
 
 cert_frozen <- list(
   a4 = list(
@@ -277,11 +278,12 @@ cert_floor <- 10 * 2 * .Machine$double.eps
 # is a bound times that factor, so a ratio at the factor is what it is built to
 # deliver and the room above it is what a machine rounding the other way needs.
 # M108 pre-registered 1e3 before any measurement existed; every measurement
-# since has come in three decades under it, which is a ceiling nothing can
+# since has come in two decades under it, which is a ceiling nothing can
 # reach. Measured 2026-08-30 on aarch64-apple-darwin23, R 4.6.1, reference
-# BLAS: eighteen estimate-over-true-error ratios across the six priced cases
-# and three fields, all between 9.829 (`cxb se`) and 10.000 (every anchor, all
-# three fields), reproduced by pricing each case through axes_v_pricing() and
+# BLAS (range corrected 2026-08-31, M116 first return, F5): eighteen
+# estimate-over-true-error ratios across the six priced cases and three
+# fields, all between 9.829339 (`cxb se`) and 10.0025192 (`a4 fiml_ratio`),
+# reproduced by pricing each case through axes_v_pricing() and
 # axes_u_pricing() against the exact values committed below and dividing
 # axes_accuracy_certificate()'s field by the result -- the same two steps
 # cert_true_error() and the per-case tests below already take.
@@ -366,7 +368,18 @@ cert_bracket <- function(est, true_rel, lbl) {
     expect_lte(true_rel, cert_floor, label = paste0(lbl, ": true error"))
   } else {
     expect_gte(est, true_rel, label = paste0(lbl, ": estimate"))
-    expect_lte(est, cert_ceiling * true_rel, label = paste0(lbl, ": estimate"))
+    # The upper end never sits below the certificate's own floor: every field
+    # is fac * max(delta, 2 * eps), so the floor is the smallest value the
+    # certificate can report and asking for less is asking for a value it
+    # cannot produce. Without this, a measured error of zero degenerates the
+    # bound to `est <= 0`, and a broken platform's sentinel then reports
+    # "1 is not less than or equal to 0" -- a comparison against zero rather
+    # than against anything the certificate promises (M116 review, F2). The
+    # failure set is unchanged: where the bound was ceiling * true_rel it
+    # still is, and where it was below the floor no estimate could sit
+    # between the two anyway.
+    expect_lte(est, max(cert_ceiling * true_rel, cert_floor),
+               label = paste0(lbl, ": estimate"))
   }
 }
 
@@ -752,14 +765,6 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   expect_identical(ref$u$hi, 5 / 8)
   expect_identical(ref$u$lo, 0)
 
-  # Every intermediate being dyadic, the SHIPPED double route is exact here
-  # too, and these three pin it against the same hand-derived fractions. They
-  # are the one claim in this file about a machine rather than a matrix, and
-  # they are left standing deliberately (M116 scope): the certificate's own
-  # assertions below no longer depend on them.
-  expect_identical(axes_v_pricing(s, d)$corrected, 97 / 128)
-  expect_identical(axes_v_pricing(s, d)$naive, 2)
-  expect_identical(axes_u_pricing(s, d), 5 / 8)
   # THE CERTIFICATE, against THIS MACHINE's error rather than against an
   # asserted zero (M116). What stood here was three identity checks, one per
   # certificate field, each against `cert_floor` -- saying the machine running
@@ -775,6 +780,18 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   # in scope here, and derived by hand rather than from any route. Where the
   # machine is exact the floor branch asserts its measured error is under the
   # floor; where it is not, both halves of the bracket run.
+  #
+  # NO exactness identity on the shipped route stands here any more (M116
+  # first return, F1). Three did -- expect_identical() of $corrected, $naive
+  # and the u pricing against the fractions above -- and they were the one
+  # claim in this file about a machine rather than a matrix: on any run that
+  # reached the brackets they had already pinned every measured error to
+  # exactly zero, which reduced both bracket branches to the identity checks
+  # the brackets replaced. With them gone the brackets are the site's
+  # assertions: a machine whose shipped route drifts here is judged by its
+  # measured error -- green under the floor, red where the certificate
+  # under-reports -- instead of reddening on a bit-level platform difference
+  # the certificate prices correctly.
   hat <- axes_v_pricing(s, d)
   dv <- cert_rel(hat$corrected, 97 / 128, 0)
   dn <- cert_rel(hat$naive, 2, 0)
