@@ -11,7 +11,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
 | M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | done | M113 | normal | milestones/archive/M114-refusal-predicate-fences.md |
-| M115 | Make the packaged accuracy bracket assert where the shipped pricing differs | review | M113 | normal | milestones/M115-certificate-bracket-reach.md |
+| M115 | Make the packaged accuracy bracket assert where the shipped pricing differs | in-progress | M113 | normal | milestones/M115-certificate-bracket-reach.md |
 | M110 | Correct the calibration-domain claim in the accuracy target and its shipped surfaces | done | — | high | milestones/archive/M110-calibration-domain-claim.md |
 | M111 | Shrink the ill-conditioning refusal to what the certificate cannot certify | done | — | normal | milestones/archive/M111-certificate-refusal-region.md |
 | M112 | Withdraw the CAIS adult normative sample | done | — | normal | milestones/archive/M112-cais-adult-sample-withdrawal.md |
