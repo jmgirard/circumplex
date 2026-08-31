@@ -244,10 +244,12 @@ cert_hex <- function(x) sprintf("%a", as.vector(x))
 
 # The relative error of one shipped double against the exact value hi + lo.
 # Written as ((hat - hi) - lo) so no precision is thrown away: wherever the two
-# agree to within a factor of two -- every quantity here bar the sign-flipped
-# `u` at counterexample B -- `hat - hi` is exact, and the low word then lands
+# agree to within a factor of two -- every quantity here bar `u` at
+# counterexample B, whose relative error is of order one (0.42 on
+# ubuntu-latest, 4.89 on macOS arm64, both measured 2026-08-30 by the two runs
+# recorded in M115's file) -- `hat - hi` is exact, and the low word then lands
 # on a difference that still has all its bits. At B the subtraction is ordinary
-# and loses nothing that matters against a relative error of 4.9.
+# and loses nothing that matters against an error that large.
 cert_rel <- function(hat, hi, lo) ((hat - hi) - lo) / (hi + lo)
 
 # A variance's relative error converted to its square root's. This is the exact
@@ -398,15 +400,20 @@ test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", 
   cert_bracket(cert$fiml_ratio, true_rel$ratio, "fiml_ratio")
 
   # The wrongness itself, asserted rather than described: this is the one
-  # committed matrix whose shipped SEs are wrong in the SECOND decimal place
-  # while the pre-M89 criterion reported them with reason NULL, and whose
-  # double-precision cval comes out sign-flipped. Written as decades rather
-  # than as one machine's figure, so it says what makes the case worth having
-  # without becoming a yardstick again: percent-level on the SE, order-unity
-  # on the cval.
-  expect_gt(true_rel$se, 1e-2)
-  expect_lt(true_rel$se, 1e-1)
-  expect_gt(true_rel$cval, 1)
+  # committed matrix on which double precision misses the stated accuracy
+  # target while the pre-M89 criterion reported the SEs with reason NULL.
+  #
+  # Asserted against delta_star -- the package's own target -- and NOT as a
+  # window around a measured figure. A first draft here wrote decades taken
+  # from the authoring machine (SE error in (1e-2, 1e-1), cval error above 1),
+  # and both reddened on ubuntu-latest, which prices this matrix through a
+  # different BLAS and measures 0.124 and 0.42 where macOS measures 0.0341 and
+  # 4.890. At an ill-conditioned matrix the size of the rounding error IS a
+  # property of the machine; what is a property of the MATRIX is that no
+  # machine gets within the target on it. So only that is claimed, and the
+  # margin is three decades or more on both machines seen so far.
+  expect_gt(true_rel$se, axes_degeneracy_delta_star)
+  expect_gt(true_rel$cval, axes_degeneracy_delta_star)
 })
 
 

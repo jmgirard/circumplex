@@ -65,7 +65,7 @@ row.
 - AC3 → T3
 - AC4 → T4
 - AC5 → T5
-- AC6 → T6
+- AC6 → T6, T7, T8, T9
 
 ## Tasks
 
@@ -87,6 +87,16 @@ row.
       review gate — where the PR and therefore the CI run exist — read that run
       and record which platforms the bracket asserted on: a gate observation,
       not a criterion.
+- [x] T7 Repair the counterexample-B decade windows that reddened on
+      ubuntu-latest: assert the machine's own measured error against the
+      package's stated accuracy target rather than against a window fitted to
+      one machine's figures; prove the new form can still fail.
+- [ ] T8 The four carried review findings, all in the same test file: compare
+      the anchor matrix numerically rather than through `%a` text; pass
+      `cert_bracket()`'s label into its expectations; check the matrix before
+      reporting a pricing refusal as a regression; assert each committed case's
+      value-array lengths.
+- [ ] T9 Re-run the profile's verify slot after the repair.
 
 ## Work log
 
@@ -104,6 +114,8 @@ row.
 - 2026-08-30: minor amendment to T6 — the CI read is moved to the review gate. `R-CMD-check.yaml` triggers only on push to the default branch or on `pull_request`, and `/milestone-review` is what opens the PR, so no CI run exists while implement is running. Nothing in AC6 or any other criterion moves; the CI read was already recorded as a gate observation rather than a criterion.
 - 2026-08-30: T6 — profile verify clean on this machine: `devtools::document()` no diff and zero `resolve link` lines at `cli.width = 500`; `devtools::test()` FAIL 0 / WARN 5 / SKIP 1 / PASS 9115, the one skip pre-existing in `test-axes-scaled-fit.R:921` (fixture generated under a different R or lavaan version) and outside this diff; `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes in 30m 30s. No NEWS.md entry: the milestone changes a test file and a `devel/` script only, with no user-visible surface. The CI read stays owed at the review gate.
 - 2026-08-30: `Depends on: M113` because M113 extends the oracle's certificate case list, which T1 and T2 both read.
+- 2026-08-30: repair gate — the counterexample-B repair asserts the machine's own error against `axes_degeneracy_delta_star` rather than a widened window or nothing at all, on the user's "decide for me" at that question; the other two answers took all four cheap findings into this repair and sent the all-skip blindness and the at-the-floor branch selection to the ROADMAP row.
+- 2026-08-30: T7 — the three decade windows at counterexample B are replaced by two assertions against `axes_degeneracy_delta_star` (1e-4), the package's own accuracy target: at an ill-conditioned matrix the size of the rounding error is a property of the machine, and what is a property of the matrix is that no machine gets within the target on it. Margin is three decades or more on both machines seen (macOS 0.0341 / 4.890, ubuntu-latest 0.124 / 0.42). Shown able to fail: with `cxb`'s committed exact words overwritten by this machine's own shipped doubles — the case made exact by construction — both new assertions redden at `:419` and `:420` reading 0.00000 against 0.00010, plus three bracket failures. Plant reverted, file green at FAIL 0 / SKIP 0 / PASS 340. Two `cert_rel` comment figures that named only the authoring machine now name both machines with their date.
 - 2026-08-30: review gate FAILED, defect return 1. AC6 fails: `R CMD check` errors on ubuntu-latest (PR #146, run 33343808365), `FAIL 2 | WARN 4 | SKIP 78 | PASS 8551`, both failures this milestone's own `test-axes-certificate.R:408-409` — the counterexample-B decade windows (`true_rel$se` in (1e-2, 1e-1), `true_rel$cval > 1`) are the authoring machine's figures, and ubuntu measures 0.124 and 0.42. macos-latest and windows-latest pass with zero certificate skips. AC1-AC5 verified; five further [O] findings recorded in the Review section for triage in the repair.
 
 ## Decisions
