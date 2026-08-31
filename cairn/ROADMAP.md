@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-31 (second pass, no tracking change: cairn_validate all green, tree clean, no milestone in flight. Master's R-CMD-check is green again since 2026-08-30, so issue #137's stated close condition is met and it is Jeff's to close. Byte headroom is nearly gone — ROADMAP.md 23,639 / 24,000 and LESSONS.md 19,997 / 20,000 — so the owed graduate-or-prune pass now also gates writing the next LESSONS line. M7's AC1/AC2 release evidence is 298 commits and 108 package files stale; re-verification belongs to the release walk, not to this audit. test-craft.md 29 / 8,718 against 35 / 9,000.)_
+_Last hygiene check: 2026-08-31 (second pass. cairn_validate green, tree clean. Master's R-CMD-check has been green since 2026-08-30, so issue #137's stated close condition is met and it is Jeff's to close. M7's release evidence is 298 commits stale; re-verification belongs to the release walk. Byte headroom is nearly gone — this file 23,929 / 24,000 and LESSONS.md 19,997 / 20,000 — so M118's T5 row-pruning is what makes room for the next LESSONS line. test-craft.md 29 / 8,718 against 35 / 9,000.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -10,6 +10,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — (all deps done) | high | milestones/M7-v2-release-prep.md |
+| M118 | Close three ways the certificate suite can pass without checking | planned | — | normal | milestones/M118-certificate-suite-pass-without-checking.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |
 | M117 | Price the accuracy certificate once per checked fit | done | — | normal | milestones/archive/M117-certificate-once-per-fit.md |
 | M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | done | M113 | normal | milestones/archive/M114-refusal-predicate-fences.md |
