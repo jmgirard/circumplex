@@ -1,6 +1,6 @@
 # M118: Close three ways the certificate suite can pass without checking
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -127,6 +127,7 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: implementation gate resolved a contradiction between Scope and T4 over where the quotient configuration's unchecked `cval` is recorded — Scope said Accepted limitations, T4 said Known fragilities. Chosen: Accepted limitations, per Scope, so T4's wording was corrected to match (a minor task edit; no scope amendment). The same gate chose a compact rewrite of the six-milestone candidate row over a minimal prune.
 - 2026-08-31: T4 — `cairn/DESIGN.md` gains one Known-fragilities paragraph (six still-open latent defects in the certificate's validation layers, sharing one ROADMAP row) and one Accepted-limitations paragraph (the quotient `cval` gap, plus `cert_hex()`, `axes_certificate_worst()`'s empty-certificate fail-open, `ratio_rel()`'s n-dependent measurement, M108's nine residues and M111 F16). Two items the row still carried were verified stale before relocation and dropped instead: M110 F3's `6.5e-6` corner was corrected by M111, and the 1e3 bracket ceiling by M116.
 - 2026-08-31: T5 — the candidate row that had absorbed findings since M108 was rewritten from 4,192 to 2,316 characters, keeping the three promotion conditions, the two standing rejections and pointers into the archives. `cairn/ROADMAP.md` 23,821 → 21,943 bytes. No code changed at T4 or T5, so the verify slot's result from T3 stands.
+- 2026-08-31: all five tasks done; `Rscript -e 'devtools::test()'` clean (0 failures, 5 pre-existing lavaan warnings, 1 skip, 9198 passes). Status → review.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
 
 ## Decisions
