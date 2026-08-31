@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M117: Price the accuracy certificate once per checked fit
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, GP2
-- **Branch/PR:** —
+- **Branch/PR:** m117-certificate-once-per-fit
 
 ## Goal
 
