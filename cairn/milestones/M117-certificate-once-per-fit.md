@@ -7,7 +7,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, GP2
-- **Branch/PR:** m117-certificate-once-per-fit
+- **Branch/PR:** m117-certificate-once-per-fit / PR #148
 
 ## Goal
 
@@ -38,26 +38,26 @@ seam.
 
 ## Acceptance criteria
 
-- [ ] AC1: For `axes_reliability()` calls whose realigned `cov2cor` matrix
+- [x] AC1: For `axes_reliability()` calls whose realigned `cov2cor` matrix
       `axes_sigma_degenerate()` answers `"ill_conditioned"` for — injected at
       the `axes_fitted_cov` binding the way
       `tests/testthat/test-axes-reliability.R:3105` already does —
       `axes_accuracy_certificate()` is entered exactly once per call, counted by
       a trace, on both a listwise-default call and a `missing = "fiml"` call.
-- [ ] AC2: `axes_corrected_se()` and `axes_scaling_factor()` called WITHOUT the
+- [x] AC2: `axes_corrected_se()` and `axes_scaling_factor()` called WITHOUT the
       new pre-computed-refusal argument each compute the certificate themselves
       and return the `"uncertified"` literal with a warning matching
       `"estimated relative error "` whose estimate is derived from that
       certificate, asserted by a test firing each surface standalone on an
       uncertifiable matrix.
-- [ ] AC3: On one matrix refused as `"uncertified"`, the warning
+- [x] AC3: On one matrix refused as `"uncertified"`, the warning
       `axes_corrected_se()` emits and the warning `axes_scaling_factor()` emits
       report the same estimated relative error — asserted both where each
       surface computes its own certificate and where both receive the
       pre-computed refusal.
-- [ ] AC4: `Rscript -e 'devtools::test()'` is clean and
+- [x] AC4: `Rscript -e 'devtools::test()'` is clean and
       `git status --short tests/testthat/_snaps/` reports nothing.
-- [ ] AC5: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors
+- [x] AC5: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors
       and 0 warnings.
 
 ## Coverage
@@ -97,6 +97,112 @@ seam.
 - 2026-08-31: T4 done — same script, machine and date as T1: median 0.029 s per call after the change (was 0.033 s; the saved evaluation is the certificate's own ~0.002 s plus its setup on this p = 24 fit). Both "uncertified" warnings still emitted.
 - 2026-08-31: T5 done — `devtools::test()` 0 failed / 9185 passed, `git status --short tests/testthat/_snaps/` empty; `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes. Status → review.
 
+- 2026-08-31: review — all five criteria verified with fresh evidence; consistency gate clean; three-lens fan-out returned six findings, none demonstrating a criterion failing, so no floor return.
+
 ## Decisions
 
 ## Review
+
+### Acceptance-criterion evidence (2026-08-31, branch m117-certificate-once-per-fit @ eb5ea92b, PR #148)
+
+- AC1 — `Rscript -e 'devtools::test()'` and a targeted `test_file()` run of
+  `tests/testthat/test-axes-certificate-refusal.R`: the M117 AC1 test passes on
+  both the listwise-default and the `missing = "fiml"` call, asserting the
+  traced `axes_accuracy_certificate` count is exactly 1 per call while both
+  surfaces still warn `"uncertified"`. Discrimination re-proven at review, not
+  taken from the work log: with `refusal = NULL` planted at both
+  `axes_reliability()` call sites the same test reddens twice (one failure per
+  `missing` path) at `test-axes-certificate-refusal.R:647`; the plant was
+  reverted and `git status R/` is clean.
+- AC2 — same targeted run: the M117 AC2+AC3 test fires `axes_corrected_se()`
+  and `axes_scaling_factor()` standalone on the committed p = 3
+  `rb18-counterexample-b` matrix without the new argument. Each moves the
+  certificate trace by exactly one, returns `reason == "uncertified"`, and
+  warns an estimate matched against `axes_certificate_worst()` recomputed
+  independently from `axes_accuracy_certificate(cov2cor(S), d)` in the test.
+- AC3 — same test: the estimate substring is extracted from all four warnings
+  (each surface with its own certificate, each surface given the shared
+  refusal) and `unique()` over the four is length one.
+- AC4 — `Rscript -e 'devtools::test()'`: 0 failed / 9185 passed / 5 warnings /
+  1 skip (the pre-existing lavaan-version fixture skip and the pre-existing
+  CPM/lavaan warnings, all on master too). `git status --short
+  tests/testthat/_snaps/` printed nothing.
+- AC5 — `Rscript -e 'devtools::check(args = "--no-manual")'`: Status OK,
+  0 errors / 0 warnings / 0 notes, 8m 14s.
+
+### Consistency gate
+
+- `cairn_validate.py` exit 0, all checks pass; 47 advisory work-log-format
+  warnings, all on M7, all pre-existing. `release window` did not fire.
+- No `DESIGN.md` principle changed, so `cairn_impact.py` was skipped.
+- Toolchain slot (`r-package`): `document()` produced no diff and zero
+  `resolve link` lines at `cli.width = 500`; `NAMESPACE`, `man/` and the
+  RcppExports pair unchanged. `pkgdown::check_pkgdown()` — no problems.
+  README.md is newer than README.Rmd and neither is touched. No NEWS entry is
+  owed: the change is behavior-preserving and both seam surfaces are internal
+  (`NAMESPACE` exports only `axes_reliability`). No new top-level files.
+  Master watches: newest push run reaching a verdict is `success` on both
+  `R-CMD-check.yaml` and `test-coverage.yaml` (head `bb0be478`).
+  `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` (5/5
+  synthetic payloads ok) and `tools/check-branch-protection.R` all exit clean.
+
+### Independent review (three fresh-context lenses, user-facing tier)
+
+[O] diff-bug, [S] blame-history, [S] prior-review, none having seen the
+implementation. The [O] lens verified behavior-preservation by execution, not
+by reading: a 13-matrix battery (clean, rescaled, ill-conditioned, negative /
+zero / infinite / NA / NaN diagonal, NA and Inf off-diagonal, exactly singular,
+indefinite) fired each surface with `refusal = NULL` and with the shared
+refusal, and return value and warning vector were `identical()` across all 26
+comparisons; end-to-end `axes_reliability()` on a clean p = 24 fit and on the
+M89-style injection was `identical()` with the seam live and with
+`axes_shared_refusal` mocked to NULL. The [S] blame lens cleared the M66 / M89
+/ M108 / M111 / M113 / M114 intent behind every touched line and the
+D-044 / D-048 / D-049 / D-051 / D-053 / D-054 family, and confirmed the raw
+arm's `naive_reason` decoupling and the guard-order precedence are untouched.
+The [S] prior-review lens found the diff implements M111 review finding F14
+rather than regressing anything; `gh api .../pulls/comments` returned `[]`, so
+no PR-thread surface was walked.
+
+Findings, ranked as reported, with disposition:
+
+- F1 [O] `refusal` is consumed with no check that it belongs to this matrix,
+  and the failure is silent and fail-open (`R/axes_corrected_se.R:352-356`,
+  `R/axes_scaled_fit.R:247-251`). Demonstrated: handing a clean matrix's
+  refusal to the degenerate `rb18-counterexample-b` matrix returns populated
+  corrected SEs and emits no warning at all; the reverse direction warns an
+  estimate from one matrix beside a condition number from the other, because
+  `axes_degeneracy_note()` mixes the passed refusal with the local matrix.
+  Unreachable through the exported API today — `axes_reliability()` is the only
+  caller and passes a matched pair. Disposition: TBD at gate.
+- F2 [O], echoed by [S] blame: `axes_shared_refusal()`'s header claims it
+  returns NULL whenever *either* surface's pre-seam doors would refuse and that
+  the guards mirror the callees "verbatim", but `axes_scaling_factor()`'s
+  `df_mismatch`, `baseline_df_mismatch` and `saturated` doors are not mirrored
+  (`R/axes_corrected_se.R:817-824` vs `R/axes_scaled_fit.R:174-185`). No
+  behavior consequence — those doors stay ahead of the seam — but the stated
+  contract is false as written. Disposition: TBD at gate.
+- F3 [O] the derivative set is built after the matrix guards in the helper and
+  before them in both callees, so a malformed derivative spec now aborts from
+  `axes_shared_refusal()` rather than from the callee: same condition,
+  different call context, and a second way the "verbatim mirror" claim fails.
+  Disposition: TBD at gate.
+- F4 [O] a third `axes_se_derivs()` build is constructed and discarded on every
+  call, including the common non-degenerate one. Measured at review on the
+  clean p = 24 fit (same machine and date as T1/T4): branch 0.042 s and 0.049 s
+  across two runs of 7 reps, master's code in the same tree 0.046 s — the
+  branch-vs-master gap sits inside this measurement's own run-to-run spread, so
+  no clean-fit regression is demonstrated. Disposition: TBD at gate.
+- F5 [O] `item_block` carries no `= NULL` default in the helper, unlike both
+  functions it mirrors, so the natural named-argument spelling errors and the
+  new test has to pass NULL positionally (`R/axes_corrected_se.R:826`).
+  Disposition: TBD at gate.
+- F6 [S] prior-review, surfaced as low-confidence: `axes_shared_refusal()` is a
+  third hand-copied instance of the door-guard sequence already duplicated
+  between the two surfaces, the divergence class M69 A1 and M71 F1 both hit.
+  The lens judged it an acknowledged tradeoff, not a reintroduced defect.
+  Disposition: TBD at gate.
+
+Return floor: no finding demonstrates an acceptance criterion failing, and F1
+— the only one with a wrong-number scenario — is unreachable through the
+exported API, so none returns the milestone to `in-progress`.
