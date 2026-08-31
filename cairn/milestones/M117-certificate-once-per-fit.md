@@ -70,7 +70,7 @@ seam.
 
 ## Tasks
 
-- [ ] T1: Measure the wall-clock cost of one `axes_reliability()` call on an
+- [x] T1: Measure the wall-clock cost of one `axes_reliability()` call on an
       ill-conditioned p = 24 fit before the change. Record the command, date,
       machine and figure in the work log.
 - [ ] T2: Add the optional pre-computed-refusal argument to
@@ -89,6 +89,9 @@ seam.
 - 2026-08-30: created by /milestone-plan.
 - 2026-08-30: plan gate chose an optional per-call pre-computed-refusal argument over memoizing inside `axes_degeneracy_refusal()` on a cache keyed by the matrix, because a cache would have to decide key identity for a floating-point matrix and would outlive the call; falsified by a second duplication appearing on a path that cannot thread an argument through.
 - 2026-08-30: criteria audit ran in **full** mode (user-facing tier), fresh-context [O] reader, two passes. First pass returned three findings — a goal sentence claiming the duplication departs from D-051's decision text when D-051 states a cost model rather than a call-count contract, a criterion binding a before-measurement that cannot be reproduced from the merged tree, and a criterion already green on the pre-change tree. Second pass over the post-gate wording returned three more — a wrong injection-site line reference, one probe standing for a family free in the `missing` path, and an unbounded promise over a warning text whose estimate is machine-dependent by design. All disposed before this file was written.
+
+- 2026-08-31: implement started; branch m117-certificate-once-per-fit. Question gate skipped — both seam surfaces are internal (`NAMESPACE` exports only `axes_reliability`), the plan gate settled the design, no tripwire tags; the two minor choices made here: the argument is named `refusal` (the `axes_degeneracy_refusal()` return, default `NULL` = compute it), and `axes_reliability()` builds it once inline at the seam.
+- 2026-08-31: T1 done — scratchpad script (M89 AC6 injection shape: p = 24 octant matrix, item 2 duplicated + 1e-9 ridge, mocked at `axes_fitted_cov`), 5 timed reps after warm-up via `system.time`, Apple M5 Pro / R 4.6.1, 2026-08-31: median 0.033 s per `axes_reliability()` call; one `axes_accuracy_certificate()` evaluation on that matrix: median 0.002 s.
 
 ## Decisions
 
