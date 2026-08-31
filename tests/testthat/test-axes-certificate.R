@@ -293,12 +293,21 @@ cert_ceiling <- 100
 
 # Both constants above are written against a package safety factor of 10, and
 # neither reads it -- deliberately, for the reason each comment gives. That
-# leaves the harness free to drift away from the package: raise
-# axes_certificate_safety_factor and cert_floor keeps certifying the old,
-# smaller floor while cert_ceiling keeps allowing the old, tighter
-# overstatement, and every assertion in this file stays green while both are
-# describing a certificate that no longer exists. This is the one assertion
-# that ties the two together (M118).
+# leaves the harness free to drift away from the package: move
+# axes_certificate_safety_factor and cert_floor keeps certifying the old floor
+# while cert_ceiling keeps allowing the old overstatement, both describing a
+# certificate that no longer exists. This is the one assertion that ties the
+# two together, and the only one that names the cause when they part (M118).
+#
+# The drift is not silent today, in either direction -- measured 2026-08-31 on
+# aarch64-apple-darwin23 by setting the package constant and re-running this
+# file. At 100 the per-case brackets and both closed-form oracle tests go red
+# as well (8 failures); at 2 the planted-perturbation test does (9 failures).
+# What every one of those reports is a bracket or an oracle missing its
+# expected value, with the moved constant nowhere in the message; this
+# assertion is what turns that into "the safety factor is not 10". It is also
+# the layer that survives a future site being added whose own bracket happens
+# to absorb the move.
 test_that("AC3: the harness's written-down safety factor is the package's", {
   expect_identical(axes_certificate_safety_factor, 10)
 })
@@ -890,16 +899,27 @@ test_that("the reference route lands on hand-derived exact values (closed-form o
   # What stood here before M116 was three expect_identical() checks against
   # these same fractions. They were deleted because bit-identity pinned every
   # measured error to exactly zero and so collapsed both bracket branches into
-  # themselves. A TOLERANCE avoids that: it admits the bit-level platform
-  # differences the brackets exist to price, while a real regression -- which
-  # moves these quantities by far more than a few units in the last place --
-  # reddens here.
+  # themselves. A TOLERANCE avoids that collapse -- the brackets below still
+  # run on their own measured error -- while a real regression, which moves
+  # these quantities by far more than a few units in the last place, reddens
+  # here.
   #
   # The tolerance is WRITTEN DOWN as `4 * 2^-53` (two units in the last place
-  # of a double) and deliberately NOT read from cert_floor or from
+  # at 1.0) and deliberately NOT read from cert_floor or from
   # axes_certificate_safety_factor: an expectation defined by the harness
   # constant it sits beside weakens whenever that constant is raised, which is
   # the failure M115 AC4 recorded for the floor itself.
+  #
+  # It is NOT, however, as wide as the brackets below. Measured 2026-08-31 on
+  # aarch64-apple-darwin23: this machine's shipped route is exact here (all
+  # three relative errors 0), so cert$se, cert$cval and cert$fiml_ratio are
+  # each identical() to cert_floor and all three cert_bracket() calls take the
+  # at-the-floor branch, whose live assertion is `true_rel <= cert_floor` =
+  # 4.4408921e-15. These pins redden at 4.4408921e-16 -- ten times tighter. A
+  # platform whose shipped route differs here by three to twenty ulp would
+  # pass the bracket, which prices that difference correctly, and fail these
+  # pins. Only this machine has been measured at this configuration; the size
+  # of the headroom these pins should carry is open (M118 review, [O] F1).
   expect_equal(hat$corrected, 97 / 128, tolerance = 4 * 2^-53)
   expect_equal(hat$naive, 2, tolerance = 4 * 2^-53)
   expect_equal(hat_u, 5 / 8, tolerance = 4 * 2^-53)

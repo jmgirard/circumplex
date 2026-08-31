@@ -58,21 +58,21 @@ and no external consumer of the package relies on any of it.
 
 ## Acceptance criteria
 
-- [ ] **AC1** — A run of `tests/testthat/test-axes-certificate.R` in which no
+- [x] **AC1** — A run of `tests/testthat/test-axes-certificate.R` in which no
       priced case is asserted fails. A test iterating the cases
       `cert_anchors()` enumerates, plus counterexample B, reads each case's
       recorded disposition and fails when the number priced is zero.
-- [ ] **AC2** — At the closed-form dyadic configuration,
+- [x] **AC2** — At the closed-form dyadic configuration,
       `test-axes-certificate.R` carries one assertion per shipped value —
       `axes_v_pricing()$corrected`, `axes_v_pricing()$naive` and
       `axes_u_pricing()` — against its hand-derived fraction (97/128, 2, 5/8)
       at a relative tolerance of `4 * 2^-53` written as a literal, and each of
       the three reddens when its own shipped value alone is perturbed by
       `8 * 2^-53` relative.
-- [ ] **AC3** — `test-axes-certificate.R` carries an assertion that
+- [x] **AC3** — `test-axes-certificate.R` carries an assertion that
       `axes_certificate_safety_factor` is identical to 10, and that assertion
       reddens when the constant is set to 100.
-- [ ] **AC4** — `Rscript -e 'devtools::test()'` clean (the profile's verify
+- [x] **AC4** — `Rscript -e 'devtools::test()'` clean (the profile's verify
       slot).
 
 ## Coverage
@@ -130,7 +130,121 @@ and no external consumer of the package relies on any of it.
 - 2026-08-31: all five tasks done; `Rscript -e 'devtools::test()'` clean (0 failures, 5 pre-existing lavaan warnings, 1 skip, 9198 passes). Status → review.
 - 2026-08-31: plan gate chose splitting the unfixed residue between DESIGN.md's Known fragilities and Accepted limitations over moving all of it to Accepted limitations and over leaving the row untouched, because the two headings already encode exactly the keeps-a-row / no-row distinction the residue splits on; falsified by an item under Accepted limitations later needing a row.
 - 2026-08-31: review opened; branch pushed and draft PR #149 created. Gate in progress — verify slot clean (0 failures, 9198 passes), `cairn_validate` exit 0, and the toolchain consistency-gate checks run so far all clean; AC discrimination proofs and the review fan-out still outstanding.
+- 2026-08-31: review gate — all four criteria met with fresh evidence, `cairn_validate` exit 0, the r-package consistency-gate slot clean (`check()` 0/0/0), and the three-lens fan-out returned ten findings, four fixed on the branch (two false comment claims, a ROADMAP shipped-status error, a DESIGN.md reachability overstatement) and six carried to the gate. No finding demonstrates a criterion failing, so status stays `review`.
 
 ## Decisions
 
 ## Review
+
+PR: https://github.com/jmgirard/circumplex/pull/149. Branch synced with
+`origin/master` (0 behind, 5 ahead) before any evidence was gathered.
+
+### Acceptance-criteria evidence
+
+- **AC1** — met. Forced the anchor-matrix precondition at
+  `test-axes-certificate.R:355` to mismatch for every case and ran
+  `test_local(filter = "axes-certificate")` 2026-08-31: six skips (a4, a5, c4,
+  b9a, b9b, cxb), and exactly one failure — the new
+  `AC1: at least one case was priced ...` test at `:583`, reporting
+  `0 <= 0` with each case's id and skip reason in its label. Unforced, the
+  same file is green with all six priced.
+- **AC2** — met. The file carries the three shipped-value assertions at the
+  closed-form dyadic configuration against 97/128, 2 and 5/8, each at a
+  literal `tolerance = 4 * 2^-53` (`test-axes-certificate.R:914-916` after the
+  review-side comment fix). Discrimination proved 2026-08-31 by three separate
+  runs, each perturbing one shipped value alone by a factor of
+  `1 + 8 * 2^-53`: each run produced exactly one failure, at that value's own
+  assertion line, the other two green.
+- **AC3** — met. `test-axes-certificate.R` asserts
+  `expect_identical(axes_certificate_safety_factor, 10)`. Discrimination
+  proved 2026-08-31 by setting the package constant at
+  `R/axes_certificate.R:430` to 100 and re-running the file: eight failures,
+  the new assertion among them and the only one naming the constant. The
+  review also ran the 2 direction (nine failures, same assertion among them);
+  the comment above the test overstated the silence in both directions and
+  was corrected review-side.
+- **AC4** — met. `Rscript -e 'devtools::test()'` 2026-08-31: `FAIL 0 | WARN 5 |
+  SKIP 1 | PASS 9198`, exit 0. Re-run after the review-side comment fixes with
+  the same counts and exit 0. The five warnings are pre-existing lavaan
+  marker-item notices in `test-ssm_sem.R`; the one skip is pre-existing and
+  outside the certificate file, which prices all six of its cases here.
+
+
+### Consistency gate
+
+Universal cairn-file checks: `cairn_validate.py` exit 0, every check PASS
+(`coverage complete` and `scaffold present` among them); 47 advisory warnings,
+all pre-existing M7 work-log line-wrapping. No `DESIGN.md` principle changed,
+so `cairn_impact.py` was not run. The `release window` advisory did not fire.
+
+Toolchain checks (the `r-package` profile's `consistency-gate` slot), all
+clean 2026-08-31: `document()` produced no diff and no `resolve link` line at
+`cli.width = 500`; no generated file hand-edited; README.md newer than
+README.Rmd; `pkgdown::check_pkgdown()` "No problems found"; `devtools::check()`
+0 errors, 0 warnings, 0 notes; no new top-level files, so no `.Rbuildignore`
+entry owed; no NEWS entry owed (internal tier, no user-visible change).
+Master watches: the newest push run reaching a verdict is `success` for both
+`R-CMD-check.yaml` and `test-coverage.yaml`. `tools/check-master-red-alert.R`,
+`tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all
+exit clean.
+
+### Independent review
+
+Three fresh-context reviewers, none having authored the implementation, each
+on a distinct evidence base. The `[S]` prior-review lens found prior-review
+evidence on the touched files (M111/M115/M116 archives) and reported no
+regression of it; the probe for GitHub inline review comments returned an
+empty array, so that surface was skipped. The `[S]` blame-history lens
+returned two findings, both also raised by the `[O]` diff lens. Ten findings
+in all, ranked by the `[O]` lens; each verified against the implementation
+rather than against the reviewer's account of it.
+
+- **F1 (fix-now, done).** The dyadic pins redden ten times tighter than the
+  only bracket assertion that runs beside them, and the comment claimed the
+  opposite. Verified: at that configuration this machine's shipped route is
+  exact, so all three certificate fields are `identical()` to `cert_floor` and
+  every `cert_bracket()` call takes the at-the-floor branch, asserting
+  `true_rel <= 4.4408921e-15`; the pins redden at `4.4408921e-16`. AC2 fixes
+  the literal, so the number itself is not changed here; the false claim was
+  corrected and the open headroom question recorded in the comment.
+- **F2 (fix-now, done).** The new AC3 comment said raising the safety factor
+  leaves every assertion in the file green. Falsified by running it: at 100,
+  eight failures; at 2, nine. Comment rewritten against both runs, keeping the
+  assertion's real justification — it is the only failure that names the
+  constant.
+- **F4 (fix-now, done).** The rewritten ROADMAP row claimed "2026-08-31 →
+  M116–M118 — all nine shipped". M118 is unmerged, and M116/M117 were planned
+  2026-08-30 (commit `8320367c`). Row corrected.
+- **F5 (fix-now, done).** `DESIGN.md`'s new Known-fragilities paragraph said
+  "none reachable today". The `cert_bracket()` at-the-floor branch is taken on
+  every run at the dyadic configuration (measured above), and the oracle
+  driver's missing-key case is reachable by a maintainer regeneration.
+  Narrowed to "none reachable by a passing test run today", with both
+  exceptions named.
+- **F3 (proposed: follow-up).** AC1 turns a legitimate all-skip platform from
+  a green-with-skips run into an `R CMD check` failure, and no record prices
+  that release risk. The trade is the milestone's stated Goal; the missing
+  record is not.
+- **F7 (proposed: follow-up).** The disposition vocabulary is an unpinned
+  string contract: moving `cert_record(id, "priced")` above the `cert_rel()`
+  calls, or a typo at either site, silently changes what the detector
+  distinguishes. The AC1 probe shows it discriminates today.
+- **F6 (proposed: reject).** The two new tests reuse the `AC1:`/`AC3:` name
+  prefixes an earlier milestone's criteria set already uses in this file.
+  Real reader friction, but a naming nitpick on a file whose prefixes were
+  already ambiguous before this diff.
+- **F8 (proposed: reject).** `4 * 2^-53` is two ulp only at 1.0 (about three
+  at 97/128), and `all.equal.numeric` scales by the object rather than the
+  expected value. Immaterial at these magnitudes; the ulp wording was
+  corrected as part of F1.
+- **F9 (proposed: reject).** The AC1 failure label repeats a 130-character
+  skip reason six times. The label's job is to name which cases skipped and
+  why, which it does.
+- **F10 (proposed: reject).** T5's work-log line records 21,943 bytes and a
+  2,316-character row against a current 21,938 / 2,343. The work log is
+  append-only history (IP4) and tracking records are exempt from the
+  derived-figures rule; the material claims hold.
+
+Return floor: no finding demonstrates an acceptance criterion failing, and
+none is a defect in what the package does for its users — the deliverable here
+is in-repo test discrimination. Status stays `review`.

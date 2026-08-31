@@ -78,8 +78,13 @@ flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
 corrected 2026-08-06.)
 
 Added 2026-08-31 (M118), sharing one ROADMAP row: six latent defects in the
-accuracy certificate's validation layers, none reachable today, each able to
-turn a real regression green once it is. In
+accuracy certificate's validation layers, none reachable by a passing test run
+today, each able to turn a real regression green once it is. (Two are latent in
+their misdiagnosis rather than in their branch: `cert_bracket()`'s at-the-floor
+branch is taken on every run at the closed-form dyadic configuration --
+measured 2026-08-31, where all three certificate fields sit exactly at the
+floor -- and the oracle driver's missing-key case is reachable by a maintainer
+regeneration, just not by a test.) In
 `tests/testthat/test-axes-certificate.R`, `cert_bracket()` selects its
 at-the-floor branch by `identical(est, cert_floor)`, a value coincidence rather
 than a statement about the fit; the measured side's component count is unpinned
