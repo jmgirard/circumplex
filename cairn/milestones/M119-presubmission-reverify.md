@@ -1,11 +1,11 @@
 # M119: Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m119-presubmission-reverify
 
 ## Goal
 

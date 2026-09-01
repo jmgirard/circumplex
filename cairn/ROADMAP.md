@@ -10,7 +10,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M119 | high | milestones/M7-v2-release-prep.md |
-| M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | planned | — | high | milestones/M119-presubmission-reverify.md |
+| M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | in-progress | — | high | milestones/M119-presubmission-reverify.md |
 | M118 | Close three ways the certificate suite can pass without checking | done | — | normal | milestones/archive/M118-certificate-suite-pass-without-checking.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |
 | M117 | Price the accuracy certificate once per checked fit | done | — | normal | milestones/archive/M117-certificate-once-per-fit.md |
