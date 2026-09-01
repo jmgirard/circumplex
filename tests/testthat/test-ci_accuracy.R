@@ -891,6 +891,7 @@ test_that("contrast print block reports displacement unconditionally (M15 snapsh
 # ---- plot method (spec sec. 7) --------------------------------------------------
 
 test_that("plot.circumplex_ci_accuracy builds a faceted coverage plot", {
+  skip_if_not_installed("vdiffr")
   skip_on_ci() # vdiffr snapshot is platform-dependent (fonts/rendering)
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1801)

@@ -329,6 +329,7 @@ test_that("the shared argument checks fire on the data frame method too", {
 # Rendered appearance ---------------------------------------------------------
 
 test_that("the trajectory-table plot renders as expected", {
+  skip_if_not_installed("vdiffr")
   # Secondary to the data-level assertions above: a passing baseline is a
   # rendering guard against unintended drift, never the fence for a behavioral
   # criterion (LESSONS M31). Unlike the occasions baselines these fixtures are

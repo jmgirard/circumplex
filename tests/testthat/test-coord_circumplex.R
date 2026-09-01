@@ -253,6 +253,7 @@ test_that("r_axis_angle overrides the automatic placement (T3)", {
 })
 
 test_that("the rim ring renders on an unround amax", {
+  skip_if_not_installed("vdiffr")
   # The rim ring is purely visual, so it gets the one plot guard the repo's
   # test doctrine allows (vdiffr where the plot is the product). No existing
   # baseline covers it: every vdiffr canvas in the suite uses amax 0.5, 0.6 or
@@ -371,6 +372,7 @@ test_that("the rim's blank label gets no plate (M39 T2)", {
 })
 
 test_that("an amplitude label over a dark mark stays legible (M39 T4)", {
+  skip_if_not_installed("vdiffr")
   # The defect M39 fixes is a CONTRAST failure, and no existing canvas baseline
   # could see it: every one of them draws the labels over empty panel. This
   # baseline puts a large dark marker and a heavy arrowhead exactly where the

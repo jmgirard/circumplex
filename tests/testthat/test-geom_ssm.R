@@ -228,6 +228,7 @@ test_that("na.rm = FALSE with no degenerate rows does not warn (T2)", {
 # --- visual regression --------------------------------------------------------
 
 test_that("a canvas-plus-geoms plot renders (visual regression)", {
+  skip_if_not_installed("vdiffr")
   skip_on_ci() # bootstrap CI positions are BLAS-sensitive (legacy lesson)
   data("jz2017")
   set.seed(12345)

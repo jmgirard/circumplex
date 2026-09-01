@@ -295,6 +295,7 @@ test_that("path = FALSE adds no path layer (AC5)", {
 # --- AC6: rendered appearance -------------------------------------------------
 
 test_that("the movement path renders as expected", {
+  skip_if_not_installed("vdiffr")
   # Secondary to the data-level assertions above: this is a rendering guard, not
   # the fence for any acceptance criterion. The M37 render-and-inspect pass is
   # what caught the defect a baseline cannot -- an arrowhead drawn underneath

@@ -271,6 +271,7 @@ test_that("Heywood communalities (>1) stay inside the canvas ring", {
 })
 
 test_that("plot is a stable visual and warns on unknown dots", {
+  skip_if_not_installed("vdiffr")
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz)
   vdiffr::expect_doppelganger("structure config plot", plot(res))

@@ -52,7 +52,7 @@ Surface tier: **user-facing** — the test edits ship inside the CRAN tarball, N
 - [x] **T1** — NEWS.md dependency bullet (`NEWS.md:249-251`) and cran-comments.md (the `Notes on dependencies` paragraph at `:87-88`, the summary-of-changes bullets at `:56` and the highlights list) corrected per AC1/AC2, each figure derived by the command the criterion names.
 - [ ] **T2** — CRAN-mode per-file timing profile before any edit: `withr::with_envvar(c(NOT_CRAN = "false"), testthat::test_local(reporter = "list"))`, time summed by file and by block for the three axes files; the ranked list in the work log (baseline: fiml ≈ 334 s, reliability ≈ 53 s, corrected-se ≈ 45 s, measured 2026-09-01; `test-axes-corrected-se.R:471` already carries one `skip_on_cran()`).
 - [ ] **T3** — Wrap the heaviest oracle / Monte-Carlo blocks from T2's list in `skip_on_cran()` until AC4's budget is met, choosing the one live block per input path first and planting-and-reverting its defect (AC6), then the AC5 off-CRAN run.
-- [ ] **T4** — `skip_if_not_installed("vdiffr")` at the 29 sites in 9 files (`grep -rn "expect_doppelganger" tests/testthat`); absent-library run via `callr::r()` with a library path lacking vdiffr, then the present-library positive control (AC7).
+- [x] **T4** — `skip_if_not_installed("vdiffr")` at the 29 sites in 9 files (`grep -rn "expect_doppelganger" tests/testthat`); absent-library run via `callr::r()` with a library path lacking vdiffr, then the present-library positive control (AC7).
 - [ ] **T5** — `devtools::check(manual = TRUE)` and the CRAN-mode `R CMD check --as-cran` on the tip; push; CI green on macOS, windows, ubuntu (AC3, AC4).
 
 ## Work log
@@ -65,6 +65,7 @@ Surface tier: **user-facing** — the test edits ship inside the CRAN tarball, N
 - 2026-09-01: plan gate chose leaving the all-skip detector unchanged over requiring a built anchor priced because the tightened form goes red on a libm that rounds one cosine differently; falsified by the five built anchors observed skipping together on any platform.
 - 2026-09-01: gate prompt flagged unclear by Jeff, captured verbatim: "i dont understand what youre asking here" (the detector question, posed in terms of anchors, fixtures and pricing); re-asked in plain words as a guard that at least one case ran, which cannot fail and cannot notice five silent skips; answered "Leave it alone".
 - 2026-09-01: T1 — `git diff v1.2.0..HEAD -- DESCRIPTION`: ggforce out; grid, parallel in; ggplot2 3.3.0→4.0.0; R 3.4→4.1; Imports count 8 at tip (was stated as seven, unchanged). Vignettes 9 at tip vs 3 at v1.2.0 → six new (was stated as five). NEWS bullet gains grid/parallel; cran-comments gains an `axes_reliability()` highlight naming the "Axes Reliability" vignette and a CAIS adult-sample withdrawal bullet.
+- 2026-09-01: T4 — `skip_if_not_installed("vdiffr")` inserted as the first line of the 17 `test_that()` blocks holding the 29 `expect_doppelganger()` sites (9 files). `callr::r()` with a symlinked library lacking vdiffr (`installed.packages()` confirms absent), `NOT_CRAN=true`, the 9 files: all 17 blocks skipped, 0 errors, 0 failures in the run; same run with the real library: all 17 passed (1–5 expectations each), 0 skipped, 0 failures.
 
 ## Decisions
 
