@@ -276,6 +276,7 @@ test_that("BC4: the corrected FIML SE calibrates over the committed fixture", {
 
 test_that("BC4: the shipped composition evaluates the ratio at Sigma-hat", {
   skip_if_not_installed("lavaan")
+  skip_on_cran()
   fx <- readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
   oct <- octants()
   seeds <- fx$provenance$seeds$mcar
@@ -385,6 +386,7 @@ test_that("BC5: the correction holds past mild missingness, at 15% MCAR and M1 M
 
 test_that("M66: stored cells reproduce live, so the fixture is not stale", {
   skip_if_not_installed("lavaan")
+  skip_on_cran()
   fx <- m66_cells()
   oct <- octants()
   items_of <- function(mat) split(colnames(mat), rep(1:8, each = 3))

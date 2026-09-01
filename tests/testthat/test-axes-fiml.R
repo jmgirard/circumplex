@@ -1019,10 +1019,12 @@ test_that("BC9: `sd = \"raw\"` is a hard error under FIML, not an NA", {
 # the T5 gate (2026-07-26): the structured FIML fit measures 18-68 s per fit
 # under realistic MAR missingness, so their replicate counts cost ~14 minutes
 # per suite run. These two cells are each a single fit and stay fully live --
-# nothing about them is read from a stored summary.
+# nothing about them is read from a stored summary -- on CI; each fit is ~20 s,
+# so both are skipped under CRAN's own check.
 
 test_that("BC14: FIML estimates a dataset listwise cannot touch", {
   skip_if_not_installed("lavaan")
+  skip_on_cran()
   # The headline. 15% per-item MCAR over 24 items leaves almost no complete
   # respondents -- listwise is not merely inefficient here, it has nothing left
   # to fit -- while FIML uses all 600. Seed 115 is RR12's pinned probe seed;
@@ -1059,6 +1061,7 @@ test_that("BC14: FIML estimates a dataset listwise cannot touch", {
 
 test_that("BC15: the five-component model is recovered under missingness", {
   skip_if_not_installed("lavaan")
+  skip_on_cran()
   # The zeta2 cell. A crossed block design (item j of every scale in block j) is
   # the layout that identifies block specificity, and this asks whether all four
   # estimated components survive 5% MCAR -- not just xi1, which the other cells
@@ -1131,9 +1134,11 @@ test_that("AC16: the FIML SE caveat prints beside the SEs, and only there", {
 # produces it. The last test here re-runs stored seeds live and requires them
 # to reproduce their stored values -- which is a far stronger check than a
 # statistical smoke, because it catches drift in the estimator AND in the
-# missingness mechanism at once. It carries no skip flag: this repo has four
-# times shipped a check that was green because it never ran (M7 --no-manual,
-# M16 skip_on_cran(), M31 vdiffr, M39 CI baseline).
+# missingness mechanism at once. It runs on every CI push (NOT_CRAN=true) and
+# is skipped only under CRAN's own check, where its 200 s of live refitting
+# put the suite over the check-time budget: this repo has four times shipped a
+# check that was green because it never ran (M7 --no-manual, M16
+# skip_on_cran(), M31 vdiffr, M39 CI baseline), so the CI run is the fence.
 
 heavy <- function() readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
 
@@ -1241,6 +1246,7 @@ test_that("BC12: the metric, not the estimator, is what moves xi1", {
 
 test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
   skip_if_not_installed("lavaan")
+  skip_on_cran()
   fx <- heavy()
   oct <- octants()
   items <- function(mat) split(colnames(mat), rep(1:8, each = 3))
