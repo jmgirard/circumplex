@@ -1,6 +1,6 @@
 # M119: Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -53,7 +53,7 @@ Surface tier: **user-facing** — the test edits ship inside the CRAN tarball, N
 - [x] **T2** — CRAN-mode per-file timing profile before any edit: `withr::with_envvar(c(NOT_CRAN = "false"), testthat::test_local(reporter = "list"))`, time summed by file and by block for the three axes files; the ranked list in the work log (baseline: fiml ≈ 334 s, reliability ≈ 53 s, corrected-se ≈ 45 s, measured 2026-09-01; `test-axes-corrected-se.R:471` already carries one `skip_on_cran()`).
 - [x] **T3** — Wrap the heaviest oracle / Monte-Carlo blocks from T2's list in `skip_on_cran()` until AC4's budget is met, choosing the one live block per input path first and planting-and-reverting its defect (AC6), then the AC5 off-CRAN run.
 - [x] **T4** — `skip_if_not_installed("vdiffr")` at the 29 sites in 9 files (`grep -rn "expect_doppelganger" tests/testthat`); absent-library run via `callr::r()` with a library path lacking vdiffr, then the present-library positive control (AC7).
-- [ ] **T5** — `devtools::check(manual = TRUE)` and the CRAN-mode `R CMD check --as-cran` on the tip; push; CI green on macOS, windows, ubuntu (AC3, AC4).
+- [x] **T5** — `devtools::check(manual = TRUE)` and the CRAN-mode `R CMD check --as-cran` on the tip; push; CI green on macOS, windows, ubuntu (AC3, AC4).
 
 ## Work log
 
@@ -71,6 +71,7 @@ Surface tier: **user-facing** — the test edits ship inside the CRAN tarball, N
 - 2026-09-01: T3 (part 2, AC5) — `NOT_CRAN=true` full `test_local(reporter = "list")` on the tip: 0 failures, 0 errors, 1 skipped block suite-wide; all six blocks that gained `skip_on_cran()` reported passed (M65-D3 49 expectations / 169 s, BC4 3, M66 5, BC14 7, BC15 5, BC6 2); suite 669 s summed real.
 - 2026-09-01: T5 (part 1, AC3) — `devtools::check(manual = TRUE)` on 604f81cf: Status OK, 0 errors / 0 warnings / 0 notes; `checking re-building of vignette outputs ... [39s/40s] OK`, `checking PDF version of manual ... OK`; tests `[10m/10m]` (that command sets `NOT_CRAN=true`, so the six new skips do not fire there).
 - 2026-09-01: T5 (part 2, AC4) — `R CMD build` then `R CMD check --as-cran --timings` on the tarball from 7edbe015 with `NOT_CRAN` unset, nothing else running: Status OK, 0 errors / 0 warnings / 0 notes; `checking tests ... [213s/214s]` (baseline 550 s on 28142f36); examples 11 s + donttest 23 s; testthat summary `FAIL 0 | WARN 4 | SKIP 149 | PASS 8123` (149 skips = the baseline's 143 + the six new).
+- 2026-09-01: T5 (part 3) — branch pushed; PR #150 opened as a draft because R-CMD-check runs on pull_request only; CI on 324e604b: macOS 16m30s pass, ubuntu 26m31s pass, windows 29m43s pass, pkgdown pass. All tasks done; status → review.
 
 ## Decisions
 
