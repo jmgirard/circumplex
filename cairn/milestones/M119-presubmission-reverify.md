@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m119-presubmission-reverify
+- **Branch/PR:** m119-presubmission-reverify · https://github.com/jmgirard/circumplex/pull/150 (draft, opened for CI)
 
 ## Goal
 
