@@ -683,7 +683,6 @@ test_that("cpm_simulate: G1 return contract (matrix, dims, names, numeric)", {
 })
 
 test_that("cpm_simulate: population covariance is exactly Phat (factor form)", {
-  skip_on_cran()
   # The generative covariance must equal matrices$Phat to machine precision:
   # rebuild Lambda Lambda^T + (I - D_zeta^2) independently from the reported
   # estimates and check it against Phat -- the contract that makes cor(X) -> Phat.
@@ -736,7 +735,6 @@ test_that("cpm_simulate: RNG contract -- reproducible and seed-sensitive", {
 })
 
 test_that("cpm_simulate: boundary -- angle at the 0/360 pole recovers Phat", {
-  skip_on_cran()
   # Generating angle exactly at the pole (LM at 360). The factor form is pure
   # trig, so the pole is not special; cor(X) must still track Phat.
   theta <- c(0, 45, 90, 135, 180, 225, 270, 360) * pi / 180

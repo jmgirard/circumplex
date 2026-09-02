@@ -1221,7 +1221,6 @@ axes_spaced_fixture <- function(angles, n = 1500L, k = 4L, xi1 = .20,
 }
 
 test_that("M60: a rotated equally spaced set estimates (Strack type b)", {
-  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Type b: eight scales at 45 deg spacing, rotated 22.5 deg off the axes
   # (strack2013 p. 2 -- weights +/-.38268 and +/-.92388).

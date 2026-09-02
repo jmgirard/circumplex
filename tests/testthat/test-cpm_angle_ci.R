@@ -48,7 +48,6 @@ test_that("CPM angle-CI transform matches a dumb circular-quantile oracle at the
 })
 
 test_that("cpm_fit() reports a pole-fixed reference angle and its CI as 360, not 0 (M20)", {
-  skip_on_cran()
   # A reference item whose theory angle is 360 sits deterministically on the
   # 0/360 pole: its fitted angle is fixed there in every bootstrap replicate,
   # so its degenerate angle CI denotes the pole exactly. Pre-M20 the row

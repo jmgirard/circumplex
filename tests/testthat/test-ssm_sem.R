@@ -486,7 +486,6 @@ test_that("ci_method = 'boot' refits per resample and agrees with mvn to Monte C
 # ssm_sem() end-to-end (spec sec. 7.2/7.3) ----------------------------------------
 
 test_that("ssm_sem() runs end-to-end on real data and matches the observed SSM direction (sec. 1.1)", {
-  skip_on_cran()
   skip_if_not_installed("lavaan")
   data("jz2017", envir = environment())
   scales <- names(jz2017)[2:9]
