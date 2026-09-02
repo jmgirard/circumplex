@@ -22,6 +22,11 @@
 # mid-patch would otherwise leave the defect in the tree, and the next run would
 # read the patched file as its "original". For the same reason the script
 # refuses to start on a dirty R/ or src/.
+#
+# The plant-run-restore loop lives inside run_defects() so that its on.exit()
+# actually fires: an on.exit() registered at script top level never runs at all,
+# not even on error (M120 review F3), which is why an error between the plant
+# and the restore used to leave the defect sitting in R/ or src/.
 
 PATCHES <- list(
   list(id = "ssm-magnitude", form = "magnitude", file = "src/parameters.cpp",
@@ -154,7 +159,6 @@ restore <- function(files) {
   if (system2("git", c("checkout", "--", files)) != 0L)
     stop("could not restore ", paste(files, collapse = ", "), call. = FALSE)
 }
-on.exit(restore(patched_files), add = TRUE)
 
 apply_patch <- function(p) {
   txt <- paste(readLines(p$file, warn = FALSE), collapse = "\n")
@@ -204,28 +208,38 @@ for (i in seq_len(nrow(spec))) {
 bad_control <- which(control != "pass")
 
 # --- each defect, against the blocks that must catch it ----------------------
-result <- vector("list", nrow(spec))
-all_pids <- trimws(unlist(strsplit(spec$patches, ";")))
-all_pids <- unique(all_pids[nzchar(all_pids)])
-for (pid in all_pids) {
-  p <- PATCH_BY_ID[[pid]]
-  if (is.null(p)) stop("unknown patch id '", pid, "' in ", spec_file, call. = FALSE)
-  rows <- which(vapply(strsplit(spec$patches, ";"),
-                       function(x) pid %in% trimws(x), logical(1)))
-  if (!length(rows)) next
-  apply_patch(p)
-  ok <- tryCatch({ pkgload::load_all(".", quiet = TRUE, compile = TRUE); TRUE },
-                 error = function(e) { message("load_all failed under ", pid, ": ",
-                                               conditionMessage(e)); FALSE })
-  cat(sprintf("\n== %s (%s) -- %s\n", p$id, p$form, p$note))
-  for (i in rows) {
-    st <- if (ok) run_block(spec$file[i], spec$test[i]) else "build-failed"
-    result[[i]] <- c(result[[i]], setNames(st, pid))
-    cat(sprintf("  %-12s %-34s %s\n", st, spec$file[i], spec$test[i]))
+# A function, not top-level code, so the on.exit() below fires however this
+# leaves -- an error inside a patched build included, which is the window where
+# a defect would otherwise be left behind in R/ or src/.
+run_defects <- function() {
+  on.exit({
+    restore(patched_files)
+    pkgload::load_all(".", quiet = TRUE, compile = TRUE)   # leave a clean build behind
+  }, add = TRUE)
+  result <- vector("list", nrow(spec))
+  all_pids <- trimws(unlist(strsplit(spec$patches, ";")))
+  all_pids <- unique(all_pids[nzchar(all_pids)])
+  for (pid in all_pids) {
+    p <- PATCH_BY_ID[[pid]]
+    if (is.null(p)) stop("unknown patch id '", pid, "' in ", spec_file, call. = FALSE)
+    rows <- which(vapply(strsplit(spec$patches, ";"),
+                         function(x) pid %in% trimws(x), logical(1)))
+    if (!length(rows)) next
+    apply_patch(p)
+    ok <- tryCatch({ pkgload::load_all(".", quiet = TRUE, compile = TRUE); TRUE },
+                   error = function(e) { message("load_all failed under ", pid, ": ",
+                                                 conditionMessage(e)); FALSE })
+    cat(sprintf("\n== %s (%s) -- %s\n", p$id, p$form, p$note))
+    for (i in rows) {
+      st <- if (ok) run_block(spec$file[i], spec$test[i]) else "build-failed"
+      result[[i]] <- c(result[[i]], setNames(st, pid))
+      cat(sprintf("  %-12s %-34s %s\n", st, spec$file[i], spec$test[i]))
+    }
+    restore(p$file)
   }
-  restore(p$file)
+  result
 }
-pkgload::load_all(".", quiet = TRUE, compile = TRUE)   # leave a clean build behind
+result <- run_defects()
 
 if (!is.na(probe_file)) {
   cat("\nprobe finished; nothing is asserted in probe mode\n")
