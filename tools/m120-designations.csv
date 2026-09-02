@@ -1,13 +1,34 @@
-fn,file,test,patches
-angle_unwrap,test-angle_unwrap.R,angle_unwrap unwraps a pole-crossing sequence (spec fixture),unwrap-wrap
-axes_reliability,test-axes-reliability.R,M60: a rotated equally spaced set estimates (Strack type b),axes-magnitude
-cpm_fit,test-cpm_oracles.R,published oracle: equal-communality rows (Table 2 model 2b),cpm-magnitude
-cpm_fit,test-cpm_angle_ci.R,"cpm_fit() reports a pole-fixed reference angle and its CI as 360, not 0 (M20)",cpm-pole
-cpm_simulate,test-cpm_api.R,cpm_simulate: population covariance is exactly Phat (factor form),cpm-magnitude
-ssm_analyze,test-pole-values.R,ssm_analyze reports the displacement that built the profile at the 0/360 pole,ssm-magnitude;ssm-wrap
-ssm_analyze_long,test-pole-values.R,ssm_analyze_long reports the displacement that built each occasion at the 0/360 pole,ssm-magnitude;ssm-wrap
-ssm_draws,test-pole-values.R,ssm_draws reports the displacement that built each profile draw at the 0/360 pole,ssm-magnitude;ssm-wrap
-ssm_parameters,test-pole-values.R,ssm_parameters reports the displacement that built the profile at the 0/360 pole,ssm-magnitude;ssm-wrap
-ssm_sem,test-pole-values.R,ssm_sem reports a latent displacement past the 0/360 pole,sem-magnitude;sem-wrap
-ssm_sem_parameters,test-pole-values.R,ssm_sem_parameters reports a latent displacement past the 0/360 pole,sem-magnitude;sem-wrap
-ssm_sem_syntax,test-ssm_sem_syntax.R,ssm_sem_syntax() returns a string carrying the weights attribute (§3.5),semweights-magnitude
+fn,disposition,file,test,patches
+angle_unwrap,satisfied,test-angle_unwrap.R,angle_unwrap unwraps a pole-crossing sequence (spec fixture),unwrap-wrap
+axes_reliability,satisfied,test-axes-reliability.R,M60: a rotated equally spaced set estimates (Strack type b),axes-magnitude
+cpm_fit,satisfied,test-cpm_oracles.R,published oracle: equal-communality rows (Table 2 model 2b),cpm-magnitude
+cpm_fit,satisfied,test-cpm_angle_ci.R,"cpm_fit() reports a pole-fixed reference angle and its CI as 360, not 0 (M20)",cpm-pole
+cpm_simulate,satisfied,test-cpm_api.R,cpm_simulate: population covariance is exactly Phat (factor form),cpm-magnitude
+ssm_analyze,satisfied,test-pole-values.R,ssm_analyze reports the displacement that built the profile at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_analyze_long,satisfied,test-pole-values.R,ssm_analyze_long reports the displacement that built each occasion at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_ci_accuracy,satisfied,test-ci_accuracy.R,"known-bad direction oracle: near-zero amplitude under-covers, misses below; scale-free rule controls c = 0 false-certification",coverage-magnitude
+ssm_draws,satisfied,test-pole-values.R,ssm_draws reports the displacement that built each profile draw at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_parameters,satisfied,test-pole-values.R,ssm_parameters reports the displacement that built the profile at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_sem,satisfied,test-pole-values.R,ssm_sem reports a latent displacement past the 0/360 pole,sem-magnitude;sem-wrap
+ssm_sem_parameters,satisfied,test-pole-values.R,ssm_sem_parameters reports a latent displacement past the 0/360 pole,sem-magnitude;sem-wrap
+ssm_sem_syntax,satisfied,test-ssm_sem_syntax.R,ssm_sem_syntax() returns a string carrying the weights attribute (§3.5),semweights-magnitude
+ssm_plot_circle,renderer,test-plot-cran-guards.R,ssm_plot_circle places each profile at its own displacement and amplitude,ssm-wrap
+ssm_plot_curve,renderer,test-plot-cran-guards.R,ssm_plot_curve draws each profile's cosine peaking at its displacement,ssm-wrap
+ssm_plot_contrast,renderer,test-plot-cran-guards.R,ssm_plot_contrast plots the contrast row the object reports,
+geom_ssm_path,covered,test-plot-cran-guards.R,geom_ssm_path draws its vertices on the short arc across the pole,ssm-magnitude
+coord_circumplex,covered,test-coord_circumplex.R,coord_circumplex() constructs a CoordRadial subclass,
+fit_structure,covered,test-fit_structure_api.R,an uncalibrated nv reports statistics but withholds interpretation,
+geom_ssm_arc,covered,test-geom_ssm_path.R,a path across the 0/360 seam travels the short arc (AC2),
+geom_ssm_point,covered,test-geom_ssm.R,supplying the retired amax/n geom arguments notes once and never errors,
+ggcircumplex,covered,test-coord_circumplex.R,the built canvas draws its amplitude axis off the due-East spoke (T3),
+instruments,covered,test-norms-audit-markers.R,an unclosed fence cannot hide a later block (M79),
+items,covered,test-axes-scaled-fit.R,"M106 review F11: the collinearity cut is the criterion's, not a flat 0.99",
+norm_standardize,covered,test-norms-anchor-range.R,"the withdrawn cais adult sample is absent, not present-and-refused",
+norms,covered,test-norms-disclosure.R,a multi-sample instrument's message says how many other samples exist,
+octants,covered,test-axes-certificate-refusal.R,"M114 AC1: a straddling certificate refuses at BOTH surfaces, whichever field is the bad one",
+PANO,covered,test-ci_accuracy.R,results are seed-reproducible and the caller RNG state is restored,
+scale_x_circumplex,covered,test-scale_circumplex.R,scale_x_circumplex() places breaks at the scale angles,
+score,covered,test-tidying_functions.R,score works,
+ssm_plot_trajectory,renderer,test-ssm_trajectory_table.R,each interval's drawn width equals its stored arc span,
+ssm_table,renderer,test-ssm_occasions.R,ssm_table renders occasion rows with occasion labels,
+theme_circumplex,covered,test-ssm_plot.R,theme_circumplex() is exported and validates base_size (T5),

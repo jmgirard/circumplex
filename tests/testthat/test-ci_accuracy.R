@@ -624,7 +624,6 @@ test_that("known-bad direction oracle: near-zero amplitude under-covers, misses 
   # over-certify a truly zero amplitude: unlike the superseded
   # round(a_lci, digits) > 0 rule (false-cert ~ 1.000), its c = 0 rate is small
   # and the Wilson-LCI Caution does not fire (directional oracle; D-007).
-  skip_on_cran()
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1101)
   dat <- as.data.frame(t(sapply(1:80, function(i) {

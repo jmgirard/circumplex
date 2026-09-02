@@ -84,9 +84,64 @@ args <- commandArgs(trailingOnly = TRUE)
 probe_file <- if ("--probe" %in% args) args[[which(args == "--probe") + 1L]] else NA_character_
 spec_file <- if (!is.na(probe_file)) probe_file else "tools/m120-designations.csv"
 if (!file.exists(spec_file)) stop("no spec file at ", spec_file, call. = FALSE)
-spec <- read.csv(spec_file, stringsAsFactors = FALSE)
+spec <- read.csv(spec_file, stringsAsFactors = FALSE, colClasses = "character")
 if (!nrow(spec)) stop(spec_file, " is empty -- refusing to pass vacuously.", call. = FALSE)
 stopifnot(all(c("fn", "file", "test", "patches") %in% names(spec)))
+
+# The two instruments must agree on the domain, or this one asserts about a set
+# it chose for itself. tools/m120-cran-coverage.R writes the domain; every
+# function in it needs a row here with a disposition, and every `satisfied` row
+# in the ssm_/cpm_/axes_ families needs at least one magnitude defect.
+if (is.na(probe_file)) {
+  if (!file.exists("tools/m120-domain.txt")) {
+    stop("tools/m120-domain.txt is missing. Run:\n",
+         "  Rscript tools/m120-cran-coverage.R\n",
+         "which computes the domain this script must cover.", call. = FALSE)
+  }
+  domain <- readLines("tools/m120-domain.txt")
+  domain <- domain[nzchar(domain)]
+  if (!length(domain)) stop("the domain file is empty -- nothing to check.", call. = FALSE)
+  if (!"disposition" %in% names(spec)) {
+    stop(spec_file, " needs a `disposition` column (satisfied / renderer / covered).",
+         call. = FALSE)
+  }
+  bad_disp <- setdiff(unique(spec$disposition), c("satisfied", "renderer", "covered"))
+  if (length(bad_disp)) {
+    stop("unknown disposition(s): ", paste(bad_disp, collapse = ", "), call. = FALSE)
+  }
+  absent <- setdiff(domain, spec$fn)
+  if (length(absent)) {
+    stop(length(absent), " function(s) in the domain have no row in ", spec_file, ":\n  - ",
+         paste(absent, collapse = "\n  - "), call. = FALSE)
+  }
+  stray <- setdiff(spec$fn, domain)
+  if (length(stray)) {
+    stop(length(stray), " row(s) in ", spec_file, " name a function outside the domain: ",
+         paste(stray, collapse = ", "), call. = FALSE)
+  }
+  fam <- grepl("^(ssm_|cpm_|axes_)", spec$fn)
+  need_mag <- unique(spec$fn[fam & spec$disposition == "satisfied"])
+  forms <- vapply(PATCHES, function(p) p$form, character(1))
+  mag_ids <- vapply(PATCHES, function(p) p$id, character(1))[forms == "magnitude"]
+  for (fn in need_mag) {
+    pats <- unlist(strsplit(spec$patches[spec$fn == fn], ";"))
+    if (!any(trimws(pats) %in% mag_ids)) {
+      stop("`", fn, "` is dispositioned satisfied but no row gives it a magnitude defect.",
+           call. = FALSE)
+    }
+  }
+  # AC4 (iii) names these by hand; each must carry a wrap defect.
+  POLE_FUNCTIONS <- c("angle_unwrap", "cpm_fit", "ssm_analyze", "ssm_draws",
+                      "ssm_parameters", "ssm_sem_parameters")
+  wrap_ids <- vapply(PATCHES, function(p) p$id, character(1))[forms == "wrap"]
+  for (fn in POLE_FUNCTIONS) {
+    pats <- trimws(unlist(strsplit(spec$patches[spec$fn == fn], ";")))
+    if (!any(pats %in% wrap_ids)) {
+      stop("`", fn, "` must carry a wrap defect on the angular path it uses.", call. = FALSE)
+    }
+  }
+  cat("domain:", length(domain), "functions, all present in", spec_file, "\n")
+}
 
 patched_files <- unique(vapply(PATCHES, function(p) p$file, character(1)))
 dirty <- system2("git", c("status", "--porcelain", "--", patched_files), stdout = TRUE)
@@ -150,12 +205,14 @@ bad_control <- which(control != "pass")
 
 # --- each defect, against the blocks that must catch it ----------------------
 result <- vector("list", nrow(spec))
-for (pid in unique(unlist(strsplit(spec$patches, ";")))) {
-  pid <- trimws(pid)
+all_pids <- trimws(unlist(strsplit(spec$patches, ";")))
+all_pids <- unique(all_pids[nzchar(all_pids)])
+for (pid in all_pids) {
   p <- PATCH_BY_ID[[pid]]
   if (is.null(p)) stop("unknown patch id '", pid, "' in ", spec_file, call. = FALSE)
   rows <- which(vapply(strsplit(spec$patches, ";"),
                        function(x) pid %in% trimws(x), logical(1)))
+  if (!length(rows)) next
   apply_patch(p)
   ok <- tryCatch({ pkgload::load_all(".", quiet = TRUE, compile = TRUE); TRUE },
                  error = function(e) { message("load_all failed under ", pid, ": ",
