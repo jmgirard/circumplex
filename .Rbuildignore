@@ -24,3 +24,4 @@
 ^Rplots\.pdf$
 ^tools$
 ^tests/testthat/_problems$
+^vignettes/.*\.Rmd\.orig$

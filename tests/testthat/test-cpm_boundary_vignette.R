@@ -4,9 +4,11 @@
 # vignette's own chunks rather than a re-typed copy of them: prose and example
 # cannot drift apart without a failure here.
 
+# The PROSE of the vignette, which survives pre-computation unchanged and so is
+# readable in every build: the source tree under devtools::test(), and inst/doc
+# under R CMD check, where R CMD build copies the shipped .Rmd. The guards that
+# only read prose stay live in both, which is where they are meant to bite.
 vignette_path <- function() {
-  # devtools::test() reads the source tree; R CMD check reads the built
-  # package, where R CMD build has copied the vignette source into inst/doc.
   candidates <- c(
     test_path("..", "..", "vignettes", "evaluating-circumplex-structure.Rmd"),
     system.file("doc", "evaluating-circumplex-structure.Rmd",
@@ -14,14 +16,29 @@ vignette_path <- function() {
   )
   hit <- candidates[nzchar(candidates) & file.exists(candidates)]
   # Some builds install the package without vignettes -- covr does, which is
-  # why these guards skipped rather than errored there. They run under
-  # devtools::test() (source tree) and under R CMD check (inst/doc), which is
-  # where they are meant to bite.
+  # why these guards skipped rather than errored there.
   skip_if(
     length(hit) == 0L,
     "vignette source unavailable in this build (installed without vignettes)"
   )
   hit[[1]]
+}
+
+# The CHUNK SOURCE, which the shipped .Rmd no longer carries: the vignettes are
+# pre-computed, so vignettes/<name>.Rmd holds rendered output and the labelled
+# chunks live only in the .Rmd.orig that tools/precompute-vignettes.R renders
+# from. That file is .Rbuildignore'd, so it exists in the source tree alone --
+# hence skip_on_cran() rather than a silent absence check: off CRAN the source
+# tree IS present, and a missing source there is a repo defect, not a skip.
+vignette_source_path <- function() {
+  skip_on_cran()
+  p <- test_path("..", "..", "vignettes",
+                 "evaluating-circumplex-structure.Rmd.orig")
+  skip_if(
+    !file.exists(p),
+    "vignette .Rmd.orig source unavailable (not a source-tree run)"
+  )
+  p
 }
 
 boundary_heading <- "### When a fit sits at a boundary"
@@ -44,7 +61,7 @@ boundary_section_text <- function(lines = readLines(vignette_path(), warn = FALS
 # Source of one labelled chunk, so a test can evaluate exactly what the reader
 # sees rather than a paraphrase of it.
 vignette_chunk <- function(label,
-                           lines = readLines(vignette_path(), warn = FALSE)) {
+                           lines = readLines(vignette_source_path(), warn = FALSE)) {
   opens <- grep("^```\\{r[ ,}]", lines)
   labels <- sub("^```\\{r[ ,]*", "", sub("[,}].*$", "", lines[opens]))
   hit <- opens[trimws(labels) == label]

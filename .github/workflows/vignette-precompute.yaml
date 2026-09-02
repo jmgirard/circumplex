@@ -1,0 +1,89 @@
+# The vignettes ship pre-computed: vignettes/<name>.Rmd.orig holds the source,
+# and the vignettes/<name>.Rmd that R CMD build sees already carries its output,
+# so re-building a vignette costs no model fits. That makes the shipped .Rmd a
+# generated file, and a generated file that nothing regenerates goes stale
+# silently — the prose would keep describing output the code no longer produces.
+#
+# This job regenerates them from source and fails if the committed copies
+# differ. Re-render locally and commit the result:
+#
+#     Rscript tools/precompute-vignettes.R
+#
+# Only the .Rmd files are compared. The figures under vignettes/figures/ are
+# PNGs whose bytes depend on the graphics device, so they are not reproducible
+# across machines and diffing them would fail on every run.
+#
+# `cairn/**` is ignored: tracking-only commits cannot change a vignette.
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - 'cairn/**'
+  pull_request:
+    branches: [main, master]
+    paths-ignore:
+      - 'cairn/**'
+  workflow_dispatch:
+
+name: vignette-precompute.yaml
+
+permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vignette-precompute:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Check CI dependency allowlists
+        run: Rscript tools/check-ci-deps.R
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          # Same allowlist discipline as the other three workflows: a Suggest
+          # missing here is never installed, its vignette chunks skip, and the
+          # re-render would then match a committed copy built from LESS output
+          # than the source asks for. tools/check-ci-deps.R enforces the mirror.
+          # brms alone is excluded — the Bayesian vignette's brm() chunk is
+          # eval = FALSE against a committed .rds fixture (cairn D-015), and
+          # that vignette is not pre-computed anyway.
+          dependencies: '"hard"'
+          extra-packages: |
+            local::.
+            any::covr
+            any::ggrepel
+            any::glmmTMB
+            any::kableExtra
+            any::knitr
+            any::lavaan
+            any::OpenMx
+            any::psych
+            any::RColorBrewer
+            any::rmarkdown
+            any::roxygen2
+            any::testthat
+            any::vdiffr
+
+      - name: Re-render the pre-computed vignettes
+        run: Rscript tools/precompute-vignettes.R
+
+      - name: Fail if a committed vignette is stale
+        run: |
+          if ! git diff --exit-code -- 'vignettes/*.Rmd'; then
+            echo "::error::A pre-computed vignette no longer matches its .Rmd.orig source."
+            echo "Run 'Rscript tools/precompute-vignettes.R' and commit the result."
+            exit 1
+          fi
+          echo "All pre-computed vignettes are up to date with their sources."

@@ -7,10 +7,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  out.width = "100%"
+)
+set.seed(12345)
+library(ggplot2)
+```
 
-
-
-``` r
+```{r setup}
 library(circumplex)
 ```
 
@@ -50,32 +59,23 @@ This vignette works through each of these and then combines them.
 backdrop, with no data drawn on it yet. By default it uses octant scales
 labeled by their angular position in degrees:
 
-
-``` r
+```{r canvas-default}
 ggcircumplex()
 ```
-
-<img src="figures/advanced-visualization-canvas-default-1.png" alt="" width="100%" />
 
 You can label the scales however you like. Passing a character vector labels the
 spokes in the order of the angles:
 
-
-``` r
+```{r canvas-labels}
 ggcircumplex(octants(), labels = PANO())
 ```
-
-<img src="figures/advanced-visualization-canvas-labels-1.png" alt="" width="100%" />
 
 The labels need not be abbreviations. The octant scales also have full
 interpersonal names, which you can put on the spokes instead:
 
-
-``` r
+```{r canvas-descriptive}
 ggcircumplex(octants(), labels = csip$Scales$Label)
 ```
-
-<img src="figures/advanced-visualization-canvas-descriptive-1.png" alt="" width="100%" />
 
 If you are working with one of the instruments bundled with the package, you can
 pass it directly with `ggcircumplex(instrument = csip)`, and its scale angles and
@@ -92,17 +92,13 @@ circumplex plot circular is `coord_circumplex()`, and you can add that to a bare
 coordinate system you supply three things: an x-scale carrying the spoke breaks
 and labels, a data layer, and the theme.
 
-
-``` r
+```{r coord-built}
 results <- ssm_analyze(
   jz2017,
   scales = PANO(),
   measures = c("NARPD", "ASPD")
 )
 subset(results$results, select = c(Label, a_est, d_est, a_lci, a_uci))
-#>   Label    a_est    d_est     a_lci     a_uci
-#> 1 NARPD 0.189244 108.9667 0.1537900 0.2271848
-#> 2  ASPD 0.226159 115.9267 0.1905403 0.2640428
 
 ggplot(results$results) +
   coord_circumplex(amax = 0.3) +
@@ -110,8 +106,6 @@ ggplot(results$results) +
   geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
   theme_circumplex()
 ```
-
-<img src="figures/advanced-visualization-coord-built-1.png" alt="" width="100%" />
 
 The `scale_x_continuous()` line is the one that tells the coordinate system
 where the scale angles are; without it the spokes would fall on `ggplot2`'s
@@ -135,16 +129,13 @@ scales." The `center` argument moves that inner limit, which is useful when
 every profile sits in a narrow band of amplitudes and the interesting variation
 is squeezed against the rim:
 
-
-``` r
+```{r coord-center}
 ggplot(results$results) +
   coord_circumplex(amax = 0.28, center = 0.15) +
   scale_x_continuous(breaks = octants(), labels = PANO()) +
   geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
   theme_circumplex()
 ```
-
-<img src="figures/advanced-visualization-coord-center-1.png" alt="" width="100%" />
 
 This is a zoom, and it changes how the figure should be read. With a nonzero
 center, radial distance is no longer proportional to amplitude and the origin no
@@ -160,16 +151,13 @@ widest gap between the displacement spokes, so they never collide with a spoke
 label. You can override that with `r_axis_angle`, given as a displacement in
 degrees:
 
-
-``` r
+```{r coord-r-axis}
 ggplot(results$results) +
   coord_circumplex(amax = 0.3, r_axis_angle = 67.5) +
   scale_x_continuous(breaks = octants(), labels = PANO()) +
   geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
   theme_circumplex()
 ```
-
-<img src="figures/advanced-visualization-coord-r-axis-1.png" alt="" width="100%" />
 
 Note that these examples build the canvas from its parts --- the coordinate
 system, an x-scale carrying the spoke breaks and labels, and the theme --- rather
@@ -188,8 +176,7 @@ interval angularly. Both take the SSM parameters directly as aesthetics and
 handle the conversion into circular coordinates internally, including
 wrap-around when a displacement interval crosses the 0/360 degree boundary.
 
-
-``` r
+```{r results-plot}
 ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   geom_ssm_arc(
     data = results$results,
@@ -205,8 +192,6 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
     mapping = aes(amplitude = a_est, displacement = d_est, fill = Label)
   )
 ```
-
-<img src="figures/advanced-visualization-results-plot-1.png" alt="" width="100%" />
 
 Each arc displays two separate confidence intervals for one profile at once:
 its radial extent is the amplitude interval and its angular extent is the
@@ -227,8 +212,7 @@ spokes, and labels are themed panel furniture rather than drawn geometry, any
 further theming reaches them. Adjust the base font size through the theme, and
 restyle the gridlines with an ordinary `theme()` call:
 
-
-``` r
+```{r theming}
 ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   geom_ssm_point(
     data = results$results,
@@ -241,8 +225,6 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   )
 ```
 
-<img src="figures/advanced-visualization-theming-1.png" alt="" width="100%" />
-
 ## Composing custom layers
 
 Because the canvas and geoms are ordinary `ggplot2` objects, you can add
@@ -251,8 +233,7 @@ fall relative to a summary. We can compute each person's own amplitude and
 displacement with `ssm_score()` and draw them as a faint cloud behind a
 group-level point.
 
-
-``` r
+```{r individuals, warning = FALSE}
 # Per-person SSM parameters for a subset of the sample. A respondent whose
 # scores are flat has no displacement and is returned as NA (with a warning),
 # so we keep only the well-defined profiles.
@@ -268,8 +249,6 @@ group <- ssm_analyze(jz2017[1:100, ], scales = PANO())
 
 # The group amplitude is shorter than a typical individual amplitude
 c(group = group$results$a_est, median_individual = median(people$Ampl))
-#>             group median_individual 
-#>         0.3651863         0.5189425
 
 ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
   geom_ssm_point(
@@ -283,8 +262,6 @@ ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
     fill = "#0072B2", size = 4
   )
 ```
-
-<img src="figures/advanced-visualization-individuals-1.png" alt="" width="100%" />
 
 The individual points spread widely around the circle while the group summary
 sits close to the origin, a picture that none of the built-in functions produce
@@ -313,10 +290,27 @@ The data frame has one row per person per wave, the eight `PANO()` scale
 columns, an `id`, and a `wave` label.) We estimate one profile per wave with
 `ssm_analyze_long()`:
 
+```{r occasions-data-sim, echo = FALSE}
+# Simulation machinery, hidden: each wave is the group cosine signal at a known
+# displacement, plus a stable per-person offset and fresh noise.
+angles <- octants()
+n <- 200
+waves <- c(T1 = 330, T2 = 355, T3 = 20)
+elevation <- rnorm(n) * 0.5
+make_wave <- function(w) {
+  signal <- 0.6 * cos((angles - waves[[w]]) * pi / 180)
+  scores <- matrix(signal, n, length(angles), byrow = TRUE) +
+    elevation + matrix(rnorm(n * length(angles), sd = 0.5), n)
+  out <- as.data.frame(scores)
+  names(out) <- PANO()
+  out$id <- seq_len(n)
+  out$wave <- w
+  out
+}
+long <- rbind(make_wave("T1"), make_wave("T2"), make_wave("T3"))
+```
 
-
-
-``` r
+```{r occasions-data}
 results_long <- ssm_analyze_long(
   long,
   scales = PANO(),
@@ -324,18 +318,11 @@ results_long <- ssm_analyze_long(
   occasion = "wave"
 )
 subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
-#>   Occasion     a_est     d_est     d_lci     d_uci
-#> 1       T1 0.6133765 332.44652 329.70848 335.43024
-#> 2       T2 0.5879017 355.92454 352.64902 359.30751
-#> 3       T3 0.5907495  17.84307  14.57562  21.11586
 ```
 
-
-``` r
+```{r occasions-plot, fig.height = 6}
 ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
-
-<img src="figures/advanced-visualization-occasions-plot-1.png" alt="" width="100%" />
 
 Two things about the displacement panel are worth reading carefully. First, it
 is drawn on an *unwrapped* branch: the profile crosses the 0/360 boundary
@@ -379,8 +366,7 @@ amplitude and displacement of a single occasion are split across two panels.
 `geom_ssm_path()` draws the same series as a path on the circular canvas, so a
 change in (amplitude, displacement) reads as movement through circumplex space.
 
-
-``` r
+```{r occasions-path}
 ggcircumplex(octants(), amax = 0.8) +
   geom_ssm_point(
     data = results_long$results,
@@ -396,8 +382,6 @@ ggcircumplex(octants(), amax = 0.8) +
     linewidth = 0.7
   )
 ```
-
-<img src="figures/advanced-visualization-occasions-path-1.png" alt="" width="100%" />
 
 The arrowhead marks the direction of time. Note what the layer does at the
 boundary: this profile moves from 330 to 355 to 20 degrees, and the step from
@@ -415,12 +399,9 @@ silently reverses time. The wrapper below does that sorting for you.
 The same figure is available ready-made from `ssm_plot_circle()`, which adds the
 path to its usual points and confidence wedges:
 
-
-``` r
+```{r occasions-path-wrapper}
 ssm_plot_circle(results_long, path = TRUE)
 ```
-
-<img src="figures/advanced-visualization-occasions-path-wrapper-1.png" alt="" width="100%" />
 
 An occasion whose displacement is undefined --- a flat or zero-amplitude profile
 --- *breaks* the path rather than being interpolated through, and the segment
@@ -435,8 +416,7 @@ Not every circumplex figure is circular. The score-by-angle curve drawn by
 by default with the angle in degrees, or with custom labels or an instrument's
 abbreviations.
 
-
-``` r
+```{r curve-axis}
 angles <- octants()
 curve <- data.frame(
   angle = angles,
@@ -450,8 +430,6 @@ ggplot(curve, aes(x = angle, y = score)) +
   labs(x = "Scale", y = "Score") +
   theme_bw()
 ```
-
-<img src="figures/advanced-visualization-curve-axis-1.png" alt="" width="100%" />
 
 Passing the same `labels` (or the same `instrument`) to both `ggcircumplex()`
 and `scale_x_circumplex()` guarantees that a circular figure and a linear one

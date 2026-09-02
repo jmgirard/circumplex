@@ -7,14 +7,26 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+# This vignette uses lavaan, which circumplex only Suggests. The chunks that
+# fit the model are gated on lavaan being installed so the vignette still
+# builds without it; chunks that need no lavaan carry an explicit eval = TRUE.
+has_lavaan <- requireNamespace("lavaan", quietly = TRUE)
+knitr::opts_chunk$set(eval = has_lavaan)
+```
 
-
-
-``` r
+```{r setup, eval = TRUE}
 library(circumplex)
 ```
 
-
+```{r lavaan-note, eval = !has_lavaan, echo = FALSE, results = "asis"}
+cat(
+  "**Note:** The `lavaan` package is not installed, so the analysis below",
+  "is not evaluated. Install it with `install.packages(\"lavaan\")` to run",
+  "this vignette."
+)
+```
 
 ## 1. What is axis reliability?
 
@@ -54,39 +66,14 @@ error) that implies an axis reliability of about .78.
 and the scales' angles. The map is a list with one character vector of item
 names per scale, in the same angle order as the angles you pass:
 
-
-``` r
+```{r map}
 data("simulated_items")
 
 # Four items per octant scale, in octants() order (PA, BC, DE, ..., NO).
 items <- split(names(simulated_items), rep(1:8, each = 4))
 
 res <- axes_reliability(simulated_items, items = items, angles = octants())
-#> axes_reliability(): 500 complete case(s) used.
 res
-#> 
-#> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
-#> Input:        item data
-#> Items:        32 (8 scales)
-#> Complete N:   500
-#> SEm scale:    std
-#> 
-#> # Per-axis reliability
-#> 
-#>  Axis item_n Reliability SEm   NB_Reliability
-#>  X    16     0.773       0.476 0.822         
-#>  Y    16     0.773       0.476 0.823         
-#> 
-#>   Note: the two axes share one axes-variance estimate and, with equal
-#>   items per axis, carry the same reliability -- expected, not an error.
-#> 
-#>   Note: the model is fit to the item correlation matrix as if it were a
-#>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
-#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
-#>   own, by design.
-#>   The component standard errors are adjusted to the correlation metric
-#>   and are calibrated; they are typically smaller than the values printed
-#>   by Strack et al. (2013), whose LISREL output carries no correction.
 ```
 
 If your items belong to one of the package's built-in instruments, you can pass
@@ -110,52 +97,8 @@ population value of .18.
 
 `summary()` adds the estimated variance components and the model's global fit:
 
-
-``` r
+```{r summary}
 summary(res)
-#> 
-#> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
-#> Input:        item data
-#> Items:        32 (8 scales)
-#> Complete N:   500
-#> SEm scale:    std
-#> 
-#> # Per-axis reliability
-#> 
-#>  Axis item_n Reliability SEm   NB_Reliability
-#>  X    16     0.773       0.476 0.822         
-#>  Y    16     0.773       0.476 0.823         
-#> 
-#>   Note: the two axes share one axes-variance estimate and, with equal
-#>   items per axis, carry the same reliability -- expected, not an error.
-#> 
-#>   Note: the model is fit to the item correlation matrix as if it were a
-#>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
-#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
-#>   own, by design.
-#>   The component standard errors are adjusted to the correlation metric
-#>   and are calibrated; they are typically smaller than the values printed
-#>   by Strack et al. (2013), whose LISREL output carries no correction.
-#> 
-#> # Variance components
-#> 
-#>  Component         Estimate SE   
-#>  general           0.051    0.005
-#>  axes              0.175    0.009
-#>  scale_specificity 0.093    0.008
-#>  item              0.680    --   
-#> 
-#> # Global fit
-#> 
-#>   chi-square(493) = 488.27,  RMSEA = 0.000,  CFI = 1.000
-#> 
-#>   The global fit statistics chisq, pvalue, rmsea and cfi are scaled to
-#>   that metric (Satorra & Bentler, 1994), which removes a distortion that
-#>   flatters fit; df and srmr are unchanged. The scaled test can modestly
-#>   over-reject at typical sample sizes -- it over-flags misfit rather than
-#>   flattering it; see ?axes_reliability for the measured rates.
-#>   They follow lavaan's *.scaled definitions, not its *.robust ones, and
-#>   differ from what fitMeasures() reports for an equivalent ML fit.
 ```
 
 The **variance components** show the decomposition the reliability rests on:
@@ -175,39 +118,11 @@ You do not always have the raw data. A paper may print an item correlation
 matrix and nothing else, and that matrix is enough: pass it as `cormat` together
 with the sample size it was computed from, in place of `data`.
 
-
-``` r
+```{r cormat}
 R <- cor(simulated_items)
 axes_reliability(
   cormat = R, items = items, angles = octants(), n = nrow(simulated_items)
 )
-#> 
-#> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
-#> Input:        correlation matrix
-#> Items:        32 (8 scales)
-#> Sample N:     500
-#> SEm scale:    std
-#> 
-#> # Per-axis reliability
-#> 
-#>  Axis item_n Reliability SEm   NB_Reliability
-#>  X    16     0.773       0.476 --            
-#>  Y    16     0.773       0.476 --            
-#> 
-#>   Note: the two axes share one axes-variance estimate and, with equal
-#>   items per axis, carry the same reliability -- expected, not an error.
-#> 
-#>   Note: the Nunnally-Bernstein comparison needs the raw item scores
-#>   (scale alphas and the axis-composite variance), so it is NA on the
-#>   correlation-matrix path.
-#> 
-#>   Note: the model is fit to the item correlation matrix as if it were a
-#>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
-#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
-#>   own, by design.
-#>   The component standard errors are adjusted to the correlation metric
-#>   and are calibrated; they are typically smaller than the values printed
-#>   by Strack et al. (2013), whose LISREL output carries no correction.
 ```
 
 The estimates are identical to the raw-data run above — the raw-data path builds
