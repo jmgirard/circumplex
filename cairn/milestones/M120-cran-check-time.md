@@ -365,3 +365,38 @@ the package does for its users — the `R/` diff is roxygen only and `src/` is
 untouched, so nothing users run changes behavior. G4 and G5 narrow what CRAN's
 own check exercises, which is the milestone's planned trade and is bounded by
 AC4 as written; the never-reinterpret rule keeps AC4 at its wording. No return.
+
+### Fix-now work directed at the gate
+
+Jeff triaged at the approval gate: fix G1–G3 on the branch, then merge; file
+candidate rows for G4 and for G5+G6. G7 stands recorded, G8 rejected.
+
+- **G1 fixed.** `cran-comments.md` now states 1 minute 47 seconds total, tests
+  23 seconds, vignette re-build 6 seconds, and adds that win-builder R-devel
+  completed the same tarball in under 5 minutes.
+- **G2 fixed.** The `cpm` and `variants` chunks of
+  `evaluating-circumplex-structure.Rmd.orig` now declare
+  `precompute:volatile-numbers` regions, each naming the ill-conditioned fit as
+  the reason. Re-rendered. The guard reads all seven up to date with **3 masked
+  regions over 235 output lines** (was 1 region / 162). **Cost, recorded
+  deliberately:** a region is chunk-granular, so the `variants` region also
+  masks that chunk's fit-index table (`rmsea` / `srmr` / `cfi` / `tli`) — a
+  drift in those digits would no longer redden the guard. This widens the
+  blind spot G5 already names, and is the trade for closing the false-STALE
+  mechanism that returned this milestone once.
+- **G3 fixed.** The unused `built_layers()` helper is gone from
+  `test-plot-cran-guards.R`; nothing referenced it.
+
+Re-derived after the three fixes, on the branch tip:
+
+- The re-render changed exactly **one** line of shipped content beyond the
+  markers — `ssm_ci_accuracy()`'s wall-clock `Elapsed:` figure. Every printed
+  number reproduced identically on this machine.
+- Full suite off CRAN: **0 failures / 9244 passes / 1 skip / 9 warnings** (the
+  pre-existing zero-variance and lavaan-marker ones).
+- AC5's parity instrument, exit 0: all seven still match their sources
+  (1114 / 579 / 386 / 711 / 389 / 349 / 452 source lines), every shipped figure
+  still carries alt text.
+- AC1 re-measured on a tarball built from the fixed branch: **tests 17 s**
+  (budget 25), **vignette re-build 5 s** (budget 10), **total 94 s** (budget
+  120), `Status: OK` — more headroom than the pre-fix runs, not less.
