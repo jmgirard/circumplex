@@ -10,7 +10,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M119, M120 | high | milestones/M7-v2-release-prep.md |
-| M120 | Bring the Windows CRAN check under 8 minutes | in-progress | — | high | milestones/M120-cran-check-time.md |
+| M120 | Bring the Windows CRAN check under 8 minutes | blocked | — | high | milestones/M120-cran-check-time.md |
 | M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | done | — | high | milestones/archive/M119-presubmission-reverify.md |
 | M118 | Close three ways the certificate suite can pass without checking | done | — | normal | milestones/archive/M118-certificate-suite-pass-without-checking.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |

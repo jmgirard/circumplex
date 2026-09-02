@@ -1,6 +1,6 @@
 # M120: Bring the Windows CRAN check under 8 minutes
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -122,7 +122,7 @@ bar travels with them).
       `devtools::document()`: `ssm_analyze` (3 un-gated calls + 5 under
       `\donttest`), `ssm_plot_circle`, `ssm_table`, `ssm_plot_curve`,
       `ssm_plot_contrast`, `ssm_plot_trajectory`, `ssm_analyze_long`.
-- [ ] **T6** — Re-measure locally (AC1); `devtools::check(manual = TRUE)`;
+- [x] **T6** — Re-measure locally (AC1); `devtools::check(manual = TRUE)`;
       refresh `cran-comments.md` where its figures move.
 - [ ] **T7** — win-builder R-devel run on the branch tarball; record the
       overall time and the four line items (Jeff runs it; results reach only
@@ -146,6 +146,8 @@ bar travels with them).
 - 2026-09-02: AMENDMENT to AC4, at Jeff's selection over a first-audited loosening he had chosen an hour earlier. Two fresh-context [O] readers audited the wording; the second rejected the loosening and its counter-proposal is what is now written. Grounds, all measured by planting real defects: the repo's 0/360 boundary blocks assert relational properties (the interval wraps, it contains the estimate) that survive a uniform branch shift, so they stay GREEN under a displacement left on atan2's branch — only 8 live blocks anywhere catch it, all core-estimator tests that pin a number; the loosened wording would have been signed off by those incidental catches while `ssm_plot_circle`'s CRAN-visible coverage is `is_ggplot()` (its vdiffr expectations skip on CRAN); and the loosening needed both instruments rewritten anyway, so it was not the cheaper route. One mechanical correction to the reader's text: it asked each pole block to fail under both wrap defects, which no single block can, since the SSM branch defect and the CPM pole defect sit on different paths — scoped to the path each function uses.
 - 2026-09-02: T4 — AC4 satisfied over all 32 domain functions. `tools/m120-cran-coverage.R` now computes the domain as the union of the newly-CRAN-skipped blocks and the blocks this branch touched, refuses an empty domain, and writes `tools/m120-domain.txt`; `tools/m120-planted-defects.R` reads that file and refuses to run unless every domain function has a row in `tools/m120-designations.csv` with a disposition, every satisfied family row carries a magnitude defect, and each of AC4(iii)'s six carries a wrap defect. Nine defects are planted (magnitude in the C++ estimator, both SEM transforms, the OLS projection weights, the CPM communality, the axis reliability and the coverage rate; wrap in the C++ displacement, both SEM transforms, the CPM pole label and angle_unwrap's shortest-rotation step). All 33 rows pass on CRAN with the tree clean and go red under every defect they must catch. Two new files: `test-pole-values.R` (six blocks naming the angle a profile was built at) and `test-plot-cran-guards.R` (four blocks asserting the numbers the built plot layers carry). Seven previously skipped blocks came back on CRAN. AC3 re-run: 412 newly skipped blocks, all run off CRAN, none skipped, none failed; whole suite off CRAN 1026 blocks, 0 failed, 0 errored. CRAN-mode cost 12.0 s over 532 live blocks (494 skipped).
 - 2026-09-02: finding recorded as an accepted risk, not fixed: the suite's pre-existing 0/360 blocks assert relational properties and stay green under a uniform branch shift, and the four plot functions had NO CRAN-visible coverage at all because vdiffr skips there. This milestone adds ten blocks that close both for the functions AC4 names; it does not re-examine every other relational boundary assertion in the suite. Falsified by a wrap regression reaching CRAN that a value-asserting pole test elsewhere in the suite would have caught.
+- 2026-09-02: T6 — final `--as-cran` on the built tarball, PDF manual included, on an idle machine: **tests 17 s, vignette re-build 5 s, PDF manual 2 s, total 1 min 27 s, Status OK** against the 259 s / 40 s / 6 min 14 s baseline. `devtools::check(manual = TRUE)` Status OK (0/0/0); `devtools::document()` no diff and no unresolved-link warning. Vignette parity re-run after the T5 roxygen changes: all seven still match their sources. `cran-comments.md` now states the reduction and that nothing was deleted. Note on measurement: an intermediate run of the same tarball read tests 35 s and total 2 min 15 s while another R session was running `devtools::check()` on this machine — AC1's figures are only meaningful on an unloaded machine, and the recorded ones were taken with no other R process running.
+- 2026-09-02: **blocked on T7** — the win-builder R-devel run is Jeff's to make (`devtools::check_win_devel()`); its results reach his address alone, so AC2 cannot be evidenced from this session. Everything else is done and committed; resume to record the four line items and the overall time once the email arrives.
 
 ## Decisions
 
