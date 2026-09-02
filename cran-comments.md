@@ -39,6 +39,9 @@ This is a major release accumulating several feature families developed since
   sample size and profile.
 * `fit_structure()`: exploratory circumplex-structure tests (Acton & Revelle,
   2004) with an exact-p randomization test of circular order.
+* `axes_reliability()`: reliability of the circumplex axes (Strack et al.,
+  2013) with component standard errors, a per-fit accuracy certificate, and a
+  companion vignette ("Axes Reliability").
 * A SEM-based (latent-variable) SSM family — `ssm_sem()`, `ssm_sem_syntax()`,
   `ssm_sem_parameters()` — estimating the disattenuated SSM profile of a
   measure from a fixed-angle lavaan measurement model, with invariance-gated
@@ -53,7 +56,11 @@ This is a major release accumulating several feature families developed since
   `scale_x_circumplex()`, and `theme_circumplex()` as the composable API and
   `ssm_plot_*()` as convenience wrappers.
 * A Monte Carlo interval engine (`ssm_analyze(method = "montecarlo")`) and
-  parallel bootstrapping (`parallel`/`ncpus`). Five new vignettes.
+  parallel bootstrapping (`parallel`/`ncpus`). Six new vignettes.
+* Instrument data: the CAIS's second normative (adult) sample is withdrawn —
+  its published octant means lie outside the instrument's 5-point response
+  range — so `cais` now ships one sample. The `cais` item-to-scale key is also
+  corrected (documented in NEWS.md under "Instrument data").
 * Bug fixes: a pairwise-deletion bootstrap crash on an all-missing resampled
   scale, and a contrast-displacement sign error at the exact +/-180 degree
   boundary.
@@ -83,9 +90,10 @@ documented in NEWS.md:
 The `ggplot2` requirement moves from `>= 3.3.0` to `>= 4.0.0`: the new
 coordinate system is a `CoordRadial` subclass and uses parameters introduced in
 ggplot2 4.0.0. `ggforce` is dropped from Imports (the new coordinate system
-subsumes what it was used for) and base R's `parallel` is added (for the new
-`parallel`/`ncpus` bootstrapping arguments), so the Imports count is unchanged
-at seven and no new third-party dependency is introduced.
+subsumes what it was used for) and two base-R packages are added: `grid` (the
+coordinate system builds its axis-label backdrops as grobs) and `parallel` (the
+worker pool behind `ssm_ci_accuracy()`'s `parallel`/`ncpus` arguments). Imports
+now lists eight packages, and no new third-party dependency is introduced.
 
 The declared `Depends: R` moves from `>= 3.4` to `>= 4.1`. This corrects an
 understated declaration rather than adding a restriction: ggplot2 (>= 4.0.0)

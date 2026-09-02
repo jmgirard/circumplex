@@ -42,6 +42,7 @@ test_that("plot.circumplex_cpm builds a circular canvas with points and wedges",
 })
 
 test_that("plot.circumplex_cpm is a stable visual", {
+  skip_if_not_installed("vdiffr")
   skip_on_ci() # vdiffr snapshots are platform-dependent (fonts/rendering)
   fit <- clean_cpm_fit()
   vdiffr::expect_doppelganger("cpm circle plot", plot(fit))

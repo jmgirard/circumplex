@@ -221,6 +221,7 @@ axes_mc_recover_xi1 <- function(oct, k, xi1, xi2, zeta1, n, reps, seed) {
 
 test_that("BC6: Monte-Carlo mean xi1 recovers truth within 2 MC-SEs (Layer B)", {
   skip_if_not_installed("lavaan")
+  skip_on_cran()
   oct <- octants()
   cells <- list(
     list(xi1 = .10, seed = 11L),

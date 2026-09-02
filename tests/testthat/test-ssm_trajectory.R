@@ -422,6 +422,7 @@ test_that("an unrecognized argument warns rather than passing silently", {
 # Rendered appearance ---------------------------------------------------------
 
 test_that("the trajectory plot renders as expected", {
+  skip_if_not_installed("vdiffr")
   # Secondary to the data-level assertions above: bootstrap CI positions are
   # BLAS-sensitive, so the baseline is a rendering guard, not the fence for any
   # acceptance criterion.

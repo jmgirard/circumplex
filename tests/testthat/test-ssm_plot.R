@@ -1,4 +1,5 @@
 test_that("Single-group mean-based SSM plot is correct", {
+  skip_if_not_installed("vdiffr")
   data("aw2009")
   set.seed(12345)
   res <- ssm_analyze(aw2009, scales = 1:8)
@@ -16,6 +17,7 @@ test_that("Single-group mean-based SSM plot is correct", {
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
+  skip_if_not_installed("vdiffr")
   data("jz2017")
   set.seed(12345)
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
@@ -27,6 +29,7 @@ test_that("Single-group correlation-based SSM plot is correct", {
 })
 
 test_that("Measure-contrast SSM plot is correct", {
+  skip_if_not_installed("vdiffr")
   data("jz2017")
   set.seed(12345)
   res <- ssm_analyze(
@@ -52,6 +55,7 @@ test_that("Measure-contrast SSM plot is correct", {
 })
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
+  skip_if_not_installed("vdiffr")
   data("jz2017")
   set.seed(12345)
   res <- ssm_analyze(
@@ -75,6 +79,7 @@ test_that("Removing plots with low fit works as expected", {
 })
 
 test_that("many plots works as expected", {
+  skip_if_not_installed("vdiffr")
   data("jz2017")
   set.seed(12345)
   res <- ssm_analyze(jz2017, scales = 2:9, measures = 10:13)
@@ -87,6 +92,7 @@ test_that("many plots works as expected", {
 })
 
 test_that("things are working at 0/360", {
+  skip_if_not_installed("vdiffr")
   data("jz2017")
   set.seed(12345)
   dat <- jz2017[sample(1:nrow(jz2017), size = 100), ]
@@ -96,12 +102,14 @@ test_that("things are working at 0/360", {
 })
 
 test_that("ggcircumplex() builds a public circular canvas", {
+  skip_if_not_installed("vdiffr")
   p <- ggcircumplex(octants())
   expect_true(ggplot2::is_ggplot(p))
   vdiffr::expect_doppelganger("ggcircumplex octant canvas", p)
 })
 
 test_that("ggcircumplex() derives angles and labels from an instrument", {
+  skip_if_not_installed("vdiffr")
   data("csip")
 
   # Instrument input must resolve to the same canvas as passing that
