@@ -69,6 +69,9 @@ within-person contrasts, and the listwise-only handling of missing waves
 (a person missing any occasion is dropped from all occasions).
 }
 \examples{
+# `boots` is lowered from its default of 2000 throughout these examples so
+# they run quickly; a reported analysis should use the default.
+
 # Build a small two-occasion dataset in long format (one row per person per
 # occasion). In practice `data` already stores the repeated occasions this
 # way; here we stack two copies of jz2017 as an illustration.
@@ -83,7 +86,10 @@ long <- rbind(t1, t2)
 
 \donttest{
 # Per-occasion SSM profiles from long-format data
-ssm_analyze_long(long, scales = scales, id = "id", occasion = "occasion")
+ssm_analyze_long(
+  long, scales = scales, id = "id", occasion = "occasion",
+  boots = 200
+)
 }
 }
 \seealso{

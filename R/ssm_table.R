@@ -15,6 +15,9 @@
 #' @family table functions
 #' @export
 #' @examples
+#' # `boots` is lowered from its default of 2000 throughout these examples so
+#' # they run quickly; a reported analysis should use the default.
+#'
 #' \donttest{
 #' # Load example data
 #' data("jz2017")
@@ -23,7 +26,8 @@
 #' res <- ssm_analyze(
 #'   jz2017,
 #'   scales = 2:9,
-#'   measures = c("NARPD", "ASPD")
+#'   measures = c("NARPD", "ASPD"),
+#'   boots = 200
 #' )
 #' ssm_table(res)
 #' 
@@ -32,7 +36,8 @@
 #'   jz2017,
 #'   scales = 2:9,
 #'   measures = c("NARPD", "ASPD"), 
-#'   contrast = TRUE
+#'   contrast = TRUE,
+#'   boots = 200
 #' )
 #' ssm_table(res)
 #' }

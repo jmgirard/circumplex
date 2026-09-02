@@ -452,6 +452,9 @@ ssm_trajectory_table_frame <- function(x, time, drop_xy = FALSE) {
 #'   than as parameter-by-time panels.
 #' @export
 #' @examples
+#' # `boots` is lowered from its default of 2000 throughout these examples so
+#' # they run quickly; a reported analysis should use the default.
+#'
 #' \donttest{
 #' data("jz2017")
 #' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
@@ -461,7 +464,8 @@ ssm_trajectory_table_frame <- function(x, time, drop_xy = FALSE) {
 #' t2 <- t1
 #' t2$occasion <- "T2"
 #' res <- ssm_analyze_long(rbind(t1, t2),
-#'   scales = scales, id = "id", occasion = "occasion"
+#'   scales = scales, id = "id", occasion = "occasion",
+#'   boots = 200
 #' )
 #' ssm_plot_trajectory(res)
 #' ssm_plot_trajectory(res, drop_xy = TRUE)
