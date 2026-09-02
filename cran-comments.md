@@ -22,7 +22,9 @@ model fits, and the heaviest test blocks are gated behind `skip_on_cran()`.
 On the maintainer's macOS machine `R CMD check --as-cran` on this tarball
 takes 1 minute 50 seconds in total, of which tests are 23 seconds and the
 vignette re-build 6 seconds; the same steps took 259 and 40 seconds before.
-A win-builder R-devel run of the same tarball completed in under 5 minutes.
+On win-builder (R-devel) this tarball is Status OK with tests at 103
+seconds and the vignette re-build at 16 seconds; before these changes the
+same two steps took 15 minutes and 146 seconds there.
 No test, vignette chunk, or example was deleted: everything still runs off
 CRAN and on every CI push.
 
