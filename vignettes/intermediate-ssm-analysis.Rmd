@@ -107,14 +107,14 @@ ssm_table(results)
 ssm_plot_circle(results)
 ```
 
-<img src="figures/intermediate-ssm-analysis-group_plot-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-group_plot-1.png" alt="plot of chunk group_plot" width="100%" />
 
 
 ``` r
 ssm_plot_curve(results)
 ```
 
-<img src="figures/intermediate-ssm-analysis-group_plot2-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-group_plot2-1.png" alt="plot of chunk group_plot2" width="100%" />
 
 Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figures will contain additional points or curves. The grouping variable just needs to contain more than one level (i.e., unique value).
 
@@ -206,14 +206,14 @@ ssm_table(results2)
 ssm_plot_circle(results2)
 ```
 
-<img src="figures/intermediate-ssm-analysis-measures_plot-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-measures_plot-1.png" alt="plot of chunk measures_plot" width="100%" />
 
 
 ``` r
 ssm_plot_curve(results2)
 ```
 
-<img src="figures/intermediate-ssm-analysis-measures_plot2-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-measures_plot2-1.png" alt="plot of chunk measures_plot2" width="100%" />
 
 ### Generalizing to multiple groups and multiple measures
 Finally, it is possible to analyze multiple measures within multiple groups. As you might expect, this requires providing both the `measures` and `grouping` arguments to the same function call. Again, any number of measures and groups is possible. The profiles in such an analysis will be named "Measure: Group" as below.
@@ -386,7 +386,7 @@ ssm_table(results3)
 ssm_plot_circle(results3)
 ```
 
-<img src="figures/intermediate-ssm-analysis-general_plot-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-general_plot-1.png" alt="plot of chunk general_plot" width="100%" />
 
 Note that the borders for the "PARPD: Male" and "SZTPD: Male" blocks are dashed instead of solid. This indicates that these profiles have low fit (i.e., $R^2<.7$). We could alternatively hide these such profiles by adding `drop_lowfit = TRUE` as below (noting that the color guide may change as profiles are dropped).
 
@@ -395,21 +395,21 @@ Note that the borders for the "PARPD: Male" and "SZTPD: Male" blocks are dashed 
 ssm_plot_circle(results3, drop_lowfit = TRUE)
 ```
 
-<img src="figures/intermediate-ssm-analysis-general_plot2-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-general_plot2-1.png" alt="plot of chunk general_plot2" width="100%" />
 
 
 ``` r
 ssm_plot_curve(results3)
 ```
 
-<img src="figures/intermediate-ssm-analysis-general_plot3-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-general_plot3-1.png" alt="plot of chunk general_plot3" width="100%" />
 
 
 ``` r
 ssm_plot_curve(results3, drop_lowfit = TRUE)
 ```
 
-<img src="figures/intermediate-ssm-analysis-general_plot4-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-general_plot4-1.png" alt="plot of chunk general_plot4" width="100%" />
 
 ## 2. Contrast analyses
 The final argument to master in this vignette is `contrast`, which allows us to compare two groups or measures. Setting this argument to TRUE will first generate scores for each group (or measure), then estimate SSM parameters for these scores, and finally calculate the difference between the parameters. To keep the code simpler and to discourage "fishing expeditions," only two groups or measures can be compared at a time.
@@ -525,7 +525,7 @@ ssm_table(results4)
 ssm_plot_contrast(results4)
 ```
 
-<img src="figures/intermediate-ssm-analysis-model_plot-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-model_plot-1.png" alt="plot of chunk model_plot" width="100%" />
 
 ### Contrasts between measures in a group
 Comparing measures in a group is very similar. Again, all we need to do is add the `contrast` argument to the function call containing `measures`. Here we will use a parameter contrast to see what they look like.
@@ -636,7 +636,7 @@ ssm_table(results5)
 ssm_plot_contrast(results5)
 ```
 
-<img src="figures/intermediate-ssm-analysis-measure_contrast_plot-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-measure_contrast_plot-1.png" alt="plot of chunk measure_contrast_plot" width="100%" />
 
 Here, instead of a circle plot, we see a contrast plot showing the difference between the two measures' SSM parameters and their 95% confidence intervals. Because the confidence interval for the elevation parameter does not include zero, this parameter is significantly different between the measures.
 
@@ -752,7 +752,7 @@ ssm_table(results6)
 ssm_plot_contrast(results6)
 ```
 
-<img src="figures/intermediate-ssm-analysis-group_contrast_plot-1.png" alt="" width="100%" />
+<img src="figures/intermediate-ssm-analysis-group_contrast_plot-1.png" alt="plot of chunk group_contrast_plot" width="100%" />
 
 ## 3. Taxonomy of analysis types
 Although all SSM analyses are based on the idea of decomposing circumplex scores into the parameters of a cosine curve, there are actually many different ways to implement it. Each of these implementations allows different questions to be explored. In the table below, a list of the SSM analysis types that are currently implemented in the `circumplex` package is provided. This table also provides the specific combination of arguments needed to implement each analysis using the `ssm_analyze()` function. Specifying which analysis to run is simply a matter of providing the correct arguments to the function; this allows a single function to essentially do the work of seven and makes for a more intuitive user experience.

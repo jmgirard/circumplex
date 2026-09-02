@@ -160,7 +160,7 @@ scale is drawn at its estimated angle, at a radius equal to its communality
 plot(cpm)
 ```
 
-<img src="figures/evaluating-circumplex-structure-cpm_plot-1.png" alt="" width="100%" />
+<img src="figures/evaluating-circumplex-structure-cpm_plot-1.png" alt="plot of chunk cpm_plot" width="100%" />
 
 ### Reading the fit indices
 
@@ -585,6 +585,10 @@ point for coverage near the nominal level and are recommended in practice.
 The `parallel`/`ncpus` arguments speed up real runs without changing
 results for a given seed.
 
+<!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
+     ill-conditioned CPM, whose solution moves in the third digit across
+     BLAS implementations; every simulated replication moves with it, so
+     this chunk's printed numbers are not reproducible across machines. -->
 
 ``` r
 set.seed(34567)
@@ -601,7 +605,7 @@ summary(acc)
 #> Population Structure:	 Browne circular model (CPM) 
 #> Group Sizes:		 All = 250 
 #> Certification Rule:	 a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:		 5.3 s
+#> Elapsed:		 10.1 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
@@ -753,6 +757,7 @@ summary(acc)
 #>                      0    200
 #>                      0    200
 ```
+<!-- precompute:volatile-numbers end -->
 
 How to read this output:
 
@@ -791,7 +796,7 @@ For a visual summary across the ladder:
 plot(acc)
 ```
 
-<img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="" width="100%" />
+<img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%" />
 
 The two profiles tell usefully different stories. Paranoid PD is
 certified: its amplitude CI lower bound clears the 0.35-CI-width margin, so
@@ -996,7 +1001,7 @@ departures in even angular spread.
 plot(res)
 ```
 
-<img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="" width="100%" />
+<img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%" />
 
 For the IIP-SC octants the picture agrees with Section 2's CPM fit: the
 scales keep their theoretical circular *ordering* with comparable

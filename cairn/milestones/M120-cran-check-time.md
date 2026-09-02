@@ -93,8 +93,8 @@ bar travels with them).
 - AC1 → T2, T3, T5, T6
 - AC2 → T7
 - AC3 → T3
-- AC4 → T4
-- AC5 → T2, T5
+- AC4 → T4, T9
+- AC5 → T2, T5, T8
 - AC6 → T6
 
 ## Tasks
@@ -127,6 +127,19 @@ bar travels with them).
 - [x] **T7** — win-builder R-devel run on the branch tarball; record the
       overall time and the four line items (Jeff runs it; results reach only
       his address).
+- [x] **T8** — Defect return, F1 + F6: repair the `vignette-precompute` guard
+      so it can pass — declared `precompute:volatile-numbers` regions in the
+      `.Rmd.orig` sources, `tools/check-vignette-staleness.R` comparing
+      everything byte-exactly except the digits of output lines inside a
+      declared region, the workflow pointed at it — and restore the shipped
+      figures' `alt` text with a `fig.alt` hook. Re-render.
+- [ ] **T9** — Defect return, F2 + F4: replace the relative `tolerance`
+      assertions in `test-plot-cran-guards.R` and `test-pole-values.R` with
+      absolute bounds, then re-run the AC4 designations they carry.
+- [ ] **T10** — Defect return, F3: make `tools/m120-planted-defects.R` restore
+      a planted defect when the run errors, as its header claims.
+- [ ] **T11** — Defect return, F7: give `tools/m120-vignette-parity.R` a
+      dependency surface a clean checkout has.
 
 ## Work log
 
@@ -152,6 +165,7 @@ bar travels with them).
 - 2026-09-02: T7 done — overall check time settled from win-builder's own results listing (https://win-builder.r-project.org/0SBISo37uvQ9), read 2026-09-02: `00check.log` last modified 02.09.2026 17:23, i.e. 15:23 UTC on German summer time, against the log's own `current time: 2026-09-02 15:19:37 UTC` start stamp — an elapsed **3 min 23 s to 4 min 23 s** at the listing's minute resolution, under AC2's 8 minutes against the 24 min CRAN measured on its pretest machine. The reading cross-checks against the log's contents: 158 s of that elapsed is the six timed steps, leaving 45-105 s untimed, and no offset other than UTC+2 gives an elapsed consistent with a 158 s timed sum (UTC+1 would require a 64-minute untimed install). AC2's four line items: tests 68 s, vignette re-build 11 s, examples 27 s, install untimed in the log but bounded at 105 s by that residual. Bears on the ROADMAP's Windows-compile-cost candidate row: its promotion condition — the install step alone eating the budget — is not met, since the whole untimed residual is at most 105 s.
 - 2026-09-02: all seven tasks done; `devtools::test()` off CRAN 0 failures / 9242 passes / 1 skip / 9 warnings (the pre-existing zero-variance and lavaan-marker warnings). Status -> review.
 - 2026-09-02: review gate FAILED and returned M120 to `in-progress`. What failed: the `vignette-precompute` workflow this milestone shipped is red on PR #151 — its byte-exact `git diff --exit-code -- 'vignettes/*.Rmd'` cannot pass, because `evaluating-circumplex-structure.Rmd` ships `ssm_ci_accuracy()` output that is not reproducible across machines (coverage 0.891 vs 0.896, N 147 vs 144, certification rate 0.735 vs 0.720 on the CI runner), on top of the wall-clock `Elapsed:` line and the machine-dependent condition numbers. All six acceptance criteria were executed with fresh evidence and met (Review section); the universal and toolchain consistency-gate checks all pass. Four further confirmed defects to fix with it: relative-`tolerance` assertions in `test-plot-cran-guards.R` and `test-pole-values.R`, a top-level `on.exit` in `tools/m120-planted-defects.R` that never fires, `fig.cap = ""` blanking every shipped figure's alt text, and `xml2` missing from the AC5 instrument's dependency surface. First defect return for this milestone.
+- 2026-09-02: T8 — review F1 and F6 repaired. F1: the `vignette-precompute` guard is now `tools/check-vignette-staleness.R`, not `git diff --exit-code`. A vignette source may declare a `<!-- precompute:volatile-numbers start -- <reason> -->` region; inside one, numeric literals in knitr output lines (`^#>`) are replaced by `<n>` on both sides before comparing, and everything else stays byte-exact — all prose, all chunk source, every other vignette in full, and inside the region the output's line count, line positions and every non-numeric word. One region is declared, around `evaluating-circumplex-structure`'s `accuracy_run` chunk, which is where every difference in the failing CI run sat. Measured on the branch: the guard reads all seven up to date (162 output lines compared without their digits); it goes STALE on a prose word edited outside the region, on a word edited inside it, on an output line deleted inside it, and on a digit changed in an unmasked vignette; it stays green on a digit changed inside the region, which is the declared blind spot. It errors on a marker with no reason, a region never closed, and a region masking no output line. F6: `tools/precompute-vignettes.R` now sets `fig.alt` through an `opts_hooks` entry that fires only where its own empty caption is in force, so the shipped figures carry `alt="plot of chunk <label>"` again instead of `alt=""` — 44 `<img>` tags across six vignettes changed on the re-render, with no `<div class="figure">` caption returning.
 
 ## Decisions
 

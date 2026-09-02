@@ -231,7 +231,7 @@ heterogeneity* around the circle (Section 5 explains why each moves).
 ssm_plot_circle(latent)
 ```
 
-<img src="figures/sem-based-ssm-analysis-latent-plot-1.png" alt="" width="70%" />
+<img src="figures/sem-based-ssm-analysis-latent-plot-1.png" alt="plot of chunk latent-plot" width="70%" />
 
 
 ``` r
@@ -528,7 +528,7 @@ contrast
 ssm_plot_contrast(contrast)
 ```
 
-<img src="figures/sem-based-ssm-analysis-contrast-plot-1.png" alt="" width="100%" />
+<img src="figures/sem-based-ssm-analysis-contrast-plot-1.png" alt="plot of chunk contrast-plot" width="100%" />
 
 The contrast block reports the difference in each SSM parameter with its
 confidence interval. As with the observed contrast, an elevation or amplitude

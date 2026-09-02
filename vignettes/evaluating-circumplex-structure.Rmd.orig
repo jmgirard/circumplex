@@ -421,11 +421,16 @@ point for coverage near the nominal level and are recommended in practice.
 The `parallel`/`ncpus` arguments speed up real runs without changing
 results for a given seed.
 
+<!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
+     ill-conditioned CPM, whose solution moves in the third digit across
+     BLAS implementations; every simulated replication moves with it, so
+     this chunk's printed numbers are not reproducible across machines. -->
 ```{r accuracy_run}
 set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
 summary(acc)
 ```
+<!-- precompute:volatile-numbers end -->
 
 How to read this output:
 

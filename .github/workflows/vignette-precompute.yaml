@@ -9,9 +9,12 @@
 #
 #     Rscript tools/precompute-vignettes.R
 #
-# Only the .Rmd files are compared. The figures under vignettes/figures/ are
-# PNGs whose bytes depend on the graphics device, so they are not reproducible
-# across machines and diffing them would fail on every run.
+# Only the .Rmd files are compared, and by tools/check-vignette-staleness.R
+# rather than a byte-exact `git diff`: one chunk's printed numbers are not
+# reproducible across machines and the guard's header explains what that script
+# masks and what it still holds byte-exact. The figures under vignettes/figures/
+# are PNGs whose bytes depend on the graphics device, so they are not
+# reproducible across machines either and are not compared at all.
 #
 # `cairn/**` is ignored: tracking-only commits cannot change a vignette.
 on:
@@ -80,10 +83,4 @@ jobs:
         run: Rscript tools/precompute-vignettes.R
 
       - name: Fail if a committed vignette is stale
-        run: |
-          if ! git diff --exit-code -- 'vignettes/*.Rmd'; then
-            echo "::error::A pre-computed vignette no longer matches its .Rmd.orig source."
-            echo "Run 'Rscript tools/precompute-vignettes.R' and commit the result."
-            exit 1
-          fi
-          echo "All pre-computed vignettes are up to date with their sources."
+        run: Rscript tools/check-vignette-staleness.R

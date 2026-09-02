@@ -29,10 +29,23 @@ knit_one <- function(name) {
   # An empty default caption keeps knitr from wrapping every out.width figure
   # in a <div class="figure"> captioned "plot of chunk <label>"; rendering the
   # .Rmd live never produced those. Chunks that set fig.cap themselves win.
+  #
+  # The alt text is a separate matter from the caption: with fig.cap = "" and no
+  # fig.alt, knitr writes alt="" and the figure becomes invisible to a screen
+  # reader, where a live build wrote alt="plot of chunk <label>" (M120 review
+  # F6). The hook restores exactly that default, and only where this script's
+  # own empty caption is what is in force -- a chunk that writes its own
+  # fig.cap or fig.alt keeps it.
   knitr::opts_chunk$set(
     fig.path = file.path("figures", paste0(name, "-")),
     fig.cap = ""
   )
+  knitr::opts_hooks$set(fig.cap = function(options) {
+    if (is.null(options$fig.alt) && identical(options$fig.cap, "")) {
+      options$fig.alt <- paste("plot of chunk", options$label)
+    }
+    options
+  })
   set.seed(12345)
   knitr::knit(paste0(name, ".Rmd.orig"), paste0(name, ".Rmd"), quiet = TRUE)
   invisible(NULL)
