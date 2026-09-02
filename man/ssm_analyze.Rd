@@ -224,34 +224,41 @@ by construction (one group per person-row).
 }
 
 \examples{
+# `boots` is lowered from its default of 2000 throughout these examples so
+# they run quickly; a reported analysis should use the default.
+
 # Load example data
 data("jz2017")
 
 # Single-group mean-based SSM
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  boots = 200
 )
 
 # Single-group correlation-based SSM
 ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-  measures = c("NARPD", "ASPD")
+  measures = c("NARPD", "ASPD"),
+  boots = 200
 )
 
 # Monte Carlo confidence intervals (faster for large samples)
 ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-  method = "montecarlo"
+  method = "montecarlo",
+  boots = 200
 )
 \donttest{
 # Multiple-group mean-based SSM
 ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-  grouping = "Gender"
+  grouping = "Gender",
+  boots = 200
 )
 
 # Multiple-group mean-based SSM with contrast
@@ -259,7 +266,8 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   grouping = "Gender",
-  contrast = TRUE
+  contrast = TRUE,
+  boots = 200
 )
 
 # Single-group correlation-based SSM with contrast
@@ -267,7 +275,8 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = c("NARPD", "ASPD"),
-  contrast = TRUE
+  contrast = TRUE,
+  boots = 200
 )
 
 # Multiple-group correlation-based SSM
@@ -275,7 +284,8 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
-  grouping = "Gender"
+  grouping = "Gender",
+  boots = 200
 )
 
 # Multiple-group correlation-based SSM with contrast
@@ -284,7 +294,8 @@ ssm_analyze(
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
   grouping = "Gender",
-  contrast = TRUE
+  contrast = TRUE,
+  boots = 200
 )
 }
 

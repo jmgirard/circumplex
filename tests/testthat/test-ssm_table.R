@@ -1,4 +1,5 @@
 test_that("SSM Table captions are correct", {
+  skip_on_cran()
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9)
   expect_equal(

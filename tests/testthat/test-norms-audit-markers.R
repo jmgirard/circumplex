@@ -123,6 +123,7 @@ test_that("the accepted marker set is exactly AC4's three shapes (M79)", {
 })
 
 test_that("an ambiguous marker line is refused, not ignored (M79)", {
+  skip_on_cran()
   env <- marker_defs()
   for (why in names(REFUSED_MARKERS)) {
     dir <- note_with(REFUSED_MARKERS[[why]])

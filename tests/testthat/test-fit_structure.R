@@ -555,6 +555,7 @@ test_that("structure_randall closed forms: perfect, anti-ordered, and tied matri
 })
 
 test_that("structure_randall_test exact p equals the dihedral closed form", {
+  skip_on_cran()
   # For a perfect circumplex the index is 1, and (by strict monotonicity in
   # distance) a relabeling reaches 1 iff it preserves every circular-distance
   # class; class-preserving relabelings of a cycle are exactly its graph
@@ -584,6 +585,7 @@ test_that("structure_randall_test exact p equals the dihedral closed form", {
 })
 
 test_that("structure_randall_test on jz2017 pins the index and exact p", {
+  skip_on_cran()
   data("jz2017")
   res <- structure_randall_test(jz2017, octants_jz)
   # Index: 260 of 288 order predictions correct -> (260 - 28)/288.
@@ -657,6 +659,7 @@ test_that("structure_randall_test Monte Carlo path: add-one p, seed convention",
 })
 
 test_that("structure_randall_test RNG contract: exact path leaves the stream untouched", {
+  skip_on_cran()
   data("jz2017")
   set.seed(42)
   seed_before <- .Random.seed
@@ -668,6 +671,7 @@ test_that("structure_randall_test RNG contract: exact path leaves the stream unt
 })
 
 test_that("structure_randall_test exact path does not create .Random.seed", {
+  skip_on_cran()
   data("jz2017")
   # Stronger than the "stream untouched" test above: with no RNG state present,
   # the exact path must consume no randomness at all -- it must not even bring
@@ -706,6 +710,7 @@ test_that("Monte Carlo RANDALL p is reproducible and interior on a marginal circ
 })
 
 test_that("internal helpers select columns correctly from a matrix input", {
+  skip_on_cran()
   data("jz2017")
   m <- as.matrix(jz2017[octants_jz])
   # `data[scales]` element-indexes a matrix (wrong); `data[, scales]` selects

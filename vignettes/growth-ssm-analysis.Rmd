@@ -7,14 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-has_glmmTMB <- requireNamespace("glmmTMB", quietly = TRUE)
-set.seed(20260716)
-library(ggplot2)
-```
 
-```{r setup}
+
+
+``` r
 library(circumplex)
 ```
 
@@ -45,15 +41,7 @@ to a dedicated mixed-modeling package. The reference recipe below uses
 **glmmTMB**; the same stacked-outcome formulation can be fit with `nlme`
 (shipped with base R) using its `varIdent`/`corSymm` machinery.
 
-```{r, echo = FALSE, results = "asis"}
-if (!has_glmmTMB) {
-  cat(
-    "> **Note:** the glmmTMB package is not installed, so the model-fitting",
-    "chunks below are not evaluated in this build of the vignette. Install",
-    "glmmTMB to reproduce them.\n"
-  )
-}
-```
+
 
 ## 2. From repeated measures to a coordinate table
 
@@ -66,7 +54,8 @@ We simulate five waves of octant scores for 150 persons whose group-level
 displacement drifts from 350° to 10° — deliberately crossing the 0°/360°
 boundary — with amplitude near 0.6 throughout.
 
-```{r simulate}
+
+``` r
 n <- 150
 waves <- 0:4
 theta <- as.numeric(octants()) * pi / 180
@@ -92,6 +81,10 @@ coord <- do.call(rbind, lapply(seq_along(waves), function(k) {
              e = pp$Elev, x = pp$Xval, y = pp$Yval)
 }))
 head(coord, 3)
+#>   person wave         e         x          y
+#> 1      1    0 0.4595363 0.5697631 -0.1920113
+#> 2      2    0 0.8644617 0.9896316  0.2426116
+#> 3      3    0 0.5354376 0.6640467 -0.2164674
 ```
 
 ## 3. One joint model, not three separate ones
@@ -101,7 +94,8 @@ stack them into long format with an outcome indicator `dv`, give each
 outcome its own intercept and slope, and let the person-level random
 effects be **correlated across outcomes**.
 
-```{r stack}
+
+``` r
 long <- reshape(coord, direction = "long",
                 varying = list(c("e", "x", "y")), v.names = "value",
                 timevar = "dv", times = c("e", "x", "y"),
@@ -110,7 +104,8 @@ long$dv <- factor(long$dv, levels = c("e", "x", "y"))
 long$person <- factor(long$person)
 ```
 
-```{r fit, eval = has_glmmTMB}
+
+``` r
 fit <- glmmTMB::glmmTMB(
   value ~ 0 + dv + dv:wave + us(0 + dv | person),
   dispformula = ~ 0 + dv,
@@ -118,6 +113,10 @@ fit <- glmmTMB::glmmTMB(
   REML = TRUE
 )
 glmmTMB::fixef(fit)$cond
+#>           dve           dvx           dvy      dve:wave      dvx:wave 
+#>  0.5249198595  0.6085429795 -0.1036244260 -0.0007414075 -0.0010567782 
+#>      dvy:wave 
+#>  0.0649480442
 ```
 
 Why joint? The displacement $d(t)$ is derived from $\hat{x}(t)$ and
@@ -144,7 +143,8 @@ draw at each wave, and hand the per-wave draws to `ssm_draws()`, which
 applies the package's circular-statistics machinery (medians and circular
 means, equal-tailed intervals with correct wrapping at the boundary).
 
-```{r draws, eval = has_glmmTMB}
+
+``` r
 fe <- glmmTMB::fixef(fit)$cond
 V <- as.matrix(vcov(fit)$cond)
 
@@ -183,6 +183,12 @@ round_df[-1] <- lapply(round_df[-1], function(v) {
   if (is.numeric(v)) round(v, 2) else v
 })
 round_df
+#>   wave a_est a_lci a_uci  d_est  d_lci  d_uci certified
+#> 1    0  0.62  0.58  0.66 350.37 347.01 353.71      TRUE
+#> 2    1  0.61  0.58  0.64 356.39 353.44 359.27      TRUE
+#> 3    2  0.61  0.58  0.64   2.51 359.69   5.34      TRUE
+#> 4    3  0.61  0.58  0.64   8.61   5.58  11.69      TRUE
+#> 5    4  0.62  0.59  0.66  14.53  11.21  17.97      TRUE
 ```
 
 The displacement estimates hug the 0°/360° boundary by design — values
@@ -192,9 +198,12 @@ shape — one row per time point, with `a_est`/`a_lci`/`a_uci`,
 `d_est`/`d_lci`/`d_uci`, and optionally `certified` — is what
 `ssm_plot_trajectory()` plots directly:
 
-```{r plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5}
+
+``` r
 ssm_plot_trajectory(trajectory, time = "wave")
 ```
+
+<img src="figures/growth-ssm-analysis-plot-1.png" alt="plot of chunk plot"  />
 
 The displacement panel is drawn on an *unwrapped* branch, so the trajectory
 crosses the boundary as one continuous path instead of jumping a full turn,
@@ -222,7 +231,8 @@ Every wave in our worked example is certified. Here is a trajectory where
 that fails: the group crosses near the origin mid-study (its $x$
 coordinate changes sign while $y$ stays near zero).
 
-```{r lowamp, eval = has_glmmTMB}
+
+``` r
 x_t2 <- seq(0.5, -0.5, length.out = length(waves))
 coord2 <- do.call(rbind, lapply(seq_along(waves), function(k) {
   mu <- 0.5 + (x_t2[k] + v_x) %o% cos(theta) + (0.02 + v_y) %o% sin(theta)
@@ -251,6 +261,17 @@ mid <- ssm_draws(cbind(
   y = B2[, "dvy"] + 2 * B2[, "dvy:wave"]
 ), type = "parameters")
 mid
+#> 
+#> # Posterior Summary:
+#> 
+#>                Estimate   Lower CrI   Upper CrI
+#> Elevation         0.516       0.468       0.565
+#> X-Value           0.001      -0.030       0.031
+#> Y-Value           0.023      -0.005       0.051
+#> Amplitude         0.028       0.006       0.055
+#> Displacement     87.741     356.372     178.957
+#> Model Fit                                      
+#>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the displacement is not interpretable.
 ```
 
 The printed note is the certification rule firing: at this wave the
@@ -263,7 +284,8 @@ waves remain certified and nominally covered.
 Assembling this fit's full trajectory the same way, and carrying the
 `certified` verdict into the table, lets the plot mark the verdict itself:
 
-```{r lowamp-plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5}
+
+``` r
 per_wave2 <- lapply(waves, function(t) {
   ssm_draws(cbind(
     e = B2[, "dve"] + t * B2[, "dve:wave"],
@@ -283,6 +305,8 @@ trajectory2 <- data.frame(
 )
 ssm_plot_trajectory(trajectory2, time = "wave")
 ```
+
+<img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"  />
 
 Uncertified waves are drawn as **hollow** points on the displacement panel.
 Read them as gaps in the argument, not as estimates with wide intervals: the
@@ -314,10 +338,12 @@ There is a second documented recipe: compute each person's displacement at
 each wave, **unwrap** each person's sequence onto a continuous branch, and
 fit an ordinary univariate growth model to the unwrapped angles.
 
-```{r unwrap-demo}
+
+``` r
 # One person's displacement over five waves, drifting across the boundary
 d_person <- c(350, 355, 2, 8, 12)
 angle_unwrap(d_person)
+#> [1] 350 355 362 368 372
 ```
 
 `angle_unwrap()` wraps its input into [0°, 360°), then accumulates the

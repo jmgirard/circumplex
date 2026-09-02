@@ -5,6 +5,7 @@
 scales8 <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
 test_that("mean-based path stores per-group n, SDs, and scale correlations", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender")
@@ -30,6 +31,7 @@ test_that("mean-based path stores per-group n, SDs, and scale correlations", {
 })
 
 test_that("correlation-based path stores joint (scales + measures) matrices", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(
@@ -52,6 +54,7 @@ test_that("correlation-based path stores joint (scales + measures) matrices", {
 })
 
 test_that("contrast objects key sufficient stats by the real groups only", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(
@@ -64,6 +67,7 @@ test_that("contrast objects key sufficient stats by the real groups only", {
 })
 
 test_that("stored profiles reproduce the object's scores (internal consistency)", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender")
@@ -75,6 +79,7 @@ test_that("stored profiles reproduce the object's scores (internal consistency)"
 })
 
 test_that("ssm_suff_stats() returns stored stats when present", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender")
@@ -82,6 +87,7 @@ test_that("ssm_suff_stats() returns stored stats when present", {
 })
 
 test_that("data = fallback reconstructs stats for objects predating storage", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender")
@@ -100,6 +106,7 @@ test_that("data = fallback reconstructs stats for objects predating storage", {
 })
 
 test_that("fallback consistency check rejects the wrong dataset", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender")
@@ -113,6 +120,7 @@ test_that("fallback consistency check rejects the wrong dataset", {
 })
 
 test_that("fallback accepts the correct data under listwise deletion with NAs", {
+  skip_on_cran()
   # Regression: ssm_compute_suff_stats() must replicate ssm_analyze()'s up-front
   # listwise na.omit before the C++ estimator, or recomputed profiles go NaN and
   # the consistency check rejects the genuine dataset.
@@ -139,6 +147,7 @@ test_that("fallback accepts the correct data under listwise deletion with NAs", 
 })
 
 test_that("fallback works on the correlation path", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   res <- ssm_analyze(

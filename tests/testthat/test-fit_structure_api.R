@@ -32,6 +32,7 @@ draft_randall <- function(r) {
 # ---- object contract --------------------------------------------------------
 
 test_that("fit_structure returns a circumplex_structure with the documented shape", {
+  skip_on_cran()
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz)
   expect_s3_class(res, "circumplex_structure")
@@ -51,6 +52,7 @@ test_that("fit_structure returns a circumplex_structure with the documented shap
 # ---- scoring behavior -------------------------------------------------------
 
 test_that("deviation scoring row-mean-centers and matches the calibration path", {
+  skip_on_cran()
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz, scoring = "deviation")
   # The calibration (data-raw/structure-test-cutoffs.R) deviation-scores with
@@ -68,6 +70,7 @@ test_that("deviation scoring row-mean-centers and matches the calibration path",
 })
 
 test_that("raw scoring leaves scores untouched and selects the raw cutoffs", {
+  skip_on_cran()
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz, scoring = "raw")
   lam <- structure_loadings(jz2017, octants_jz, ridge = 0)
@@ -82,6 +85,7 @@ test_that("raw scoring leaves scores untouched and selects the raw cutoffs", {
 })
 
 test_that("RANDALL is included, honors the scoring, and reports the exact p", {
+  skip_on_cran()
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz, scoring = "deviation")
   x <- as.matrix(jz2017[octants_jz])
@@ -126,6 +130,7 @@ test_that("n_perm switches RANDALL to the reproducible Monte Carlo path", {
 })
 
 test_that("the default path is deterministic (leaves the global RNG untouched)", {
+  skip_on_cran()
   data("jz2017")
   set.seed(1)
   before <- .Random.seed
@@ -179,6 +184,7 @@ test_that("ten or more scales without n_perm error up front, naming n_perm", {
 # ---- missing-data policy ----------------------------------------------------
 
 test_that("listwise deletion is the default and matches the complete-case fit", {
+  skip_on_cran()
   data("jz2017")
   d <- jz2017[octants_jz]
   d[1, "PA"] <- NA
@@ -241,6 +247,7 @@ test_that("a zero-variance scale yields a graceful object, not a crash", {
 # ---- plot -------------------------------------------------------------------
 
 test_that("plot draws one point per scale at its communality radius", {
+  skip_on_cran()
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz)
   p <- plot(res)
@@ -254,6 +261,7 @@ test_that("plot draws one point per scale at its communality radius", {
 })
 
 test_that("Heywood communalities (>1) stay inside the canvas ring", {
+  skip_on_cran()
   data("jz2017")
   # A 4-scale subset drives paf2 into a Heywood case (a communality > 1), which
   # the plot must contain by expanding amax rather than drawing outside the ring.
@@ -271,6 +279,7 @@ test_that("Heywood communalities (>1) stay inside the canvas ring", {
 })
 
 test_that("plot warns on unknown dots", {
+  skip_on_cran()
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz)
   expect_warning(plot(res, bogus = TRUE))
@@ -285,6 +294,7 @@ test_that("plot is a stable visual", {
 })
 
 test_that("plot gives every scale a distinct fill beyond the 8-colour palette", {
+  skip_on_cran()
   # More than eight scales exceed Set2's range; the hue fallback must colour all
   # of them without the "n too large for palette Set2" warning or a collapse of
   # the extra scales onto the neutral fill.

@@ -37,6 +37,7 @@ walked_ids <- function(sites) {
 }
 
 test_that("the manifest is set-equal to a fresh walk of the audit script (M87)", {
+  skip_on_cran()
   sites <- manifest_sites()
   got <- walked_ids(sites)
   want <- manifest_ids()

@@ -53,6 +53,7 @@ occasions_list <- function(occ_order, scales = SC8) {
 # AC1 -- round-trip equivalence with the wide occasions path ---------------
 
 test_that("long wrapper reproduces the equivalent wide occasions call (grouped)", {
+  skip_on_cran()
   long <- make_long_data(occ = c("T1", "T2"))
   wide <- to_wide(long, c("T1", "T2"))
   occ <- occasions_list(c("T1", "T2"))
@@ -70,6 +71,7 @@ test_that("long wrapper reproduces the equivalent wide occasions call (grouped)"
 })
 
 test_that("long wrapper reproduces the wide paired contrast (single group)", {
+  skip_on_cran()
   long <- make_long_data(occ = c("T1", "T2"), group = FALSE)
   wide <- to_wide(long, c("T1", "T2"), group = FALSE)
   occ <- occasions_list(c("T1", "T2"))
@@ -104,6 +106,7 @@ test_that("long wrapper reproduces the wide Monte Carlo call", {
 })
 
 test_that("numeric scale indexes select the same columns as names", {
+  skip_on_cran()
   long <- make_long_data(occ = c("T1", "T2"), group = FALSE)
   set.seed(17)
   by_name <- suppressMessages(ssm_analyze_long(
@@ -120,6 +123,7 @@ test_that("numeric scale indexes select the same columns as names", {
 # AC2 -- occasion order is temporal, never alphabetical ---------------------
 
 test_that("occasion order follows first appearance, not alphabetical (T10/T2)", {
+  skip_on_cran()
   # Rows stacked T2 then T10, so the temporal (as-supplied) order is T2, T10;
   # alphabetical sorting would flip it to T10, T2 and reverse the contrast.
   long <- make_long_data(occ = c("T2", "T10"), group = FALSE)
@@ -148,6 +152,7 @@ test_that("occasion order follows first appearance, not alphabetical (T10/T2)", 
 })
 
 test_that("a factor occasion column uses its levels for order", {
+  skip_on_cran()
   long <- make_long_data(occ = c("T2", "T10"), group = FALSE)
   # Rows are T2-then-T10, but the factor levels declare T10 before T2.
   long$occasion <- factor(long$occasion, levels = c("T10", "T2"))
@@ -198,6 +203,7 @@ test_that("time-varying grouping errors informatively", {
 })
 
 test_that("grouping recorded only at a later occasion is retained (not dropped)", {
+  skip_on_cran()
   # Regression (M28 review, diff-bug + blame-history lenses): a person whose
   # group is NA at the first-listed occasion but known later must keep that
   # known group -- taking the first physical row would assign NA and silently

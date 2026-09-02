@@ -107,6 +107,7 @@ test_that("analytic summary() output is byte-identical to merge-base (four regim
 })
 
 test_that("an analytic marker-firing fit names each fired label exactly once", {
+  skip_on_cran()
   voc <- cpm_oracle_voc()
   hey <- suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
                                   angles = voc$th_start, n = 5000, m = 2))
@@ -160,6 +161,7 @@ m94_expect_note_in_diagnostics <- function(out) {
 }
 
 test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2000", {
+  skip_on_cran()
   jz <- m94_boot_jz()
   expect_identical(jz$details$ci_method, "bootstrap")
   expect_lt(jz$details$N, 2000)
@@ -188,6 +190,7 @@ test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2
 })
 
 test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N >= 2000", {
+  skip_on_cran()
   big <- m94_boot_big()
   expect_identical(big$details$ci_method, "bootstrap")
   expect_gte(big$details$N, 2000)
@@ -219,6 +222,7 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
 })
 
 test_that("the marker note claims no interval consequence (banned phrases absent)", {
+  skip_on_cran()
   jz <- m94_boot_jz()
   out <- paste(capture.output(summary(jz)), collapse = "\n")
   block <- m94_marker_block(out)
@@ -230,6 +234,7 @@ test_that("the marker note claims no interval consequence (banned phrases absent
 })
 
 test_that("a bootstrap fit with no fired marker prints no marker note", {
+  skip_on_cran()
   cl <- m94_boot_clean()
   expect_identical(cl$details$ci_method, "bootstrap")
   expect_identical(cpm_boundary_markers(cl), character(0))

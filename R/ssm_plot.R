@@ -55,12 +55,16 @@ has_ggrepel <- function() {
 #' @family visualization functions
 #' @export
 #' @examples
+#' # `boots` is lowered from its default of 2000 throughout these examples so
+#' # they run quickly; a reported analysis should use the default.
+#'
 #' \donttest{
 #' data("jz2017")
 #' res <- ssm_analyze(
 #'   jz2017,
 #'   scales = 2:9,
-#'   measures = c("NARPD", "ASPD")
+#'   measures = c("NARPD", "ASPD"),
+#'   boots = 200
 #' )
 #' ssm_plot_circle(res)
 #' }
@@ -340,12 +344,16 @@ ssm_plot_circle <- function(ssm_object,
 #' @family visualization functions
 #' @export
 #' @examples
+#' # `boots` is lowered from its default of 2000 throughout these examples so
+#' # they run quickly; a reported analysis should use the default.
+#'
 #' \donttest{
 #' data("jz2017")
 #' res <- ssm_analyze(
 #'   jz2017,
 #'   scales = 2:9,
-#'   measures = 10:13
+#'   measures = 10:13,
+#'   boots = 200
 #' )
 #' ssm_plot_curve(res)
 #' ssm_plot_curve(res, angle_labels = PANO())
@@ -480,13 +488,17 @@ ssm_plot_curve <- function(ssm_object,
 #' @family visualization functions
 #' @export
 #' @examples
+#' # `boots` is lowered from its default of 2000 throughout these examples so
+#' # they run quickly; a reported analysis should use the default.
+#'
 #' \donttest{
 #' data("jz2017")
 #' res <- ssm_analyze(
 #'   jz2017,
 #'   scales = 2:9,
 #'   measures = c("NARPD", "ASPD"),
-#'   contrast = TRUE
+#'   contrast = TRUE,
+#'   boots = 200
 #' )
 #' ssm_plot_contrast(res)
 #' }

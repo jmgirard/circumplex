@@ -92,6 +92,7 @@ cov_batch <- function(citekeys, scales) {
 }
 
 test_that("the coverage report's schema is the ten declared columns (M80)", {
+  skip_on_cran()
   env <- coverage_defs()
   dir <- coverage_notes()
   res <- env$audit_norms(env$AUDIT_BATCH, dir)
@@ -105,6 +106,7 @@ test_that("the coverage report's schema is the ten declared columns (M80)", {
 })
 
 test_that("no coverage cell is a string-pasted payload (M80)", {
+  skip_on_cran()
   env <- coverage_defs()
   dir <- coverage_notes()
   cov <- env$audit_norms(env$AUDIT_BATCH, dir)$coverage
@@ -131,6 +133,7 @@ test_that("no coverage cell is a string-pasted payload (M80)", {
 })
 
 test_that("a note-only row is reported once per block and payload (M80)", {
+  skip_on_cran()
   env <- coverage_defs()
   dir <- coverage_notes()
   cov <- env$audit_norms(env$AUDIT_BATCH, dir)$coverage
@@ -179,6 +182,7 @@ test_that("two passes over one note do not duplicate its note-only row (M80)", {
 })
 
 test_that("two note-only rows differing in one key cell stay two (M80)", {
+  skip_on_cran()
   env <- coverage_defs()
   # The dedupe key is the NOTE ROW -- sample, scale, value and anchor -- not the
   # two cells the report carries. Keyed on the report's `label` and `detail`
@@ -331,6 +335,7 @@ test_that("a value missing from either side names its field and sample (M80)", {
 })
 
 test_that("an unaudited note sample names the claiming instrument (M80)", {
+  skip_on_cran()
   env <- coverage_defs()
   dir <- coverage_notes()
   # AC2's second clause. trucco2013 tables igicr's three samples; dropping the
@@ -393,6 +398,7 @@ test_that("a block whose instrument-level rows no pass reads is reported (M80)",
 })
 
 test_that("the committed coverage report is the one this code emits (M80)", {
+  skip_on_cran()
   env <- coverage_defs()
   dir <- coverage_notes()
   path <- testthat::test_path("..", "..", "data-raw",

@@ -35,6 +35,7 @@ x_scale <- function(p) ggplot2::ggplot_build(p)$layout$panel_scales_x[[1]]
 # Happy path and the continuous axis (AC1) ------------------------------------
 
 test_that("a trajectory table plots on a continuous time axis", {
+  skip_on_cran()
   p <- ssm_plot_trajectory(traj_table(), time = "wave")
 
   expect_s3_class(p, "ggplot")
@@ -47,6 +48,7 @@ test_that("a trajectory table plots on a continuous time axis", {
 })
 
 test_that("the time column keeps the caller's own name and labels the axis", {
+  skip_on_cran()
   tbl <- traj_table()
   names(tbl)[names(tbl) == "wave"] <- "month"
   p <- ssm_plot_trajectory(tbl, time = "month")
@@ -57,6 +59,7 @@ test_that("the time column keeps the caller's own name and labels the axis", {
 })
 
 test_that("only the panels the table can fill are drawn", {
+  skip_on_cran()
   # Amplitude and displacement alone: the minimum legal table.
   p <- ssm_plot_trajectory(traj_table(), time = "wave")
   expect_equal(levels(p$data$Panel), c("Amplitude", "Displacement"))
@@ -89,6 +92,7 @@ test_that("only the panels the table can fill are drawn", {
 # The seam and the interval span are M33's machinery, shared (AC2) ------------
 
 test_that("a seam-straddling model trajectory renders as one continuous path", {
+  skip_on_cran()
   tbl <- traj_table()
   d <- ssm_plot_trajectory(tbl, time = "wave")$data
   d <- d[d$Parameter == "d", ]
@@ -117,6 +121,7 @@ test_that("each interval's drawn width equals its stored arc span", {
 })
 
 test_that("an interval wider than a half-turn is not inverted", {
+  skip_on_cran()
   # A near-origin wave: ssm_draws() reports a "displacement unknown" interval
   # covering most of the circle. Placing each bound by its own signed distance
   # would clamp this into (-180, 180] and render it as the most precise wave in
@@ -150,6 +155,7 @@ test_that("an interval wider than a half-turn is not inverted", {
 })
 
 test_that("a time point with no defined displacement leaves a gap", {
+  skip_on_cran()
   tbl <- traj_table()
   tbl$d_est[[3]] <- NA
   tbl$d_lci[[3]] <- NA
@@ -186,6 +192,7 @@ test_that("the certified column drives hollow marking on the displacement panel"
 })
 
 test_that("the certification legend draws both keys on the table path too", {
+  skip_on_cran()
   # Same defect, second entry point: an all-TRUE certified column is exactly
   # the case a model-based ssm_draws() workflow produces most often.
   all_true <- legend_key_glyphs(
@@ -316,6 +323,7 @@ test_that("broken bounds and columns are refused rather than silently dropped", 
 })
 
 test_that("the shared argument checks fire on the data frame method too", {
+  skip_on_cran()
   tbl <- traj_table()
 
   expect_error(ssm_plot_trajectory(tbl, time = "wave", base_size = Inf), "positive finite")

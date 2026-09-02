@@ -94,6 +94,7 @@ test_that("BC2: SEm formula reproduces Table 3 col 13 (Layer A)", {
 # guarantees a well-conditioned fit.)
 
 test_that("BC4: fitted lavaan object has the intended constraint set", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   set.seed(486115)
   oct <- octants()
@@ -148,6 +149,7 @@ test_that("BC4: fitted lavaan object has the intended constraint set", {
 })
 
 test_that("BC5: exact population matrix recovers every component (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   k <- 4L
@@ -295,6 +297,7 @@ axes_lav_components <- function(S, n, items, angles_deg) {
 }
 
 test_that("BC7: lavaan and OpenMx agree on the component variances (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   skip_if_not_installed("OpenMx")
   oct <- octants()
@@ -361,6 +364,7 @@ axes_nb_from_data <- function(dat, items, angles_deg) {
 }
 
 test_that("BC9: N-B overestimates vs CFA at high scale-specificity (Figure 3)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   k <- 4L
@@ -404,6 +408,7 @@ axes_valid_fixture <- function(n = 1500L, k = 4L, xi1 = .20, seed = 42L) {
 }
 
 test_that("BC11: small positive xi1 gives a small reliability, not a boundary", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   set.seed(2)
@@ -419,6 +424,7 @@ test_that("BC11: small positive xi1 gives a small reliability, not a boundary", 
 })
 
 test_that("the fit-measure guard names the actual problem on every mismatch", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The guard exists because `fitMeasures()` DROPS a name it does not
   # recognize and returns a shorter vector, so a future lavaan retiring
@@ -476,6 +482,7 @@ test_that("the fit-measure guard names the actual problem on every mismatch", {
 })
 
 test_that("BC11: a boundary fit (xi1 <= 0) returns NA + warning + flag", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   # xi1 = 0 population, small N: seed 5 yields a negative xi1-hat (a boundary).
@@ -569,6 +576,7 @@ test_that("M62: no xi1 the boundary guard admits can yield a NaN or negative SEm
 })
 
 test_that("M62: no accepted input lets a bare `NaNs produced` warning escape", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # AC1's second clause, asserted on UNMOCKED calls. The sibling test below
   # forces the boundary through a mock, which routes straight to a literal
@@ -610,6 +618,7 @@ test_that("M62: no accepted input lets a bare `NaNs produced` warning escape", {
 })
 
 test_that("M62: the boundary branch reports NA rather than NaN, end to end", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture()
   # Forces the boundary through the same seam the convergence guard uses. This
@@ -629,6 +638,7 @@ test_that("M62: the boundary branch reports NA rather than NaN, end to end", {
 })
 
 test_that("M62: a numeric `sd` must be finite and positive", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture()
   run <- function(s) suppressMessages(
@@ -662,6 +672,7 @@ test_that("M62: a numeric `sd` must be finite and positive", {
 })
 
 test_that("BC12: each malformed input errors informatively", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture()
   ok <- function() suppressMessages(
@@ -767,6 +778,7 @@ test_that("OLS-shadow recovers the components exactly on the population matrix",
 })
 
 test_that("OLS-shadow cross-checks the CFA estimate on finite data", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   k <- 4L
@@ -781,6 +793,7 @@ test_that("OLS-shadow cross-checks the CFA estimate on finite data", {
 })
 
 test_that("start values do not change the converged CFA estimates", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   k <- 4L
@@ -801,6 +814,7 @@ test_that("start values do not change the converged CFA estimates", {
 })
 
 test_that("BC13: listwise deletion reports N and refuses when N <= p", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture(n = 1500L)
   # Missingness is removed listwise, and the complete-case N is reported.
@@ -822,6 +836,7 @@ test_that("BC13: listwise deletion reports N and refuses when N <= p", {
 # S3 object, methods, and the bundled example dataset (T10, AC14).
 
 test_that("AC14: axes_reliability() runs on the bundled simulated_items data", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   data("simulated_items", package = "circumplex", envir = environment())
   expect_equal(dim(simulated_items), c(500L, 32L))
@@ -844,6 +859,7 @@ test_that("AC14: axes_reliability() runs on the bundled simulated_items data", {
 })
 
 test_that("axes_reliability() works via the instrument path", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # A simulated 32-item dataset matching iipsc's item->scale->angle mapping.
   data("iipsc", package = "circumplex", envir = environment())
@@ -903,6 +919,7 @@ axes_rt_compare <- function(raw, cm, tol = 1e-6) {
 }
 
 test_that("AC2: the cormat path reproduces the raw path exactly", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
 
   # Dataset 1: the bundled 32-item example.
@@ -944,6 +961,7 @@ test_that("AC2: the cormat path reproduces the raw path exactly", {
 # then follows from choosing an n where that exact offset is below the bar.
 
 test_that("AC3(a): the population matrix recovers every component (cormat path)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   k <- 4L
@@ -1031,6 +1049,7 @@ test_that("AC3(a): the population matrix recovers every component (cormat path)"
 # OpenMx is already Suggests; no new Imports (D-006/D-014).
 
 test_that("AC3(b): lavaan and OpenMx agree on the cormat path (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   skip_if_not_installed("OpenMx")
   oct <- octants()
@@ -1071,6 +1090,7 @@ test_that("AC3(b): lavaan and OpenMx agree on the cormat path (Layer B)", {
 # AC4 + AC5: what the cormat path reports NA for, refuses, and errors on.
 
 test_that("AC4: N-B is NA with a stated reason and sd = 'raw' is refused", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   data("simulated_items", package = "circumplex", envir = environment())
   items <- split(names(simulated_items), rep(1:8, each = 4))
@@ -1106,6 +1126,7 @@ test_that("AC4: N-B is NA with a stated reason and sd = 'raw' is refused", {
 })
 
 test_that("AC5: each malformed cormat/n input errors informatively", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   data("simulated_items", package = "circumplex", envir = environment())
   items <- split(names(simulated_items), rep(1:8, each = 4))
@@ -1222,6 +1243,7 @@ test_that("M60: a rotated equally spaced set estimates (Strack type b)", {
 })
 
 test_that("M60: equally spaced sets with k != 8 estimate", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   for (k in c(6L, 12L)) {
     ang <- (seq_len(k) - 1L) * (360 / k)
@@ -1290,6 +1312,7 @@ test_that("M60: the refusal contract survives the relaxation", {
 })
 
 test_that("M60: the spacing test is modular at the pole", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_spaced_fixture(octants())
   # octants() carries LM = 360; the same set written with 0 must behave
@@ -1315,6 +1338,7 @@ test_that("M60: the spacing test is modular at the pole", {
 })
 
 test_that("M60: angles_spacing_status() classifies at the pole and near-misses", {
+  skip_on_cran()
   # The package's own octant set, LM = 360.
   expect_identical(angles_spacing_status(octants()), "ok")
   # The same eight positions written with 0 instead of 360 -- one position, so
@@ -1371,6 +1395,7 @@ test_that("M60: angles_spacing_status() classifies at the pole and near-misses",
 })
 
 test_that("M60: per-axis item_n is n * k/2 at any rotation", {
+  skip_on_cran()
   # The tolerance is set from the DISCRIMINATION required, not from what this
   # machine prints (M59): the smallest error that could matter is one item, so
   # item_n = 1.0, and 1e-8 fences that at 1e8x while sitting ~6 orders above
@@ -1471,6 +1496,7 @@ axes_pop_recovers <- function(angles, k, xi1, xi2, zeta1) {
 }
 
 test_that("M60: exact population recovery holds at rotated and non-octant sets", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   xi1 <- .15; xi2 <- .08; zeta1 <- .12
   cells <- list(
@@ -1492,6 +1518,7 @@ test_that("M60: exact population recovery holds at rotated and non-octant sets",
 })
 
 test_that("M60: Monte-Carlo recovery holds at a rotated octant set (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   mc <- axes_mc_recover_xi1(
     seq(22.5, 337.5, by = 45), k = 4L, xi1 = .15, xi2 = .05, zeta1 = .08,
@@ -1501,6 +1528,7 @@ test_that("M60: Monte-Carlo recovery holds at a rotated octant set (Layer B)", {
 })
 
 test_that("M60: lavaan and OpenMx agree at a non-octant set (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   skip_if_not_installed("OpenMx")
   for (ang in list(seq(22.5, 337.5, by = 45), (seq_len(6L) - 1L) * 60)) {
@@ -1539,6 +1567,7 @@ test_that("M61 T1: cronbach_alpha() is NaN at one item -- the reason N-B cannot 
 })
 
 test_that("M61 T1/T6: the single-item set passes every gate, and now estimates", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The COC shape (Strack type e; Table 3 p. 7: 16 items, no scales, item_n 8):
   # sixteen equally spaced positions carrying one item each. Until M61 the
@@ -1667,6 +1696,7 @@ test_that("M61 T3: a mixed map keeps the three-column shadow", {
 })
 
 test_that("M61 T4/T6: the zeta1-dropped path returns a three-row component set (AC1)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- (seq_len(12L) - 1L) * 30
   fx <- axes_spaced_fixture(ang, n = 1200L, k = 1L)
@@ -1709,6 +1739,7 @@ axes_unbalanced_population <- function(angles, counts, xi1, xi2, zeta1) {
 }
 
 test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Eight equally spaced positions; scale 1 carries a pair, the rest one item
   # each. One pair is all the drop rule requires.
@@ -1753,6 +1784,7 @@ test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
 # what confirms comp_var("SS1") reads the SHARED zeta1 label rather than
 # happening to read a latent that owns a pair.
 test_that("M61: exact population recovery at mixed item counts (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- (seq_len(8L) - 1L) * 45
   xi1 <- .20; xi2 <- .05; zeta1 <- .08
@@ -1783,6 +1815,7 @@ test_that("M61: exact population recovery at mixed item counts (Layer B)", {
 })
 
 test_that("M61 T5: N-B is NA-with-reason on the single-item path, never NaN (AC3)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- (seq_len(8L) - 1L) * 45
   fx <- axes_spaced_fixture(ang, n = 1000L, k = 1L)
@@ -1805,6 +1838,7 @@ test_that("M61 T5: N-B is NA-with-reason on the single-item path, never NaN (AC3
 })
 
 test_that("M61 T5: a MIXED map also reports N-B as NA -- the M61-D1 hole", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # This is the branch AC3's literal wording would have missed: zeta1 IS fitted
   # here, so a "zeta1-dropped path" rule would let alpha's NaN through.
@@ -1826,6 +1860,7 @@ test_that("M61 T5: a MIXED map also reports N-B as NA -- the M61-D1 hole", {
 })
 
 test_that("M61 T5: N-B stays available and unannotated when every scale has a pair", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_spaced_fixture(octants(), n = 800L, k = 4L)
   res <- suppressMessages(
@@ -1903,6 +1938,7 @@ axes_analytic_item_n <- function(angles_deg, counts) {
 }
 
 test_that("M61 T7: fractional item_n survives end to end on the zeta1-dropped path", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Five single-item positions -- an ODD count, which is the only single-item
   # shape giving a fractional item_n (k/2 = 2.5). This is the reachable
@@ -1929,6 +1965,7 @@ test_that("M61 T7: fractional item_n survives end to end on the zeta1-dropped pa
 })
 
 test_that("M61 T7: fractional AND unequal item_n survives on the zeta1-fitted path", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Four positions rotated 22.5 degrees off the axes, carrying 2/3/2/2 items.
   # This is the only shape whose per-axis item_n are fractional *and differ*,
@@ -1998,6 +2035,7 @@ axes_pop_recovers_single <- function(angles, xi1, xi2) {
 }
 
 test_that("M61 T8: exact population recovery at single-item configurations (AC6)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   xi1 <- .16
   xi2 <- .09
@@ -2021,6 +2059,7 @@ test_that("M61 T8: exact population recovery at single-item configurations (AC6)
 })
 
 test_that("M61 T8: Monte-Carlo recovery holds at a single-item set (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # axes_mc_recover_xi1() reads AX only, so it carries over to the zeta1-dropped
   # path unchanged; k = 1 item per position is the whole difference.
@@ -2065,6 +2104,7 @@ axes_mx_components_single <- function(S, n, angles_deg) {
 }
 
 test_that("M61 T8: lavaan and OpenMx agree at a single-item set (Layer B)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   skip_if_not_installed("OpenMx")
   for (ang in list((seq_len(12L) - 1L) * 30, (seq_len(5L) - 1L) * 72)) {
@@ -2117,6 +2157,7 @@ test_that("M61 review F3: the k < 4 message names only components the map would 
 })
 
 test_that("M61 review F4: nb_reason carries every reason that applies", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- (seq_len(8L) - 1L) * 45
   pop <- axes_population_cor(ang, 1L, .20, .05, zeta1 = 0)
@@ -2456,6 +2497,7 @@ test_that("M63 T6: axes_is_boundary() catches a negative zeta2", {
 })
 
 test_that("M63 T6: axes_reliability() fits and reports zeta2 end to end", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- c(0, 45, 90, 135, 180, 225, 270, 315)
   k <- 2L
@@ -2545,6 +2587,7 @@ axes_zeta2_pop <- function(angles, k, truth, item_block) {
 }
 
 test_that("M63 T7 (AC3): the fit recovers zeta2 on the exact population", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- octants()
   k <- 4L
@@ -2566,6 +2609,7 @@ test_that("M63 T7 (AC3): the fit recovers zeta2 on the exact population", {
 })
 
 test_that("M63 T7 (AC4): the omitted-zeta2 bias in xi1 is conditional on geometry", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   ang <- octants()
   k <- 4L
@@ -2614,6 +2658,7 @@ test_that("M63 T7 (AC4): the omitted-zeta2 bias in xi1 is conditional on geometr
 })
 
 test_that("M63 review: even angular spread does NOT make omitting zeta2 safe", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The review counterexample to the FIRST wording of this milestone's own
   # conditional. That wording said xi1 was unaffected when "each block draws
@@ -2700,6 +2745,7 @@ test_that("M63 review: xi2 inflation is not unconditional", {
 })
 
 test_that("M63 T7 (AC4): closed-form omitted-variable bias predicts the fitted bias", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # An independent route to the same number, so the conditional above rests on
   # a derivation and not only on a fitted value: for y = X*beta + gamma*z, the
@@ -2781,6 +2827,7 @@ axes_mx_components_zeta2 <- function(S, n, angles_deg, n_items, item_block) {
 }
 
 test_that("M63 T7 (AC5): lavaan, OpenMx and the OLS shadow agree on zeta2", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   skip_if_not_installed("OpenMx")
   ang <- octants()
@@ -2863,6 +2910,7 @@ test_that("M63 T8 (AC5): the blocked Table 3 rows reproduce Rel and SEm (Layer A
 })
 
 test_that("M63 T9 (AC7): every documented surface names the block component", {
+  skip_on_cran()
   # man/ in the dev tree, Rd_db() once installed -- the dual-source pattern
   # test-rd-latex-safe.R already uses, because a man/-only guard silently
   # SKIPS under R CMD check (installed packages carry help/, not man/) and a
@@ -2963,6 +3011,7 @@ axes_capture_fit <- function(thunk) {
 }
 
 test_that("AC1: details reports p* and the N the fit was priced at", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture(n = 1200L, k = 3L, seed = 70L)
   p <- length(fx$names)
@@ -3008,6 +3057,7 @@ test_that("AC1: details reports p* and the N the fit was priced at", {
 })
 
 test_that("AC1: details exposes the baseline chisq and df as one pair", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture(n = 900L, k = 3L, seed = 71L)
   got <- axes_capture_fit(function() {
@@ -3083,6 +3133,7 @@ test_that("AC2: the vignette's calibration table and its object pointer travel t
 # ---- M89 AC6: the degeneracy criterion tripping inside axes_reliability() ----
 
 test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the four scaled statistics together", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   pop <- axes_population_cor(oct, 3L, .35, .10, .08)
@@ -3152,6 +3203,7 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
 
 
 test_that("M91 AC5: a raw-metric-only degeneracy through the assembly seam NAs nothing reported", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   pop <- axes_population_cor(oct, 3L, .35, .10, .08)
@@ -3201,6 +3253,7 @@ test_that("M91 AC5: a raw-metric-only degeneracy through the assembly seam NAs n
 
 
 test_that("M91 AC4: the printed SE-failure note stays silent in the raw-arm-only regime", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   pop <- axes_population_cor(oct, 3L, .35, .10, .08)

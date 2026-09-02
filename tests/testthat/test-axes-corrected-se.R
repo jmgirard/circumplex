@@ -22,6 +22,7 @@ probe_pop <- function() {
 
 
 test_that("BC2: the corrected covariance reproduces RR13's deterministic anchors", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
@@ -61,6 +62,7 @@ test_that("BC2: the corrected covariance reproduces RR13's deterministic anchors
 
 
 test_that("BC2: the naive branch reproduces lavaan's own information matrix", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
@@ -85,6 +87,7 @@ test_that("BC2: the naive branch reproduces lavaan's own information matrix", {
 
 
 test_that("BC1: Sigma-hat is realigned to the item map, not consumed as given", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
@@ -123,6 +126,7 @@ test_that("BC1: Sigma-hat is realigned to the item map, not consumed as given", 
 
 
 test_that("BC1: components$SE is the corrected value, details keeps the naive one", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   res <- axes_reliability(cormat = pp$sigma, items = pp$items,
@@ -172,6 +176,7 @@ test_that("BC1: components$SE is the corrected value, details keeps the naive on
 
 
 test_that("BC1: the block-specificity component is corrected too (the K matrix)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # RR13's reproduction appendix omits K entirely -- it derives {C, J, B, E_ii}
   # only -- so zeta2 is the one piece of BC1 with no published worked value
@@ -512,6 +517,7 @@ test_that("BC6: the stored bootstrap reproduces live, so the oracle is not stale
 
 
 test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   res <- axes_reliability(cormat = pp$sigma, items = pp$items,
@@ -647,6 +653,7 @@ test_that("AC7: the Rd states the correction and no longer claims otherwise", {
 
 
 test_that("M66 review F3: print() WIRING for the correction-failure note", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Title says WIRING deliberately (the M62 lesson): this constructs the
   # failure state on the object rather than provoking it, so it proves the
@@ -887,6 +894,7 @@ m69_vech_se <- function(sigma, mats, n_comp, n) {
 
 
 test_that("AC2: the corrected branch matches the vech oracle at cov2cor, octant map", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
@@ -908,6 +916,7 @@ test_that("AC2: the corrected branch matches the vech oracle at cov2cor, octant 
 
 
 test_that("AC2: the corrected branch matches the vech oracle at cov2cor, blockwise map", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   # The crossed layout, as the BC1 K-matrix test above uses: a contiguous one
@@ -953,6 +962,7 @@ test_that("AC2: the corrected branch matches the vech oracle at cov2cor, blockwi
 # matrix by design (pinned at :104), so the literal BC2 recipe would error.
 
 test_that("AC7: corrected and fiml_ratio are invariant to diagonal rescaling", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_pop()
   fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
@@ -996,6 +1006,7 @@ test_that("AC7: corrected and fiml_ratio are invariant to diagonal rescaling", {
 
 
 test_that("AC7: the same invariance holds on the zeta2 (blockwise) probe", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Deviation D1 reads "the probe fits" as the octant probe PLUS the zeta2
   # probe. The test above covers only the first, leaving the block-specificity
@@ -1043,6 +1054,7 @@ test_that("AC7: the same invariance holds on the zeta2 (blockwise) probe", {
 
 
 test_that("AC7: the reported FIML SE is se_uncorrected times fiml_ratio", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Deviation D1's wiring assertion. After D2 this is the PRIMARY evidence that
   # the repricing reaches the FIML surface at all: the committed band fixture

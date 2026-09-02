@@ -242,6 +242,7 @@ test_that("published oracle: equal-communality rows (Table 2 model 2b)", {
 })
 
 test_that("published oracle: m = 2 reproduces CIRCUM's two Heywood cases", {
+  skip_on_cran()
   voc <- cpm_oracle_voc()
   fit <- suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
                                   angles = voc$th_start, n = voc$N, m = 2))
@@ -264,6 +265,7 @@ test_that("published oracle: m = 2 reproduces CIRCUM's two Heywood cases", {
 })
 
 test_that("published oracle: m = 3 drives beta_3 to the boundary as CIRCUM found", {
+  skip_on_cran()
   voc <- cpm_oracle_voc()
   fit <- suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
                                   angles = voc$th_start, n = voc$N, m = 3))
@@ -283,6 +285,7 @@ test_that("published oracle: m = 3 drives beta_3 to the boundary as CIRCUM found
 })
 
 test_that("published oracle: verbal-ability matrix and the m cap", {
+  skip_on_cran()
   # Listing 7-8 (pp. 67-68): CircE's m = 5 attempt on p = 6 variables is
   # underidentified (negative df) and ends in a singular Hessian; our API
   # refuses over-cap m up front instead (design sec. 1.4).
@@ -521,6 +524,7 @@ test_that("zeta is the communality index; Communality is its square", {
 # cross-implementation (live; the OpenMx free-scaling fit).
 
 test_that("free-scaling frozen oracle: our engine reproduces Grassi App. A", {
+  skip_on_cran()
   voc <- cpm_oracle_voc()
   app <- cpm_oracle_voc_appendix()
   fit <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
@@ -582,6 +586,7 @@ test_that("free-scaling live oracle: our engine agrees with OpenMx free-scaling"
 })
 
 test_that("free-scaling: fixed-grid (variant B) reproduces Table 2 model 3c", {
+  skip_on_cran()
   # Table 2 model 3c: equally spaced angles, free scaling. Our variant-B free
   # fit lands on the published beta and F at same-model tolerances (the B6
   # model-difference allowance that variant B needed against the diag family is

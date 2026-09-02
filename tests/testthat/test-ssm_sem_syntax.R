@@ -79,6 +79,7 @@ test_that("ssm_sem_syntax() returns a string carrying the weights attribute (§3
 })
 
 test_that("ssm_sem_syntax() reads angles and names from an instrument (§3.5)", {
+  skip_on_cran()
   syn <- ssm_sem_syntax(instrument = iipsc)
   expect_equal(as.numeric(attr(syn, "angles")), iipsc$Scales$Angle)
   # Scale names appear as observed variables in the syntax.
@@ -168,6 +169,7 @@ test_that("require_lavaan() is silent when lavaan is present (§7.4)", {
 # Fit-under-lavaan on a reference instrument (spec §3.5 acceptance) ------------
 
 test_that("emitted syntax fits under DEFAULT lavaan, both tiers, with/without a measure", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   scales <- names(jz2017)[2:9] # PA..NO octant scales
   angles <- as.numeric(octants())
@@ -192,6 +194,7 @@ test_that("emitted syntax fits under DEFAULT lavaan, both tiers, with/without a 
 })
 
 test_that("fitted model is the INTENDED one: df matches the free-param count (§3.4)", {
+  skip_on_cran()
   # Directly guards against lavaan's auto.fix.first silently fixing loadings
   # (which yields a different, wrong model with a larger df).
   skip_if_not_installed("lavaan")
@@ -209,6 +212,7 @@ test_that("fitted model is the INTENDED one: df matches the free-param count (§
 })
 
 test_that("scaled fit keeps every scale's angle fixed at its theoretical value", {
+  skip_on_cran()
   # The plane loadings (lx_i, ly_i) must lie on the ray at theta_i: the direction
   # is fixed even though the saturation is free. A wrong (auto.fix.first) model
   # would fail this.
@@ -354,6 +358,7 @@ sem_two_group_data <- function(n = 400, seed = 20260707) {
 }
 
 test_that("multi-group syntax fits and converges under default cfa, both tiers x every rung", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   dat <- sem_two_group_data()
   octs <- as.numeric(octants())
@@ -373,6 +378,7 @@ test_that("multi-group syntax fits and converges under default cfa, both tiers x
 })
 
 test_that("shared parameters use repeated-vector labels: no lavaan single-label warning", {
+  skip_on_cran()
   # Cross-group equality is stated explicitly as c(a1,a1)*s1 (not a plain
   # a1*s1), so lavaan must not warn that "using a single label per parameter
   # in a multiple group setting implies imposing equality constraints".
@@ -397,6 +403,7 @@ test_that("shared parameters use repeated-vector labels: no lavaan single-label 
 })
 
 test_that("multi-group df matches the free-parameter count (lavaan authoritative, §3.4/§6.2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   dat <- sem_two_group_data()
   octs <- as.numeric(octants())
@@ -421,6 +428,7 @@ test_that("multi-group df matches the free-parameter count (lavaan authoritative
 })
 
 test_that("equality structure matches the invariance contract (§6.2, parameterTable)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   dat <- sem_two_group_data()
   octs <- as.numeric(octants())
@@ -476,6 +484,7 @@ test_that("equality structure matches the invariance contract (§6.2, parameterT
 })
 
 test_that("fitted configural solution keeps every angle fixed per group (§5.5)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   dat <- sem_two_group_data()
   octs <- as.numeric(octants())

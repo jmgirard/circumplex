@@ -448,6 +448,7 @@ cert_bracket <- function(est, true_rel, lbl) {
 
 
 test_that("AC3: the anchor case list is not empty", {
+  skip_on_cran()
   # Without this, emptying cert_anchors() would take every bracket assertion in
   # this file with it -- the per-case tests below are GENERATED from that list,
   # and a loop over nothing generates nothing and reports PASS. The count is
@@ -598,6 +599,7 @@ test_that("AC1: at least one case was priced against its committed exact values"
 
 
 test_that("AC3: the estimate discriminates the reachable cases from counterexample B", {
+  skip_on_cran()
   # The discrimination is the point of the instrument: the same threshold that
   # passes every reachable geometry must refuse B. delta_star = 1e-4 is the
   # stated accuracy target the criterion already carries.
@@ -617,6 +619,7 @@ test_that("AC3: the estimate discriminates the reachable cases from counterexamp
 
 
 test_that("AC1: the estimate is finite and non-negative across the admitted domain", {
+  skip_on_cran()
   # "Admitted" is AC1's own scope: every matrix on which the criterion's
   # "singular" and "indefinite" limbs pass -- which includes the whole
   # ill-conditioned band, up to and past the current floor, and the
@@ -660,6 +663,7 @@ test_that("AC1: the estimate is finite and non-negative across the admitted doma
 
 
 test_that("AC1: the estimate cannot depend on the typed sample size", {
+  skip_on_cran()
   # Structural, not tested-into-existence: the certificate is computed from the
   # pre-square-root quadratic forms, in which n never appears, and takes no `n`
   # argument at all. The formals assertion is what pins that -- an `n` added
@@ -761,6 +765,7 @@ test_that("dd_solve() returns its sentinel, never a condition, on a column
 
 
 test_that("the estimate tracks a planted perturbation of the shipped values", {
+  skip_on_cran()
   # A sensitivity invariant, not an oracle: it asserts the comparison is wired
   # to the shipped numbers and responds monotonically, with no external truth
   # at all. The shipped double route is captured and its output multiplied by

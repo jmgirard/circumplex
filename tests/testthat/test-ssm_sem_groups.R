@@ -85,6 +85,7 @@ interior_2g <- function(d1_deg = 40, d2_deg = 110) {
 # The invariance ladder and gating (sec. 6.2/6.3) ---------------------------------
 
 test_that("measure-path ssm_sem() with grouping fits the ladder to metric and reports per-group + contrast rows (sec. 6.2/6.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g()
   dat <- sim_2g(pop, n_per = 700, seed = 11)
@@ -116,6 +117,7 @@ test_that("measure-path ssm_sem() with grouping fits the ladder to metric and re
 })
 
 test_that("the metric-rung model is empirically identified at the metric-true population (sane SEs, no ridge; T3 lesson)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g()
   dat <- sim_2g(pop, n_per = 500, seed = 12)
@@ -136,6 +138,7 @@ test_that("the metric-rung model is empirically identified at the metric-true po
 })
 
 test_that("non-comparison path: metric failure yields a stated non-comparison, not a number (sec. 6.3)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Group B violates metric invariance: a different circumplex-saturation
   # PATTERN (second-harmonic), not just a metric rescaling
@@ -180,6 +183,7 @@ test_that("non-comparison path: metric failure yields a stated non-comparison, n
 # The +/-180 branch cut on the latent group contrast (sec. 5.5/6.4) ---------------
 
 test_that("latent group contrast near +/-180 stays on the estimate's branch (sec. 6.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g(d1_deg = 5, d2_deg = 186)
   dat <- sim_2g(pop, n_per = 700, seed = 14)
@@ -202,6 +206,7 @@ test_that("latent group contrast near +/-180 stays on the estimate's branch (sec
 # The latent mean path (sec. 6.4) --------------------------------------------------
 
 test_that("mean path: the latent mean contrast recovers a constructed cosine shift EXACTLY at population moments under the strict tier (sec. 6.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   p <- 8
   th <- oct * pi / 180
@@ -245,6 +250,7 @@ test_that("mean path: the latent mean contrast recovers a constructed cosine shi
 })
 
 test_that("mean path end-to-end: ssm_sem() gates at scalar and recovers the shift within sampling noise (sec. 6.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   p <- 8
   th <- oct * pi / 180
@@ -290,6 +296,7 @@ test_that("mean path end-to-end: ssm_sem() gates at scalar and recovers the shif
 })
 
 test_that("mean path defaults its gating to scalar; measure path to metric (sec. 7.2 / review F8)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g()
   dat <- sim_2g(pop, n_per = 400, seed = 16)
@@ -309,6 +316,7 @@ test_that("mean path defaults its gating to scalar; measure path to metric (sec.
 # Estimand documentation surface (T4 acceptance) ----------------------------------
 
 test_that("print shows the invariance block and the two-estimand distinction is stated in the docs (sec. 6.1)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g()
   dat <- sim_2g(pop, n_per = 400, seed = 17)
@@ -326,6 +334,7 @@ test_that("print shows the invariance block and the two-estimand distinction is 
 })
 
 test_that("the reference group follows FACTOR LEVELS, not row order: relabeling flips the contrast (CLAUDE.md grouping contract)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Caught by /statistical-validation: lavaan's default group order is order
   # of appearance in the data, so without an explicit group.label the
@@ -360,6 +369,7 @@ test_that("the reference group follows FACTOR LEVELS, not row order: relabeling 
 })
 
 test_that("same seed reproduces multi-group results; group draws are joint (sec. 5.3/5.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g()
   dat <- sim_2g(pop, n_per = 400, seed = 18)
@@ -379,6 +389,7 @@ test_that("same seed reproduces multi-group results; group draws are joint (sec.
 # Cumulative gating (the /code-review finding: gate on ALL rungs <= required) --
 
 test_that("a metric rejection gates the mean-path contrast even when the scalar increment passes (cumulative gating)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Mean path, scaled tier: group B has a pattern-violating saturation
   # structure (metric false). The scalar-vs-metric INCREMENT may well pass;
@@ -411,6 +422,7 @@ test_that("a metric rejection gates the mean-path contrast even when the scalar 
 })
 
 test_that("a rejection ABOVE the required rung is reported only, never gating (spec: step 4 reported, never required)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Measure path (required = metric) with invariance = "scalar" requested:
   # metric holds; intercept differences make scalar fail; the contrast must
@@ -440,6 +452,7 @@ test_that("a rejection ABOVE the required rung is reported only, never gating (s
 # Mandated boundary cells, multi-group (CLAUDE.md) ------------------------------
 
 test_that("a group profile at the 0/360 pole gets a straddling per-group CI inside a contrast analysis", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- sem_pop_2g(
     a = rep(0.55, 8), cc = rep(0.6, 8),
@@ -464,6 +477,7 @@ test_that("a group profile at the 0/360 pole gets a straddling per-group CI insi
 })
 
 test_that("a flat group profile degrades honestly inside a contrast analysis (no crash, no confident direction)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- sem_pop_2g(
     a = rep(0.55, 8), cc = rep(0.6, 8),
@@ -491,6 +505,7 @@ test_that("a flat group profile degrades honestly inside a contrast analysis (no
 # The accidental cross-group equality guard (escape hatch) -----------------------
 
 test_that("single-group syntax fitted with group= is refused (measure blocks equality-constrained by shared labels)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- interior_2g()
   dat <- sim_2g(pop, n_per = 400, seed = 26)
@@ -575,6 +590,7 @@ dcfi_printed <- function(res) {
 }
 
 test_that("dcfi is the CFI difference between adjacent fitted rungs, NA where there is no predecessor (cheung2002)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pop <- dcfi_pop_2g(0)
   dat <- sim_groups(pop$sigma, n_per = 400, seed = 11)
@@ -613,6 +629,7 @@ test_that("dcfi is the CFI difference between adjacent fitted rungs, NA where th
 })
 
 test_that("the strict tier's VACUOUS metric rung carries no dcfi, and the next rung differences against configural", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   p <- 8
   th <- oct * pi / 180
@@ -651,6 +668,7 @@ test_that("the strict tier's VACUOUS metric rung carries no dcfi, and the next r
 })
 
 test_that("in scope (two groups, plain-ML CFI) the Cheung-Rensvold flag retains above the -.01 cutoff and rejects below it", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Retained: metric-invariant population, CFI does not drop
   pop_ok <- dcfi_pop_2g(0)
@@ -700,6 +718,7 @@ test_that("the -.01 cutoff is a >= boundary and never fires outside its validate
 })
 
 test_that("outside the validated scope (robust CFI, or more than two groups) dcfi prints with a not-validated note and NO binary flag", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # (a) robust CFI: the package's DEFAULT estimator (MLR), two groups
   pop <- dcfi_pop_2g(0.02)
@@ -744,6 +763,7 @@ test_that("outside the validated scope (robust CFI, or more than two groups) dcf
 })
 
 test_that("Delta-CFI is REPORTED ONLY: it never moves the gate, the verdict, or the estimation fit, even when it disagrees with Delta-chi-square", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # A deliberate DISAGREEMENT: a small pattern violation at large n. The
   # Cheung-Rensvold flag retains (CFI drops only ~.002) while the nested
@@ -805,6 +825,7 @@ dcfi_pop_lowsat <- function(eps) {
 }
 
 test_that("a non-ML estimator that still yields a plain CFI is OUT of scope (Cheung & Rensvold simulated ML only)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # GLS, WLS, ULS and continuous DWLS all produce plain-named fit measures, so
   # "no cfi.robust/cfi.scaled" does NOT imply "normal-theory ML CFI". Cheung &
@@ -841,6 +862,7 @@ test_that("a non-ML estimator that still yields a plain CFI is OUT of scope (Che
 })
 
 test_that("printed dcfi resolves against the cutoff: values either side of -.01 never render alike (M57 review F2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # round(dcfi, 3) would print both -0.0096 (retain) and -0.0104 (reject) as
   # "-0.01", showing one number under two opposite labels directly beneath a
@@ -881,6 +903,7 @@ test_that("printed dcfi resolves against the cutoff: values either side of -.01 
 })
 
 test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nested test retains (AND-leak guard)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Complement of the disagreement fixture above. There, ΔCFI retained while
   # Δχ² rejected, and the truth was comparable = FALSE -- so a leak of the form

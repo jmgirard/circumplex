@@ -51,6 +51,7 @@ shipped_pairs <- function() {
 }
 
 test_that("every shipped sample carries a Kind from the controlled vocabulary", {
+  skip_on_cran()
   for (nm in shipped_instruments()) {
     info <- shipped_instrument(nm)$Norms[[2]]
     expect_true("Kind" %in% names(info), info = nm)
@@ -62,6 +63,7 @@ test_that("every shipped sample carries a Kind from the controlled vocabulary", 
 })
 
 test_that("the shipped kinds are the ones the audit record assigns", {
+  skip_on_cran()
   pairs <- shipped_pairs()
   # Exhaustiveness first: a loop over the expectation map alone would pass
   # while silently skipping a shipped pair the map forgot.
@@ -121,6 +123,7 @@ KIND_PHRASES <- c(
 )
 
 test_that("norms() prints each sample's kind, and no other sample's", {
+  skip_on_cran()
   for (nm in shipped_instruments()) {
     obj <- shipped_instrument(nm)
     info <- obj$Norms[[2]]
@@ -175,6 +178,7 @@ accepted_pairs <- function() {
 }
 
 test_that("every accepted call discloses its sample's kind, in message and attribute", {
+  skip_on_cran()
   pairs <- accepted_pairs()
   expected <- expected_kinds[
     pair_key(expected_kinds$instrument, expected_kinds$sample) %in%

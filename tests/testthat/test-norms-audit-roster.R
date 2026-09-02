@@ -58,6 +58,7 @@ shipped_roster_literal <- function() {
 }
 
 test_that("dropping any batch row is visible in the run (M79)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   batch <- env$AUDIT_BATCH
@@ -102,6 +103,7 @@ test_that("dropping any batch row is visible in the run (M79)", {
 })
 
 test_that("a dropped instrument is named, not just counted (M79)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   batch <- env$AUDIT_BATCH
@@ -156,6 +158,7 @@ test_that("an instrument shipping no norms is not a roster gap (M79)", {
 })
 
 test_that("the roster is the package's own enumeration, not a copy (M79)", {
+  skip_on_cran()
   # Comparing shipped_roster()'s instruments against shipped_instruments() is
   # a tautology -- both bottom out in circumplex:::instrument_names(), so the
   # assertion holds even if that function returns nothing (M79 review, F11).
@@ -196,6 +199,7 @@ test_that("the roster is the package's own enumeration, not a copy (M79)", {
 })
 
 test_that("injecting one object does not shrink the audited world (M79)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   # The return-2 hole: `objects` overrides one instrument's VALUES, and the
@@ -239,6 +243,7 @@ test_that("injecting one object does not shrink the audited world (M79)", {
 # roster reports 22 (23 at that measurement; M112 withdrew one sample).
 
 test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   batch <- env$AUDIT_BATCH
@@ -279,6 +284,7 @@ test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
 })
 
 test_that("a roster touching `data/` must cover all of it (M86)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   batch <- env$AUDIT_BATCH
@@ -330,6 +336,7 @@ test_that("a roster touching `data/` must cover all of it (M86)", {
 })
 
 test_that("the default roster is resolved before it is validated (M84)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   batch <- env$AUDIT_BATCH
@@ -552,6 +559,7 @@ test_that("the builder's roster is the shipped data, pair for pair (M86)", {
 })
 
 test_that("passing the shipped roster explicitly changes no gap (M84, M86)", {
+  skip_on_cran()
   env <- roster_defs()
   dir <- roster_notes()
   # The M79 regression, restated against the surviving spelling. Auditing a
