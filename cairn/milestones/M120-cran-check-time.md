@@ -56,14 +56,29 @@ bar travels with them).
       CRAN: for the blocks enumerated by the branch diff over
       `tests/testthat/`, a `NOT_CRAN=true` per-block run names each one with a
       result that is neither skip nor failure.
-- [ ] AC4 — For each exported function whose CRAN-mode coverage this milestone
-      reduces — the set enumerated by the union of the CRAN-mode
-      skipped-block-set diff (before vs after) and the branch diff over
-      `tests/testthat/` — at least one block still runs on CRAN exercising that
-      function; and for each such function in the `ssm_*`, `cpm_*` and `axes_*`
-      families, that block is shown red under two planted defects on the path
-      it covers: a magnitude error in a returned estimate, and — where the
-      output has an angular component — a wrap error at 0°/360° or ±180°.
+- [ ] AC4 — Domain: the exported functions whose CRAN-mode coverage this
+      milestone reduces, enumerated by `tools/m120-cran-coverage.R` as the
+      union of the CRAN-mode skipped-block diff (before vs after) and the
+      branch diff over `tests/testthat/`; the instrument fails if the domain is
+      empty. (i) For every domain function, at least one block naming it is run
+      in CRAN mode on the clean tree and reports a pass with no skip — shown by
+      running it, not by matching text. (ii) For every domain function in the
+      `ssm_*`, `cpm_*` and `axes_*` families except the renderers `ssm_table`,
+      `ssm_plot_circle`, `ssm_plot_curve`, `ssm_plot_contrast` and
+      `ssm_plot_trajectory`, some live-on-CRAN block fails — a test failure,
+      not an error — when a planted defect inflates by 5% a numeric value the
+      function returns. (iii) `angle_unwrap`, `cpm_fit`, `ssm_analyze`,
+      `ssm_draws`, `ssm_parameters` and `ssm_sem_parameters` each have a
+      live-on-CRAN block asserting an expected angular *value* at the 0°/360°
+      pole — not a relational property — and each such block fails under a wrap
+      defect planted on the angular path that function uses: displacement left
+      on `atan2`'s (-π, π] branch for the SSM estimator and for the SEM
+      transform, a pole angle reporting 0 instead of 360 for the CPM path.
+      Where the suite has no such block, this milestone authors one. Blocks may
+      differ between (ii) and (iii). (iv) `tools/m120-planted-defects.R` reads
+      the domain emitted by `tools/m120-cran-coverage.R` and fails unless every
+      domain function appears in `tools/m120-designations.csv` with a
+      disposition and the defects that disposition requires.
 - [ ] AC5 — Every vignette chunk and documented example whose computation this
       milestone precomputes or cheapens — the set enumerated by the branch diff
       over `vignettes/`, `man/`, and any `R/` default or helper feeding a
@@ -128,6 +143,7 @@ bar travels with them).
 - 2026-09-02: T3 — `skip_on_cran()` added to 416 test blocks, chosen top-down by measured cost in three passes (thresholds 0.10 s, 0.10 s, 0.07 s, re-measuring between passes because per-file warm-up cost migrates onto whichever block runs first). CRAN-mode live cost fell 157.0 s -> 7.0 s over 516 still-live blocks; 500 of 1016 blocks now skip on CRAN. An intermediate `--as-cran` run after two passes read 26 s for tests and 1 min 54 s total. `tools/m120-skipped-blocks-live.R` derives the newly skipped set from the branch diff (HEAD's skipped-block names minus master's) and requires each to run off CRAN: all 416 ran, none skipped, none failed; whole suite off CRAN 1016 blocks, 0 failed, 0 errored, 1 skipped. Planting `skip()` in one of those blocks reddens it. The instrument refuses an empty newly-skipped set and errors on a `skip_on_cran()` outside any `test_that()` block, which is why T2's helper-level skip moved onto its three calling blocks.
 - 2026-09-02: Jeff chose the deeper (three-pass) cut at the mini gate over backing off one pass and raising AC1's tests figure to 30 s: ~6.2 min projected on Windows against ~7.3 min, at the cost of 153 more blocks skipping on CRAN. AC1 is unamended; CI keeps running every block.
 - 2026-09-02: T5 — `boots = 200` added to the 15 roxygen example calls that ran the 2000 default (`ssm_analyze` 8, `ssm_plot_circle`/`ssm_plot_curve`/`ssm_plot_contrast` 1 each, `ssm_table` 2, `ssm_plot_trajectory` 1, `ssm_analyze_long` 1), each `@examples` block opening with a line saying the count is lowered for speed and a reported analysis should use the default; `devtools::document()` regenerated seven Rd files and emitted no warning. `--as-cran` on the resulting tarball, with all step timings forced on: **tests 15 s, vignette re-build 4 s, total 1 min 24 s, Status OK** — AC1 met against the 259 s / 40 s / 6 min 14 s baseline. Examples fell 12 s -> 8 s and `--run-donttest` 27 s -> 11 s. Full suite off CRAN: 0 failures, 9198 passes.
+- 2026-09-02: AMENDMENT to AC4, at Jeff's selection over a first-audited loosening he had chosen an hour earlier. Two fresh-context [O] readers audited the wording; the second rejected the loosening and its counter-proposal is what is now written. Grounds, all measured by planting real defects: the repo's 0/360 boundary blocks assert relational properties (the interval wraps, it contains the estimate) that survive a uniform branch shift, so they stay GREEN under a displacement left on atan2's branch — only 8 live blocks anywhere catch it, all core-estimator tests that pin a number; the loosened wording would have been signed off by those incidental catches while `ssm_plot_circle`'s CRAN-visible coverage is `is_ggplot()` (its vdiffr expectations skip on CRAN); and the loosening needed both instruments rewritten anyway, so it was not the cheaper route. One mechanical correction to the reader's text: it asked each pole block to fail under both wrap defects, which no single block can, since the SSM branch defect and the CPM pole defect sit on different paths — scoped to the path each function uses.
 
 ## Decisions
 
