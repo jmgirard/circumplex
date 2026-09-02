@@ -1,12 +1,12 @@
 # M120: Bring the Windows CRAN check under 8 minutes
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
-- **Branch/PR:** `m120-cran-check-time`
+- **Branch/PR:** `m120-cran-check-time` / https://github.com/jmgirard/circumplex/pull/151
 
 ## Goal
 
@@ -44,19 +44,19 @@ bar travels with them).
 
 ## Acceptance criteria
 
-- [ ] AC1 — On the tarball built from the branch tip, `R CMD check --as-cran`
+- [x] AC1 — On the tarball built from the branch tip, `R CMD check --as-cran`
       with `NOT_CRAN` unset on the maintainer's macOS machine reports a tests
       step of at most 25 s, a vignette re-build step of at most 10 s, and a
       total under 2 min, against the 259 s / 40 s / 6 min 14 s baseline
       measured there 2026-09-01.
-- [ ] AC2 — A win-builder R-devel run of that tarball reports an overall check
+- [x] AC2 — A win-builder R-devel run of that tarball reports an overall check
       time under 8 minutes, with its tests, vignette re-build, examples and
       install line items recorded.
-- [ ] AC3 — Every test block this milestone newly skips on CRAN still runs off
+- [x] AC3 — Every test block this milestone newly skips on CRAN still runs off
       CRAN: for the blocks enumerated by the branch diff over
       `tests/testthat/`, a `NOT_CRAN=true` per-block run names each one with a
       result that is neither skip nor failure.
-- [ ] AC4 — Domain: the exported functions whose CRAN-mode coverage this
+- [x] AC4 — Domain: the exported functions whose CRAN-mode coverage this
       milestone reduces, enumerated by `tools/m120-cran-coverage.R` as the
       union of the CRAN-mode skipped-block diff (before vs after) and the
       branch diff over `tests/testthat/`; the instrument fails if the domain is
@@ -79,12 +79,12 @@ bar travels with them).
       the domain emitted by `tools/m120-cran-coverage.R` and fails unless every
       domain function appears in `tools/m120-designations.csv` with a
       disposition and the defects that disposition requires.
-- [ ] AC5 — Every vignette chunk and documented example whose computation this
+- [x] AC5 — Every vignette chunk and documented example whose computation this
       milestone precomputes or cheapens — the set enumerated by the branch diff
       over `vignettes/`, `man/`, and any `R/` default or helper feeding a
       documented chunk — renders without error, and no mismatch survives
       between the surrounding prose and the rendered output.
-- [ ] AC6 — `Rscript -e 'devtools::check(manual = TRUE)'` on the branch tip is
+- [x] AC6 — `Rscript -e 'devtools::check(manual = TRUE)'` on the branch tip is
       0 errors / 0 warnings / 0 notes, and `devtools::document()` produces no
       diff.
 
@@ -151,7 +151,225 @@ bar travels with them).
 - 2026-09-02: T7 — win-builder R-devel run of the branch tarball, log read in full (R-devel r90457 ucrt, x86_64-w64-mingw32, Windows Server 2022, started 2026-09-02 15:19:37 UTC): `Status: OK`, no NOTE/WARNING/ERROR. Timed steps: incoming feasibility [12s], R code for possible problems [25s], examples [27s], tests [68s] (`testthat.R` [68s]), re-building of vignette outputs [11s], PDF manual [15s] = 158 s, against 1,165 s for the same six steps on the 2026-09-01 pre-branch run (tests 15 min -> 68 s, vignettes 146 s -> 11 s, examples 41 s -> 27 s). The install step (`checking whether package 'circumplex' can be installed ... OK`) again carries no timing, so the three AC2 line items that are timed are recorded and the fourth is recorded as untimed — the third Windows log in a row to omit it. The log states no overall check time; whether AC2's overall figure can be evidenced at all is the open question below.
 - 2026-09-02: T7 done — overall check time settled from win-builder's own results listing (https://win-builder.r-project.org/0SBISo37uvQ9), read 2026-09-02: `00check.log` last modified 02.09.2026 17:23, i.e. 15:23 UTC on German summer time, against the log's own `current time: 2026-09-02 15:19:37 UTC` start stamp — an elapsed **3 min 23 s to 4 min 23 s** at the listing's minute resolution, under AC2's 8 minutes against the 24 min CRAN measured on its pretest machine. The reading cross-checks against the log's contents: 158 s of that elapsed is the six timed steps, leaving 45-105 s untimed, and no offset other than UTC+2 gives an elapsed consistent with a 158 s timed sum (UTC+1 would require a 64-minute untimed install). AC2's four line items: tests 68 s, vignette re-build 11 s, examples 27 s, install untimed in the log but bounded at 105 s by that residual. Bears on the ROADMAP's Windows-compile-cost candidate row: its promotion condition — the install step alone eating the budget — is not met, since the whole untimed residual is at most 105 s.
 - 2026-09-02: all seven tasks done; `devtools::test()` off CRAN 0 failures / 9242 passes / 1 skip / 9 warnings (the pre-existing zero-variance and lavaan-marker warnings). Status -> review.
+- 2026-09-02: review gate FAILED and returned M120 to `in-progress`. What failed: the `vignette-precompute` workflow this milestone shipped is red on PR #151 — its byte-exact `git diff --exit-code -- 'vignettes/*.Rmd'` cannot pass, because `evaluating-circumplex-structure.Rmd` ships `ssm_ci_accuracy()` output that is not reproducible across machines (coverage 0.891 vs 0.896, N 147 vs 144, certification rate 0.735 vs 0.720 on the CI runner), on top of the wall-clock `Elapsed:` line and the machine-dependent condition numbers. All six acceptance criteria were executed with fresh evidence and met (Review section); the universal and toolchain consistency-gate checks all pass. Four further confirmed defects to fix with it: relative-`tolerance` assertions in `test-plot-cran-guards.R` and `test-pole-values.R`, a top-level `on.exit` in `tools/m120-planted-defects.R` that never fires, `fig.cap = ""` blanking every shipped figure's alt text, and `xml2` missing from the AC5 instrument's dependency surface. First defect return for this milestone.
 
 ## Decisions
 
 ## Review
+
+Evidence gathered 2026-09-02 at review, on the branch tip (`0f9cfba5`), by
+command. The two tracking-only commits after T6 leave the package content of
+the tarball identical to the one T6 and T7 measured.
+
+- **AC1 — met.** Tarball built from the branch tip with `R CMD build`; `R CMD
+  check --as-cran` run with `NOT_CRAN` unset and `_R_CHECK_TIMINGS_=0` on the
+  maintainer's macOS machine with no other R process running. Step timings:
+  **tests 23 s** (budget 25 s), **re-building of vignette outputs 6 s** (budget
+  10 s), **wall-clock total 106 s = 1 min 46 s** (budget 2 min), `Status: OK`,
+  no NOTE/WARNING/ERROR. Against the 2026-09-01 baseline of 259 s / 40 s /
+  6 min 14 s. Other steps: install 10 s, examples 10 s, examples
+  --run-donttest 13 s, PDF manual 3 s. A first run of the same tarball read the
+  same tests (23 s) and vignette (6 s) figures.
+- **AC2 — met.** The win-builder R-devel run of the branch tarball is Jeff's to
+  make; its artifacts were re-read this session from
+  `https://win-builder.r-project.org/0SBISo37uvQ9`, so the figures below are
+  read off the live log rather than recalled. Log: R Under development
+  (2026-08-31 r90457 ucrt), x86_64-w64-mingw32, `current time: 2026-09-02
+  15:19:37 UTC`, `Status: OK`, and NOTE / WARNING / ERROR appear nowhere.
+  **Overall check time 3 min 23 s - 4 min 23 s**, under the 8-minute target and
+  against the 24 min CRAN measured on its pretest machine: the directory
+  listing gives `00check.log` last modified 02.09.2026 17:23 (German summer
+  time, UTC+2 = 15:23 UTC) against the 15:19:37 UTC start, at the listing's
+  minute resolution. Four line items: **tests 68 s**, **re-building of vignette
+  outputs 11 s**, **examples 27 s**, **install untimed in the log** — the third
+  Windows log in a row to omit a timing on the install step — and bounded above
+  by the 45-105 s of elapsed time the six timed steps (158 s total) do not
+  account for.
+- **AC3 — met.** `Rscript tools/m120-skipped-blocks-live.R` (exit 0). It derives
+  the newly CRAN-skipped set from the branch diff over `tests/testthat/` rather
+  than a typed list, and refuses an empty set: **412 blocks**. Run with
+  `NOT_CRAN=true`, each of the 412 is named with its own result and **none
+  skipped, none failed**; the whole suite off CRAN reports 1026 blocks, 0
+  failed, 0 errored, 1 skipped (a pre-existing skip outside the newly skipped
+  set).
+- **AC4 — met.** Two instruments, run in order, both exit 0.
+  - Domain (`Rscript tools/m120-cran-coverage.R`): the union of the 412 newly
+    CRAN-skipped blocks and the 424 blocks this branch touched yields **32
+    exported functions**, written to `tools/m120-domain.txt`; the script
+    refuses an empty domain and also refuses to pass if any of them loses all
+    CRAN-mode coverage. 554 blocks remain live on CRAN. Six exports are called
+    by no test block at all and are reported separately as not this milestone's
+    doing (`CoordCircumplex`, `GeomSsmArc`, `GeomSsmPath`, `GeomSsmPoint`,
+    `ggsave`, `html_render`).
+  - (i), (ii), (iii) and (iv) (`Rscript tools/m120-planted-defects.R`): the
+    script reads `tools/m120-domain.txt`, requires all 32 domain functions to
+    carry a row with a disposition in `tools/m120-designations.csv`, rejects a
+    stray row outside the domain, requires a magnitude defect on every
+    `satisfied` row of the `ssm_*` / `cpm_*` / `axes_*` families, and requires a
+    wrap defect for each of AC4(iii)'s six. Result: **all 33 designated blocks
+    pass on CRAN unpatched** (control run, `NOT_CRAN` unset — a block that
+    skipped there would be rejected as covering nothing) **and all 22
+    block-defect pairs go red** under the ten planted defects: `ssm-magnitude`,
+    `ssm-wrap`, `sem-magnitude`, `sem-wrap`, `semweights-magnitude`,
+    `cpm-magnitude`, `cpm-pole`, `coverage-magnitude`, `unwrap-wrap`,
+    `axes-magnitude`. `R/` and `src/` restored clean afterwards.
+- **AC5 — met**, over both halves of the enumerated set.
+  - Vignettes (7, the branch diff over `vignettes/`): `Rscript
+    tools/m120-vignette-parity.R` (exit 0) against the tarball-installed
+    package. For each of the seven it renders the live `.Rmd.orig` source and
+    the shipped pre-computed `.Rmd`, strips both to visible text, and compares:
+    **all seven match** (1114 / 579 / 386 / 711 / 389 / 349 / 452 source
+    lines). A rendering error on either side is a failure there, not a skip, so
+    the run also evidences that every source and every shipped vignette renders
+    without error; the `--as-cran` run's `re-building of vignette outputs` step
+    is OK. The only normalized line is `ssm_ci_accuracy()`'s printed wall-clock
+    `Elapsed:`.
+  - Examples (7 Rd files, the branch diff over `man/`, from the `R/` roxygen it
+    is generated from): all 15 changed calls carry `boots = 200`
+    (`ssm_analyze` 8, `ssm_table` 2, `ssm_plot_circle` / `ssm_plot_curve` /
+    `ssm_plot_contrast` / `ssm_plot_trajectory` / `ssm_analyze_long` 1 each),
+    and every one of the seven `\examples` blocks opens with the line saying the
+    count is lowered for speed and that a reported analysis should use the
+    default — so no surviving prose claims the default resample count for a
+    call that no longer uses it. They render without error: the `--as-cran`
+    `examples` step is OK at 10 s and `examples with --run-donttest` OK at 13 s.
+- **AC6 — met.** `Rscript -e 'devtools::check(manual = TRUE)'` on the branch
+  tip: **0 errors / 0 warnings / 0 notes**, `Status: OK`, duration 12 min 44 s
+  (this is the full check with the PDF manual, not the check-time budget AC1
+  measures). `Rscript -e 'options(cli.width = 500); devtools::document()'`
+  emitted no line matching `resolve link` and left `man/` and `NAMESPACE`
+  with an empty `git status` — no diff.
+
+### Consistency gate
+
+- `cairn_validate.py` exit 0, all checks PASS; 47 advisory WARNs, every one a
+  multi-line work-log entry in M7's pre-existing log, none from this milestone.
+  The `release window` advisory did not fire.
+- No `DESIGN.md` principle changed (the diff does not touch it), so
+  `cairn_impact.py --changed` does not apply.
+- Toolchain checks, from the `r-package` profile's `consistency-gate` slot:
+  `document()` no diff and no unresolved-link warning (above);
+  no generated file hand-edited; `devtools::build_readme()` leaves `README.md`
+  unchanged; `pkgdown::check_pkgdown()` "No problems found";
+  `.Rbuildignore` covers the one new top-level pattern
+  (`^vignettes/.*\.Rmd\.orig$`) and the check reports no NOTE;
+  `devtools::check()` clean (above); master watches — the newest push run on
+  `master` reaching a verdict is 2026-09-02T04:58:32Z, `success` on both
+  `R-CMD-check.yaml` and `test-coverage.yaml`;
+  `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`,
+  `tools/check-branch-protection.R` and `tools/check-ci-deps.R` all exit clean.
+  NEWS.md: no entry written, because the milestone changes no exported
+  behavior — the example calls and the vignette build change, not what any
+  function does.
+
+**Gate result: FAILED on the branch's own CI.** `gh pr checks 151` reports
+`vignette-precompute` **fail** (21m8s) — the workflow this milestone shipped.
+`pkgdown` and `matrix` pass; the three `R-CMD-check` platform jobs were still
+pending when the gate was called.
+
+### Independent review
+
+Surface tier user-facing and the diff touches executable surface, so the full
+three-lens fan-out ran, each lens fresh-context with a distinct evidence base.
+[O] diff-bug returned 16 ranked findings; [S] blame-history returned 4; [S]
+prior-review-record returned none — it found no archived `## Review` finding
+this diff walks back, and its GitHub probe
+(`gh api repos/jmgirard/circumplex/pulls/comments?per_page=1`) returned `[]`,
+so no repo-wide inline-review surface exists to walk.
+
+Two lens claims were checked before triage and hold: [O]'s reading that the
+`vignette-precompute` guard cannot pass, and its reading of `tolerance` in
+testthat edition 3.
+
+**Findings, and their disposition.**
+
+- **F1 (return-forcing; [O] rank 1, CONFIRMED by the CI run).** The
+  `vignette-precompute` staleness guard cannot go green.
+  `.github/workflows/vignette-precompute.yaml` compares the re-rendered
+  vignettes byte-exactly (`git diff --exit-code -- 'vignettes/*.Rmd'`), but
+  `vignettes/evaluating-circumplex-structure.Rmd` carries output that is not
+  reproducible across machines. The CI failure log shows the drift is not only
+  the wall-clock `Elapsed:` line [O] named: `ssm_ci_accuracy()`'s simulation
+  numbers themselves move (coverage `0.891` -> `0.896`, N `147` -> `144`,
+  certification rate `0.735` -> `0.720`), and the printed condition numbers
+  (`1.83e+14`, `9.24e+16`) are machine-dependent too.
+  `tools/m120-vignette-parity.R` normalizes only `Elapsed:`, so AC5's
+  instrument does not see this; the guard does, on every run. This is the sole
+  mechanism stopping a shipped `.Rmd` drifting from its `.Rmd.orig` — the
+  falsifier the T2 plan-gate entry named for choosing pre-computation.
+- **F2 (fix on the branch; [O] rank 2, CONFIRMED).**
+  `tests/testthat/test-plot-cran-guards.R:91` — `expect_equal(sort(peaks),
+  sort(d_est), tolerance = 5)`. The package is testthat edition 3, where
+  `tolerance` is relative: a 10x difference passes at `tolerance = 5`
+  (verified directly). The block reddens under `ssm-wrap` only because the
+  expected side moves too; as the value assertion its comment claims, it is
+  near-vacuous.
+- **F3 (fix on the branch; [O] rank 3, CONFIRMED).**
+  `tools/m120-planted-defects.R`'s `on.exit(restore(patched_files))` sits at
+  script top level, where it never fires — verified with a minimal `Rscript`
+  that `stop()`s after a top-level `on.exit`. The script's header asserts the
+  opposite. A `stop()` between `apply_patch()` and the loop's `restore()`
+  therefore leaves a planted defect in `R/` or `src/`; the next run's
+  dirty-tree refusal catches it, so it is detectable, not silent.
+- **F4 ([O] rank 6, same mechanism as F2; fix on the branch).**
+  `tests/testthat/test-pole-values.R:139` uses `tolerance = 1e-1` on a `d_est`
+  near 350 (relative, so about +/-35 degrees) and line 100 uses `1e-2`
+  (+/-3.5 degrees). Both still redden under `sem-wrap`, which moves the value
+  by 360, but a 30-degree estimator error would pass.
+- **F5 ([O] ranks 4, 5, 10, 11; follow-up).** Instrument strength:
+  `m120-planted-defects.R` gates its magnitude requirement on the CSV's own
+  `disposition` label without checking that `renderer` names exactly AC4(ii)'s
+  five, so relabelling a row to `covered` drops its defect silently; both
+  instruments detect a skip only by the literal `^\s*skip_on_cran\(\)\s*$`
+  line, so `vdiffr`, `expect_snapshot`, `skip_if_not_installed()` and
+  `skip_on_os()` skips are invisible and the "554 live on CRAN" figure
+  over-counts; coverage attribution counts textual mentions, not reached
+  calls. The 33 designated blocks each get a real CRAN-mode control run, so
+  AC4's own claims stand; the looser credit is for the 15 `covered` rows.
+- **F6 ([O] rank 7; fix on the branch).**
+  `tools/precompute-vignettes.R:34` sets `fig.cap = ""` globally, so every
+  shipped vignette figure renders as `alt=""` where a live build produced
+  `alt="plot of chunk <label>"` — an accessibility regression in shipped
+  documentation. `tools/m120-vignette-parity.R:22` collapses `<img ...>` to a
+  placeholder, so AC5's instrument is structurally blind to it.
+- **F7 ([O] rank 12; fix on the branch).** `tools/m120-vignette-parity.R`
+  needs `xml2`, which is in neither `DESCRIPTION` `Suggests` nor the
+  `vignette-precompute` allowlist (confirmed), so the AC5 instrument does not
+  run on a clean checkout. It is used elsewhere in CI only by
+  `test-coverage.yaml`.
+- **F8 ([O] ranks 8, 9, 13, 14, 15, 16; follow-up or rejected).** A ggplot2
+  lifecycle warning is baked into `introduction-to-ssm-analysis.Rmd` as
+  standalone output (bears on F1's nondeterminism, since it prints once per
+  session); `exact_cov_sample()` reseeds the global RNG as a side effect;
+  `vignettes/figures/` adds 1.3 MB of PNGs with no size figure recorded
+  against CRAN's thresholds (AC6's clean check is the only evidence);
+  the guard ignores figures by design, so a plot-only change ships a stale
+  PNG silently; the occasions boundary battery is now off-CRAN with the wide
+  equivalents still live (a narrowing, not a hole); the two vignette-guard
+  readers now read different files.
+- **F9 ([S] blame ranks 1-2; follow-up).** Two shipped-*data* sweeps left
+  CRAN: `test-norms-provenance.R`'s "shipped angles follow the LM = 360
+  convention" (added by M72 against the pole-canonicalization mistake the
+  0/360 convention exists to prevent) and `test-norms-anchor-range.R`'s "no
+  shipped norm sample's mean falls outside its instrument's anchors" (the
+  D-040 hotfix's domain-wide sweep, count-pinned by M112). Both sit outside
+  AC4's domain, which reaches computation paths rather than static data
+  audits; the narrower `norm_standardize()` refusal test stays live on CRAN.
+  Neither is an AC4 failure — AC4 is about functions losing coverage, and both
+  functions keep a live designated block.
+- **[S] blame ranks 3-4, and the whole [S] prior-review lens: no finding.**
+  The `axes-fiml` / `axes-reliability` sweeps left the value-pinning blocks
+  those decisions rest on live; the `norms-audit-*` skips are redundant with
+  an existing `file.exists()` gate on a `.Rbuildignore`d dev script.
+
+### Disposition
+
+**Status returned to `in-progress`.** F1 is a confirmed defect in something
+this milestone shipped, it is what makes the branch's CI red, and repairing it
+is design work rather than a review-side patch: the
+`evaluating-circumplex-structure` vignette's `ssm_ci_accuracy()` output has to
+become reproducible across machines, or be excluded from the byte-exact
+comparison, or the guard has to compare something other than bytes. F2, F3,
+F4, F6 and F7 are the fix-now list to carry back with it. No acceptance
+criterion failed: AC1-AC6 are all met with the evidence above, and their ticks
+stand.
