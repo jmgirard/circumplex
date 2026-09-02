@@ -1,7 +1,8 @@
 ## Test environments
 
-* local macOS (Darwin 25.5.0), R 4.6.1, via `devtools::check(manual = TRUE)`
-  (including the PDF manual)
+* local macOS (Darwin 25.6.0), R 4.6.1, via `devtools::check(manual = TRUE)`
+  (including the PDF manual), and via `R CMD check --as-cran` on the built
+  tarball with `NOT_CRAN` unset
 * win-builder (R-devel), via `devtools::check_win_devel()`
 * GitHub Actions CI matrix (macOS-latest/release, windows-latest/release,
   ubuntu-latest/devel, ubuntu-latest/release, ubuntu-latest/oldrel-1)
@@ -17,11 +18,7 @@ No reverse dependencies on CRAN (checked via
 
 ## Notes on the URL check
 
-`urlchecker::url_check()` reports a 403 (Forbidden) for the DOI
-https://doi.org/10.1177/01466216261440511 cited in the new "SEM-Based SSM
-Analysis" vignette. The DOI resolves correctly (a HEAD request to doi.org
-returns a 302 redirect); the 403 comes from the publisher (SAGE) blocking
-automated requests, not from a broken link.
+`urlchecker::url_check()` reports all 28 URLs correct.
 
 ## Summary of changes
 
@@ -65,8 +62,8 @@ This is a major release accumulating several feature families developed since
   scale, and a contrast-displacement sign error at the exact +/-180 degree
   boundary.
 
-Three user-visible behavior changes motivate the major-version bump, all
-documented in NEWS.md:
+The user-visible behavior changes to functions and data that already shipped
+in 1.2.0, all documented in NEWS.md, are what motivate the major-version bump:
 
 1. The displacement-interpretability guardrail in `print()`/`summary()` now
    uses a scale-free rule (amplitude CI lower bound at least 0.35
@@ -84,6 +81,15 @@ documented in NEWS.md:
    rather than yielding garbled output columns. All documented call forms are
    unaffected. Count-valued arguments across several functions are likewise
    now validated as a single non-negative whole number.
+4. The `cais` dataset now ships one normative sample rather than two (see the
+   withdrawal note above), so a call passing `sample = 2` for that instrument
+   errors saying the sample does not exist. Such a call was already erroring
+   before this release.
+5. `norm_standardize()` refuses a normative sample whose published mean scores
+   fall outside the instrument's own response range, rather than returning
+   z-scores in an undefined unit.
+6. `ssm_plot_circle()` warns and names any profile it cannot place on the
+   circle, where it previously dropped the profile silently.
 
 ## Notes on dependencies
 
