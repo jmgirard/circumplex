@@ -145,6 +145,10 @@ covariance-structure fit indices.</p>
 <p>On the raw-data path the default confidence intervals are
 bootstrapped. We lower <code>boots</code> from its default of 2000 to
 keep this vignette quick to build; in practice, use the default.</p>
+<!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
+     ill-conditioned, so the reported condition number and the bootstrap
+     acceptance counts move across BLAS implementations; the numbers this
+     chunk prints are not reproducible across machines. -->
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span>
@@ -217,6 +221,7 @@ keep this vignette quick to build; in practice, use the default.</p>
 <span><span class="co">#&gt;   only, and not every marker was measured; they are not validated as</span></span>
 <span><span class="co">#&gt;   predictors of the bootstrap intervals shown here (see the vignette</span></span>
 <span><span class="co">#&gt;   section 'When a fit sits at a boundary').</span></span></code></pre></div>
+<!-- precompute:volatile-numbers end -->
 <p>Two parts of this output matter most for evaluating structure:</p>
 <ul>
 <li>
@@ -248,7 +253,7 @@ communality
 with a joint confidence region where one is estimable.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cpm</span><span class="op">)</span></span></code></pre></div>
-<p><img src="evaluating-circumplex-structure_files/figure-html/cpm_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/evaluating-circumplex-structure-cpm_plot-1.png" alt="plot of chunk cpm_plot" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="reading-the-fit-indices">Reading the fit indices<a class="anchor" aria-label="anchor" href="#reading-the-fit-indices"></a>
@@ -533,6 +538,10 @@ instrument consistent with <em>equally spaced</em> scales? With
 <em>equal</em> communalities? The correlation-matrix path is convenient
 for this comparison (point estimates and fit indices are deterministic,
 so no bootstrap is needed):</p>
+<!-- precompute:volatile-numbers start -- these three model variants
+     refit the same ill-conditioned correlation matrix, so the reported
+     condition number and the fit indices derived from that solution move
+     across BLAS implementations. -->
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="va">cpm</span><span class="op">$</span><span class="va">matrices</span><span class="op">$</span><span class="va">R</span> <span class="co"># the sample correlation matrix stored by cpm_fit()</span></span>
 <span><span class="va">fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
@@ -558,6 +567,7 @@ so no bootstrap is needed):</p>
 <span><span class="co">#&gt; 1  quasi-circumplex 10 0.078 0.042 0.984 0.956</span></span>
 <span><span class="co">#&gt; 2 equal-communality 17 0.100 0.063 0.956 0.928</span></span>
 <span><span class="co">#&gt; 3         circulant 24 0.185 0.130 0.790 0.755</span></span></code></pre></div>
+<!-- precompute:volatile-numbers end -->
 <p>The pattern reproduces what Zimmermann and Wright (2017, p. 14)
 reported for these data with CircE: the fully constrained model (equal
 spacing <em>and</em> equal communality — the <code>"circulant"</code>
@@ -781,10 +791,14 @@ give a Monte Carlo standard error under one percentage point for
 coverage near the nominal level and are recommended in practice. The
 <code>parallel</code>/<code>ncpus</code> arguments speed up real runs
 without changing results for a given seed.</p>
+<!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
+     ill-conditioned CPM, whose solution moves in the third digit across
+     BLAS implementations; every simulated replication moves with it, so
+     this chunk's printed numbers are not reproducible across machines. -->
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">34567</span><span class="op">)</span></span>
 <span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy</a></span><span class="op">(</span><span class="va">res</span>, reps <span class="op">=</span> <span class="fl">200</span>, amplitude_factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 9.17e+16): angles may</span></span>
+<span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles may</span></span>
 <span><span class="co">#&gt; be clustered or parameters weakly determined.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -796,7 +810,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; Population Structure:     Browne circular model (CPM) </span></span>
 <span><span class="co">#&gt; Group Sizes:      All = 250 </span></span>
 <span><span class="co">#&gt; Certification Rule:   a_lci / (a_uci - a_lci) &gt;= 0.35 (scale-free, print-independent) </span></span>
-<span><span class="co">#&gt; Elapsed:      14.2 s</span></span>
+<span><span class="co">#&gt; Elapsed:      7.6 s</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
 <span><span class="co">#&gt; RMSEA = 0.064, SRMR = 0.038).</span></span>
@@ -814,9 +828,9 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; against Bradley's (1978) liberal band via 95% Wilson intervals:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
-<span><span class="co">#&gt;     Elevation      coverage 94.0% -- borderline</span></span>
-<span><span class="co">#&gt;     Amplitude      coverage 94.0% -- borderline</span></span>
-<span><span class="co">#&gt;     Displacement   coverage 89.6% when certified -- borderline</span></span>
+<span><span class="co">#&gt;     Elevation      coverage 93.0% -- borderline</span></span>
+<span><span class="co">#&gt;     Amplitude      coverage 94.5% -- borderline</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 89.1% when certified -- borderline</span></span>
 <span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
 <span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
 <span><span class="co">#&gt;                    2.5%)</span></span>
@@ -825,11 +839,11 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;   `reps` would sharpen the verdict.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
-<span><span class="co">#&gt;     Elevation      coverage 94.0% -- borderline</span></span>
-<span><span class="co">#&gt;     Amplitude      coverage 85.0% -- INADEQUATE (under-coverage; misses are</span></span>
+<span><span class="co">#&gt;     Elevation      coverage 95.0% -- borderline</span></span>
+<span><span class="co">#&gt;     Amplitude      coverage 83.0% -- INADEQUATE (under-coverage; misses are</span></span>
 <span><span class="co">#&gt;                    almost all below the interval: the amplitude CI tends to</span></span>
 <span><span class="co">#&gt;                    sit above the truth)</span></span>
-<span><span class="co">#&gt;     Displacement   coverage 60.0% when certified -- INADEQUATE</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 50.0% when certified -- INADEQUATE</span></span>
 <span><span class="co">#&gt;                    (under-coverage)</span></span>
 <span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
 <span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
@@ -842,67 +856,67 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coverage by profile, parameter, and amplitude condition:</span></span>
 <span><span class="co">#&gt;  Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width</span></span>
-<span><span class="co">#&gt;    PARPD         e     1.000    0.940 0.017     0.030      0.030        0.152</span></span>
+<span><span class="co">#&gt;    PARPD         e     1.000    0.930 0.018     0.035      0.035        0.151</span></span>
 <span><span class="co">#&gt;    PARPD         x     1.000    0.940 0.017     0.030      0.030        0.122</span></span>
-<span><span class="co">#&gt;    PARPD         y     1.000    0.925 0.019     0.020      0.055        0.131</span></span>
-<span><span class="co">#&gt;    PARPD         a     1.000    0.940 0.017     0.045      0.015        0.125</span></span>
-<span><span class="co">#&gt;    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.384</span></span>
-<span><span class="co">#&gt;     OCPD         e     1.000    0.940 0.017     0.025      0.035        0.156</span></span>
+<span><span class="co">#&gt;    PARPD         y     1.000    0.930 0.018     0.020      0.050        0.131</span></span>
+<span><span class="co">#&gt;    PARPD         a     1.000    0.945 0.016     0.040      0.015        0.125</span></span>
+<span><span class="co">#&gt;    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.326</span></span>
+<span><span class="co">#&gt;     OCPD         e     1.000    0.950 0.015     0.025      0.025        0.156</span></span>
 <span><span class="co">#&gt;     OCPD         x     1.000    0.945 0.016     0.025      0.030        0.126</span></span>
 <span><span class="co">#&gt;     OCPD         y     1.000    0.965 0.013     0.030      0.005        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     1.000    0.850 0.025     0.150      0.000        0.103</span></span>
-<span><span class="co">#&gt;     OCPD         d     1.000    0.825 0.027     0.075      0.100      221.255</span></span>
-<span><span class="co">#&gt;    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.152</span></span>
+<span><span class="co">#&gt;     OCPD         a     1.000    0.830 0.027     0.170      0.000        0.103</span></span>
+<span><span class="co">#&gt;     OCPD         d     1.000    0.830 0.027     0.075      0.095      220.815</span></span>
+<span><span class="co">#&gt;    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.151</span></span>
 <span><span class="co">#&gt;    PARPD         x     0.500    0.935 0.017     0.025      0.040        0.124</span></span>
-<span><span class="co">#&gt;    PARPD         y     0.500    0.930 0.018     0.020      0.050        0.128</span></span>
-<span><span class="co">#&gt;    PARPD         a     0.500    0.945 0.016     0.055      0.000        0.112</span></span>
-<span><span class="co">#&gt;    PARPD         d     0.500    0.915 0.020     0.045      0.040      157.065</span></span>
+<span><span class="co">#&gt;    PARPD         y     0.500    0.935 0.017     0.015      0.050        0.128</span></span>
+<span><span class="co">#&gt;    PARPD         a     0.500    0.935 0.017     0.065      0.000        0.111</span></span>
+<span><span class="co">#&gt;    PARPD         d     0.500    0.905 0.021     0.050      0.045      154.830</span></span>
 <span><span class="co">#&gt;     OCPD         e     0.500    0.940 0.017     0.030      0.030        0.158</span></span>
 <span><span class="co">#&gt;     OCPD         x     0.500    0.940 0.017     0.030      0.030        0.128</span></span>
-<span><span class="co">#&gt;     OCPD         y     0.500    0.930 0.018     0.025      0.045        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     0.500    0.460 0.035     0.540      0.000        0.102</span></span>
-<span><span class="co">#&gt;     OCPD         d     0.500    0.710 0.032     0.160      0.130      256.904</span></span>
-<span><span class="co">#&gt;    PARPD         e     0.000    0.945 0.016     0.020      0.035        0.153</span></span>
-<span><span class="co">#&gt;    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.123</span></span>
+<span><span class="co">#&gt;     OCPD         y     0.500    0.935 0.017     0.020      0.045        0.131</span></span>
+<span><span class="co">#&gt;     OCPD         a     0.500    0.485 0.035     0.515      0.000        0.102</span></span>
+<span><span class="co">#&gt;     OCPD         d     0.500    0.710 0.032     0.170      0.120      256.592</span></span>
+<span><span class="co">#&gt;    PARPD         e     0.000    0.940 0.017     0.025      0.035        0.153</span></span>
+<span><span class="co">#&gt;    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.124</span></span>
 <span><span class="co">#&gt;    PARPD         y     0.000    0.950 0.015     0.040      0.010        0.131</span></span>
-<span><span class="co">#&gt;    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.099</span></span>
+<span><span class="co">#&gt;    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.098</span></span>
 <span><span class="co">#&gt;    PARPD         d     0.000       NA    NA        NA         NA           NA</span></span>
-<span><span class="co">#&gt;     OCPD         e     0.000    0.915 0.020     0.040      0.045        0.157</span></span>
-<span><span class="co">#&gt;     OCPD         x     0.000    0.960 0.014     0.030      0.010        0.125</span></span>
-<span><span class="co">#&gt;     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.132</span></span>
-<span><span class="co">#&gt;     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.101</span></span>
+<span><span class="co">#&gt;     OCPD         e     0.000    0.920 0.019     0.040      0.040        0.157</span></span>
+<span><span class="co">#&gt;     OCPD         x     0.000    0.955 0.015     0.035      0.010        0.124</span></span>
+<span><span class="co">#&gt;     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.131</span></span>
+<span><span class="co">#&gt;     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.100</span></span>
 <span><span class="co">#&gt;     OCPD         d     0.000       NA    NA        NA         NA           NA</span></span>
-<span><span class="co">#&gt;    PARPD         e     2.077    0.950 0.015     0.025      0.025        0.151</span></span>
-<span><span class="co">#&gt;    PARPD         x     2.077    0.945 0.016     0.030      0.025        0.118</span></span>
-<span><span class="co">#&gt;    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.128</span></span>
-<span><span class="co">#&gt;    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.124</span></span>
-<span><span class="co">#&gt;    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.199</span></span>
+<span><span class="co">#&gt;    PARPD         e     2.077    0.945 0.016     0.025      0.030        0.150</span></span>
+<span><span class="co">#&gt;    PARPD         x     2.077    0.950 0.015     0.025      0.025        0.118</span></span>
+<span><span class="co">#&gt;    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.127</span></span>
+<span><span class="co">#&gt;    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.125</span></span>
+<span><span class="co">#&gt;    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.504</span></span>
 <span><span class="co">#&gt;     OCPD         e     2.077    0.930 0.018     0.040      0.030        0.157</span></span>
-<span><span class="co">#&gt;     OCPD         x     2.077    0.910 0.020     0.060      0.030        0.126</span></span>
+<span><span class="co">#&gt;     OCPD         x     2.077    0.915 0.020     0.055      0.030        0.127</span></span>
 <span><span class="co">#&gt;     OCPD         y     2.077    0.945 0.016     0.030      0.025        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     2.077    0.925 0.019     0.075      0.000        0.109</span></span>
-<span><span class="co">#&gt;     OCPD         d     2.077    0.885 0.023     0.050      0.065      158.585</span></span>
+<span><span class="co">#&gt;     OCPD         a     2.077    0.930 0.018     0.070      0.000        0.109</span></span>
+<span><span class="co">#&gt;     OCPD         d     2.077    0.885 0.023     0.050      0.065      160.646</span></span>
 <span><span class="co">#&gt;  Coverage_conditional N_conditional Structural N_reps</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.896           144      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.891           147      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.600            10      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.500             8      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.926            27      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.893            28      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.000             3      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.333             3      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
@@ -922,7 +936,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.882            17      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.833            18      FALSE    200</span></span>
 <span><span class="co">#&gt;   Note: amplitude coverage on rows flagged Structural is structurally 0 (a</span></span>
 <span><span class="co">#&gt;   percentile interval of strictly positive amplitude replicates cannot</span></span>
 <span><span class="co">#&gt;   contain a zero truth) -- a theorem, not a measurement; the informative</span></span>
@@ -930,14 +944,14 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Guardrail operating characteristics:</span></span>
 <span><span class="co">#&gt;  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate</span></span>
-<span><span class="co">#&gt;    PARPD     1.000     0.720    0.654    0.778     0.025      NA         0.555</span></span>
-<span><span class="co">#&gt;     OCPD     1.000     0.050    0.027    0.090     0.025      NA         0.075</span></span>
-<span><span class="co">#&gt;    PARPD     0.500     0.135    0.094    0.189     0.025      NA         0.115</span></span>
+<span><span class="co">#&gt;    PARPD     1.000     0.735    0.670    0.791     0.025      NA         0.555</span></span>
+<span><span class="co">#&gt;     OCPD     1.000     0.040    0.020    0.077     0.025      NA         0.075</span></span>
+<span><span class="co">#&gt;    PARPD     0.500     0.140    0.099    0.195     0.025      NA         0.115</span></span>
 <span><span class="co">#&gt;     OCPD     0.500     0.015    0.005    0.043     0.025      NA         0.045</span></span>
 <span><span class="co">#&gt;    PARPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.020</span></span>
 <span><span class="co">#&gt;     OCPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.070</span></span>
 <span><span class="co">#&gt;    PARPD     2.077     1.000    0.981    1.000     0.025      NA         0.985</span></span>
-<span><span class="co">#&gt;     OCPD     2.077     0.085    0.054    0.132     0.025      NA         0.115</span></span>
+<span><span class="co">#&gt;     OCPD     2.077     0.090    0.058    0.138     0.025      NA         0.115</span></span>
 <span><span class="co">#&gt;  Branch_pathology_rate N_reps</span></span>
 <span><span class="co">#&gt;                      0    200</span></span>
 <span><span class="co">#&gt;                      0    200</span></span>
@@ -947,6 +961,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;                      0    200</span></span>
 <span><span class="co">#&gt;                      0    200</span></span>
 <span><span class="co">#&gt;                      0    200</span></span></code></pre></div>
+<!-- precompute:volatile-numbers end -->
 <p>How to read this output:</p>
 <ul>
 <li>
@@ -986,7 +1001,7 @@ conclusion per profile.</li>
 <p>For a visual summary across the ladder:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="evaluating-circumplex-structure_files/figure-html/accuracy_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%"></p>
 <p>The two profiles tell usefully different stories. Paranoid PD is
 certified: its amplitude CI lower bound clears the 0.35-CI-width margin,
 so <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports its displacement, and nothing in
@@ -1212,7 +1227,7 @@ departures in communality,
 departures in even angular spread.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
-<p><img src="evaluating-circumplex-structure_files/figure-html/fit_structure_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%"></p>
 <p>For the IIP-SC octants the picture agrees with Section 2’s CPM fit:
 the scales keep their theoretical circular <em>ordering</em> with
 comparable communalities and roughly even spacing, and the Fisher, Gap,

@@ -242,7 +242,8 @@ on it:
 ssm_plot_circle(latent)
 ```
 
-![](sem-based-ssm-analysis_files/figure-html/latent-plot-1.png)
+![plot of chunk
+latent-plot](figures/sem-based-ssm-analysis-latent-plot-1.png)
 
 ``` r
 
@@ -553,7 +554,8 @@ contrast
 ssm_plot_contrast(contrast)
 ```
 
-![](sem-based-ssm-analysis_files/figure-html/contrast-plot-1.png)
+![plot of chunk
+contrast-plot](figures/sem-based-ssm-analysis-contrast-plot-1.png)
 
 The contrast block reports the difference in each SSM parameter with its
 confidence interval. As with the observed contrast, an elevation or

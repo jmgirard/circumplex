@@ -82,7 +82,7 @@
 
 
 
-<script src="intermediate-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="intermediate-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Intermediate SSM Analysis</h1>
@@ -233,10 +233,10 @@ Male
 </table>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/group_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-group_plot-1.png" alt="plot of chunk group_plot" width="100%"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/group_plot2-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-group_plot2-1.png" alt="plot of chunk group_plot2" width="100%"></p>
 <p>Any number of groups can be analyzed in this way, and the output will
 contain additional profile blocks, the table will contain additional
 rows, and the figures will contain additional points or curves. The
@@ -371,10 +371,10 @@ ASPD
 </table>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/measures_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-measures_plot-1.png" alt="plot of chunk measures_plot" width="100%"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/measures_plot2-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-measures_plot2-1.png" alt="plot of chunk measures_plot2" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="generalizing-to-multiple-groups-and-multiple-measures">Generalizing to multiple groups and multiple measures<a class="anchor" aria-label="anchor" href="#generalizing-to-multiple-groups-and-multiple-measures"></a>
@@ -640,7 +640,7 @@ SZTPD: Male
 </table>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-general_plot-1.png" alt="plot of chunk general_plot" width="100%"></p>
 <p>Note that the borders for the “PARPD: Male” and “SZTPD: Male” blocks
 are dashed instead of solid. This indicates that these profiles have low
 fit (i.e.,
@@ -650,13 +650,13 @@ We could alternatively hide these such profiles by adding
 may change as profiles are dropped).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span>, drop_lowfit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot2-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-general_plot2-1.png" alt="plot of chunk general_plot2" width="100%"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot3-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-general_plot3-1.png" alt="plot of chunk general_plot3" width="100%"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span>, drop_lowfit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot4-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-general_plot4-1.png" alt="plot of chunk general_plot4" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -831,7 +831,7 @@ Male - Female
 </table>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/model_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-model_plot-1.png" alt="plot of chunk model_plot" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="contrasts-between-measures-in-a-group">Contrasts between measures in a group<a class="anchor" aria-label="anchor" href="#contrasts-between-measures-in-a-group"></a>
@@ -991,7 +991,7 @@ ASPD - NARPD
 </table>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/measure_contrast_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-measure_contrast_plot-1.png" alt="plot of chunk measure_contrast_plot" width="100%"></p>
 <p>Here, instead of a circle plot, we see a contrast plot showing the
 difference between the two measures’ SSM parameters and their 95%
 confidence intervals. Because the confidence interval for the elevation
@@ -1163,7 +1163,7 @@ BORPD: Male - Female
 </table>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/group_contrast_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/intermediate-ssm-analysis-group_contrast_plot-1.png" alt="plot of chunk group_contrast_plot" width="100%"></p>
 </div>
 </div>
 <div class="section level2">

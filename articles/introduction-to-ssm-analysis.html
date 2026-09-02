@@ -82,7 +82,7 @@
 
 
 
-<script src="introduction-to-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="introduction-to-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Introduction to SSM Analysis</h1>
@@ -138,11 +138,11 @@ personality psychologist might want to understand what kind of
 interpersonal behaviors are associated with a trait (e.g.,
 extraversion).</p>
 <pre><code><span><span class="co">#&gt; Warning: The `label.size` argument of `geom_label()` is deprecated as of ggplot2 3.5.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/model-1.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="co">#&gt; ℹ Please use the `linewidth` argument instead.</span></span>
+<span><span class="co">#&gt; This warning is displayed once per session.</span></span>
+<span><span class="co">#&gt; Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span>
+<span><span class="co">#&gt; generated.</span></span></code></pre>
+<p><img src="figures/introduction-to-ssm-analysis-model-1.png" alt="plot of chunk model" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="the-structural-summary-method">The Structural Summary Method<a class="anchor" aria-label="anchor" href="#the-structural-summary-method"></a>
@@ -157,16 +157,16 @@ plotting a set of example scores below, we can gain a visual intuition
 that a cosine curve makes sense in this case. First, we can examine the
 scores with a bar chart ignoring the circular relationship among
 them.</p>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/column-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-column-1.png" alt="plot of chunk column" width="100%"></p>
 <p>Next, we can leverage the fact that these subscales have specific
 angular displacements in the circumplex model (and that 0 and 360
 degrees are the same) to create a path diagram.</p>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/path-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-path-1.png" alt="plot of chunk path" width="100%"></p>
 <p>This already looks like a cosine curve, and we can finally use the
 SSM to estimate the parameters of the curve that best fits the observed
 data. By plotting it alongside the data, we can get a sense of how well
 the model fits our example data.</p>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/curve-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-curve-1.png" alt="plot of chunk curve" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="understanding-the-ssm-parameters">Understanding the SSM parameters<a class="anchor" aria-label="anchor" href="#understanding-the-ssm-parameters"></a>
@@ -190,7 +190,7 @@ Before we discuss these parameters, however, we can also estimate the
 fit of the SSM model. This is essentially how close the cosine curve is
 to the observed data points. Deviations (in red, below) will lower model
 fit.</p>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/residuals-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-residuals-1.png" alt="plot of chunk residuals" width="100%"></p>
 <p>If fit is less than 0.70, it is considered “unacceptable” and only
 the elevation parameter should be interpreted. If fit is between 0.70
 and 0.80, it is considered “adequate,” and if it is greater than 0.80,
@@ -208,7 +208,7 @@ correlation-based SSM,
 is considered “marked” and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>e</mi><mo stretchy="false" form="prefix">|</mo><mo>&lt;</mo><mn>.15</mn></mrow><annotation encoding="application/x-tex">|e|&lt;.15</annotation></semantics></math>
 is considered “modest.”</p>
-<p><img src="VIG1-e.gif" class="r-plt" alt="" width="100%"></p>
+<p><img src="VIG1-e.gif" alt="plot of chunk elev" width="100%"></p>
 <p>The second SSM parameter is amplitude or
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
 which is calculated as the difference between the highest point of the
@@ -219,7 +219,7 @@ to elevation, when using correlation-based SSM,
 is considered “marked” and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>&lt;</mo><mn>.15</mn></mrow><annotation encoding="application/x-tex">a&lt;.15</annotation></semantics></math>
 is considered “modest.”</p>
-<p><img src="VIG1-a.gif" class="r-plt" alt="" width="100%"></p>
+<p><img src="VIG1-a.gif" alt="plot of chunk ampl" width="100%"></p>
 <p>The final SSM parameter is displacement or
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
 which is calculated as the angle at which the curve reaches its highest
@@ -233,7 +233,7 @@ circle; a profile that peaks right at the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>0</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">0^\circ</annotation></semantics></math>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>360</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">360^\circ</annotation></semantics></math>
 boundary may be reported as either value, since both point in the same
 direction.</p>
-<p><img src="VIG1-d.gif" class="r-plt" alt="" width="100%"></p>
+<p><img src="VIG1-d.gif" alt="plot of chunk disp" width="100%"></p>
 <p>By interpreting these three parameters, we can understand a profile
 much more parsimoniously than by trying to interpret all eight subscales
 individually. This approach also leverages the circumplex relationship
@@ -283,7 +283,7 @@ agency, whereas a high score on DE indicates problems related to being
 “cold” or too low on communion. Scales that are not directly on the
 y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency
 and communion.</p>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/iipsc-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-iipsc-1.png" alt="plot of chunk iipsc" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="mean-based-ssm-analysis">3. Mean-based SSM Analysis<a class="anchor" aria-label="anchor" href="#mean-based-ssm-analysis"></a>
@@ -447,10 +447,10 @@ conventional). This, again, is as simple as passing the
 <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> functions.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot1-1.png" alt="plot of chunk plot1" width="100%"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot2-1.png" alt="plot of chunk plot2" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -582,14 +582,14 @@ to either consult the mapping between scales and angles or plot the
 results.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/plot3-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot3-1.png" alt="plot of chunk plot3" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our
 hypotheses, the displacement for NARPD was associated with high agency
 and was somewhere between the “domineering” and “vindictive”
 octants.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/plot4-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot4-1.png" alt="plot of chunk plot4" width="100%"></p>
 </div>
 </div>
 <div class="section level2">

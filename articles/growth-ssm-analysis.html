@@ -295,7 +295,7 @@ table in this shape — one row per time point, with
 plots directly:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="growth-ssm-analysis_files/figure-html/plot-1.png" class="r-plt" alt="" width="624"></p>
+<p><img src="figures/growth-ssm-analysis-plot-1.png" alt="plot of chunk plot"></p>
 <p>The displacement panel is drawn on an <em>unwrapped</em> branch, so
 the trajectory crosses the boundary as one continuous path instead of
 jumping a full turn, and values there may legitimately fall outside
@@ -402,7 +402,7 @@ verdict itself:</p>
 <span>  certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">details</span><span class="op">$</span><span class="va">certified</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="growth-ssm-analysis_files/figure-html/lowamp-plot-1.png" class="r-plt" alt="" width="624"></p>
+<p><img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"></p>
 <p>Uncertified waves are drawn as <strong>hollow</strong> points on the
 displacement panel. Read them as gaps in the argument, not as estimates
 with wide intervals: the amplitude panel shows why, with the interval

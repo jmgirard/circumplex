@@ -60,7 +60,8 @@ their angular position in degrees:
 ggcircumplex()
 ```
 
-![](advanced-visualization_files/figure-html/canvas-default-1.png)
+![plot of chunk
+canvas-default](figures/advanced-visualization-canvas-default-1.png)
 
 You can label the scales however you like. Passing a character vector
 labels the spokes in the order of the angles:
@@ -70,7 +71,8 @@ labels the spokes in the order of the angles:
 ggcircumplex(octants(), labels = PANO())
 ```
 
-![](advanced-visualization_files/figure-html/canvas-labels-1.png)
+![plot of chunk
+canvas-labels](figures/advanced-visualization-canvas-labels-1.png)
 
 The labels need not be abbreviations. The octant scales also have full
 interpersonal names, which you can put on the spokes instead:
@@ -80,7 +82,8 @@ interpersonal names, which you can put on the spokes instead:
 ggcircumplex(octants(), labels = csip$Scales$Label)
 ```
 
-![](advanced-visualization_files/figure-html/canvas-descriptive-1.png)
+![plot of chunk
+canvas-descriptive](figures/advanced-visualization-canvas-descriptive-1.png)
 
 If you are working with one of the instruments bundled with the package,
 you can pass it directly with `ggcircumplex(instrument = csip)`, and its
@@ -120,7 +123,8 @@ ggplot(results$results) +
   theme_circumplex()
 ```
 
-![](advanced-visualization_files/figure-html/coord-built-1.png)
+![plot of chunk
+coord-built](figures/advanced-visualization-coord-built-1.png)
 
 The `scale_x_continuous()` line is the one that tells the coordinate
 system where the scale angles are; without it the spokes would fall on
@@ -158,7 +162,8 @@ ggplot(results$results) +
   theme_circumplex()
 ```
 
-![](advanced-visualization_files/figure-html/coord-center-1.png)
+![plot of chunk
+coord-center](figures/advanced-visualization-coord-center-1.png)
 
 This is a zoom, and it changes how the figure should be read. With a
 nonzero center, radial distance is no longer proportional to amplitude
@@ -184,7 +189,8 @@ ggplot(results$results) +
   theme_circumplex()
 ```
 
-![](advanced-visualization_files/figure-html/coord-r-axis-1.png)
+![plot of chunk
+coord-r-axis](figures/advanced-visualization-coord-r-axis-1.png)
 
 Note that these examples build the canvas from its parts — the
 coordinate system, an x-scale carrying the spoke breaks and labels, and
@@ -226,7 +232,8 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   )
 ```
 
-![](advanced-visualization_files/figure-html/results-plot-1.png)
+![plot of chunk
+results-plot](figures/advanced-visualization-results-plot-1.png)
 
 Each arc displays two separate confidence intervals for one profile at
 once: its radial extent is the amplitude interval and its angular extent
@@ -266,7 +273,7 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   )
 ```
 
-![](advanced-visualization_files/figure-html/theming-1.png)
+![plot of chunk theming](figures/advanced-visualization-theming-1.png)
 
 ## Composing custom layers
 
@@ -310,7 +317,8 @@ ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
   )
 ```
 
-![](advanced-visualization_files/figure-html/individuals-1.png)
+![plot of chunk
+individuals](figures/advanced-visualization-individuals-1.png)
 
 The individual points spread widely around the circle while the group
 summary sits close to the origin, a picture that none of the built-in
@@ -364,7 +372,8 @@ subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
 ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
 
-![](advanced-visualization_files/figure-html/occasions-plot-1.png)
+![plot of chunk
+occasions-plot](figures/advanced-visualization-occasions-plot-1.png)
 
 Two things about the displacement panel are worth reading carefully.
 First, it is drawn on an *unwrapped* branch: the profile crosses the
@@ -435,7 +444,8 @@ ggcircumplex(octants(), amax = 0.8) +
   )
 ```
 
-![](advanced-visualization_files/figure-html/occasions-path-1.png)
+![plot of chunk
+occasions-path](figures/advanced-visualization-occasions-path-1.png)
 
 The arrowhead marks the direction of time. Note what the layer does at
 the boundary: this profile moves from 330 to 355 to 20 degrees, and the
@@ -462,7 +472,8 @@ which adds the path to its usual points and confidence wedges:
 ssm_plot_circle(results_long, path = TRUE)
 ```
 
-![](advanced-visualization_files/figure-html/occasions-path-wrapper-1.png)
+![plot of chunk
+occasions-path-wrapper](figures/advanced-visualization-occasions-path-wrapper-1.png)
 
 An occasion whose displacement is undefined — a flat or zero-amplitude
 profile — *breaks* the path rather than being interpolated through, and
@@ -496,7 +507,8 @@ ggplot(curve, aes(x = angle, y = score)) +
   theme_bw()
 ```
 
-![](advanced-visualization_files/figure-html/curve-axis-1.png)
+![plot of chunk
+curve-axis](figures/advanced-visualization-curve-axis-1.png)
 
 Passing the same `labels` (or the same `instrument`) to both
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)

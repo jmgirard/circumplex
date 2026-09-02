@@ -141,6 +141,9 @@ Other visualization functions:
 ## Examples
 
 ``` r
+# `boots` is lowered from its default of 2000 throughout these examples so
+# they run quickly; a reported analysis should use the default.
+
 # \donttest{
 data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
@@ -150,7 +153,8 @@ t1$occasion <- "T1"
 t2 <- t1
 t2$occasion <- "T2"
 res <- ssm_analyze_long(rbind(t1, t2),
-  scales = scales, id = "id", occasion = "occasion"
+  scales = scales, id = "id", occasion = "occasion",
+  boots = 200
 )
 ssm_plot_trajectory(res)
 

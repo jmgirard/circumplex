@@ -148,17 +148,17 @@ default it uses octant scales labeled by their angular position in
 degrees:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/canvas-default-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-canvas-default-1.png" alt="plot of chunk canvas-default" width="100%"></p>
 <p>You can label the scales however you like. Passing a character vector
 labels the spokes in the order of the angles:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/canvas-labels-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-canvas-labels-1.png" alt="plot of chunk canvas-labels" width="100%"></p>
 <p>The labels need not be abbreviations. The octant scales also have
 full interpersonal names, which you can put on the spokes instead:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="va">csip</span><span class="op">$</span><span class="va">Scales</span><span class="op">$</span><span class="va">Label</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/canvas-descriptive-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-canvas-descriptive-1.png" alt="plot of chunk canvas-descriptive" width="100%"></p>
 <p>If you are working with one of the instruments bundled with the
 package, you can pass it directly with
 <code>ggcircumplex(instrument = csip)</code>, and its scale angles and
@@ -193,7 +193,7 @@ theme.</p>
 <span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/coord-built-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-coord-built-1.png" alt="plot of chunk coord-built" width="100%"></p>
 <p>The <code>scale_x_continuous()</code> line is the one that tells the
 coordinate system where the scale angles are; without it the spokes
 would fall on <code>ggplot2</code>’s default breaks rather than on the
@@ -223,7 +223,7 @@ against the rim:</p>
 <span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/coord-center-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-coord-center-1.png" alt="plot of chunk coord-center" width="100%"></p>
 <p>This is a zoom, and it changes how the figure should be read. With a
 nonzero center, radial distance is no longer proportional to amplitude
 and the origin no longer represents zero amplitude, so differences in
@@ -245,7 +245,7 @@ never collide with a spoke label. You can override that with
 <span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/coord-r-axis-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-coord-r-axis-1.png" alt="plot of chunk coord-r-axis" width="100%"></p>
 <p>Note that these examples build the canvas from its parts — the
 coordinate system, an x-scale carrying the spoke breaks and labels, and
 the theme — rather than adding a second coordinate system on top of
@@ -281,7 +281,7 @@ degree boundary.</p>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/results-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-results-plot-1.png" alt="plot of chunk results-plot" width="100%"></p>
 <p>Each arc displays two separate confidence intervals for one profile
 at once: its radial extent is the amplitude interval and its angular
 extent is the displacement interval. It is a convenient way to show both
@@ -315,7 +315,7 @@ call:</p>
 <span>    panel.grid.major <span class="op">=</span> <span class="fu">element_line</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span><span class="op">)</span>,</span>
 <span>    legend.position <span class="op">=</span> <span class="st">"bottom"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/theming-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-theming-1.png" alt="plot of chunk theming" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="composing-custom-layers">Composing custom layers<a class="anchor" aria-label="anchor" href="#composing-custom-layers"></a>
@@ -356,7 +356,7 @@ group-level point.</p>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"#0072B2"</span>, size <span class="op">=</span> <span class="fl">4</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/individuals-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-individuals-1.png" alt="plot of chunk individuals" width="100%"></p>
 <p>The individual points spread widely around the circle while the group
 summary sits close to the origin, a picture that none of the built-in
 functions produce directly. That contrast is not an artifact: the group
@@ -401,7 +401,7 @@ per wave with <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_lon
 <span><span class="co">#&gt; 3       T3 0.5907495  17.84307  14.57562  21.11586</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">results_long</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/occasions-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-occasions-plot-1.png" alt="plot of chunk occasions-plot" width="100%"></p>
 <p>Two things about the displacement panel are worth reading carefully.
 First, it is drawn on an <em>unwrapped</em> branch: the profile crosses
 the 0/360 boundary between the second and third wave, and rather than
@@ -461,7 +461,7 @@ space.</p>
 <span>    arrow <span class="op">=</span> <span class="fu">arrow</span><span class="op">(</span>length <span class="op">=</span> <span class="fu">unit</span><span class="op">(</span><span class="fl">0.18</span>, <span class="st">"inches"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>    linewidth <span class="op">=</span> <span class="fl">0.7</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/occasions-path-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-occasions-path-1.png" alt="plot of chunk occasions-path" width="100%"></p>
 <p>The arrowhead marks the direction of time. Note what the layer does
 at the boundary: this profile moves from 330 to 355 to 20 degrees, and
 the step from the second to the third wave is drawn as the short 25
@@ -480,7 +480,7 @@ reverses time. The wrapper below does that sorting for you.</p>
 and confidence wedges:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results_long</span>, path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/occasions-path-wrapper-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-occasions-path-wrapper-1.png" alt="plot of chunk occasions-path-wrapper" width="100%"></p>
 <p>An occasion whose displacement is undefined — a flat or
 zero-amplitude profile — <em>breaks</em> the path rather than being
 interpolated through, and the segment after the gap is still drawn on
@@ -510,7 +510,7 @@ abbreviations.</p>
 <span>  <span class="fu"><a href="../reference/scale_x_circumplex.html">scale_x_circumplex</a></span><span class="op">(</span><span class="va">angles</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Scale"</span>, y <span class="op">=</span> <span class="st">"Score"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="advanced-visualization_files/figure-html/curve-axis-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="figures/advanced-visualization-curve-axis-1.png" alt="plot of chunk curve-axis" width="100%"></p>
 <p>Passing the same <code>labels</code> (or the same
 <code>instrument</code>) to both <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> and
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> guarantees that a circular figure and

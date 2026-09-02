@@ -157,7 +157,8 @@ estimable.
 plot(cpm)
 ```
 
-![](evaluating-circumplex-structure_files/figure-html/cpm_plot-1.png)
+![plot of chunk
+cpm_plot](figures/evaluating-circumplex-structure-cpm_plot-1.png)
 
 ### Reading the fit indices
 
@@ -612,7 +613,7 @@ changing results for a given seed.
 
 set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
-#> Warning: CPM Hessian is ill-conditioned (condition number 9.17e+16): angles may
+#> Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles may
 #> be clustered or parameters weakly determined.
 summary(acc)
 #> 
@@ -624,7 +625,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:      14.2 s
+#> Elapsed:      7.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
@@ -642,9 +643,9 @@ summary(acc)
 #> against Bradley's (1978) liberal band via 95% Wilson intervals:
 #> 
 #>   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):
-#>     Elevation      coverage 94.0% -- borderline
-#>     Amplitude      coverage 94.0% -- borderline
-#>     Displacement   coverage 89.6% when certified -- borderline
+#>     Elevation      coverage 93.0% -- borderline
+#>     Amplitude      coverage 94.5% -- borderline
+#>     Displacement   coverage 89.1% when certified -- borderline
 #>     Guardrail      under a truly zero amplitude, displacement would be
 #>                    certified 1.0% of the time (user-expectation benchmark
 #>                    2.5%)
@@ -653,11 +654,11 @@ summary(acc)
 #>   `reps` would sharpen the verdict.
 #> 
 #>   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):
-#>     Elevation      coverage 94.0% -- borderline
-#>     Amplitude      coverage 85.0% -- INADEQUATE (under-coverage; misses are
+#>     Elevation      coverage 95.0% -- borderline
+#>     Amplitude      coverage 83.0% -- INADEQUATE (under-coverage; misses are
 #>                    almost all below the interval: the amplitude CI tends to
 #>                    sit above the truth)
-#>     Displacement   coverage 60.0% when certified -- INADEQUATE
+#>     Displacement   coverage 50.0% when certified -- INADEQUATE
 #>                    (under-coverage)
 #>     Guardrail      under a truly zero amplitude, displacement would be
 #>                    certified 1.0% of the time (user-expectation benchmark
@@ -670,67 +671,67 @@ summary(acc)
 #> 
 #> Coverage by profile, parameter, and amplitude condition:
 #>  Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width
-#>    PARPD         e     1.000    0.940 0.017     0.030      0.030        0.152
+#>    PARPD         e     1.000    0.930 0.018     0.035      0.035        0.151
 #>    PARPD         x     1.000    0.940 0.017     0.030      0.030        0.122
-#>    PARPD         y     1.000    0.925 0.019     0.020      0.055        0.131
-#>    PARPD         a     1.000    0.940 0.017     0.045      0.015        0.125
-#>    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.384
-#>     OCPD         e     1.000    0.940 0.017     0.025      0.035        0.156
+#>    PARPD         y     1.000    0.930 0.018     0.020      0.050        0.131
+#>    PARPD         a     1.000    0.945 0.016     0.040      0.015        0.125
+#>    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.326
+#>     OCPD         e     1.000    0.950 0.015     0.025      0.025        0.156
 #>     OCPD         x     1.000    0.945 0.016     0.025      0.030        0.126
 #>     OCPD         y     1.000    0.965 0.013     0.030      0.005        0.131
-#>     OCPD         a     1.000    0.850 0.025     0.150      0.000        0.103
-#>     OCPD         d     1.000    0.825 0.027     0.075      0.100      221.255
-#>    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.152
+#>     OCPD         a     1.000    0.830 0.027     0.170      0.000        0.103
+#>     OCPD         d     1.000    0.830 0.027     0.075      0.095      220.815
+#>    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.151
 #>    PARPD         x     0.500    0.935 0.017     0.025      0.040        0.124
-#>    PARPD         y     0.500    0.930 0.018     0.020      0.050        0.128
-#>    PARPD         a     0.500    0.945 0.016     0.055      0.000        0.112
-#>    PARPD         d     0.500    0.915 0.020     0.045      0.040      157.065
+#>    PARPD         y     0.500    0.935 0.017     0.015      0.050        0.128
+#>    PARPD         a     0.500    0.935 0.017     0.065      0.000        0.111
+#>    PARPD         d     0.500    0.905 0.021     0.050      0.045      154.830
 #>     OCPD         e     0.500    0.940 0.017     0.030      0.030        0.158
 #>     OCPD         x     0.500    0.940 0.017     0.030      0.030        0.128
-#>     OCPD         y     0.500    0.930 0.018     0.025      0.045        0.131
-#>     OCPD         a     0.500    0.460 0.035     0.540      0.000        0.102
-#>     OCPD         d     0.500    0.710 0.032     0.160      0.130      256.904
-#>    PARPD         e     0.000    0.945 0.016     0.020      0.035        0.153
-#>    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.123
+#>     OCPD         y     0.500    0.935 0.017     0.020      0.045        0.131
+#>     OCPD         a     0.500    0.485 0.035     0.515      0.000        0.102
+#>     OCPD         d     0.500    0.710 0.032     0.170      0.120      256.592
+#>    PARPD         e     0.000    0.940 0.017     0.025      0.035        0.153
+#>    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.124
 #>    PARPD         y     0.000    0.950 0.015     0.040      0.010        0.131
-#>    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.099
+#>    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.098
 #>    PARPD         d     0.000       NA    NA        NA         NA           NA
-#>     OCPD         e     0.000    0.915 0.020     0.040      0.045        0.157
-#>     OCPD         x     0.000    0.960 0.014     0.030      0.010        0.125
-#>     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.132
-#>     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.101
+#>     OCPD         e     0.000    0.920 0.019     0.040      0.040        0.157
+#>     OCPD         x     0.000    0.955 0.015     0.035      0.010        0.124
+#>     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.131
+#>     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.100
 #>     OCPD         d     0.000       NA    NA        NA         NA           NA
-#>    PARPD         e     2.077    0.950 0.015     0.025      0.025        0.151
-#>    PARPD         x     2.077    0.945 0.016     0.030      0.025        0.118
-#>    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.128
-#>    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.124
-#>    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.199
+#>    PARPD         e     2.077    0.945 0.016     0.025      0.030        0.150
+#>    PARPD         x     2.077    0.950 0.015     0.025      0.025        0.118
+#>    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.127
+#>    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.125
+#>    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.504
 #>     OCPD         e     2.077    0.930 0.018     0.040      0.030        0.157
-#>     OCPD         x     2.077    0.910 0.020     0.060      0.030        0.126
+#>     OCPD         x     2.077    0.915 0.020     0.055      0.030        0.127
 #>     OCPD         y     2.077    0.945 0.016     0.030      0.025        0.131
-#>     OCPD         a     2.077    0.925 0.019     0.075      0.000        0.109
-#>     OCPD         d     2.077    0.885 0.023     0.050      0.065      158.585
+#>     OCPD         a     2.077    0.930 0.018     0.070      0.000        0.109
+#>     OCPD         d     2.077    0.885 0.023     0.050      0.065      160.646
 #>  Coverage_conditional N_conditional Structural N_reps
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.896           144      FALSE    200
+#>                 0.891           147      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.600            10      FALSE    200
+#>                 0.500             8      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.926            27      FALSE    200
+#>                 0.893            28      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.000             3      FALSE    200
+#>                 0.333             3      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
@@ -750,7 +751,7 @@ summary(acc)
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.882            17      FALSE    200
+#>                 0.833            18      FALSE    200
 #>   Note: amplitude coverage on rows flagged Structural is structurally 0 (a
 #>   percentile interval of strictly positive amplitude replicates cannot
 #>   contain a zero truth) -- a theorem, not a measurement; the informative
@@ -758,14 +759,14 @@ summary(acc)
 #> 
 #> Guardrail operating characteristics:
 #>  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate
-#>    PARPD     1.000     0.720    0.654    0.778     0.025      NA         0.555
-#>     OCPD     1.000     0.050    0.027    0.090     0.025      NA         0.075
-#>    PARPD     0.500     0.135    0.094    0.189     0.025      NA         0.115
+#>    PARPD     1.000     0.735    0.670    0.791     0.025      NA         0.555
+#>     OCPD     1.000     0.040    0.020    0.077     0.025      NA         0.075
+#>    PARPD     0.500     0.140    0.099    0.195     0.025      NA         0.115
 #>     OCPD     0.500     0.015    0.005    0.043     0.025      NA         0.045
 #>    PARPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.020
 #>     OCPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.070
 #>    PARPD     2.077     1.000    0.981    1.000     0.025      NA         0.985
-#>     OCPD     2.077     0.085    0.054    0.132     0.025      NA         0.115
+#>     OCPD     2.077     0.090    0.058    0.138     0.025      NA         0.115
 #>  Branch_pathology_rate N_reps
 #>                      0    200
 #>                      0    200
@@ -815,7 +816,8 @@ For a visual summary across the ladder:
 plot(acc)
 ```
 
-![](evaluating-circumplex-structure_files/figure-html/accuracy_plot-1.png)
+![plot of chunk
+accuracy_plot](figures/evaluating-circumplex-structure-accuracy_plot-1.png)
 
 The two profiles tell usefully different stories. Paranoid PD is
 certified: its amplitude CI lower bound clears the 0.35-CI-width margin,
@@ -1036,7 +1038,8 @@ communalities; `Fisher` measures departures in communality,
 plot(res)
 ```
 
-![](evaluating-circumplex-structure_files/figure-html/fit_structure_plot-1.png)
+![plot of chunk
+fit_structure_plot](figures/evaluating-circumplex-structure-fit_structure_plot-1.png)
 
 For the IIP-SC octants the picture agrees with Section 2’s CPM fit: the
 scales keep their theoretical circular *ordering* with comparable

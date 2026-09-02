@@ -194,7 +194,10 @@ semantics this wrapper delegates to.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Build a small two-occasion dataset in long format (one row per person per</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># `boots` is lowered from its default of 2000 throughout these examples so</span></span></span>
+<span class="r-in"><span><span class="co"># they run quickly; a reported analysis should use the default.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Build a small two-occasion dataset in long format (one row per person per</span></span></span>
 <span class="r-in"><span><span class="co"># occasion). In practice `data` already stores the repeated occasions this</span></span></span>
 <span class="r-in"><span><span class="co"># way; here we stack two copies of jz2017 as an illustration.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span></span>
@@ -208,16 +211,19 @@ semantics this wrapper delegates to.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Per-occasion SSM profiles from long-format data</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze_long</span><span class="op">(</span><span class="va">long</span>, scales <span class="op">=</span> <span class="va">scales</span>, id <span class="op">=</span> <span class="st">"id"</span>, occasion <span class="op">=</span> <span class="st">"occasion"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_analyze_long</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">long</span>, scales <span class="op">=</span> <span class="va">scales</span>, id <span class="op">=</span> <span class="st">"id"</span>, occasion <span class="op">=</span> <span class="st">"occasion"</span>,</span></span>
+<span class="r-in"><span>  boots <span class="op">=</span> <span class="fl">200</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [T1]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.917      0.891      0.944</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.325      0.377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.281     -0.223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.404      0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    320.894    327.733</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.321      0.374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.277     -0.220</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.397      0.459</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    321.175    327.287</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.878                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -225,10 +231,10 @@ semantics this wrapper delegates to.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.917      0.891      0.944</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.325      0.377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.281     -0.223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.404      0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    320.894    327.733</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.321      0.374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.277     -0.220</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.397      0.459</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    321.175    327.287</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.878                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

@@ -128,6 +128,9 @@ Other analysis functions:
 ## Examples
 
 ``` r
+# `boots` is lowered from its default of 2000 throughout these examples so
+# they run quickly; a reported analysis should use the default.
+
 # Build a small two-occasion dataset in long format (one row per person per
 # occasion). In practice `data` already stores the repeated occasions this
 # way; here we stack two copies of jz2017 as an illustration.
@@ -142,16 +145,19 @@ long <- rbind(t1, t2)
 
 # \donttest{
 # Per-occasion SSM profiles from long-format data
-ssm_analyze_long(long, scales = scales, id = "id", occasion = "occasion")
+ssm_analyze_long(
+  long, scales = scales, id = "id", occasion = "occasion",
+  boots = 200
+)
 #> 
 #> # Profile [T1]:
 #> 
 #>                Estimate   Lower CI   Upper CI
 #> Elevation         0.917      0.891      0.944
-#> X-Value           0.351      0.325      0.377
-#> Y-Value          -0.252     -0.281     -0.223
-#> Amplitude         0.432      0.404      0.462
-#> Displacement    324.292    320.894    327.733
+#> X-Value           0.351      0.321      0.374
+#> Y-Value          -0.252     -0.277     -0.220
+#> Amplitude         0.432      0.397      0.459
+#> Displacement    324.292    321.175    327.287
 #> Model Fit         0.878                      
 #> 
 #> 
@@ -159,10 +165,10 @@ ssm_analyze_long(long, scales = scales, id = "id", occasion = "occasion")
 #> 
 #>                Estimate   Lower CI   Upper CI
 #> Elevation         0.917      0.891      0.944
-#> X-Value           0.351      0.325      0.377
-#> Y-Value          -0.252     -0.281     -0.223
-#> Amplitude         0.432      0.404      0.462
-#> Displacement    324.292    320.894    327.733
+#> X-Value           0.351      0.321      0.374
+#> Y-Value          -0.252     -0.277     -0.220
+#> Amplitude         0.432      0.397      0.459
+#> Displacement    324.292    321.175    327.287
 #> Model Fit         0.878                      
 #> 
 # }
