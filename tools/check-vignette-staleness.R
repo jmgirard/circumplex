@@ -23,12 +23,16 @@
 #   ...
 #   <!-- precompute:volatile-numbers end -->
 #
-# and INSIDE a marked region only, numeric literals in knitr output lines (those
-# beginning `#>`) are replaced by <n> on both sides before comparing. Everything
-# else is byte-exact: all prose, all chunk source, every other vignette in full,
-# and inside the marked region the output's line count, line positions and every
-# non-numeric word. The blind spot is exactly one thing -- a stale digit inside a
-# declared region -- and the marker states in the file why it is there.
+# and INSIDE a marked region only, knitr output lines (those beginning `#>`) have
+# their numeric literals replaced by <n> and their runs of blank space collapsed
+# to one space before comparing. The whitespace goes with the digits because
+# print() right-aligns a column to its widest entry, so a number one digit
+# shorter shifts the whole column -- masking the digits while comparing the
+# padding they produced would still fail on every run. Everything else is
+# byte-exact: all prose, all chunk source, every other vignette in full, and
+# inside the marked region the output's line count, line positions and every
+# non-numeric word. The blind spot is a stale digit, or a change in spacing,
+# inside a declared region -- and the marker states in the file why it is there.
 #
 # Base R only: this runs before the package's own dependencies matter.
 
@@ -66,7 +70,7 @@ maskable <- function(lines, what) {
     }
     if (open && grepl("^#>", ln)) {
       masked[length(masked)] <- masked[length(masked)] + 1L
-      out[[i]] <- gsub(NUMBER, "<n>", ln)
+      out[[i]] <- trimws(gsub("[[:blank:]]+", " ", gsub(NUMBER, "<n>", ln)), "right")
     }
   }
   if (open) stop(what, ": a precompute:volatile-numbers region is never closed.", call. = FALSE)
