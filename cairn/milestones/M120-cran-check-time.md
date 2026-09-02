@@ -1,12 +1,12 @@
 # M120: Bring the Windows CRAN check under 8 minutes
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m120-cran-check-time`
 
 ## Goal
 
@@ -84,7 +84,7 @@ bar travels with them).
 
 ## Tasks
 
-- [ ] **T1** — Re-derive the baseline on the branch and record the procedure:
+- [x] **T1** — Re-derive the baseline on the branch and record the procedure:
       per-file CRAN-mode `ListReporter` timings and the `--as-cran` step
       timings, both from the built tarball with `NOT_CRAN` unset.
 - [ ] **T2** — Precompute the vignettes: `.Rmd.orig` + render script,
@@ -123,6 +123,7 @@ bar travels with them).
 - 2026-09-01: `cairn_validate`'s release-window advisory fires on this milestone's CRAN-shaped title; dispositioned — M120 ships no version and never submits (the resubmission stays M7's T4), so it stays `planned` rather than parked as `blocked`.
 - 2026-09-01: Jeff's win-builder log read in full (https://win-builder.r-project.org/YRV8eN2j66TA/00check.log): every timed step is `incoming feasibility [14s]`, `R code for possible problems [39s]`, `examples [41s]`, `tests [15m]`, `re-building of vignette outputs [146s]`, `PDF manual [25s]` — 1,165 s of the 1,440 s total, so the unattributed residual narrows from 328 s to 275 s. The install step (`checking whether package 'circumplex' can be installed ... OK`) carries no timing there, so the compile-cost assumption above stands unmeasured; CRAN's pretest `00check.log` is still the artifact that would settle it. That run's Status was OK with no notes — CRAN's incoming pretest applies the 10-minute checktime rule that win-builder does not.
 - 2026-09-01: CRAN's pretest Windows log read in full (incoming_pretest/circumplex_2.0.0_20260902_050533/Windows/00check.log): `Status: OK`, and the strings NOTE, WARNING, ERROR and checktime appear nowhere in it — so the pretest table's `Check: *, Result: NA` row is a summary-layer artifact, not a second defect, and the checktime NOTE is raised by CRAN's summary layer rather than by `R CMD check`. Timed steps there: feasibility [15s], R code for possible problems [44s], examples [45s], tests [16m], vignette re-build [145s], PDF manual [25s] = 1,234 s of the 1,440 s, narrowing the unattributed residual to 206 s; the install step again carries no timing. AC1's targets are unchanged and now carry more margin: fixed cost ~335 s leaves ~145 s of Windows headroom for tests plus vignettes against the 8-minute target.
+- 2026-09-02: T1 — baseline re-derived on the branch with `tools/m120-test-timings.R` (committed; clears `NOT_CRAN`, `test_dir()` + `ListReporter`) and an `--as-cran --timings` run of the built tarball with `NOT_CRAN` unset. Tests 157.0 s live over 932 blocks (84 already skipped, 0 failures); `--as-cran` steps: tests 155 s, vignette re-build 27 s, examples --run-donttest 17 s, examples untimed, install untimed, Status OK. These are 2026-09-02 figures on the maintainer's macOS machine and run faster than the plan's 2026-09-01 baseline (259/40/27 s) — AC1's targets are absolute, so they bind unchanged. Cost is concentrated: skipping the 100 costliest live blocks (each >= 0.19 s) leaves 27.3 s, the top 150 (>= 0.11 s) leaves 19.8 s.
 
 ## Decisions
 
