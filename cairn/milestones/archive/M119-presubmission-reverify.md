@@ -1,0 +1,11 @@
+# M119: Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records
+
+**Status:** done (2026-09-01, PR #150 https://github.com/jmgirard/circumplex/pull/150)
+
+**Goal:** Make the v2.0.0 tarball submittable after the 302 commits that followed M7's merge: bring the CRAN-mode test time down, guard the vdiffr sites against an absent Suggests package, and bring NEWS.md and cran-comments.md back in line with the tree.
+
+**Outcome:** Six heavy oracle and Monte-Carlo blocks gained `skip_on_cran()` (fiml `M65-D3`, `BC14`, `BC15`; corrected-se `BC4`, `M66`; reliability `BC6`), taking `R CMD check --as-cran` tests from 550 s to 172 s with one live block per `axes_reliability()` input path shown to redden under a planted defect on its own path. `skip_if_not_installed("vdiffr")` guards all 29 `expect_doppelganger()` sites in 17 blocks across 9 files (all skip cleanly without vdiffr, all pass with it). NEWS.md's 2.0.0 dependency bullet and cran-comments.md's dependency paragraph and summary now match DESCRIPTION and the tree: 8 Imports (grid for the coordinate system's label-backdrop grobs, parallel for `ssm_ci_accuracy()`'s worker pool, ggforce out), 6 new vignettes, an `axes_reliability()` highlight and the CAIS adult-sample withdrawal. The `plot.circumplex_fit_structure()` unknown-dots warning test now runs without vdiffr. Both release checks 0/0/0 on the tip.
+
+**Decisions:** none milestone-local; the plan gate's three choices (CRAN-skip heavy cells; no further accuracy pass; all-skip detector left alone) are in the milestone work log, the last priced on a ROADMAP candidate row.
+
+**Review:** Three-lens fan-out (user-facing tier). The Opus lens raised nine: fixed at the gate — the warning assertion trapped behind a vdiffr guard, wrong grid and parallel rationales in NEWS.md and cran-comments.md, a test comment claiming CI runs on every push; rejected — secondary assertions inside snapshot blocks, the stale cran-comments environment block (release walk), and one informational note. Both Sonnet lenses flagged the same item: the M65-D3 block's "carries no skip flag" comment reversed by the plan's own skip; kept, with the fence verified from the PR's CI log (check step `NOT_CRAN: true`, 78 skips against 149 in CRAN mode). No archived review or PR thread touched these files. Nothing retired or graduated.

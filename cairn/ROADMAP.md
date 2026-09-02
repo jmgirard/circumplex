@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-31 (M118 merged and archived; cairn_validate green, tree clean, CI green on macOS/ubuntu/windows. T5's row prune bought back real headroom — ROADMAP 22,797 / 24,000 and LESSONS.md 19,997 / 20,000, unchanged because M118's lesson went to test-craft.md instead (29 lines / 8,924 bytes against 35 / 9,000). Issue #137's stated close condition is still met and it is Jeff's to close; M7's release evidence is now 300+ commits stale, and re-verification belongs to the release walk.)_
+_Last hygiene check: 2026-09-01 (M119 merged and archived; cairn_validate green, tree clean, CI green on macOS/ubuntu/windows. M114's row pruned under terminal-row retention. LESSONS.md's M7-family line extended with the NOT_CRAN measurement rule; test-craft.md unchanged. M7's only dependency is now done, and its release evidence is re-derived on the walk.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -10,11 +10,10 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M119 | high | milestones/M7-v2-release-prep.md |
-| M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | review | — | high | milestones/M119-presubmission-reverify.md |
+| M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | done | — | high | milestones/archive/M119-presubmission-reverify.md |
 | M118 | Close three ways the certificate suite can pass without checking | done | — | normal | milestones/archive/M118-certificate-suite-pass-without-checking.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |
 | M117 | Price the accuracy certificate once per checked fit | done | — | normal | milestones/archive/M117-certificate-once-per-fit.md |
-| M114 | Pin the shared refusal predicate, and assert the dead literal rather than dropping it | done | M113 | normal | milestones/archive/M114-refusal-predicate-fences.md |
 | M115 | Make the packaged accuracy bracket assert where the shipped pricing differs | done | M113 | normal | milestones/archive/M115-certificate-bracket-reach.md |
 
 ## Candidates
