@@ -2,7 +2,7 @@
 
 - **Status:** blocked
 - **Priority:** high
-- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55, M119
+- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55, M119, M120
 - **Branch/PR:** `m7-v2-release-prep` / [PR #64](https://github.com/jmgirard/circumplex/pull/64)
 
 ## Goal
@@ -281,3 +281,4 @@ does **not** tick AC4, set status `done`, or archive. M7 returns to
 - 2026-09-01: win-builder R-devel result received (Jeff pasted the log; results go only to me@jmgirard.com). R Under development 2026-08-31 r90457 ucrt, x86_64-w64-mingw32, Windows Server 2022, gcc 14.3.0: Status OK, no errors, warnings or notes; CRAN incoming feasibility OK. Timings there: tests 15m, vignette re-build 146s, examples 41s, PDF manual 25s. The 15m is the post-skip suite — win-builder leaves `NOT_CRAN` unset, so the six `skip_on_cran()` blocks fire — against 172s for the same suite on the maintainer's 18-core machine, a ~5x platform factor. cran-comments' 0/0/0 claim across all three environments is now verified in full; no edit needed. Every check the walk owns is green; the only step left is Jeff's `submit_cran()`.
 - 2026-09-01: cran-comments.md trimmed 115 lines / 6,474 bytes → 29 / 1,025 at Jeff's judgment that the file was longer than reviewers want. Removed: the 70-line feature summary and the 21-line dependency essay (NEWS.md ships and carries both), and the URL-check section (urlchecker is clean, so there is nothing to justify with 0 notes). Kept: environments, the 0/0/0 result, no reverse dependencies, and two dependency points a reviewer might otherwise query — the ggplot2 4.0.0 floor with the seven→eight Imports change, and the R 3.4→4.1 correction. Every retained figure re-verified at the tip: Imports 8 (7 at v1.2.0), `Depends: R (>= 4.1)`, and both ggplot2 4.0.3 and htmlTable 2.5.0 declare `Depends: R (>= 4.1)`. Git holds the long version.
 - 2026-09-01: T4 done — Jeff ran `devtools::submit_cran()` at 22:00 CDT (2026-09-02 03:00:34 UTC) on SHA 3d07b024, recorded in the untracked `CRAN-SUBMISSION` file (already `.Rbuildignore`d). The submitted tarball carries the 115-line cran-comments.md; the 29-line trim committed at 22:02 (681d1684) landed two minutes later and applies to any resubmission, not to what CRAN now holds. Awaiting the CRAN confirmation email and the review outcome.
+- 2026-09-01: CRAN's incoming pretest failed the submission: `r-devel-windows-x86_64` reports `Overall checktime 24 min > 10 min` (NOTE) plus a `Check: *, Result: NA` row, `r-devel-linux-x86_64-debian-gcc` OK. T4's handoff stands but the tarball CRAN holds is not acceptable, so M7 is blocked on M120 (Windows check time under 8 minutes) as well as M119; the resubmission stays M7's T4.
