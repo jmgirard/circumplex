@@ -1,6 +1,6 @@
 # M120: Bring the Windows CRAN check under 8 minutes
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -148,6 +148,7 @@ bar travels with them).
 - 2026-09-02: finding recorded as an accepted risk, not fixed: the suite's pre-existing 0/360 blocks assert relational properties and stay green under a uniform branch shift, and the four plot functions had NO CRAN-visible coverage at all because vdiffr skips there. This milestone adds ten blocks that close both for the functions AC4 names; it does not re-examine every other relational boundary assertion in the suite. Falsified by a wrap regression reaching CRAN that a value-asserting pole test elsewhere in the suite would have caught.
 - 2026-09-02: T6 — final `--as-cran` on the built tarball, PDF manual included, on an idle machine: **tests 17 s, vignette re-build 5 s, PDF manual 2 s, total 1 min 27 s, Status OK** against the 259 s / 40 s / 6 min 14 s baseline. `devtools::check(manual = TRUE)` Status OK (0/0/0); `devtools::document()` no diff and no unresolved-link warning. Vignette parity re-run after the T5 roxygen changes: all seven still match their sources. `cran-comments.md` now states the reduction and that nothing was deleted. Note on measurement: an intermediate run of the same tarball read tests 35 s and total 2 min 15 s while another R session was running `devtools::check()` on this machine — AC1's figures are only meaningful on an unloaded machine, and the recorded ones were taken with no other R process running.
 - 2026-09-02: **blocked on T7** — the win-builder R-devel run is Jeff's to make (`devtools::check_win_devel()`); its results reach his address alone, so AC2 cannot be evidenced from this session. Everything else is done and committed; resume to record the four line items and the overall time once the email arrives.
+- 2026-09-02: T7 — win-builder R-devel run of the branch tarball, log read in full (R-devel r90457 ucrt, x86_64-w64-mingw32, Windows Server 2022, started 2026-09-02 15:19:37 UTC): `Status: OK`, no NOTE/WARNING/ERROR. Timed steps: incoming feasibility [12s], R code for possible problems [25s], examples [27s], tests [68s] (`testthat.R` [68s]), re-building of vignette outputs [11s], PDF manual [15s] = 158 s, against 1,165 s for the same six steps on the 2026-09-01 pre-branch run (tests 15 min -> 68 s, vignettes 146 s -> 11 s, examples 41 s -> 27 s). The install step (`checking whether package 'circumplex' can be installed ... OK`) again carries no timing, so the three AC2 line items that are timed are recorded and the fourth is recorded as untimed — the third Windows log in a row to omit it. The log states no overall check time; whether AC2's overall figure can be evidenced at all is the open question below.
 
 ## Decisions
 
