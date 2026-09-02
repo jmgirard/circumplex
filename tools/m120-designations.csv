@@ -1,7 +1,13 @@
-"fn","file","test","patches"
-"axes_reliability","test-axes-reliability.R","M60: a rotated equally spaced set estimates (Strack type b)","axes-magnitude"
-"ssm_analyze","test-ssm_montecarlo.R","seeded Monte Carlo output matches the pre-Z1 pin (engine refactor guard)","ssm-magnitude;ssm-wrap"
-"ssm_draws","test-ssm_draws.R","shape B equals shape A applied to the per-row (e, x, y)","ssm-magnitude;ssm-wrap"
-"ssm_parameters","test-ssm_sem.R","sem transform equals ssm_parameters() at equally spaced angles (sec. 8.2)","ssm-magnitude;ssm-wrap"
-"ssm_score","test-ssm_analysis.R","ssm_score works","ssm-magnitude;ssm-wrap"
-"ssm_sem_syntax","test-ssm_sem_syntax.R","ssm_sem_syntax() returns a string carrying the weights attribute (§3.5)","semweights-magnitude"
+fn,file,test,patches
+angle_unwrap,test-angle_unwrap.R,angle_unwrap unwraps a pole-crossing sequence (spec fixture),unwrap-wrap
+axes_reliability,test-axes-reliability.R,M60: a rotated equally spaced set estimates (Strack type b),axes-magnitude
+cpm_fit,test-cpm_oracles.R,published oracle: equal-communality rows (Table 2 model 2b),cpm-magnitude
+cpm_fit,test-cpm_angle_ci.R,"cpm_fit() reports a pole-fixed reference angle and its CI as 360, not 0 (M20)",cpm-pole
+cpm_simulate,test-cpm_api.R,cpm_simulate: population covariance is exactly Phat (factor form),cpm-magnitude
+ssm_analyze,test-pole-values.R,ssm_analyze reports the displacement that built the profile at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_analyze_long,test-pole-values.R,ssm_analyze_long reports the displacement that built each occasion at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_draws,test-pole-values.R,ssm_draws reports the displacement that built each profile draw at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_parameters,test-pole-values.R,ssm_parameters reports the displacement that built the profile at the 0/360 pole,ssm-magnitude;ssm-wrap
+ssm_sem,test-pole-values.R,ssm_sem reports a latent displacement past the 0/360 pole,sem-magnitude;sem-wrap
+ssm_sem_parameters,test-pole-values.R,ssm_sem_parameters reports a latent displacement past the 0/360 pole,sem-magnitude;sem-wrap
+ssm_sem_syntax,test-ssm_sem_syntax.R,ssm_sem_syntax() returns a string carrying the weights attribute (§3.5),semweights-magnitude

@@ -56,6 +56,13 @@ PATCHES <- list(
        old = "  w <- solve(crossprod(b), t(b))",
        new = "  w <- 1.05 * solve(crossprod(b), t(b))",
        note = "the SSM OLS projection weights inflated 5% at their single derivation"),
+  # angle_unwrap owns its own degree arithmetic (R/convenience_functions.R) and
+  # never reaches the C++ estimator, so its wrap defect is planted there: drop
+  # the shortest-signed-rotation wrap and a pole crossing runs backwards.
+  list(id = "unwrap-wrap", form = "wrap", file = "R/convenience_functions.R",
+       old = "  d <- ((w[-1] - w[-n] + 180) %% 360) - 180",
+       new = "  d <- w[-1] - w[-n]",
+       note = "angle_unwrap taking the raw difference instead of the shortest signed rotation"),
   list(id = "axes-magnitude", form = "magnitude", file = "R/axes_reliability.R",
        old = "c(x = axis_reliability_sb(xi1, item_n[[\"x\"]]),",
        new = "c(x = 1.05 * axis_reliability_sb(xi1, item_n[[\"x\"]]),",
