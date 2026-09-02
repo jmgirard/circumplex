@@ -248,10 +248,10 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 
 * The package now requires ggplot2 (>= 4.0.0), and `ggforce` is no longer a
   dependency. Two base-R packages join Imports: `grid` (the rebuilt coordinate
-  system and trajectory plots draw grobs directly) and `parallel` (the new
-  `parallel`/`ncpus` bootstrapping arguments). The declared R requirement moves
-  to R (>= 4.1) to match the floor ggplot2 already imposes; no installation
-  that worked before is affected.
+  system builds its axis-label backdrops as grobs) and `parallel` (the worker
+  pool behind `ssm_ci_accuracy()`'s `parallel`/`ncpus` arguments). The declared
+  R requirement moves to R (>= 4.1) to match the floor ggplot2 already imposes;
+  no installation that worked before is affected.
 
 * `ssm_score()`'s extra arguments passed through `...` must now be named
   (e.g. `prefix = "IIP_"`) and must be single strings; an unnamed or

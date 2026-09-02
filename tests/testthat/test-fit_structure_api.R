@@ -270,13 +270,18 @@ test_that("Heywood communalities (>1) stay inside the canvas ring", {
   expect_lte(max(pts$y), pp$r.range[[2]] + 1e-6)
 })
 
-test_that("plot is a stable visual and warns on unknown dots", {
+test_that("plot warns on unknown dots", {
+  data("jz2017")
+  res <- fit_structure(jz2017, scales = octants_jz)
+  expect_warning(plot(res, bogus = TRUE))
+})
+
+test_that("plot is a stable visual", {
   skip_if_not_installed("vdiffr")
   data("jz2017")
   res <- fit_structure(jz2017, scales = octants_jz)
   vdiffr::expect_doppelganger("structure config plot", plot(res))
   vdiffr::expect_doppelganger("structure config no legend", plot(res, legend = FALSE))
-  expect_warning(plot(res, bogus = TRUE))
 })
 
 test_that("plot gives every scale a distinct fill beyond the 8-colour palette", {

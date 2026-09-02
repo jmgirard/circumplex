@@ -1018,9 +1018,9 @@ test_that("BC9: `sd = \"raw\"` is a hard error under FIML, not an NA", {
 # BC11's MAR reversal and BC12's metric falsification moved to the T6 harness at
 # the T5 gate (2026-07-26): the structured FIML fit measures 18-68 s per fit
 # under realistic MAR missingness, so their replicate counts cost ~14 minutes
-# per suite run. These two cells are each a single fit and stay fully live --
-# nothing about them is read from a stored summary -- on CI; each fit is ~20 s,
-# so both are skipped under CRAN's own check.
+# per suite run. These two cells are each a single fit, and nothing about them
+# is read from a stored summary. Each fit is ~20 s, so both are skipped under
+# CRAN's own check and run live on CI.
 
 test_that("BC14: FIML estimates a dataset listwise cannot touch", {
   skip_if_not_installed("lavaan")
@@ -1134,11 +1134,12 @@ test_that("AC16: the FIML SE caveat prints beside the SEs, and only there", {
 # produces it. The last test here re-runs stored seeds live and requires them
 # to reproduce their stored values -- which is a far stronger check than a
 # statistical smoke, because it catches drift in the estimator AND in the
-# missingness mechanism at once. It runs on every CI push (NOT_CRAN=true) and
-# is skipped only under CRAN's own check, where its 200 s of live refitting
-# put the suite over the check-time budget: this repo has four times shipped a
-# check that was green because it never ran (M7 --no-manual, M16
-# skip_on_cran(), M31 vdiffr, M39 CI baseline), so the CI run is the fence.
+# missingness mechanism at once. It is skipped only under CRAN's own check,
+# where its 200 s of live refitting put the suite over the check-time budget;
+# every CI run (pushes to master and pull requests, NOT_CRAN=true) executes it.
+# This repo has four times shipped a check that was green because it never ran
+# (M7 --no-manual, M16 skip_on_cran(), M31 vdiffr, M39 CI baseline), so the CI
+# run is the fence for this block.
 
 heavy <- function() readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
 

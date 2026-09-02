@@ -91,9 +91,9 @@ The `ggplot2` requirement moves from `>= 3.3.0` to `>= 4.0.0`: the new
 coordinate system is a `CoordRadial` subclass and uses parameters introduced in
 ggplot2 4.0.0. `ggforce` is dropped from Imports (the new coordinate system
 subsumes what it was used for) and two base-R packages are added: `grid` (the
-coordinate system and trajectory plots build grobs directly) and `parallel`
-(for the new `parallel`/`ncpus` bootstrapping arguments). Imports now lists
-eight packages, and no new third-party dependency is introduced.
+coordinate system builds its axis-label backdrops as grobs) and `parallel` (the
+worker pool behind `ssm_ci_accuracy()`'s `parallel`/`ncpus` arguments). Imports
+now lists eight packages, and no new third-party dependency is introduced.
 
 The declared `Depends: R` moves from `>= 3.4` to `>= 4.1`. This corrects an
 understated declaration rather than adding a restriction: ggplot2 (>= 4.0.0)
