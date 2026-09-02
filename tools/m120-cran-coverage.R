@@ -74,11 +74,20 @@ if (is.null(now) || is.null(was)) stop("could not read one of the two versions",
 # A block calls `fn` when its source names it as a call.
 calls <- function(src, fn) grepl(paste0("(^|[^A-Za-z0-9._])", fn, "\\s*\\("), src)
 
+# The domain is a UNION of two things, because either can cut what CRAN sees:
+# a block this branch newly SKIPS on CRAN, and a block this branch CHANGED at
+# all (a block made cheaper rather than skipped covers less than it did).
 newly_skipped <- now[now$skips_cran, ]
 was_key <- paste(was$file, was$test, sep = "\r")
 was_skipped <- was_key[was$skips_cran]
 newly_skipped <- newly_skipped[
   !paste(newly_skipped$file, newly_skipped$test, sep = "\r") %in% was_skipped, ]
+
+was_src <- setNames(was$src, was_key)
+now_key <- paste(now$file, now$test, sep = "\r")
+changed <- now[!(now_key %in% names(was_src)) |
+                 now$src != was_src[now_key], ]
+touched <- unique(rbind(newly_skipped, changed))
 if (!nrow(newly_skipped)) {
   stop("no block is newly CRAN-skipped against ", base,
        " -- refusing to pass vacuously.", call. = FALSE)
@@ -87,7 +96,7 @@ live_now <- now[!now$skips_cran, ]
 
 lost <- character(0); kept <- list(); orphan <- character(0)
 for (fn in exports) {
-  if (!any(calls(newly_skipped$src, fn))) next          # coverage not reduced
+  if (!any(calls(touched$src, fn))) next                # coverage not reduced
   hit <- which(calls(live_now$src, fn))
   if (!length(hit)) {
     lost <- c(lost, fn)
@@ -99,8 +108,17 @@ for (fn in exports) {
   if (!any(calls(now$src, fn))) orphan <- c(orphan, fn)
 }
 
+domain <- sort(unique(c(lost, names(kept))))
+if (!length(domain)) {
+  stop("the domain is EMPTY -- no exported function is named by any block this\n",
+       "branch skipped or changed. That is not a pass; it means the domain\n",
+       "computation found nothing to check.", call. = FALSE)
+}
+writeLines(domain, "tools/m120-domain.txt")
 cat("newly CRAN-skipped blocks:", nrow(newly_skipped),
+    "| blocks this branch touched:", nrow(touched),
     "| blocks still live on CRAN:", nrow(live_now), "\n")
+cat("domain written to tools/m120-domain.txt (", length(domain), "functions )\n")
 cat("exported functions whose CRAN coverage this branch reduces:",
     length(lost) + length(kept), "\n\n")
 for (fn in names(kept)) {

@@ -59,6 +59,16 @@ PATCHES <- list(
   # angle_unwrap owns its own degree arithmetic (R/convenience_functions.R) and
   # never reaches the C++ estimator, so its wrap defect is planted there: drop
   # the shortest-signed-rotation wrap and a pole crossing runs backwards.
+  # A 5% inflation of the SSM amplitude is NOT observable in ssm_ci_accuracy()'s
+  # output: it replays the procedure against the observed fit, so estimate and
+  # replicates inflate together and every coverage rate is unchanged -- an
+  # invariance of the statistic, not a hole. The numeric value this function
+  # itself returns is the coverage rate, so the magnitude defect is planted
+  # there, on its own arithmetic.
+  list(id = "coverage-magnitude", form = "magnitude", file = "R/ssm_ci_accuracy.R",
+       old = "      cvg <- if (n_eff > 0) mean(cv, na.rm = TRUE) else NA_real_",
+       new = "      cvg <- if (n_eff > 0) 1.05 * mean(cv, na.rm = TRUE) else NA_real_",
+       note = "ssm_ci_accuracy() coverage rate inflated 5% where it is aggregated"),
   list(id = "unwrap-wrap", form = "wrap", file = "R/convenience_functions.R",
        old = "  d <- ((w[-1] - w[-n] + 180) %% 360) - 180",
        new = "  d <- w[-1] - w[-n]",
