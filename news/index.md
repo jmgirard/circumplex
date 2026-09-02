@@ -294,9 +294,13 @@ on a real ggplot2 coordinate system.
   `append = TRUE` and `append = FALSE` return paths.
 
 - The package now requires ggplot2 (\>= 4.0.0), and `ggforce` is no
-  longer a dependency. The declared R requirement moves to R (\>= 4.1)
-  to match the floor ggplot2 already imposes; no installation that
-  worked before is affected.
+  longer a dependency. Two base-R packages join Imports: `grid` (the
+  rebuilt coordinate system builds its axis-label backdrops as grobs)
+  and `parallel` (the worker pool behind
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)’s
+  `parallel`/`ncpus` arguments). The declared R requirement moves to R
+  (\>= 4.1) to match the floor ggplot2 already imposes; no installation
+  that worked before is affected.
 
 - [`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md)’s
   extra arguments passed through `...` must now be named
