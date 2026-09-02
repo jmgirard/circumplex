@@ -440,6 +440,7 @@ test_that("bootstrap and MC paired-contrast CIs agree within tolerance", {
 })
 
 test_that("committed coverage-oracle results satisfy the registered bands", {
+  skip_on_cran()
   # Pins the devel/m25-paired-coverage.R run (reps = 500, boots = 600): a
   # regenerated rds that drifted out of its pre-registered acceptance would
   # fail here. Skipped where devel/ is absent (built tarball).
@@ -529,6 +530,7 @@ test_that("ssm_table renders occasion rows with occasion labels", {
 })
 
 test_that("ssm_plot_circle and ssm_plot_curve accept occasions objects", {
+  skip_on_cran()
   data <- make_contrast_data(n = 100, seed = 35)
   set.seed(36)
   res <- ssm_analyze(data,
@@ -547,6 +549,7 @@ test_that("ssm_plot_circle and ssm_plot_curve accept occasions objects", {
 })
 
 test_that("ssm_plot_contrast plots an occasion contrast", {
+  skip_on_cran()
   data <- make_contrast_data(n = 100, seed = 37)
   set.seed(38)
   res <- ssm_analyze(data,
@@ -566,6 +569,7 @@ test_that("ssm_plot_contrast plots an occasion contrast", {
 # ssm_ci_accuracy() occasions path (M29; D-017) -------------------------------
 
 test_that("occasions ci_accuracy population is the stacked cross-occasion covariance (AC1)", {
+  skip_on_cran()
   # A dependent fixture (rho = 0.7) and an independent one (rho = 0), same
   # marginals: the stored stacked covariance must carry the within-person
   # cross-occasion dependence in its off-diagonal p x p blocks, not zero them.
@@ -601,6 +605,7 @@ test_that("occasions ci_accuracy population is the stacked cross-occasion covari
 })
 
 test_that("occasions ci_accuracy runs both engines and reports a paired-contrast row", {
+  skip_on_cran()
   data <- make_contrast_data(n = 120, seed = 40)
   occ <- list(T1 = occ_names(1), T2 = occ_names(2))
   for (method in c("bootstrap", "montecarlo")) {
@@ -673,6 +678,7 @@ test_that("occasions ci_accuracy warns (not refuses) on a rank-deficient stacked
 })
 
 test_that("occasions ci_accuracy flags Structural rows at c=0 and runs a near-zero occasion honestly (AC4)", {
+  skip_on_cran()
   # (a) the c = 0 amplitude-ladder rung zeroes every occasion's amplitude, so
   # each occasion's amplitude coverage is structurally 0 (a percentile interval
   # of positive amplitude replicates cannot contain a zero truth) and must be
@@ -715,6 +721,7 @@ test_that("occasions ci_accuracy flags Structural rows at c=0 and runs a near-ze
 })
 
 test_that("occasions ci_accuracy handles a pole-straddling occasion without error (AC4)", {
+  skip_on_cran()
   # occasion 1 peaks on the 0/360 pole; the diagnostic's angular coverage
   # (mod-360 arc membership) must run and report a finite displacement row
   data <- make_contrast_data(n = 80, d1 = 0, dd = 90, seed = 7)
@@ -736,6 +743,7 @@ test_that("occasions ci_accuracy handles a pole-straddling occasion without erro
 # Boundary battery (CLAUDE.md; spec sec. 2.3 item 4) --------------------------
 
 test_that("occasion profile CI straddling the 0/360 pole wraps, both engines", {
+  skip_on_cran()
   # occasion 1 peaks exactly on the pole; with this n and noise the CI is
   # several degrees wide on each side, so it must straddle and wrap
   data <- make_contrast_data(n = 40, d1 = 0, dd = 90, seed = 7)
@@ -759,6 +767,7 @@ test_that("occasion profile CI straddling the 0/360 pole wraps, both engines", {
 })
 
 test_that("occasion contrast near +/-180 keeps sign and branch, both engines", {
+  skip_on_cran()
   for (dd in c(175, -175)) {
     data <- make_contrast_data(n = 200, d1 = 90, dd = dd, seed = 11)
     for (method in c("bootstrap", "montecarlo")) {
@@ -778,6 +787,7 @@ test_that("occasion contrast near +/-180 keeps sign and branch, both engines", {
 })
 
 test_that("a flat occasion reports NA displacement with a warning, both engines", {
+  skip_on_cran()
   data <- make_contrast_data(n = 60, seed = 13)
   # occasion 2 becomes exactly flat: constant score for every person and scale
   data[occ_names(2)] <- 2
@@ -814,6 +824,7 @@ test_that("k = 3 occasions agree across engines on point estimates", {
 })
 
 test_that("occasion contrast runs through both engines consistently", {
+  skip_on_cran()
   data <- make_contrast_data(n = 300)
   set.seed(4)
   res_bs <- ssm_analyze(data,

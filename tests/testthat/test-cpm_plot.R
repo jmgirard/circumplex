@@ -25,6 +25,7 @@ cpm_layer <- function(b, p, geom_class) {
 }
 
 test_that("plot.circumplex_cpm builds a circular canvas with points and wedges", {
+  skip_on_cran()
   fit <- clean_cpm_fit()
   p <- plot(fit)
   expect_true(ggplot2::is_ggplot(p))
@@ -50,6 +51,7 @@ test_that("plot.circumplex_cpm is a stable visual", {
 })
 
 test_that("plot.circumplex_cpm names scales whose CI wedge is inestimable", {
+  skip_on_cran()
   # The raw jz2017 octants give an ill-conditioned Hessian -> analytic CIs are
   # all NA. Every scale then draws as a point with no wedge, and the plot must
   # name them rather than let the wedges vanish silently (the unified
@@ -71,6 +73,7 @@ test_that("plot.circumplex_cpm names scales whose CI wedge is inestimable", {
 })
 
 test_that("plot.circumplex_cpm validates its arguments", {
+  skip_on_cran()
   fit <- clean_cpm_fit()
   expect_error(plot(fit, amax = c(1, 2)))
   expect_error(plot(fit, amax = -1))

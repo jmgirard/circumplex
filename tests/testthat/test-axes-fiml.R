@@ -63,6 +63,7 @@ test_that("the N-1 rescaling is the thing that makes BC2 exact", {
 })
 
 test_that("the FIML metric is NOT the available-case scale() metric", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The distinction RR12's whole ruling turns on. Under missingness the two
   # metrics must differ; if they ever coincide, the implementation has silently
@@ -126,6 +127,7 @@ fiml_holes <- function(mat, rate = 0.10, seed = 105L) {
 }
 
 test_that("AC1: `missing` defaults to listwise and leaves that path alone", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   mat <- fiml_fixture()
   items <- fiml_items(mat)
@@ -149,6 +151,7 @@ test_that("AC1: `missing` defaults to listwise and leaves that path alone", {
 })
 
 test_that("AC1: `missing = \"fiml\"` is refused on the cormat path", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   mat <- fiml_fixture()
   # Not one of BC7's six clauses, and deliberately so: a published correlation
@@ -164,6 +167,7 @@ test_that("AC1: `missing = \"fiml\"` is refused on the cormat path", {
 })
 
 test_that("AC3: on complete data the two paths agree to 1e-8", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The FIML path's only exactly-known answer. Both paths see the same rows, so
   # any disagreement beyond float noise is the metric or the estimator moving,
@@ -188,6 +192,7 @@ test_that("AC3: on complete data the two paths agree to 1e-8", {
 })
 
 test_that("AC3: complete-data agreement holds with a fifth component too", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # zeta2 is fitted only when the block map adds rank (M63), so the four-row
   # cell above never exercises it; without this the criterion's "(and zeta2 when
@@ -211,6 +216,7 @@ test_that("AC3: complete-data agreement holds with a fifth component too", {
 })
 
 test_that("on complete data EVERY reported fit measure agrees between paths", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The gap that let a wrong number ship: AC3 pins the components, reliability
   # and SEm, and nothing pinned `$fit`. lavaan hands a `missing = "ml"` fit the
@@ -259,6 +265,7 @@ test_that("on complete data EVERY reported fit measure agrees between paths", {
 })
 
 test_that("AC4: the FIML fit uses observed information", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Asserted on the object axes_reliability() ACTUALLY fitted, captured through
   # the convergence seam, rather than on a parallel fit assembled by the test --
@@ -285,6 +292,7 @@ test_that("AC4: the FIML fit uses observed information", {
 })
 
 test_that("AC4: the listwise fit is not silently promoted to FIML", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The other half of the seam: a mock that only ever sees "observed" would
   # pass above even if every fit used observed information. Fire the listwise
@@ -305,6 +313,7 @@ test_that("AC4: the listwise fit is not silently promoted to FIML", {
 })
 
 test_that("AC5: no two-stage refit of R-hat reaches the reported results", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   mat <- fiml_holes(fiml_fixture())
   dat <- as.data.frame(mat)
@@ -389,6 +398,7 @@ test_that("BC7 (i): N_used counts rows with any observed item, and floors at p",
 })
 
 test_that("BC7 (i): all-missing rows are dropped and excluded from N_used", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   mat <- fx$mat
@@ -458,6 +468,7 @@ test_that("BC7 (iv): saturated-stage non-convergence is refused", {
 })
 
 test_that("BC7 (iv): the unmocked convergence predicate reports TRUE", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The half the mock cannot prove, and the one that actually bit at T1:
   # lavInspect(fit, "converged") reports FALSE on a healthy saturated fit
@@ -492,6 +503,7 @@ test_that("BC7 (v): the PD guard consumes R-hat and refuses on it", {
 })
 
 test_that("BC7 (v): duplicated items are refused, but by clause (vi)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The honest record of where the end-to-end route actually lands, so a later
   # session does not read the mocked test above as an end-to-end guarantee.
@@ -521,6 +533,7 @@ test_that("BC7 (v): duplicated items are refused, but by clause (vi)", {
 })
 
 test_that("BC7 (vi): structured-fit non-convergence is refused", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   local_mocked_bindings(axes_converged = function(fit) FALSE)
@@ -528,6 +541,7 @@ test_that("BC7 (vi): structured-fit non-convergence is refused", {
 })
 
 test_that("M65-D2: thin pairwise overlap warns rather than refusing", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   mat <- fx$mat
@@ -551,6 +565,7 @@ test_that("M65-D2: thin pairwise overlap warns rather than refusing", {
 })
 
 test_that("M65-D2: healthy overlap draws no warning", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   expect_no_warning(
@@ -562,6 +577,7 @@ test_that("M65-D2: healthy overlap draws no warning", {
 })
 
 test_that("the thin-overlap warning separates thin overlap from a small sample", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Two cases, deliberately split, because the pre-M67 predicate
   # `min_coverage < 30` could not tell them apart: on complete data
@@ -631,6 +647,7 @@ test_that("the thin-overlap warning separates thin overlap from a small sample",
 })
 
 test_that("M60 re-assertion: the listwise refusals still fire on their own terms", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The FIML branch moved the sample-size floor to N_used and the PD gate to
   # R-hat. Both checks refused things INCIDENTALLY on the listwise path before
@@ -665,6 +682,7 @@ test_that("M60 re-assertion: the listwise refusals still fire on their own terms
 })
 
 test_that("M65-D4: the EM cap is a backstop, not a routine limit", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # lavaan's single-level default of 500 EM iterations makes clause (iv) fire on
   # data FIML can estimate: one item at 20/300 coverage stalls at 500 and
@@ -719,6 +737,7 @@ test_that("the h1 EM runs unaccelerated wherever lavaan offers acceleration", {
 })
 
 test_that("M65-D5: the EM cap is spelled for the lavaan actually installed", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Regression test for the failure CI caught and a local check could not:
   # lavaan renamed this option at 0.7-1, from a top-level `em.h1.iter.max` to
@@ -750,6 +769,7 @@ test_that("M65-D5: the EM cap is spelled for the lavaan actually installed", {
 })
 
 test_that("M65-D5: a stalled structured-stage EM is refused, not muffled", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The second EM site (F1). A `missing = "ml"` cfa() runs its own unrestricted
   # -moments EM for the saturated loglikelihood that chi-square, CFI and RMSEA
@@ -868,6 +888,7 @@ test_that("the EM-stall predicate fires on both lavaan generations", {
 # exists to avoid.
 
 test_that("BC8: the startup message reports the four counts", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   mat <- fiml_holes(fx$mat)
@@ -885,6 +906,7 @@ test_that("BC8: the startup message reports the four counts", {
 })
 
 test_that("BC8: details records the estimator, read back off the fit", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   mat <- fiml_holes(fx$mat)
@@ -908,6 +930,7 @@ test_that("BC8: details records the estimator, read back off the fit", {
 })
 
 test_that("BC8: print() shows the total N beside the complete-case count", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   mat <- fiml_holes(fx$mat)
@@ -930,6 +953,7 @@ test_that("BC8: print() shows the total N beside the complete-case count", {
 })
 
 test_that("BC8: with rows dropped, `Total N` is the TOTAL, not the used count", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The case AC8's own drop clause contemplates and the fixture above cannot
   # reach. A row with no observed item at all is dropped from N_used, so the two
@@ -954,6 +978,7 @@ test_that("BC8: with rows dropped, `Total N` is the TOTAL, not the used count", 
 })
 
 test_that("BC9: the N-B comparison is NA under FIML, with the reason", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   res <- fiml_call(fiml_holes(fx$mat), fx$items)
@@ -966,6 +991,7 @@ test_that("BC9: the N-B comparison is NA under FIML, with the reason", {
 })
 
 test_that("BC9: the FIML reason accumulates with the others", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # `nb_reason` carries EVERY reason that applies, not the first matched (the
   # M61 review's F4 holding). A single-item instrument estimated under FIML has
@@ -987,6 +1013,7 @@ test_that("BC9: the FIML reason accumulates with the others", {
 })
 
 test_that("BC9: `sd = \"raw\"` is a hard error under FIML, not an NA", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   mat <- fiml_holes(fx$mat)
@@ -1101,6 +1128,7 @@ test_that("BC15: the five-component model is recovered under missingness", {
 # where the SEs are, not only in the help page.
 
 test_that("AC16: the FIML SE caveat prints beside the SEs, and only there", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   fi <- fiml_call(fiml_holes(fx$mat), fx$items)
@@ -1377,6 +1405,7 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
 })
 
 test_that("M68: the EM-stall refusal fires before any statistic is scaled", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The companion to the stall test above, and the ordering half of M68 AC4.
   # The refusal exists because a stalled saturated EM leaves chi-square, CFI and

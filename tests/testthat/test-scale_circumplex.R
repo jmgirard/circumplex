@@ -31,6 +31,7 @@ test_that("an instrument supplies both angles and abbreviation labels", {
 })
 
 test_that("scale_x_circumplex() reproduces the curve plot's axis labels", {
+  skip_on_cran()
   data("jz2017")
   set.seed(12345)
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")

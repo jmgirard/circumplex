@@ -153,6 +153,7 @@ test_that("self_standardize works", {
 # previously carried a second, identical copy of it.
 
 test_that("each shipped norm sample keys every scale exactly once", {
+  skip_on_cran()
   for (nm in shipped_instruments()) {
     obj <- get(nm)
     norms <- obj$Norms[[1]]
@@ -169,6 +170,7 @@ test_that("each shipped norm sample keys every scale exactly once", {
 })
 
 test_that("norm_standardize runs on every shipped instrument and sample", {
+  skip_on_cran()
   # End-to-end rather than structural only: a key that survives the shape
   # assertions above but still mixes samples would produce numbers here.
   #

@@ -50,6 +50,7 @@ traj_fit <- function(d = c(350, 359, 8, 16), labels = paste0("T", seq_along(d)),
 # ssm_trajectory_frame(): reshape ---------------------------------------------
 
 test_that("the reshape emits one row per group, occasion, and parameter", {
+  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
 
@@ -61,6 +62,7 @@ test_that("the reshape emits one row per group, occasion, and parameter", {
 })
 
 test_that("drop_xy removes only the x and y panels", {
+  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res, drop_xy = TRUE)
 
@@ -69,6 +71,7 @@ test_that("drop_xy removes only the x and y panels", {
 })
 
 test_that("a grouped object yields one series per group level", {
+  skip_on_cran()
   res <- traj_fit(grouping = "Gender")
   df <- ssm_trajectory_frame(res)
 
@@ -79,6 +82,7 @@ test_that("a grouped object yields one series per group level", {
 # Occasion ordering is temporal, never alphabetical (AC2) ----------------------
 
 test_that("occasions keep their list order when labels sort the other way", {
+  skip_on_cran()
   # T10 is listed second but sorts FIRST alphabetically. An implementation that
   # lets the character Occasion column reach a discrete scale unfactored
   # silently reverses the time axis.
@@ -90,6 +94,7 @@ test_that("occasions keep their list order when labels sort the other way", {
 })
 
 test_that("the long-format path preserves its occasion ordering too", {
+  skip_on_cran()
   scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
   wide <- make_traj_data(d = c(350, 10))
   long <- rbind(
@@ -122,6 +127,7 @@ test_that("the long-format path preserves its occasion ordering too", {
 # Displacement seam continuity (AC3) ------------------------------------------
 
 test_that("the fixture really does straddle the 0/360 seam", {
+  skip_on_cran()
   # Guards the guard: if this stops holding, every seam assertion below goes
   # vacuous and would pass against a linear implementation.
   res <- traj_fit()
@@ -134,6 +140,7 @@ test_that("the fixture really does straddle the 0/360 seam", {
 })
 
 test_that("the displacement branch is continuous across the seam", {
+  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
   d <- df[df$Parameter == "d", ]
@@ -147,6 +154,7 @@ test_that("the displacement branch is continuous across the seam", {
 })
 
 test_that("each CI bound lands on its own estimate's branch", {
+  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
   d <- df[df$Parameter == "d", ]
@@ -172,6 +180,7 @@ test_that("each CI bound lands on its own estimate's branch", {
 })
 
 test_that("an interval wider than a half-turn stays upright", {
+  skip_on_cran()
   # The regime D-007 certification exists to flag: a zero-amplitude occasion
   # whose displacement is essentially unknown. Its stored interval spans most of
   # the circle, which an implementation that places each bound independently
@@ -198,6 +207,7 @@ test_that("an interval wider than a half-turn stays upright", {
 })
 
 test_that("the seam guard has teeth against a linear implementation", {
+  skip_on_cran()
   # Mutation check, not eyeballing: recompute the displacement panel the naive
   # way (bounds carried by the estimate's branch offset rather than their own
   # signed distance) and confirm the assertions above go red.
@@ -217,6 +227,7 @@ test_that("the seam guard has teeth against a linear implementation", {
 # Certification marking (AC4) -------------------------------------------------
 
 test_that("certification is carried per occasion from the amplitude CI pair", {
+  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
 
@@ -230,6 +241,7 @@ test_that("certification is carried per occasion from the amplitude CI pair", {
 })
 
 test_that("a near-zero-amplitude occasion fails certification", {
+  skip_on_cran()
   # a = 0 in one occasion: the amplitude CI lower bound collapses toward zero
   # relative to the interval width, so D-007 declines to certify its
   # displacement.
@@ -243,6 +255,7 @@ test_that("a near-zero-amplitude occasion fails certification", {
 # Degenerate occasions and the contrast row (AC5) ------------------------------
 
 test_that("an occasion with no location leaves a gap, not a broken tail", {
+  skip_on_cran()
   res <- traj_fit()
   res$results$a_est[[2]] <- NA_real_ # flat occasion: no location
   df <- ssm_trajectory_frame(res)
@@ -257,6 +270,7 @@ test_that("an occasion with no location leaves a gap, not a broken tail", {
 })
 
 test_that("the contrast row is dropped, not plotted as a time point", {
+  skip_on_cran()
   res <- traj_fit(d = c(350, 10), labels = c("T1", "T2"), contrast = TRUE)
   expect_true(res$details$contrast)
   expect_equal(nrow(res$results), 3) # two occasions + the contrast row
@@ -281,6 +295,7 @@ traj_layer <- function(p, geom_class, which = 1L) {
 }
 
 test_that("both occasions constructors yield a ggplot", {
+  skip_on_cran()
   expect_true(ggplot2::is_ggplot(ssm_plot_trajectory(traj_fit())))
 
   scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
@@ -302,6 +317,7 @@ test_that("both occasions constructors yield a ggplot", {
 })
 
 test_that("every requested parameter gets its own panel", {
+  skip_on_cran()
   p <- ssm_plot_trajectory(traj_fit())
   built <- ggplot2::ggplot_build(p)
   expect_equal(length(unique(built$layout$layout$PANEL)), 5)
@@ -312,6 +328,7 @@ test_that("every requested parameter gets its own panel", {
 })
 
 test_that("a grouped object draws one series per group", {
+  skip_on_cran()
   p <- ssm_plot_trajectory(traj_fit(grouping = "Gender"))
   line <- traj_layer(p, "GeomLine")
 
@@ -319,6 +336,7 @@ test_that("a grouped object draws one series per group", {
 })
 
 test_that("confidence bands are drawn per occasion", {
+  skip_on_cran()
   p <- ssm_plot_trajectory(traj_fit())
   ribbon <- traj_layer(p, "GeomRibbon")
 
@@ -328,6 +346,7 @@ test_that("confidence bands are drawn per occasion", {
 })
 
 test_that("the plotted displacement path is continuous across the seam", {
+  skip_on_cran()
   # The load-bearing assertion, at the data level: check() runs clean on a
   # visually wrong figure, so the built layer data is the only honest witness.
   p <- ssm_plot_trajectory(traj_fit())
@@ -343,6 +362,7 @@ test_that("the plotted displacement path is continuous across the seam", {
 })
 
 test_that("uncertified occasions render hollow and certified ones filled", {
+  skip_on_cran()
   res <- traj_fit()
   # Force occasion 2 below the D-007 certification ratio by widening its
   # amplitude interval down toward zero; every other occasion keeps its signal.
@@ -358,6 +378,7 @@ test_that("uncertified occasions render hollow and certified ones filled", {
 })
 
 test_that("the certification legend draws both keys when nothing is uncertified", {
+  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
   expect_true(all(df$Certified)) # the regime the defect hides in
@@ -377,6 +398,7 @@ test_that("the certification legend draws both keys when nothing is uncertified"
 })
 
 test_that("na.rm = FALSE names the dropped occasion count", {
+  skip_on_cran()
   res <- traj_fit()
   res$results$a_est[[2]] <- NA_real_
 
@@ -403,6 +425,7 @@ test_that("an SSM object without occasions is refused informatively", {
 })
 
 test_that("non-finite and non-scalar arguments are refused by name", {
+  skip_on_cran()
   res <- traj_fit()
 
   # is.na() would let Inf through, and it would only surface as a cryptic
@@ -416,6 +439,7 @@ test_that("non-finite and non-scalar arguments are refused by name", {
 })
 
 test_that("an unrecognized argument warns rather than passing silently", {
+  skip_on_cran()
   expect_warning(ssm_plot_trajectory(traj_fit(), colour = "red"), "disregarded")
 })
 

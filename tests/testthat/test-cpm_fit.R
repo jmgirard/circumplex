@@ -134,6 +134,7 @@ test_that("pack/unpack are inverse maps (logit zeta, softmax beta, free angles)"
 # ---- 4. analytic gradient vs central finite differences (sec. 6.4) --------------
 
 test_that("analytic gradient matches central finite differences at random points", {
+  skip_on_cran()
   set.seed(20260706)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
   h <- 1e-6
@@ -176,6 +177,7 @@ recovers <- function(theta0, zeta0, beta0, m, variant = "A", reference = 1) {
 }
 
 test_that("exact recovery: generic feasible gamma0", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
   zeta0 <- c(0.85, 0.8, 0.75, 0.7, 0.82, 0.78, 0.73, 0.68)
   beta0 <- c(0.5, 0.3, 0.15, 0.05)
@@ -200,6 +202,7 @@ test_that("exact recovery: an angle exactly at the 0/360 pole", {
 })
 
 test_that("exact recovery: near-equal angles", {
+  skip_on_cran()
   theta0 <- c(0, 0.02, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4)
   zeta0 <- rep(0.7, 8)
   beta0 <- c(0.5, 0.3, 0.2)
@@ -208,6 +211,7 @@ test_that("exact recovery: near-equal angles", {
 })
 
 test_that("exact recovery: small beta tail", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.6, 2.4, 3.2, 4.0, 4.8, 5.6)
   zeta0 <- rep(0.8, 8)
   beta0 <- c(0.6, 0.35, 0.049, 0.001)
@@ -259,6 +263,7 @@ test_that("feasibility: df = 0 warns, singular R refused, m-cap enforced", {
 # ---- 8. RNG silence (sec. 6.5, A-review F4) --------------------------------------
 
 test_that("cpm_engine leaves .Random.seed untouched and is deterministic", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.6, 2.4, 3.2, 4.0, 4.8, 5.6)
   P0 <- cpm_implied_cor(theta0, rep(0.8, 8), c(0.5, 0.3, 0.2))
 
@@ -285,6 +290,7 @@ test_that("cpm_engine leaves .Random.seed untouched and is deterministic", {
 # ---- 9. convention trap: degrees at API, radians inside (sec. 6.5) --------------
 
 test_that("degree API call reproduces an internal radian construction exactly", {
+  skip_on_cran()
   theta_deg <- c(0, 45, 90, 135, 180, 225, 270, 315)
   theta_rad <- theta_deg * pi / 180
   P0 <- cpm_implied_cor(theta_rad, rep(0.8, 8), c(0.5, 0.3, 0.2))
@@ -303,6 +309,7 @@ test_that("degree API call reproduces an internal radian construction exactly", 
 # ---- 10. boundary / canonicalization / polish / diagnostics -----------------
 
 test_that("mirror starts converge to equal F and identical canonical output", {
+  skip_on_cran()
   # An in-family truth: fitting P0 and its reflection both recover the same
   # canonicalized (theory-closest) solution.
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
@@ -318,6 +325,7 @@ test_that("mirror starts converge to equal F and identical canonical output", {
 })
 
 test_that("canonicalization is invariant to reflecting the generating angles", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
   zeta0 <- c(0.85, 0.8, 0.75, 0.7, 0.82, 0.78, 0.73, 0.68)
   beta0 <- c(0.5, 0.3, 0.2)
@@ -335,6 +343,7 @@ test_that("canonicalization is invariant to reflecting the generating angles", {
 })
 
 test_that("canonicalization is invariant to permuting scale order", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
   zeta0 <- c(0.85, 0.8, 0.75, 0.7, 0.82, 0.78, 0.73, 0.68)
   beta0 <- c(0.5, 0.3, 0.2)
@@ -348,6 +357,7 @@ test_that("canonicalization is invariant to permuting scale order", {
 })
 
 test_that("beta_m -> 0 polish drops the boundary harmonic; df increases", {
+  skip_on_cran()
   # In-family truth with a negligible top harmonic: polish should drop it.
   theta0 <- c(0, 0.8, 1.6, 2.4, 3.2, 4.0, 4.8, 5.6)
   zeta0 <- rep(0.8, 8)
@@ -368,6 +378,7 @@ test_that("beta_m -> 0 polish drops the boundary harmonic; df increases", {
 })
 
 test_that("zeta -> 1 fires a Heywood flag", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.6, 2.4, 3.2, 4.0, 4.8, 5.6)
   zeta0 <- c(0.999, rep(0.7, 7))  # one near 1
   beta0 <- c(0.5, 0.3, 0.2)
@@ -379,6 +390,7 @@ test_that("zeta -> 1 fires a Heywood flag", {
 })
 
 test_that("exact recovery for variants B (fixed angles) and C (single zeta)", {
+  skip_on_cran()
   theta0 <- c(0, 45, 90, 135, 180, 225, 270, 315) * pi / 180
   # Variant B: angles fixed, free zeta.
   zetaB <- c(0.85, 0.8, 0.75, 0.7, 0.82, 0.78, 0.73, 0.68)
@@ -396,6 +408,7 @@ test_that("exact recovery for variants B (fixed angles) and C (single zeta)", {
 })
 
 test_that("canonicalization is invariant to a common rotation of the angles", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
   zeta0 <- c(0.85, 0.8, 0.75, 0.7, 0.82, 0.78, 0.73, 0.68)
   beta0 <- c(0.5, 0.3, 0.2)
@@ -412,6 +425,7 @@ test_that("canonicalization is invariant to a common rotation of the angles", {
 })
 
 test_that("a clean in-family fit is not flagged multimodal", {
+  skip_on_cran()
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
   zeta0 <- rep(0.78, 8)
   beta0 <- c(0.5, 0.3, 0.2)
@@ -471,6 +485,7 @@ test_that("analytic gradient matches FD on a polished (reduced keep_k) spec", {
 })
 
 test_that("polish removes an INTERIOR harmonic (beta_1 = 0, beta_2/3 > 0)", {
+  skip_on_cran()
   theta0 <- seq(0, 2 * pi * 7 / 8, length.out = 8)
   zeta0 <- rep(0.8, 8)
   beta0 <- c(0.5, 0, 0.3, 0.2)               # interior k = 1 on the boundary
@@ -541,6 +556,7 @@ test_that("canonicalization tie-break: fully undecided warns and reports as-is",
 })
 
 test_that("exact-octant in-family fit is NOT flagged multimodal", {
+  skip_on_cran()
   # Octant angles put one scale exactly opposite the reference (relative angle
   # +pi in both mirrors via the angle_dist atom), which a non-circular mirror
   # comparison misreads as a distinct equal-F optimum. Regression for the
@@ -556,6 +572,7 @@ test_that("exact-octant in-family fit is NOT flagged multimodal", {
 })
 
 test_that("analytic gradient matches FD for variants C and D (shared zeta)", {
+  skip_on_cran()
   # The shared-u chain (dF/du = z(1-z) * sum_i dF/dzeta_i) and the fixed-angle
   # unpack path were not exercised by the variant-A FD test.
   set.seed(20260707)
@@ -596,6 +613,7 @@ test_that("analytic gradient matches FD for variants C and D (shared zeta)", {
 # ---- M4 review #1: vacuous "reproduced" via the g0+mirror pair ---------------
 
 test_that("g0+mirror alone cannot certify convergence acceptance (A/C)", {
+  skip_on_cran()
   # Reflection is an exact F-isometry (rho is even), so the mirror start is a
   # deterministic image of g0 and always ties its F. "Reproduced by >= 2
   # starts" must mean >= 2 INDEPENDENT starts: the g0/mirror pair counts once.
@@ -647,6 +665,7 @@ test_that("g0+mirror alone cannot certify convergence acceptance (A/C)", {
 })
 
 test_that("free-angle acceptance still holds when a jitter confirms g0", {
+  skip_on_cran()
   # Clean in-family data: jitter starts converge to the same optimum as g0,
   # which IS a valid independent reproduction -- must stay accepted.
   theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
@@ -751,6 +770,7 @@ test_that("free-scaling pack/unpack round-trips sigma (log map)", {
 })
 
 test_that("free-scaling analytic gradient matches central FD at >= 50 points", {
+  skip_on_cran()
   # spec sec. 6: theta random (incl a 0/360-pole and a near-equal-angles
   # config), zeta in (.3,.95), beta interior via v ~ U(-1,1), s ~ U(-.35,.35),
   # random PD R incl a few non-unit-diagonal, and one reduced (polished) spec.
@@ -831,6 +851,7 @@ test_that("free-scaling gradient at sigma = 1 equals the unit gradient exactly",
 })
 
 test_that("free-scaling: stationarity diag(Sigma^-1 R) = 1 at the optimum", {
+  skip_on_cran()
   voc <- cpm_oracle_voc()
   fit <- cpm_engine(voc$R, angles = voc$th_start, m = 1, variant = "A",
                     reference = 1, scaling = "free")
@@ -846,6 +867,7 @@ test_that("free-scaling: stationarity diag(Sigma^-1 R) = 1 at the optimum", {
 })
 
 test_that("free-scaling exact recovery: in-family Sigma gives F = 0, sigma = 1", {
+  skip_on_cran()
   # Population exactly in the correlation family (sigma = 1) => F-hat ~ 0 and,
   # crucially, sigma-hat = 1 to 1e-6 (a free family that could not recover
   # sigma = 1 on in-family data would be mis-specified).
@@ -860,6 +882,7 @@ test_that("free-scaling exact recovery: in-family Sigma gives F = 0, sigma = 1",
 })
 
 test_that("free-scaling rescale-equivariance: fit(D R D) => sigma -> D sigma", {
+  skip_on_cran()
   # The sharpest single test of the whole construction (spec sec. 6): scaling
   # the input by a positive diagonal D scales sigma-hat by D and leaves
   # theta/zeta/beta/F-hat invariant. No diag-constrained analog exists.
@@ -880,6 +903,7 @@ test_that("free-scaling rescale-equivariance: fit(D R D) => sigma -> D sigma", {
 })
 
 test_that("free-scaling nesting: F_free <= F_unit on every fixture", {
+  skip_on_cran()
   # sigma = 1 is a feasible point of the free family (nested), so its optimum
   # cannot be worse: F-hat_free <= F-hat_unit + 1e-8. Checked on the published
   # vocational matrix (m = 1) and a well-identified clean in-family R (m = 3).
@@ -909,6 +933,7 @@ test_that("unit-scaling cpm_fit is unchanged by the free-scaling machinery", {
 })
 
 test_that("free-scaling cpm_fit end-to-end: VarRatio column, no CI, df unchanged", {
+  skip_on_cran()
   voc <- cpm_oracle_voc()
   ff <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
                 n = voc$N, m = 1, scaling = "free")

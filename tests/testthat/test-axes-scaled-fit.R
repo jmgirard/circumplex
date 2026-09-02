@@ -229,6 +229,7 @@ probe_fit <- function(pp, n = 600) {
 
 
 test_that("AC2: the shipped factor matches the explicit vech-space oracle (octant map)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_octant()
   ff <- probe_fit(pp)
@@ -252,6 +253,7 @@ test_that("AC2: the shipped factor matches the explicit vech-space oracle (octan
 
 
 test_that("AC2: the shipped factor matches the oracle on a 6-scale map", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_six()
   ff <- probe_fit(pp)
@@ -274,6 +276,7 @@ test_that("AC2: the shipped factor matches the oracle on a 6-scale map", {
 
 
 test_that("AC2: the shipped factor matches the oracle with one item per scale", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_single()
   ff <- probe_fit(pp)
@@ -337,6 +340,7 @@ test_that("AC2: 1/c corroborates RR13's measured E[T] = 261.1 at df = 273", {
 
 
 test_that("AC1: the factor refuses rather than guessing when its inputs are wrong", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_octant()
   ff <- probe_fit(pp)
@@ -426,6 +430,7 @@ test_that("M90 AC1: a saturated model (df = 0) is refused as 'saturated', not 'i
 
 
 test_that("AC1: lavaan still forms rmsea, cfi and pvalue the way the scaler assumes", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The scaler does not re-derive lavaan's fit indices -- it recomputes them
   # from the SCALED chi-square using the published definitions. That is only
@@ -643,6 +648,7 @@ expect_scaled_contract <- function(res, label) {
 }
 
 test_that("AC1: listwise, cormat and fiml all report scaled fit statistics", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fx <- wire_fixture()
 
@@ -677,6 +683,7 @@ test_that("AC1: listwise, cormat and fiml all report scaled fit statistics", {
 })
 
 test_that("AC1: `$fit$df` and `$fit$srmr` are what lavaan itself reports", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Bit-identity against an INDEPENDENT refit, not against the stored
   # uncorrected copy -- the stored copy comes from the same fitMeasures() call
@@ -702,6 +709,7 @@ test_that("AC1: `$fit$df` and `$fit$srmr` are what lavaan itself reports", {
 
 
 test_that("AC13: Gamma_R agrees entrywise with the closed normal-theory formula", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # RR14's "Beyond the brief" finding 1: the oracle validated Gamma_R only on
   # its DIAGONAL, while the off-diagonal cells carry most of tr{U Gamma_R} and
@@ -836,6 +844,7 @@ test_that("AC10: the tail excess is not factor-estimation noise", {
 
 
 test_that("AC14: the live smoke cell reproduces the committed harness", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The stored numbers above are a pin; this runs the same path end-to-end at
   # 12 replicates so a regression in the WIRING is caught without the 5-minute
@@ -986,6 +995,7 @@ test_that("AC11: the vignette carries the same four claims", {
 
 
 test_that("AC11: the printed note gives direction and a pointer, and no rates", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_octant()
   res <- axes_reliability(cormat = pp$sigma, items = pp$items,
@@ -1192,6 +1202,7 @@ test_that("AC4: axes_scaled_fit's Wc citation still lands on the Wc fold", {
 # ---- M70 AC4: which CFI variant the reported value actually is --------------
 
 test_that("AC4: the reported cfi IS the cfi.scaled definition, not cfi.robust", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_octant()
   bad <- pp$sigma
@@ -1394,6 +1405,7 @@ m89_grid_maps <- function() {
 }
 
 test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's, same literal", {
+  skip_on_cran()
   for (m in m89_grid_maps()) {
     pp <- m$pp
     p <- nrow(pp$sigma)
@@ -1584,6 +1596,7 @@ test_that("AC2: the non-finite diagonal doors keep one vocabulary on both surfac
 
 
 test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at the scaling surface; the SE helper refuses it", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   pp <- probe_octant()
   ff <- probe_fit(pp)
@@ -1691,6 +1704,7 @@ test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 
 
 
 test_that("M90 AC5: criterion-accepted draws from the most cancellable recorded family never reach the backstop", {
+  skip_on_cran()
   # Smoke tier of the recorded AC5 search (work log: 30,000 accepted draws
   # spanning p in {3, 8, 24} + adversarial hill-climbs, 0 reaches, nearest
   # miss cval = +1.2e-5 at p = 3 / df = 1 -- the one map family whose cval
@@ -1811,6 +1825,7 @@ test_that("M90 AC7: an NA fitted diagonal refuses with exactly ONE warning on th
 
 
 test_that("AC3: tau is a named constant, and the floored criterion accepts all three probe-map fits", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The accuracy target is a named constant beside the criterion, not an
   # inlined magic number. Since M106 it is two documented quantities behind one
@@ -1847,6 +1862,7 @@ test_that("AC3: tau is a named constant, and the floored criterion accepts all t
 
 
 test_that("AC7: the scaling surface is invariant under positive-diagonal congruences on every free axis", {
+  skip_on_cran()
   # AC1's invariance claim, verified across the family it is free in: for any
   # positive diagonal D, sigma -> D sigma D changes nothing this surface
   # computes -- cov2cor() removes D exactly -- so `reason` stays NULL and
@@ -2437,6 +2453,7 @@ test_that("M106 review round 2 F1: a nonpositive smallest eigenvalue reports no 
 
 
 test_that("M106 AC5: both cormat radii resolve as the recalibrated target implies", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
   inames <- paste0("i", seq_len(9L))
@@ -2508,6 +2525,7 @@ test_that("M106 AC5: both cormat radii resolve as the recalibrated target implie
 
 
 test_that("M106 AC4: three kappa across the band, at three p, straddle the committed floor", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   oct <- octants()
 

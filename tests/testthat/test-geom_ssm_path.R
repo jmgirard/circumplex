@@ -112,6 +112,7 @@ test_that("an all-undefined series yields no drawable path (AC3)", {
 # --- T3/AC1: ordering and series separation -----------------------------------
 
 test_that("there is no order aesthetic to mis-group the layer (AC1)", {
+  skip_on_cran()
   # An `order` aesthetic was tried and removed (M37 review): ggplot2's
   # add_group() builds `group` from every discrete column when the user has not
   # mapped one, so a character `order` put each row in its own group and the
@@ -136,6 +137,7 @@ test_that("the data row order is honoured (AC1)", {
 })
 
 test_that("group separates series and each unwraps independently (AC1)", {
+  skip_on_cran()
   # Two series crossing the seam in opposite directions. Unwrapping them as one
   # pooled sequence would contaminate each with the other's branch.
   df <- data.frame(
@@ -161,6 +163,7 @@ test_that("group separates series and each unwraps independently (AC1)", {
 # --- AC1: the coord curves the segments, the layer does not ---------------------
 
 test_that("segments are munched along the polar geodesic (AC1)", {
+  skip_on_cran()
   # coord_circumplex() reports is_linear() == FALSE, so ggplot2 munches each
   # segment into many small pieces that follow the circle. If the path were
   # drawn as straight cartesian chords, the grob would carry exactly one point
@@ -178,6 +181,7 @@ test_that("segments are munched along the polar geodesic (AC1)", {
 # --- T4/AC4: arrowheads --------------------------------------------------------
 
 test_that("arrowheads are absent by default and render when requested (AC4)", {
+  skip_on_cran()
   df <- data.frame(a_est = c(0.2, 0.3, 0.4), d_est = c(10, 60, 120))
   # Verified at grob level, not by baseline alone: an arrow parameter that is
   # accepted but dropped on the way to the grob renders an identical-looking
@@ -224,6 +228,7 @@ path_layer_of <- function(p) {
 }
 
 test_that("path = TRUE follows details$occasions order, not alphabetical (AC5)", {
+  skip_on_cran()
   data("jz2017")
   scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
   # T1, T2, T10 -- alphabetical sorting puts T10 second and reverses the middle
@@ -247,12 +252,14 @@ test_that("path = TRUE follows details$occasions order, not alphabetical (AC5)",
 })
 
 test_that("path = TRUE is refused for an object with no occasions (AC5)", {
+  skip_on_cran()
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "NARPD")
   expect_error(ssm_plot_circle(res, path = TRUE), "needs an SSM object with occasions")
 })
 
 test_that("drop_lowfit breaks the path at the dropped occasion (AC5)", {
+  skip_on_cran()
   # Regression, M37 review: df_path is snapshotted before the drop_lowfit
   # filter (so an undefined-displacement occasion survives as NA and breaks the
   # path). That snapshot must not also smuggle a low-fit occasion past the
@@ -280,6 +287,7 @@ test_that("drop_lowfit breaks the path at the dropped occasion (AC5)", {
 })
 
 test_that("path = FALSE adds no path layer (AC5)", {
+  skip_on_cran()
   data("jz2017")
   scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
   res <- ssm_analyze_long(

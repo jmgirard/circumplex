@@ -36,6 +36,7 @@ standardize_probe <- function(obj, s, ...) {
 # AC1 -------------------------------------------------------------------
 
 test_that("the two message forms partition the shipped instruments", {
+  skip_on_cran()
   # The forms are asserted below over their own memberships; if the two did not
   # exhaust the roster, an instrument could exhibit neither and go unswept.
   multi <- single <- character(0)
@@ -54,6 +55,7 @@ test_that("the two message forms partition the shipped instruments", {
 })
 
 test_that("a single-sample instrument's message names the sample, size and description", {
+  skip_on_cran()
   for (nm in shipped_instruments()) {
     obj <- shipped_instrument(nm)
     if (nrow(obj$Norms[[2]]) > 1) next
@@ -166,6 +168,7 @@ test_that("the message's fixed text frames the sample as a description, not a po
 # AC2 -------------------------------------------------------------------
 
 test_that("both return paths carry the norm_sample attribute", {
+  skip_on_cran()
   for (nm in shipped_instruments()) {
     obj <- shipped_instrument(nm)
     for (s in obj$Norms[[2]]$Sample) {
@@ -204,6 +207,7 @@ test_that("the attribute is present whether or not the message was emitted", {
 # AC9 (RR16 BC1) --------------------------------------------------------
 
 test_that("the norm-standardizing surfaces keep the names the review settled on", {
+  skip_on_cran()
   # RR16/D-041 decided against renaming these. The decision is only as durable
   # as something that fails when it is undone, so this pin is that something.
   exports <- getNamespaceExports("circumplex")

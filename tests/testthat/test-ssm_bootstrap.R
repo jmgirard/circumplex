@@ -113,6 +113,7 @@ test_that("bootstrap with some degenerate replicates does not error", {
 })
 
 test_that("pairwise-deletion bootstrap tolerates an all-NA resampled column (F1)", {
+  skip_on_cran()
   # F1 (Brief C audit): under listwise = FALSE a resample can draw only NA rows
   # for one scale, leaving an empty column for col_means(). Pre-fix this aborted
   # the whole ssm_analyze() call with "mean(): object has no elements". The mean

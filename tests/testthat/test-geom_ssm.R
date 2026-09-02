@@ -65,6 +65,7 @@ test_that("theta range stays [0, 360] however narrow the data's displacement (T-
 # --- R1: the coord owns amax; there is no per-layer amax ----------------------
 
 test_that("amplitude radius is owned by the coord, not the layer (R1)", {
+  skip_on_cran()
   df <- data.frame(a_est = 0.25, d_est = 0)
   r_of <- function(amax) {
     xy <- point_grob_xy(point_plot(df, amax = amax))
@@ -82,6 +83,7 @@ test_that("amplitude radius is owned by the coord, not the layer (R1)", {
 # --- T-i2: seam-straddle unwrap by extension, short way across the pole --------
 
 test_that("a seam-straddling arc unwraps by extension and draws the short way (T-i2)", {
+  skip_on_cran()
   p <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 10))
   # Data level: xmax extended past 360 (350 + 20-degree span).
   ad <- layer_data_for(p, "GeomSsmArc")
@@ -95,6 +97,7 @@ test_that("a seam-straddling arc unwraps by extension and draws the short way (T
 })
 
 test_that("a seam-adjacent non-straddling arc touches the pole without wrapping (T-i2b)", {
+  skip_on_cran()
   # [350, 360] and [0, 10] each span 10 degrees and touch the pole from one side.
   below <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 360))
   above <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 0, d_uci = 10))
@@ -106,6 +109,7 @@ test_that("a seam-adjacent non-straddling arc touches the pole without wrapping 
 })
 
 test_that("an interval spanning a full circle is rejected from setup_data (T-i2c)", {
+  skip_on_cran()
   bad <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = -100, d_uci = 300))
   expect_error(ggplot2::ggplot_build(bad), "full circle")
   # A genuine seam-crossing interval (min > max, short way) is still accepted.
@@ -133,6 +137,7 @@ test_that("a zero-width interval draws no wedge, not a degenerate line (T-arc0)"
 # --- I4: flat / undefined rows are dropped ------------------------------------
 
 test_that("a flat profile (NA displacement) is dropped, not mis-drawn (I4)", {
+  skip_on_cran()
   df <- data.frame(a_est = c(0.3, NA), d_est = c(90, NA))
   p <- point_plot(df)
   expect_no_error(ggplot2::ggplot_build(p))
@@ -140,6 +145,7 @@ test_that("a flat profile (NA displacement) is dropped, not mis-drawn (I4)", {
 })
 
 test_that("a defined estimate with an undefined CI draws a point but no wedge", {
+  skip_on_cran()
   df <- data.frame(
     a_est = 0.3, d_est = 90,
     a_lci = NA_real_, a_uci = NA_real_, d_lci = NA_real_, d_uci = NA_real_
@@ -179,6 +185,7 @@ test_that("supplying the retired amax/n geom arguments notes once and never erro
 # warns with the dropped-row count before dropping (ggplot2 convention).
 
 test_that("geom_ssm_point warns by count under na.rm = FALSE, silent under TRUE (T2)", {
+  skip_on_cran()
   df <- data.frame(a_est = c(0.3, NA, 0.2), d_est = c(90, NA, 45)) # one degenerate
   build <- function(na.rm) {
     ggplot2::ggplot_build(
@@ -194,6 +201,7 @@ test_that("geom_ssm_point warns by count under na.rm = FALSE, silent under TRUE 
 })
 
 test_that("geom_ssm_arc warns by count under na.rm = FALSE, silent under TRUE (T2)", {
+  skip_on_cran()
   # Two incomplete-CI rows (missing bounds) among three.
   df <- data.frame(
     a_lci = c(0.2, NA, 0.1), a_uci = c(0.3, 0.4, 0.2),

@@ -39,6 +39,7 @@ test_that("The instruments function produces the expected output", {
 })
 
 test_that("instruments() output is derived from the instrument datasets, not hardcoded", {
+  skip_on_cran()
   # Independently enumerate the packaged circumplex_instrument datasets.
   nms <- utils::data(package = "circumplex")$results[, "Item"]
   insts <- Filter(function(nm) {

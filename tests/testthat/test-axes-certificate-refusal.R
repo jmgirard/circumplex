@@ -46,6 +46,7 @@ m111_reachable <- function() {
 
 
 test_that("M111 AC2: every reachable geometry the oracle prices computes at both surfaces", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   cases <- m111_reachable()
   # The domain this test runs over, asserted rather than assumed: a builder
@@ -108,6 +109,7 @@ test_that("M111 AC2: every reachable geometry the oracle prices computes at both
 
 
 test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses through axes_reliability()", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The route the exported surface can actually take. The counterexample below
   # is p = 3 and cannot ride this seam at all (axes_reliability() refuses fewer
@@ -176,6 +178,7 @@ test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses throug
 
 
 test_that("M111 AC3 (graded route): the committed counterexample refuses at both surfaces", {
+  skip_on_cran()
   # The one matrix on record whose reported corrected SEs were measured WRONG
   # -- by 3.4% with reason NULL under the pre-M89 floor (RR18). Its certificate
   # is graded rather than sentinel: 3.4e-1 for the SEs and 4.9e+1 for cval,
@@ -266,6 +269,7 @@ m111_both <- function(sigma, ang, scl) {
 }
 
 test_that("M111 AC4: 'indefinite' and 'singular' still refuse at both surfaces, unchanged", {
+  skip_on_cran()
   # Two p, and two spectral forms at each. The forms differ in more than
   # scale: form 1 plants a single eigenvalue in a rotated basis (the whole
   # rest of the spectrum flat at 1), form 2 subtracts a rank-one projector
@@ -355,6 +359,7 @@ m114_straddle_eps <- c(3e-9, 5e-9, 8e-9)
 m114_straddle_sigma <- function(eps) m106_family_c(eps, xi1 = 0.1, xi2 = 0.3)
 
 test_that("M114 AC1: an input whose fields straddle the target refuses at BOTH surfaces", {
+  skip_on_cran()
   ang <- c(90, 180, 270, 360)
   scl <- as.character(1:4)
   d <- axes_se_derivs(ang, scl, NULL, FALSE, FALSE)
@@ -592,6 +597,7 @@ m117_estimate <- function(w) {
 }
 
 test_that("M117 AC1: the certificate is evaluated exactly once per checked axes_reliability() call, on both missing paths", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The M89 AC6 injection idiom: the fit runs on clean data and the
   # ill-conditioned matrix is injected at axes_fitted_cov(), the one seam both

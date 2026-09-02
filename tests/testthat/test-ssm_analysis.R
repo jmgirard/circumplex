@@ -721,6 +721,7 @@ test_that("ssm_score errors on a non-scalar or non-character label (R4)", {
 })
 
 test_that("NA grouping values are dropped with a message in both modes", {
+  skip_on_cran()
   data("jz2017")
   jz <- jz2017
   jz$Gender[c(1, 5, 10)] <- NA

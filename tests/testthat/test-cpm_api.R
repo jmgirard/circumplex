@@ -60,6 +60,7 @@ sim_octant_data <- function(N, seed) {
 # ---- object shape (design sec. 5.4) -----------------------------------------
 
 test_that("cpm_fit returns a circumplex_cpm matching the design sec. 5.4 sketch", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   expect_s3_class(fit, "circumplex_cpm")
@@ -82,6 +83,7 @@ test_that("cpm_fit returns a circumplex_cpm matching the design sec. 5.4 sketch"
 })
 
 test_that("the Brief-B contract fields are present (gamma-hat, N, m, matrices)", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   # gamma-hat = theta / zeta / beta, plus N and m, plus programmatic handles.
@@ -95,6 +97,7 @@ test_that("the Brief-B contract fields are present (gamma-hat, N, m, matrices)",
 # ---- fit indices (design sec. 5.3) ------------------------------------------
 
 test_that("the test statistic uses n = N - 1 (Wishart df), not N", {
+  skip_on_cran()
   # Non-perfect fit so N vs N-1 give distinguishable T.
   R <- misfit_octant_P()
   N <- 200L
@@ -108,6 +111,7 @@ test_that("the test statistic uses n = N - 1 (Wishart df), not N", {
 })
 
 test_that("SRMR uses the off-diagonal-only denominator p(p-1)/2", {
+  skip_on_cran()
   R <- misfit_octant_P()
   fit <- cpm_fit(cormat = R, scales = oct_labels(), angles = oct_angles(), n = 300)
   resid <- fit$matrices$residuals
@@ -137,6 +141,7 @@ test_that("CFI/TLI degrade to 1 (not NaN/Inf) when the baseline has no misfit", 
 })
 
 test_that("AIC/BIC follow T + 2q and T + q ln(N)", {
+  skip_on_cran()
   R <- misfit_octant_P()
   N <- 250L
   fit <- cpm_fit(cormat = R, scales = oct_labels(), angles = oct_angles(), n = N)
@@ -147,6 +152,7 @@ test_that("AIC/BIC follow T + 2q and T + q ln(N)", {
 })
 
 test_that("RMSEA CI: excellent fit collapses to [0, 0] (both edge guards)", {
+  skip_on_cran()
   # Perfect in-family fit => T ~ 0 => the lambda_U equation has no root; the
   # guard must return [0, 0] rather than erroring (design sec. 5.3, A-review F5).
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
@@ -156,6 +162,7 @@ test_that("RMSEA CI: excellent fit collapses to [0, 0] (both edge guards)", {
 })
 
 test_that("RMSEA CI: estimate lies inside and endpoints match the noncentral tails", {
+  skip_on_cran()
   R <- misfit_octant_P()
   # N chosen so T is large enough that neither edge guard is active (both bounds
   # are interior roots), letting us confirm the intended tail probabilities.
@@ -178,6 +185,7 @@ test_that("RMSEA CI: estimate lies inside and endpoints match the noncentral tai
 # ---- analytic CIs (design sec. 5.2) -----------------------------------------
 
 test_that("analytic CIs are finite and centered on the estimates", {
+  skip_on_cran()
   R <- misfit_octant_P()
   fit <- cpm_fit(cormat = R, scales = oct_labels(), angles = oct_angles(),
                  n = 400, interval = 0.95)
@@ -193,6 +201,7 @@ test_that("analytic CIs are finite and centered on the estimates", {
 })
 
 test_that("a singular information matrix (Heywood) yields NA CIs, not an error", {
+  skip_on_cran()
   data("jz2017")
   fit <- suppressWarnings(
     # NO scale Heywoods at zeta = 1; analytic CIs are the object under test.
@@ -203,6 +212,7 @@ test_that("a singular information matrix (Heywood) yields NA CIs, not an error",
 })
 
 test_that("Angle_theory echoes the supplied angles (LM = 360, not 0)", {
+  skip_on_cran()
   # CLAUDE.md convention: LM = 360, not 0. octants() supplies 360 for LM; the
   # engine wraps 360 -> 0 internally, so the reported theoretical angle must be
   # sourced from the user input, not the wrapped internal value.
@@ -213,6 +223,7 @@ test_that("Angle_theory echoes the supplied angles (LM = 360, not 0)", {
 })
 
 test_that("analytic SEs match an independent brute-force delta-method", {
+  skip_on_cran()
   # Independent check of the logit/softmax/angle delta method: numerically
   # differentiate the natural parameters w.r.t. the unconstrained vector and
   # propagate avar = (2/n) H^-1, then compare to cpm_analytic_se().
@@ -255,6 +266,7 @@ test_that("analytic SEs match an independent brute-force delta-method", {
 # ---- correlation function and matrices --------------------------------------
 
 test_that("corfun returns rho-hat in degrees; rho(0) = 1", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   expect_equal(fit$corfun(0), 1, tolerance = 1e-8)
@@ -266,6 +278,7 @@ test_that("corfun returns rho-hat in degrees; rho(0) = 1", {
 })
 
 test_that("matrices: Phat is a correlation matrix and residuals = R - Phat", {
+  skip_on_cran()
   R <- misfit_octant_P()
   fit <- cpm_fit(cormat = R, scales = oct_labels(), angles = oct_angles(), n = 300)
   # diag() carries the matrix dimnames now that R/Phat/residuals are named
@@ -283,6 +296,7 @@ test_that("matrices: Phat is a correlation matrix and residuals = R - Phat", {
 # ---- convention traps (design sec. 6.5) -------------------------------------
 
 test_that("degrees at the API: circumplex_degree and numeric angles agree", {
+  skip_on_cran()
   R <- misfit_octant_P()
   f_num <- cpm_fit(cormat = R, scales = oct_labels(), angles = oct_angles(),
                    n = 300)
@@ -293,6 +307,7 @@ test_that("degrees at the API: circumplex_degree and numeric angles agree", {
 })
 
 test_that("raw-data and cormat paths agree on identical inputs", {
+  skip_on_cran()
   data("jz2017")
   sdata <- stats::na.omit(jz2017[oct_labels()])
   N <- nrow(sdata)
@@ -371,6 +386,7 @@ test_that("saturated model (df = 0) warns and returns NA fit indices", {
 # ---- bootstrap CIs (design sec. 5.2, M4/B3) ----------------------------------
 
 test_that("bootstrap is the raw-data default and is seed-reproducible", {
+  skip_on_cran()
   d <- sim_octant_data(300, 42)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
 
@@ -400,6 +416,7 @@ test_that("bootstrap is the raw-data default and is seed-reproducible", {
 })
 
 test_that("bootstrap point estimates and fit indices match the analytic path", {
+  skip_on_cran()
   d <- sim_octant_data(300, 42)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
 
@@ -415,6 +432,7 @@ test_that("bootstrap point estimates and fit indices match the analytic path", {
 })
 
 test_that("bootstrap angle CIs straddling 0/360 are wrapped and contain the estimate", {
+  skip_on_cran()
   # PA's true angle is 0; with seed 42 at N = 300 its fitted angle lands near
   # the pole (~353 degrees), so the replicate distribution straddles 0/360.
   # reference = 3 keeps PA's angle free. The circular quantile machinery
@@ -454,6 +472,7 @@ test_that("bootstrap angle CIs straddling 0/360 are wrapped and contain the esti
 })
 
 test_that("discarded bootstrap replicates are counted, warned, and surfaced", {
+  skip_on_cran()
   # N = 12 rows on p = 8 scales: most resamples are rank-deficient (non-PD),
   # and some warm refits fail the scaled-gradient acceptance criterion.
   d <- sim_octant_data(12, 5)
@@ -482,6 +501,7 @@ test_that("discarded bootstrap replicates are counted, warned, and surfaced", {
 })
 
 test_that("the per-replicate mirror guard reflects a mirrored solution back", {
+  skip_on_cran()
   # A-review F10: reflect any replicate angularly closer to the mirror of
   # gamma-hat than to gamma-hat. Reflection is an involution, so guarding the
   # mirrored gamma-hat must restore it exactly; gamma-hat itself is untouched.
@@ -502,6 +522,7 @@ test_that("the per-replicate mirror guard reflects a mirrored solution back", {
 })
 
 test_that("RNG contract: analytic path is RNG-silent, bootstrap consumes the stream", {
+  skip_on_cran()
   d <- sim_octant_data(300, 42)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
 
@@ -533,6 +554,7 @@ test_that("print and summary render as expected", {
 })
 
 test_that("the largest-residual tie-break is platform-deterministic", {
+  skip_on_cran()
   # misfit_octant_P()'s symmetric v %o% v pattern ties four pairs at the
   # largest |residual| (PA-HI, BC-JK, DE-LM, FG-NO, equal to ~1e-16), so the
   # old which.max() reported a BLAS/platform-dependent pair (the cause of a
@@ -545,6 +567,7 @@ test_that("the largest-residual tie-break is platform-deterministic", {
 })
 
 test_that("summary()'s analytic-CI caution follows the coverage-oracle calibration", {
+  skip_on_cran()
   # Calibrated by devel/m4-coverage-oracle.R (M4/B6; DESIGN.md): analytic CIs
   # mis-covered for every studied truth below N = 2000; between 2000 and
   # ~50000 they mis-covered only in near-boundary regimes, which the fit's
@@ -590,6 +613,7 @@ test_that("summary()'s analytic-CI caution follows the coverage-oracle calibrati
 })
 
 test_that("summary()'s free-scaling caution is the coverage-validated N-conditional rule", {
+  skip_on_cran()
   # M19 (D-010): the free-family coverage oracle measured scaling = "free"'s
   # theta/zeta/beta analytic-CI coverage regime to be the diag family's
   # (sigma-hat ~= 1 at correlation truths), so the free family uses the SAME
@@ -644,6 +668,7 @@ test_that("print and summary render a bootstrap fit as expected", {
 # construction, not from memory.
 
 test_that("cpm_simulate: G1 return contract (matrix, dims, names, numeric)", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
@@ -658,6 +683,7 @@ test_that("cpm_simulate: G1 return contract (matrix, dims, names, numeric)", {
 })
 
 test_that("cpm_simulate: population covariance is exactly Phat (factor form)", {
+  skip_on_cran()
   # The generative covariance must equal matrices$Phat to machine precision:
   # rebuild Lambda Lambda^T + (I - D_zeta^2) independently from the reported
   # estimates and check it against Phat -- the contract that makes cor(X) -> Phat.
@@ -678,6 +704,7 @@ test_that("cpm_simulate: population covariance is exactly Phat (factor form)", {
 })
 
 test_that("cpm_simulate: large-n sample cor -> Phat, margins ~ standardized", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
@@ -689,6 +716,7 @@ test_that("cpm_simulate: large-n sample cor -> Phat, margins ~ standardized", {
 })
 
 test_that("cpm_simulate: RNG contract -- reproducible and seed-sensitive", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
@@ -708,6 +736,7 @@ test_that("cpm_simulate: RNG contract -- reproducible and seed-sensitive", {
 })
 
 test_that("cpm_simulate: boundary -- angle at the 0/360 pole recovers Phat", {
+  skip_on_cran()
   # Generating angle exactly at the pole (LM at 360). The factor form is pure
   # trig, so the pole is not special; cor(X) must still track Phat.
   theta <- c(0, 45, 90, 135, 180, 225, 270, 360) * pi / 180
@@ -721,6 +750,7 @@ test_that("cpm_simulate: boundary -- angle at the 0/360 pole recovers Phat", {
 })
 
 test_that("cpm_simulate: a polished-out harmonic still reproduces Phat", {
+  skip_on_cran()
   # An in-family model with beta_3 == 0 makes cpm_fit polish k = 3 out; the
   # sqrt(beta_3) = 0 columns of Lambda then contribute nothing and the
   # generative covariance must remain exactly Phat.
@@ -737,6 +767,7 @@ test_that("cpm_simulate: a polished-out harmonic still reproduces Phat", {
 })
 
 test_that("cpm_simulate: prototype of the Z1 (ssm_ci_accuracy) mean-based loop", {
+  skip_on_cran()
   # The mean-based plug-in population (spec sec. 3.2): standardized draws Z from
   # cpm_simulate, rescaled X_g = Z D_s + 1 mu^T, then the user's SSM procedure
   # is rerun on the simulated data. Exercises the exact consumption Z1 needs and
@@ -763,6 +794,7 @@ test_that("cpm_simulate: prototype of the Z1 (ssm_ci_accuracy) mean-based loop",
 })
 
 test_that("cpm_simulate: input validation via inherits()/is_count()", {
+  skip_on_cran()
   fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 500)
   expect_error(cpm_simulate(list(), n = 10), "circumplex_cpm")

@@ -47,6 +47,7 @@ test_that("certification rule is single-sourced across print and the diagnostic 
 # ---- ladder construction (sec. 4.1 functional-targeted 3x3 solve) -----------
 
 test_that("ladder correction hits the estimator functional exactly, any spacing (F3)", {
+  skip_on_cran()
   angle_sets <- list(
     octants = as.numeric(octants()),
     unequal = c(0, 30, 80, 145, 190, 220, 305, 340)
@@ -206,6 +207,7 @@ test_that("multinomial-weight means and correlations equal expanded resamples", 
 # ---- the c = 0 machinery pin (sec. 4.2) --------------------------------------
 
 test_that("c = 0 amplitude coverage is identically 0 with all misses below (machinery pin)", {
+  skip_on_cran()
   # NOT evidence the module works (a percentile interval of positive
   # amplitudes cannot contain 0 -- a theorem); pins the machinery only.
   theta <- deg2rad(as.numeric(octants()))
@@ -232,6 +234,7 @@ test_that("c = 0 amplitude coverage is identically 0 with all misses below (mach
 })
 
 test_that("suff-stats fallback resolves recorded-call args from the caller's env", {
+  skip_on_cran()
   # Regression (milestone-close review): a pre-storage object whose ssm_analyze()
   # call referenced a *local* variable for `scales`. The fallback must evaluate
   # that symbol in the caller's frame, not ssm_ci_accuracy()'s -- else it aborts
@@ -255,6 +258,7 @@ test_that("suff-stats fallback resolves recorded-call args from the caller's env
 })
 
 test_that("contrast displacement is reported unconditionally, matching print (M15/M15-D1)", {
+  skip_on_cran()
   # M15 supersedes Milestone-close review #3: print.circumplex_ssm() applies no
   # certification gate to a contrast (Delta-a is a signed difference, not a
   # prototypicality measure), so ssm_ci_accuracy() reports the contrast's
@@ -314,6 +318,7 @@ test_that("contrast displacement is reported unconditionally, matching print (M1
 # ---- end-to-end: mean-based group contrast on octant data --------------------
 
 test_that("end-to-end run on octant data: object contract (sec. 7)", {
+  skip_on_cran()
   data("jz2017")
   jz <- jz2017[1:240, ]
   set.seed(201)
@@ -364,6 +369,7 @@ test_that("end-to-end run on octant data: object contract (sec. 7)", {
 # ---- correlation path with measure contrast ----------------------------------
 
 test_that("correlation path: measure contrast, PSD repair, branch pathology fields", {
+  skip_on_cran()
   data("jz2017")
   jz <- jz2017[1:200, ]
   set.seed(301)
@@ -389,6 +395,7 @@ test_that("correlation path: measure contrast, PSD repair, branch pathology fiel
 # ---- Monte Carlo engine replay ------------------------------------------------
 
 test_that("a montecarlo-method object is assessed with the Monte Carlo engine", {
+  skip_on_cran()
   data("jz2017")
   jz <- jz2017[1:200, ]
   set.seed(401)
@@ -404,6 +411,7 @@ test_that("a montecarlo-method object is assessed with the Monte Carlo engine", 
 # ---- boundary: population displacement at the 0/360 pole ----------------------
 
 test_that("coverage counts correctly when the population peaks at 0/360", {
+  skip_on_cran()
   theta <- deg2rad(as.numeric(octants()))
   set.seed(501)
   dat <- as.data.frame(t(sapply(1:150, function(i) {
@@ -455,6 +463,7 @@ test_that("results are seed-reproducible and the caller RNG state is restored", 
 })
 
 test_that("parallel path yields results identical to serial at a fixed seed", {
+  skip_on_cran()
   skip_on_os("windows")   # multicore forks; mclapply is serial on Windows
   theta <- deg2rad(as.numeric(octants()))
   set.seed(811)
@@ -507,6 +516,7 @@ test_that("objects predating suff-stats storage work through the data fallback",
 })
 
 test_that("a pre-fitted CPM is reused rather than refit", {
+  skip_on_cran()
   data("jz2017")
   jz <- jz2017[1:200, ]
   set.seed(911)
@@ -521,6 +531,7 @@ test_that("a pre-fitted CPM is reused rather than refit", {
 })
 
 test_that("a free-scaling CPM is refused (correlation-structure diagnostic)", {
+  skip_on_cran()
   # M18 review: a free-scaling fit's Phat is a covariance (non-unit diagonal),
   # which would embed inconsistent variances into the simulated population and
   # silently miscalibrate coverage. Refuse it up front rather than corrupt.
@@ -701,6 +712,7 @@ test_that("bootstrap and Monte Carlo engines agree within combined MC error", {
 # ---- degenerate ladder: the sec. 4.1 margin rung -------------------------------
 
 test_that("an amplitude estimate below half its CI width adds the margin rung", {
+  skip_on_cran()
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1401)
   dat <- as.data.frame(t(sapply(1:60, function(i) {
@@ -751,6 +763,7 @@ test_that("healthy amplitudes add no margin rung", {
 # ---- guardrail measurement columns (sec. 4.3) ----------------------------------
 
 test_that("guardrail table carries Wilson bounds and reps; coverage carries N_conditional and Structural", {
+  skip_on_cran()
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1501)
   dat <- as.data.frame(t(sapply(1:100, function(i) {
@@ -791,6 +804,7 @@ test_that("guardrail table carries Wilson bounds and reps; coverage carries N_co
 })
 
 test_that("a contrast row's zero-amplitude condition is not flagged structural", {
+  skip_on_cran()
   # The contrast amplitude is a signed, unconstrained difference: its
   # percentile interval CAN contain 0, so the c = 0 theorem does not apply
   data("jz2017")
@@ -812,6 +826,7 @@ test_that("a contrast row's zero-amplitude condition is not flagged structural",
 # ---- verdict wording (sec. 5.2) -------------------------------------------------
 
 test_that("summary() carries the false-certification caution and wording bar", {
+  skip_on_cran()
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1601)
   dat <- as.data.frame(t(sapply(1:100, function(i) {
@@ -913,6 +928,7 @@ test_that("plot.circumplex_ci_accuracy builds a faceted coverage plot", {
 })
 
 test_that("plot excludes the contrast from the certified-displacement panel (M15)", {
+  skip_on_cran()
   # Presentation surface follows print's profiles-only certification (M15-D1):
   # the contrast appears in "Displacement" (unconditional) but not in
   # "Displacement (certified)". Data-level assertion -- no vdiffr/platform dep.

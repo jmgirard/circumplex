@@ -405,6 +405,7 @@ test_that("the two shipped copies of each scale angle agree (M72)", {
 })
 
 test_that("shipped angles follow the LM = 360 convention (M72)", {
+  skip_on_cran()
   # DESIGN.md IP2: degrees in the user API run in (0, 360] with LM = 360, never
   # 0. The audit compares against the source modulo 360, which cannot see this.
   for (inst in names(audited_objects)) {
@@ -417,6 +418,7 @@ test_that("shipped angles follow the LM = 360 convention (M72)", {
 })
 
 test_that("every shipped instrument's item key partitions its items (M74)", {
+  skip_on_cran()
   # score() takes rowMeans over exactly the numbers in Scales$Items, so an item
   # missing from every key is silently never scored and an item named twice is
   # scored into two octants. Neither shows up in any count the audit reports:
@@ -457,6 +459,7 @@ test_that("cais's item key matches sodano2006's octant blocks (M74)", {
 })
 
 test_that("a source-note block no batch row audits is reported (M75)", {
+  skip_on_cran()
   # DEVELOPMENT-ONLY: data-raw/ is not installed.
   script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
   skip_if_not(file.exists(script), "data-raw/ not present (installed package)")

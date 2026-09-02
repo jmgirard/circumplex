@@ -27,11 +27,11 @@ vignette_path <- function() {
 # The CHUNK SOURCE, which the shipped .Rmd no longer carries: the vignettes are
 # pre-computed, so vignettes/<name>.Rmd holds rendered output and the labelled
 # chunks live only in the .Rmd.orig that tools/precompute-vignettes.R renders
-# from. That file is .Rbuildignore'd, so it exists in the source tree alone --
-# hence skip_on_cran() rather than a silent absence check: off CRAN the source
-# tree IS present, and a missing source there is a repo defect, not a skip.
+# from. That file is .Rbuildignore'd, so it exists in the source tree alone, so
+# every block that reads chunk source carries its own skip_on_cran() -- stated at
+# the block, where a reader (and tools/m120-skipped-blocks-live.R) can see which
+# blocks it governs, rather than hidden inside this helper.
 vignette_source_path <- function() {
-  skip_on_cran()
   p <- test_path("..", "..", "vignettes",
                  "evaluating-circumplex-structure.Rmd.orig")
   skip_if(
@@ -117,6 +117,7 @@ test_that("the boundary section names every marker label the package prints", {
 })
 
 test_that("the demonstration fit fires exactly the markers the section names", {
+  skip_on_cran()
   env <- run_chunks(c("cpm", "boundary_demo"))
   expect_true(exists("demo", envir = env, inherits = FALSE))
   fired <- cpm_boundary_markers(get("demo", envir = env))
@@ -155,6 +156,7 @@ test_that("the marker-list locus paragraph states the shipped printing behavior"
 })
 
 test_that("the displayed fit still shows what the section's opening reads", {
+  skip_on_cran()
   # The section opens by reading this fit: a Heywood case at NO with a
   # zero-width interval, and an ill-conditioning warning from the same chunk.
   # Without these pins the whole premise could go stale silently.
@@ -176,6 +178,7 @@ test_that("the displayed fit still shows what the section's opening reads", {
 })
 
 test_that("the angle paragraph's pinned figures and ordering still hold", {
+  skip_on_cran()
   # The displayed fit's point estimates do not depend on the bootstrap (the
   # analytic and bootstrap fits agree to 0 on Angle, checked 2026-08-16), but
   # the chunk is evaluated as written so a change to the example is caught.

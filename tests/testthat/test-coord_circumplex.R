@@ -24,6 +24,7 @@ test_that("coord_circumplex() constructs a CoordRadial subclass", {
 })
 
 test_that("coord_circumplex() validates amax and center", {
+  skip_on_cran()
   expect_error(coord_circumplex(amax = "a"), "amax")
   expect_error(coord_circumplex(amax = c(1, 2)), "amax")
   # amax must exceed the center (else the radial axis is empty/inverted).
@@ -56,6 +57,7 @@ test_that("amax and center are the radial limits, trained in one place", {
 })
 
 test_that("a break landing on the rim survives the radial censor", {
+  skip_on_cran()
   # `amax` is documented as the amplitude the outer ring represents, but ggplot2
   # censors the radial breaks against the panel range with an exact comparison
   # and the break generator drifts a few ULPs wide of it: seq(0, 0.3, by = 0.1)
@@ -92,6 +94,7 @@ rim_furniture <- function(amax, center = 0, data_at = 0.7, trained_max = 1) {
 }
 
 test_that("the canvas always draws a ring at the rim", {
+  skip_on_cran()
   # The break algorithm often proposes no break at `amax` at all -- over
   # [0, 1.75] it proposes 2, which is genuinely outside the panel and correctly
   # censored -- so the outermost ring sat below the rim and the circle was drawn
@@ -117,6 +120,7 @@ test_that("the canvas always draws a ring at the rim", {
 })
 
 test_that("the rim ring is labeled only when amax is itself a generated break", {
+  skip_on_cran()
   # M38-D1: the rim adds a ring and nothing else. Crowding is governed by
   # rendered label width, not break spacing, so labelling every rim collides
   # (amax = 1.1 printed 1.00/1.10 as "1.0010") and suppressing the neighbour to
@@ -149,6 +153,7 @@ test_that("the rim ring is labeled only when amax is itself a generated break", 
 })
 
 test_that("appending the rim respects what the amplitude scale says about labels", {
+  skip_on_cran()
   # A scale carrying explicit `labels` pairs them positionally with its own
   # breaks and aborts on a length mismatch, so the appended rim must never be
   # handed to it: doing so errored out of the build entirely.
@@ -292,6 +297,7 @@ axis_label_parts <- function(p) {
 }
 
 test_that("the amplitude labels are drawn over a backdrop (M39 T2)", {
+  skip_on_cran()
   parts <- axis_label_parts(ggcircumplex(octants(), amax = 0.8))
 
   # The labels themselves are unchanged: still one vectorized text grob.
@@ -312,6 +318,7 @@ test_that("the amplitude labels are drawn over a backdrop (M39 T2)", {
 })
 
 test_that("each plate is rotated onto its own label (M39 T2)", {
+  skip_on_cran()
   # The regression this exists for: the radial axis sits at an angle and every
   # label is turned about its own anchor to stay readable, but rectGrob has no
   # rotation. A first implementation shared the labels' x/y and still drew the
@@ -339,6 +346,7 @@ test_that("each plate is rotated onto its own label (M39 T2)", {
 })
 
 test_that("the backdrop tracks a relocated axis (M39 T2)", {
+  skip_on_cran()
   # r_axis_angle (M32) moves the axis, which changes the label rotation; the
   # plates must follow it rather than keep the default placement's angle.
   p <- ggplot2::ggplot() +
@@ -360,6 +368,7 @@ test_that("the backdrop tracks a relocated axis (M39 T2)", {
 })
 
 test_that("the rim's blank label gets no plate (M39 T2)", {
+  skip_on_cran()
   # M38 appends the rim break with a blank label. A plate behind an empty string
   # would be a stray floating rectangle, so the count follows the non-empty
   # labels, not the break count.
@@ -400,6 +409,7 @@ test_that("an amplitude label over a dark mark stays legible (M39 T4)", {
 })
 
 test_that("plate extent and padding offset are fenced structurally (M39 F4)", {
+  skip_on_cran()
   # Review found the structural fence covered rotation and anchor but NOT size
   # or offset: a plate hardcoded to 30x30pt, or one with the padding re-centring
   # dropped, passed everything here and failed only the two vdiffr baselines --
@@ -425,6 +435,7 @@ test_that("plate extent and padding offset are fenced structurally (M39 F4)", {
 })
 
 test_that("spoke labels are never plated, even when they read like amplitudes (M39 F2)", {
+  skip_on_cran()
   # Review reproduction: the walk matched on label text alone, so a caller whose
   # THETA labels happen to equal the amplitude labels got plates behind both --
   # and the theta guide is traversed first. The spoke labels are explicitly Out
@@ -454,6 +465,7 @@ test_that("spoke labels are never plated, even when they read like amplitudes (M
 })
 
 test_that("a plotmath label is measured as drawn, not as its source text (M39 F3)", {
+  skip_on_cran()
   # Review found `as.character()` deparsed an expression, so the plate was sized
   # to the string "gamma^2" rather than to the single rendered glyph -- several
   # times too wide, and vertically offset by the superscript. The plate must be

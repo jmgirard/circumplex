@@ -20,6 +20,7 @@
 # ---- Class A: an angle exactly at the 0/360 pole, free scaling --------------
 
 test_that("free scaling, class A: an in-family angle at the 0/360 pole recovers", {
+  skip_on_cran()
   # Non-reference scale 2 sits at exactly 0 (the reference-relative pole), as in
   # the unit-path pole test. Data are exactly in the correlation family
   # (sigma = 1), so free scaling must recover sigma-hat = 1 AND report the pole
@@ -38,6 +39,7 @@ test_that("free scaling, class A: an in-family angle at the 0/360 pole recovers"
 })
 
 test_that("free scaling, class A: a genuine sigma != 1 pattern recovers at the pole", {
+  skip_on_cran()
   # Inject non-trivial variance scales with a pole angle, then fit the resulting
   # covariance directly (engine level -- the cormat path requires unit-diagonal
   # input; here we test the estimator's pole+scale recovery). Rescale-

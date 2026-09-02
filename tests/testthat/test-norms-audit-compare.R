@@ -40,6 +40,7 @@ test_that("an item key compares equal across padding differences (M80)", {
 })
 
 test_that("two unparseable item cells do not compare equal (M80)", {
+  skip_on_cran()
   env <- compare_defs()
   # The defect the abort exists for. Without it both sides normalise to the
   # string "NA" and this comparison returns TRUE: two cells nobody can read,

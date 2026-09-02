@@ -77,6 +77,7 @@ named_scales <- function(msg) {
 }
 
 test_that("no shipped norm sample's mean falls outside its instrument's anchors", {
+  skip_on_cran()
   # Domain first: an empty sweep would satisfy the emptiness below without
   # having looked at anything (M108).
   # Pinned, not merely non-empty: `> 0` is satisfied by a sweep that reached

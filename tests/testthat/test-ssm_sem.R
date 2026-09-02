@@ -105,6 +105,7 @@ test_that("vectorized sem transform matches the scalar reference row-by-row (M9)
 # Analytic-truth recovery (spec sec. 4.1/8.1) ------------------------------------
 
 test_that("latent SSM parameters recover the closed-form truth from population moments (sec. 8.1)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Interior cell: a* comfortably positive, d* mid-quadrant, heterogeneous
   # saturations and residuals so nothing collapses to the observed profile.
@@ -143,6 +144,7 @@ test_that("latent SSM parameters recover the closed-form truth from population m
 })
 
 test_that("a general factor leaning into the plane is recovered by the strict tier and lowers latent fit (sec. 4.2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # g-plane lean is expressible only under the strict tier (fixed unit-cosine
   # loadings, fully free factor covariance): under the scaled tier, free
@@ -167,6 +169,7 @@ test_that("a general factor leaning into the plane is recovered by the strict ti
 # Theta -> 0 population-level equivalence ladder (spec sec. 8.2) -----------------
 
 test_that("as residual variance -> 0 the latent profile converges to the observed profile (sec. 8.2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   a <- rep(0.5, 8)
   cc <- rep(0.65, 8)
@@ -192,6 +195,7 @@ test_that("as residual variance -> 0 the latent profile converges to the observe
 # Boundary suite (spec sec. 5.5) -------------------------------------------------
 
 test_that("latent displacement at the 0/360 pole is reported on the package convention with a contiguous straddling CI (sec. 5.5)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # Measure aligned exactly with the +x axis: d* = 0 (equivalently 360)
   sigma_m <- cbind(c(0.15, 0.45, 0))
@@ -267,6 +271,7 @@ test_that("a flat latent profile (measure independent of everything) degrades li
 })
 
 test_that("two-measure latent contrast near +/-180 stays on the estimate's branch (sec. 5.5/6.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   d1 <- 5 * pi / 180
   d2 <- 186 * pi / 180
@@ -300,6 +305,7 @@ test_that("two-measure latent contrast near +/-180 stays on the estimate's branc
 # Guards (spec sec. 4.5) ----------------------------------------------------------
 
 test_that("a disattenuated point correlation at/above 1 is refused with the scale named (sec. 4.5)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # M is the common part t_1 of scale 1 (sigma_m = Phi lambda_1). Shrinking
   # Var(M) below Var(t_1) drives the model-implied disattenuated rho*_1
@@ -334,6 +340,7 @@ test_that("a disattenuated point correlation at/above 1 is refused with the scal
 })
 
 test_that("inadmissible MVN draws are filtered engine-side with a cause-naming warning (sec. 4.5)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   a <- rep(0.55, 8)
   cc <- rep(0.6, 8)
@@ -356,6 +363,7 @@ test_that("inadmissible MVN draws are filtered engine-side with a cause-naming w
 })
 
 test_that("an inadmissible-draw share above the threshold escalates to an error (sec. 4.5)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   a <- rep(0.55, 8)
   cc <- rep(0.6, 8)
@@ -398,6 +406,7 @@ test_that("MVN draws respect the linear fixed-angle direction constraints (sec. 
 })
 
 test_that("mvn results are reproducible from a seed (RNG contract, sec. 5.4)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -477,6 +486,7 @@ test_that("ci_method = 'boot' refits per resample and agrees with mvn to Monte C
 # ssm_sem() end-to-end (spec sec. 7.2/7.3) ----------------------------------------
 
 test_that("ssm_sem() runs end-to-end on real data and matches the observed SSM direction (sec. 1.1)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   data("jz2017", envir = environment())
   scales <- names(jz2017)[2:9]
@@ -511,6 +521,7 @@ test_that("ssm_sem() runs end-to-end on real data and matches the observed SSM d
 })
 
 test_that("ssm_sem() validates its arguments (sec. 7.2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   data("jz2017", envir = environment())
   scales <- names(jz2017)[2:9]
@@ -541,6 +552,7 @@ test_that("ssm_sem() validates its arguments (sec. 7.2)", {
 })
 
 test_that("contrast arity is validated at every branch (sec. 7.2)", {
+  skip_on_cran()
   # Characterization test for the shared contrast-arity validator: locks the
   # message on each failure branch across both entry points. The grouped
   # branches error before any lavaan fit, so raw jz2017 suffices; the
@@ -591,6 +603,7 @@ test_that("ssm_sem() gates on lavaan with a clear install hint (sec. 7.4)", {
 })
 
 test_that("ssm_sem_parameters() refuses angles that do not match the fitted model", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   th_deg <- c(0, 30, 90, 200, 290)
   a <- rep(0.55, 5)
@@ -617,6 +630,7 @@ test_that("ssm_sem_parameters() refuses angles that do not match the fitted mode
 })
 
 test_that("ssm_sem_parameters() handles user-supplied multi-group fits per group (T4 escape hatch)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -647,6 +661,7 @@ test_that("ssm_sem_parameters() handles user-supplied multi-group fits per group
 })
 
 test_that("ssm_sem_parameters() refuses the unidentified free-g-plane scaled configuration", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -672,6 +687,7 @@ test_that("ssm_sem_parameters() refuses the unidentified free-g-plane scaled con
 })
 
 test_that("ssm_sem_parameters() warns when a raw-data se='standard' fit meets the mvn engine", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -700,6 +716,7 @@ test_that("ssm_sem_parameters() warns when a raw-data se='standard' fit meets th
 })
 
 test_that("ssm_sem_parameters() refuses a structurally incompatible lavaan fit (sec. 7.2)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # A generic one-factor model: none of the circumplex structure is present
   dat <- as.data.frame(matrix(rnorm(200 * 4), 200, 4,
@@ -718,6 +735,7 @@ test_that("ssm_sem_parameters() refuses a structurally incompatible lavaan fit (
 # Subclass methods and the method audit (spec sec. 7.3) ----------------------------
 
 test_that("summary.circumplex_ssm_sem() states the actual inferential method (sec. 7.3)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -745,6 +763,7 @@ test_that("sem_detail_labels() single-sources the summary detail-line labels", {
 })
 
 test_that("print.circumplex_ssm_sem() prepends the measurement-model block (sec. 7.3)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -761,6 +780,7 @@ test_that("print.circumplex_ssm_sem() prepends the measurement-model block (sec.
 })
 
 test_that("ssm_ci_accuracy() refuses latent (SEM) objects with a pointer to the harness (sec. 7.3)", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -774,6 +794,7 @@ test_that("ssm_ci_accuracy() refuses latent (SEM) objects with a pointer to the 
 })
 
 test_that("inherited consumers render latent results sensibly: ssm_table() and plots (sec. 7.3 method audit)", {
+  skip_on_cran()
   # The sec. 7.3 method audit, in full (every exported function that
   # dispatches on or checks the circumplex_ssm class string, per Grep):
   #   print.circumplex_ssm    -> overridden (measurement-model block) [tested]
@@ -819,6 +840,7 @@ test_that("sem_fmt_p() never renders a p-value as exactly zero", {
 })
 
 test_that("engine preconditions on user-supplied fits fail with actionable errors", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
   pop <- sem_canonical_pop(sigma_m, v_m = 1)
@@ -847,6 +869,7 @@ test_that("engine preconditions on user-supplied fits fail with actionable error
 })
 
 test_that("a bootstrap-covariance fit meeting the mvn engine gets an advisory", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   # The advisory is keyed solely on the fit's recorded `se` option, so test it
   # deterministically: fit with se = "standard" (fast, stable, real stored

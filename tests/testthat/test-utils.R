@@ -20,6 +20,7 @@ test_that("angle convenience functions work", {
 })
 
 test_that("angle_dist reports an exact half-turn as +pi, not -pi (F3)", {
+  skip_on_cran()
   # Contract: shortest signed rotation on the principal branch (-pi, pi].
   # Pre-fix the wrap had range [-pi, pi), so the exact half-turn atom was
   # reported as -pi. The half-turn must be +pi.
