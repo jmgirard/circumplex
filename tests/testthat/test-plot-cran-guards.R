@@ -69,11 +69,24 @@ test_that("ssm_plot_curve draws each profile's cosine peaking at its displacemen
   expect_gt(length(curves), 0L)
   d <- curves[[1]]
   expect_true(all(is.finite(d$x)) && all(is.finite(d$y)))
-  peaks <- vapply(split(d, d$group), function(g) g$x[which.max(g$y)], numeric(1))
-  # The curve for each profile peaks at that profile's displacement (the grid is
-  # coarse, so a degree or two of slack), and 350 must not peak near -10.
-  expect_equal(sort(as.numeric(peaks)), sort(as.numeric(res$results$d_est)),
-               tolerance = 5)
+  groups <- split(d, d$group)
+  expect_length(groups, nrow(res$results))
+  # The curve is evaluated on a grid, so its maximum lands on a grid point, and
+  # the grid spans only the plotted angular window -- a profile whose
+  # displacement falls outside that window peaks at the window's edge, which is
+  # a property of the drawn range and not of the estimate. So the expectation is
+  # the grid point nearest the displacement, measured LINEARLY: a displacement
+  # left on atan2's branch (-10 for 350) is nearest the low edge, where the
+  # correct curve peaks near 350, so this still fails under that defect. The
+  # bound is half a grid step, absolute in degrees -- testthat edition 3's
+  # `tolerance` is relative, under which a 10x error passes at `tolerance = 5`.
+  step <- stats::median(diff(sort(unique(d$x))))
+  for (i in seq_along(groups)) {
+    g <- groups[[i]]
+    dd <- as.numeric(res$results$d_est[[i]])
+    expected <- g$x[which.min(abs(g$x - dd))]
+    expect_lt(abs(g$x[which.max(g$y)] - expected), step / 2)
+  }
 })
 
 test_that("ssm_plot_contrast plots the contrast row the object reports", {

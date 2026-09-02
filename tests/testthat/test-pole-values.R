@@ -91,9 +91,13 @@ test_that("ssm_sem_parameters reports a latent displacement past the 0/360 pole"
   # latent profile -- a different code path from the SEM transform under test.
   truth <- ssm_parameters(as.numeric(pop$rho0), oct)
   expect_gt(as.numeric(truth$Disp), 180)   # the case really is past the branch
-  expect_equal(as.numeric(res$results$d_est), as.numeric(truth$Disp),
-               tolerance = 1e-2)
-  expect_equal(res$results$a_est, truth$Ampl, tolerance = 1e-4)
+  # Absolute degrees, not testthat edition 3's relative `tolerance`: at a
+  # displacement near 350, `tolerance = 1e-2` admits +/-3.5 degrees. The
+  # population fit reproduces the closed form to 4.2e-07 degrees here, so 1e-3
+  # leaves three orders of margin for cross-platform optimizer noise while
+  # still failing on any error a reader would call an error.
+  expect_lt(abs(as.numeric(res$results$d_est) - as.numeric(truth$Disp)), 1e-3)
+  expect_lt(abs(as.numeric(res$results$a_est) - as.numeric(truth$Ampl)), 1e-4)
 })
 
 test_that("ssm_analyze_long reports the displacement that built each occasion at the 0/360 pole", {
@@ -132,7 +136,7 @@ test_that("ssm_sem reports a latent displacement past the 0/360 pole", {
                  measures = pop$measures, boots = 10)
   truth <- ssm_parameters(as.numeric(pop$rho0), oct)
   expect_gt(as.numeric(truth$Disp), 180)
-  expect_equal(as.numeric(res$results$d_est), as.numeric(truth$Disp),
-               tolerance = 1e-1)
-  expect_equal(res$results$a_est, truth$Ampl, tolerance = 1e-2)
+  # Absolute degrees, as above; `tolerance = 1e-1` here was +/-35 degrees.
+  expect_lt(abs(as.numeric(res$results$d_est) - as.numeric(truth$Disp)), 1e-3)
+  expect_lt(abs(as.numeric(res$results$a_est) - as.numeric(truth$Ampl)), 1e-4)
 })
