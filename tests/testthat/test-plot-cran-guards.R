@@ -29,13 +29,6 @@ plot_guard_result <- function() {
               grouping = "Group", boots = 10)
 }
 
-built_layers <- function(p) {
-  expect_true(ggplot2::is_ggplot(p))
-  b <- ggplot2::ggplot_build(p)
-  expect_gt(length(b$data), 0L)
-  b$data
-}
-
 # The layer whose row count matches the profiles and which carries both plotted
 # coordinates. Erroring rather than returning NULL matters: a plot that silently
 # dropped its data layer would otherwise make the assertions below vacuous.

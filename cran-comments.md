@@ -20,8 +20,9 @@ The previous submission drew a check-time NOTE on r-devel-windows-x86_64
 (24 minutes). The vignettes now ship pre-computed, so re-building them runs no
 model fits, and the heaviest test blocks are gated behind `skip_on_cran()`.
 On the maintainer's macOS machine `R CMD check --as-cran` on this tarball
-takes 1 minute 27 seconds in total, of which tests are 17 seconds and the
-vignette re-build 5 seconds; the same steps took 259 and 40 seconds before.
+takes 1 minute 47 seconds in total, of which tests are 23 seconds and the
+vignette re-build 6 seconds; the same steps took 259 and 40 seconds before.
+A win-builder R-devel run of the same tarball completed in under 5 minutes.
 No test, vignette chunk, or example was deleted: everything still runs off
 CRAN and on every CI push.
 

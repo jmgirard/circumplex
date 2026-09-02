@@ -58,12 +58,17 @@ On the raw-data path the default confidence intervals are bootstrapped. We
 lower `boots` from its default of 2000 to keep this vignette quick to
 build; in practice, use the default.
 
+<!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
+     ill-conditioned, so the reported condition number and the bootstrap
+     acceptance counts move across BLAS implementations; the numbers this
+     chunk prints are not reproducible across machines. -->
 ```{r cpm}
 data("jz2017")
 set.seed(12345)
 cpm <- cpm_fit(jz2017, scales = PANO(), angles = octants(), boots = 500)
 summary(cpm)
 ```
+<!-- precompute:volatile-numbers end -->
 
 Two parts of this output matter most for evaluating structure:
 
@@ -280,6 +285,10 @@ consistent with *equally spaced* scales? With *equal* communalities? The
 correlation-matrix path is convenient for this comparison (point estimates
 and fit indices are deterministic, so no bootstrap is needed):
 
+<!-- precompute:volatile-numbers start -- these three model variants
+     refit the same ill-conditioned correlation matrix, so the reported
+     condition number and the fit indices derived from that solution move
+     across BLAS implementations. -->
 ```{r variants}
 R <- cpm$matrices$R # the sample correlation matrix stored by cpm_fit()
 fits <- lapply(
@@ -300,6 +309,7 @@ data.frame(
   tli = round(vapply(fits, function(f) f$fit$tli, numeric(1)), 3)
 )
 ```
+<!-- precompute:volatile-numbers end -->
 
 The pattern reproduces what Zimmermann and Wright (2017, p. 14) reported
 for these data with CircE: the fully constrained model (equal spacing *and*

@@ -57,6 +57,10 @@ On the raw-data path the default confidence intervals are bootstrapped. We
 lower `boots` from its default of 2000 to keep this vignette quick to
 build; in practice, use the default.
 
+<!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
+     ill-conditioned, so the reported condition number and the bootstrap
+     acceptance counts move across BLAS implementations; the numbers this
+     chunk prints are not reproducible across machines. -->
 
 ``` r
 data("jz2017")
@@ -131,6 +135,7 @@ summary(cpm)
 #>   predictors of the bootstrap intervals shown here (see the vignette
 #>   section 'When a fit sits at a boundary').
 ```
+<!-- precompute:volatile-numbers end -->
 
 Two parts of this output matter most for evaluating structure:
 
@@ -406,6 +411,10 @@ consistent with *equally spaced* scales? With *equal* communalities? The
 correlation-matrix path is convenient for this comparison (point estimates
 and fit indices are deterministic, so no bootstrap is needed):
 
+<!-- precompute:volatile-numbers start -- these three model variants
+     refit the same ill-conditioned correlation matrix, so the reported
+     condition number and the fit indices derived from that solution move
+     across BLAS implementations. -->
 
 ``` r
 R <- cpm$matrices$R # the sample correlation matrix stored by cpm_fit()
@@ -433,6 +442,7 @@ data.frame(
 #> 2 equal-communality 17 0.100 0.063 0.956 0.928
 #> 3         circulant 24 0.185 0.130 0.790 0.755
 ```
+<!-- precompute:volatile-numbers end -->
 
 The pattern reproduces what Zimmermann and Wright (2017, p. 14) reported
 for these data with CircE: the fully constrained model (equal spacing *and*
@@ -605,7 +615,7 @@ summary(acc)
 #> Population Structure:	 Browne circular model (CPM) 
 #> Group Sizes:		 All = 250 
 #> Certification Rule:	 a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:		 10.1 s
+#> Elapsed:		 7.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
