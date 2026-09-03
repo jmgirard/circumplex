@@ -60,6 +60,14 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="circumplex-development-version">circumplex (development version)<a class="anchor" aria-label="anchor" href="#circumplex-development-version"></a></h2>
+<div class="section level3">
+<h3 id="minor-improvements-and-fixes-development-version">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-development-version"></a></h3>
+<ul><li><p>The package’s tests now pass on CRAN’s macOS x86_64 flavors. The check of <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code>’s single-group output against a stored copy compared cosine and sine loadings printed at 17 significant digits, and that platform’s math library rounds one of them a single unit in the last place differently. The comparison now ignores differences beyond 12 significant digits and nothing else. <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code>’s output is unchanged.</p></li>
+<li><p>The figures in the pre-rendered vignettes (Introduction to SSM Analysis, Intermediate SSM Analysis, Advanced Circumplex Visualization, Evaluating Circumplex Structure, SEM-Based SSM Analysis, Growth Models on SSM Parameters, and Axes Reliability) are rendered at twice the previous resolution. They had been rendered at 72 dpi and stretched to the article width on the package website, so they looked soft on high-resolution screens.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="circumplex-200">circumplex 2.0.0<a class="anchor" aria-label="anchor" href="#circumplex-200"></a></h2>
 <p>This is a major release. Its flagship addition is <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>, a native reimplementation of Browne’s (1992) circular stochastic process model for the correlational structure of circumplex scales — filling the gap left by the archived CircE package, the previous R implementation. Alongside it come four other new analysis families: latent-variable SSM analysis with <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code>, repeated-measures (longitudinal) SSM analysis, <code><a href="../reference/fit_structure.html">fit_structure()</a></code> for exploratory circumplex-structure tests, <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> for the reliability of the circumplex axes (Strack et al., 2013), and <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>, a diagnostic for whether an <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> result’s confidence intervals can be trusted at your sample size and profile (Zimmermann &amp; Wright, 2017). The plotting layer has been rebuilt on a real ggplot2 coordinate system.</p>
 <div class="section level3">

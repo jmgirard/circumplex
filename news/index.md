@@ -1,5 +1,28 @@
 # Changelog
 
+## circumplex (development version)
+
+### Minor improvements and fixes
+
+- The package’s tests now pass on CRAN’s macOS x86_64 flavors. The check
+  of
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)’s
+  single-group output against a stored copy compared cosine and sine
+  loadings printed at 17 significant digits, and that platform’s math
+  library rounds one of them a single unit in the last place
+  differently. The comparison now ignores differences beyond 12
+  significant digits and nothing else.
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)’s
+  output is unchanged.
+
+- The figures in the pre-rendered vignettes (Introduction to SSM
+  Analysis, Intermediate SSM Analysis, Advanced Circumplex
+  Visualization, Evaluating Circumplex Structure, SEM-Based SSM
+  Analysis, Growth Models on SSM Parameters, and Axes Reliability) are
+  rendered at twice the previous resolution. They had been rendered at
+  72 dpi and stretched to the article width on the package website, so
+  they looked soft on high-resolution screens.
+
 ## circumplex 2.0.0
 
 This is a major release. Its flagship addition is
