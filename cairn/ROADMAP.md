@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-09-03 (health audit at the "close M7" request. **circumplex 2.0.0 is published on CRAN** (page read 2026-09-03: Version 2.0.0, Published 2026-09-02) — M7's external blocker is resolved and the milestone is closable; routed to /milestone-review M7 (only that skill sets `done`). No `v2.0.0` git tag exists yet. cairn_validate green (the 47 work-log-format advisories are M7's legacy multi-line entries, append-only history). Tree clean; no open PRs; merged PRs #150/#151/#152 all operator work already tracked; no outside merges; no `resolves` clauses among the retained done rows, so no orphaned issues. Issue #137 stays open, re-confirmed noise (master green). Byte budgets: ROADMAP 22,782 / 24,000, LESSONS 19,992 / 20,000. Post-2.0.0 hotfix #152 sits unreleased on master.)_
+_Last hygiene check: 2026-09-03 (M7 review-close. **circumplex 2.0.0 published on CRAN** — page read 2026-09-03: Version 2.0.0, Published 2026-09-02; AC4 evidenced post-merge per the 2026-07-19 deferral, M7 done and archived, PR #64 merged 2026-07-19. Terminal-row retention: M118 pruned (oldest of six). cairn_validate green (the 47 M7 work-log-format advisories left with the archived file). No `Resolves:` slot on M7, so no issue writes. Byte budgets: ROADMAP 22,255 / 24,000, LESSONS 19,992 / 20,000 — 8 bytes of room, the next lesson forces a retirement. No new lesson from the publication itself. Open: no `v2.0.0` git tag yet; hotfix #152 sits on master unreleased against the published 2.0.0.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -9,10 +9,9 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M7 | v2.0.0 CRAN release preparation | blocked | M119, M120 | high | milestones/M7-v2-release-prep.md |
+| M7 | v2.0.0 CRAN release preparation | done | — | high | milestones/archive/M7-v2-release-prep.md |
 | M120 | Bring the Windows CRAN check under 8 minutes | done | — | high | milestones/archive/M120-cran-check-time.md |
 | M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | done | — | high | milestones/archive/M119-presubmission-reverify.md |
-| M118 | Close three ways the certificate suite can pass without checking | done | — | normal | milestones/archive/M118-certificate-suite-pass-without-checking.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |
 | M117 | Price the accuracy certificate once per checked fit | done | — | normal | milestones/archive/M117-certificate-once-per-fit.md |
 
