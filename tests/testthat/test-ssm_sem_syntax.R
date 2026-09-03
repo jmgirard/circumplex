@@ -235,6 +235,28 @@ test_that("scaled fit keeps every scale's angle fixed at its theoretical value",
 
 # Multi-group emission (spec §3.5 / §6.2, T4) ---------------------------------
 
+# The n_groups = 1 fixtures below are pinned byte-for-byte to the pre-multi-
+# group emission. Their cosine/sine literals are printed at 17 significant
+# digits, and libm implementations legitimately disagree in the last digit
+# (CRAN's r-release/r-oldrel macOS x86_64 round cos(225 degrees) one ulp away
+# from every other flavor: 2.0.0 check ERROR, 2026-09-03). This comparison is
+# the fixture contract: identical modulo that last-digit noise, and nothing
+# else -- every word, line, and number beyond 12 significant digits must match.
+normalize_numerals <- function(x) {
+  # Every decimal literal (an integer stays as it is) rounded to 12 significant
+  # digits, in place; the surrounding text is untouched.
+  pattern <- "-?[0-9]+\\.[0-9]+([eE][+-]?[0-9]+)?"
+  m <- gregexpr(pattern, x)
+  regmatches(x, m) <- lapply(regmatches(x, m), function(lit) {
+    formatC(as.numeric(lit), digits = 12, format = "g")
+  })
+  x
+}
+
+expect_syntax_identical <- function(actual, expected) {
+  expect_identical(normalize_numerals(actual), normalize_numerals(expected))
+}
+
 # Pre-change single-group output, captured verbatim from the generator BEFORE
 # the multi-group layer was added. n_groups = 1 must remain byte-identical to
 # these strings forever (the hard requirement): a future refactor of the
@@ -254,20 +276,20 @@ test_that("n_groups = 1 emission is byte-identical to the pre-change output (§3
     attributes(x) <- NULL
     x
   }
-  expect_identical(
+  expect_syntax_identical(
     strip(ssm_sem_syntax(scales = scales, angles = octs, model = "scaled")),
     exp_scaled_nomeas
   )
-  expect_identical(
+  expect_syntax_identical(
     strip(ssm_sem_syntax(scales = scales, angles = octs, model = "scaled",
       measures = "M1")),
     exp_scaled_meas
   )
-  expect_identical(
+  expect_syntax_identical(
     strip(ssm_sem_syntax(scales = scales, angles = octs, model = "strict")),
     exp_strict_nomeas
   )
-  expect_identical(
+  expect_syntax_identical(
     strip(ssm_sem_syntax(scales = scales, angles = octs, model = "strict",
       measures = "M1")),
     exp_strict_meas
@@ -276,6 +298,31 @@ test_that("n_groups = 1 emission is byte-identical to the pre-change output (§3
   syn <- ssm_sem_syntax(scales = scales, angles = octs)
   expect_identical(attr(syn, "n_groups"), 1L)
   expect_null(attr(syn, "invariance"))
+})
+
+test_that("the byte-identity fixture tolerates last-digit libm noise and nothing else", {
+  # Regression for the 2.0.0 CRAN ERROR on r-release/r-oldrel macOS x86_64:
+  # that libm rounds the 225-degree loading to -0.70710678118654735 where every
+  # other flavor prints -0.70710678118654746. The fixture contract must accept
+  # that perturbation (a 1-ulp difference in a fixed loading is invisible to
+  # lavaan) while still rejecting a real change to a number or a word.
+  intel_macos <- sub("-0.70710678118654746*lx4", "-0.70710678118654735*lx4",
+    exp_scaled_nomeas, fixed = TRUE)
+  expect_false(identical(intel_macos, exp_scaled_nomeas))
+  expect_success(expect_syntax_identical(intel_macos, exp_scaled_nomeas))
+
+  # A change visible at 12 significant digits is still a failure.
+  real_change <- sub("0.70710678118654757", "0.70710678200000000",
+    exp_scaled_nomeas, fixed = TRUE)
+  expect_failure(expect_syntax_identical(real_change, exp_scaled_nomeas))
+  # So is a change to a structural token, and a change to a whole number.
+  expect_failure(expect_syntax_identical(
+    sub("cx ~~ 0*cy", "cx ~~ NA*cy", exp_scaled_nomeas, fixed = TRUE),
+    exp_scaled_nomeas))
+  expect_failure(expect_syntax_identical(
+    sub("0 == 1*lx1 - 0*ly1", "0 == 1*lx1 - 1*ly1", exp_scaled_nomeas,
+      fixed = TRUE),
+    exp_scaled_nomeas))
 })
 
 test_that("invariance supplied with n_groups = 1 errors clearly (§6.2)", {

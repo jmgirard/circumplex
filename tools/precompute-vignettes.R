@@ -36,9 +36,15 @@ knit_one <- function(name) {
   # F6). The hook restores exactly that default, and only where this script's
   # own empty caption is what is in force -- a chunk that writes its own
   # fig.cap or fig.alt keeps it.
+  #
+  # dpi = 144 renders each figure at twice knitr's 72-dpi default, the 2x
+  # ("retina") size pkgdown produced when it knitted these vignettes itself;
+  # at 72 dpi a 7-inch figure is 504 pixels wide and stretched to the article
+  # column, visibly soft on the site. out.width still governs display size.
   knitr::opts_chunk$set(
     fig.path = file.path("figures", paste0(name, "-")),
-    fig.cap = ""
+    fig.cap = "",
+    dpi = 144
   )
   knitr::opts_hooks$set(fig.cap = function(options) {
     if (is.null(options$fig.alt) && identical(options$fig.cap, "")) {
