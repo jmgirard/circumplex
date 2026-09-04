@@ -1,14 +1,3 @@
-# circumplex 2.0.2
-
-## Minor improvements and fixes
-
-* The package's tests now pass on Linux arm64. Two checks of `ssm_draws()`
-  compared amplitudes computed by the package's C++ code against the same
-  amplitudes computed in R, and required the two to agree to the last bit.
-  They do on every other platform, but on that one they can differ by one
-  unit in the last place. The checks now require agreement to 12 significant
-  digits. No result reported by `ssm_draws()` has changed.
-
 # circumplex 2.0.1
 
 ## Minor improvements and fixes
@@ -19,6 +8,13 @@
   math library rounds one of them a single unit in the last place differently.
   The comparison now ignores differences beyond 12 significant digits and
   nothing else. `ssm_sem_syntax()`'s output is unchanged.
+
+* The package's tests now pass on Linux arm64. Two checks of `ssm_draws()`
+  compared amplitudes computed by the package's C++ code against the same
+  amplitudes computed in R, and required the two to agree to the last bit.
+  They do on every other platform, but on that one they can differ by one
+  unit in the last place. The checks now require agreement to 12 significant
+  digits. No result reported by `ssm_draws()` has changed.
 
 * The figures in the pre-rendered vignettes (Introduction to SSM Analysis,
   Intermediate SSM Analysis, Advanced Circumplex Visualization, Evaluating
