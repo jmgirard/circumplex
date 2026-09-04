@@ -1,5 +1,19 @@
 # Changelog
 
+## circumplex (development version)
+
+### Minor improvements and fixes
+
+- The package’s tests now pass on Linux arm64. Two checks of
+  [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+  compared amplitudes computed by the package’s C++ code against the
+  same amplitudes computed in R, and required the two to agree to the
+  last bit. They do on every other platform, but on that one they can
+  differ by one unit in the last place. The checks now require agreement
+  to 12 significant digits. No result reported by
+  [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+  has changed.
+
 ## circumplex 2.0.1
 
 ### Minor improvements and fixes
