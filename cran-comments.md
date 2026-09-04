@@ -2,13 +2,14 @@
 
 * local macOS 26.6.2, R 4.6.1 — `devtools::check(manual = TRUE)` and
   `R CMD check --as-cran` on the built tarball
-* win-builder, R-devel (2026-08-31 r90457)
 * GitHub Actions — macOS/release, windows/release, ubuntu/devel,
   ubuntu/release, ubuntu/oldrel-1
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+The note is CRAN incoming's "Days since last update", explained below.
 
 ## Downstream dependencies
 
@@ -16,26 +17,20 @@ None on CRAN.
 
 ## Notes
 
-The previous submission drew a check-time NOTE on r-devel-windows-x86_64
-(24 minutes). The vignettes now ship pre-computed, so re-building them runs no
-model fits, and the heaviest test blocks are gated behind `skip_on_cran()`.
-On the maintainer's macOS machine `R CMD check --as-cran` on this tarball
-takes 1 minute 50 seconds in total, of which tests are 23 seconds and the
-vignette re-build 6 seconds; the same steps took 259 and 40 seconds before.
-On win-builder (R-devel) this tarball is Status OK with tests at 103
-seconds and the vignette re-build at 16 seconds; before these changes the
-same two steps took 15 minutes and 146 seconds there.
-No test, vignette chunk, or example was deleted: everything still runs off
-CRAN and on every CI push.
+This patch exists to clear the ERROR that 2.0.0 shows on
+r-release-macos-x86_64 and r-oldrel-macos-x86_64. Four assertions in
+`test-ssm_sem_syntax.R` compared `ssm_sem_syntax()`'s printed output against a
+stored copy at 17 significant digits, and those platforms' math library rounds
+`cos(225°)` one unit in the last place differently, so the stored text did not
+match. The comparison now ignores differences beyond 12 significant digits and
+nothing else; `ssm_sem_syntax()`'s output is unchanged, and no test was removed
+or skipped. The remaining change in this release raises the resolution of the
+pre-rendered vignette figures.
 
-This is a major release; the user-visible behavior changes that motivate the
-version bump are listed under "Breaking changes and changed behavior" in
-NEWS.md. Two points on dependencies:
+That ERROR is why the release follows 2.0.0 by a day rather than waiting.
 
-* `ggplot2` moves to (>= 4.0.0), whose coordinate-system API the rebuilt
-  plotting layer subclasses. `ggforce` is dropped and base R's `grid` and
-  `parallel` are added, so Imports goes from seven packages to eight with no
-  new third-party dependency.
-* `Depends: R` moves from (>= 3.4) to (>= 4.1). This corrects an understated
-  declaration rather than adding a restriction: ggplot2 (>= 4.0.0) and
-  htmlTable already require R (>= 4.1).
+Check times are unchanged from the 2.0.0 submission. On the maintainer's macOS
+machine `R CMD check --as-cran` on this tarball takes 1 minute 53 seconds in
+total, of which the tests are 23 seconds, installation 11 seconds, and the
+examples 10 and 14 seconds. The vignettes ship pre-computed, so re-building
+them runs no model fits.
