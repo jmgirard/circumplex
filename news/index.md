@@ -1,6 +1,6 @@
 # Changelog
 
-## circumplex (development version)
+## circumplex 2.0.2
 
 ### Minor improvements and fixes
 
