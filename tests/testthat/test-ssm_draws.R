@@ -1,5 +1,24 @@
 # T3: ssm_draws() dispatch contract (spec sec. 5.1) ----------------------------
 
+# Amplitude is computed twice from the same (x, y): in C++ for profile draws
+# (`std::sqrt(std::pow(xval, 2) + std::pow(yval, 2))`, src/parameters.cpp) and
+# in R for parameter draws (`sqrt(x^2 + y^2)`, R/ssm_draws.R). The two agree
+# bit-for-bit on x86-64 and on macOS arm64, and land one unit in the last
+# place apart on Linux aarch64 -- CRAN's linux-arm64 additional check, where
+# 2.0.0 is an ERROR on exactly this comparison (2026-09-03). The shape
+# oracles below therefore ask for agreement to 12 significant digits, which
+# is the contract: last-place noise between the two implementations passes,
+# and every real change to either one still fails. The test immediately after
+# this block holds that line in both directions.
+expect_shape_equal <- function(actual, expected) {
+  expect_equal(actual, expected, tolerance = 1e-12)
+}
+
+# One unit in the last place, upward. Base R has no nextafter(); for the
+# amplitudes here (all in [0.25, 1)) adding eps * |x| moves one or two
+# representable steps, which is the perturbation being replayed.
+one_ulp_up <- function(x) x + abs(x) * .Machine$double.eps
+
 test_that("ssm_draws dispatches shape B when angles are supplied", {
   # Two profile draws over octants; each row goes through group_parameters()
   # exactly as a bootstrap replicate would. Row 1 is the pure first harmonic
@@ -291,39 +310,74 @@ test_that("feeding a run's bootstrap replicates reproduces its intervals exactly
     strata = bs_input$Group
   )
   # Replicate columns are (e, x, y, a, d, fit); the adapter recomputes a and
-  # d from (e, x, y) by the identical formulas, so the draws are bit-equal
-  # (compare in degrees -- both sides converted once by the same expression;
-  # a radian roundtrip would add a rounding step to only one side).
+  # d from (e, x, y) by the same formulas, so the draws agree to 12
+  # significant digits -- the same two amplitude implementations, and the
+  # same last-place caveat, as expect_shape_equal above (compare in degrees
+  # -- both sides converted once by the same expression; a radian roundtrip
+  # would add a rounding step to only one side).
   adapter <- ssm_draws(bs$t[, 1:3], type = "parameters")
-  expect_identical(as.numeric(adapter$draws[, "a"]), as.numeric(bs$t[, 4]))
-  expect_identical(as.numeric(adapter$draws[, "d"]),
-                   as.numeric(as_degree(as_radian(bs$t[, 5]))))
+  expect_shape_equal(as.numeric(adapter$draws[, "a"]), as.numeric(bs$t[, 4]))
+  expect_shape_equal(as.numeric(adapter$draws[, "d"]),
+                     as.numeric(as_degree(as_radian(bs$t[, 5]))))
   for (p in c("e", "x", "y", "a", "d")) {
-    expect_identical(
+    expect_shape_equal(
       as.numeric(adapter$results[[paste0(p, "_lci")]]),
       as.numeric(res$results[[paste0(p, "_lci")]])
     )
-    expect_identical(
+    expect_shape_equal(
       as.numeric(adapter$results[[paste0(p, "_uci")]]),
       as.numeric(res$results[[paste0(p, "_uci")]])
     )
   }
 })
 
+test_that("the shape oracles tolerate last-place noise and nothing else", {
+  # Replays what CRAN's linux-arm64 check hit: elements 34 and 35 of the
+  # matrix the next test compares are amplitudes, and there the C++ and R
+  # amplitude expressions disagreed in the last digit.
+  set.seed(7)
+  pdraws <- matrix(rnorm(10 * 8, mean = 1), ncol = 8)
+  cols <- c("e", "x", "y", "a", "d")
+  ref <- ssm_draws(pdraws, angles = octants())$draws[, cols]
+
+  nudged <- ref
+  nudged[c(34L, 35L)] <- one_ulp_up(nudged[c(34L, 35L)])
+  # The perturbation is real (so nothing below passes vacuously) and is
+  # last-place sized.
+  expect_false(identical(nudged, ref))
+  expect_lt(max(abs(nudged - ref) / abs(ref)), 1e-15)
+
+  # Byte-identity is what 2.0.0 asked for, and what that platform failed.
+  expect_failure(expect_identical(nudged, ref))
+  # Agreement to 12 significant digits is what the oracles ask for now.
+  expect_success(expect_shape_equal(nudged, ref))
+
+  # And nothing looser: a change far above last-place noise still fails, as
+  # does a wrong value in any other column.
+  wrong_a <- ref
+  wrong_a[34L] <- wrong_a[34L] * (1 + 1e-9)
+  expect_failure(expect_shape_equal(wrong_a, ref))
+
+  wrong_e <- ref
+  wrong_e[1L] <- wrong_e[1L] * (1 + 1e-9)
+  expect_failure(expect_shape_equal(wrong_e, ref))
+})
+
 test_that("shape B equals shape A applied to the per-row (e, x, y)", {
   # Oracle 3 (shape consistency): for any profile-draws matrix, shape B must
   # equal shape A applied to the per-row (e, x, y) computed from those
-  # profiles -- exact by construction, and the only oracle exercising the
-  # dispatch/column-mapping channels together.
+  # profiles -- exact but for last-place noise between the two amplitude
+  # implementations (see expect_shape_equal above), and the only oracle
+  # exercising the dispatch/column-mapping channels together.
   set.seed(7)
   pdraws <- matrix(rnorm(10 * 8, mean = 1), ncol = 8)
   resB <- ssm_draws(pdraws, angles = octants())
   resA <- ssm_draws(resB$draws[, c("e", "x", "y")], type = "parameters")
-  expect_identical(resA$draws[, c("e", "x", "y", "a", "d")],
-                   resB$draws[, c("e", "x", "y", "a", "d")])
+  expect_shape_equal(resA$draws[, c("e", "x", "y", "a", "d")],
+                     resB$draws[, c("e", "x", "y", "a", "d")])
   for (p in c("e", "x", "y", "a", "d")) {
     for (s in c("est", "lci", "uci")) {
-      expect_identical(
+      expect_shape_equal(
         as.numeric(resA$results[[paste0(p, "_", s)]]),
         as.numeric(resB$results[[paste0(p, "_", s)]])
       )
