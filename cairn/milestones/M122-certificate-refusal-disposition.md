@@ -7,7 +7,7 @@
 - **Principles touched:** IP3
 - **Resolves:** —
 - **Surface tier:** internal — test-suite behavior; no exported behavior changes
-- **Branch/PR:** `m122-certificate-refusal-disposition`
+- **Branch/PR:** `m122-certificate-refusal-disposition` / https://github.com/jmgirard/circumplex/pull/155
 
 ## Goal
 
@@ -193,4 +193,9 @@ candidate row (RR22 rec 12).
 - 2026-09-05: `tools/arm64/check.sh` refused the tarball on its first run
   because the scratchpad is outside Docker Desktop's shared paths - M121's
   empty-bind-mount guard firing as designed. Re-run from a shared path.
-
+- 2026-09-05: review opened. master had not moved (branch 0 behind); branch
+  pushed and draft PR #155 opened. Evidence gathering in progress: AC1's arm64
+  half is green (`check.sh` on a fresh branch tarball, `Status: OK`, FAIL 0 /
+  PASS 2427, disposition line `cxb = refused -- unidentified`); the macOS
+  `devtools::test()` run and the planted-defect probe battery have not reported
+  yet, so no criterion checkbox is ticked. `cairn_validate` exits 0.
