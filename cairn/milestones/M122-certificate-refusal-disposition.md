@@ -76,7 +76,7 @@ candidate row (RR22 rec 12).
 
 ## Tasks
 
-- [ ] T1: Rewrite the counterexample-B block to the exhaustive-disposition
+- [x] T1: Rewrite the counterexample-B block to the exhaustive-disposition
       shape: matrix mismatch fails (never skips, the matrix is committed
       bytes); the priced route keeps its three brackets and both `delta_star`
       assertions; the refusing route asserts `"unidentified"` from both `v` and
@@ -85,19 +85,19 @@ candidate row (RR22 rec 12).
       delta_star` sit outside both. Commit the measured `rcond(info)` band
       beside the case as the stated ground for the admission
       (RB tripwire: ip-touching).
-- [ ] T2: Repair `test-axes-certificate-refusal.R:180` to the same shape —
+- [x] T2: Repair `test-axes-certificate-refusal.R:180` to the same shape —
       graded route asserts the warning is not `"… 1;"`, refused route asserts
       it is.
-- [ ] T3: Add the double-double-versus-exact assertion at `cxb`, running on
+- [x] T3: Add the double-double-versus-exact assertion at `cxb`, running on
       both routes, with the reason stated against the file's existing
       "deliberately NOT pinned" comment (that comment refuses a *gate*, not an
       assertion).
-- [ ] T4: Pin the disposition vocabulary to named constants, assert membership
+- [x] T4: Pin the disposition vocabulary to named constants, assert membership
       in the detector, emit the disposition table on every run, and require
       `cxb ∈ {priced, refused}` plus at least one anchor priced.
-- [ ] T5: Fold in the two Known-fragilities items: `cert_bracket()`'s floor
+- [x] T5: Fold in the two Known-fragilities items: `cert_bracket()`'s floor
       branch and `cert_rel()`'s zero denominator.
-- [ ] T6: Run the planted-defect probes for AC2, AC3, AC4, AC5 and AC6 on both
+- [x] T6: Run the planted-defect probes for AC2, AC3, AC4, AC5 and AC6 on both
       macOS and the arm64 harness.
 - [ ] T7: Add the file-header assertion rule and the LESSONS clause; run
       `devtools::check(manual = TRUE)` and the arm64 harness; write NEWS.
@@ -161,4 +161,24 @@ candidate row (RR22 rec 12).
   verdict. Probed through the `expectation_failure` condition instead; both
   probe helpers were then shown to redden on the case they are meant to catch.
   Suite now 9276 passes, 0 failures.
+- 2026-09-05: T1-T6 done. Planted-defect probes, each run against the file it
+  targets, restoring the tree between runs. AC2 (arm64, where the shipped
+  pricing refuses): the refusal literal edited to `"singular"` and then to
+  `"indefinite"` fails naming `cxb` and that literal, from both `v` and `u`.
+  AC3: `axes_pricing_core()` refusing unconditionally fails naming each of
+  `a4`, `a5`, `c4`, `b9a`, `b9b` on both platforms; the `cxb` matrix moved one
+  ulp fails at three sites and records `matrix mismatch`, never `skipped`.
+  AC4: each of the four committed `v_hi`/`vn_hi` literals moved one ulp
+  reddens the dd-vs-exact assertion (1.39, 1.34, 0.67, 1.42 ulp against the
+  0.5 bound) on macOS, and `v_hi[1]` gives the identical 1.39 on arm64.
+  AC5: `cert_record()` with a value outside the set errors; the disposition
+  table prints on every run; the detector reddens on the planted all-skip run
+  (five anchors moved) and on the planted all-refused run. AC6: the inverted
+  expectation fails on both platforms, and on opposite branches - macOS
+  "expected 2, got 0" on the graded route, arm64 "expected 0, got 2" on the
+  refusing one.
+- 2026-09-05: the first AC6 patch was invalid and its arm64 run reported a
+  false green - a string replace matched both branches and left the file
+  semantically unchanged there. Rewritten to swap the two branches by line
+  index and re-run on both platforms.
 
