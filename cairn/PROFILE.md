@@ -93,6 +93,10 @@ Followed by `/cairn-release` — a CRAN release walk (never self-submits):
 - Wide checks as applicable: `devtools::check_win_devel()` and/or R-hub; `revdepcheck` if dependents exist.
 - Update `cran-comments.md` (test environments, check results, NOTE justifications, revdep summary).
 - Bump `Version:` in DESCRIPTION.
+- **linux-arm64 check, before the handoff**: `tools/arm64/check.sh <tarball>` on
+  the tarball about to be submitted must report `Status: OK`, and its dated green
+  log goes in `cran-comments.md`'s test-environments list. Without it the
+  submission step is not reached. Coverage limits: `tools/arm64/README.md`.
 - Handoff checklist (user runs): `devtools::submit_cran()`, confirm the CRAN
   email, then `usethis::use_github_release()` + `usethis::use_dev_version()`.
 
@@ -105,15 +109,11 @@ root. Carries the `.Rbuildignore` `^cairn$` entry (keeps the tracking dir out
 of the built package).
 
 ## greenfield-openers
-Language-specific opener `cairn-init` asks in a new/empty R package. The
-universal openers (distribution ambition, rendered here as **CRAN intent**, and
-numeric-work-needs-oracle-verification) live in cairn-init's universal layer, so they are not repeated here.
+Language-specific opener `cairn-init` asks in a new/empty R package; the
+universal ones (CRAN intent, oracle verification) live in cairn-init's own layer.
 
-- **Compiled code?** Will the package include compiled code
-  (Rcpp / RcppArmadillo / C / C++ / Fortran)?
-  - Options: **pure R** (reversible default) · Rcpp · RcppArmadillo.
-  - Consequence: compiled ⇒ a `src/` dir, `LinkingTo`, a C/C++ toolchain, and
-    `R CMD check` compiling on every check. Adding compiled code later is
-    additive, so the reversible default is pure R.
-  - Lands in: DESIGN Conventions (a "compiled code via <pkg>" line) and informs
-    the `verify` / `test-doctrine` check surface.
+- **Compiled code?** Will the package include compiled code (Rcpp /
+  RcppArmadillo / C / C++ / Fortran)? Menu: **pure R** (reversible default) ·
+  Rcpp · RcppArmadillo. Compiled ⇒ `src/`, `LinkingTo`, a C/C++ toolchain, and
+  a compile on every check; adding it later is additive. Lands in DESIGN
+  Conventions ("compiled code via <pkg>"), informs `verify` / `test-doctrine`.
