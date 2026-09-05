@@ -404,7 +404,18 @@ Re-verification after the fixes: macOS `test_local` over both edited files
 `test-axes-certificate.R` `FAIL 0 | PASS 221` with
 `cxb = refused -- unidentified`, `test-axes-certificate-refusal.R`
 `FAIL 0 | PASS 223` (up one, the new `cov2cor` assertion). AC1's full-suite and
-AC7's `check(manual = TRUE)` re-runs on the fixed tree are recorded below.
+AC7's `check(manual = TRUE)` re-runs on the fixed tree, all green:
+
+- AC1, macOS `devtools::test()` on the fixed tree:
+  `FAIL 0 | WARN 9 | SKIP 1 | PASS 9279`, one assertion up on the pre-fix 9278,
+  which is finding 5's `cov2cor` check. Disposition line `... cxb = priced`.
+- AC1, arm64 `tools/arm64/check.sh` on a tarball rebuilt from the fixed tree:
+  `Status: OK`, test log `FAIL 0 | WARN 4 | SKIP 540 | PASS 2427`, disposition
+  line `... cxb = refused -- unidentified`. Same platform record as the first
+  run (R 4.6.1, `aarch64-unknown-linux-gnu`, OpenBLAS 0.3.33) and the same
+  assertion count -- the corrected ulp bound does not move it.
+- AC7, macOS `devtools::check(manual = TRUE)` on the fixed tree: `Status: OK`,
+  0 errors / 0 warnings / 0 notes.
 
 - 2026-09-05: step-7 approval: PR #155 approved for merge, with findings 1-5
   fixed on the branch and 6-7 routed to a candidate row.
