@@ -1,6 +1,6 @@
 # M121: A local reproduction of CRAN's linux-arm64 check flavor
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -75,7 +75,7 @@ one of the two platform-exact rejection sources, not both.
 - [x] T3: Build the block-deleted tarball, run the harness, record the result.
 - [x] T4: Add the release-walk requirement to `cairn/PROFILE.md`, the command
       to `CLAUDE.md`, and the refresh recipe to `tools/arm64/`.
-- [ ] T5: Run `devtools::check(manual = TRUE)` and `tar -tzf` on the built
+- [x] T5: Run `devtools::check(manual = TRUE)` and `tar -tzf` on the built
       tarball.
 
 ## Work log
@@ -157,3 +157,11 @@ one of the two platform-exact rejection sources, not both.
   `tools/arm64/README.md`'s "Refreshing the pin". `PROFILE.md` was at 119 of
   its 120-line cap, so the `greenfield-openers` slot was compressed 15 lines to
   9 (no content dropped) to make room: 119 lines, 8,109 bytes after.
+- 2026-09-05: T5 — `devtools::check(manual = TRUE)` on the branch: `Status: OK`,
+  0 errors / 0 warnings / 0 notes, 12m 8.9s, the PDF-manual step included. On
+  that same built tarball `tar -tzf` lists 357 paths, 0 of them under
+  `circumplex/tools/` and none matching `arm64` or `Dockerfile` — the existing
+  `^tools$` `.Rbuildignore` entry covers the new directory. The suite also
+  passes on macOS arm64 (`checking tests ... OK`), where the `cxb` case prices,
+  which is the platform dependence M122 takes up.
+- 2026-09-05: all tasks done, status → review.
