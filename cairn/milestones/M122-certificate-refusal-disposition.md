@@ -1,6 +1,6 @@
 # M122: Make the certificate suite exhaustive over the routes the shipped pricing can take
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M121
 - **Driving RR:** —
@@ -99,7 +99,7 @@ candidate row (RR22 rec 12).
       branch and `cert_rel()`'s zero denominator.
 - [x] T6: Run the planted-defect probes for AC2, AC3, AC4, AC5 and AC6 on both
       macOS and the arm64 harness.
-- [ ] T7: Add the file-header assertion rule and the LESSONS clause; run
+- [x] T7: Add the file-header assertion rule and the LESSONS clause; run
       `devtools::check(manual = TRUE)` and the arm64 harness; write NEWS.
 
 ## Work log
@@ -181,4 +181,16 @@ candidate row (RR22 rec 12).
   false green - a string replace matched both branches and left the file
   semantically unchanged there. Rewritten to swap the two branches by line
   index and re-run on both platforms.
+- 2026-09-05: T7 done. `devtools::check(manual = TRUE)` on macOS: Status OK,
+  0 errors / 0 warnings / 0 notes, 8m 4s, PDF manual built. The linux-arm64
+  flavor check on the branch tarball (`tools/arm64/check.sh`, R 4.6.1,
+  aarch64-unknown-linux-gnu, OpenBLAS 0.3.33) reports `Status: OK` where the
+  submitted 2.0.1 ERRORed; its own test log carries the disposition line
+  "a4 = priced; a5 = priced; c4 = priced; b9a = priced; b9b = priced;
+  cxb = refused -- unidentified" and no anchor-matrix skip, which is the
+  CRAN-flavor evidence for keeping the anchor clause live. Green log and
+  platform record at `~/tmp-m122/` for the release walk's cran-comments step.
+- 2026-09-05: `tools/arm64/check.sh` refused the tarball on its first run
+  because the scratchpad is outside Docker Desktop's shared paths - M121's
+  empty-bind-mount guard firing as designed. Re-run from a shared path.
 

@@ -10,7 +10,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M121 | A local reproduction of CRAN's linux-arm64 check flavor | done | — | high | milestones/archive/M121-arm64-check-harness.md |
-| M122 | Make the certificate suite exhaustive over the routes the shipped pricing can take | in-progress | M121 | high | milestones/M122-certificate-refusal-disposition.md |
+| M122 | Make the certificate suite exhaustive over the routes the shipped pricing can take | review | M121 | high | milestones/M122-certificate-refusal-disposition.md |
 | M120 | Bring the Windows CRAN check under 8 minutes | done | — | high | milestones/archive/M120-cran-check-time.md |
 | M119 | Re-verify v2.0.0 for submission: CRAN check time, vdiffr guards, release records | done | — | high | milestones/archive/M119-presubmission-reverify.md |
 | M116 | Make three passing-without-checking assertions in the certificate suite redden | done | — | normal | milestones/archive/M116-certificate-suite-vacuities.md |
