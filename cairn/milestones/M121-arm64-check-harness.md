@@ -481,6 +481,10 @@ proposed to the maintainer at the gate.
   claim is false**: the [O] lens checked both and withdrew them
   (`test-growth_invariants.R:49` carries the guard).
 
+**PR conversation, read once before the gate.** PR #154 carries no reviews, no
+conversation comments and no review threads at all — the three reads returned
+empty. Nothing to triage from that surface.
+
 **Return floor.** No finding demonstrates an acceptance criterion failing. AC4
 requires the header to record both counts, the commit, and the gap as
 uncharacterized and credited to no cause; it does, and finding 6 touches a
@@ -650,3 +654,4 @@ returns stay 1.
   both master watches `success` on the newest push run, all three `tools/` audit
   scripts clean.
 - 2026-09-05: re-review — all six criteria re-run with fresh evidence and all six pass; AC6 `Status: OK`, 0/0/0, PDF-manual step included, tarball manifest 357 paths with 0 under `tools/`. Three-lens fan-out re-run: prior-review lens no evidence and zero findings; the other two returned 19 findings consolidating to 17, of which 14 are proposed fix-now, 2 candidate rows and 1 noted, plus 4 rejected and 3 refuted. No finding demonstrates a criterion failing, so the return floor does not fire; defect-return count 0, amendment returns 1. Pre-gate checkpoint.
+- 2026-09-05: review — PR #154 conversation read before the gate: no reviews, no comments, no review threads. Findings and dispositions put to the maintainer.
