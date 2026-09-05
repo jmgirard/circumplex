@@ -34,10 +34,10 @@ one of the two platform-exact rejection sources, not both.
       `ecb06de7` reports `Status: 1 ERROR`, and the test-failure block of the
       resulting `00check.log` names `test-axes-certificate.R:544:3` and
       contains `the shipped pricing REFUSES at case 'cxb'`.
-- [ ] AC2: The same run records, from inside the container and not from
-      `00check.log` (which prints no such line), `R.version$platform` equal to
-      `aarch64-unknown-linux-gnu` and a `La_library()` path containing
-      `openblas`.
+- [ ] AC2: The same run writes `arm64-platform.txt` beside the tarball, from
+      inside the container that runs the check, recording `R.version$platform`
+      equal to `aarch64-unknown-linux-gnu` and both a `La_library()` and an
+      `extSoftVersion()[["BLAS"]]` path containing `openblas`.
 - [ ] AC3: The same script run on a tarball identical to AC1's except that the
       `test_that()` block opening at `test-axes-certificate.R:527` is deleted
       reports no ERROR arising from `test-axes-certificate.R` — showing the
@@ -115,3 +115,31 @@ one of the two platform-exact rejection sources, not both.
   visible inside the container before checking and requires a `Status:` line in
   `00check.log` after; both guards were seen to fire red on the empty mount
   before the passing run.
+- 2026-09-05: amendment (substantive, AC2) — the drafted parenthetical
+  "`00check.log` (which prints no such line)" is false: the log's line 3 reads
+  `* using platform: aarch64-unknown-linux-gnu`. Only the LAPACK and BLAS paths
+  are absent. Amended at a mini gate, then twice more on the re-audits below;
+  AC2 now names the artifact it binds (`arm64-platform.txt`), drops every claim
+  about what `R CMD check` prints, and requires both linear-algebra paths.
+- 2026-09-05: re-audit: AC2 (full) — returned five findings on the first
+  amended draft: an unbounded "never prints" claim about R CMD check's output;
+  that clause binding a third-party instrument rather than the deliverable; no
+  artifact named for "records"; "from inside the container" overstating a probe
+  that ran in a separate `docker run` from the check; and a stale
+  `arm64-platform.txt` admissible as evidence. All five repaired — the clause
+  dropped, `arm64-platform.txt` named, the probe moved into the checking
+  container, the file removed before the run.
+- 2026-09-05: re-audit: AC2 (full) — returned four findings on the second
+  draft: the criterion binds the probe process rather than the checking process
+  (answered by AC2's own "from inside the container" wording, which the reader
+  called honest); `check.sh`'s comment overclaimed past that (corrected to
+  container identity, not process identity); freshness unobservable from the
+  finished file (the record is now stamped with tarball and UTC time); and the
+  criterion under-binding evidence the run already produces. The fourth went to
+  the user, who chose to require the BLAS path too. AC2's re-entry is spent.
+- 2026-09-05: T2 re-run on the revised `check.sh` — `Status: 1 ERROR`, same
+  failure at `00check.log:350-351`, same `[ FAIL 1 | WARN 4 | SKIP 540 | PASS
+  2399 ]`. `arm64-platform.txt` now reads `tarball: circumplex_2.0.1.tar.gz` /
+  `date: 2026-09-05T17:40:04Z` / platform `aarch64-unknown-linux-gnu` / LAPACK
+  `.../openblas-pthread/libopenblasp-r0.3.33.so` / BLAS
+  `.../openblas-pthread/libblas.so.3`. 39 s.

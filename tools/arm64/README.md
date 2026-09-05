@@ -22,9 +22,12 @@ installs the working tree and runs a single test file.
 | OpenBLAS | Debian `libopenblas0-pthread` 0.3.33+ds-3 |
 
 The R, platform, LAPACK and OpenBLAS rows were read from inside the container
-on 2026-09-05; `check.sh` re-reads the first three on every run and writes them
-to `arm64-platform.txt` beside the tarball, because `R CMD check` prints no
-such line into `00check.log`.
+on 2026-09-05. `check.sh` re-reads R, platform, LAPACK and BLAS on every run,
+in the same container as the check, and writes them to `arm64-platform.txt`
+beside the tarball, stamped with the tarball name and the UTC time.
+`00check.log` names the platform but no LAPACK or BLAS path, so the log alone
+cannot say which linear algebra the check ran against — which on this package
+is the whole question.
 
 Build it with:
 

@@ -40,19 +40,29 @@ if ! docker run --rm --platform linux/arm64 -v "$DIR":/pkg -w /pkg "$IMAGE" \
   exit 2
 fi
 
-# Recorded from inside the container: R CMD check prints no platform or LAPACK
-# line of its own, so 00check.log cannot answer what the check actually ran on.
-docker run --rm --platform linux/arm64 "$IMAGE" \
-  Rscript -e 'cat("R: ", R.version.string, "\nplatform: ", R.version$platform, "\nLAPACK: ", La_library(), "\nBLAS: ", extSoftVersion()[["BLAS"]], "\n", sep = "")' \
-  | tee "$DIR/arm64-platform.txt"
+# 00check.log names no LAPACK or BLAS path, so it cannot say which linear
+# algebra the check ran against -- and on this package that is the whole
+# question. The probe therefore runs in the SAME CONTAINER as the check, one
+# `docker run`. It is still a separate R process from `R CMD check`, so what
+# it establishes is the container's R installation, not the checking
+# process's own: container identity, not process identity. The file is
+# stamped with the tarball and the UTC time and removed before the run, so a
+# previous run's answer can neither survive beside a new log nor be mistaken
+# for this one's.
+rm -f "$DIR/arm64-platform.txt"
+
+PROBE='cat("R: ", R.version.string, "\nplatform: ", R.version$platform, "\nLAPACK: ", La_library(), "\nBLAS: ", extSoftVersion()[["BLAS"]], "\n", sep = "")'
 
 set +e
 docker run --rm --platform linux/arm64 \
   -e _R_CHECK_FORCE_SUGGESTS_=false \
   -e _R_CHECK_TESTS_NLINES_=0 \
+  -e PROBE="$PROBE" \
   -v "$DIR":/pkg -w /pkg \
   "$IMAGE" \
-  R CMD check --no-manual --no-vignettes "$BASE"
+  bash -c 'printf "tarball: %s\ndate: %s\n" "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > arm64-platform.txt
+           Rscript -e "$PROBE" | tee -a arm64-platform.txt
+           R CMD check --no-manual --no-vignettes "$1"' _ "$BASE"
 STATUS=$?
 set -e
 
