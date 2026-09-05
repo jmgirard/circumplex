@@ -68,6 +68,7 @@
 </li>
 <li>Check: <code>Rscript -e 'devtools::check(args = "--no-manual")'</code> (slow; run before commits touching R/ or src/)</li>
 <li>Release check: <code>Rscript -e 'devtools::check(manual = TRUE)'</code> — adds the PDF-manual step <code>--no-manual</code> skips, where LaTeX-hostile characters in roxygen surface. Required before any release-readiness claim; <code>cran-comments.md</code> advertises this command, not the one above. Needs TinyTeX on PATH (<code>~/.Renviron</code> carries it).</li>
+<li>arm64 CRAN flavor: <code>tools/arm64/check.sh &lt;tarball&gt;</code> — reproduces CRAN’s linux-arm64 special check locally (Docker, native on Apple Silicon; build the image once first, per <code>tools/arm64/README.md</code>). Exits 0 only on <code>Status: OK</code>, and green is required before any CRAN submission; the README says what the image is and what it does not cover.</li>
 <li>Document: <code>Rscript -e 'devtools::document()'</code> (after changing any roxygen)</li>
 <li>Rebuild C++ after editing src/: <code>Rscript -e 'Rcpp::compileAttributes(); devtools::load_all()'</code>
 </li>
