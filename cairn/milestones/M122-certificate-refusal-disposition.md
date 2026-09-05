@@ -57,7 +57,7 @@ candidate row (RR22 rec 12).
 - [x] AC6: `test-axes-certificate-refusal.R:180` is exhaustive over the two
       routes: with `NOT_CRAN=true` it passes on macOS and on the arm64 harness,
       and inverting its expected warning text makes it fail on both.
-- [ ] AC7: `Rscript -e 'devtools::check(manual = TRUE)'` reports 0 errors and 0
+- [x] AC7: `Rscript -e 'devtools::check(manual = TRUE)'` reports 0 errors and 0
       warnings; `cert_bracket()` selects its floor branch by a stated argument
       rather than by `identical(est, cert_floor)` and `cert_rel()` refuses a
       zero denominator, each with a planted probe that reddens; and NEWS.md
@@ -261,3 +261,106 @@ from a run made in this phase, not carried from implementation.
   Review section's lines; AC7's `devtools::check(manual = TRUE)` still running.
   Three fresh-context lenses reported; six findings stand for gate triage, none
   of them showing a criterion failing, so no return under the floor.
+- **AC7 — met.** `Rscript -e 'devtools::check(manual = TRUE)'` on macOS:
+  `Status: OK`, 0 errors / 0 warnings / 0 notes, 7m 40.1s, PDF and HTML manuals
+  both built. `cert_bracket()` now selects its floor branch by the `at_floor`
+  argument (defaulting to `est <= cert_floor`) rather than by
+  `identical(est, cert_floor)`, and `cert_rel()` stops with "the exact value is
+  zero" on a zero denominator; the in-suite probes for both
+  ("AC7: the two harness helpers select their branches on a stated condition")
+  are green on both platforms, which is the helpers reddening on the cases they
+  target. NEWS.md carries an entry naming Linux arm64 and stating that
+  `axes_reliability()` refuses that matrix on every platform as before and no
+  result it reports has changed. See finding 3 on the discrimination of one of
+  those two probes.
+
+### Consistency gate
+
+Universal cairn-file checks: `cairn_validate.py` exits 0, every check PASS or
+OK; 75 advisory warnings, all of them the wrapped work-log lines this repo has
+always written. No `release window` advisory. No `DESIGN.md` principle changed
+by the diff, so `cairn_impact.py --changed` does not apply.
+
+Toolchain checks, from the `r-package` profile's `consistency-gate` slot:
+`devtools::document()` produces no diff and zero `resolve link` warnings at
+`cli.width = 500`; generated files unedited; README.Rmd untouched by the diff,
+so no re-knit is owed; `pkgdown::check_pkgdown()` reports no problems; NEWS.md
+carries this milestone's entry; no new top-level files, so no `.Rbuildignore`
+entry owed; `devtools::check()` clean (the AC7 run above). Master watches: the
+newest push run on master reaching a verdict is `success` for both
+`R-CMD-check.yaml` and `test-coverage.yaml` (`bb54f6ff`, 2026-09-05).
+`tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and
+`tools/check-branch-protection.R` all exit clean.
+
+Gate result: pass.
+### Independent review
+
+Three fresh-context lenses, none having seen the implementation: [O] diff-bug,
+[S] blame-history, [S] prior-review-record. The blame lens reported no defects.
+The prior-review lens found one (finding 2 below) and recorded that
+`gh api .../pulls/comments` returns `[]`, so there is no GitHub inline-review
+surface in this repo and the archived `## Review` sections are the whole
+prior-review record. The diff lens reported twelve. Consolidated and deduped,
+with each claim re-verified against the implementation at this gate:
+
+1. `dd_ulp()` divides a relative error by `2^-53`, which equals an ulp count
+   only at mantissa exactly 2. Measured from the committed literals, one code
+   unit is 1.0850-1.2794 true ulp, so the `< 0.5` bound documented as "half a
+   unit in the last place" actually demands 0.391-0.461 ulp. The error is in
+   the safe direction (it overstates the measured error), but this is a new
+   CRAN-live assertion whose tightest measured margin is 0.419 of 0.5, in a
+   package that has taken three platform-exact rejections.
+2. `cairn/DESIGN.md:83-95` still lists `cert_bracket()` selecting its branch
+   "by `identical(est, cert_floor)`, a value coincidence" and "`cert_rel()`
+   divides by `hi + lo`, which is zero exactly when the exact quantity is" as
+   open latent defects. T5 fixed both, so that record is now false, and its
+   "six latent defects" count is stale at four.
+3. The `cert_bracket()` below-floor probe does not discriminate its own repair:
+   under the pre-M122 `identical(est, cert_floor)`, `est = cert_floor / 2`
+   takes the two-sided branch and `expect_gte(cert_floor/2, cert_floor*4)`
+   fails, so the probe reddens either way. The reviewer's stronger claim -- that
+   the two branches have identical failure sets below the floor -- is wrong:
+   the old branch fails iff `true_rel > est`, the new one iff
+   `true_rel > cert_floor`, so below the floor the new code is strictly more
+   lenient. Which makes the probe's comment ("under the old test it did not")
+   false in the opposite direction from the one reported.
+4. The new file header and the LESSONS clause both say counterexample B cost
+   2.0.1 its "third CRAN rejection"; D-055 says its "second pre-test
+   rejection". Reading the ROADMAP's sequence, D-055 is right -- "third" is the
+   third platform-exact failure site, not the third rejection.
+5. `test-axes-certificate-refusal.R:238` reads the route by pricing raw `S`,
+   while the surface under test prices `cov2cor(sigma)`. Safe today only
+   because the fixture has an exact unit diagonal, which nothing asserts or
+   records; a fixture regenerated without one would silently put the probe on a
+   different matrix than the branch it selects.
+6. `axes_accuracy_certificate()` returns its sentinel by six routes besides
+   "the pricing refused" (`!axes_dd_selftest()`, a NULL `axes_dd_pricing()`,
+   non-finite `v_hat`/`vn_hat`/`u_hat`, nonpositive quadratic forms, a vanished
+   cval numerator). If one fires while the pricing succeeds, the priced branch
+   brackets a sentinel `cert` and passes, since `expect_lte(1, max(cert_ceiling
+   * true_rel, cert_floor))` holds. The two-branch split is exhaustive over the
+   shipped pricing's routes, which is what the criteria ask, but not over the
+   certificate's.
+7. `cert_refusal_admitted()` compares the committed band to
+   `.Machine$double.eps`, which is `2^-52` on every platform R supports, so the
+   predicate is a constant: true at `cxb`, false at every anchor. It is
+   therefore equivalent to naming the case, and admits any `unidentified`
+   refusal at `cxb` including one from a genuine regression. The refusal's
+   identity is asserted, so `singular` and `indefinite` still fail; what is
+   unasserted is that this machine's own `rcond(info)` falls inside the band.
+8. The disposition table prints the pinned string `refused -- unidentified`
+   whatever literal was recorded, so an anchor refusing as `singular` would be
+   reported in the table as `unidentified`; only `detail` carries the truth.
+   The `fail()` message is correct, so nothing goes green wrongly.
+9. `bracket_passes(1e-3, 1e-5, at_floor = FALSE)` passes on exact bit-equality
+   (`100 * 1e-5` and `1e-3` are the same double), so the probe has zero margin.
+10. The NEWS entry describes the failure as a check requiring the accuracy
+    check "to report a number", which is accurate for the certificate suite but
+    not for the second file repaired, whose assertion turned on warning text.
+11. AC4 states agreement "to <= 1e-14"; the implementation asserts about
+    5.5e-17 relative. The implementation is stronger, so the criterion is met
+    as written and nothing is under-tested.
+
+None of these demonstrates an acceptance criterion failing, and none is a
+defect in what the shipped package does for its users, so none meets the
+return floor. Dispositions are recorded below at the gate.
