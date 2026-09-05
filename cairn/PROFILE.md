@@ -112,8 +112,8 @@ of the built package).
 Language-specific opener `cairn-init` asks in a new/empty R package; the
 universal ones (CRAN intent, oracle verification) live in cairn-init's own layer.
 
-- **Compiled code?** Rcpp / RcppArmadillo / C / C++ / Fortran, or pure R?
-  Compiled ⇒ a `src/` dir, `LinkingTo`, a C/C++ toolchain, and `R CMD check`
-  compiling on every check; adding it later is additive, so pure R is the
-  reversible default. Lands in DESIGN Conventions ("compiled code via <pkg>")
-  and informs the `verify` / `test-doctrine` surface.
+- **Compiled code?** Will the package include compiled code (Rcpp /
+  RcppArmadillo / C / C++ / Fortran)? Menu: **pure R** (reversible default) ·
+  Rcpp · RcppArmadillo. Compiled ⇒ `src/`, `LinkingTo`, a C/C++ toolchain, and
+  a compile on every check; adding it later is additive. Lands in DESIGN
+  Conventions ("compiled code via <pkg>"), informs `verify` / `test-doctrine`.

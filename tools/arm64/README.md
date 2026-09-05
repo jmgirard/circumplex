@@ -1,15 +1,28 @@
 # linux-arm64 check harness
 
-A local reproduction of CRAN's `r-devel-linux-x86_64` **arm64** additional
-check — the flavor that rejected the 2.0.1 tarball twice. One command, on
-Apple Silicon, natively (no emulation):
+A local reproduction of CRAN's `linux-arm64` special check — the incoming-
+pretest flavor served under `specialChecks/linux-arm64`, which rejected the
+2.0.1 tarball twice. Runs on Apple Silicon natively (no emulation).
+
+Build the image once:
+
+```
+docker build --platform linux/arm64 -t circumplex-arm64check:latest tools/arm64/
+```
+
+then, per tarball:
 
 ```
 tools/arm64/check.sh /path/to/circumplex_X.Y.Z.tar.gz
 ```
 
-`testfile.sh` is the fast loop once `check.sh` has found something: it
-installs the working tree and runs a single test file.
+`check.sh` exits 0 only when `00check.log` reports `Status: OK`; it exits 2
+when the harness itself could not run (no image, a non-aarch64 container, a
+dead platform probe, no verdict in the log).
+
+`testfile.sh` is the fast loop once `check.sh` has found something: it copies
+the working tree into the container (the repo is mounted read-only, so the
+compile leaves nothing behind) and runs a single test file.
 
 ## What the image is
 
@@ -29,22 +42,26 @@ beside the tarball, stamped with the tarball name and the UTC time.
 cannot say which linear algebra the check ran against — which on this package
 is the whole question.
 
-Build it with:
-
-```
-docker build --platform linux/arm64 -t circumplex-arm64check:latest tools/arm64/
-```
-
-Set `CIRCUMPLEX_ARM64_IMAGE` to use a different tag.
+Set `CIRCUMPLEX_ARM64_IMAGE` to use a different tag. Whatever the tag,
+`check.sh` refuses to run a container that does not report an `aarch64`
+platform.
 
 ## What it does not cover
 
 **Four heavyweight Suggests are deliberately absent**: `brms`, `OpenMx` and
 `glmmTMB` take hours to build; `vdiffr` wants system font headers. The tests
 that use `OpenMx`, `glmmTMB` and `vdiffr` self-skip when the package is
-missing. `brms` appears in no test at all — it is a dependency of
-`vignettes/bayesian-ssm-analysis.Rmd`, and `check.sh` passes `--no-vignettes`.
-A failure confined to those four packages is invisible here.
+missing. `brms` appears in no test at all, and in
+`vignettes/bayesian-ssm-analysis.Rmd` only in prose and in one `eval = FALSE`
+chunk — nothing builds against it. A failure confined to those four packages
+is invisible here.
+
+**The image is pinned at its base layer only.** `Dockerfile`'s `FROM` is a
+digest, but `apt-get update` runs against Debian unstable and the two
+`install.packages()` layers fetch whatever CRAN serves that day, so a rebuild
+months from now is not the same image. What each run actually got is in
+`arm64-platform.txt`; the version table above is a record of one build, not a
+guarantee about the next.
 
 **The assertion counts, and the gap between them.** This harness ran **2399**
 passing assertions on a plain `R CMD build` tarball of commit `ecb06de7`
@@ -54,16 +71,24 @@ move this figure — the same source built with `--no-build-vignettes` gives 236
 — so the count belongs to the recipe as much as to the commit. **What accounts
 for the 11-assertion difference is not known**, and it is credited to no cause
 here. In particular it is not established that the four absent packages explain
-it: removing them moves the suite from 69 skips to 540, and CRAN's log reports
-540 skips too.
+it: this container and CRAN's arm64 machine both report `SKIP 540`, and CRAN's
+log never names the four packages, so CRAN appears to lack them too. (The
+suite's skip total is dominated by its 469 `skip_on_cran()` calls, which fire
+under `R CMD check` and not under `devtools::test()`; only 27 blocks are
+guarded on these four packages. A host `devtools::test()` total is therefore
+not comparable with either figure above.)
 
 **CRAN's macOS x86_64 flavor is not covered.** That is the other of the two
 platform-exact rejection sources this package has hit, and reproducing it
 would need a different image on different hardware. A green run here is
 evidence about arm64 only.
 
-`check.sh` passes `--no-manual --no-vignettes`, so the PDF manual and vignette
-re-building steps are CRAN's to run, not this harness's.
+`check.sh` passes `--no-manual --no-vignettes`, so the PDF manual step is
+skipped and the vignettes are neither re-built nor **run** — and the vignettes
+exercise the estimators, so numeric divergence reachable only from vignette
+code would not surface here. It also runs plain `R CMD check`, not
+`--as-cran`, so any CRAN-only incoming check is outside what a green here
+says.
 
 ## Refreshing the pin
 

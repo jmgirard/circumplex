@@ -20,10 +20,11 @@ ENV MAKEFLAGS="-j8"
 # WARNS on a failed package, so an unverified layer bakes in a silent hole.
 RUN Rscript -e 'options(Ncpus = 8L); p <- c("Rcpp", "RcppArmadillo", "rlang", "boot", "ggplot2", "htmlTable"); install.packages(p, repos = "https://cloud.r-project.org"); miss <- setdiff(p, rownames(installed.packages())); if (length(miss)) stop("failed: ", paste(miss, collapse = ", ")); stopifnot(packageVersion("ggplot2") >= "4.0.0")'
 
-# The test runner, plus the Suggests the suite actually reaches for. brms,
-# OpenMx and glmmTMB are deliberately out: hours to build, and their tests
-# skip when absent. vdiffr wants system font headers and is likewise out --
-# its snapshot tests self-skip.
+# The test runner, plus the Suggests the suite actually reaches for. OpenMx
+# and glmmTMB are deliberately out: hours to build, and their tests skip when
+# absent. brms is out for the same build cost and reaches no test at all.
+# vdiffr wants system font headers and is likewise out -- its snapshot tests
+# self-skip.
 RUN Rscript -e 'options(Ncpus = 8L); p <- c("testthat", "knitr", "rmarkdown", "lavaan", "psych", "ggrepel", "RColorBrewer"); install.packages(p, repos = "https://cloud.r-project.org"); miss <- setdiff(p, rownames(installed.packages())); if (length(miss)) stop("failed: ", paste(miss, collapse = ", "))'
 
 RUN Rscript -e 'cat("R:", R.version.string, "\nplatform:", R.version$platform, "\nLAPACK:", La_library(), "\n")'

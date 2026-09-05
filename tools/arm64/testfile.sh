@@ -14,7 +14,19 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
   exit 2
 fi
 
+# The repo is mounted READ-ONLY and copied inside the container before the
+# install: `R CMD INSTALL` compiles in place, and compiling here would leave
+# aarch64-Linux src/*.o and src/*.so in a macOS working tree, where the next
+# `devtools::load_all()` fails on them. The test-file name is passed as a
+# positional argument, never interpolated into the `bash -c` string, so a
+# filename carrying a quote breaks nothing. Install output is NOT discarded:
+# a failed compile has to say why.
 exec docker run --rm --platform linux/arm64 \
-  -v "$(cd "$REPO" && pwd)":/src -w /src \
+  -v "$(cd "$REPO" && pwd)":/src:ro \
   "$IMAGE" \
-  bash -c "R CMD INSTALL --no-docs --no-byte-compile . >/dev/null 2>&1 && Rscript -e 'library(testthat); library(circumplex); setwd(\"tests/testthat\"); test_file(\"$FILE\")'"
+  bash -c 'set -euo pipefail
+           cp -a /src /build
+           cd /build
+           R CMD INSTALL --no-docs --no-byte-compile .
+           cd tests/testthat
+           Rscript -e "library(testthat); library(circumplex); test_file(commandArgs(TRUE)[[1]])" "$1"' _ "$FILE"

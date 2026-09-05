@@ -491,6 +491,82 @@ uncharacterized and credited to no cause; it does, and finding 6 touches a
 supporting sentence AC4 does not bind. Defect-return count stays 0; amendment
 returns stay 1.
 
+### Fix-now work, directed at the gate 2026-09-05
+
+The maintainer chose "fix all 14, then merge". Every fix is confined to
+`tools/arm64/`, the two ignore files, `CLAUDE.md` and `PROFILE.md`; no R code,
+roxygen or package surface was touched, so the profile's `verify` slot had
+nothing to run.
+
+**check.sh (findings 1-4, 9).** Exit status is now read from the log, not
+forwarded: `Status: OK` exits 0, any other status exits 1, and a harness that
+never reached a verdict exits 2. The probe's block runs under `set -euo
+pipefail` and writes with `>>` instead of `| tee`, so a dead probe aborts
+instead of leaving a header-only record. After the probe the container greps
+its own record for `^platform: aarch64` and exits 3 otherwise. The check
+directory is removed before the run alongside `arm64-platform.txt`. The file
+header now describes what the record actually holds (R, platform, LAPACK,
+BLAS; container identity, not process identity) and states the exit-status
+contract.
+
+Each new guard was proven able to fail before being trusted:
+
+| planted defect | result |
+|---|---|
+| `--no-build-vignettes` tarball, `Status: 2 WARNINGs` | exit **1** (was 0 — the false green finding 1 named) |
+| platform predicate inverted to `sparc64`, standing in for a non-aarch64 container | exit **2**, `not an aarch64 container`, no `Status:` line printed |
+| `PROBE` replaced with `stop("probe is dead")` | exit **2**, `the harness did not complete (container exit 1)` |
+| `circumplex.Rcheck/00check.log` planted with `Status: OK`, run aborted before the check | directory removed first; the planted green was never read |
+
+And the two criteria still discriminate on the fixed script: the `ecb06de7`
+tarball exits 1 with `Status: 1 ERROR` and the `REFUSES at case 'cxb'` failure
+present; the block-deleted tarball exits 0 with `Status: OK` and
+`test-axes-certificate` absent from the log.
+
+**testfile.sh (finding 10).** The repo is mounted `:ro` and copied to `/build`
+inside the container before `R CMD INSTALL`, so the in-place compile no longer
+leaves aarch64 objects in a macOS working tree; the test-file name is passed as
+a positional argument rather than interpolated into the `bash -c` string; and
+install output is no longer sent to `/dev/null`.
+
+**README.md (findings 5-8, 14, and the documentation halves of 15-16).** The
+flavor is named as RB22's own URL names it — CRAN's incoming-pretest
+`linux-arm64` special check. The `docker build` prerequisite is a step, not an
+implication, and the exit-status contract is stated. The skip-count sentence
+now compares like with like (the container's `SKIP 540` against CRAN's, both
+under `R CMD check`) and records that the suite's 469 `skip_on_cran()` calls,
+not the 27 package guards, dominate any host-versus-container skip difference.
+The `brms` claim is corrected: it reaches no test and appears in the vignette
+only in prose and one `eval = FALSE` chunk. Two coverage gaps are now stated —
+the pin covers the base layer only, and the harness runs plain `R CMD check`
+with `--no-vignettes`, so vignette code never runs and CRAN-only incoming
+checks are outside a green here.
+
+**Dockerfile (finding 12).** The comment no longer claims `brms`'s tests skip
+when absent; `brms` has no tests.
+
+**CLAUDE.md (finding 8).** The entry names the one-time image build and the
+`Status: OK` exit contract.
+
+**PROFILE.md (finding 12 of the first pass, F11).** The `greenfield-openers`
+compiled-code opener again separates the five technologies the question names
+from the three options on the menu (**pure R** · Rcpp · RcppArmadillo). 119
+lines, 8,131 bytes — still inside the 120-line cap.
+
+**Ignore files (finding 11).** `.gitignore` gains `arm64-platform.txt`,
+`*.Rcheck/` and `*.tar.gz`; `.Rbuildignore` gains `^arm64-platform\.txt$` and
+`^.*\.Rcheck$`, so a harness run from the repo root cannot put a
+non-standard top-level file into the next build. No tracked file matches the
+new git patterns (`git ls-files '*.tar.gz'` is empty).
+
+**Finding 13** is a work-log correction, taken as a superseding line below
+rather than an edit (the work log is append-only).
+
+**Remaining follow-ups.** Findings 15 and 16 keep candidate rows for the parts
+documentation cannot fix: making the whole image reproducible rather than its
+base layer, and deciding whether the harness should run `--as-cran`. Finding 17
+stays noted with no action.
+
 ## Work log
 
 - 2026-09-05: planned. Criteria audit (full mode): returned six findings on
@@ -655,3 +731,5 @@ returns stay 1.
   scripts clean.
 - 2026-09-05: re-review — all six criteria re-run with fresh evidence and all six pass; AC6 `Status: OK`, 0/0/0, PDF-manual step included, tarball manifest 357 paths with 0 under `tools/`. Three-lens fan-out re-run: prior-review lens no evidence and zero findings; the other two returned 19 findings consolidating to 17, of which 14 are proposed fix-now, 2 candidate rows and 1 noted, plus 4 rejected and 3 refuted. No finding demonstrates a criterion failing, so the return floor does not fire; defect-return count 0, amendment returns 1. Pre-gate checkpoint.
 - 2026-09-05: review — PR #154 conversation read before the gate: no reviews, no comments, no review threads. Findings and dispositions put to the maintainer.
+- 2026-09-05: correction — the T4 line above reports the `greenfield-openers` slot compressed "15 lines to 9"; the section is 13 lines on `master` and was 9 after that commit. The 119 lines / 8,109 bytes it reports are right. Supersedes that clause only.
+- 2026-09-05: review — gate directed "fix all 14". All fourteen fixed on the branch (Review section). Four new `check.sh` guards each shown red against a planted defect before being trusted; both criteria re-run on the fixed script and still discriminate. Findings 15 and 16 keep candidate rows, 17 noted.

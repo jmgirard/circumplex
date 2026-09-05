@@ -25,3 +25,5 @@
 ^tools$
 ^tests/testthat/_problems$
 ^vignettes/.*\.Rmd\.orig$
+^arm64-platform\.txt$
+^.*\.Rcheck$

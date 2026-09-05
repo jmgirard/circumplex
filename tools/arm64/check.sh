@@ -4,9 +4,17 @@
 #
 #   usage: tools/arm64/check.sh /path/to/circumplex_X.Y.Z.tar.gz
 #
-# Writes, beside the tarball:
+# Writes, beside the tarball (both removed before the run, so nothing an
+# earlier run left behind can be read as this one's result):
 #   circumplex.Rcheck/   the check directory, 00check.log included
-#   arm64-platform.txt   the platform and LAPACK the check ran on
+#   arm64-platform.txt   the R version, platform, LAPACK and BLAS of the
+#                        CONTAINER the check ran in -- a separate R process
+#                        from `R CMD check`, so container identity, not
+#                        process identity
+#
+# Exit status: 0 only when 00check.log reports `Status: OK`. `R CMD check`
+# itself exits 0 on WARNINGs and NOTEs, which CRAN rejects on, so its status
+# is not forwarded unchanged.
 #
 # _R_CHECK_FORCE_SUGGESTS_=false because the image deliberately omits the
 # heavyweight Suggests (brms, OpenMx, glmmTMB, vdiffr); their tests self-skip.
@@ -48,8 +56,12 @@ fi
 # process's own: container identity, not process identity. The file is
 # stamped with the tarball and the UTC time and removed before the run, so a
 # previous run's answer can neither survive beside a new log nor be mistaken
-# for this one's.
+# for this one's. The check directory goes the same way: `R CMD check` unlinks
+# only the directory its own tarball names, so a run that dies before the
+# check starts would otherwise leave a previous log for the Status: guard
+# below to read.
 rm -f "$DIR/arm64-platform.txt"
+rm -rf "$DIR/circumplex.Rcheck"
 
 PROBE='cat("R: ", R.version.string, "\nplatform: ", R.version$platform, "\nLAPACK: ", La_library(), "\nBLAS: ", extSoftVersion()[["BLAS"]], "\n", sep = "")'
 
@@ -60,11 +72,31 @@ docker run --rm --platform linux/arm64 \
   -e PROBE="$PROBE" \
   -v "$DIR":/pkg -w /pkg \
   "$IMAGE" \
-  bash -c 'printf "tarball: %s\ndate: %s\n" "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > arm64-platform.txt
-           Rscript -e "$PROBE" | tee -a arm64-platform.txt
-           R CMD check --no-manual --no-vignettes "$1"' _ "$BASE"
+  bash -c 'set -euo pipefail
+           printf "tarball: %s\ndate: %s\n" "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > arm64-platform.txt
+           Rscript -e "$PROBE" >> arm64-platform.txt
+           cat arm64-platform.txt
+           # --platform does not guarantee an arm64 IMAGE: an image built on an
+           # amd64 host, or a CIRCUMPLEX_ARM64_IMAGE pointed at one, runs under
+           # emulation and reports x86_64. A green from that machine is not
+           # evidence about the flavor this harness exists to reproduce.
+           grep -q "^platform: aarch64" arm64-platform.txt || {
+             echo "not an aarch64 container -- see arm64-platform.txt" >&2
+             exit 3
+           }
+           set +e
+           R CMD check --no-manual --no-vignettes "$1"
+           exit 0' _ "$BASE"
 STATUS=$?
 set -e
+
+# The container exits 0 once `R CMD check` has run at all; anything else is the
+# harness failing to get that far (an unbuilt image, a non-aarch64 one, a dead
+# probe), never a package result.
+if [ "$STATUS" -ne 0 ]; then
+  echo "the harness did not complete (container exit $STATUS)" >&2
+  exit 2
+fi
 
 # A check that produced no verdict is a harness failure, not a package result.
 LOG="$DIR/circumplex.Rcheck/00check.log"
@@ -77,4 +109,7 @@ echo
 grep '^Status:' "$LOG"
 echo "platform record: $DIR/arm64-platform.txt"
 echo "check directory: $DIR/circumplex.Rcheck"
-exit "$STATUS"
+
+# CRAN rejects on WARNINGs, and `R CMD check` exits 0 on them, so the verdict
+# is read from the log rather than taken from the exit status.
+grep -q '^Status: OK$' "$LOG" || exit 1
