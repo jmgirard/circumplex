@@ -53,7 +53,8 @@
 # doing X. Five escalations to outside review returned the same defect in a
 # different disguise each time -- a measured error, a bit pattern, a decade
 # window, and finally the premise that one committed matrix always prices,
-# which cost the 2.0.1 release its third CRAN rejection. This rule is what
+# which cost the 2.0.1 release its second pre-test rejection, at the third
+# platform-exact failure site this package has hit. This rule is what
 # ends the series, and it is checked at review rather than by any assertion.
 
 
@@ -751,22 +752,35 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   #
   # TWO BOUNDS, because the two quantities fail differently.
   #
-  # `v` and `v_naive`: the bound is HALF a unit in the last place, which is to
-  # say the reference route must deliver the correctly rounded double of the
-  # exact value. Measured 2026-09-05, bit-identical on aarch64-apple-darwin23
-  # and on aarch64-unknown-linux-gnu/OpenBLAS: 0.165 and 0.057 ulp for `v`,
-  # 0.419 and 0.269 for `v_naive`.
+  # `v` and `v_naive`: the bound is HALF a unit in the last place of the exact
+  # value, which is to say the reference route must deliver that value's
+  # correctly rounded double. Measured 2026-09-05 by `dd_ulp()` below,
+  # bit-identical on aarch64-apple-darwin23 and on
+  # aarch64-unknown-linux-gnu/OpenBLAS: 0.135 and 0.045 ulp for `v`, 0.387 and
+  # 0.234 for `v_naive`.
   #
   # `u`: at B it is a difference of two quantities of size about one that
   # comes out 0.0555, so a rounding of either operand is amplified by about
   # eighteen in RELATIVE terms while staying the same size in ABSOLUTE ones.
   # The bound is therefore absolute -- one ulp of the operands' own scale --
-  # and the measurement is 3.8e-17, a third of it, again identical on both
-  # platforms. Stated as a relative bound this would be 6.1 ulp, a figure with
-  # no derivation behind it.
+  # and the measurement is 3.76e-17 against a bound of 1.11e-16, again
+  # identical on both platforms. Stated as a relative bound this would be
+  # 6.1 ulp, a figure with no derivation behind it.
   fz <- cert_frozen$cxb
   ref <- axes_dd_pricing(fx$S, d)
-  dd_ulp <- function(hat, hi, lo) abs(cert_rel(hat, hi, lo)) / 2^-53
+  # ONE UNIT IN THE LAST PLACE OF `hi`, which is what "ulp" has to mean here.
+  # This divided the RELATIVE error by 2^-53 until the M122 review (finding 1),
+  # which is an ulp count only where the mantissa is exactly 2: across the four
+  # quantities committed at B one such unit is 1.085 to 1.279 true ulp, so a
+  # bound written as half an ulp was really demanding 0.391 to 0.461 of one.
+  # Taken against ulp(hi) directly, the bound means what it says.
+  dd_ulp <- function(hat, hi, lo) {
+    if (any(hi == 0)) {
+      stop("dd_ulp(): the exact value is zero, so it has no last place",
+           call. = FALSE)
+    }
+    abs((hat - hi) - lo) / 2^(floor(log2(abs(hi))) - 52)
+  }
   expect_lt(max(dd_ulp(dd_to_double(ref$v),
                        as.numeric(fz$v_hi), as.numeric(fz$v_lo))), 0.5,
             label = "cxb dd-vs-exact v (ulp)")
@@ -922,9 +936,18 @@ test_that("AC7: the two harness helpers select their branches on a stated condit
   #
   # cert_bracket(): the floor branch used to be chosen by bit-equality with
   # `cert_floor`, so an estimate BELOW the floor took the two-sided branch
-  # instead. The probe is exactly that value. Under `est <= cert_floor` the
-  # floor branch runs and catches the under-report (a true error above what
-  # the floor certifies); under the old test it did not.
+  # instead. The probe is exactly that value.
+  #
+  # WHAT THIS PROBE DOES AND DOES NOT SHOW (M122 review, finding 3). It shows
+  # the floor branch running and reddening on an under-report. It does NOT
+  # discriminate the repair, and no probe can: below the floor the old branch
+  # failed iff `true_rel > est` and the new one fails iff
+  # `true_rel > cert_floor`, so the new failure set is a strict SUBSET of the
+  # old one -- the change is more lenient there, not stricter. What the repair
+  # buys is a truthful report rather than a wider one: `identical()` made the
+  # branch turn on two numbers happening to agree, and ran the two-sided
+  # bracket against an estimate the certificate cannot emit. The argument
+  # probes below are what discriminate the new signature.
   #
   # Probed through the CONDITION each branch signals rather than through
   # expect_success()/expect_failure(), which count expectations: the two-sided

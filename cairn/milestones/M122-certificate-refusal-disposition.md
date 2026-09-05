@@ -364,3 +364,47 @@ with each claim re-verified against the implementation at this gate:
 None of these demonstrates an acceptance criterion failing, and none is a
 defect in what the shipped package does for its users, so none meets the
 return floor. Dispositions are recorded below at the gate.
+### Triage at the gate (2026-09-05)
+
+Maintainer's decision: fix findings 1-5 on the branch, route 6 and 7 to a
+candidate row, merge on green CI.
+
+- Finding 1 -- **fixed now.** `dd_ulp()` now divides the absolute error by
+  `2^(floor(log2(abs(hi))) - 52)`, one unit in the last place of the exact
+  value, and refuses a zero `hi`. Re-measured after the change: 0.135 and
+  0.045 ulp for `v`, 0.387 and 0.234 for `v_naive`, `u` 3.76e-17 against
+  1.11e-16. The comment's figures were replaced with these. AC4's planted
+  probe re-run against the corrected bound fails at `1.14 >= 0.50` on macOS
+  and on arm64 alike -- 1.39/1.2235, exactly the rescaling.
+- Finding 2 -- **fixed now.** `cairn/DESIGN.md`'s Known-fragilities entry is
+  corrected in place and marked `corrected 2026-09-05`: the two M122 fixed are
+  moved to a "Fixed by M122" clause naming what replaced each, and the count
+  reads two fixed, four remaining.
+- Finding 3 -- **fixed now**, by correcting the claim rather than the probe.
+  The comment now states that the probe shows the floor branch reddening but
+  does not discriminate the repair, that no probe can (the new failure set is
+  a strict subset of the old below the floor), and that what the repair buys
+  is a truthful report rather than a wider one.
+- Finding 4 -- **fixed now.** The file header and the LESSONS clause now read
+  "second pre-test rejection", agreeing with D-055; the header adds that this
+  is the third platform-exact failure site, which is what "third" meant.
+- Finding 5 -- **fixed now.** `expect_identical(stats::cov2cor(S), S)` is
+  asserted before the route probe, with the reason stated.
+- Findings 6 and 7 -- **follow-up**, one candidate row: the certificate's six
+  other sentinel routes are not covered by the two-branch split, and
+  `cert_refusal_admitted()` never measures this machine's own `rcond(info)`.
+- Findings 8, 9, 10 -- **rejected at the gate** as too small to carry: the
+  disposition table's literal, the zero-margin argument probe, and the NEWS
+  wording. None can turn a red run green.
+- Finding 11 -- **no action.** AC4 is met as written; the implementation is
+  stronger than the criterion asks.
+
+Re-verification after the fixes: macOS `test_local` over both edited files
+`FAIL 0` with `cxb = priced`; arm64 `tools/arm64/testfile.sh`
+`test-axes-certificate.R` `FAIL 0 | PASS 221` with
+`cxb = refused -- unidentified`, `test-axes-certificate-refusal.R`
+`FAIL 0 | PASS 223` (up one, the new `cov2cor` assertion). AC1's full-suite and
+AC7's `check(manual = TRUE)` re-runs on the fixed tree are recorded below.
+
+- 2026-09-05: step-7 approval: PR #155 approved for merge, with findings 1-5
+  fixed on the branch and 6-7 routed to a candidate row.

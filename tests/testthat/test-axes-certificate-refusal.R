@@ -232,6 +232,13 @@ test_that("M111 AC3: the committed counterexample refuses at both surfaces, on e
   # text, so the two are independent: the pricing decides, and the text is
   # then required to agree with it. Reading the route off the text and
   # asserting the text would assert nothing.
+  # The surface under test prices cov2cor(sigma); this probe prices S. The two
+  # agree only because this fixture's diagonal is exactly unit, which is
+  # asserted rather than assumed (M122 review, finding 5) -- a regenerated
+  # fixture without that property would put the probe on a different matrix
+  # than the branch it selects, and both branches could then assert the wrong
+  # thing.
+  expect_identical(stats::cov2cor(S), S)
   refused <- is.character(axes_v_pricing(S, axes_se_derivs(
     as.numeric(fx$ia), scl, NULL, FALSE, FALSE)))
   expect_length(grep("estimated relative error ", wse, fixed = TRUE), 1L)
