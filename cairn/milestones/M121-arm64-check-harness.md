@@ -1,13 +1,13 @@
 # M121: A local reproduction of CRAN's linux-arm64 check flavor
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
 - **Resolves:** —
 - **Surface tier:** internal — dev tooling; no consumer of the package relies on it
-- **Branch/PR:** —
+- **Branch/PR:** `m121-arm64-check-harness`
 
 ## Goal
 
@@ -66,7 +66,7 @@ one of the two platform-exact rejection sources, not both.
 
 ## Tasks
 
-- [ ] T1: Move the Dockerfile and the two runner scripts from
+- [x] T1: Move the Dockerfile and the two runner scripts from
       `~/.cache/circumplex-arm64/` into `tools/arm64/`; pin the base image by
       digest; write the header AC4 requires; have the runner record platform
       and LAPACK from inside the container.
@@ -93,3 +93,11 @@ one of the two platform-exact rejection sources, not both.
   fails to build on the day of a resubmission is worse than one lagging CRAN
   by a month, and the first build attempt did fail that way). Falsified by:
   a CRAN arm64 failure the pinned image cannot reproduce.
+- 2026-09-05: T1 — harness committed to `tools/arm64/` (Dockerfile, `check.sh`,
+  `testfile.sh`, `README.md`). Base pinned `FROM r-base@sha256:41d55643…`, the
+  digest `r-base:latest` resolved to on 2026-09-05; building the committed file
+  produced image `b61a7aa01c56`, byte-identical to the one the evidence runs on,
+  so the pin cost no rebuild. `check.sh` now writes `arm64-platform.txt` from
+  inside the container and sets `_R_CHECK_TESTS_NLINES_=0` — at the default 13
+  lines the failing-test block in `00check.log` filled with vdiffr snapshot
+  notices and never reached the actual failure.
