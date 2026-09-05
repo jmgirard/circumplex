@@ -72,7 +72,7 @@ one of the two platform-exact rejection sources, not both.
       and LAPACK from inside the container.
 - [x] T2: Build the `ecb06de7` tarball, run the harness on it, record the log
       excerpt as evidence.
-- [ ] T3: Build the block-deleted tarball, run the harness, record the result.
+- [x] T3: Build the block-deleted tarball, run the harness, record the result.
 - [ ] T4: Add the release-walk requirement to `cairn/PROFILE.md`, the command
       to `CLAUDE.md`, and the refresh recipe to `tools/arm64/`.
 - [ ] T5: Run `devtools::check(manual = TRUE)` and `tar -tzf` on the built
@@ -143,3 +143,10 @@ one of the two platform-exact rejection sources, not both.
   `date: 2026-09-05T17:40:04Z` / platform `aarch64-unknown-linux-gnu` / LAPACK
   `.../openblas-pthread/libopenblasp-r0.3.33.so` / BLAS
   `.../openblas-pthread/libblas.so.3`. 39 s.
+- 2026-09-05: T3 — same `ecb06de7` export with `test-axes-certificate.R` lines
+  527-567 removed (the `test_that()` opening at 527 through its matching `})`;
+  the file drops from 14 blocks to 13). `check.sh` on that tarball exits 0 with
+  `Status: OK` and `* checking tests ... OK`; `test-axes-certificate.R` appears
+  zero times in `00check.log`. So the harness's ERROR tracks the block under
+  test rather than firing unconditionally — the two runs differ only in those
+  41 lines.
