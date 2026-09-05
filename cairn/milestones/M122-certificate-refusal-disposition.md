@@ -33,28 +33,28 @@ candidate row (RR22 rec 12).
 
 ## Acceptance criteria
 
-- [ ] AC1: `R CMD check` of a branch tarball on M121's arm64 harness reports 0
+- [x] AC1: `R CMD check` of a branch tarball on M121's arm64 harness reports 0
       ERRORs, and `Rscript -e 'devtools::test()'` on macOS reports 0 failures —
       the two routes, both green.
-- [ ] AC2: The refusing route asserts which refusal it is. With
+- [x] AC2: The refusing route asserts which refusal it is. With
       `axes_pricing_core()` edited to return `"singular"` where it returns
       `"unidentified"` today, a run of `test-axes-certificate.R` on the arm64
       harness fails with a message naming both `cxb` and `singular`; with it
       edited to return `"indefinite"` there, likewise.
-- [ ] AC3: A refusal at any anchor is still a regression. With
+- [x] AC3: A refusal at any anchor is still a regression. With
       `axes_pricing_core()` edited to return `"unidentified"` unconditionally,
       a run of `test-axes-certificate.R` fails with messages naming each of
       `a4`, `a5`, `c4`, `b9a` and `b9b`; and with the `cxb` matrix check made
       to mismatch, that case fails rather than skipping.
-- [ ] AC4: The exact-rational oracle keeps a live assertion at `cxb` on both
+- [x] AC4: The exact-rational oracle keeps a live assertion at `cxb` on both
       routes: the double-double reference route agrees with the committed exact
       values to ≤ 1e-14, and perturbing one committed exact literal by one ulp
       makes that assertion fail on macOS and on the arm64 harness alike.
-- [ ] AC5: Dispositions are a pinned set, printed on every run. A
+- [x] AC5: Dispositions are a pinned set, printed on every run. A
       `cert_record()` call with a value outside the set fails; the run's output
       names each of the six cases and its disposition; and the detector reddens
       under a planted all-skip run and under a planted all-refused run.
-- [ ] AC6: `test-axes-certificate-refusal.R:180` is exhaustive over the two
+- [x] AC6: `test-axes-certificate-refusal.R:180` is exhaustive over the two
       routes: with `NOT_CRAN=true` it passes on macOS and on the arm64 harness,
       and inverting its expected warning text makes it fail on both.
 - [ ] AC7: `Rscript -e 'devtools::check(manual = TRUE)'` reports 0 errors and 0
@@ -199,3 +199,65 @@ candidate row (RR22 rec 12).
   PASS 2427, disposition line `cxb = refused -- unidentified`); the macOS
   `devtools::test()` run and the planted-defect probe battery have not reported
   yet, so no criterion checkbox is ticked. `cairn_validate` exits 0.
+
+## Review
+
+Fresh evidence, gathered 2026-09-05 at the review gate. Every figure below is
+from a run made in this phase, not carried from implementation.
+
+- **AC1 — met.** macOS `Rscript -e 'devtools::test()'` (aarch64-apple-darwin23):
+  `FAIL 0 | WARN 9 | SKIP 1 | PASS 9278`, disposition line `a4 = priced;
+  a5 = priced; c4 = priced; b9a = priced; b9b = priced; cxb = priced`. arm64
+  `tools/arm64/check.sh` on a branch tarball built this phase
+  (`circumplex_2.0.1.tar.gz`, plain `R CMD build`): `Status: OK`, 0 ERRORs, its
+  test log `FAIL 0 | WARN 4 | SKIP 540 | PASS 2427`, disposition line
+  `... cxb = refused -- unidentified`, no anchor-matrix skip. Platform record:
+  R 4.6.1, `aarch64-unknown-linux-gnu`, LAPACK
+  `openblas-pthread/libopenblasp-r0.3.33.so`. The two platforms take opposite
+  routes at counterexample B and both are green, which is the criterion's
+  "two routes, both green".
+- **AC2 — met.** Probes run on the arm64 harness, where the shipped pricing
+  refuses. `axes_pricing_core()`'s `return("unidentified")` (R/axes_corrected_se.R:179)
+  edited to `"singular"`: three failures, two of them
+  `Expected cxb v pricing to be identical to "unidentified"` /
+  `cxb u pricing`, `actual: "singular"`. Edited to `"indefinite"`: the same two
+  failures with `actual: "indefinite"`. Both name `cxb` and the planted literal,
+  and both surfaces (`v` and `u`) fail separately.
+- **AC3 — met.** `axes_pricing_core()` made to refuse unconditionally: on macOS
+  and on arm64 alike the detector fails with the table
+  `a4 = refused -- unidentified; a5 = ...; c4 = ...; b9a = ...; b9b = ...`,
+  each of the five anchors named, plus five per-case bracket failures.
+  Separately, the committed `cxb` matrix moved one ulp
+  (`sig[1]` `-0x1.ac70f5bf320e9p-1` -> `...eap-1`): 3 failures on both
+  platforms, the case recorded `matrix mismatch` (never `skipped`), the
+  message reading "the matrix at case 'cxb' is read from committed bytes and
+  no longer matches the exact values committed beside it".
+- **AC4 — met.** The dd-vs-exact assertion is live at `cxb` on both routes
+  (macOS priced, arm64 refused) and passes in both green runs. Perturbing the
+  committed `v_hi[1]` by one ulp (`0x1.a27aa6fa81289p+3` -> `...8ap+3`) fails
+  identically on both platforms:
+  `Expected cxb dd-vs-exact v (ulp) < 0.5. Actual comparison: 1.39 >= 0.50`.
+  The criterion's stated bound is 1e-14; the implementation asserts about
+  5.5e-17 relative, so it is stronger than the criterion asks (see finding 9).
+- **AC5 — met.** `cert_record()` with an out-of-set value errors and the value
+  never reaches the environment (in-suite test "AC5: the disposition vocabulary
+  is closed", green on both platforms). The table prints on every run, green
+  ones included, naming all six cases — observed in every log gathered here,
+  including the arm64 `R CMD check` test log. The detector reddens on a planted
+  all-refused run (AC3's probe: `Expected anchors priced (...) > 0L`) and on a
+  planted all-skip run (the five anchor `sig[1]` literals each moved one ulp):
+  `Expected anchors priced (a4 = skipped; a5 = skipped; c4 = skipped;
+  b9a = skipped; b9b = skipped; cxb = priced) > 0L`. That last run is also the
+  discrimination evidence for the M122 rewrite: the old "at least one case
+  priced" clause would have passed it, since `cxb` priced.
+- **AC6 — met.** With `NOT_CRAN=true` the repaired block passes on both
+  platforms (macOS: inside the green `devtools::test()` run; arm64:
+  `tools/arm64/testfile.sh`, `FAIL 0 | PASS 222`). Swapping the two branches by
+  line index fails on both, and on opposite branches — macOS at
+  `test-axes-certificate-refusal.R:252` (the graded route it takes), arm64 at
+  `:246` (the refusing route it takes) — which is the exhaustiveness the
+  criterion asks for.
+- 2026-09-05: review evidence gathered for AC1-AC6, all six ticked against the
+  Review section's lines; AC7's `devtools::check(manual = TRUE)` still running.
+  Three fresh-context lenses reported; six findings stand for gate triage, none
+  of them showing a criterion failing, so no return under the floor.
