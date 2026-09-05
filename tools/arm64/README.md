@@ -39,13 +39,23 @@ Set `CIRCUMPLEX_ARM64_IMAGE` to use a different tag.
 
 ## What it does not cover
 
-**Four Suggests are deliberately absent**: `brms`, `OpenMx` and `glmmTMB` take
-hours to build and their tests self-skip when the package is missing;
-`vdiffr` wants system font headers and its snapshot tests likewise self-skip.
-The cost is **11 assertions**: this harness ran 2399 passing assertions on the
-2.0.1 tarball where CRAN's own arm64 log for the same tarball recorded 2410
-(the CRAN figure is transcribed in `cairn/reviews/archive/RB22-certificate-platform-refusal.md`).
+**Four heavyweight Suggests are deliberately absent**: `brms`, `OpenMx` and
+`glmmTMB` take hours to build; `vdiffr` wants system font headers. The tests
+that use `OpenMx`, `glmmTMB` and `vdiffr` self-skip when the package is
+missing. `brms` appears in no test at all — it is a dependency of
+`vignettes/bayesian-ssm-analysis.Rmd`, and `check.sh` passes `--no-vignettes`.
 A failure confined to those four packages is invisible here.
+
+**The assertion counts, and the gap between them.** This harness ran **2399**
+passing assertions on a plain `R CMD build` tarball of commit `ecb06de7`
+(2.0.1); CRAN's own arm64 log for that commit recorded **2410** (transcribed at
+`cairn/reviews/archive/RB22-certificate-platform-refusal.md:49`). Build flags
+move this figure — the same source built with `--no-build-vignettes` gives 2365
+— so the count belongs to the recipe as much as to the commit. **What accounts
+for the 11-assertion difference is not known**, and it is credited to no cause
+here. In particular it is not established that the four absent packages explain
+it: removing them moves the suite from 69 skips to 540, and CRAN's log reports
+540 skips too.
 
 **CRAN's macOS x86_64 flavor is not covered.** That is the other of the two
 platform-exact rejection sources this package has hit, and reproducing it

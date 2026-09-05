@@ -1,6 +1,6 @@
 # M121: A local reproduction of CRAN's linux-arm64 check flavor
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -43,10 +43,16 @@ one of the two platform-exact rejection sources, not both.
       reports no ERROR arising from `test-axes-certificate.R` — showing the
       harness distinguishes the failing tarball from a passing one rather than
       reporting ERROR unconditionally.
-- [ ] AC4: The image is pinned by digest, and `tools/arm64/`'s header records
-      the tag the digest was taken from, the R and OpenBLAS versions, the four
-      omitted Suggests with the count of assertions they cost (11 against
-      CRAN's 2410), and that CRAN's macOS x86_64 flavor is not covered.
+- [ ] AC4: `tools/arm64/Dockerfile`'s base image is pinned by digest, and
+      `tools/arm64/README.md` records: the tag that digest was taken from; the
+      R and OpenBLAS versions read from the built image, with the date they
+      were read; the four heavyweight Suggests the image omits (`brms`,
+      `OpenMx`, `glmmTMB`, `vdiffr`); this harness's own passing-assertion
+      count from a plain `R CMD build` tarball of commit `ecb06de7` (2399)
+      beside the CRAN arm64 figure for that commit transcribed in
+      `cairn/reviews/archive/RB22-certificate-platform-refusal.md` (2410), the
+      commit named, with the gap between them recorded as uncharacterized and
+      credited to no cause; and that CRAN's macOS x86_64 flavor is not covered.
 - [x] AC5: `cairn/PROFILE.md`'s release-walk slot requires a dated green arm64
       check log in `cran-comments.md`'s test-environments list before the
       submission step; `CLAUDE.md`'s Commands section carries the command; and
@@ -60,7 +66,7 @@ one of the two platform-exact rejection sources, not both.
 - AC1 → T1, T2
 - AC2 → T1, T2
 - AC3 → T3
-- AC4 → T1
+- AC4 → T1, T2
 - AC5 → T4
 - AC6 → T5
 
@@ -410,3 +416,48 @@ F5-F13 keep their proposed dispositions and are triaged at the re-review gate.
   demands, so the criterion is the defect. First amendment return on M121;
   defect-return count unchanged at 0.
 
+- 2026-09-05: re-audit: AC4 (full) — returned seven findings on the drafted
+  amended wording: "the image is pinned by digest" over-claims (only the
+  Dockerfile's base layer is pinned); "for the same tarball" is false (CRAN's
+  2410 came from the submitted tarball, the harness's 2399 from a locally
+  rebuilt one — same commit, different bytes); the non-attribution clause is a
+  causal exclusion resting on an aggregate skip total; 2410's only in-repo
+  warrant is a transcription; nothing ties the README's version rows to a run;
+  Coverage maps AC4 to T1 while the counts come from T2's run; and freezing
+  both figures in the criterion dates it. The first two and the Coverage row
+  were fixed outright; the causal-exclusion finding became the mini gate's
+  question; the other three keep proposed dispositions for the re-review
+  triage. The reader also refuted the amendment return's conjectured cause for
+  the gap — the suite has exactly one `requireNamespace()` guard
+  (`tests/testthat/helper-lavaan-cfi.R:65`) and it guards lavaan, which the
+  image installs.
+- 2026-09-05: amendment (substantive, AC4) — executed the review's amendment
+  return at a mini gate. Offered three wordings; the user chose recording the
+  gap as uncharacterized over asserting the omitted Suggests are not its cause,
+  the evidence for that exclusion being one aggregate skip total and a CRAN log
+  the repo can no longer re-read. AC4 now binds `tools/arm64/README.md` to both
+  counts — 2399 from a plain `R CMD build` tarball of `ecb06de7`, 2410 from the
+  CRAN arm64 figure transcribed in RB22 — with the gap recorded as
+  uncharacterized and credited to no cause; names the four heavyweight Suggests
+  instead of counting them (the image omits seven of DESCRIPTION's fourteen);
+  narrows the pin clause to the Dockerfile's base image; and requires the R and
+  OpenBLAS rows to carry the date they were read from the built image. Coverage
+  becomes AC4 → T1, T2.
+- 2026-09-05: re-audit: AC4 (full) — returned six findings on the gate-settled
+  wording, all narrowing: the wording permitted the false 11-assertion sentence
+  to survive elsewhere in the file; "the four omitted Suggests" miscounts (the
+  image omits seven Suggests, four of them the heavyweights meant); "for the
+  same source commit" was ambiguous about whether the README must name the
+  commit; 2399 is a function of the build recipe, not the commit alone; 2410 is
+  a third-party figure whose repo-local warrant is the RB22 transcription; and
+  the digest clause read as though it backed the recorded versions. All six
+  repaired into the wording the user then took. AC4's re-entry is spent.
+- 2026-09-05: T1 — `tools/arm64/README.md`'s "What it does not cover" rewritten
+  to satisfy the amended AC4: the 11-assertion cost claim is gone, the two
+  counts carry their commit and build recipe, the gap is named as unexplained
+  and credited to no cause, and the four packages are split by what the harness
+  actually loses (`OpenMx`, `glmmTMB`, `vdiffr` have self-skipping tests; `brms`
+  appears in no test — it is a vignette dependency and `check.sh` passes
+  `--no-vignettes`). No R code or roxygen changed, so the profile's verify slot
+  has nothing to run.
+- 2026-09-05: amendment complete, status → review.
