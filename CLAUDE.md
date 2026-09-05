@@ -12,6 +12,10 @@ concerns; angular/boundary behavior is where bugs hide.
   step `--no-manual` skips, where LaTeX-hostile characters in roxygen surface. Required
   before any release-readiness claim; `cran-comments.md` advertises this command, not the
   one above. Needs TinyTeX on PATH (`~/.Renviron` carries it).
+- arm64 CRAN flavor: `tools/arm64/check.sh <tarball>` — reproduces CRAN's
+  linux-arm64 additional check locally (Docker, native on Apple Silicon). Green
+  is required before any CRAN submission; `tools/arm64/README.md` says what the
+  image is and what it does not cover.
 - Document: `Rscript -e 'devtools::document()'` (after changing any roxygen)
 - Rebuild C++ after editing src/: `Rscript -e 'Rcpp::compileAttributes(); devtools::load_all()'`
 - Never edit generated files by hand: `R/RcppExports.R`, `src/RcppExports.cpp`, `man/*.Rd`, `NAMESPACE`

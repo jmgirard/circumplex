@@ -73,7 +73,7 @@ one of the two platform-exact rejection sources, not both.
 - [x] T2: Build the `ecb06de7` tarball, run the harness on it, record the log
       excerpt as evidence.
 - [x] T3: Build the block-deleted tarball, run the harness, record the result.
-- [ ] T4: Add the release-walk requirement to `cairn/PROFILE.md`, the command
+- [x] T4: Add the release-walk requirement to `cairn/PROFILE.md`, the command
       to `CLAUDE.md`, and the refresh recipe to `tools/arm64/`.
 - [ ] T5: Run `devtools::check(manual = TRUE)` and `tar -tzf` on the built
       tarball.
@@ -150,3 +150,10 @@ one of the two platform-exact rejection sources, not both.
   zero times in `00check.log`. So the harness's ERROR tracks the block under
   test rather than firing unconditionally — the two runs differ only in those
   41 lines.
+- 2026-09-05: T4 — release-walk slot now requires a `Status: OK` arm64 run on
+  the submission tarball and its dated log in `cran-comments.md`'s
+  test-environments list before the handoff step; `CLAUDE.md`'s Commands
+  section carries `tools/arm64/check.sh <tarball>`; the refresh recipe is
+  `tools/arm64/README.md`'s "Refreshing the pin". `PROFILE.md` was at 119 of
+  its 120-line cap, so the `greenfield-openers` slot was compressed 15 lines to
+  9 (no content dropped) to make room: 119 lines, 8,109 bytes after.
