@@ -43,7 +43,7 @@ one of the two platform-exact rejection sources, not both.
       reports no ERROR arising from `test-axes-certificate.R` — showing the
       harness distinguishes the failing tarball from a passing one rather than
       reporting ERROR unconditionally.
-- [ ] AC4: `tools/arm64/Dockerfile`'s base image is pinned by digest, and
+- [x] AC4: `tools/arm64/Dockerfile`'s base image is pinned by digest, and
       `tools/arm64/README.md` records: the tag that digest was taken from; the
       R and OpenBLAS versions read from the built image, with the date they
       were read; the four heavyweight Suggests the image omits (`brms`,
@@ -308,6 +308,63 @@ checkbox is unticked, status goes to `in-progress` for that amendment alone,
 and review stops here. The amendment is the only work convened; F1-F3 and
 F5-F13 keep their proposed dispositions and are triaged at the re-review gate.
 
+### Re-review, 2026-09-05 — fresh evidence after the AC4 amendment
+
+Run at branch head `817b91c4`, which is `master` plus this branch's commits
+(`master` is an ancestor of HEAD, so no merge was owed). Tarballs rebuilt from
+scratch under `~/.cache/circumplex-arm64/review-20260905/`; image
+`circumplex-arm64check:latest`, id `sha256:b61a7aa01c56…` — the same id T1
+recorded, so the pin still holds.
+
+- **AC1 — pass.** `R CMD build` on a fresh `git archive ecb06de7` export gave
+  `circumplex_2.0.1.tar.gz` (9,790,873 bytes; 4 bytes off the first pass's
+  9,790,877, a rebuild artifact). `tools/arm64/check.sh` on it exits 1;
+  `00check.log` is 378 lines and its last line is `Status: 1 ERROR`. Lines
+  350-351 read `── Failure ('test-axes-certificate.R:544:3'): AC2/AC3: at
+  counterexample B the estimate brackets a 3.4%-wrong SE ──` / `the shipped
+  pricing REFUSES at case 'cxb' (unidentified, unidentified) -- an admitted
+  geometry, so this is a regression, not a platform difference`. Tally
+  `[ FAIL 1 | WARN 4 | SKIP 540 | PASS 2399 ]`.
+- **AC2 — pass.** The same run wrote `arm64-platform.txt` beside the tarball,
+  stamped `tarball: circumplex_2.0.1.tar.gz` / `date: 2026-09-05T19:15:33Z`
+  (the run's own time; `check.sh` removes the file before the run). It records
+  `platform: aarch64-unknown-linux-gnu`, `LAPACK:
+  /usr/lib/aarch64-linux-gnu/openblas-pthread/libopenblasp-r0.3.33.so` and
+  `BLAS: /usr/lib/aarch64-linux-gnu/openblas-pthread/libblas.so.3` — both
+  linear-algebra paths containing `openblas` — written from the same
+  `docker run` as `R CMD check`.
+- **AC3 — pass.** A second `ecb06de7` export with `test-axes-certificate.R`
+  lines 527-567 deleted (the `test_that("AC2/AC3: …")` opening at 527 through
+  its matching `})` at 567): `diff` against the committed file reports 41
+  removed lines and 0 added, and top-level `test_that(` blocks drop 14 → 13.
+  `check.sh` on that tarball exits 0; `00check.log` is 83 lines, line 83 reads
+  `Status: OK`, line 76 `* checking tests ... OK`, and
+  `test-axes-certificate` appears 0 times in the log.
+- **AC4 — pass** (the amended criterion). `tools/arm64/Dockerfile`'s `FROM` is
+  `r-base@sha256:41d5564375009abf74a63987fd7fb9b44c90b1580b310be10ef973abe92496c3`
+  — a digest. `tools/arm64/README.md`'s "What the image is" table names the tag
+  that digest came from (`r-base:latest`, resolved 2026-09-05), R 4.6.1
+  (2026-06-24) and OpenBLAS Debian `libopenblas0-pthread` 0.3.33+ds-3, and says
+  those rows were read from inside the container on 2026-09-05. Both re-read
+  from the built image today: `R version 4.6.1 (2026-06-24)` and `dpkg -l`
+  `libopenblas0-pthread:arm64  0.3.33+ds-3`. "What it does not cover" names all
+  four heavyweight Suggests (`brms`, `OpenMx`, `glmmTMB`, `vdiffr`); records
+  2399 from a plain `R CMD build` tarball of `ecb06de7` — the figure this
+  re-review's own AC1 run reproduced — beside CRAN's 2410 for that commit, cited
+  to `cairn/reviews/archive/RB22-certificate-platform-refusal.md:49`, where the
+  transcribed line reads `[ FAIL 1 | WARN 4 | SKIP 540 | PASS 2410 ]`; states
+  that what accounts for the 11-assertion difference is not known and credits it
+  to no cause; and states that CRAN's macOS x86_64 flavor is not covered. The
+  false "11 assertions they cost" attribution the amendment return was raised
+  against appears nowhere in the file.
+- **AC5 — pass.** `cairn/PROFILE.md`'s `release-walk` slot carries the bullet
+  "**linux-arm64 check, before the handoff**", requiring `Status: OK` on the
+  tarball about to be submitted and its dated green log in `cran-comments.md`'s
+  test-environments list, with "Without it the submission step is not reached",
+  placed above the handoff-checklist bullet. `CLAUDE.md:15-18` carries `arm64
+  CRAN flavor: tools/arm64/check.sh <tarball>`. `tools/arm64/README.md` carries
+  the five-step "Refreshing the pin" recipe.
+
 ## Work log
 
 - 2026-09-05: planned. Criteria audit (full mode): returned six findings on
@@ -461,3 +518,12 @@ F5-F13 keep their proposed dispositions and are triaged at the re-review gate.
   `--no-vignettes`). No R code or roxygen changed, so the profile's verify slot
   has nothing to run.
 - 2026-09-05: amendment complete, status → review.
+- 2026-09-05: re-review (in progress) — re-entered at step 1 after the AC4
+  amendment; `master` is an ancestor of the branch head, PR #154 still open as a
+  draft. Fresh evidence recorded for AC1, AC2, AC3, AC4 and AC5 (AC4 ticked
+  against it); AC6's `devtools::check(manual = TRUE)` and the three review
+  lenses were still running when this checkpoint was committed. Consistency gate
+  re-run green: `cairn_validate` exit 0 (148 work-log-format advisories only),
+  `document()` no-diff with 0 unresolved links, `pkgdown::check_pkgdown()` clean,
+  both master watches `success` on the newest push run, all three `tools/` audit
+  scripts clean.
