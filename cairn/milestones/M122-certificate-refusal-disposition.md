@@ -155,3 +155,10 @@ candidate row (RR22 rec 12).
   20,000); the M108-family line was compressed in the same pass to 19,991.
   `cairn/test-craft.md` is at 8,924 of its own 9,000, so the ownership exit
   was not available for the remedy.
+- 2026-09-05: full `devtools::test()` returned FAIL 1 at the AC7 helper probe:
+  `expect_success()` asserts exactly one expectation and the two-sided bracket
+  branch fires two, so the helper reported the branch's arity rather than its
+  verdict. Probed through the `expectation_failure` condition instead; both
+  probe helpers were then shown to redden on the case they are meant to catch.
+  Suite now 9276 passes, 0 failures.
+

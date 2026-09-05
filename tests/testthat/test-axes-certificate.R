@@ -925,12 +925,23 @@ test_that("AC7: the two harness helpers select their branches on a stated condit
   # instead. The probe is exactly that value. Under `est <= cert_floor` the
   # floor branch runs and catches the under-report (a true error above what
   # the floor certifies); under the old test it did not.
+  #
+  # Probed through the CONDITION each branch signals rather than through
+  # expect_success()/expect_failure(), which count expectations: the two-sided
+  # branch fires two (both halves of the bracket) and the floor branch one, so
+  # a count-based helper reports the branch's arity instead of its verdict.
+  bracket_reddens <- function(...) {
+    expect_condition(cert_bracket(...), class = "expectation_failure")
+  }
+  bracket_passes <- function(...) {
+    expect_no_condition(cert_bracket(...), class = "expectation_failure")
+  }
   below_floor <- cert_floor / 2
-  expect_failure(cert_bracket(below_floor, cert_floor * 4, "probe below floor"))
+  bracket_reddens(below_floor, cert_floor * 4, "probe below floor")
   # ... and the argument overrides the default in both directions, so a caller
   # that knows which branch it wants gets that branch and not another.
-  expect_success(cert_bracket(1e-3, 1e-5, "probe two-sided", at_floor = FALSE))
-  expect_failure(cert_bracket(1e-3, 1e-5, "probe forced floor", at_floor = TRUE))
+  bracket_passes(1e-3, 1e-5, "probe two-sided", at_floor = FALSE)
+  bracket_reddens(1e-3, 1e-5, "probe forced floor", at_floor = TRUE)
 
   # cert_rel(): a zero exact value has no relative error, and the expression
   # returned NaN or an infinity there rather than saying so.
