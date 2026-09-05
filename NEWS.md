@@ -16,6 +16,16 @@
   unit in the last place. The checks now require agreement to 12 significant
   digits. No result reported by `ssm_draws()` has changed.
 
+* The package's tests now pass on Linux arm64 in a third place. One check
+  priced a deliberately ill-conditioned matrix and required
+  `axes_reliability()`'s internal accuracy check to report a number for it.
+  Whether a number can be computed at that matrix depends on the platform's
+  linear algebra library: on Linux arm64 the inversion gives up, which the
+  check treated as a defect. It now accepts either outcome and requires what
+  is true on both — that the fit is refused, and that the accuracy check says
+  so. `axes_reliability()` refuses that matrix on every platform, as it did
+  before, and no result it reports has changed.
+
 * The figures in the pre-rendered vignettes (Introduction to SSM Analysis,
   Intermediate SSM Analysis, Advanced Circumplex Visualization, Evaluating
   Circumplex Structure, SEM-Based SSM Analysis, Growth Models on SSM Parameters,

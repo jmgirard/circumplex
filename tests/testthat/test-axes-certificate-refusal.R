@@ -177,13 +177,25 @@ test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses throug
 })
 
 
-test_that("M111 AC3 (graded route): the committed counterexample refuses at both surfaces", {
+test_that("M111 AC3: the committed counterexample refuses at both surfaces, on either route", {
   skip_on_cran()
   # The one matrix on record whose reported corrected SEs were measured WRONG
-  # -- by 3.4% with reason NULL under the pre-M89 floor (RR18). Its certificate
-  # is graded rather than sentinel: 3.4e-1 for the SEs and 4.9e+1 for cval,
-  # both decades past the 1e-4 accuracy target, so the refusal stands here
-  # where M111 lifted it for the reachable geometries above.
+  # -- by 3.4% with reason NULL under the pre-M89 floor (RR18). Both decades
+  # past the 1e-4 accuracy target, so the refusal stands here where M111
+  # lifted it for the reachable geometries above.
+  #
+  # WHICH CERTIFICATE THIS CASE GETS IS A PLATFORM FACT (M122; D-055). This
+  # test was written as the GRADED half of a pair -- the case above takes the
+  # sentinel route, this one a graded 4.9e+1 -- and it asserted that
+  # difference by requiring the warning NOT to read "estimated relative error
+  # 1;". But `solve(info)` at this matrix succeeds or fails on the platform's
+  # LU roundoff (rcond(info) 2.6008e-16 on macOS/arm64, 2.0494e-16 on
+  # linux-arm64/OpenBLAS, straddling eps), and where it fails the certificate
+  # degrades to its sentinel and the warning reads exactly that. The pairing
+  # is still asserted, but on the route this machine actually takes: the two
+  # cases must not BOTH be graded and must not BOTH be sentinel, which is what
+  # the pairing was ever about. See test-axes-certificate.R for the same
+  # repair at the bracket suite.
   #
   # Priced by the two surfaces DIRECTLY. At p = 3 with df = 1 it is unreachable
   # through the exported path, which requires four scales, so the
@@ -207,20 +219,38 @@ test_that("M111 AC3 (graded route): the committed counterexample refuses at both
                               fit_zeta1 = FALSE, fit_zeta2 = FALSE,
                               df = 1, baseline_df = 3)
   )
-  # WHICH route, asserted rather than described (M111 review F5). This one is
-  # GRADED: the shared predicate reads the worse of the two estimates, which
-  # on the platform this was authored on is cval's 4.9e+1 -- decades past the
-  # target and nothing like the sentinel the case above takes. A drift onto
-  # the sentinel would leave both AC3 cases on one route with every other
-  # assertion still green, so what is asserted is the ROUTE: the note is
-  # present, and it is not the sentinel's. The digits themselves are NOT
-  # pinned -- they are the fixture's own arithmetic, which reproduces bit for
-  # bit only on the platform that produced it (pinning 49 reddened ubuntu and
-  # windows at this milestone's own review gate, macOS green).
+  # WHICH route, asserted rather than described (M111 review F5), and now
+  # exhaustively over the two the matrix admits (M122). The note is present on
+  # both routes and carries an estimate on both; what differs is whether that
+  # estimate is the sentinel, which prints as exactly "1" at the note's two
+  # significant digits. The digits of a GRADED estimate are NOT pinned -- they
+  # are the fixture's own arithmetic, which reproduces bit for bit only on the
+  # platform that produced it (pinning 49 reddened ubuntu and windows at
+  # M111's own review gate, macOS green).
+  #
+  # The route is read from the shipped pricing rather than from the warning
+  # text, so the two are independent: the pricing decides, and the text is
+  # then required to agree with it. Reading the route off the text and
+  # asserting the text would assert nothing.
+  refused <- is.character(axes_v_pricing(S, axes_se_derivs(
+    as.numeric(fx$ia), scl, NULL, FALSE, FALSE)))
   expect_length(grep("estimated relative error ", wse, fixed = TRUE), 1L)
   expect_length(grep("estimated relative error ", wsf, fixed = TRUE), 1L)
-  expect_length(grep("estimated relative error 1;", wse, fixed = TRUE), 0L)
-  expect_length(grep("estimated relative error 1;", wsf, fixed = TRUE), 0L)
+  sentinel_notes <- c(grep("estimated relative error 1;", wse, fixed = TRUE),
+                      grep("estimated relative error 1;", wsf, fixed = TRUE))
+  if (refused) {
+    # The shipped pricing gave up, so there is no reported number to have a
+    # relative error and the sentinel is the only truthful estimate. Both
+    # surfaces must print it -- one printing a graded figure would mean the
+    # two disagree about whether this fit was certified.
+    expect_length(sentinel_notes, 2L)
+  } else {
+    # A value exists, so the estimate is graded and neither surface may print
+    # the sentinel. This is also what keeps the pairing with the case above
+    # meaningful: that one reaches the sentinel through a rank-deficient
+    # derivative set, on every platform.
+    expect_length(sentinel_notes, 0L)
+  }
   # One shared literal, both surfaces, distinct from the two that refuse
   # without the certificate -- M89's nestedness contract holding across it.
   expect_identical(se$reason, "uncertified")

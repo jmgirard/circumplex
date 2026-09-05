@@ -38,6 +38,23 @@
 # A third layer ships alongside and is deliberately NOT counted as a type: the
 # planted-perturbation invariants below assert the comparison's sensitivity
 # with no external truth at all.
+#
+# THE RULE THIS FILE IS HELD TO (M122; D-055). Every assertion here is one of
+# three things:
+#
+#   (a) a property of a committed matrix or of the exact oracle;
+#   (b) this machine's own measurement, bracketed by a machine-independent
+#       bound;
+#   (c) an exhaustive disposition -- every outcome the shipped route can take
+#       at that matrix is enumerated, and each branch asserts.
+#
+# "The shipped route does X here", with no branch for it doing otherwise, is a
+# FROZEN MEASUREMENT and is disallowed, however many machines have been seen
+# doing X. Five escalations to outside review returned the same defect in a
+# different disguise each time -- a measured error, a bit pattern, a decade
+# window, and finally the premise that one committed matrix always prices,
+# which cost the 2.0.1 release its third CRAN rejection. This rule is what
+# ends the series, and it is checked at review rather than by any assertion.
 
 
 # ---- the six anchor geometries ----------------------------------------------
@@ -252,7 +269,23 @@ cert_hex <- function(x) sprintf("%a", as.vector(x))
 # recorded in M115's file) -- `hat - hi` is exact, and the low word then lands
 # on a difference that still has all its bits. At B the subtraction is ordinary
 # and loses nothing that matters against an error that large.
-cert_rel <- function(hat, hi, lo) ((hat - hi) - lo) / (hi + lo)
+#
+# THE DENOMINATOR IS REFUSED WHERE IT IS ZERO (M122, from the Known-fragilities
+# list). A relative error against an exact zero is not defined, and what this
+# expression returns there is Inf, -Inf or NaN depending on the sign of a
+# numerator that is itself a rounding artifact. Every quantity committed in
+# this file is nonzero, so nothing reaches it today; the guard is here because
+# the assertion added at counterexample B divides by a committed value on a
+# route where no shipped number exists to sanity-check the result, and a
+# silent NaN there passes an `expect_lt()` as NA rather than reddening.
+cert_rel <- function(hat, hi, lo) {
+  if (any(hi + lo == 0)) {
+    stop("cert_rel(): the exact value is zero, so there is no relative error ",
+         "to form -- this quantity needs an absolute-error comparison",
+         call. = FALSE)
+  }
+  ((hat - hi) - lo) / (hi + lo)
+}
 
 # A variance's relative error converted to its square root's. This is the exact
 # identity sqrt(1 + e) - 1, written with the cancellation at small `e` removed
@@ -330,17 +363,107 @@ test_that("AC3: the harness's written-down safety factor is the package's", {
 # so only after every value it prices has been computed.
 cert_dispositions <- new.env(parent = emptyenv())
 
-cert_record <- function(id, disposition) {
-  assign(id, disposition, envir = cert_dispositions)
+# THE VOCABULARY IS PINNED (M122). Until now a disposition was whatever string
+# the recording site happened to write, and the detector picked one out with
+# `== "priced"`: a typo at either end makes that comparison quietly false, and
+# a run in which nothing was priced then reports the same green as a run in
+# which everything was. These four constants are the whole vocabulary, and
+# cert_record() refuses anything outside it -- a typo is red with a reason
+# instead of green on nothing.
+#
+# The DETAIL is carried separately from the disposition for the same reason:
+# a skip reason and a refusal literal are prose, and folding them into the
+# disposition string is what made the set unpinnable.
+cert_disp <- c(
+  priced   = "priced",
+  refused  = "refused -- unidentified",
+  skipped  = "skipped",
+  mismatch = "matrix mismatch"
+)
+
+cert_record <- function(id, disposition, detail = "") {
+  if (!isTRUE(disposition %in% cert_disp)) {
+    stop("cert_record(): '", disposition, "' is not one of the pinned ",
+         "dispositions (", paste(cert_disp, collapse = "; "), ")",
+         call. = FALSE)
+  }
+  assign(id, list(disposition = disposition, detail = detail),
+         envir = cert_dispositions)
   invisible(disposition)
 }
 
 cert_disposition <- function(id) {
   if (exists(id, envir = cert_dispositions, inherits = FALSE)) {
-    get(id, envir = cert_dispositions, inherits = FALSE)
+    get(id, envir = cert_dispositions, inherits = FALSE)$disposition
   } else {
     "never reached"
   }
+}
+
+cert_detail <- function(id) {
+  if (exists(id, envir = cert_dispositions, inherits = FALSE)) {
+    get(id, envir = cert_dispositions, inherits = FALSE)$detail
+  } else {
+    ""
+  }
+}
+
+
+# ---- WHAT EACH CASE'S MATRIX IS, AND WHERE A REFUSAL IS ADMITTED (M122) -----
+#
+# Two facts per case, both committed, both read by cert_true_error() in place
+# of a case name. Naming a case in an `if` is how an admission written for one
+# matrix quietly widens to another; naming a PROPERTY means widening it is a
+# visible edit to this table.
+#
+# ORIGIN -- how the matrix reaches the comparison. The five anchors are built
+# here from `cos()` at octant differences, so a machine whose libm rounds one
+# of those differently builds a different matrix and has no yardstick: that is
+# a skip. Counterexample B is read from committed BYTES (a fixture), so a
+# mismatch there is not a platform difference at all -- it means the fixture or
+# the frozen block moved -- and the honest verdict is a failure. Measured
+# 2026-09-05: of the eight distinct cosines the anchor builders use, exactly
+# one sits within 0.05 of a unit in the last place of a rounding boundary
+# (cos(3.9269908169872414) = -0.7071067811865477, margin 0.0396 ulp), and it
+# moves four of the five anchors; the four-variable case c4 moves only on
+# cos(0) and cos(pi), both a full half ulp from any boundary.
+#
+# RCOND_BAND -- the interval the information matrix's reciprocal condition
+# estimate occupies at this case, under one-ulp perturbation of the matrix.
+# Where that band CONTAINS .Machine$double.eps, `solve(info)`'s success is a
+# property of the platform's LU roundoff rather than of the matrix, and a
+# refusal is therefore admitted. Where it does not -- every anchor, whose
+# rcond sits decades above eps -- a refusal stays a regression.
+#
+# The band committed for cxb was measured by RR22 over 300 one-ulp neighbours
+# of the fixture (min 1.667e-16, median 2.41e-16, max 3.35e-16), and BOTH ends
+# have since been straddled by real platforms rather than by perturbation
+# alone: 2.6008e-16 on aarch64-apple-darwin23 with reference BLAS, which
+# prices, and 2.0494e-16 on aarch64-unknown-linux-gnu with OpenBLAS 0.3.33,
+# which refuses (both measured 2026-09-05, the second in tools/arm64's
+# container). eps is 2.220446e-16, between the two.
+cert_admission <- list(
+  a4  = list(origin = "cos-built",       rcond_band = NULL),
+  a5  = list(origin = "cos-built",       rcond_band = NULL),
+  c4  = list(origin = "cos-built",       rcond_band = NULL),
+  b9a = list(origin = "cos-built",       rcond_band = NULL),
+  b9b = list(origin = "cos-built",       rcond_band = NULL),
+  cxb = list(origin = "committed-bytes", rcond_band = c(1.667e-16, 3.35e-16))
+)
+
+# A matrix this machine builds itself can differ from the committed one
+# innocently; committed bytes cannot.
+cert_matrix_is_built <- function(id) {
+  identical(cert_admission[[id]]$origin, "cos-built")
+}
+
+# The admission, read off the committed band rather than off the case name:
+# a refusal is admitted exactly where the band straddles this machine's eps.
+cert_refusal_admitted <- function(id) {
+  band <- cert_admission[[id]]$rcond_band
+  !is.null(band) &&
+    band[[1L]] <= .Machine$double.eps &&
+    .Machine$double.eps <= band[[2L]]
 }
 
 # THIS MACHINE's own relative error at one case, against the committed exact
@@ -363,31 +486,67 @@ cert_true_error <- function(id, sigma, d) {
   # denormal, the one place that parse loses bits).
   if (!identical(sigma[upper.tri(sigma)], as.numeric(fz$sig))) {
     reason <- paste0(
-      "this machine does not build the anchor matrix at case '", id, "' bit ",
-      "for bit, so the exact quadratic forms committed for that matrix are ",
-      "not a yardstick for this one"
+      "this machine does not build the matrix at case '", id, "' bit for ",
+      "bit, so the exact quadratic forms committed for that matrix are not a ",
+      "yardstick for this one"
     )
+    # WHICH VERDICT depends on where the matrix came from, not on which case
+    # this is (M122). A cos()-built anchor can differ innocently -- a libm one
+    # ulp away at one octant difference -- and the yardstick is then simply
+    # absent, which is a skip. A matrix read from committed bytes cannot
+    # differ innocently: a mismatch there means the fixture or the frozen
+    # block moved, and calling that a platform difference would hide the one
+    # edit this comparison exists to catch.
+    #
     # RECORDED BEFORE skip(), which unwinds this case's test_that() and would
     # otherwise leave the case looking like one that was never reached.
-    cert_record(id, paste0("skipped -- ", reason))
-    testthat::skip(reason)
+    if (cert_matrix_is_built(id)) {
+      cert_record(id, cert_disp[["skipped"]], reason)
+      testthat::skip(reason)
+    }
+    cert_record(id, cert_disp[["mismatch"]], reason)
+    testthat::fail(paste0(
+      "the matrix at case '", id, "' is read from committed bytes and no ",
+      "longer matches the exact values committed beside it -- ", reason
+    ))
+    return(NULL)
   }
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
-  # A REFUSAL from the shipped pricing is NOT a failure to reproduce. Every
-  # one of these six geometries is admitted -- axes_sigma_degenerate() passes
-  # on each -- so a refusal here is a regression in axes_pricing_core(), and
-  # folding it into the skip above would turn that red green. Fail on it, and
-  # let the caller carry on: the certificate returns its sentinel at a refusal,
-  # which reddens the bracket too.
+  # A REFUSAL from the shipped pricing IS A ROUTE, not a failure to reproduce
+  # -- but only where the case's committed conditioning band says the platform
+  # decides it (M122; D-055). At the five anchors that band is absent: their
+  # information matrices sit decades clear of eps, they price on every platform
+  # measured, and a refusal there is a regression in axes_pricing_core() which
+  # this fail() is what catches. At counterexample B the band straddles eps,
+  # measured on two real platforms in both directions, so a refusal is one of
+  # the two outcomes the matrix admits and the caller asserts it exhaustively.
+  #
+  # Either way NULL comes back, and the recorded disposition is what tells the
+  # caller which of the two it was; the certificate returns its sentinel at a
+  # refusal, which reddens a bracket applied to it.
   if (is.character(v) || is.character(u)) {
-    testthat::fail(paste0(
-      "the shipped pricing REFUSES at case '", id, "' (",
-      paste(Filter(is.character, list(v, u)), collapse = ", "),
-      ") -- an admitted geometry, so this is a regression, not a platform ",
-      "difference"
-    ))
-    cert_record(id, "refused by the shipped pricing")
+    literals <- paste(Filter(is.character, list(v, u)), collapse = ", ")
+    if (!cert_refusal_admitted(id)) {
+      cert_record(id, cert_disp[["refused"]], literals)
+      testthat::fail(paste0(
+        "the shipped pricing REFUSES at case '", id, "' (", literals,
+        ") -- no conditioning band is committed for this case, so this is a ",
+        "regression, not a platform difference"
+      ))
+      return(NULL)
+    }
+    # THE REFUSAL'S IDENTITY, asserted here rather than left to the caller:
+    # the admission is for the LU gate giving up on a matrix whose condition
+    # straddles eps, which surfaces as "unidentified" from the acov inversion.
+    # "singular" would mean solve(sigma) itself failed -- rcond(sigma) is
+    # 1.39e-7 at B, five decades inside double range, so that is a regression;
+    # "indefinite" lives downstream of both functions called here, so it would
+    # mean a wiring change. Either fails, and so does a refusal from only one
+    # of the two.
+    expect_identical(v, "unidentified", label = paste0(id, " v pricing"))
+    expect_identical(u, "unidentified", label = paste0(id, " u pricing"))
+    cert_record(id, cert_disp[["refused"]], literals)
     return(NULL)
   }
   dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
@@ -395,7 +554,7 @@ cert_true_error <- function(id, sigma, d) {
   du <- cert_rel(u, as.numeric(fz$u_hi), as.numeric(fz$u_lo))
   # AFTER the pricing, not before: what is claimed is that this case was
   # measured against its committed exact values, not that it was attempted.
-  cert_record(id, "priced")
+  cert_record(id, cert_disp[["priced"]])
   list(
     # Aggregated by MAX over components, as the certificate's own estimands
     # are: the reported SE vector refuses as a unit, so the worst component is
@@ -425,8 +584,19 @@ cert_true_error <- function(id, sigma, d) {
 # a cross-platform failure arrives as two bare numbers otherwise, naming
 # neither -- which is how the ubuntu-latest failure that returned this
 # milestone at its first review gate had to be traced by line number.
-cert_bracket <- function(est, true_rel, lbl) {
-  if (identical(est, cert_floor)) {
+# `at_floor` SAYS WHICH BRANCH IS TAKEN, and says it as a comparison rather
+# than as a value coincidence (M122, from the Known-fragilities list). What
+# stood here was `identical(est, cert_floor)`: bit-equality with a constant
+# the harness writes down and the package computes separately, so the branch
+# turned on two numbers happening to agree. Below the floor -- reachable by
+# lowering the package's safety factor -- that test is FALSE and the two-sided
+# bracket ran against an estimate the certificate cannot actually produce,
+# which is the wrong report. The floor is the smallest value the certificate
+# emits, so "at or below it" is the condition meant all along; it is an
+# argument so a caller that knows which branch it expects can say so and have
+# the other one fail.
+cert_bracket <- function(est, true_rel, lbl, at_floor = est <= cert_floor) {
+  if (at_floor) {
     expect_lte(true_rel, cert_floor, label = paste0(lbl, ": true error"))
   } else {
     expect_gte(est, true_rel, label = paste0(lbl, ": estimate"))
@@ -524,56 +694,154 @@ for (cert_case in cert_anchors()) {
 }
 
 
-test_that("AC2/AC3: at counterexample B the estimate brackets a 3.4%-wrong SE", {
+test_that("AC2/AC3: counterexample B is refused on every route, and bracketed where it prices", {
   # The one committed matrix on which the shipped corrected SEs are measurably
-  # wrong (3.413e-02) while the pre-M89 criterion reported them with reason
-  # NULL, and on which the double-precision cval comes out sign-flipped (exact
-  # +0.0555, double -0.216 -- relative error 4.890). Frozen from the same
-  # oracle run. Provenance of the fixture itself is at its first read site in
-  # test-axes-scaled-fit.R.
+  # wrong (3.413e-02 on the machine that froze the figures) while the pre-M89
+  # criterion reported them with reason NULL, and on which the
+  # double-precision cval comes out sign-flipped (exact +0.0555, double
+  # -0.216). Frozen from the same oracle run. Provenance of the fixture itself
+  # is at its first read site in test-axes-scaled-fit.R.
+  #
+  # WHAT THIS TEST CLAIMS CHANGED AT M122 (D-055). It used to claim "B prices,
+  # and the estimate brackets an error of about 3.4%". That is a fact about
+  # one machine: `solve(info)`'s outcome here is decided by the platform's LU
+  # roundoff -- rcond(info) is 2.6008e-16 on macOS/arm64 with reference BLAS
+  # and 2.0494e-16 on linux-arm64 with OpenBLAS, straddling eps = 2.220446e-16
+  # -- so the shipped pricing prices on the first and refuses on the second,
+  # and CRAN's linux-arm64 pre-test rejected 2.0.1 on exactly the fail() this
+  # file used to raise there. The claim is now: B is refused `uncertified` on
+  # EVERY route, the route taken is one of the two the committed conditioning
+  # band admits, and where a value exists the certificate brackets it. Both
+  # branches assert; neither can be empty.
   fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
   d <- axes_se_derivs(fx$ia, c("A", "B", "C"), NULL, FALSE, FALSE)
-  # OUTSIDE the precondition, for the same reason kappa is outside it at the
-  # five anchors: where the gate below fires this test would otherwise assert
-  # nothing at all -- not even that the fixture is still the 3.4%-wrong matrix
-  # the frozen figures were measured on. The literal is committed here rather
-  # than read from the fixture's own `kappa` field, which would be blind in
-  # the dimension it derives.
+
+  # ---- outside both routes -------------------------------------------------
+  #
+  # Outside the precondition, for the same reason kappa is outside it at the
+  # five anchors: where the checks below divide, this test would otherwise
+  # assert nothing at all -- not even that the fixture is still the matrix the
+  # frozen figures were measured on. The literal is committed here rather than
+  # read from the fixture's own `kappa` field, which would be blind in the
+  # dimension it derives.
   expect_equal(m106_kappa(fx$S), 6654372.506, tolerance = 1e-6)
+  # ... and that B still reaches the certificate's limb rather than one of the
+  # two literals that refuse without consulting it. Asserted here as well as
+  # in the refusal suite, which CRAN skips.
+  expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
 
   true_rel <- cert_true_error("cxb", fx$S, d)
-  if (is.null(true_rel)) return()
   cert <- axes_accuracy_certificate(fx$S, d)
 
-  cert_bracket(cert$se, true_rel$se, "cxb se")
-  cert_bracket(cert$cval, true_rel$cval, "cxb cval")
-  cert_bracket(cert$fiml_ratio, true_rel$ratio, "cxb fiml_ratio")
-
-  # The wrongness itself, asserted rather than described: this is the one
-  # committed matrix on which double precision misses the stated accuracy
-  # target while the pre-M89 criterion reported the SEs with reason NULL.
+  # THE EXACT-RATIONAL ORACLE'S REACH AT B, ON BOTH ROUTES (M122). The bracket
+  # has two halves -- the shipped route's error against exact truth, and the
+  # certificate's estimate against that error -- and on the refusing route the
+  # first half is empty, which is the whole five-line loss the old shape took.
+  # The certificate's REFERENCE route is not: axes_dd_pricing() is R-level
+  # `+`, `-`, `*` and `/` on doubles throughout, touching neither BLAS nor
+  # LAPACK, and it computes at B on every route (measured at all 97 refusing
+  # neighbours, RR22). Its agreement with the committed exact values is the
+  # yardstick the certificate would have used, and it needs no shipped value.
   #
-  # Asserted against delta_star -- the package's own target -- and NOT as a
-  # window around a measured figure. A first draft here wrote decades taken
-  # from the authoring machine (SE error in (1e-2, 1e-1), cval error above 1),
-  # and both reddened on ubuntu-latest, which prices this matrix through a
-  # different BLAS and measures 0.124 and 0.42 where macOS measures 0.0341 and
-  # 4.890. At an ill-conditioned matrix the size of the rounding error IS a
-  # property of the machine; what is a property of the MATRIX is that no
-  # machine gets within the target on it. So only that is claimed, and the
-  # margin is three decades or more on both machines seen so far.
-  expect_gt(true_rel$se, axes_degeneracy_delta_star)
-  expect_gt(true_rel$cval, axes_degeneracy_delta_star)
+  # The comment at the head of this file records a decision NOT to pin the dd
+  # route. That decision is about using it as a PRECONDITION -- a gate that
+  # skips, which is how a planted defect in the route once hid -- and not
+  # about asserting it against truth derived elsewhere; the two closed-form
+  # oracle tests below already do exactly that.
+  #
+  # TWO BOUNDS, because the two quantities fail differently.
+  #
+  # `v` and `v_naive`: the bound is HALF a unit in the last place, which is to
+  # say the reference route must deliver the correctly rounded double of the
+  # exact value. Measured 2026-09-05, bit-identical on aarch64-apple-darwin23
+  # and on aarch64-unknown-linux-gnu/OpenBLAS: 0.165 and 0.057 ulp for `v`,
+  # 0.419 and 0.269 for `v_naive`.
+  #
+  # `u`: at B it is a difference of two quantities of size about one that
+  # comes out 0.0555, so a rounding of either operand is amplified by about
+  # eighteen in RELATIVE terms while staying the same size in ABSOLUTE ones.
+  # The bound is therefore absolute -- one ulp of the operands' own scale --
+  # and the measurement is 3.8e-17, a third of it, again identical on both
+  # platforms. Stated as a relative bound this would be 6.1 ulp, a figure with
+  # no derivation behind it.
+  fz <- cert_frozen$cxb
+  ref <- axes_dd_pricing(fx$S, d)
+  dd_ulp <- function(hat, hi, lo) abs(cert_rel(hat, hi, lo)) / 2^-53
+  expect_lt(max(dd_ulp(dd_to_double(ref$v),
+                       as.numeric(fz$v_hi), as.numeric(fz$v_lo))), 0.5,
+            label = "cxb dd-vs-exact v (ulp)")
+  expect_lt(max(dd_ulp(dd_to_double(ref$v_naive),
+                       as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))), 0.5,
+            label = "cxb dd-vs-exact v_naive (ulp)")
+  expect_lt(abs((dd_to_double(ref$u) - as.numeric(fz$u_hi)) -
+                  as.numeric(fz$u_lo)), 2^-53,
+            label = "cxb dd-vs-exact u (absolute)")
+
+  # No machine gets within the accuracy target on this matrix. On the refusing
+  # route the certificate says so with its sentinel (four decades past the
+  # target); on the priced route with a graded estimate. Either way the
+  # worst-of is what the refusal predicate reads, so this is the claim that
+  # holds on both.
+  expect_gt(axes_certificate_worst(cert), axes_degeneracy_delta_star)
+
+  # ---- the two admitted routes --------------------------------------------
+  #
+  # Branched on the RECORDED disposition rather than on `is.null(true_rel)`:
+  # a matrix mismatch also returns NULL, and it must not be mistaken for a
+  # refusal and have the refusal's assertions run against a priced value.
+  disp <- cert_disposition("cxb")
+
+  if (identical(disp, cert_disp[["refused"]])) {
+    # THE REFUSING ROUTE. cert_true_error() has already asserted the refusal's
+    # identity ("unidentified" from both `v` and `u`). What is left is the
+    # contract that follows from it: the certificate degrades to its sentinel
+    # -- D-051's promise, asserted here for the first time at a matrix that
+    # reaches it naturally rather than through a planted duplicate derivative
+    # -- and the predicate users actually depend on still refuses.
+    expect_identical(cert, list(se = 1, cval = 1, fiml_ratio = 1))
+    expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")
+
+  } else if (identical(disp, cert_disp[["priced"]])) {
+    # THE PRICED ROUTE, unchanged: the three brackets, and the wrongness
+    # itself asserted rather than described.
+    cert_bracket(cert$se, true_rel$se, "cxb se")
+    cert_bracket(cert$cval, true_rel$cval, "cxb cval")
+    cert_bracket(cert$fiml_ratio, true_rel$ratio, "cxb fiml_ratio")
+
+    # Asserted against delta_star -- the package's own target -- and NOT as a
+    # window around a measured figure. A first draft here wrote decades taken
+    # from the authoring machine (SE error in (1e-2, 1e-1), cval error above
+    # 1), and both reddened on ubuntu-latest, which prices this matrix through
+    # a different BLAS and measures 0.124 and 0.42 where macOS measures 0.0341
+    # and 4.890. At an ill-conditioned matrix the size of the rounding error
+    # IS a property of the machine; what is a property of the MATRIX is that
+    # no machine gets within the target on it.
+    expect_gt(true_rel$se, axes_degeneracy_delta_star)
+    expect_gt(true_rel$cval, axes_degeneracy_delta_star)
+
+  } else {
+    # Neither route: cert_true_error() has already failed (the matrix no
+    # longer matches its committed bytes). Say which state this was, so the
+    # report names it rather than leaving a test that asserted only the
+    # outside-both checks.
+    testthat::fail(paste0(
+      "counterexample B took neither admitted route -- disposition '", disp,
+      "' (", cert_detail("cxb"), ")"
+    ))
+  }
 })
 
 
-test_that("AC1: at least one case was priced against its committed exact values", {
-  # THE ALL-SKIP DETECTOR (M118). Every bracket assertion above runs only for
-  # a case cert_true_error() actually priced; a case whose anchor matrix this
-  # machine builds differently skips instead, and each skip abandons only its
-  # own test_that(). So a machine on which all six skip reports six skips and
-  # zero failures -- a green file with nothing measured against the exact
-  # values it commits. That state is what this test turns red.
+test_that("AC1: every case reached an admitted disposition, and the anchors were priced", {
+  # THE DETECTOR (M118, rewritten at M122). Every bracket assertion above runs
+  # only for a case cert_true_error() actually priced; a case whose anchor
+  # matrix this machine builds differently skips instead, and each skip
+  # abandons only its own test_that(). So a machine on which all of them skip
+  # reports skips and zero failures -- a green file with nothing measured
+  # against the exact values it commits. That state is what this test turns
+  # red, and since M122 it also turns red on the state the counterexample-B
+  # fix creates: every case REFUSING, which the old "at least one priced"
+  # clause would have caught only by accident.
   #
   # It reads the dispositions the cases recorded as they ran, rather than
   # re-pricing anything: re-pricing here would be a second copy of the
@@ -583,18 +851,93 @@ test_that("AC1: at least one case was priced against its committed exact values"
   # The case list is pinned at six -- five anchors plus counterexample B --
   # because this test's own domain is a list that can empty: with no cases
   # enumerated there would be nothing to count and no priced case to want.
-  ids <- c(vapply(cert_anchors(), `[[`, "", "id"), "cxb")
+  anchors <- vapply(cert_anchors(), `[[`, "", "id")
+  ids <- c(anchors, "cxb")
   expect_length(ids, 6L)
 
   dispositions <- vapply(ids, cert_disposition, "")
-  priced <- ids[dispositions == "priced"]
-  # The label carries every case's disposition, so a failure here says which
-  # cases skipped and why rather than reporting a bare zero.
+  table_line <- paste0(ids, " = ", dispositions, collapse = "; ")
+
+  # THE TABLE IS EMITTED ON EVERY RUN, green ones included (M122). Until now
+  # the only way to learn which cases were actually measured was a human
+  # reading a CI log for skip counts, and a green arm64 or CRAN log said
+  # nothing at all. `info` prints on failure only, so the table goes out
+  # through a message, which testthat's reporters carry.
+  message("certificate cases: ", table_line)
+
+  # EVERY DISPOSITION IS ONE OF THE PINNED FOUR. A case that never ran records
+  # nothing and reads back "never reached", which is outside the set and fails
+  # here -- as does a typo at any recording site.
+  for (id in ids) {
+    expect_true(cert_disposition(id) %in% cert_disp,
+                label = paste0(id, " disposition '", cert_disposition(id),
+                               "' (", table_line, ")"))
+  }
+
+  # COUNTEREXAMPLE B took one of its two admitted routes. It is read from
+  # committed bytes, so "skipped" is not available to it and a mismatch is a
+  # failure; this is the clause that notices if that ever stops being true.
+  expect_true(cert_disposition("cxb") %in%
+                cert_disp[c("priced", "refused")],
+              label = paste0("cxb disposition (", table_line, ")"))
+
+  # AT LEAST ONE ANCHOR WAS PRICED -- the clause that fails on the all-skip
+  # run, and the one clause here with CRAN exposure, since the five anchors
+  # are built from cos() and a libm one ulp away at an octant difference
+  # builds a different matrix.
+  #
+  # KEPT CRAN-LIVE, on measurement (2026-09-05). Of the eight distinct cosines
+  # the builders use, exactly one sits within 0.05 ulp of a rounding boundary
+  # (cos(3.9269908169872414), margin 0.0396 ulp), and it moves four of the
+  # five anchors. The fifth, c4, moves only on cos(0) and cos(pi), each a full
+  # half ulp from any boundary and at an extremum where cos is flat. All five
+  # skipping together therefore takes a libm wrong at both sites. CRAN's
+  # r-release-macos-x86_64 log for 2.0.0 -- the flavor whose cos(225 degrees)
+  # rounds differently -- reports no anchor-matrix skip, and all five priced
+  # on linux-arm64/OpenBLAS in tools/arm64's container.
+  priced <- anchors[dispositions[anchors] == cert_disp[["priced"]]]
   expect_gt(length(priced), 0L,
-            label = paste0(
-              "cases priced (dispositions: ",
-              paste0(ids, " = ", dispositions, collapse = "; "), ")"
-            ))
+            label = paste0("anchors priced (", table_line, ")"))
+})
+
+
+test_that("AC5: the disposition vocabulary is closed", {
+  # cert_record() is the only writer, and a string outside the pinned four
+  # must not reach the environment at all -- otherwise the detector's
+  # membership check above is reading a value the recorder already accepted,
+  # and the two would have to agree by convention rather than by construction.
+  expect_error(cert_record("probe", "priced!"), "pinned dispositions")
+  expect_identical(cert_disposition("probe"), "never reached")
+  expect_length(cert_disp, 4L)
+  expect_identical(sort(names(cert_disp)),
+                   c("mismatch", "priced", "refused", "skipped"))
+})
+
+
+test_that("AC7: the two harness helpers select their branches on a stated condition", {
+  # cert_bracket() and cert_rel() are the two helpers M122 repaired, and both
+  # repairs are invisible from the cases above -- the branch the anchors take
+  # and the denominators they divide by are unchanged by either. So each is
+  # probed directly, with the defect its repair removes.
+  #
+  # cert_bracket(): the floor branch used to be chosen by bit-equality with
+  # `cert_floor`, so an estimate BELOW the floor took the two-sided branch
+  # instead. The probe is exactly that value. Under `est <= cert_floor` the
+  # floor branch runs and catches the under-report (a true error above what
+  # the floor certifies); under the old test it did not.
+  below_floor <- cert_floor / 2
+  expect_failure(cert_bracket(below_floor, cert_floor * 4, "probe below floor"))
+  # ... and the argument overrides the default in both directions, so a caller
+  # that knows which branch it wants gets that branch and not another.
+  expect_success(cert_bracket(1e-3, 1e-5, "probe two-sided", at_floor = FALSE))
+  expect_failure(cert_bracket(1e-3, 1e-5, "probe forced floor", at_floor = TRUE))
+
+  # cert_rel(): a zero exact value has no relative error, and the expression
+  # returned NaN or an infinity there rather than saying so.
+  expect_error(cert_rel(1e-16, 0, 0), "the exact value is zero")
+  expect_error(cert_rel(c(1, 2), c(1, 0), c(0, 0)), "the exact value is zero")
+  # ... and an ordinary quantity still divides.
+  expect_equal(cert_rel(2 + 2^-51, 2, 0), 2^-52)
 })
 
 

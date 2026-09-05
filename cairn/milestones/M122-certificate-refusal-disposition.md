@@ -1,13 +1,13 @@
 # M122: Make the certificate suite exhaustive over the routes the shipped pricing can take
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M121
 - **Driving RR:** —
 - **Principles touched:** IP3
 - **Resolves:** —
 - **Surface tier:** internal — test-suite behavior; no exported behavior changes
-- **Branch/PR:** —
+- **Branch/PR:** `m122-certificate-refusal-disposition`
 
 ## Goal
 
@@ -125,3 +125,33 @@ candidate row (RR22 rec 12).
   three times. Implement should confirm the margin before leaving the clause
   CRAN-live, and put it under `skip_on_cran()` if it cannot. Falsified by: a
   CRAN flavor reporting an anchor-matrix skip.
+- 2026-09-05: checkpoint, tasks not yet ticked. T1-T5 and T7 are written and
+  both edited files pass on both platforms (macOS 217/222 passes,
+  aarch64-linux/OpenBLAS 213/222 -- the gap is the refusing route's smaller
+  assertion count); the full `devtools::test()` run and T6's planted probes
+  have not reported yet, so no checkbox is ticked.
+- 2026-09-05: baseline reproduced before any edit -- `tools/arm64/testfile.sh`
+  fails at `test-axes-certificate.R:544` with the CRAN message ("the shipped
+  pricing REFUSES at case 'cxb' (unidentified, unidentified)"), and all five
+  anchors priced there.
+- 2026-09-05: measured, for the gate -- of the eight distinct cosines the
+  anchor builders use, one sits 0.0396 ulp from a rounding boundary
+  (cos(3.9269908169872414)) and moves four anchors; c4 moves only on cos(0)
+  and cos(pi), both 0.5 ulp clear. Gate answer: the detector's "at least one
+  anchor priced" clause stays CRAN-live, and B's admission is built as
+  reviewed rather than re-escalated.
+- 2026-09-05: measured -- the dd reference route is bit-identical on
+  aarch64-apple-darwin23 and aarch64-unknown-linux-gnu/OpenBLAS at every cxb
+  quantity, 0.17/0.42 ulp for v/v_naive and 3.8e-17 absolute for u, which is
+  what the two dd-vs-exact bounds are set from. `rcond(info)` is 2.6008e-16
+  on the first and 2.0494e-16 on the second, straddling eps.
+- 2026-09-05: minor amendment -- fixed two defects in `tools/arm64/testfile.sh`
+  found while running T6's loop: it copied macOS `src/*.o` into the container
+  (make skipped the aarch64 compile and the install died on "invalid ELF
+  header"), and it ran `library(circumplex)`, so the suite's helpers could not
+  see internals and the run died in `source_test_helpers()`. Both are
+  discovered sub-tasks of T6, not new scope.
+- 2026-09-05: LESSONS.md byte budget was tripped by the M122 clause (20,398 of
+  20,000); the M108-family line was compressed in the same pass to 19,991.
+  `cairn/test-craft.md` is at 8,924 of its own 9,000, so the ownership exit
+  was not available for the remedy.

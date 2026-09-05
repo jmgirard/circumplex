@@ -21,12 +21,30 @@ fi
 # positional argument, never interpolated into the `bash -c` string, so a
 # filename carrying a quote breaks nothing. Install output is NOT discarded:
 # a failed compile has to say why.
+#
+# THE COPY IS SWEPT of build products first (M122). A macOS working tree that
+# has been through `devtools::load_all()` carries Mach-O `src/*.o` and a
+# `src/circumplex.so`; `make` inside the container finds them newer than the
+# sources, reports "Nothing to be done", and links the macOS objects into an
+# aarch64 library. The install then fails at load with "invalid ELF header" --
+# which reads like a broken image rather than what it is. `check.sh` builds
+# from a tarball and never sees this; only this working-tree path does.
+#
+# `package = "circumplex"` is what puts the package's INTERNALS in scope
+# (M122). `library(circumplex)` attaches the exports only, and the helper
+# files this suite sources call unexported functions at load time, so the run
+# died in `source_test_helpers()` before reaching a single test. `R CMD check`
+# never hits this either: `tests/testthat.R` calls `test_check()`, which
+# evaluates in the package namespace. NOT_CRAN is passed through so a caller
+# can reach the blocks CRAN skips.
 exec docker run --rm --platform linux/arm64 \
   -v "$(cd "$REPO" && pwd)":/src:ro \
+  -e "NOT_CRAN=${NOT_CRAN:-}" \
   "$IMAGE" \
   bash -c 'set -euo pipefail
            cp -a /src /build
            cd /build
+           rm -f src/*.o src/*.so src/*.dll src/*.dylib
            R CMD INSTALL --no-docs --no-byte-compile .
            cd tests/testthat
-           Rscript -e "library(testthat); library(circumplex); test_file(commandArgs(TRUE)[[1]])" "$1"' _ "$FILE"
+           Rscript -e "library(testthat); test_file(commandArgs(TRUE)[[1]], package = \"circumplex\")" "$1"' _ "$FILE"
