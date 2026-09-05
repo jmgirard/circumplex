@@ -26,6 +26,20 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
   exit 2
 fi
 
+# Docker Desktop shares only a configured set of host paths, and a bind mount
+# of a path outside that set silently becomes an EMPTY directory: R CMD check
+# then warns that the tarball "is neither a file nor directory", skips it, and
+# EXITS 0. A green harness that ran nothing is worse than no harness, so the
+# tarball's visibility inside the container is proven before anything else.
+if ! docker run --rm --platform linux/arm64 -v "$DIR":/pkg -w /pkg "$IMAGE" \
+     test -f "$BASE"; then
+  echo "$BASE is not visible inside the container." >&2
+  echo "$DIR is probably outside Docker Desktop's shared paths;" >&2
+  echo "move the tarball under your home directory, or add the path in" >&2
+  echo "Docker Desktop > Settings > Resources > File sharing." >&2
+  exit 2
+fi
+
 # Recorded from inside the container: R CMD check prints no platform or LAPACK
 # line of its own, so 00check.log cannot answer what the check actually ran on.
 docker run --rm --platform linux/arm64 "$IMAGE" \
@@ -42,7 +56,15 @@ docker run --rm --platform linux/arm64 \
 STATUS=$?
 set -e
 
+# A check that produced no verdict is a harness failure, not a package result.
+LOG="$DIR/circumplex.Rcheck/00check.log"
+if [ ! -f "$LOG" ] || ! grep -q '^Status:' "$LOG"; then
+  echo "no Status: line in $LOG -- the check did not complete" >&2
+  exit 2
+fi
+
 echo
+grep '^Status:' "$LOG"
 echo "platform record: $DIR/arm64-platform.txt"
 echo "check directory: $DIR/circumplex.Rcheck"
 exit "$STATUS"

@@ -70,7 +70,7 @@ one of the two platform-exact rejection sources, not both.
       `~/.cache/circumplex-arm64/` into `tools/arm64/`; pin the base image by
       digest; write the header AC4 requires; have the runner record platform
       and LAPACK from inside the container.
-- [ ] T2: Build the `ecb06de7` tarball, run the harness on it, record the log
+- [x] T2: Build the `ecb06de7` tarball, run the harness on it, record the log
       excerpt as evidence.
 - [ ] T3: Build the block-deleted tarball, run the harness, record the result.
 - [ ] T4: Add the release-walk requirement to `cairn/PROFILE.md`, the command
@@ -101,3 +101,17 @@ one of the two platform-exact rejection sources, not both.
   inside the container and sets `_R_CHECK_TESTS_NLINES_=0` — at the default 13
   lines the failing-test block in `00check.log` filled with vdiffr snapshot
   notices and never reached the actual failure.
+- 2026-09-05: T2 — `R CMD build` on a `git archive ecb06de7` export produced
+  `circumplex_2.0.1.tar.gz`; `check.sh` on it exits 1 with `Status: 1 ERROR`,
+  and `00check.log` carries `[ FAIL 1 | WARN 4 | SKIP 540 | PASS 2399 ]` with
+  the failure block at lines 350-351 naming `test-axes-certificate.R:544:3` and
+  `the shipped pricing REFUSES at case 'cxb'`. `arm64-platform.txt` records
+  platform `aarch64-unknown-linux-gnu` and LAPACK
+  `.../openblas-pthread/libopenblasp-r0.3.33.so`. Run took 40 s.
+- 2026-09-05: T2 — the first run exposed a defect in `check.sh` itself: a
+  tarball outside Docker Desktop's shared paths mounts as an EMPTY directory,
+  so `R CMD check` warned "neither a file nor directory", skipped it and exited
+  0 — a green harness that ran nothing. `check.sh` now proves the tarball
+  visible inside the container before checking and requires a `Status:` line in
+  `00check.log` after; both guards were seen to fire red on the empty mount
+  before the passing run.
