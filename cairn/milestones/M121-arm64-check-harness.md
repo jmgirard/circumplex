@@ -365,6 +365,128 @@ recorded, so the pin still holds.
   CRAN flavor: tools/arm64/check.sh <tarball>`. `tools/arm64/README.md` carries
   the five-step "Refreshing the pin" recipe.
 
+- **AC6 — pass.** `Rscript -e 'devtools::check(manual = TRUE)'` on the branch
+  head: `Status: OK`, `0 errors | 0 warnings | 0 notes`, duration 28m 54.4s,
+  with `* checking PDF version of manual ... OK`. The check's own tarball is
+  deleted with its temp directory, so the manifest half ran on a fresh
+  `R CMD build` of the same tree: 357 paths, 0 under `circumplex/tools/`, 0
+  matching `arm64` or `Dockerfile` (case-insensitive). `.Rbuildignore`'s
+  `^tools$` entry does this, and it predates the branch — the criterion is
+  satisfied by pre-existing state, which is what it was written to confirm.
+
+### Re-review findings — three lenses, second pass
+
+Full three-lens fan-out again (executable surface in the diff). The [S]
+prior-review lens reported **no prior-review evidence**: no archived `## Review`
+touches these files, the probe `gh api repos/jmgirard/circumplex/pulls/comments`
+returned `[]`, and the nearest analogous lessons (M93 fail-closed scripts,
+M116/M118/M82 "the harness itself lies") are followed rather than regressed by
+this diff — zero findings, as designed.
+
+The [O] diff-bug and [S] blame-history lenses reported 14 and 5 findings; after
+verification against the implementation they consolidate to the list below,
+which also carries the first pass's F1-F13 forward. Dispositions are the ones
+proposed to the maintainer at the gate.
+
+1. **check.sh exits 0 on a non-OK status** (first pass F1; both lenses this
+   pass). `R CMD check` exits nonzero only on ERROR, and `check.sh:80`
+   propagates that verbatim, while `PROFILE.md`'s new release-walk slot gates
+   the CRAN handoff on `Status: OK`. A WARNING-only arm64 run is a false green
+   for the doctrine this same branch adds. Fix now.
+2. **Nothing asserts the run was actually aarch64** (first pass F4, sharpened).
+   `arm64-platform.txt` is written and never read back; an image built without
+   `--platform` on an amd64 host, or a `CIRCUMPLEX_ARM64_IMAGE` override, gives
+   a green that is not arm64 — the one thing the milestone exists to establish
+   is the one thing not checked. Fix now.
+3. **The platform probe's failure is swallowed** (first pass F2). No `set -e`
+   or `pipefail` inside the `bash -c`; `Rscript … | tee` takes `tee`'s status,
+   so a dead probe leaves a header-only record and the run continues. Fix now.
+4. **A stale `circumplex.Rcheck/00check.log` is read as this run's verdict**
+   (first pass F3). Nothing removes the check directory before the run, so a
+   `docker run` that dies before `R CMD check` starts leaves the previous log,
+   and `check.sh` prints its `Status:` line — the line `PROFILE.md` tells the
+   reader to paste into `cran-comments.md`. Fix now.
+5. **The README's flavor label is wrong** (first pass F5). `README.md:3` says
+   `r-devel-linux-x86_64` **arm64**; RB22 records the log's own URL as
+   win-builder's `incoming_pretest/.../specialChecks/linux-arm64`. Fix now.
+6. **The README's skip-count sentence misattributes a `skip_on_cran` effect.**
+   "Removing them moves the suite from 69 skips to 540" compares a host
+   `devtools::test()` run against a container `R CMD check` run: the suite
+   carries 469 `skip_on_cran()` calls, which fire only under the latter, against
+   27 `skip_if_not_installed()` guards for the four packages. The paragraph's
+   conclusion survives on the sound comparison (CRAN's 540 against the
+   container's 540, both under `R CMD check`); the 69 figure is a confound. This
+   is the evidence the AC4 gate declined to rest a causal exclusion on, so the
+   amended criterion is unaffected. Fix now.
+7. **Two brms claims are inaccurate.** `README.md` calls `brms` a dependency of
+   `vignettes/bayesian-ssm-analysis.Rmd` that `--no-vignettes` skips — it
+   appears there only in prose and in an `eval = FALSE` chunk (line 106), so it
+   is not a build-time dependency; and `Dockerfile:24-26` says the three
+   omitted heavyweights' "tests skip when absent" when `brms` has no tests at
+   all. Fix now.
+8. **"One command" overstates** (first pass F9): `check.sh` exits 2 until
+   `docker build` has been run, and `CLAUDE.md`'s entry does not say so.
+   Fix now.
+9. **check.sh's file header overclaims** (first pass F10): it omits BLAS, which
+   AC2 now requires, and reasserts the process-identity claim the body comment
+   was rewritten to disavow. Fix now.
+10. **testfile.sh interpolates unsafely and compiles into the host tree**
+    (first pass F8): `$FILE` inside a double-quoted `bash -c`, `R CMD INSTALL …
+    .` on a read-write mount leaving aarch64 objects in a macOS working tree,
+    and install diagnostics sent to `/dev/null`. Fix now.
+11. **The harness's outputs are neither gitignored nor Rbuildignored** (first
+    pass F13, sharpened): run from the repo root — where the usage line invites
+    you to point it — a stray `arm64-platform.txt` becomes a non-standard
+    top-level file the next `R CMD build` ships, a NOTE on the submission this
+    gate protects. Fix now.
+12. **The `greenfield-openers` compression lost a distinction and is outside
+    Scope** (first pass F11; blame lens independently). On `master` the slot
+    separates the five compiled-code technologies the question names from the
+    three options actually on the menu (**pure R** · Rcpp · RcppArmadillo); the
+    rewrite reads as five selectable options. Fix now.
+13. **The T4 work-log line misreports the compression** (first pass F12): "15
+    lines to 9"; the section is 13 lines on `master` and 9 here. The work log is
+    append-only, so the correction is a superseding line, not an edit. Fix now.
+14. **`--no-vignettes` is understated** in the README: it skips running the
+    vignettes' R code, not only re-building them, and that code exercises the
+    estimators. Fix now.
+15. **The digest pin covers the base layer only** (first pass F6): `apt-get
+    update` runs against Debian unstable and the two `install.packages()` layers
+    fetch current CRAN versions, so a rebuild is not reproducible. Candidate row
+    plus a line under "What it does not cover".
+16. **The harness runs plain `R CMD check`, not `--as-cran`**, and the README
+    does not list that as a gap. CRAN's arm64 log's own options line is not
+    transcribed in the repo, so whether the flavor uses `--as-cran` cannot be
+    re-verified here. Candidate row.
+17. **The README does not name which live oracles go dark** without `OpenMx`
+    and `glmmTMB` (D-029 declined the analogous CI trim on exactly that ground).
+    Noted, no action: CRAN's own arm64 log reports the same `SKIP 540` this
+    container does, so relative to the flavor being reproduced nothing is lost.
+- **Rejected — "AC6's `^tools$` predates the branch, so the criterion tested
+  nothing new."** Correct as an observation, and recorded in AC6's evidence
+  above; confirming that pre-existing state covers the new directory is what the
+  criterion was written to do.
+- **Rejected — the intermediate branch state shipped the false 11-assertion
+  claim.** True of commit `9430f018` and repaired by `817b91c4` within the same
+  branch, which squash-merges as one commit. Out-of-scope: fixed before review.
+- **Rejected — the ROADMAP status mirror.** The blame lens flagged that a
+  careless read misses the milestone re-opening once; the mirror is correct.
+- **Rejected — the `greenfield-openers` intro rewording.** Operative meaning
+  unchanged; both lenses that raised it said as much.
+- **Refuted — `_R_CHECK_TESTS_NLINES_=0`'s stated rationale cannot apply
+  because vdiffr is absent.** The AC1 log ends its failing-test block with
+  `Deleting unused snapshots: …svg` — the notices are produced *because* vdiffr
+  is missing, so the comment describes what actually happened.
+- **Refuted — `PROBE` env-var quoting is unsafe** and **the glmmTMB self-skip
+  claim is false**: the [O] lens checked both and withdrew them
+  (`test-growth_invariants.R:49` carries the guard).
+
+**Return floor.** No finding demonstrates an acceptance criterion failing. AC4
+requires the header to record both counts, the commit, and the gap as
+uncharacterized and credited to no cause; it does, and finding 6 touches a
+supporting sentence AC4 does not bind. Defect-return count stays 0; amendment
+returns stay 1.
+
 ## Work log
 
 - 2026-09-05: planned. Criteria audit (full mode): returned six findings on
@@ -527,3 +649,4 @@ recorded, so the pin still holds.
   `document()` no-diff with 0 unresolved links, `pkgdown::check_pkgdown()` clean,
   both master watches `success` on the newest push run, all three `tools/` audit
   scripts clean.
+- 2026-09-05: re-review — all six criteria re-run with fresh evidence and all six pass; AC6 `Status: OK`, 0/0/0, PDF-manual step included, tarball manifest 357 paths with 0 under `tools/`. Three-lens fan-out re-run: prior-review lens no evidence and zero findings; the other two returned 19 findings consolidating to 17, of which 14 are proposed fix-now, 2 candidate rows and 1 noted, plus 4 rejected and 3 refuted. No finding demonstrates a criterion failing, so the return floor does not fire; defect-return count 0, amendment returns 1. Pre-gate checkpoint.
