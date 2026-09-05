@@ -1962,3 +1962,53 @@ bound.
 **Reopens.** A measurement in which a max over the two arms' standalone errors
 is at or above the quotient's own at every fitted component across the
 oracle's case list — which would restore B4 as a safe upper proxy.
+
+### D-055 (2026-09-05): a refusal from the shipped pricing is a platform fact at counterexample B, and the certificate suite becomes exhaustive over both routes — annotates D-051's sentinel clause, moves nothing it decided (M122, RR22)
+
+**Context.** `cert_true_error()`'s refusal branch fails a case whose shipped
+pricing returns a string, on the stated ground that all six committed
+geometries are admitted, so a refusal there must be a regression in
+`axes_pricing_core()` rather than a platform difference. That branch was
+written to satisfy the M108-family lesson: a precondition that skips can
+swallow the refusal it should catch, so a refusal must be discriminated from a
+non-reproduction. Counterexample B failed it on CRAN's linux-arm64 flavor and
+cost circumplex 2.0.1 its second pre-test rejection.
+
+**What was measured.** RR22 priced `rcond(info)` at the committed fixture and
+at 300 one-ulp neighbours of it, together with the shipped pricing, the
+certificate and the refusal predicate at each, and `solve(info, tol = ...)`
+across five tolerances. The figures and constructions are in
+`cairn/reviews/archive/RR22-certificate-platform-refusal.md`.
+
+**Decision.** The branch's premise is false and is replaced, not weakened. At
+counterexample B the outcome of `solve(info)` is a property of the platform's
+LU roundoff rather than of the matrix, so both outcomes are admitted there and
+the suite asserts each exhaustively: the priced route keeps its brackets, and
+the refusing route asserts the refusal's exact identity, the certificate's
+sentinel, and the refusal predicate's answer. The admission is grounded in a
+committed conditioning band rather than in a case name, so widening it to an
+anchor is a visible edit rather than a wider branch; a refusal at any anchor
+stays a regression. The five-line reach the refusing platform would otherwise
+lose is restored by asserting the double-double reference route against the
+committed exact values, which is platform-independent and runs on both routes.
+An explicit `solve()` tolerance is rejected: no value inside the measured band
+is platform-stable, and every value below it removes the conditioning gate
+rather than tuning it.
+
+**Consequences.** No shipped behavior changes; D-051's sentinel contract is
+asserted for the first time at a matrix that reaches it naturally rather than
+through a planted derivative. The suite's stated job at counterexample B moves
+from "assert B prices and is wrong by 3.4%" to "assert B is refused
+`uncertified` on every route, that the route taken is one of the two admitted
+ones, and that where a value exists the certificate brackets it". A file-level
+rule follows: every assertion in the certificate suite is a property of a
+committed matrix or of the exact oracle, a bracketed own-measurement, or an
+exhaustive disposition — a claim about what the shipped route does at a
+committed matrix, with no branch for it doing otherwise, is a frozen
+measurement and is disallowed.
+
+**Reopens.** A platform on which counterexample B prices and the certificate
+reports below the accuracy target — an under-report, which reopens D-051's
+mechanism rather than this test; a refusal there under any literal other than
+`"unidentified"`; or a machine-independent derivation of a `solve()` tolerance
+inside the measured band.
