@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/jmgirard/circumplex/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/jmgirard/circumplex/blob/v2.0.1/DESCRIPTION)
 
 Girard J, Zimmermann J, Wright A (2026). *circumplex: Analysis and
 Visualization of Circular Data*. R package version 2.0.1,
