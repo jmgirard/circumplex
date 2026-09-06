@@ -98,6 +98,22 @@ divided by `hi + lo`, which is zero exactly when the exact quantity is, and now
 refuses that denominator. Full text in the M113, M115 and M116 archives' Review
 sections, and in M122's.
 
+Added 2026-09-05 (M122 review, findings 6 and 7), same ROADMAP row, taking the
+count from four open to six. `axes_accuracy_certificate()` returns its sentinel
+by six routes besides "the shipped pricing refused" -- a failed `axes_dd_selftest()`,
+a NULL `axes_dd_pricing()`, non-finite `v_hat`/`vn_hat`/`u_hat`, nonpositive
+quadratic forms on either arm, and a vanished cval numerator -- and the
+counterexample-B block's two-branch split does not distinguish them: on a platform
+where one fires while the pricing succeeds, the priced branch brackets a sentinel
+`cert` and passes, since `expect_lte(1, max(cert_ceiling * true_rel, cert_floor))`
+holds. And `cert_refusal_admitted()` decides the admission by comparing the
+committed `rcond` band to `.Machine$double.eps`, which is `2^-52` on every platform
+R supports -- so the predicate is a constant, true at `cxb` and false at every
+anchor, and is equivalent to naming the case it was written to avoid naming. It
+admits any `unidentified` refusal at `cxb`, a genuine regression included; what
+would make it live is asserting this machine's own measured `rcond(info)` falls
+inside the band.
+
 **Accepted limitations** (no fix planned; no candidate row): a withdrawn norm
 sample's values are reachable only from the source repository. `?cais` and
 NEWS.md point at `cairn/references/sodano2006.md` for the CAIS adult sample
