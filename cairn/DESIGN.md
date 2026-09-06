@@ -79,25 +79,24 @@ corrected 2026-08-06.)
 
 Added 2026-08-31 (M118), sharing one ROADMAP row: six latent defects in the
 accuracy certificate's validation layers, none reachable by a passing test run
-today, each able to turn a real regression green once it is. (Two are latent in
-their misdiagnosis rather than in their branch: `cert_bracket()`'s at-the-floor
-branch is taken on every run at the closed-form dyadic configuration --
-measured 2026-08-31, where all three certificate fields sit exactly at the
-floor -- and the oracle driver's missing-key case is reachable by a maintainer
-regeneration, just not by a test.) In
-`tests/testthat/test-axes-certificate.R`, `cert_bracket()` selects its
-at-the-floor branch by `identical(est, cert_floor)`, a value coincidence rather
-than a statement about the fit; the measured side's component count is unpinned
-against the committed exact pair's length at three `cert_rel()` sites, and the
-dyadic `cval` bracket is unaggregated, so a regeneration pasted in truncated is
-recycled to length and compared against the wrong exact values;
+today, each able to turn a real regression green once it is. **Two were fixed
+by M122 and four remain; corrected 2026-09-05.** (One of the four is latent in
+its misdiagnosis rather than in its branch: the oracle driver's missing-key
+case is reachable by a maintainer regeneration, just not by a test.) In
+`tests/testthat/test-axes-certificate.R`, the measured side's component count
+is unpinned against the committed exact pair's length at three `cert_rel()`
+sites, and the dyadic `cval` bracket is unaggregated, so a regeneration pasted
+in truncated is recycled to length and compared against the wrong exact values;
 `cert_root_rel()` returns NaN rather than failing at a relative variance error
-at or below -100%; `cert_rel()` divides by `hi + lo`, which is zero exactly
-when the exact quantity is; and the planted-perturbation layer was never
-extended to the quotient field's denominator. In
-`devel/degeneracy-oracle/exact_oracle.R`, a missing oracle key becomes a silent
-NULL pasted into the regeneration. Full text in the M113, M115 and M116
-archives' Review sections.
+at or below -100%; and the planted-perturbation layer was never extended to the
+quotient field's denominator. In `devel/degeneracy-oracle/exact_oracle.R`, a
+missing oracle key becomes a silent NULL pasted into the regeneration. **Fixed
+by M122:** `cert_bracket()` selected its at-the-floor branch by
+`identical(est, cert_floor)`, a value coincidence rather than a statement about
+the fit, and now selects it by a stated `at_floor` argument; `cert_rel()`
+divided by `hi + lo`, which is zero exactly when the exact quantity is, and now
+refuses that denominator. Full text in the M113, M115 and M116 archives' Review
+sections, and in M122's.
 
 **Accepted limitations** (no fix planned; no candidate row): a withdrawn norm
 sample's values are reachable only from the source repository. `?cais` and
