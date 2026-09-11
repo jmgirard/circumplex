@@ -2,289 +2,267 @@
 
 ## circumplex (development version)
 
-- [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
-  now always draws an amplitude ring at `amax`, so every circumplex
-  canvas closes at its rim. Previously the outermost ring was wherever
-  the axis break algorithm happened to place one, which for many values
-  of `amax` left the circle open and let points be drawn past the last
-  visible ring. The rim ring is unlabeled unless `amax` is itself one of
-  the axis breaks; the labeled rings are otherwise unchanged.
+## circumplex 2.0.1
 
-- Fixed a bug where
-  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
-  could omit the outer amplitude ring, so a plot’s circle was left open
-  at the rim and points could be drawn beyond the outermost visible
-  ring. This happened whenever an amplitude gridline fell exactly on
-  `amax` (for instance `amax = 0.3` or `0.6`).
+CRAN release: 2026-09-06
 
-- The new
-  [`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
-  layer draws a profile’s movement across occasions as a path on the
-  circumplex canvas, so change in amplitude and displacement reads as
-  motion in circumplex space rather than only as separate parameter
-  panels. Each segment is curved along the circle by
-  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md).
-  Consecutive occasions are joined the short way around the 0/360
-  boundary, so a step from 350 to 10 degrees is drawn as a 20 degree arc
-  across the pole rather than a 340 degree sweep the long way round.
-  Occasions are connected in data order, with `group` separating one
-  series from another and an optional `order` aesthetic to sort within a
-  series; an optional `arrow` marks the direction of time. An occasion
-  with no defined displacement (a flat or zero-amplitude profile) breaks
-  the path rather than being interpolated through, and the segment after
-  the gap is still drawn on the correct branch.
+### Minor improvements and fixes
 
-- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  gains a `path` argument that adds this movement path to its usual
-  points and confidence wedges, for results from
-  `ssm_analyze(occasions = )` and
-  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md).
-  Occasions are connected in the order they were supplied, never
-  alphabetically.
+- The package’s tests now pass on CRAN’s macOS x86_64 flavors. The check
+  of
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_syntax.md)’s
+  single-group output against a stored copy compared cosine and sine
+  loadings printed at 17 significant digits, and that platform’s math
+  library rounds one of them a single unit in the last place
+  differently. The comparison now ignores differences beyond 12
+  significant digits and nothing else.
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_syntax.md)’s
+  output is unchanged.
 
-- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)’s
-  “Displacement interpretable” legend now draws both of its keys.
-  Previously, when no occasion was flagged as uninterpretable, the
-  `FALSE` key appeared as a label with no symbol beside it, so the
-  legend named an encoding it never showed.
-
-- [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
-  now rejects a non-finite `amax` or `center` with a message naming the
-  argument, instead of accepting an infinite value and failing later
-  inside the rendering with an unrelated error.
-
-- The “Advanced Circumplex Visualization” vignette has been rewritten
-  over the new plotting API. It now teaches
-  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
-  as the owner of the amplitude-to-radius mapping (replacing the old
-  advice to keep a per-layer `amax` in sync), the configurable circle
-  center and amplitude-axis placement, restyling the canvas through
-  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
-  and ordinary `theme()` calls, subclassing the exported
-  `GeomSsmPoint`/`GeomSsmArc` objects to build reusable layers, and
-  plotting a trajectory across occasions.
-
-- The reference index now groups the plotting API into “Complete Plots”
-  and “Building Blocks”. The `ssm_plot_*` functions now cross-link to
-  each other, so
-  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
-  is reachable from its siblings’ help pages, and the composable layers
-  ([`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
-  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
-  the `geom_ssm_*()` layers,
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md),
-  and
-  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md))
-  likewise cross-link to each other.
-
-- The new
-  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
-  plots how each SSM parameter changes across occasions, one panel per
-  parameter with its confidence interval as a band, for results from
-  `ssm_analyze(occasions = )` and
-  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md).
-  The displacement panel is drawn on an unwrapped branch, so a profile
-  whose displacement crosses the 0/360 boundary is shown as one
-  continuous path instead of jumping a full turn, and each confidence
-  bound is placed on its own estimate’s branch. Occasions appear in the
-  order they were supplied, never alphabetically. An occasion whose
-  amplitude is too close to zero for its displacement to be
-  interpretable is marked with a hollow point, and a profile with no
-  defined displacement leaves a gap rather than a spurious segment.
-
-- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
-  also accepts a **trajectory table**: a data frame with one row per
-  time point, a numeric time column named by the new `time` argument,
-  and `a_est`/`a_lci`/`a_uci` and `d_est`/`d_lci`/`d_uci` columns
-  (optionally the `e_*`, `x_*`, and `y_*` triples and a logical
-  `certified` column). This is the shape a model-based workflow
-  assembles by evaluating a fitted growth model at each time point and
-  passing the draws through
-  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md),
-  and it is plotted on a continuous time axis, so unequally spaced time
-  points are drawn at their actual spacing. Only the panels the table
-  can fill are drawn. The displacement unwrap, the interval placement,
-  and the hollow marking of uninterpretable time points are shared with
-  the occasions path; when no `certified` column is supplied, the figure
-  makes no interpretability claim rather than asserting one. The “Growth
-  modeling” vignette now uses this instead of assembling the figure by
-  hand.
-
-- Circumplex figures are now built on a real ggplot2 coordinate system.
-  The new
-  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
-  owns the amplitude-to-radius scaling and the displacement-to-angle
-  transform in one place, so a canvas and its data layers can no longer
-  disagree about the outer-ring amplitude. It adds a configurable
-  amplitude *center* (the rings relabel and the amplitudes remap
-  together) and a theme-responsive canvas: the rings, spokes, and labels
-  drawn by
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  now restyle through `+ theme_*()`.
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
-  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
-  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
-  and
-  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  keep their signatures and correct output. The per-layer `amax`
-  argument (and
-  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)’s
-  `n`) are no longer needed and are ignored with a one-time note. This
-  requires ggplot2 (\>= 4.0.0), and `ggforce` is no longer a dependency.
-
-- The circumplex ggplot2 layers are now more extensible and ergonomic.
-  The `GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` ggproto
-  generators are exported so downstream packages can subclass them. The
-  amplitude (radial) axis and its labels are now drawn in the widest gap
-  between the displacement spokes, so they no longer overlap a spoke
-  label;
-  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
-  gains an `r_axis_angle` argument to place it manually. The canvas
-  theme is exported as
-  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md).
-  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
-  and
-  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
-  follow the ggplot2 `na.rm` convention: with `na.rm = FALSE` they warn
-  (with the count) before dropping profiles that cannot be placed, while
-  the default `na.rm = TRUE` drops them silently.
-  `ssm_plot_circle(repel = TRUE)` now gives a clear error when the
-  suggested `ggrepel` package is not installed.
-
-- [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
-  now assesses repeated-measures occasions analyses instead of stopping
-  with an error. Its plug-in population is a multivariate normal with
-  the observed stacked cross-occasion covariance, so the within-person
-  dependence across occasions is carried into the simulation (rather
-  than ignored); it reports CI trustworthiness per occasion and for the
-  paired within-person contrast. A flat occasion is refused by name, a
-  rank-deficient stacked covariance is flagged (the fit-statistic pass
-  rate becomes descriptive), and because the occasions population is the
-  observed covariance the `structure`/`cpm` arguments are not accepted
-  on that path.
-
-- New
-  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md)
-  provides a long-format (one row per person per occasion) interface to
-  the repeated-measures occasions analysis. It reshapes the data to the
-  wide layout
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-  expects and delegates to it, so the estimation, paired within-person
-  contrasts, and listwise missing-wave handling are unchanged. Occasion
-  order is taken from the factor levels (or first appearance) of the
-  `occasion` column and is never sorted alphabetically, so a `T10`/`T2`
-  pair keeps its temporal order.
-
-- New growth-model support for repeated-measures SSM analysis. A new
-  vignette (“Growth Models on SSM Parameters”) documents the recommended
-  recipe for modeling change in SSM parameters over time: fit a *joint*
-  mixed model to the per-person Cartesian coordinates from
-  [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
-  (the reference recipe uses glmmTMB, now in Suggests; fitting the
-  coordinates with separate univariate models silently zeroes their
-  cross-covariance and produces wrong displacement intervals), then
-  convert fixed-effect draws to amplitude/displacement trajectories with
-  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md).
-  The recipe was validated by simulation: pointwise displacement
-  coverage is nominal in a pole-crossing design, and the univariate
-  shortcut demonstrably fails coverage under correlated person effects.
-
-- New
-  [`angle_unwrap()`](http://circumplex.jmgirard.com/dev/reference/angle_unwrap.md)
-  helper unwraps a temporally ordered sequence of angles onto a
-  continuous branch (350, 10, 30 becomes 350, 370, 390), supporting the
-  vignette’s alternative unwrap-then-model recipe. Inputs are wrapped to
-  \[0, 360) first; an exact 180-degree step ascends (the package’s
-  half-turn convention); `NA` makes later waves branch-ambiguous and so
-  propagates onward.
-
-- [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
-  objects now apply the package’s displacement-certification rule to the
-  amplitude credible interval: when the interval’s lower bound sits
-  under 0.35 interval-widths above zero, printing notes that the
-  displacement is not interpretable, and the verdict is stored in
-  `$details$certified` (used per-timepoint by the growth vignette).
-
-- New per-person (intraindividual) SSM scoring:
-  [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
-  scores each person’s own circumplex profile through the closed-form
-  SSM transform and returns a per-person parameter table – one row per
-  person, with an `id` argument that first averages a person’s rows
-  (e.g., occasions of intensive longitudinal data) within person before
-  scoring. Degenerate profiles keep their row with `NA` parameters
-  (never a silent drop), and an `na_rate` column exposes each person’s
-  share of missing scale cells. A
-  [`summary()`](https://rdrr.io/r/base/summary.html) method aggregates
-  the table at the group level using circular statistics for
-  displacement (circular mean and mean resultant length, never
-  arithmetic means of angles), reporting how many undefined
-  displacements were excluded. Two documented caveats: the circular mean
-  of per-person displacements (equal weight per person) is a different
-  quantity from the displacement of the group mean profile
-  (amplitude-weighted), and by the triangle inequality the group
-  profile’s amplitude is at most the mean per-person amplitude, strictly
-  smaller when directions disperse.
-
-- New Bayesian draws adapter:
+- The package’s tests now pass on Linux arm64. Two checks of
   [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
-  converts posterior draws from a user-fitted Bayesian model (e.g., a
-  brms cosine regression) into SSM parameter draws and summarizes them
-  with the package’s circular-statistics machinery – circular quantiles
-  for displacement (credible intervals that straddle 0/360 wrap instead
-  of inverting), posterior medians for the linear parameters (the
-  amplitude posterior is right-skewed), and the circular mean for
-  displacement, with the marginal-coherence caveat documented. Two draw
-  shapes are accepted and never guessed: (e, x, y) parameter draws
-  (`type = "parameters"`, required because a 3-column matrix is
-  ambiguous) and profile draws (one column per scale, with `angles`).
-  Draws with undefined displacement are excluded from the displacement
-  summaries only, with an honest warning that says “posterior draws” and
-  “credible interval”. A new precomputed vignette, *Bayesian SSM
-  Analysis*, derives the cosine-regression mapping (pinning the atan2
-  argument order with an executable known-direction check), walks a brms
-  random-intercept example whose posterior draws ship with the package,
-  and exhibits the Rayleigh-shaped prior that independent (x, y) priors
-  induce on amplitude (brms is a new optional `Suggests` dependency used
-  only by that vignette’s frozen model-fitting chunk).
+  compared amplitudes computed by the package’s C++ code against the
+  same amplitudes computed in R, and required the two to agree to the
+  last bit. They do on every other platform, but on that one they can
+  differ by one unit in the last place. The checks now require agreement
+  to 12 significant digits. No result reported by
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
+  has changed.
 
-- New repeated-measures (longitudinal) SSM analyses:
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-  gains an `occasions` argument taking a named list of column blocks,
-  one per occasion, each selecting the same circumplex scales measured
-  at that occasion (wide data, one row per person). Every occasion
-  yields its own profile row, occasions cross with `grouping`, and
-  `contrast = TRUE` with exactly two occasions (single group) estimates
-  the paired within-person contrast – second listed occasion minus first
-  – through both engines: the bootstrap resamples persons (preserving
-  within-person dependence nonparametrically) and the Monte Carlo engine
-  draws the stacked occasion mean vectors jointly. Cross-occasion column
-  alignment is validated by stem matching (a reordered occasion block
-  errors instead of silently rotating displacement). Occasions analyses
-  are listwise-only across waves, with the dropped-person count messaged
-  and a selection caution documented. Results from occasions analyses
-  carry a new `Occasion` column that is present only for such analyses –
-  downstream code should test for the column by name. Coverage of the
-  paired contrasts was validated by simulation at nominal rate across
-  boundary cells (displacement changes near 0 and 180 degrees, CIs
-  straddling the 0/360 pole, small samples, three occasions); note that
-  paired contrasts are not unconditionally more efficient than
-  independent-groups designs (see the new Occasions section in
-  [`?ssm_analyze`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)).
+- The package’s tests now pass on Linux arm64 in a third place. One
+  check priced a deliberately ill-conditioned matrix and required
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)’s
+  internal accuracy check to report a number for it. Whether a number
+  can be computed at that matrix depends on the platform’s linear
+  algebra library: on Linux arm64 the inversion gives up, which the
+  check treated as a defect. It now accepts either outcome and requires
+  what is true on both — that the fit is refused, and that the accuracy
+  check says so.
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  refuses that matrix on every platform, as it did before, and no result
+  it reports has changed.
+
+- The figures in the pre-rendered vignettes (Introduction to SSM
+  Analysis, Intermediate SSM Analysis, Advanced Circumplex
+  Visualization, Evaluating Circumplex Structure, SEM-Based SSM
+  Analysis, Growth Models on SSM Parameters, and Axes Reliability) are
+  rendered at twice the previous resolution. They had been rendered at
+  72 dpi and stretched to the article width on the package website, so
+  they looked soft on high-resolution screens.
+
+## circumplex 2.0.0
+
+CRAN release: 2026-09-02
+
+This is a major release. Its flagship addition is
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
+a native reimplementation of Browne’s (1992) circular stochastic process
+model for the correlational structure of circumplex scales — filling the
+gap left by the archived CircE package, the previous R implementation.
+Alongside it come four other new analysis families: latent-variable SSM
+analysis with
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+repeated-measures (longitudinal) SSM analysis,
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+for exploratory circumplex-structure tests,
+[`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+for the reliability of the circumplex axes (Strack et al., 2013), and
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+a diagnostic for whether an
+[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+result’s confidence intervals can be trusted at your sample size and
+profile (Zimmermann & Wright, 2017). The plotting layer has been rebuilt
+on a real ggplot2 coordinate system.
+
+### Breaking changes and changed behavior
+
+- The component standard errors reported by
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  are now calibrated. Previously they were computed as if the item
+  correlation matrix were a covariance matrix — the source paper’s own
+  practice, documented as approximate — which for strong-axes
+  instruments overstated the standard error of the axes variance by
+  25–45%, and for weak-axes, strong-general instruments could understate
+  it slightly. Because the error changed sign across the range of
+  instruments the function accepts, no fixed caveat could state it
+  honestly. Point estimates, reliabilities, SEm, degrees of freedom, and
+  SRMR are all unchanged; the remaining fit statistics are corrected
+  separately, below. Corrected standard errors are typically *smaller*
+  than those printed in Strack et al. (2013), whose LISREL values carry
+  the same uncorrected approximation. The uncorrected values remain
+  available in `details$se_uncorrected`.
+
+- The global fit statistics reported by
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  are now calibrated to the correlation metric. `chisq`, `pvalue`,
+  `rmsea` and `cfi` are Satorra-Bentler-type *scaled* values, computed
+  by dividing the chi-square by a factor evaluated at the fitted matrix
+  (with `cfi` also scaling its baseline model); `df` and `srmr` are
+  unchanged. Previously these carried the same correlation-as-covariance
+  mismatch as the standard errors did, running the other way: sample
+  correlations vary less than covariances, so the test statistic came
+  out too small and fit was flattered — by roughly 4% at one reference
+  population, which the documentation had reported as though it were a
+  constant. It is not a constant, and the scaling factor is now
+  recomputed for every fit. All three input paths scale, including
+  `missing = "fiml"`. Expect slightly larger chi-squares, smaller
+  p-values, slightly higher RMSEA, and slightly lower CFI than previous
+  versions reported on the same data. The unscaled values remain
+  available in `details$fit_uncorrected`, with the factors in
+  `details$scaling_factor`. If the factor cannot be computed, the four
+  are `NA` with the reason in `details$fit_scaling_failed` rather than
+  falling back to the unscaled values. The correction is calibrated in
+  mean and its test is asymptotically exact, but at small samples
+  relative to the item count it over-rejects: see
+  [`?axes_reliability`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  for the measured rates and the sample sizes they were measured at.
+  Note the direction — the scaled test over-flags misfit, where the
+  uncorrected one flattered it. These follow the definitions lavaan
+  calls `chisq.scaled`, `pvalue.scaled`, `rmsea.scaled` and
+  `cfi.scaled`, not its `*.robust` forms. Since the fit itself is
+  estimated with plain ML, `fitMeasures()` on an equivalent fit reports
+  the unscaled values under the bare names and no `*.scaled` or
+  `*.robust` measure at all, so a cross-check against lavaan’s bare
+  `cfi` will differ and a request for `cfi.robust` will come back empty.
+
+- [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  now refuses a degenerate fitted covariance matrix under a single
+  stated criterion, evaluated in the metric every reported number is
+  computed in. Where it refuses, both surfaces refuse: the component
+  standard errors and the four scaled statistics (`chisq`, `pvalue`,
+  `rmsea`, `cfi`) are `NA` together, each surface’s warning names that
+  shared reason, and `df` and `srmr` still report. Which fits it refuses
+  is settled in two steps. A fitted matrix whose smallest eigenvalue,
+  relative to its largest, falls at or below
+  `sqrt(p * .Machine$double.eps / 1e-5)` is not refused for that alone —
+  it is checked. The check replays that fit’s own arithmetic in roughly
+  31-digit precision and estimates the relative error the numbers it
+  produced actually carry — the corrected standard errors, the factor
+  the scaled statistics are divided by, and the ratio that multiplies
+  the reported standard error on the `missing = "fiml"` path; a fit
+  whose worst estimate is within the accuracy target `1e-4` computes
+  normally. Most fits below the floor do: over the geometries measured,
+  their estimated errors run around `1e-11`. A fit whose worst estimate
+  exceeds the target, or that the check cannot price at all, is refused
+  as `"uncertified"`, and its warning names that same worst estimate —
+  so a fit can be refused on that ratio while its standard errors alone
+  would have passed. The other two reasons never reach the check:
+  `"indefinite"` where the smallest eigenvalue is negative by more than
+  the fit’s own convergence noise — a statement about the model rather
+  than about arithmetic, which no arithmetic check can license — and
+  `"singular"` where the matrix carries non-finite entries, which the
+  check cannot price. The `1e-5` is the accuracy target `1e-4` — the
+  largest relative error a reported standard error may carry, set from
+  the resolution those standard errors are printed at and from the
+  coverage of a nominal 95% Wald interval, and corroborated by the
+  standard error’s own sampling variability, under which a numerical
+  error at the target is about a tenth of the statistical noise already
+  in the number at sample sizes up to about 500,000 for `1/sqrt(2)`, the
+  typical relative sampling coefficient, and only up to about 2,000 for
+  `0.045`, the least favorable geometry measured (below the sample sizes
+  typical of published circumplex correlation matrices) — divided by the
+  factor of `10` by which the criterion’s error bound may undershoot the
+  error it stands for. Where this criterion refuses a fit as
+  `"uncertified"`, the warning also names the estimated relative error,
+  and then the conditioning — the condition number where the smallest
+  eigenvalue is positive, and otherwise that the matrix is numerically
+  rank-deficient, which is what a duplicate item pair makes it — and
+  names item pairs correlated tightly enough to force the refusal on
+  their own: one pair with advice to drop one of them, several with the
+  count and up to three of them named. That diagnosis rides the warning;
+  the stored result’s reason fields, and the note
+  [`print()`](https://rdrr.io/r/base/print.html) shows for them, still
+  carry the bare code. (The scaled-fit surface has a second, separate
+  refusal, `"ill_conditioned"`, for a numerical cancellation rather than
+  for conditioning; that one carries no such diagnosis, because it is
+  reached only by a matrix this criterion accepted, whose conditioning
+  is therefore not the reason.) The standard-error surface additionally
+  applies the same criterion to the raw fitted matrix, which one
+  internal arm of its computation — the uncorrected normal-theory
+  pricing kept only as a diagnostic tie to lavaan’s own standard errors
+  — inverts. A matrix degenerate only in the raw metric (wildly unequal
+  fitted variances over a well-conditioned correlation structure)
+  refuses that internal arm alone: the reported standard errors and
+  scaled fit statistics all compute, with no warning, and the internal
+  refusal is recorded silently in `details$naive_reason` (a new
+  `details` field, `NULL` whenever that arm computed) under the same
+  reason vocabulary. Under the shared criterion the two surfaces’
+  user-facing refusals therefore agree exactly, and on a unit-diagonal
+  fitted matrix the two metrics coincide; each surface retains its own
+  refusals outside the criterion (such as the saturated-model door,
+  which touches only the fit statistics). Previously the two surfaces
+  disagreed at the numerical margin — whichever internal
+  [`solve()`](https://rdrr.io/r/base/solve.html) failed first refused
+  with an incidental label — so a sufficiently degenerate fitted matrix
+  could yield `NA` corrected standard errors beside silently scaled fit
+  statistics derived from the same matrix. The failure-reason vocabulary
+  is now shared across both surfaces, and the reported literals change
+  as follows. On `details$se_correction_failed` alone: a nonpositive
+  fitted variance reports `"singular"` where it previously reported
+  `"nonpositive_diagonal"`, and a positive-infinite one reports
+  `"infinite_diagonal"` rather than `"unidentified"`. On
+  `details$se_correction_failed` and `details$fit_scaling_failed` alike:
+  an exactly singular fitted matrix reports `"uncertified"` where both
+  previously reported `"singular"`, and an indefinite one reports
+  `"indefinite"` deliberately or `"uncertified"` at the numerical
+  margin, per the refusal-vocabulary split in the next entry. Code that
+  branches on any of these reason strings needs updating.
+
+- [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)‘s
+  refusal reasons now say which degeneracy happened. Within the
+  degeneracy criterion’s refusal region, a fitted correlation structure
+  whose smallest eigenvalue is decisively negative — beyond the fit’s
+  own numerical noise band — reports `"indefinite"`, a statement about
+  the model; roundoff-level negativity, exact singularity, and
+  ill-conditioning severe enough to fail the per-fit accuracy check
+  report `"uncertified"`, a numerical caution. A saturated model (zero
+  degrees of freedom) is refused as `"saturated"` before any scaling
+  arithmetic runs, where it previously surfaced as `"indefinite"`
+  through an internal division by zero; and the final
+  nonpositive-scaling-factor backstop likewise reports
+  `"ill_conditioned"` rather than `"indefinite"`, an indefiniteness it
+  cannot diagnose. When the standard-error surface’s two internal arms
+  would label one matrix differently, the reported literal is the
+  correlation-metric arm’s — the same arm the fit-scaling surface prices
+  — so the two surfaces never name the same matrix differently. Two of
+  these changes are visible today only at the internal helpers’
+  documented contract boundary, not through any
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  call: `"saturated"` needs a three-item map, which
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  refuses, and the backstop’s relabel has not been observed to fire (a
+  30,000-draw search found no reaching input — recorded as not-reached,
+  not as unreachable); they are documented for code that branches on the
+  `details` reason fields.
+
+- [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  objects now report `details$n_moments`, the number of distinct
+  analyzed moments p\* = p(p+1)/2, and `details$baseline`, the
+  independence model’s unscaled chi-square and degrees of freedom.
+  `details$n` is documented now as the sample size the fit was priced
+  at, as distinct from `n_total` and `n_complete`. Together `n_moments`
+  and `n` let you locate a fit on the calibration table in
+  [`vignette("axes-reliability")`](http://circumplex.jmgirard.com/dev/articles/axes-reliability.md);
+  `baseline`, with `fit$chisq`, `fit$df` and the `baseline` element of
+  `details$scaling_factor`, lets you reproduce the reported `cfi`.
+
+- The displacement-interpretability guardrail in
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) now uses a
+  scale-free rule: a profile’s displacement is certified as
+  interpretable only when the amplitude confidence interval’s lower
+  bound sits at least 0.35 interval-widths above zero. This replaces the
+  rule introduced in 1.2.0, which certified whenever the lower bound
+  rounded above zero at the display precision — a threshold that moved
+  with the print `digits` and meant different things on different score
+  metrics, and that (as the new
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
-  errors informatively on occasions objects for now.
-
-- `cpm_fit(scaling = "free")` now also starts its optimizer from the
-  unit-scaling solution, so the free family’s fit statistic can never
-  exceed the default family’s on the same input beyond numerical
-  tolerance (the free family mathematically nests the default;
-  previously a rare multi-start tail — about 1 in 2,000 fits in
-  simulation — could land the free optimizer on a slightly worse
-  optimum). Results change only in those rare cases, and only for the
-  better; the default family is unaffected. The convergence-acceptance
-  criterion is unchanged and still requires the multi-start battery
-  itself to reproduce the reported optimum, so a fit rescued by the new
-  start may now carry the (accurate) acceptance warning where it
-  previously reported a slightly worse optimum silently.
+  diagnostic makes visible) certified a genuinely zero amplitude almost
+  every time. The new rule holds false-certification near the interval’s
+  one-sided error rate regardless of scale or display settings. As a
+  result, some near-zero-amplitude profiles that were previously
+  certified are now flagged uninterpretable. The threshold is calibrated
+  for the default 95% confidence interval.
 
 - Displacement and angle confidence-interval endpoints that land exactly
   on the 0/360 pole are now reported as 360, never 0, matching how the
@@ -300,6 +278,302 @@
   degenerate CI of `[0, 0]`, and now prints 360 throughout. An
   exact-pole endpoint is a measure-zero floating-point corner for real
   data, so numeric results are otherwise unchanged.
+
+- The CAIS’s second normative sample has been **withdrawn**, and `cais`
+  now ships one sample, the child sample. The CAIS is rated on a 5-point
+  scale, but three of the octant means its source publishes for the
+  second sample’s respondents fall above 5, so that sample is not on the
+  metric of the scores it would standardize and the z-scores it produced
+  were wrong in an undefined unit. It was therefore refused rather than
+  used (see the next item), which left it shipping as data no call could
+  accept. The transcription was faithful — the discrepancy originates in
+  the source’s own table — so the values survive, with the evidence and
+  what a reply from the authors would reopen, in the package’s source
+  repository under `cairn/references/sodano2006.md`. Code that passed
+  `sample = 2` to
+  [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  for the CAIS was already erroring and now errors saying the sample
+  does not exist. The CAIS child sample and every other instrument are
+  unaffected. See
+  [`?cais`](http://circumplex.jmgirard.com/dev/reference/cais.md).
+
+- [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  now refuses a normative sample whose mean scores fall outside the
+  instrument’s own response range, instead of returning z-scores
+  computed from it. Such a sample cannot be on the same metric as the
+  scores being standardized, so the values it produced were wrong in an
+  undefined unit, with nothing in the output to indicate it. No shipped
+  sample is now affected — the one that was is the withdrawn CAIS sample
+  above — and the check stands so that no future sample can enter the
+  roster off-metric.
+
+- [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  now reports which normative sample it used. Every successful call
+  prints the sample number, its size, its description and its reference
+  kind — for example, “Standardized against IIP-SC normative sample 1: N
+  = 872, American college students. Reference kind: identified published
+  source.” — and, where the instrument carries more than one sample,
+  says how many others are available. Which sample you standardize
+  against is a result-determining choice rather than a technicality:
+  across the shipped instruments, different samples of the same
+  instrument move a respondent’s z-scores by roughly half a standard
+  deviation on average, and by nearly twice that at the extreme. Pass
+  the new `quiet = TRUE` to suppress the message in loops and knitted
+  documents.
+
+- Every normative sample now records what kind of reference distribution
+  it is, in a new `Kind` column readable at `instrument$Norms[[2]]`. Six
+  of the 24 shipped samples — the IIP-32’s and IIP-64’s — were drawn to
+  represent a defined population, so their means and standard deviations
+  estimate that population’s; 16 are described in an identified
+  published source and describe that group of people and no wider frame;
+  and two appear in no source that has been identified at all.
+  [`norms()`](http://circumplex.jmgirard.com/dev/reference/norms.md)
+  prints the kind for each sample it lists, and
+  [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  names it in both its message and its attribute, so the distinction is
+  available where you choose a sample and where you use one. See
+  [`?norms`](http://circumplex.jmgirard.com/dev/reference/norms.md) for
+  what each kind means.
+
+- Every data frame returned by
+  [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  now carries a `"norm_sample"` attribute recording the instrument, the
+  sample number, its size, its description and its reference kind, so a
+  script that never sees the console can still report what its z-scores
+  are relative to. Retrieve it with `attr(x, "norm_sample")`. It is
+  attached whether or not `quiet` is set, and on both the
+  `append = TRUE` and `append = FALSE` return paths.
+
+- The package now requires ggplot2 (\>= 4.0.0), and `ggforce` is no
+  longer a dependency. Two base-R packages join Imports: `grid` (the
+  rebuilt coordinate system builds its axis-label backdrops as grobs)
+  and `parallel` (the worker pool behind
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)’s
+  `parallel`/`ncpus` arguments). The declared R requirement moves to R
+  (\>= 4.1) to match the floor ggplot2 already imposes; no installation
+  that worked before is affected.
+
+- [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)’s
+  extra arguments passed through `...` must now be named
+  (e.g. `prefix = "IIP_"`) and must be single strings; an unnamed or
+  non-scalar argument is now an error rather than being silently ignored
+  (previously it could yield unlabeled or garbled output columns). Rows
+  whose profile has undefined displacement now produce a single warning
+  reporting how many such rows there are, rather than one warning per
+  row.
+
+- Count-valued arguments (e.g. `boots`, `reps`, `ncpus`, `digits`, and
+  the sample size `n`) across
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
+  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
+  and
+  [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
+  are now uniformly validated as a single non-negative whole number. A
+  few of these previously accepted a length-greater-than-one vector
+  without complaint; such input now raises a clear error.
+
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  now warns and names any profile it cannot place on the circle because
+  its displacement is undefined (a flat or zero-amplitude profile),
+  instead of dropping it from the figure without notice.
+
+### Circumplex structure and model fitting
+
+- New
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  function estimates Browne’s (1992) circular stochastic process model
+  for the correlational structure of circumplex scales or items, a
+  native replacement for the archived CircE package. It accepts either
+  raw data or a correlation matrix, estimates item angles and
+  communality indices (with four model variants), and reports the usual
+  covariance-structure fit indices (chi-square, RMSEA with a 90%
+  confidence interval, SRMR, CFI, TLI, AIC, BIC). The returned
+  `circumplex_cpm` object has
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) methods. On the
+  raw-data path, confidence intervals are estimated by a nonparametric
+  bootstrap by default (resampling rows and refitting the model, with
+  percentile intervals; angle intervals use the package’s circular
+  quantile machinery, so an interval straddling the 0/360 degree
+  boundary is reported wrapped, as with displacement intervals).
+  Resamples that are degenerate or fail the convergence criterion are
+  excluded with a warning and counted in the output. Only the bootstrap
+  consumes R’s random number stream: call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  for reproducible intervals (point estimates are deterministic). On the
+  correlation-matrix path, intervals are analytic (Wald) — there is no
+  raw data to resample — and
+  [`summary()`](https://rdrr.io/r/base/summary.html) cautions when the
+  sample size is small enough that these may mis-cover. A `scaling`
+  argument selects the covariance-scaling family: `"unit"` (the default)
+  fits the correlation structure, while `"free"` fits Browne’s
+  covariance structure with `p` free variance scales — the
+  parameterization CIRCUM and CircE use — so
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  can reproduce their published output exactly. Free scaling adds `p`
+  parameters without changing the degrees of freedom, and reports the
+  fitted variance ratios in a `VarRatio` column (without confidence
+  intervals). With correlation input the two families’ model-test
+  statistics are calibration-indistinguishable (paired simulation at
+  sample sizes 250–50,000), so the default remains the recommended
+  family for routine inference; use `scaling = "free"` when the goal is
+  reproducing published CIRCUM/CircE output. `cpm_fit(scaling = "free")`
+  also starts its optimizer from the unit-scaling solution, so the free
+  family’s fit statistic can never exceed the default family’s on the
+  same input beyond numerical tolerance (the free family mathematically
+  nests the default).
+
+- The
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  estimator has been validated against the published CIRCUM/CircE
+  literature (Grassi, Luccio, & Di Blas, 2010, reanalyzing Browne’s 1992
+  vocational-interest example) and against independent OpenMx and lavaan
+  implementations of the same model (both now in Suggests as test
+  oracles only). CIRCUM and CircE fit Browne’s covariance
+  parameterization with free variance scalings;
+  `cpm_fit(scaling = "free")` fits that same family and reproduces their
+  published estimates, chi-square, and fit indices to printed precision,
+  while the default correlation-structure fit differs from them slightly
+  in finite samples (same degrees of freedom, asymptotically
+  equivalent); see the package’s design notes for details. A large
+  seeded simulation study measured the coverage of both interval
+  methods: based on its results,
+  [`summary()`](https://rdrr.io/r/base/summary.html) now also cautions
+  about analytic intervals at any sample size below 50,000 when the
+  fitted solution is near a parameter boundary or weakly identified
+  (Heywood case, removed harmonic, very small correlation-function
+  weight, ill-conditioning, or competing near-tied optima — the caution
+  names which), the regime where they measurably mis-covered. Percentile
+  bootstrap intervals were confirmed as the better default but are
+  themselves conservative-liberal in spots (notably for near-boundary
+  correlation-function weights); improving them is planned follow-up
+  work. On the bootstrap path,
+  [`summary()`](https://rdrr.io/r/base/summary.html) also lists any
+  fired markers in a descriptive note at every sample size, stating that
+  what has been measured about the markers covers analytic intervals
+  only — not every marker was measured, and none is validated as a
+  predictor of the bootstrap intervals shown.
+
+- New
+  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+  function evaluates whether a set of scales forms a circumplex using
+  the exploratory criteria of Acton & Revelle (2004). Four criteria are
+  computed from the first two unrotated principal-axis factors of the
+  scales’ correlations — the Fisher Test of equal axes, the Gap Test of
+  equal spacing, and the Variance (VT2) and Rotation tests of
+  interstitiality — and a fifth, the RANDALL correspondence index
+  (Hubert & Arabie, 1987; Tracey, 1997), tests the hypothesized circular
+  *order* of the scales with a randomization test that yields an exact
+  p-value. The factor-analytic statistics are classified against
+  interpretive cutoffs that were re-derived by simulation under Acton &
+  Revelle’s own generating model for eight (octant) scales — their
+  published cutoffs were calibrated on far more variables and do not
+  transfer — and that are keyed to the scoring, since these criteria
+  work best with a general factor removed.
+  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+  deviation-scores (ipsatizes) by default for that reason, with a raw
+  opt-out. Missing values are handled by listwise deletion by default (a
+  `listwise` argument, matching
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)),
+  so all five tests share one complete-case correlation matrix — the
+  metric the cutoffs were calibrated on. The returned
+  `circumplex_structure` object has
+  [`print()`](https://rdrr.io/r/base/print.html),
+  [`summary()`](https://rdrr.io/r/base/summary.html), and
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods;
+  interpretations are presented as the heuristic likelihood
+  classifications they are, never as significance tests.
+
+- New
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  function estimates the reliability (and standard error of measurement)
+  of the two circumplex axes with the item-level restricted
+  tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The
+  model decomposes each item’s variance into a general factor, the two
+  circumplex axes, scale specificity, and item specificity, and reads
+  the axes’ reliability off the isolated axes-variance component with
+  the Spearman-Brown formula — a confirmatory, item-level complement to
+  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)‘s
+  exploratory scale-level criteria. The Nunnally-Bernstein axis
+  reliability is reported alongside for comparison (it overestimates
+  when scale specificity is large). Items are supplied through a
+  `circumplex_instrument` or an explicit angle-and-item map. Any equally
+  spaced set of scale angles is accepted, at any rotation and any count
+  from four scales up — the canonical octants, an interstitial set
+  rotated off the axes, or a six- or twelve-scale circumplex. Unequally
+  spaced (quasi-circumplex) angles are refused rather than approximated,
+  and three scales are refused because the variance components are not
+  separately identified at that count. Scales may carry a single item
+  each, as Strack’s single-item circumplex types do: with one item at
+  every position no two items share a scale, so the scale-specificity
+  component is not identified and is dropped from the model rather than
+  estimated, leaving a three-row components table. A mixed instrument
+  carrying at least one multi-item scale still estimates it. Because
+  coefficient alpha is undefined for a one-item scale, the
+  Nunnally-Bernstein comparison is reported as `NA` with a stated reason
+  whenever any scale has fewer than two items — as Strack et
+  al. themselves do, leaving it blank for such instruments. Blockwise
+  instruments — those administering items in blocks cutting across the
+  scales — are supported through a `blocks` argument taking a list of
+  item columns, one element per block, which adds Strack’s
+  block-specificity component to the model and a `zeta2` row to the
+  components table. Blocks that carry no information the model lacks
+  (blocks that coincide with the scales, one block for everything, or
+  one block per item) leave the component unidentified, and it is
+  dropped with `details$zeta2_fitted` recording that, as scale
+  specificity is on a single-item instrument. Whether ignoring real
+  blocks matters depends on their geometry: the general factor is
+  inflated under most layouts and never deflated, while the axes
+  variance — and so the reliability — moves only when block membership
+  carries information about the angular distance between items. When
+  each block draws exactly one item from every scale it carries none,
+  and the reliability is unaffected; other layouts bias it in either
+  direction, and being evenly spread around the circle is not sufficient
+  for safety. Estimation works either from raw item data or, through
+  `cormat` and `n`, from a published item correlation matrix alone, for
+  reanalyzing a matrix whose raw data is not available; on that path the
+  Nunnally-Bernstein comparison is reported as `NA` and `sd = "raw"` is
+  refused, since both need the respondents’ own item scores. Missing
+  data are handled by listwise deletion by default, and a
+  `missing = "fiml"` setting estimates from every respondent who
+  answered at least one item by full-information maximum likelihood
+  instead. FIML assumes the data are missing at random and multivariate
+  normal, both stronger assumptions than listwise deletion needs: under
+  MCAR listwise deletion is already consistent and merely inefficient,
+  so the gain there is precision rather than correctness, while under
+  MAR listwise deletion is biased and FIML is not. The items are
+  standardized by the saturated model’s own FIML moments rather than by
+  whichever cells happen to be observed, and those columns feed a single
+  FIML fit; the reported standard errors are observed-information
+  standard errors on that standardized metric, conditional on the
+  standardization constants. Under `missing = "fiml"` the
+  Nunnally-Bernstein comparison is `NA` and `sd = "raw"` is refused,
+  both needing items observed by every respondent. Pairwise-deletion
+  correlations are never used on either setting. Strack et al. report no
+  missing-data analyses, so the FIML variant is certified against the
+  package’s own synthetic oracle rather than against their results. A
+  boundary fit returns `NA` reliability rather than a clipped value; and
+  the returned `circumplex_axes_reliability` object has
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) methods. A bundled
+  simulated dataset, `simulated_items`, is included for the examples.
+
+- New
+  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md)
+  function draws standardized observations from a fitted
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  model’s implied correlation matrix, using the model’s exact
+  positive-semidefinite factor representation. It returns a numeric
+  matrix with one column per scale (in fitted order, named), whose
+  population correlation matrix is the fitted `Phat`. Call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
+  it for reproducible draws.
+
+### Latent-variable (SEM) analysis
 
 - New SEM-based (latent-variable) SSM analysis:
   [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
@@ -350,62 +624,136 @@
   remains the right tool when invariance cannot be assumed; it answers
   its own, different question.
 
-- New vignette, “SEM-Based SSM Analysis,” teaching the latent SSM: the
-  disattenuated estimand and how it differs from the observed profile,
-  why amplitude and displacement intervals are built in-package rather
-  than by lavaan, the two group-difference estimands (observed
-  vs. invariance-gated latent) side by side, and the model-conditional
-  assumptions that make the latent parameters interpretable.
+- The invariance ladder that
+  [`print()`](https://rdrr.io/r/base/print.html) reports now also
+  carries `dcfi`, the change in CFI from the previous fitted rung, as a
+  labeled *secondary* criterion: Cheung and Rensvold’s (2002) general
+  rule rejects an invariance step when CFI falls by more than .01. (That
+  direction is taken from the article’s own Table 5, whose critical
+  values are the 1% *lower* tails of the simulated null distributions;
+  the sentence stating the rule on its p. 251 reads backwards relative
+  to that table, and the package follows the simulation.) It is reported
+  and never gates — the nested test alone decides comparability, the
+  verdict, and which fit the estimates come from — and the two criteria
+  can legitimately disagree, since a change in CFI is insensitive to
+  sample size where the nested test is not. The retain/reject label
+  prints only inside the envelope their simulation covers, which is
+  narrow: they simulated **two groups, ML estimation, and multivariate
+  normal data, and examined Type I error only** — not power — and robust
+  CFI variants were not part of their study. So the label appears only
+  for a two-group fit estimated by ML whose CFI is the plain, non-robust
+  one. `estimator = "ML"` is necessary but not sufficient:
+  `missing = "fiml"` also makes lavaan report a robust CFI, as do the
+  `"MLR"` default and `"MLM"`. Under a robust CFI from any of those
+  routes, a non-ML estimator such as `"GLS"`, or more than two groups,
+  the `dcfi` value still prints, marked as not validated for that
+  configuration, with a note naming which condition applies and carrying
+  no verdict — extending the cutoff there would require simulation that
+  has not been done.
 
-This version’s flagship addition is
-[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
-a native reimplementation of Browne’s (1992) circular stochastic process
-model for the correlational structure of circumplex scales — filling the
-gap left by the archived CircE package, the previous R implementation.
-It ships alongside
-[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
-a new diagnostic for whether an
-[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-result’s confidence intervals can be trusted at your sample size and
-profile (Zimmermann & Wright, 2017). See the new vignette, “Evaluating
-Circumplex Structure”, for a worked introduction to both.
+### Repeated-measures and longitudinal analysis
 
-- The displacement-interpretability guardrail in
-  [`print()`](https://rdrr.io/r/base/print.html) and
-  [`summary()`](https://rdrr.io/r/base/summary.html) now uses a
-  scale-free rule: a profile’s displacement is certified as
-  interpretable only when the amplitude confidence interval’s lower
-  bound sits at least 0.35 interval-widths above zero. This replaces the
-  rule introduced in 1.2.0, which certified whenever the lower bound
-  rounded above zero at the display precision — a threshold that moved
-  with the print `digits` and meant different things on different score
-  metrics, and that (as the new
-  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
-  diagnostic makes visible) certified a genuinely zero amplitude almost
-  every time. The new rule holds false-certification near the interval’s
-  one-sided error rate regardless of scale or display settings. As a
-  result, some near-zero-amplitude profiles that were previously
-  certified are now flagged uninterpretable. The threshold is calibrated
-  for the default 95% confidence interval.
+- New repeated-measures (longitudinal) SSM analyses:
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  gains an `occasions` argument taking a named list of column blocks,
+  one per occasion, each selecting the same circumplex scales measured
+  at that occasion (wide data, one row per person). Every occasion
+  yields its own profile row, occasions cross with `grouping`, and
+  `contrast = TRUE` with exactly two occasions (single group) estimates
+  the paired within-person contrast — second listed occasion minus first
+  — through both engines: the bootstrap resamples persons (preserving
+  within-person dependence nonparametrically) and the Monte Carlo engine
+  draws the stacked occasion mean vectors jointly. Cross-occasion column
+  alignment is validated by stem matching (a reordered occasion block
+  errors instead of silently rotating displacement). Occasions analyses
+  are listwise-only across waves, with the dropped-person count messaged
+  and a selection caution documented. Results from occasions analyses
+  carry a new `Occasion` column that is present only for such analyses —
+  downstream code should test for the column by name. Coverage of the
+  paired contrasts was validated by simulation at nominal rate across
+  boundary cells (displacement changes near 0 and 180 degrees, CIs
+  straddling the 0/360 pole, small samples, three occasions); note that
+  paired contrasts are not unconditionally more efficient than
+  independent-groups designs (see the new Occasions section in
+  [`?ssm_analyze`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)).
 
-- New vignette, “Evaluating Circumplex Structure”: how to test whether
-  an instrument fits a circumplex in your sample with
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  (reading and benchmarking the fit indices, comparing the constrained
-  model variants, and the boundary-solution/chi-square cautions from the
-  package’s validation simulations), and how to check whether SSM
-  confidence intervals can be trusted at your sample size and profile
-  with
-  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md).
-  Summarizes Zimmermann & Wright’s (2017) simulation findings as cited
-  context (transcribed from the published article), reproduces their
-  Study 5 analyses on the bundled `jz2017` data, and adds guidance on
-  when to trust each SSM parameter and on what ipsatizing octant scores
-  costs an SSM analysis. The diagnostic itself was validated against the
-  article: configured to transcribed Zimmermann & Wright simulation
-  conditions, it reproduces their published accuracy classifications
-  (validation scripts and results are recorded in the package’s
-  development repository).
+- New
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md)
+  provides a long-format (one row per person per occasion) interface to
+  the repeated-measures occasions analysis. It reshapes the data to the
+  wide layout
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  expects and delegates to it, so the estimation, paired within-person
+  contrasts, and listwise missing-wave handling are unchanged. Occasion
+  order is taken from the factor levels (or first appearance) of the
+  `occasion` column and is never sorted alphabetically, so a `T10`/`T2`
+  pair keeps its temporal order.
+
+- New per-person (intraindividual) SSM scoring:
+  [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
+  scores each person’s own circumplex profile through the closed-form
+  SSM transform and returns a per-person parameter table — one row per
+  person, with an `id` argument that first averages a person’s rows
+  (e.g., occasions of intensive longitudinal data) within person before
+  scoring. Degenerate profiles keep their row with `NA` parameters
+  (never a silent drop), and an `na_rate` column exposes each person’s
+  share of missing scale cells. A
+  [`summary()`](https://rdrr.io/r/base/summary.html) method aggregates
+  the table at the group level using circular statistics for
+  displacement (circular mean and mean resultant length, never
+  arithmetic means of angles), reporting how many undefined
+  displacements were excluded. Two documented caveats: the circular mean
+  of per-person displacements (equal weight per person) is a different
+  quantity from the displacement of the group mean profile
+  (amplitude-weighted), and by the triangle inequality the group
+  profile’s amplitude is at most the mean per-person amplitude, strictly
+  smaller when directions disperse.
+
+- New Bayesian draws adapter:
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
+  converts posterior draws from a user-fitted Bayesian model (e.g., a
+  brms cosine regression) into SSM parameter draws and summarizes them
+  with the package’s circular-statistics machinery — circular quantiles
+  for displacement (credible intervals that straddle 0/360 wrap instead
+  of inverting), posterior medians for the linear parameters (the
+  amplitude posterior is right-skewed), and the circular mean for
+  displacement, with the marginal-coherence caveat documented. Two draw
+  shapes are accepted and never guessed: (e, x, y) parameter draws
+  (`type = "parameters"`, required because a 3-column matrix is
+  ambiguous) and profile draws (one column per scale, with `angles`).
+  Draws with undefined displacement are excluded from the displacement
+  summaries only, with an honest warning that says “posterior draws” and
+  “credible interval”.
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
+  objects also apply the package’s displacement-certification rule to
+  the amplitude credible interval: when the interval’s lower bound sits
+  under 0.35 interval-widths above zero, printing notes that the
+  displacement is not interpretable, and the verdict is stored in
+  `$details$certified`.
+
+- New growth-model support for repeated-measures SSM analysis,
+  documented in a new vignette (“Growth Models on SSM Parameters”): fit
+  a *joint* mixed model to the per-person Cartesian coordinates from
+  [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
+  (the reference recipe uses glmmTMB, now in Suggests; fitting the
+  coordinates with separate univariate models silently zeroes their
+  cross-covariance and produces wrong displacement intervals), then
+  convert fixed-effect draws to amplitude/displacement trajectories with
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md).
+  The recipe was validated by simulation: pointwise displacement
+  coverage is nominal in a pole-crossing design, and the univariate
+  shortcut demonstrably fails coverage under correlated person effects.
+
+- New
+  [`angle_unwrap()`](http://circumplex.jmgirard.com/dev/reference/angle_unwrap.md)
+  helper unwraps a temporally ordered sequence of angles onto a
+  continuous branch (350, 10, 30 becomes 350, 370, 390), supporting the
+  vignette’s alternative unwrap-then-model recipe. Inputs are wrapped to
+  \[0, 360) first; an exact 180-degree step ascends (the package’s
+  half-turn convention); `NA` makes later waves branch-ambiguous and so
+  propagates onward.
+
+### Interval methods and diagnostics
 
 - New
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
@@ -457,182 +805,17 @@ Circumplex Structure”, for a worked introduction to both.
   `ssm_ci_accuracy(..., data = )`, which is checked for consistency
   against the stored profiles.
 
-- New
-  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
-  function evaluates whether a set of scales forms a circumplex using
-  the exploratory criteria of Acton & Revelle (2004). Four criteria are
-  computed from the first two unrotated principal-axis factors of the
-  scales’ correlations — the Fisher Test of equal axes, the Gap Test of
-  equal spacing, and the Variance (VT2) and Rotation tests of
-  interstitiality — and a fifth, the RANDALL correspondence index
-  (Hubert & Arabie, 1987; Tracey, 1997), tests the hypothesized circular
-  *order* of the scales with a randomization test that yields an exact
-  p-value. The factor-analytic statistics are classified against
-  interpretive cutoffs that were re-derived by simulation under Acton &
-  Revelle’s own generating model for eight (octant) scales — their
-  published cutoffs were calibrated on far more variables and do not
-  transfer — and that are keyed to the scoring, since these criteria
-  work best with a general factor removed.
-  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
-  deviation-scores (ipsatizes) by default for that reason, with a raw
-  opt-out. Missing values are handled by listwise deletion by default (a
-  `listwise` argument, matching
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)),
-  so all five tests share one complete-case correlation matrix — the
-  metric the cutoffs were calibrated on. The returned
-  `circumplex_structure` object has
-  [`print()`](https://rdrr.io/r/base/print.html),
-  [`summary()`](https://rdrr.io/r/base/summary.html), and
-  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods;
-  interpretations are presented as the heuristic likelihood
-  classifications they are, never as significance tests. See the
-  “Evaluating Circumplex Structure” vignette.
-
-- The Monte Carlo interval engine (`ssm_analyze(method = "montecarlo")`)
-  is faster on correlation-based analyses: the influence-function
-  covariance is built in one vectorized pass and all profile rows are
-  propagated through the SSM transformation in a single compiled call.
-  Results are unchanged (byte-identical for a fixed seed).
-
-- New
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  function estimates Browne’s (1992) circular stochastic process model
-  for the correlational structure of circumplex scales or items, a
-  native replacement for the archived CircE package. It accepts either
-  raw data or a correlation matrix, estimates item angles and
-  communality indices (with four model variants), and reports the usual
-  covariance-structure fit indices (chi-square, RMSEA with a 90%
-  confidence interval, SRMR, CFI, TLI, AIC, BIC). The returned
-  `circumplex_cpm` object has
-  [`print()`](https://rdrr.io/r/base/print.html) and
-  [`summary()`](https://rdrr.io/r/base/summary.html) methods. On the
-  raw-data path, confidence intervals are estimated by a nonparametric
-  bootstrap by default (resampling rows and refitting the model, with
-  percentile intervals; angle intervals use the package’s circular
-  quantile machinery, so an interval straddling the 0/360 degree
-  boundary is reported wrapped, as with displacement intervals).
-  Resamples that are degenerate or fail the convergence criterion are
-  excluded with a warning and counted in the output. Only the bootstrap
-  consumes R’s random number stream: call
-  [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  for reproducible intervals (point estimates are deterministic). On the
-  correlation-matrix path, intervals are analytic (Wald) — there is no
-  raw data to resample — and
-  [`summary()`](https://rdrr.io/r/base/summary.html) cautions when the
-  sample size is small enough that these may mis-cover. A `scaling`
-  argument selects the covariance-scaling family: `"unit"` (the default)
-  fits the correlation structure, while `"free"` fits Browne’s
-  covariance structure with `p` free variance scales — the
-  parameterization CIRCUM and CircE use — so
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  can reproduce their published output exactly. Free scaling adds `p`
-  parameters without changing the degrees of freedom, and reports the
-  fitted variance ratios in a `VarRatio` column (without confidence
-  intervals). With correlation input the two families’ model-test
-  statistics are calibration-indistinguishable (paired simulation at
-  sample sizes 250–50,000), so the default remains the recommended
-  family for routine inference; use `scaling = "free"` when the goal is
-  reproducing published CIRCUM/CircE output.
-
-- The
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  estimator has been validated against the published CIRCUM/CircE
-  literature (Grassi, Luccio, & Di Blas, 2010, reanalyzing Browne’s 1992
-  vocational-interest example) and against independent OpenMx and lavaan
-  implementations of the same model (both now in Suggests as test
-  oracles only). CIRCUM and CircE fit Browne’s covariance
-  parameterization with free variance scalings;
-  `cpm_fit(scaling = "free")` fits that same family and reproduces their
-  published estimates, chi-square, and fit indices to printed precision,
-  while the default correlation-structure fit differs from them slightly
-  in finite samples (same degrees of freedom, asymptotically
-  equivalent); see the package’s design notes for details. A large
-  seeded simulation study measured the coverage of both interval
-  methods: based on its results,
-  [`summary()`](https://rdrr.io/r/base/summary.html) now also cautions
-  about analytic intervals at any sample size below 50,000 when the
-  fitted solution is near a parameter boundary or weakly identified
-  (Heywood case, removed harmonic, very small correlation-function
-  weight, ill-conditioning, or competing near-tied optima — the caution
-  names which), the regime where they measurably mis-covered. Percentile
-  bootstrap intervals were confirmed as the better default but are
-  themselves conservative-liberal in spots (notably for near-boundary
-  correlation-function weights); improving them is planned follow-up
-  work.
-
-- New
-  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md)
-  function draws standardized observations from a fitted
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  model’s implied correlation matrix, using the model’s exact
-  positive-semidefinite factor representation. It returns a numeric
-  matrix with one column per scale (in fitted order, named), whose
-  population correlation matrix is the fitted `Phat`. Call
-  [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
-  it for reproducible draws.
-
-- New [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method
-  for `circumplex_cpm` objects draws the estimated item configuration on
-  the
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  canvas: each scale appears at its estimated angle and at a radius
-  given by its communality, with a wedge spanning its angle and
-  communality confidence intervals where these are estimable (scales
-  with an inestimable interval are drawn as a point only and named).
-
-- New
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  function builds an empty circumplex plotting canvas (amplitude rings,
-  displacement spokes, and scale labels) as a ggplot2 object that you
-  can add layers to with `+`. It accepts a set of scale `angles` and
-  `labels`, or a `circumplex_instrument` object to derive both
-  automatically. This is the first piece of a public circumplex
-  visualization layer; the package’s own
-  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  draws on the same canvas.
-
-- New
-  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
-  and
-  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
-  layers draw SSM profile points and their confidence-region arcs
-  directly in circumplex space on a
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  canvas, taking amplitude and displacement as aesthetics and handling
-  the polar transform (including wrap-around at the 0/360 degree
-  boundary) internally. These make it possible to build custom
-  circumplex figures by composing ggplot2 layers.
-
-- New
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
-  provides an angle-labeled x-axis scale for linear circumplex plots
-  (such as the score-by-angle curve). It labels axis breaks with their
-  angle in degrees by default, or with custom labels or a
-  `circumplex_instrument`’s scale abbreviations, using the same
-  conventions as
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
-
-- New vignette “Advanced Circumplex Visualization” shows how to build
-  custom circumplex figures by composing
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
-  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
-  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
-  and
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
-  with other ggplot2 components.
-
-- [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  and
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
-  now label and place circumplex scales at their exact angles, including
-  non-integer angles (for example, the 22.5-degree spacing of a 16-scale
-  instrument), instead of rounding them to whole degrees.
-
-- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  now warns and names any profile it cannot place on the circle because
-  its displacement is undefined (a flat or zero-amplitude profile),
-  instead of dropping it from the figure without notice.
+- [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  also assesses repeated-measures occasions analyses. Its plug-in
+  population is a multivariate normal with the observed stacked
+  cross-occasion covariance, so the within-person dependence across
+  occasions is carried into the simulation (rather than ignored); it
+  reports CI trustworthiness per occasion and for the paired
+  within-person contrast. A flat occasion is refused by name, a
+  rank-deficient stacked covariance is flagged (the fit-statistic pass
+  rate becomes descriptive), and because the occasions population is the
+  observed covariance the `structure`/`cpm` arguments are not accepted
+  on that path.
 
 - [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
   gains a `method` argument offering a Monte Carlo alternative to the
@@ -658,25 +841,397 @@ Circumplex Structure”, for a worked introduction to both.
   regardless of these settings, so parallelizing never changes your
   estimates or confidence intervals.
 
+- The Monte Carlo interval engine (`ssm_analyze(method = "montecarlo")`)
+  is faster on correlation-based analyses: the influence-function
+  covariance is built in one vectorized pass and all profile rows are
+  propagated through the SSM transformation in a single compiled call.
+  Results are unchanged (byte-identical for a fixed seed).
+
 - [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
   is now vectorized internally (one compiled call instead of a row-wise
   loop), making it much faster on large data sets. Results are
-  unchanged. Rows whose profile has undefined displacement now produce a
-  single warning reporting how many such rows there are, rather than one
-  warning per row. Extra arguments passed through `...` must now be
-  named (e.g. `prefix = "IIP_"`) and must be single strings; an unnamed
-  or non-scalar argument is now an error rather than being silently
-  ignored (previously it could yield unlabeled or garbled output
-  columns).
+  unchanged.
 
-- Fixed a bug where a bootstrap resample under pairwise deletion
-  (`listwise = FALSE`) could crash
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-  with `mean(): object has no elements` when the resample happened to
-  draw only missing values for one scale. Such a scale now yields an
-  `NA` mean (matching the correlation path), and the affected resample
-  is excluded from the confidence intervals as a degenerate profile,
-  consistent with the existing degeneracy handling.
+### Visualization
+
+- Circumplex figures are now built on a real ggplot2 coordinate system.
+  The new
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  owns the amplitude-to-radius scaling and the displacement-to-angle
+  transform in one place, so a canvas and its data layers can no longer
+  disagree about the outer-ring amplitude. It adds a configurable
+  amplitude *center* (the rings relabel and the amplitudes remap
+  together) and a theme-responsive canvas: the rings, spokes, and labels
+  drawn by
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  now restyle through `+ theme_*()`. It always draws an amplitude ring
+  at `amax`, so every circumplex canvas closes at its rim and no point
+  is drawn past the last visible ring; that rim ring is unlabeled unless
+  `amax` is itself one of the axis breaks. A non-finite `amax` or
+  `center` is rejected with a message naming the argument.
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
+  and
+  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  keep their signatures and correct output. The per-layer `amax`
+  argument (and
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)’s
+  `n`) are no longer needed and are ignored with a one-time note.
+
+- New
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  function builds an empty circumplex plotting canvas (amplitude rings,
+  displacement spokes, and scale labels) as a ggplot2 object that you
+  can add layers to with `+`. It accepts a set of scale `angles` and
+  `labels`, or a `circumplex_instrument` object to derive both
+  automatically. The package’s own
+  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  draws on the same canvas.
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  and
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  label and place circumplex scales at their exact angles, including
+  non-integer angles (for example, the 22.5-degree spacing of a 16-scale
+  instrument), instead of rounding them to whole degrees.
+
+- New
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
+  and
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
+  layers draw SSM profile points and their confidence-region arcs
+  directly in circumplex space on a
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  canvas, taking amplitude and displacement as aesthetics and handling
+  the polar transform (including wrap-around at the 0/360 degree
+  boundary) internally. These make it possible to build custom
+  circumplex figures by composing ggplot2 layers.
+
+- New
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  provides an angle-labeled x-axis scale for linear circumplex plots
+  (such as the score-by-angle curve). It labels axis breaks with their
+  angle in degrees by default, or with custom labels or a
+  `circumplex_instrument`’s scale abbreviations, using the same
+  conventions as
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
+
+- The circumplex ggplot2 layers are extensible and ergonomic. The
+  `GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` ggproto generators
+  are exported so downstream packages can subclass them. The amplitude
+  (radial) axis and its labels are drawn in the widest gap between the
+  displacement spokes, so they no longer overlap a spoke label;
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  gains an `r_axis_angle` argument to place it manually. The canvas
+  theme is exported as
+  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md).
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
+  and
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
+  follow the ggplot2 `na.rm` convention: with `na.rm = FALSE` they warn
+  (with the count) before dropping profiles that cannot be placed, while
+  the default `na.rm = TRUE` drops them silently.
+  `ssm_plot_circle(repel = TRUE)` now gives a clear error when the
+  suggested `ggrepel` package is not installed.
+
+- The new
+  [`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
+  layer draws a profile’s movement across occasions as a path on the
+  circumplex canvas, so change in amplitude and displacement reads as
+  motion in circumplex space rather than only as separate parameter
+  panels. Each segment is curved along the circle by
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md).
+  Consecutive occasions are joined the short way around the 0/360
+  boundary, so a step from 350 to 10 degrees is drawn as a 20 degree arc
+  across the pole rather than a 340 degree sweep the long way round.
+  Occasions are connected in data order, with `group` separating one
+  series from another and an optional `order` aesthetic to sort within a
+  series; an optional `arrow` marks the direction of time. An occasion
+  with no defined displacement (a flat or zero-amplitude profile) breaks
+  the path rather than being interpolated through, and the segment after
+  the gap is still drawn on the correct branch.
+
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  gains a `path` argument that adds this movement path to its usual
+  points and confidence wedges, for results from
+  `ssm_analyze(occasions = )` and
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md).
+  Occasions are connected in the order they were supplied, never
+  alphabetically.
+
+- The new
+  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  plots how each SSM parameter changes across occasions, one panel per
+  parameter with its confidence interval as a band, for results from
+  `ssm_analyze(occasions = )` and
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md).
+  The displacement panel is drawn on an unwrapped branch, so a profile
+  whose displacement crosses the 0/360 boundary is shown as one
+  continuous path instead of jumping a full turn, and each confidence
+  bound is placed on its own estimate’s branch. Occasions appear in the
+  order they were supplied, never alphabetically. An occasion whose
+  amplitude is too close to zero for its displacement to be
+  interpretable is marked with a hollow point, and a profile with no
+  defined displacement leaves a gap rather than a spurious segment.
+
+- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  also accepts a **trajectory table**: a data frame with one row per
+  time point, a numeric time column named by the new `time` argument,
+  and `a_est`/`a_lci`/`a_uci` and `d_est`/`d_lci`/`d_uci` columns
+  (optionally the `e_*`, `x_*`, and `y_*` triples and a logical
+  `certified` column). This is the shape a model-based workflow
+  assembles by evaluating a fitted growth model at each time point and
+  passing the draws through
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md),
+  and it is plotted on a continuous time axis, so unequally spaced time
+  points are drawn at their actual spacing. Only the panels the table
+  can fill are drawn. The displacement unwrap, the interval placement,
+  and the hollow marking of uninterpretable time points are shared with
+  the occasions path; when no `certified` column is supplied, the figure
+  makes no interpretability claim rather than asserting one.
+
+- New [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method
+  for `circumplex_cpm` objects draws the estimated item configuration on
+  the
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  canvas: each scale appears at its estimated angle and at a radius
+  given by its communality, with a wedge spanning its angle and
+  communality confidence intervals where these are estimable (scales
+  with an inestimable interval are drawn as a point only and named).
+
+- The amplitude axis labels are now drawn over a translucent backdrop,
+  so they stay readable where a data layer falls behind them. The
+  amplitude axis is drawn on top of the plotted data, which kept the
+  labels visible but not legible: a label crossing a dark marker, an
+  arrowhead, or a dense scatter had too little contrast against it to
+  read. The backdrop is deliberately translucent rather than opaque, so
+  it restores contrast without hiding the data it covers.
+
+### Instrument data
+
+- The normative data shipped with `csie`, `csig`, `csip`, `csiv` and
+  `iitc` has been re-verified against its published sources, value by
+  value. Every mean, standard deviation and sample size was confirmed
+  correct, as was every item-to-scale assignment its source publishes;
+  no norm value changed.
+- The source recorded for two of those instruments did change. `csiv`
+  now reports its norms as unpublished data from the instrument’s author
+  rather than attributing them to Locke (2000), whose article reports a
+  different sample and publishes no octant statistics. The `URL`
+  recorded for `csie` and `csiv` now points at the author’s current
+  norms tables; the previous addresses had been redirected to a site
+  homepage. Use
+  [`norms()`](http://circumplex.jmgirard.com/dev/reference/norms.md) to
+  see the provenance recorded for any instrument.
+- [`?norms`](http://circumplex.jmgirard.com/dev/reference/norms.md) now
+  states that the population shown for a normative sample is a short
+  standardized label chosen by this package, deliberately broader than
+  the description the original source gives.
+- [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  now works with `iei`. The sample column of the IEI’s normative data
+  had been built so that its two samples were interleaved rather than
+  stacked, which left each sample holding four octants twice and four
+  not at all; standardizing against either IEI sample failed with an
+  error about duplicate angles. No normative value was wrong, and no
+  other instrument was affected.
+- The reference recorded for the `iei` norms misspelled the second
+  author’s name and now reads Horner, Locke, & Hulsey (2024).
+- The normative data shipped with `iis32`, `iis64`, `ipipipc` and `isc`
+  has now been re-verified the same way. For `iis64` and `isc`, every
+  mean, standard deviation and sample size was confirmed correct against
+  the published source, as was every item-to-scale assignment the source
+  publishes.
+- For `iis32` and `ipipipc`, it could not be. Neither instrument’s cited
+  article publishes the octant means and standard deviations the package
+  ships: Hatcher and Rogers (2012) reports no descriptive statistics at
+  all, and Markey and Markey (2009) reports them only for a sample other
+  than the one the package names. No other source for them has been
+  identified. The values ship unchanged, since nothing establishes they
+  are wrong either, but the `Reference` recorded for each now says the
+  norms source is unconfirmed instead of crediting an article that does
+  not carry them, and
+  [`?iis32`](http://circumplex.jmgirard.com/dev/reference/iis32.md) and
+  [`?ipipipc`](http://circumplex.jmgirard.com/dev/reference/ipipipc.md)
+  say the same. Standardized scores from these two instruments should be
+  treated as resting on unverified norms.
+- Four item texts were wrong against their sources and are corrected. In
+  `iis64`, item 5 had been truncated to “I realize” and now reads “I
+  realize that I don’t have to be friends with everyone”, and item 7
+  read “not agreeable with others” where the source prints “not
+  agreeable to others”. In `iis32`, item 28 read “I’m ok with not being
+  included in all activities” where its own source prints “okay” (the
+  wording differs between the two IIS articles). In `ipipipc`, item 16
+  read “Don’t fall for sob-stories” where the source prints “sob
+  stories”.
+- The sources cited for `iitc` and `iei` were recorded as “in press” and
+  now give the published citations.
+- **`cais` scores change.** The CAIS item-to-scale key was wrong and is
+  corrected. The instrument’s 37 items are not distributed evenly across
+  the eight octants — its source assigns five items each to PA, BC, DE,
+  HI, LM and NO, four to FG and three to JK — but the key shipped four
+  items per octant, which put one Warm-Agreeable item into
+  Unassuming-Ingenuous, one Gregarious-Extraverted item into
+  Warm-Agreeable and one Assured-Dominant item into
+  Gregarious-Extraverted, and left the last five items scored into no
+  scale at all.
+  [`score()`](http://circumplex.jmgirard.com/dev/reference/score.md) and
+  anything downstream of it therefore returned different values than the
+  instrument’s authors defined, and
+  [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  compared those values against norms computed the correct way. **Seven
+  of the eight octants change under the correction:** PA gains the item
+  that had been scored as Gregarious-Extraverted, BC, DE and HI each
+  gain one of the previously unscored items, JK loses an item, and LM
+  and NO each lose one item and gain two. Only FG (items 4, 12, 20
+  and 28) is unchanged. Re-run any CAIS analysis. The item text and its
+  ordering were correct throughout.
+- The normative data shipped with `cais`, `iei`, `igicr` and `iipsc` has
+  now been re-verified against its published sources the same way as the
+  other nine. Every mean and standard deviation of the nine normative
+  samples those four instruments carried at the time was confirmed
+  correct, as was every scale angle the sources publish. (One of the
+  nine, the CAIS’s second sample, has since been withdrawn — see above.)
+  Four shipped values did not match their source and are corrected: the
+  `cais` item-to-scale key above, and the three provenance records
+  below.
+- Three provenance records changed with that verification. The `cais`
+  sample size for the child sample now reports 204, the sample size
+  printed on the table its means and standard deviations come from,
+  rather than the 213 given for the child sample elsewhere in the same
+  article. The `iipsc` college-student norms were credited to a 2011
+  publication and now name Hopwood, Pincus, DeMoor, & Koonce (2008), the
+  article that publishes them, which is also the DOI the instrument
+  already recorded;
+  [`?iipsc`](http://circumplex.jmgirard.com/dev/reference/iipsc.md) now
+  cites both of its normative sources rather than only one. The `iei`
+  `URL` pointed at the study’s data repository, which publishes neither
+  of its normative tables, and now gives one address per sample: the
+  author’s IEI norms page for the undergraduate sample and the article
+  for the community sample.
+- Every bundled instrument’s item-to-scale key is now checked to cover
+  each of the instrument’s items exactly once, so a key that silently
+  drops or double-counts an item — the `cais` failure above — cannot
+  ship again.
+- The normative data shipped with `iip32` and `iip64` has now been
+  re-verified against the IIP professional manual, which completes the
+  sweep: every one of the fifteen bundled instruments has now been
+  checked against a published source, though for `iis32` and `ipipipc`
+  that check is what established that no source publishes their values.
+  All 96 means and standard deviations of the six IIP normative samples
+  were confirmed correct, as were all 96 item-to-scale assignments and
+  the three IIP-64 sample sizes. No value changed. The manual prints no
+  sample sizes for the IIP-32 specifically, so its 800/400/400 are
+  carried over from the same standardization sample the manual describes
+  for the longer form, which is what the shorter form was scored from.
+- [`?iip32`](http://circumplex.jmgirard.com/dev/reference/iip32.md) and
+  [`?iip64`](http://circumplex.jmgirard.com/dev/reference/iip64.md) now
+  cite the third edition of the manual (Horowitz, Alden, Wiggins, &
+  Pincus, 2003, Mind Garden), the edition the shipped values were
+  verified against, rather than the earlier edition from a different
+  publisher; both help pages also carry the credit line the publisher’s
+  reproduction permission requires for the normative statistics.
+- The `Population` recorded for both IIP instruments’ normative samples
+  now describes them as a national standardization sample rather than as
+  community adults, which is what the manual reports: 800 adults sampled
+  to be representative of the U.S. adult population, with separate norms
+  for women and men.
+
+### Documentation
+
+- The “Evaluating Circumplex Structure” vignette gains a section, *When
+  a fit sits at a boundary*, on reading a
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  solution that sits at or near a parameter boundary — the regime the
+  vignette’s own worked example turns out to occupy. It glosses each of
+  the five boundary and weak-identification markers
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  records, reads the displayed fit’s Heywood case and its zero-width
+  communality interval, shows a fit whose
+  [`summary()`](https://rdrr.io/r/base/summary.html) prints the
+  fired-marker list, separates what the package’s validation simulations
+  measured from what they did not, and gives four concrete next steps.
+  [`?summary.circumplex_cpm`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_cpm.md)
+  points at it. The section on reading the estimated angles is also
+  corrected: it now says that one scale is held fixed to identify the
+  configuration, and describes the spacing the printed table actually
+  shows rather than calling the departures minor.
+
+- The “Using Circumplex Instruments” vignette and
+  [`?norms`](http://circumplex.jmgirard.com/dev/reference/norms.md) now
+  say precisely what the bundled normative statistics are, instead of
+  implying that a normative sample stands in for a population. The
+  standardizing section characterizes the shipped samples from the
+  instrument objects themselves — the counts are computed in the
+  vignette rather than written down — noting that many are single-study
+  samples of college students, that the IIP-32 and IIP-64 national
+  standardization samples are the exception at one end, and that two of
+  the tables are published in no identified source at the other. It
+  drops a claim that some instruments offer samples matched on
+  nationality (none do; the matched sets are by gender and by age), and
+  it resolves the choice between samples on which group your
+  participants resemble rather than on which sample is larger.
+  [`?norms`](http://circumplex.jmgirard.com/dev/reference/norms.md) now
+  adds that the `Population` label names the group a sample was drawn
+  from rather than a population it was drawn to represent, and points at
+  the vignette.
+
+- New vignette, “Evaluating Circumplex Structure”: how to test whether
+  an instrument fits a circumplex in your sample with
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  (reading and benchmarking the fit indices, comparing the constrained
+  model variants, and the boundary-solution/chi-square cautions from the
+  package’s validation simulations), and how to check whether SSM
+  confidence intervals can be trusted at your sample size and profile
+  with
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md).
+  Summarizes Zimmermann & Wright’s (2017) simulation findings as cited
+  context (transcribed from the published article), reproduces their
+  Study 5 analyses on the bundled `jz2017` data, and adds guidance on
+  when to trust each SSM parameter and on what ipsatizing octant scores
+  costs an SSM analysis. The diagnostic itself was validated against the
+  article: configured to transcribed Zimmermann & Wright simulation
+  conditions, it reproduces their published accuracy classifications
+  (validation scripts and results are recorded in the package’s
+  development repository).
+
+- New vignette, “SEM-Based SSM Analysis,” teaching the latent SSM: the
+  disattenuated estimand and how it differs from the observed profile,
+  why amplitude and displacement intervals are built in-package rather
+  than by lavaan, the two group-difference estimands (observed
+  vs. invariance-gated latent) side by side, and the model-conditional
+  assumptions that make the latent parameters interpretable.
+
+- New precomputed vignette, “Bayesian SSM Analysis,” derives the
+  cosine-regression mapping (pinning the atan2 argument order with an
+  executable known-direction check), walks a brms random-intercept
+  example whose posterior draws ship with the package, and exhibits the
+  Rayleigh-shaped prior that independent (x, y) priors induce on
+  amplitude (brms is a new optional `Suggests` dependency used only by
+  that vignette’s frozen model-fitting chunk).
+
+- New vignette, “Advanced Circumplex Visualization,” teaches the
+  plotting API:
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  as the owner of the amplitude-to-radius mapping, the configurable
+  circle center and amplitude-axis placement, restyling the canvas
+  through
+  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
+  and ordinary `theme()` calls, subclassing the exported
+  `GeomSsmPoint`/`GeomSsmArc` objects to build reusable layers, and
+  plotting a trajectory across occasions.
+
+- The reference index now groups the plotting API into “Complete Plots”
+  and “Building Blocks”. The `ssm_plot_*` functions cross-link to each
+  other, so
+  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  is reachable from its siblings’ help pages, and the composable layers
+  ([`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+  the `geom_ssm_*()` layers,
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md),
+  and
+  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md))
+  likewise cross-link to each other.
 
 - Clarified in the documentation of
   [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
@@ -689,23 +1244,54 @@ Circumplex Structure”, for a worked introduction to both.
   balance the closed-form estimator is not a least-squares fit and the
   reported fit can fall below 0.
 
+### Bug fixes
+
+- `axes_reliability(missing = "fiml")` no longer refuses, on Windows
+  only, data it estimates on other platforms. The saturated-stage EM
+  that estimates the standardizing moments now always runs
+  unaccelerated: lavaan 0.7 defaults that stage to SQUAREM acceleration,
+  whose convergence on items with very few observed responses proved
+  platform-sensitive — an item observed 20 times out of 300 estimated
+  cleanly on macOS and Linux but stalled at any iteration cap on
+  Windows, so the same data raised “The saturated (EM) stage did not
+  converge” on one platform and not the others. The package’s iteration
+  cap was calibrated under the unaccelerated EM, so this restores the
+  measured regime rather than adding a new one. Estimates on data with
+  such thinly-observed items may shift within the EM’s own convergence
+  tolerance (differences on the order of 1e-3 in the estimated moments);
+  healthy data is unaffected in both value and speed.
+
+- [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)’s
+  refusal of an off-metric normative sample now names the offending
+  scales for every instrument. On the seven instruments whose normative
+  data labels its scale column `Abbrev` rather than `Scale`, the message
+  previously named no scale at all.
+
+- Asking
+  [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  for a normative sample an instrument does not carry now produces an
+  error naming that argument and listing the sample numbers the
+  instrument does carry. Previously the call fell through to an
+  unrelated check and failed with a message about `scales` not matching
+  the normative data, which named neither the argument at fault nor a
+  valid value.
+
+- Fixed a bug where a bootstrap resample under pairwise deletion
+  (`listwise = FALSE`) could crash
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  with `mean(): object has no elements` when the resample happened to
+  draw only missing values for one scale. Such a scale now yields an
+  `NA` mean (matching the correlation path), and the affected resample
+  is excluded from the confidence intervals as a degenerate profile,
+  consistent with the existing degeneracy handling.
+
 - Fixed a bug where the displacement of a group contrast between two
   exactly opposed profiles (a half-turn apart) was reported as `-180`
   degrees instead of `+180`, inconsistent with the documented
   `(-180, 180]` convention for contrasts. Such a contrast is now
   reported as `+180`.
 
-- Count-valued arguments (e.g. `boots`, `reps`, `ncpus`, `digits`, and
-  the sample size `n`) across
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
-  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
-  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
-  and
-  [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
-  are now uniformly validated as a single non-negative whole number. A
-  few of these previously accepted a length-greater-than-one vector
-  without complaint; such input now raises a clear error.
+### Other
 
 - [`instruments()`](http://circumplex.jmgirard.com/dev/reference/instruments.md)
   now derives its listing from the bundled instrument data rather than a

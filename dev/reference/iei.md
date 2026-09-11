@@ -14,10 +14,10 @@ An object of class `circumplex_instrument` of length 5.
 
 ## Source
 
-Horner, M. S., Locke, K. D., & Hulsey, T. L. (in press). Assessing
-affective dimensions of the interpersonal circumplex: development and
-validation of the interpersonal emotion inventory. *Journal of
-Personality Assessment*. Advanced online publication.
+Horner, M. S., Locke, K. D., & Hulsey, T. L. (2025). Assessing affective
+dimensions of the interpersonal circumplex: Development and validation
+of the Interpersonal Emotion Inventory. *Journal of Personality
+Assessment, 107*(2), 170-187. First published online 13 September 2024.
 
 [doi:10.1080/00223891.2024.2400266](https://doi.org/10.1080/00223891.2024.2400266)
 
@@ -118,11 +118,13 @@ summary(iei)
 #> 
 #> The IEI currently has 2 normative data set(s):
 #> 1. 1223 American undergraduate students
-#> Horner, Locker, & Hulsey (2024)
-#> <https://osf.io/w37dj/>
+#> Reference kind: identified published source
+#> Horner, Locke, & Hulsey (2024)
+#> <https://kennethlocke.org/IEI/IEI_Norms.html>
 #> 2. 278 American crowdworkers
-#> Horner, Locker, & Hulsey (2024)
-#> <https://osf.io/w37dj/>
+#> Reference kind: identified published source
+#> Horner, Locke, & Hulsey (2024)
+#> <https://doi.org/10.1080/00223891.2024.2400266>
 scales(iei, items = TRUE)
 #> The IEI contains 8 circumplex scales.
 #> PA: Confident-Impressive (90 degrees)

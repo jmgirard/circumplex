@@ -201,7 +201,7 @@ plots directly:
 ssm_plot_trajectory(trajectory, time = "wave")
 ```
 
-![](growth-ssm-analysis_files/figure-html/plot-1.png)
+![plot of chunk plot](figures/growth-ssm-analysis-plot-1.png)
 
 The displacement panel is drawn on an *unwrapped* branch, so the
 trajectory crosses the boundary as one continuous path instead of
@@ -308,7 +308,8 @@ trajectory2 <- data.frame(
 ssm_plot_trajectory(trajectory2, time = "wave")
 ```
 
-![](growth-ssm-analysis_files/figure-html/lowamp-plot-1.png)
+![plot of chunk
+lowamp-plot](figures/growth-ssm-analysis-lowamp-plot-1.png)
 
 Uncertified waves are drawn as **hollow** points on the displacement
 panel. Read them as gaps in the argument, not as estimates with wide

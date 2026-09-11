@@ -156,7 +156,7 @@ summary(ipipipc)
 #> 13. Start conversations
 #> 14. Do most of the talking
 #> 15. Contradict others
-#> 16. Don't fall for sob-stories
+#> 16. Don't fall for sob stories
 #> 17. Don't talk a lot
 #> 18. Seldom toot my own horn
 #> 19. Think of others first
@@ -176,7 +176,8 @@ summary(ipipipc)
 #> 
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
-#> Markey & Markey (2009)
+#> Reference kind: no identified source
+#> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 ```
 
@@ -206,7 +207,8 @@ anchors(ipipipc)
 norms(ipipipc)
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
-#> Markey & Markey (2009)
+#> Reference kind: no identified source
+#> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 ```
 
@@ -232,7 +234,7 @@ scales(ipipipc, items = TRUE)
 #>     31. Have a sharp tongue
 #> DE: Cold-Hearted (180 degrees)
 #>     8. Believe people should fend for themselves
-#>     16. Don't fall for sob-stories
+#>     16. Don't fall for sob stories
 #>     24. Don't put a lot of thought into things
 #>     32. Am not interested in other people's problems
 #> FG: Aloof-Introverted (225 degrees)
@@ -521,45 +523,99 @@ in your data.
 ### Standardizing scale-level data
 
 Finally, it can often be helpful to transform scale-level data through
-reference to a normative or comparison sample. This is often called
-“norm standardizing” and involves subtracting the normative sample’s
-mean score on a scale from each participant’s score on that scale and
-then dividing this difference by the normative sample’s standard
-deviation. This rescales the scale scores to be in standard deviation
-units and to describe the magnitude of each participant’s difference
-from the normative average.
+reference to a *reference sample*: a specific group of people whose
+scores on the same instrument the package ships as a table of means and
+standard deviations. This is often called “norm standardizing” and
+involves subtracting the reference sample’s mean score on a scale from
+each participant’s score on that scale and then dividing this difference
+by the reference sample’s standard deviation. This rescales the scale
+scores to be in standard deviation units and to describe the magnitude
+of each participant’s difference from the average of that particular
+sample.
 
 For many circumplex instruments, the data needed to perform
 standardization is included in its instrument object. Some instruments
-even have multiple (e.g., different or overlapping) normative samples
-for comparisons that are matched in terms of gender, age, or
-nationality. In selecting a normative sample to compare to, it is
-important to consider both the size and the appropriateness of the
-sample.
+have more than one reference sample — for example, separate samples for
+men and women, or for children and adults. In selecting a reference
+sample, the first question to ask is which group your participants are
+most sensibly described relative to; the size of the sample is a
+secondary consideration.
 
-To demonstrate, let’s examine the normative data sets available for the
-IIP-SC. Below we see that there are two options: a rather large sample
-of American college students and a rather small sample of American
-psychiatric outpatients.
+Before choosing, it is worth knowing what these reference samples
+generally are.
+
+``` r
+
+inst <- Filter(
+  function(x) inherits(x, "circumplex_instrument"),
+  mget(
+    utils::data(package = "circumplex")$results[, "Item"],
+    envir = as.environment("package:circumplex"),
+    ifnotfound = list(NULL)
+  )
+)
+samples <- do.call(rbind, lapply(inst, function(x) x$Norms[[2]]))
+
+n_instruments <- length(inst)
+n_samples <- nrow(samples)
+n_college <- sum(grepl("college|undergraduate", samples$Population))
+n_small <- sum(samples$Size < 300)
+n_standardization <- sum(samples$Kind == "standardization")
+n_unsourced <- sum(samples$Kind == "unsourced")
+```
+
+The package ships 23 reference samples across 15 instruments. 10 of them
+describe college or undergraduate students, and 6 have fewer than 300
+participants. Most are the single study sample that was available to the
+researchers who published the instrument — people recruited at one
+institution, at one time — rather than a group assembled to represent
+any wider population. The exception is the IIP-32 and IIP-64, whose 6
+samples come from a national standardization study designed for exactly
+that purpose. At the other end, 2 of the tables are published in no
+source that has been identified, and scores standardized against them
+rest on unverified numbers. You do not have to work any of this out from
+the descriptions: every sample carries a `Kind` — `standardization`,
+`published`, or `unsourced` — which is where the two counts just given
+come from, and which
+[`norms()`](http://circumplex.jmgirard.com/dev/reference/norms.md)
+prints and
+[`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+names in the message it prints unless you silence it. A reference sample
+is therefore best read as a concrete, described group of people to
+compare against, and the `Population` column printed below names the
+group each sample was drawn from rather than a population the sample
+stands in for.
+
+To demonstrate, let’s examine the reference samples available for the
+IIP-SC. Below we see two options: a sample of American college students
+and a sample of American psychiatric outpatients. They differ greatly in
+size, but what makes one or the other the right choice is which group
+your participants resemble.
 
 ``` r
 
 norms(iipsc)
 #> The IIP-SC currently has 2 normative data set(s):
 #> 1. 872 American college students
-#> Hopwood, Pincus, DeMoor, & Koonce (2011)
+#> Reference kind: identified published source
+#> Hopwood, Pincus, DeMoor, & Koonce (2008)
 #> <https://doi.org/10.1080/00223890802388665>
 #> 2. 106 American psychiatric outpatients
+#> Reference kind: identified published source
 #> Soldz, Budman, Demby, & Merry (1995)
 #> <https://doi.org/10.1177/1073191195002001006>
 ```
 
 Assuming our example data also come from a non-psychiatric community
-sample of mostly college students, the first normative sample seems like
-a better choice, especially since it is so much larger and therefore
-subject to less sampling error. However, there may be times when the
-second normative sample would be the more appropriate comparison, even
-despite its smaller sample.
+sample of mostly college students, the first reference sample is the
+better choice — because it describes a similar group of people, not
+because it is larger. Which sample you choose matters a great deal more
+than how precisely that sample’s mean and standard deviation are
+estimated: switching to a different reference sample typically shifts
+standardized scores by several times the uncertainty that even the
+smallest shipped sample contributes. If your participants were
+psychiatric outpatients, the second sample would be the appropriate
+reference despite its size.
 
 To transform the scale scores we calculated during the last section, we
 can call the
@@ -577,6 +633,7 @@ z_scales <- norm_standardize(
   sample = 1,
   append = FALSE
 )
+#> Standardized against IIP-SC normative sample 1: N = 872, American college students. Reference kind: identified published source. 1 other sample is available; see norms().
 print(z_scales)
 #>           PA_z       BC_z       DE_z        FG_z       HI_z       JK_z
 #> 1   1.50000000  1.7500000  0.4093567 -1.10554090 -1.0054645 -1.3313783

@@ -14,9 +14,10 @@ An object of class `circumplex_instrument` of length 5.
 
 ## Source
 
-Bliton, C. F., & Pincus, A. L. (in press). Construction and Validation
-of the Interpersonal Influence Tactics Circumplex (IIT-C) Scales.
-*Assessment*.
+Bliton, C. F., & Pincus, A. L. (2020). Construction and validation of
+the Interpersonal Influence Tactics Circumplex (IIT-C) Scales.
+*Assessment, 27*(4), 688-705. First published online 25 July 2019, which
+is the version the shipped norms credit as Bliton & Pincus (2019).
 
 [doi:10.1177/1073191119864661](https://doi.org/10.1177/1073191119864661)
 
@@ -116,6 +117,7 @@ summary(iitc)
 #> 
 #> The IIT-C currently has 1 normative data set(s):
 #> 1. 862 American college students
+#> Reference kind: identified published source
 #> Bliton & Pincus (2019)
 #> <https://doi.org/10.1177/1073191119864661>
 scales(iitc, items = TRUE)

@@ -83,6 +83,7 @@ summary(csig)
 #> 
 #> The CSIG currently has 1 normative data set(s):
 #> 1. 665 MTurkers from US, Canada, and India about interactions between nations
+#> Reference kind: identified published source
 #> Locke (2014)
 #> <https://doi.org/10.1177/0146167213514280>
 scales(csig, items = TRUE)

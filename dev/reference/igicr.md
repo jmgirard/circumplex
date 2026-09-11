@@ -84,12 +84,15 @@ summary(igicr)
 #> 
 #> The IGI-CR currently has 3 normative data set(s):
 #> 1. 387 American community adolescents (age 11-13), overall
+#> Reference kind: identified published source
 #> Trucco, Wright, & Colder (2013)
 #> <https://doi.org/10.1177/1073191111411672>
 #> 2. 174 American community adolescents (age 11-13), males
+#> Reference kind: identified published source
 #> Trucco, Wright, & Colder (2013)
 #> <https://doi.org/10.1177/1073191111411672>
 #> 3. 213 American community adolescents (age 11-13), females
+#> Reference kind: identified published source
 #> Trucco, Wright, & Colder (2013)
 #> <https://doi.org/10.1177/1073191111411672>
 scales(igicr, items = TRUE)

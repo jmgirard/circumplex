@@ -114,6 +114,7 @@ summary(csip)
 #> 
 #> The CSIP currently has 1 normative data set(s):
 #> 1. 712 American college students
+#> Reference kind: identified published source
 #> Boudreaux, Ozer, Oltmanns, & Wright (2018)
 #> <https://doi.org/10.1037/pas0000505>
 scales(csip, items = TRUE)

@@ -4,11 +4,12 @@ Draw the estimated item configuration of a
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
 object on the circular canvas from
 [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
-Each scale is placed at its *estimated* angle (`θ`), at a radius given
-by its communality (`ζ²`, the share of its variance explained by the
-common circumplex factors), so items that the model explains well sit
-near the outer ring and items it explains poorly sit near the centre.
-The canvas spokes mark the *theoretical* angles supplied to
+Each scale is placed at its *estimated* angle (\\\theta\\), at a radius
+given by its communality (\\\zeta^2\\, the share of its variance
+explained by the common circumplex factors), so items that the model
+explains well sit near the outer ring and items it explains poorly sit
+near the centre. The canvas spokes mark the *theoretical* angles
+supplied to
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
 so the gap between a point and its spoke shows how far the estimated
 angle departed from the hypothesised one. Where the confidence intervals

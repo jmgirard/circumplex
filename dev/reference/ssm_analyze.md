@@ -311,23 +311,27 @@ Other analysis functions:
 ## Examples
 
 ``` r
+# `boots` is lowered from its default of 2000 throughout these examples so
+# they run quickly; a reported analysis should use the default.
+
 # Load example data
 data("jz2017")
 
 # Single-group mean-based SSM
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  boots = 200
 )
 #> 
 #> # Profile [All]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.917      0.889      0.946
-#> X-Value           0.351      0.324      0.378
-#> Y-Value          -0.252     -0.281     -0.224
-#> Amplitude         0.432      0.402      0.461
-#> Displacement    324.292    320.751    327.676
+#> Elevation         0.917      0.887      0.945
+#> X-Value           0.351      0.324      0.377
+#> Y-Value          -0.252     -0.280     -0.224
+#> Amplitude         0.432      0.405      0.464
+#> Displacement    324.292    321.098    327.430
 #> Model Fit         0.878                      
 #> 
 
@@ -335,28 +339,29 @@ ssm_analyze(
 ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-  measures = c("NARPD", "ASPD")
+  measures = c("NARPD", "ASPD"),
+  boots = 200
 )
 #> 
 #> # Profile [NARPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.202      0.169      0.237
-#> X-Value          -0.062     -0.094     -0.028
-#> Y-Value           0.179      0.145      0.214
-#> Amplitude         0.189      0.155      0.226
-#> Displacement    108.967     99.002    118.680
+#> Elevation         0.202      0.170      0.236
+#> X-Value          -0.062     -0.091     -0.031
+#> Y-Value           0.179      0.140      0.213
+#> Amplitude         0.189      0.152      0.224
+#> Displacement    108.967     99.785    117.747
 #> Model Fit         0.957                      
 #> 
 #> 
 #> # Profile [ASPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.124      0.090      0.157
-#> X-Value          -0.099     -0.134     -0.064
-#> Y-Value           0.203      0.168      0.240
-#> Amplitude         0.226      0.190      0.266
-#> Displacement    115.927    107.286    124.541
+#> Elevation         0.124      0.089      0.156
+#> X-Value          -0.099     -0.127     -0.065
+#> Y-Value           0.203      0.166      0.238
+#> Amplitude         0.226      0.189      0.261
+#> Displacement    115.927    107.705    123.823
 #> Model Fit         0.964                      
 #> 
 
@@ -364,17 +369,18 @@ ssm_analyze(
 ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-  method = "montecarlo"
+  method = "montecarlo",
+  boots = 200
 )
 #> 
 #> # Profile [All]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.917      0.889      0.945
-#> X-Value           0.351      0.323      0.379
-#> Y-Value          -0.252     -0.282     -0.223
-#> Amplitude         0.432      0.403      0.463
-#> Displacement    324.292    320.840    327.907
+#> Elevation         0.917      0.883      0.941
+#> X-Value           0.351      0.326      0.374
+#> Y-Value          -0.252     -0.277     -0.222
+#> Amplitude         0.432      0.403      0.462
+#> Displacement    324.292    320.769    327.857
 #> Model Fit         0.878                      
 #> 
 # \donttest{
@@ -382,28 +388,29 @@ ssm_analyze(
 ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-  grouping = "Gender"
+  grouping = "Gender",
+  boots = 200
 )
 #> 
 #> # Profile [Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.946      0.908      0.983
-#> X-Value           0.459      0.419      0.497
-#> Y-Value          -0.310     -0.353     -0.265
-#> Amplitude         0.554      0.509      0.598
-#> Displacement    325.963    322.036    329.958
+#> Elevation         0.946      0.903      0.985
+#> X-Value           0.459      0.428      0.496
+#> Y-Value          -0.310     -0.368     -0.272
+#> Amplitude         0.554      0.519      0.606
+#> Displacement    325.963    321.189    329.239
 #> Model Fit         0.889                      
 #> 
 #> 
 #> # Profile [Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.884      0.843      0.926
-#> X-Value           0.227      0.194      0.261
-#> Y-Value          -0.186     -0.227     -0.149
-#> Amplitude         0.294      0.259      0.331
-#> Displacement    320.685    313.535    327.870
+#> Elevation         0.884      0.840      0.926
+#> X-Value           0.227      0.193      0.260
+#> Y-Value          -0.186     -0.227     -0.150
+#> Amplitude         0.294      0.264      0.334
+#> Displacement    320.685    313.758    326.426
 #> Model Fit         0.824                      
 #> 
 
@@ -412,39 +419,40 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   grouping = "Gender",
-  contrast = TRUE
+  contrast = TRUE,
+  boots = 200
 )
 #> 
 #> # Profile [Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.946      0.906      0.985
-#> X-Value           0.459      0.419      0.499
-#> Y-Value          -0.310     -0.354     -0.269
-#> Amplitude         0.554      0.509      0.601
-#> Displacement    325.963    322.085    329.738
+#> Elevation         0.946      0.913      0.977
+#> X-Value           0.459      0.414      0.499
+#> Y-Value          -0.310     -0.355     -0.266
+#> Amplitude         0.554      0.507      0.597
+#> Displacement    325.963    322.037    330.077
 #> Model Fit         0.889                      
 #> 
 #> 
 #> # Profile [Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.884      0.843      0.926
-#> X-Value           0.227      0.190      0.262
-#> Y-Value          -0.186     -0.224     -0.149
-#> Amplitude         0.294      0.255      0.332
-#> Displacement    320.685    313.633    327.912
+#> Elevation         0.884      0.847      0.926
+#> X-Value           0.227      0.193      0.259
+#> Y-Value          -0.186     -0.224     -0.142
+#> Amplitude         0.294      0.253      0.329
+#> Displacement    320.685    313.972    328.423
 #> Model Fit         0.824                      
 #> 
 #> 
 #> # Contrast [Male - Female]:
 #> 
 #>                  Estimate   Lower CI   Upper CI
-#> Δ Elevation        -0.062     -0.117     -0.004
-#> Δ X-Value          -0.232     -0.285     -0.179
-#> Δ Y-Value           0.124      0.066      0.180
-#> Δ Amplitude        -0.261     -0.318     -0.200
-#> Δ Displacement     -5.278    -13.287      2.978
+#> Δ Elevation        -0.062     -0.117     -0.005
+#> Δ X-Value          -0.232     -0.289     -0.178
+#> Δ Y-Value           0.124      0.060      0.186
+#> Δ Amplitude        -0.261     -0.320     -0.198
+#> Δ Displacement     -5.278    -14.282      3.758
 #> Δ Model Fit        -0.066                      
 #> 
 
@@ -453,39 +461,40 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = c("NARPD", "ASPD"),
-  contrast = TRUE
+  contrast = TRUE,
+  boots = 200
 )
 #> 
 #> # Profile [NARPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.202      0.170      0.233
-#> X-Value          -0.062     -0.097     -0.029
-#> Y-Value           0.179      0.145      0.213
-#> Amplitude         0.189      0.154      0.225
-#> Displacement    108.967     99.181    119.113
+#> Elevation         0.202      0.171      0.237
+#> X-Value          -0.062     -0.096     -0.029
+#> Y-Value           0.179      0.149      0.208
+#> Amplitude         0.189      0.158      0.219
+#> Displacement    108.967     99.248    117.546
 #> Model Fit         0.957                      
 #> 
 #> 
 #> # Profile [ASPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.124      0.090      0.159
-#> X-Value          -0.099     -0.134     -0.064
-#> Y-Value           0.203      0.165      0.239
-#> Amplitude         0.226      0.189      0.265
-#> Displacement    115.927    107.395    124.309
+#> Elevation         0.124      0.085      0.158
+#> X-Value          -0.099     -0.131     -0.064
+#> Y-Value           0.203      0.173      0.233
+#> Amplitude         0.226      0.191      0.257
+#> Displacement    115.927    107.036    122.274
 #> Model Fit         0.964                      
 #> 
 #> 
 #> # Contrast [ASPD - NARPD]:
 #> 
 #>                  Estimate   Lower CI   Upper CI
-#> Δ Elevation        -0.079     -0.114     -0.042
-#> Δ X-Value          -0.037     -0.074      0.002
-#> Δ Y-Value           0.024     -0.014      0.061
-#> Δ Amplitude         0.037     -0.001      0.075
-#> Δ Displacement      6.960     -3.617     17.108
+#> Δ Elevation        -0.079     -0.114     -0.044
+#> Δ X-Value          -0.037     -0.077     -0.003
+#> Δ Y-Value           0.024     -0.009      0.060
+#> Δ Amplitude         0.037     -0.001      0.076
+#> Δ Displacement      6.960     -2.999     16.989
 #> Δ Model Fit         0.007                      
 #> 
 
@@ -494,28 +503,29 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
-  grouping = "Gender"
+  grouping = "Gender",
+  boots = 200
 )
 #> 
 #> # Profile [NARPD: Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.172      0.128      0.217
-#> X-Value          -0.080     -0.126     -0.034
-#> Y-Value           0.202      0.152      0.249
-#> Amplitude         0.217      0.166      0.266
-#> Displacement    111.669     99.779    123.161
+#> Elevation         0.172      0.129      0.217
+#> X-Value          -0.080     -0.120     -0.032
+#> Y-Value           0.202      0.162      0.248
+#> Amplitude         0.217      0.174      0.268
+#> Displacement    111.669     99.649    119.903
 #> Model Fit         0.972                      
 #> 
 #> 
 #> # Profile [NARPD: Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.244      0.192      0.296
-#> X-Value          -0.029     -0.075      0.014
-#> Y-Value           0.146      0.098      0.191
-#> Amplitude         0.149      0.105      0.196
-#> Displacement    101.248     84.330    119.449
+#> Elevation         0.244      0.205      0.289
+#> X-Value          -0.029     -0.079      0.009
+#> Y-Value           0.146      0.103      0.191
+#> Amplitude         0.149      0.109      0.197
+#> Displacement    101.248     86.443    119.726
 #> Model Fit         0.902                      
 #> 
 
@@ -525,39 +535,40 @@ ssm_analyze(
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
   grouping = "Gender",
-  contrast = TRUE
+  contrast = TRUE,
+  boots = 200
 )
 #> 
 #> # Profile [NARPD: Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.172      0.128      0.217
-#> X-Value          -0.080     -0.128     -0.038
-#> Y-Value           0.202      0.152      0.249
-#> Amplitude         0.217      0.167      0.269
-#> Displacement    111.669    100.674    123.270
+#> Elevation         0.172      0.117      0.217
+#> X-Value          -0.080     -0.132     -0.039
+#> Y-Value           0.202      0.151      0.246
+#> Amplitude         0.217      0.164      0.261
+#> Displacement    111.669    100.139    124.133
 #> Model Fit         0.972                      
 #> 
 #> 
 #> # Profile [NARPD: Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.244      0.192      0.296
-#> X-Value          -0.029     -0.074      0.013
-#> Y-Value           0.146      0.099      0.192
-#> Amplitude         0.149      0.103      0.196
-#> Displacement    101.248     85.069    118.602
+#> Elevation         0.244      0.197      0.292
+#> X-Value          -0.029     -0.066      0.015
+#> Y-Value           0.146      0.100      0.188
+#> Amplitude         0.149      0.107      0.193
+#> Displacement    101.248     84.035    117.725
 #> Model Fit         0.902                      
 #> 
 #> 
 #> # Contrast [NARPD: Male - Female]:
 #> 
 #>                  Estimate   Lower CI   Upper CI
-#> Δ Elevation         0.072      0.003      0.140
-#> Δ X-Value           0.051     -0.011      0.114
-#> Δ Y-Value          -0.056     -0.127      0.011
-#> Δ Amplitude        -0.068     -0.139     -0.001
-#> Δ Displacement    -10.421    -30.566     10.325
+#> Δ Elevation         0.072      0.012      0.149
+#> Δ X-Value           0.051     -0.009      0.116
+#> Δ Y-Value          -0.056     -0.121      0.007
+#> Δ Amplitude        -0.068     -0.136     -0.012
+#> Δ Displacement    -10.421    -33.040      8.904
 #> Δ Model Fit        -0.071                      
 #> 
 # }

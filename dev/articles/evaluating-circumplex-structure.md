@@ -120,17 +120,30 @@ summary(cpm)
 #> 
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a Heywood-type solution).
 #>   Note: 11 of 500 bootstrap resamples were excluded (0 degenerate, 11 non-convergent); the intervals are based on 489 replicates and are conditional on estimability.
+#> 
+#>   Note: boundary/weak-identification markers fired: Heywood communality;
+#>   small correlation-function weight; ill-conditioned Hessian.
+#>   What has been measured about these markers covers analytic intervals
+#>   only, and not every marker was measured; they are not validated as
+#>   predictors of the bootstrap intervals shown here (see the vignette
+#>   section 'When a fit sits at a boundary').
 ```
 
 Two parts of this output matter most for evaluating structure:
 
-- **The estimated angles.** Compare them with the theoretical angles:
-  the IIP-SC octants land near — but not exactly on — their theoretical
-  positions, so the circumplex ordering is preserved while the *spacing*
-  is not perfectly equal. This is the typical result for well-validated
-  circumplex instruments: minor deviations from perfect structure are
-  common and have little practical impact on SSM profiles (Gurtman &
-  Pincus, 2000).
+- **The estimated angles.** Compare them with the theoretical angles,
+  but read the comparison carefully: one scale is held fixed to identify
+  the configuration (PA here, at 90°), so every other scale’s departure
+  is measured from that anchor and a different anchor would redistribute
+  them. Two things are worth separating. The *ordering* around the
+  circle is preserved — the estimated angles run through the octants in
+  the same cyclic order the instrument assigns them. The *spacing* is
+  not: the gaps between circularly adjacent estimates run from under 20°
+  to nearly 80° against a theoretical 45°, and the largest departure
+  from a theoretical position is about 66°. Departures from perfect
+  structure are common in well-validated circumplex instruments (Gurtman
+  & Pincus, 2000), and the model comparison below quantifies what this
+  pattern costs: it is why forcing equal spacing fits these data poorly.
 - **The communality indices.** Scales with low $`\zeta`$ are poorly
   described by the circle; a profile peak at such a scale’s angle means
   less than the same peak at a well-explained scale’s angle.
@@ -145,7 +158,8 @@ estimable.
 plot(cpm)
 ```
 
-![](evaluating-circumplex-structure_files/figure-html/cpm_plot-1.png)
+![plot of chunk
+cpm_plot](figures/evaluating-circumplex-structure-cpm_plot-1.png)
 
 ### Reading the fit indices
 
@@ -158,18 +172,25 @@ or above suggest good comparative fit (Hu & Bentler, 1999). Treat these
 as conventions from the broader covariance-structure literature, not
 circumplex-specific laws.
 
-Two circumplex-specific cautions, both from this package’s own
-validation simulations:
+Two caveats come from the benchmark sources themselves. Browne and
+Cudeck call their own RMSEA thresholds “based on subjective judgment,”
+cautioning that such a figure “cannot be regarded as infallible or
+correct” (Browne & Cudeck, 1993) — read the cutoffs as conventions, not
+decision rules. And these benchmarks are least dependable at small
+samples: Hu and Bentler (1999) found that the ML-based TLI and RMSEA
+tend to *overreject* true-population models when the sample is small
+(CFI is not among the indices they flag), and circumplex analyses are
+often run at modest sample sizes — the SSM accuracy thresholds in
+Section 3 span roughly $`n = 50`$ to $`200`$. At small $`n`$, then, a
+TLI or RMSEA that falls short of its benchmark can reflect the index’s
+small-sample behavior as much as the model’s fit.
 
-- **Boundary solutions are common at realistic sample sizes.** When
-  octant scales share a strong general factor (as interpersonal problem
-  scales do), fitted solutions frequently sit at or near a parameter
-  boundary — a communality estimate at 1 (a “Heywood” case), or a
-  harmonic weight at 0.
-  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-  flags these in its diagnostics. They are usually a property of the
-  estimator meeting real data at finite $`n`$, not a data-entry error,
-  but they matter for inference (next point).
+Two further cautions are circumplex-specific, both from this package’s
+own validation simulations:
+
+- **Boundary solutions are common at realistic sample sizes**, including
+  in the fit above. What that means and what to do about it is the
+  subject of the next subsection, *When a fit sits at a boundary*.
 - **Do not lean hard on the chi-square p value.** In simulations at
   field-typical sample sizes with octant-like population structures, the
   test statistic did not follow its nominal chi-square reference
@@ -184,6 +205,214 @@ below $`N = 2000`$, and up to very large $`N`$ when a boundary marker is
 present: in validation, analytic intervals mis-covered in exactly those
 regimes. Prefer the bootstrap (the raw-data default) when you have raw
 data.
+
+### When a fit sits at a boundary
+
+The fit above is one of these fits, and it says so. Its `# Diagnostics`
+block prints a note that a communality index reached its upper boundary,
+and the results table shows which one: the NO scale’s communality index
+is 1.000, with a confidence interval of \[1.000, 1.000\]. A zero-width
+interval is not a precise estimate — it is an absent one. Both endpoints
+equal the estimate, which is to say that at least the middle 95% of the
+retained bootstrap resamples also sat on the boundary, leaving the
+percentile interval no width to report. The same chunk also emits a
+warning that the fit’s Hessian is ill-conditioned, a second signal from
+the same regime. When octant scales share a strong general factor, as
+interpersonal problem scales do, fitted solutions frequently sit at or
+near a parameter boundary; this is the estimator meeting real data at
+finite $`n`$, not a data-entry error.
+
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+records five such markers, and
+[`summary()`](https://rdrr.io/r/base/summary.html) names the ones that
+fired:
+
+- **Heywood communality** — a communality index estimated at its upper
+  boundary ($`\hat\zeta > 0.995`$): the circle accounts for that scale
+  essentially completely.
+- **boundary harmonic removed** — a correlation-function weight sat at
+  zero and was dropped from the model, with the degrees of freedom
+  adjusted.
+- **small correlation-function weight** — the smallest weight is below
+  0.10, near enough to zero to matter for inference.
+- **ill-conditioned Hessian** — the curvature matrix the analytic
+  standard errors are computed from is close to singular; angles may be
+  clustered or parameters weakly determined.
+- **competing near-tied optima** — the search found more than one
+  solution of nearly equal fit, so the reported one may not be uniquely
+  determined.
+
+[`summary()`](https://rdrr.io/r/base/summary.html) prints that list when
+markers fire, though on the analytic path only within a sample-size
+window. On the bootstrap path — as in the fit displayed above — it
+prints as a descriptive note at every sample size, alongside a statement
+that what has been measured about the markers covers analytic intervals
+only (and not every marker was measured — *What a fired marker does and
+does not tell you*, below, has the particulars), so they are not
+validated as predictors of the bootstrap intervals they accompany. When
+the intervals are analytic the list instead arrives inside a coverage
+caution printed when $`N`$ falls between 2000 and 50000; below 2000 an
+unconditional caution prints without the list, and above 50000 neither
+prints. To see that caution-embedded form, we simulate a larger sample
+from the structure just estimated with
+[`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
+then refit it on the correlation-matrix path, where the intervals are
+analytic.
+
+``` r
+
+set.seed(2026)
+sim <- cpm_simulate(cpm, n = 2500) # draws from the structure estimated above
+demo <- cpm_fit(
+  cormat = cor(sim), scales = colnames(sim), angles = octants(), n = 2500
+)
+summary(demo)
+#> 
+#> Circular Process Model (Browne, 1992) 
+#> Model:             quasi-circumplex 
+#> Harmonics (m):     3 
+#> Sample size (N):   2500 
+#> Reference scale:   PA 
+#> CI method:         analytic 
+#> Confidence level:  0.95 
+#> 
+#> # Estimated angles and communality indices
+#> 
+#>  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
+#>     PA           90  90.000    90.000    90.000 0.785    0.748    0.823
+#>     BC          135 125.057   120.571   129.542 0.881    0.852    0.911
+#>     DE          180 167.802   161.988   173.616 0.799    0.777    0.820
+#>     FG          225 193.344   187.711   198.976 0.878    0.854    0.901
+#>     HI          270 250.958   245.112   256.805 0.958    0.944    0.971
+#>     JK          315 269.528   263.351   275.706 0.948    0.938    0.958
+#>     LM          360 293.619   286.622   300.617 0.803    0.778    0.829
+#>     NO           45  12.673     7.017    18.329 0.929    0.836    1.023
+#>  Communality
+#>        0.617
+#>        0.777
+#>        0.638
+#>        0.770
+#>        0.917
+#>        0.899
+#>        0.645
+#>        0.863
+#> 
+#> # Correlation-function weights
+#> 
+#>  k  Beta Beta_lci Beta_uci
+#>  0 0.442    0.422    0.462
+#>  1 0.453    0.436    0.470
+#>  2 0.068    0.058    0.078
+#>  3 0.037    0.030    0.044
+#> 
+#> # Fit indices
+#> 
+#>   χ²(10) = 2.229, p = 0.994
+#>   RMSEA = 0 [0, 0] (90% CI)
+#>   SRMR  = 0.005
+#>   CFI   = 1    TLI = 1.002
+#>   AIC   = 38.229    BIC = 143.062
+#> 
+#> # Residuals
+#> 
+#>   Largest absolute residual: 0.012 (FG – NO)
+#> 
+#>   Note: this solution is near a parameter boundary or weakly identified
+#>   (small correlation-function weight);
+#>   analytic (Wald) confidence intervals mis-covered for such fits in validation
+#>   even at N in the tens of thousands. Interpret them with caution and prefer
+#>   the bootstrap on the raw-data path when available.
+```
+
+One marker fires here — a **small correlation-function weight** — and
+[`summary()`](https://rdrr.io/r/base/summary.html) names it. Notice what
+did *not* happen: the population this sample was drawn from carries NO’s
+communality at the boundary, yet this draw produced no Heywood case. A
+boundary in the population does not guarantee a boundary in every sample
+from it, any more than a quiet fit guarantees there is no boundary
+behind the data.
+
+**What a fired marker does and does not tell you.** The package’s
+validation simulations measured what these markers predict, and the
+measurement is narrower than the markers are. It covered *analytic*
+(Wald) intervals fitted from a correlation matrix, and it measured
+interval **coverage** — how often an interval contained the truth — not
+bias in the point estimates.
+
+- *Communality indices* take the worst of it **when an ill-conditioning,
+  a Heywood, or a near-tied-optima marker fires** — all three covered
+  $`\zeta`$ well below nominal, ill-conditioning worst of them. Two
+  failure modes show up in the output rather than hiding in it: the
+  analytic standard errors can come back missing, which happens for the
+  angles and the weights at the same time because one singular curvature
+  matrix takes all three families down together, or an interval can
+  collapse to zero width because a negative asymptotic variance was
+  clamped at zero. NO’s zero-width interval above arrives by a third
+  route — it is a percentile interval whose resamples sat on the
+  boundary — but it reaches the reader the same way, as an interval with
+  no usable width.
+- *Angles.* Taking all marker-firing fits together, angle intervals
+  actually degraded somewhat *more* than communality intervals did, so
+  the ranking above belongs to those markers rather than to the
+  parameter families in general. The strongest single angle signal was
+  the ill-conditioning marker, with the small-weight marker next and the
+  Heywood marker weakest of the three.
+- *Correlation-function weights* moved least: marker-firing fits covered
+  $`\beta`$ only slightly less often than quiet ones, so a fired marker
+  tells you least here. The real $`\beta`$ problem is a different one
+  and does not depend on any marker — in the package’s bootstrap
+  validation, percentile intervals for a weight whose *population* value
+  sits near zero under-covered at every sample size studied, and the
+  shortfall did not shrink as $`n`$ grew. That is a property of
+  percentile intervals at a boundary, not a small-sample artifact, and
+  it is about where the truth sits, not about what the fit flagged.
+
+Four things the record does *not* support, and which no reading of these
+markers should assume. Nothing was measured about bias in the point
+estimates. The marker study fitted analytic intervals only, so the
+markers are not validated as predictors on the bootstrap path this
+vignette uses by default. The **boundary harmonic removed** marker
+showed no evidence of predicting mis-coverage at all — fits carrying it
+covered as well as fits without it; it is kept because it names a real
+feature of the solution, not because it forecasts trouble. And the
+numbers behind **Heywood communality**, **ill-conditioned Hessian** and
+**competing near-tied optima** come almost entirely from one
+deliberately provoking configuration, where those markers fire often
+enough to measure, and near-tied optima fired only rarely even there.
+Read them as what happens where those markers fire, not as how often
+they fire.
+
+**What to do when one fires.**
+
+1.  *Locate it.* Read the results table beside the note and find the
+    scale or weight sitting at the boundary, as NO is above. A marker
+    with no identified owner is not yet a diagnosis.
+2.  *Re-fit to find out what the boundary is about.* The default
+    `"quasi-circumplex"` model is the least constrained of the variants
+    in the next subsection, so a boundary that appears only under a
+    constrained variant was put there by the constraint, while one
+    already present in the default fit belongs to the data and the model
+    family rather than to an assumption you added. If you fitted from a
+    correlation matrix, refitting from raw data also buys you bootstrap
+    intervals in place of analytic ones.
+3.  *Report it.* Quote the marker alongside the estimate it belongs to:
+    which scales sat at the boundary, and that their intervals are
+    degenerate or missing. An angle or communality reported without its
+    diagnostic note is a number stripped of its own caveat.
+4.  *Keep using what still holds.* These remain usable: the point
+    estimates, as the solution the model actually fitted (their bias in
+    this regime is unmeasured, so read them as estimates, not to the
+    digit); the fit indices and the residual summary, which a boundary
+    changes the behaviour of the *intervals* around, not the computation
+    of — read them with the caution given earlier in this section, which
+    is about field sample sizes rather than about markers; and parameter
+    intervals that came back with ordinary width, read knowing that
+    marked fits covered less well than unmarked ones across all three
+    families. This does not: a parameter interval that is missing or
+    zero-width. (The demonstration fit above prints `RMSEA = 0 [0, 0]`,
+    which is not that failure — it is a fit statistic at its own floor,
+    because the refit recovers almost exactly the structure it was
+    simulated from.)
 
 ### Comparing model variants
 
@@ -264,7 +493,7 @@ reports — judging an interval accurate when its empirical coverage
 stayed within Bradley’s (1978) liberal band of 92.5% to 97.5%. Their
 headline results:
 
-| Parameter | Point estimate | 95% CI accurate when… |
+| Parameter | Point estimate | 95% bootstrap CI accurate when… |
 |----|----|----|
 | Elevation ($`e`$) | essentially unbiased | $`n \ge 50`$ |
 | X value / affiliation | essentially unbiased | $`n \ge 50`$ |
@@ -385,7 +614,7 @@ changing results for a given seed.
 
 set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
-#> Warning: CPM Hessian is ill-conditioned (condition number 9.17e+16): angles may
+#> Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles may
 #> be clustered or parameters weakly determined.
 summary(acc)
 #> 
@@ -397,7 +626,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:      14.1 s
+#> Elapsed:      7.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
@@ -415,9 +644,9 @@ summary(acc)
 #> against Bradley's (1978) liberal band via 95% Wilson intervals:
 #> 
 #>   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):
-#>     Elevation      coverage 94.0% -- borderline
-#>     Amplitude      coverage 94.0% -- borderline
-#>     Displacement   coverage 89.6% when certified -- borderline
+#>     Elevation      coverage 93.0% -- borderline
+#>     Amplitude      coverage 94.5% -- borderline
+#>     Displacement   coverage 89.1% when certified -- borderline
 #>     Guardrail      under a truly zero amplitude, displacement would be
 #>                    certified 1.0% of the time (user-expectation benchmark
 #>                    2.5%)
@@ -426,11 +655,11 @@ summary(acc)
 #>   `reps` would sharpen the verdict.
 #> 
 #>   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):
-#>     Elevation      coverage 94.0% -- borderline
-#>     Amplitude      coverage 85.0% -- INADEQUATE (under-coverage; misses are
+#>     Elevation      coverage 95.0% -- borderline
+#>     Amplitude      coverage 83.0% -- INADEQUATE (under-coverage; misses are
 #>                    almost all below the interval: the amplitude CI tends to
 #>                    sit above the truth)
-#>     Displacement   coverage 60.0% when certified -- INADEQUATE
+#>     Displacement   coverage 50.0% when certified -- INADEQUATE
 #>                    (under-coverage)
 #>     Guardrail      under a truly zero amplitude, displacement would be
 #>                    certified 1.0% of the time (user-expectation benchmark
@@ -443,67 +672,67 @@ summary(acc)
 #> 
 #> Coverage by profile, parameter, and amplitude condition:
 #>  Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width
-#>    PARPD         e     1.000    0.940 0.017     0.030      0.030        0.152
+#>    PARPD         e     1.000    0.930 0.018     0.035      0.035        0.151
 #>    PARPD         x     1.000    0.940 0.017     0.030      0.030        0.122
-#>    PARPD         y     1.000    0.925 0.019     0.020      0.055        0.131
-#>    PARPD         a     1.000    0.940 0.017     0.045      0.015        0.125
-#>    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.384
-#>     OCPD         e     1.000    0.940 0.017     0.025      0.035        0.156
+#>    PARPD         y     1.000    0.930 0.018     0.020      0.050        0.131
+#>    PARPD         a     1.000    0.945 0.016     0.040      0.015        0.125
+#>    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.326
+#>     OCPD         e     1.000    0.950 0.015     0.025      0.025        0.156
 #>     OCPD         x     1.000    0.945 0.016     0.025      0.030        0.126
 #>     OCPD         y     1.000    0.965 0.013     0.030      0.005        0.131
-#>     OCPD         a     1.000    0.850 0.025     0.150      0.000        0.103
-#>     OCPD         d     1.000    0.825 0.027     0.075      0.100      221.255
-#>    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.152
+#>     OCPD         a     1.000    0.830 0.027     0.170      0.000        0.103
+#>     OCPD         d     1.000    0.830 0.027     0.075      0.095      220.815
+#>    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.151
 #>    PARPD         x     0.500    0.935 0.017     0.025      0.040        0.124
-#>    PARPD         y     0.500    0.930 0.018     0.020      0.050        0.128
-#>    PARPD         a     0.500    0.945 0.016     0.055      0.000        0.112
-#>    PARPD         d     0.500    0.915 0.020     0.045      0.040      157.065
+#>    PARPD         y     0.500    0.935 0.017     0.015      0.050        0.128
+#>    PARPD         a     0.500    0.935 0.017     0.065      0.000        0.111
+#>    PARPD         d     0.500    0.905 0.021     0.050      0.045      154.830
 #>     OCPD         e     0.500    0.940 0.017     0.030      0.030        0.158
 #>     OCPD         x     0.500    0.940 0.017     0.030      0.030        0.128
-#>     OCPD         y     0.500    0.930 0.018     0.025      0.045        0.131
-#>     OCPD         a     0.500    0.460 0.035     0.540      0.000        0.102
-#>     OCPD         d     0.500    0.710 0.032     0.160      0.130      256.904
-#>    PARPD         e     0.000    0.945 0.016     0.020      0.035        0.153
-#>    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.123
+#>     OCPD         y     0.500    0.935 0.017     0.020      0.045        0.131
+#>     OCPD         a     0.500    0.485 0.035     0.515      0.000        0.102
+#>     OCPD         d     0.500    0.710 0.032     0.170      0.120      256.592
+#>    PARPD         e     0.000    0.940 0.017     0.025      0.035        0.153
+#>    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.124
 #>    PARPD         y     0.000    0.950 0.015     0.040      0.010        0.131
-#>    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.099
+#>    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.098
 #>    PARPD         d     0.000       NA    NA        NA         NA           NA
-#>     OCPD         e     0.000    0.915 0.020     0.040      0.045        0.157
-#>     OCPD         x     0.000    0.960 0.014     0.030      0.010        0.125
-#>     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.132
-#>     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.101
+#>     OCPD         e     0.000    0.920 0.019     0.040      0.040        0.157
+#>     OCPD         x     0.000    0.955 0.015     0.035      0.010        0.124
+#>     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.131
+#>     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.100
 #>     OCPD         d     0.000       NA    NA        NA         NA           NA
-#>    PARPD         e     2.077    0.950 0.015     0.025      0.025        0.151
-#>    PARPD         x     2.077    0.945 0.016     0.030      0.025        0.118
-#>    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.128
-#>    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.124
-#>    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.199
+#>    PARPD         e     2.077    0.945 0.016     0.025      0.030        0.150
+#>    PARPD         x     2.077    0.950 0.015     0.025      0.025        0.118
+#>    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.127
+#>    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.125
+#>    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.504
 #>     OCPD         e     2.077    0.930 0.018     0.040      0.030        0.157
-#>     OCPD         x     2.077    0.910 0.020     0.060      0.030        0.126
+#>     OCPD         x     2.077    0.915 0.020     0.055      0.030        0.127
 #>     OCPD         y     2.077    0.945 0.016     0.030      0.025        0.131
-#>     OCPD         a     2.077    0.925 0.019     0.075      0.000        0.109
-#>     OCPD         d     2.077    0.885 0.023     0.050      0.065      158.585
+#>     OCPD         a     2.077    0.930 0.018     0.070      0.000        0.109
+#>     OCPD         d     2.077    0.885 0.023     0.050      0.065      160.646
 #>  Coverage_conditional N_conditional Structural N_reps
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.896           144      FALSE    200
+#>                 0.891           147      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.600            10      FALSE    200
+#>                 0.500             8      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.926            27      FALSE    200
+#>                 0.893            28      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.000             3      FALSE    200
+#>                 0.333             3      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
@@ -523,7 +752,7 @@ summary(acc)
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
 #>                    NA            NA      FALSE    200
-#>                 0.882            17      FALSE    200
+#>                 0.833            18      FALSE    200
 #>   Note: amplitude coverage on rows flagged Structural is structurally 0 (a
 #>   percentile interval of strictly positive amplitude replicates cannot
 #>   contain a zero truth) -- a theorem, not a measurement; the informative
@@ -531,14 +760,14 @@ summary(acc)
 #> 
 #> Guardrail operating characteristics:
 #>  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate
-#>    PARPD     1.000     0.720    0.654    0.778     0.025      NA         0.555
-#>     OCPD     1.000     0.050    0.027    0.090     0.025      NA         0.075
-#>    PARPD     0.500     0.135    0.094    0.189     0.025      NA         0.115
+#>    PARPD     1.000     0.735    0.670    0.791     0.025      NA         0.555
+#>     OCPD     1.000     0.040    0.020    0.077     0.025      NA         0.075
+#>    PARPD     0.500     0.140    0.099    0.195     0.025      NA         0.115
 #>     OCPD     0.500     0.015    0.005    0.043     0.025      NA         0.045
 #>    PARPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.020
 #>     OCPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.070
 #>    PARPD     2.077     1.000    0.981    1.000     0.025      NA         0.985
-#>     OCPD     2.077     0.085    0.054    0.132     0.025      NA         0.115
+#>     OCPD     2.077     0.090    0.058    0.138     0.025      NA         0.115
 #>  Branch_pathology_rate N_reps
 #>                      0    200
 #>                      0    200
@@ -588,7 +817,8 @@ For a visual summary across the ladder:
 plot(acc)
 ```
 
-![](evaluating-circumplex-structure_files/figure-html/accuracy_plot-1.png)
+![plot of chunk
+accuracy_plot](figures/evaluating-circumplex-structure-accuracy_plot-1.png)
 
 The two profiles tell usefully different stories. Paranoid PD is
 certified: its amplitude CI lower bound clears the 0.35-CI-width margin,
@@ -809,7 +1039,8 @@ communalities; `Fisher` measures departures in communality,
 plot(res)
 ```
 
-![](evaluating-circumplex-structure_files/figure-html/fit_structure_plot-1.png)
+![plot of chunk
+fit_structure_plot](figures/evaluating-circumplex-structure-fit_structure_plot-1.png)
 
 For the IIP-SC octants the picture agrees with Section 2’s CPM fit: the
 scales keep their theoretical circular *ordering* with comparable

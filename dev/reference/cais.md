@@ -20,12 +20,29 @@ childhood: Development of the Child and Adolescent Interpersonal Survey.
 
 [doi:10.1207/s15327752jpa8703_12](https://doi.org/10.1207/s15327752jpa8703_12)
 
+## Note on the withdrawn second normative sample
+
+The package ships one CAIS normative sample, the child sample. A second,
+drawn from the source's adult respondents, was shipped until version
+2.0.0 and has been withdrawn. The CAIS is rated on a 5-point scale, but
+three of the octant means the source publishes for those respondents
+fall above 5, so that sample cannot be on the same metric as the scores
+it would standardize:
+[`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+refused it, which left it as data no call could use. The transcription
+was faithful and the source's own table is the origin of the
+discrepancy, so the values are not lost — they are recorded, with the
+evidence about what went wrong in the source and what a reply from its
+authors would reopen, in the package's source repository under
+`cairn/references/sodano2006.md`, which also records the state of the
+query to the source's authors.
+
 ## Examples
 
 ``` r
 summary(cais)
 #> CAIS: Child and Adolescent Interpersonal Survey
-#> 37 items, 8 scales, 2 normative data sets
+#> 37 items, 8 scales, 1 normative data sets
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>
 #> 
@@ -85,11 +102,9 @@ summary(cais)
 #> 36. I share
 #> 37. I have a lot of friends
 #> 
-#> The CAIS currently has 2 normative data set(s):
-#> 1. 213 American fourth and sixth graders (aged 9 to 13)
-#> Sodano & Tracey (2006)
-#> <https://doi.org/10.1207/s15327752jpa8703_12>
-#> 2. 194 American college students (aged 17 to 50)
+#> The CAIS currently has 1 normative data set(s):
+#> 1. 204 American fourth and sixth graders (aged 9 to 13)
+#> Reference kind: identified published source
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>
 scales(cais, items = TRUE)
@@ -99,16 +114,19 @@ scales(cais, items = TRUE)
 #>     9. I know a lot
 #>     17. I think I can do a lot
 #>     25. I speak up for myself
+#>     32. I think I am right
 #> BC: Arrogant-Calculating (135 degrees)
 #>     2. I call people names
 #>     10. I like making trouble
 #>     18. I trick people
 #>     26. I tell people what to do
+#>     33. I am sneaky
 #> DE: Cold-Hearted (180 degrees)
 #>     3. I hurt people
 #>     11. I make people cry
 #>     19. I am mean to others
 #>     27. I like it when others feel bad
+#>     34. I am grumpy
 #> FG: Aloof-Introverted (225 degrees)
 #>     4. I am by myself a lot
 #>     12. I am alone
@@ -119,19 +137,21 @@ scales(cais, items = TRUE)
 #>     13. I am sad
 #>     21. I know very little
 #>     29. I give in easily
+#>     35. I am afraid
 #> JK: Unassuming-Ingenuous (315 degrees)
 #>     6. I am calm
 #>     14. I am quiet
 #>     22. Tricking people is mean
-#>     30. I help people
 #> LM: Warm-Agreeable (360 degrees)
 #>     7. I am kind to others
 #>     15. I try to help others feel better
 #>     23. I am friendly
-#>     31. I play with others
+#>     30. I help people
+#>     36. I share
 #> NO: Gregarious-Extraverted (45 degrees)
 #>     8. I am fun to be around
 #>     16. I am happy
 #>     24. I am giving
-#>     32. I think I am right
+#>     31. I play with others
+#>     37. I have a lot of friends
 ```
