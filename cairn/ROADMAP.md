@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-09-10 (CRAN published 2.0.1 on 2026-09-06 and `v2.0.1` is tagged with its GitHub release, so the patch-release row is closed to a tombstone; M119 and M117 terminal rows pruned, 3 of 3.)_
+_Last hygiene check: 2026-09-14 (M123 archived after PR #156; M120 terminal row pruned, 3 of 3.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M123 | The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep | review | — | normal | milestones/M123-plain-vignettes-sweep.md |
 | M124 | The axes-reliability and SEM vignettes read as plain English | planned | M123 | normal | milestones/M124-plain-vignettes-axes-sem.md |
 | M125 | The circumplex-structure vignette reads as plain English | planned | M123 | normal | milestones/M125-plain-vignette-structure.md |
+| M123 | The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep | done | — | normal | milestones/archive/M123-plain-vignettes-sweep.md |
 | M121 | A local reproduction of CRAN's linux-arm64 check flavor | done | — | high | milestones/archive/M121-arm64-check-harness.md |
 | M122 | Make the certificate suite exhaustive over the routes the shipped pricing can take | done | M121 | high | milestones/archive/M122-certificate-refusal-disposition.md |
-| M120 | Bring the Windows CRAN check under 8 minutes | done | — | high | milestones/archive/M120-cran-check-time.md |
 
 ## Candidates
 

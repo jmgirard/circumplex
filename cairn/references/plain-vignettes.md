@@ -20,6 +20,7 @@ The reader is an applied researcher. The reader knows R, data frames, correlatio
 6. No dash and no semicolon in prose. Use a period, a comma, parentheses or a connecting word ("because", "but", "so").
 7. No milestone, decision or review id (`M123`, `D-015`, `RR22`) in a vignette.
 8. Code chunks, chunk options, figure captions and alt text do not change in this pass.
+9. A gloss is a claim. Check each new gloss against `R/` or the chunk, and give a batch of fix-round glosses its own fresh re-read. At M123's review, 5 of 16 new glosses were wrong or added a claim (added M123 review).
 
 ## Precision list
 
