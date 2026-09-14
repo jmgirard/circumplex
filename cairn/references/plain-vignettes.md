@@ -61,7 +61,7 @@ The `--inventory` mode of `tools/prose-sweep.R` reads the terms below. It matche
 
 `tools/prose-sweep.R` is the definition in code. This section and the script change together.
 
-Swept prose is a page minus four parts: the YAML header, every HTML comment (multi-line ones too), the References section, and every fenced block. A fenced block opens with three or more backticks or tildes, with or without an info string. It closes with at least as many of the same character. The References section runs from a heading named "References" to the next heading of the same or a higher level.
+Swept prose is a page minus five parts: the YAML header, every HTML comment (multi-line ones too), the References section, every fenced block, and every knitr table. A knitr table is a line that starts with `Table:`, followed after any blank lines by pipe-table rows. `knitr::kable(caption = ...)` writes this form into a knitted `.Rmd`, and chunk code wrote its text. The caption line and the rows up to the first line that is not a table row are removed. A `Table:` line with no table rows under it stays prose (added M124). A fenced block opens with three or more backticks or tildes, with or without an info string. It closes with at least as many of the same character. The References section runs from a heading named "References" to the next heading of the same or a higher level.
 
 A sentence is a run of words in swept prose that ends at one of these points:
 
@@ -98,6 +98,8 @@ The M123 review found these gaps and deferred them to the candidate row "The pro
 - A re-knit that adds or removes a chunk's output adds or removes a fence pair in `--chunks` output.
 - The tests plant no References section followed by more prose, no id in a code span and no dash in math. They also plant no inline comment with prose on both sides, no tilde fence with an info string, no fence over three characters and no `-` (stdin) input.
 - The em dash test fails, not skips, on a machine without the `en_US.UTF-8` locale.
+- A hand-written pipe table with a `Table:` caption line above it is skipped as a knitr table. A `kable()` table without a caption is still swept, so its generated cells can produce findings (added M124).
+- A skipped knitr table is in neither swept prose nor `--chunks` output, so a changed table passes both. Only `vignette-precompute` compares it. The rule also misses a pandoc `: caption` line, a caption under the table, and an indented table. Prose right after the last row, with no blank line, can join the prose before the table (added M124 review).
 
 ### A vignette re-knit and the chunk comparison
 
@@ -126,8 +128,44 @@ Reader reports, numbered as the rows cite them: claims reader C1 to C20, one-rea
 
 ### M124 (axes-reliability, sem-based-ssm-analysis)
 
+Reader reports, numbered as the rows cite them: claims reader A1 to A2 (axes) and S1 (SEM), one-read reader R1 to R28 (axes) and E1 to E29 (SEM), and gloss re-read G1 to G7. Items not in a row were fixed.
+
 | Page | Item | Disposition | Evidence |
 |---|---|---|---|
+| axes, SEM | Inventory: `vignette("introduction-to-ssm-analysis")` added | Kept | Rule 3 asks for this link. The introduction vignette defines elevation, amplitude, displacement and fit. |
+| axes | Inventory: `sd` added (R7) | Kept | "pass numeric axis SDs to `sd`" names the argument that the base text used. `R/axes_reliability.R` accepts numeric SDs. |
+| SEM | Inventory: `lx`, `ly` added (E4) | Kept | The gloss names the loadings in the constraint. The generated syntax writes `cx =~ lx*` and `cy =~ ly*`. |
+| axes | A2: "`zeta2` row" became "`block_specificity` row (symbol `zeta2`)" | Kept | The component table rows are built with `Component = "block_specificity", Symbol = "zeta2"` in `R/axes_reliability.R`. |
+| axes | R19: "Under MAR" became "Under MAR that is not MCAR" | Kept | The base sentence contrasts MAR with the MCAR case just before it. MCAR is a special case of MAR, so the unqualified base contradicted itself. |
+| SEM | E12, G2: "linear parameters get percentile intervals" became "elevation, X value, Y value and amplitude" | Kept | Amplitude is nonlinear but gets a percentile interval, and fit gets none (`R/ssm_bootstrap.R`, `ssm_replicate_intervals`). |
+| axes | R6, R9, R10 (calibrated uncertainty), R14 (asymptotically exact), R15, R16, R20, R21, R23, R24, R27 | Rejected | Technical notes for a reader who checks the numbers. A gloss would need facts the page and `?axes_reliability` do not state, such as the band width or the FIML standardization details. |
+| axes | R8: "Four properties" | Rejected | Section 5 has four bold properties. The calibration question is a sub-point of the first. |
+| axes | R12: lavaan variant names | Rejected | The paragraph addresses readers who cross-check in lavaan. It is now split in two. |
+| SEM | E2, E3, E7, E10, E11, E13, E14, E15, E20, E23 | Rejected | The terms are explained by the sentences around them, or the text addresses readers who fit their own lavaan models. |
+| SEM | E18: table cells | Rejected | A code chunk writes the table. Chunks do not change in this pass. |
+| SEM | E19: configural and scalar rungs | Rejected | Standard SEM terms. A gloss of scalar invariance needs a claim about intercepts that the page does not make. |
+| SEM | E24, E25: "branch" | Rejected | The next sentence says what the branch means for the interval endpoints. |
+| SEM | E26: "plane factors are fixed isotropic and orthogonal" | Kept as a base claim | The generated syntax fixes them only under the scaled tier, and the strict tier frees the factor covariance. The `ssm_plot_trajectory()` doc-bug candidate row now holds the fix, because a form-only pass does not change the claim. |
+| SEM | E29: "point" then "boundary" | Rejected | The point is where the families meet. The boundary divides fixed from free angles. |
+
+The review readers read `53d94913`, and their items carry a V prefix. The claims readers gave VA1 to VA12 (axes) and VS1 to VS10 (SEM). The one-read readers gave VR1 to VR30 (axes) and VE1 to VE33 (SEM). The diff reviewer gave F1 to F7. The review fixed six items: VA1, VA2, VA4, VS1, VS3 and VS9. For VA1, the five components now count the axes as one and block specificity as the fifth (`strack2013.md` p. 4). For VA2, the gloss is gone and the base wording is back, because the mean match is a large-sample result. For VS1, the clause is gone, because the package uses robust SEs against misspecification. A fresh re-read checked the six fixes. It found problems in VA2, VS3 and VS9, and those three now use base wording or the re-reader's wording.
+
+| Page | Item | Disposition | Evidence |
+|---|---|---|---|
+| axes, SEM | VA3, VS2, VS8 | Matched | Rows R19, E12 and the inventory row above. |
+| axes | VA5 "misprices" became "comes out wrong", VA8 "direct read-out" became "shows" | Rejected | The scope clause stays, and the quantities named are the same. |
+| axes | VA6 "oracle" became "simulated test data" | Rejected | "Known by construction" keeps the known-truth sense. |
+| axes | VA7, F3: "item specificity (the item error component)" | Rejected | `strack2013.md` p. 4 names the free error term item specificity. The page calls the same component item error. |
+| axes | VA9 exact-fit and approximate-fit classes, VA10, VA11, VA12 | Rejected | Standard terms or a claim the base implied, and each is consistent with `R/axes_reliability.R` and `R/axes_scaled_fit.R`. VA11 adds the missing Hu and Bentler reference. |
+| SEM | VS4, VS5 (F5), VS6, VS10 | Rejected | Each names a referent or glosses a standard term correctly, and the reader found each accurate. |
+| SEM | VS7: categorical and hybrid glosses | Rejected | `wendt2019.md` names the categorical model (LCA) and the hybrid model (SP-FA). |
+| axes | VR1, VR2, VR3, VR5, VR6, VR7, VR11, VR12, VR13, VR14, VR17, VR19, VR20 | Rejected | Technical notes for a reader who checks the numbers or cross-checks in lavaan. A gloss needs facts the page and `?axes_reliability` do not state. |
+| axes | VR15, VR16, VR22, VR23, VR24, VR25 | Rejected | Base wording or base structure (VR16 as R8 above). An added reason why is a new claim. |
+| axes | VR4, VR8, VR9, VR10, VR18, VR21, VR26, VR27, VR28, VR29, VR30 | Rejected | A later paragraph, the linked introduction vignette or the instruments vignette defines the term. Otherwise the term is standard for the reader profile. |
+| SEM | VE1, VE3, VE4, VE7, VE8, VE9, VE11, VE12, VE13, VE14, VE17, VE18, VE19, VE21, VE23, VE24, VE25, VE26, VE27, VE28, VE30, VE32, VE33 | Rejected | Technical notes for a reader who fits their own lavaan models, as E2 and the related rows above. |
+| SEM | VE2 (the article's ΔCFI direction), VE5 (the E26 bullet), VE20 | Rejected | Base claims that a form-only pass keeps. VE5 is in the doc-bug candidate row. |
+| SEM | VE6, VE10, VE15, VE16, VE22, VE29, VE31 | Rejected | The term is defined in the introduction vignette that the page links, or in a later section that the text names. |
+| SEM | F6, F7: knitr tables are in neither the sweep nor `--chunks`, and the table rule misses other caption forms | Follow-up | Listed under "Known sweep gaps". `vignette-precompute` still compares the table output. |
 
 ### M125 (evaluating-circumplex-structure)
 
