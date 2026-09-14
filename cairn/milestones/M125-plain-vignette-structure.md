@@ -1,6 +1,6 @@
 # M125: The circumplex-structure vignette reads as plain English
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M123
 - **Driving RR:** —
@@ -48,7 +48,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 - [x] T1: Rewrite the first half of the page's prose, by section, and copy each edit into the shipped `.Rmd`. Coverage, CPM and fit-index statements keep their measured conditions. Check them against `cairn/DESIGN.md` "Statistical conventions and their rationale".
 - [x] T2: Rewrite the second half the same way.
 - [x] T3: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add the M125 ledger rows. Update NEWS.
-- [ ] T4: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
+- [x] T4: Run check and test. Re-knit locally and run the staleness check. `/milestone-review` pushes, opens the PR and confirms that the `vignette-precompute` workflow passes on its head.
 
 ## Work log
 
@@ -58,6 +58,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 - 2026-09-14: T2 done. Sections 3 to 6 rewritten and copied. Both files sweep with exit 0, `--prose` matches between them, `--chunks` matches base. The checklist's "see Section 4" for ipsatizing now says Section 5, the section that covers it. A ledger row at T3 records this.
 - 2026-09-14: T3 done. Inventory base-to-head: nothing removed, 2 items added (the intro link and "50" rejoined on one line). [O] claims reader: 10 items (K1 empty, K3 changed meaning), fixed K3, K4, K5, K9, K10. [O] one-read reader: 39 paragraphs, fixed 13, rejected 26 in grouped ledger rows. [O] gloss re-read of the fix round: 14 points, 2 problems (G8 ladder gloss, G13 RMSEA direction), both fixed with its wording. The full test run then failed `test-cpm_boundary_vignette.R:150`, because that test pins the phrase "what has been measured about the markers covers analytic intervals only". The phrase is restored, and that file passes with NOT_CRAN=true (43 pass). NEWS bullet extended to six vignettes. Ledger rows added.
 - 2026-09-14: claim audit: 41 claims read, 1 corrected — vignettes/evaluating-circumplex-structure.Rmd.orig, vignettes/evaluating-circumplex-structure.Rmd, NEWS.md. A38 ("three categories") fixed to four, and the A11 ambiguity split. The same reader re-read both, and both hold. A25 ("withholds" the displacement) is base wording, so it went to the doc-bug candidate row and a ledger row. Checkpoint: T4 still open, and `devtools::check()` is running.
+- 2026-09-14: T4 done. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes. `devtools::test()`: FAIL 0, PASS 9319. Local `tools/precompute-vignettes.R evaluating-circumplex-structure` then `tools/check-vignette-staleness.R`: all 7 up to date. The re-knit changed one masked `#>` line only, and the committed copy is restored. Minor amendment: T4's push step moves to `/milestone-review`, which opens the PR after approval (tracking rules). AC3 is read on the PR head there.
 
 ## Decisions
 
