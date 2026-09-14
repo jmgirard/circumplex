@@ -1,13 +1,13 @@
 # M123: The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the vignettes ship in the package and on the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** m123-plain-vignettes-sweep
 
 ## Goal
 
@@ -47,9 +47,9 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 
 ## Tasks
 
-- [ ] T1: Write `tools/prose-sweep.R`. It takes files, or `-` for standard input. It drops the YAML header, HTML comments (multi-line too), the References section and every fenced block (backtick or tilde, with or without an info string). A code span and a `$...$` math span each count as one word. A heading, list item, table cell, blockquote line and paragraph end each end a sentence. A period after a single capital letter does not end one. Report mode prints each sentence over 25 words, each dash (U+2014, `---`, ` -- `, `&mdash;`), each semicolon outside code spans, math and HTML entities, and each match of `\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\b`. It exits 0 clean, 1 on a finding, 2 when a file has no sentences, 3 on a usage error. `--prose` prints one sentence per line. `--chunks` prints fenced blocks as AC2 states. `--inventory` prints the AC4 items, one per line, sorted.
-- [ ] T2: Write `tests/testthat/test-prose-sweep.R`. It skips outside the source tree. Plant each finding kind in more than one form and place: a long sentence in a list item, heading, blockquote and table cell; each dash form; semicolons in prose (flagged) and in a code span, math and `&amp;` (not flagged); an id in prose, link text and a URL. Plant a long sentence, semicolon and dash inside each fence form and a multi-line comment, and assert silence. Assert which finding each plant produces, and that a clean fixture exits 0.
-- [ ] T3: Write `cairn/references/plain-vignettes.md` and its `INDEX.md` line. It holds the reader profile, the rules, the precision list, the sweep definition from T1 and a ledger section per milestone. The reader knows R, data frames, correlation, regression and confidence intervals. The rules: 25-word sentences; active voice and simple tenses; define a term at first use or link the introduction vignette; change form, not claims (tidymedia's rule 6); keep every statistical qualifier. Precision-list terms include interval, credible, confidence, significant, contrast, displacement, amplitude, elevation and fit. Also record the effect of a vignette re-knit on AC2.
+- [x] T1: Write `tools/prose-sweep.R`. It takes files, or `-` for standard input. It drops the YAML header, HTML comments (multi-line too), the References section and every fenced block (backtick or tilde, with or without an info string). A code span and a `$...$` math span each count as one word. A heading, list item, table cell, blockquote line and paragraph end each end a sentence. A period after a single capital letter does not end one. Report mode prints each sentence over 25 words, each dash (U+2014, `---`, ` -- `, `&mdash;`), each semicolon outside code spans, math and HTML entities, and each match of `\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\b`. It exits 0 clean, 1 on a finding, 2 when a file has no sentences, 3 on a usage error. `--prose` prints one sentence per line. `--chunks` prints fenced blocks as AC2 states. `--inventory` prints the AC4 items, one per line, sorted.
+- [x] T2: Write `tests/testthat/test-prose-sweep.R`. It skips outside the source tree. Plant each finding kind in more than one form and place: a long sentence in a list item, heading, blockquote and table cell; each dash form; semicolons in prose (flagged) and in a code span, math and `&amp;` (not flagged); an id in prose, link text and a URL. Plant a long sentence, semicolon and dash inside each fence form and a multi-line comment, and assert silence. Assert which finding each plant produces, and that a clean fixture exits 0.
+- [x] T3: Write `cairn/references/plain-vignettes.md` and its `INDEX.md` line. It holds the reader profile, the rules, the precision list, the sweep definition from T1 and a ledger section per milestone. The reader knows R, data frames, correlation, regression and confidence intervals. The rules: 25-word sentences; active voice and simple tenses; define a term at first use or link the introduction vignette; change form, not claims (tidymedia's rule 6); keep every statistical qualifier. Precision-list terms include interval, credible, confidence, significant, contrast, displacement, amplitude, elevation and fit. Also record the effect of a vignette re-knit on AC2.
 - [ ] T4: Rewrite `vignettes/bayesian-ssm-analysis.Rmd` prose.
 - [ ] T5: Rewrite `vignettes/growth-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/growth-ssm-analysis.Rmd`.
 - [ ] T6: Rewrite `vignettes/advanced-visualization.Rmd.orig` prose and copy each edit into `vignettes/advanced-visualization.Rmd`.
@@ -65,6 +65,10 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: plan gate chose the six newer vignettes over all nine, because the older three show fewer long sentences (8, 15, 30); falsified by a reader finding the older pages as hard to follow.
 - 2026-09-14: plan gate chose to proceed over holding for the ebook candidate, because that project is not open; falsified by the user opening the ebook project before M125 ships.
 - 2026-09-14: plan split the six pages across three milestones rather than one, because one milestone would exceed ~10 tasks and the 150-line cap; falsified by M123's review showing one page per task takes far less than a session.
+- 2026-09-14: implement started on branch m123-plain-vignettes-sweep. Question gate skipped, because the plan left nothing open.
+- 2026-09-14: T1 done. `tools/prose-sweep.R` as specified, plus three refinements the plan did not name. Latin abbreviations (`e.g.`, `i.e.`, `et al.`, `vs.`, `cf.`) do not end a sentence. Horizontal rules and table alignment rows hold no prose. Code and math spans are also skipped for dashes. The rules page records all three.
+- 2026-09-14: T2 done. `test-prose-sweep.R` passes 25 expectations. Its sentence-split test caught a regex that never split sentences (no `perl = TRUE`), fixed before commit. Full `devtools::test()` 0 failures.
+- 2026-09-14: T3 done. `cairn/references/plain-vignettes.md` and its INDEX line. The re-knit note records that knitr rewrites chunk openings to ` r` and that `--chunks` drops `#>` lines.
 
 ## Decisions
 
