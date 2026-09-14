@@ -175,6 +175,29 @@ split_page <- function(lines) {
     j <- j + 1L
   }
 
+  # A knitr table: knitr::kable(caption = ...) knits to a "Table:" caption line,
+  # then blank lines, then a pipe table. Chunk code wrote that text, so the
+  # caption and the table rows are not prose. A "Table:" line with no pipe
+  # table under it stays prose.
+  j <- 1L
+  while (j <= n) {
+    ln <- prose[[j]]
+    if (!is.na(ln) && grepl("^Table:", ln)) {
+      k <- j + 1L
+      while (k <= n && !is.na(prose[[k]]) && !nzchar(trimws(prose[[k]]))) k <- k + 1L
+      if (k <= n && !is.na(prose[[k]]) && grepl("^\\s*\\|", prose[[k]])) {
+        prose[[j]] <- NA
+        while (k <= n && !is.na(prose[[k]]) && grepl("^\\s*\\|", prose[[k]])) {
+          prose[[k]] <- NA
+          k <- k + 1L
+        }
+        j <- k
+        next
+      }
+    }
+    j <- j + 1L
+  }
+
   list(prose = prose, blocks = blocks)
 }
 

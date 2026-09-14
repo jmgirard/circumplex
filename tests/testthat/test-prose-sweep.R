@@ -152,6 +152,45 @@ test_that("a long sentence in a paragraph is counted across source lines", {
   expect_identical(res$out, character(0))
 })
 
+test_that("a table under a knitr Table: caption is not swept, other tables are", {
+  # knitr::kable(caption = ...) knits to a "Table:" caption line, a blank line
+  # and a pipe table. That text comes from chunk code, so the sweep skips it.
+  page <- c(
+    "Intro line.",
+    "",
+    "Table: SILENT-caption; with a semicolon",
+    "",
+    "|Question |Confounds |",
+    "|:--------|:---------|",
+    paste0("|short |", long_text("SILENT-kable"), "; a — dash |"),
+    "",
+    "PLANT-after a pause — then more.",
+    "",
+    "| name | text |",
+    "|---|---|",
+    paste0("| short | ", long_text("PLANT-bare-cell"), " |"),
+    "",
+    "Table: PLANT-caption-prose; a caption line with no table under it.",
+    "",
+    "A closing sentence."
+  )
+  res <- run_sweep(page)
+  expect_identical(res$status, 1L)
+  at <- function(tag) which(grepl(tag, page, fixed = TRUE))[[1]]
+  expected <- c(
+    paste(at("PLANT-after"), "dash"),
+    paste(at("PLANT-bare-cell"), "long sentence"),
+    paste(at("PLANT-caption-prose"), "semicolon")
+  )
+  expect_setequal(finding_keys(res$out), expected)
+  expect_length(finding_keys(res$out), length(expected))
+
+  # The skipped table leaves no sentence behind in --prose either.
+  res <- run_sweep(page, "--prose")
+  expect_false(any(grepl("SILENT", res$out, fixed = TRUE)))
+  expect_true(any(grepl("PLANT-bare-cell", res$out, fixed = TRUE)))
+})
+
 test_that("a clean page exits 0 and a page with no sentences exits 2", {
   clean <- c("---", "title: x", "---", "", "# Heading", "", "A short sentence. Another one.")
   res <- run_sweep(clean)

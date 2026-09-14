@@ -61,7 +61,7 @@ The `--inventory` mode of `tools/prose-sweep.R` reads the terms below. It matche
 
 `tools/prose-sweep.R` is the definition in code. This section and the script change together.
 
-Swept prose is a page minus four parts: the YAML header, every HTML comment (multi-line ones too), the References section, and every fenced block. A fenced block opens with three or more backticks or tildes, with or without an info string. It closes with at least as many of the same character. The References section runs from a heading named "References" to the next heading of the same or a higher level.
+Swept prose is a page minus five parts: the YAML header, every HTML comment (multi-line ones too), the References section, every fenced block, and every knitr table. A knitr table is a line that starts with `Table:`, followed after any blank lines by pipe-table rows. `knitr::kable(caption = ...)` writes this form into a knitted `.Rmd`, and chunk code wrote its text. The caption line and the rows up to the first line that is not a table row are removed. A `Table:` line with no table rows under it stays prose (added M124). A fenced block opens with three or more backticks or tildes, with or without an info string. It closes with at least as many of the same character. The References section runs from a heading named "References" to the next heading of the same or a higher level.
 
 A sentence is a run of words in swept prose that ends at one of these points:
 
@@ -98,6 +98,7 @@ The M123 review found these gaps and deferred them to the candidate row "The pro
 - A re-knit that adds or removes a chunk's output adds or removes a fence pair in `--chunks` output.
 - The tests plant no References section followed by more prose, no id in a code span and no dash in math. They also plant no inline comment with prose on both sides, no tilde fence with an info string, no fence over three characters and no `-` (stdin) input.
 - The em dash test fails, not skips, on a machine without the `en_US.UTF-8` locale.
+- A hand-written pipe table with a `Table:` caption line above it is skipped as a knitr table. A `kable()` table without a caption is still swept, so its generated cells can produce findings (added M124).
 
 ### A vignette re-knit and the chunk comparison
 
