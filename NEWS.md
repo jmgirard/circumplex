@@ -2,9 +2,10 @@
 
 ## Documentation
 
-* Five vignettes now use plain English: "Bayesian SSM Analysis", "Growth
+* Six vignettes now use plain English: "Bayesian SSM Analysis", "Growth
   Models on SSM Parameters", "Advanced Circumplex Visualization", "Axes
-  Reliability" and "SEM-Based SSM Analysis". Their sentences are shorter and
+  Reliability", "SEM-Based SSM Analysis" and "Evaluating Circumplex
+  Structure". Their sentences are shorter and
   carry no em dashes or semicolons. Each now links the introduction vignette
   near its start. Their code and its output did not change.
 
