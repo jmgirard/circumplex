@@ -7,7 +7,7 @@
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the vignettes ship in the package and on the pkgdown site
-- **Branch/PR:** m123-plain-vignettes-sweep
+- **Branch/PR:** m123-plain-vignettes-sweep, https://github.com/jmgirard/circumplex/pull/156
 
 ## Goal
 
