@@ -61,6 +61,8 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 - claim audit: 44 claims read, 1 corrected — NEWS.md, tools/prose-sweep.R, tests/testthat/test-prose-sweep.R, vignettes/axes-reliability.Rmd(.orig), vignettes/sem-based-ssm-analysis.Rmd(.orig)
 - 2026-09-14: the corrected claim is the simulated-population sentence. It numbered block specificity as the fourth of five components, but `data-raw/simulated_items.R` counts the two axes separately and has no block component. The auditor's replacement text is applied. The header comment of `tools/prose-sweep.R` now lists knitr tables. The corrected sentence was not re-read, because it takes the auditor's own wording.
 - 2026-09-14: T4 done. `devtools::check(args = "--no-manual")` at `f51067f3` gave 0 errors, 0 warnings and 0 notes, with tests included. The head commit after it changes only vignette prose and a comment in the build-ignored script. At head, the vignette-reading and sweep tests give 0 failures and 3017 passes. Minor amendment: T4's push and `vignette-precompute` confirmation move to `/milestone-review`, because the git model opens the PR only after approval. AC3 evidence therefore comes from the PR run. Status set to review.
+- 2026-09-14: review ran the four fresh readers and three lenses, and the gate-directed claim fixes are at `39c4b54e`.
+- step-7 approval: m124-plain-vignettes-axes-sem approved for merge
 
 ## Decisions
 
