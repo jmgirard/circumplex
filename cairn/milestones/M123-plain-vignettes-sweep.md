@@ -52,7 +52,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - [x] T3: Write `cairn/references/plain-vignettes.md` and its `INDEX.md` line. It holds the reader profile, the rules, the precision list, the sweep definition from T1 and a ledger section per milestone. The reader knows R, data frames, correlation, regression and confidence intervals. The rules: 25-word sentences; active voice and simple tenses; define a term at first use or link the introduction vignette; change form, not claims (tidymedia's rule 6); keep every statistical qualifier. Precision-list terms include interval, credible, confidence, significant, contrast, displacement, amplitude, elevation and fit. Also record the effect of a vignette re-knit on AC2.
 - [x] T4: Rewrite `vignettes/bayesian-ssm-analysis.Rmd` prose.
 - [x] T5: Rewrite `vignettes/growth-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/growth-ssm-analysis.Rmd`.
-- [ ] T6: Rewrite `vignettes/advanced-visualization.Rmd.orig` prose and copy each edit into `vignettes/advanced-visualization.Rmd`.
+- [x] T6: Rewrite `vignettes/advanced-visualization.Rmd.orig` prose and copy each edit into `vignettes/advanced-visualization.Rmd`.
 - [ ] T7: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add ledger rows. Add one NEWS bullet.
 - [ ] T8: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
 
@@ -71,6 +71,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: T3 done. `cairn/references/plain-vignettes.md` and its INDEX line. The re-knit note records that knitr rewrites chunk openings to ` r` and that `--chunks` drops `#>` lines.
 - 2026-09-14: T4 done. Bayesian page sweep exits 0 (was 11 long sentences, 11 dashes, 2 semicolons). `--chunks` unchanged. Inventory loses nothing and gains one link to the introduction vignette, added where the page first names the three parameters.
 - 2026-09-14: T5 done. Growth page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 29 long sentences, 28 dashes, 6 semicolons). `--chunks` unchanged on both. The added and removed lines of the two diffs are identical. Inventory gains only the introduction-vignette link.
+- 2026-09-14: T6 done. Visualization page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 33 long sentences, 15 dashes, 5 semicolons). `--chunks` unchanged on both, the two diffs carry identical edits, and the inventory is unchanged. Two glosses added in place: "resultant (the average vector)" and "munches (splits into short pieces)".
 
 ## Decisions
 
