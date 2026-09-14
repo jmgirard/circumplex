@@ -81,6 +81,23 @@ Rscript tools/prose-sweep.R vignettes/<name>.Rmd.orig
 
 `tests/testthat/test-prose-sweep.R` plants each finding kind in several forms and places and asserts which finding each plant produces.
 
+### Known sweep gaps
+
+The M123 review found these gaps and deferred them to the candidate row "The prose sweep as a merge gate". No page in M123 hits one.
+
+- A hard-wrapped line that starts with `1. `, `- `, `+ ` or `* ` starts a new unit, so it splits a sentence the renderer keeps whole.
+- `etc.`, `approx.`, `Fig.`, `Eq.` and `resp.` end a sentence.
+- Each blockquote line is its own unit, so a long sentence wrapped across `>` lines passes.
+- `<!--` inside a code span opens a comment and drops prose up to the next `-->`.
+- A line such as "```r x``` is odd." opens a fence that swallows the rest of the page.
+- `&#8212;`, `&#x2014;`, a spaced en dash and a ` --` at the end of a unit are not flagged. `R&D;` hides its semicolon.
+- Ids are searched only in swept prose, not in chunks, comments, YAML or References.
+- `--inventory` reads the precision list relative to the working directory.
+- A pandoc heading `# References {-}` and setext headings are not recognized.
+- A re-knit that adds or removes a chunk's output adds or removes a fence pair in `--chunks` output.
+- The tests plant no References section followed by more prose, no id in a code span and no dash in math. They also plant no inline comment with prose on both sides, no tilde fence with an info string, no fence over three characters and no `-` (stdin) input.
+- The em dash test fails, not skips, on a machine without the `en_US.UTF-8` locale.
+
 ### A vignette re-knit and the chunk comparison
 
 A pre-computed vignette ships as a knitted `.Rmd`, and `tools/precompute-vignettes.R` regenerates it from the `.Rmd.orig`. A re-knit rewrites each chunk's opening line (`{r name, ...}` becomes ` r`) and its `#>` output lines. `--chunks` drops the `#>` lines, so new output alone does not change the comparison. The opening lines of the shipped `.Rmd` stay the same across re-knits of unchanged chunk options. So a base-to-head difference in `--chunks` output of a shipped `.Rmd` means chunk source or chunk options changed. A re-knit also rewrites the `<img>` lines that knitr writes for figures. Those lines are prose, not chunks, so they do not affect the chunk comparison. The `vignette-precompute` workflow compares the shipped prose to the re-knit byte for byte. So a prose edit that you copy into the `.Rmd` by hand must match the `.Rmd.orig` exactly.
@@ -97,7 +114,7 @@ Reader reports, numbered as the rows cite them: claims reader C1 to C20, one-rea
 |---|---|---|---|
 | bayesian, growth, visualization | Inventory: `vignette("introduction-to-ssm-analysis")` added (C1, C6, V1) | Kept | Rule 3 asks for this link. The introduction vignette exists in `vignettes/`. |
 | bayesian, growth, visualization | Inventory: "45°" added | Kept | The gloss "eight scales placed 45° apart" matches `octants()`, whose eight angles are the multiples of 45 from 45 to 360. |
-| growth | Inventory: `ssm_analyze(method = "montecarlo")` added (G7) | Removed at review (corrected M123 review) | The review's claims reader found "the same one" stronger than the base "the same asymptotic move", so the base wording returned. |
+| growth | Inventory: `ssm_analyze(method = "montecarlo")` added (G7) | Removed at review (corrected M123 review) | The review's claims reader found "the same one" stronger than the base "the same asymptotic move". The head now says "the same large-sample (asymptotic) step". |
 | bayesian | C5: "Convert them to ..., or pass profile draws" is an instruction | Kept | The claim is the same: both routes make the draws summarizable. |
 | growth | C15: "multivariate normal (MVN)" gloss | Kept | The expansion is correct. |
 | growth | C16: "exact posterior inference" for projected-normal regression | Kept as a base claim | The base text makes the claim. The fix moved the claim back onto the method, not the package. Whether "exact" fits MCMC output is outside a form-only pass. |

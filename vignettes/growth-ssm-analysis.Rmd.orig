@@ -44,7 +44,8 @@ circular-correct summaries.
 The division of labor is deliberate and mirrors the package's Bayesian
 vignette: **circumplex does not fit mixed models**. It prepares the
 coordinate data on the way in (`ssm_parameters_id()`). It converts fitted
-model draws (random draws of the fitted model's estimates) on the way out
+model draws (draws that describe the uncertainty in the fitted model's
+estimates) on the way out
 (`ssm_draws()`). The growth model itself belongs
 to a dedicated mixed-modeling package. The reference recipe below uses
 **glmmTMB**. The same stacked-outcome formulation can also be fit with
@@ -141,10 +142,10 @@ So combining them silently sets $\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0$.
 The $x$ and $y$ person effects are each person's stable shifts in $x$ and
 $y$. Our validation simulations included a design with strongly correlated
 $x$–$y$ person effects. In that design, the shortcut's pointwise $d(t)$
-coverage drops from the nominal 95% to roughly 86%. The joint recipe stays at
-nominal. Pointwise coverage is how often the interval at one wave contains
-the true direction. Such a
-design is realistic, because profile tilts are rarely aligned with an axis.
+coverage drops from the nominal 95% to roughly 86%. Pointwise coverage is how
+often the interval at one wave contains the true direction. The joint recipe
+stays at nominal. Strongly correlated person effects are realistic, because
+profile tilts are rarely aligned with an axis.
 Do not fit the coordinates separately.
 
 ## 4. From fixed effects to $(a(t), d(t))$ with intervals
@@ -219,8 +220,8 @@ continuous. So the trajectory crosses the boundary as one continuous path
 instead of jumping a full turn. Values there may legitimately fall outside
 $[0°, 360°)$. Each interval is placed on its estimate's branch and keeps the
 width it was reported with. This holds even for an interval that straddles
-the boundary, which is stored with `d_lci > d_uci`, because each bound is
-wrapped into $[0°, 360°)$ on its own.
+the boundary, which is stored with `d_lci > d_uci`. It is stored that way because each
+bound is wrapped onto the circle on its own.
 
 Placing the intervals by hand is easy to get subtly wrong. The natural
 recipe is to "shift each bound by its signed distance from the estimate."
@@ -337,8 +338,7 @@ With modest N, prefer degrees-of-freedom-adjusted inference or a parametric
 bootstrap of the fixed effects over raw normal-approximation draws. A
 parametric bootstrap refits the model to data simulated from the fitted
 model.
-Degrees-of-freedom-adjusted inference widens intervals to account for a
-small sample. It includes the Kenward–Roger adjustment for
+Degrees-of-freedom-adjusted inference includes the Kenward–Roger adjustment for
 `lme4` fits via **pbkrtest**, the approximate denominator degrees of freedom
 `nlme` supplies, or $t$-quantile-based intervals.
 

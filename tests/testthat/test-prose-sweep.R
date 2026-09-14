@@ -245,4 +245,11 @@ test_that("an em dash is still found outside a UTF-8 locale", {
   res <- run_sweep(c("Intro line.", "", "A pause — then more."), env = "LC_ALL=C")
   expect_identical(res$status, 1L)
   expect_identical(finding_keys(res$out), "3 dash")
+
+  # The inventory folds U+2212 into a hyphen; that must not crash either.
+  terms <- tempfile(fileext = ".md")
+  writeLines(c("## Precision list", "", "- interval"), terms)
+  res <- run_sweep("A turn of −340° here.", c("--inventory", "--terms", shQuote(terms)), env = "LC_ALL=C")
+  expect_identical(res$status, 0L)
+  expect_identical(res$out, c("degree: -340", "number: -340"))
 })

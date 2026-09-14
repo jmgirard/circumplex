@@ -31,17 +31,16 @@
 
 MAX_WORDS <- 25L
 ID_PATTERN <- "\\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\\b"
-EMDASH <- "—"
-MINUS <- "−"
-DEGREE <- "°"
-
-# paste0() in a non-UTF-8 locale returns unmarked bytes, which the regex engine
-# then refuses to translate, so each pattern built from the constants above is
-# marked UTF-8 again.
+# In a non-UTF-8 locale, a "\u" literal and a paste0() result can both come back
+# as unmarked bytes, which the regex engine then refuses to translate. So every
+# non-ASCII constant, and each pattern built from one, is marked UTF-8.
 utf8 <- function(x) {
   Encoding(x) <- "UTF-8"
   x
 }
+EMDASH <- utf8("—")
+MINUS <- utf8("−")
+DEGREE <- utf8("°")
 DASH_RE <- utf8(paste0(EMDASH, "|---|(?<=\\s)--(?=\\s)|&mdash;"))
 # A leading minus (a hyphen or U+2212) after a space, an opening bracket or the
 # start of the text stays on its number in the inventory, so a sign flip shows.
