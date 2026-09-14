@@ -9,7 +9,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M124 | The axes-reliability and SEM vignettes read as plain English | in-progress | M123 | normal | milestones/M124-plain-vignettes-axes-sem.md |
+| M124 | The axes-reliability and SEM vignettes read as plain English | review | M123 | normal | milestones/M124-plain-vignettes-axes-sem.md |
 | M125 | The circumplex-structure vignette reads as plain English | planned | M123 | normal | milestones/M125-plain-vignette-structure.md |
 | M123 | The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep | done | — | normal | milestones/archive/M123-plain-vignettes-sweep.md |
 | M121 | A local reproduction of CRAN's linux-arm64 check flavor | done | — | high | milestones/archive/M121-arm64-check-harness.md |

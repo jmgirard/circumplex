@@ -1,6 +1,6 @@
 # M124: The axes-reliability and SEM vignettes read as plain English
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M123
 - **Driving RR:** —
@@ -47,7 +47,7 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 - [x] T1: Rewrite `vignettes/axes-reliability.Rmd.orig` prose and copy each edit into `vignettes/axes-reliability.Rmd`. The estimator's corrections (standard errors, fit statistics, the correlation metric) keep every qualifier. Check each one against `?axes_reliability` and `cairn/references/strack2013.md`.
 - [x] T2: Rewrite `vignettes/sem-based-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/sem-based-ssm-analysis.Rmd`. Fit-index and contrast statements keep their scope conditions. Check them against `?ssm_sem`.
 - [x] T3: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add the M124 ledger rows. Update NEWS.
-- [ ] T4: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
+- [x] T4: Run check and test. The push and the `vignette-precompute` run happen at `/milestone-review`, which opens the PR after approval.
 
 ## Work log
 
@@ -60,6 +60,7 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 - 2026-09-14: first full check failed with 2 test failures. `test-axes-corrected-se.R` AC7 and `test-axes-scaled-fit.R` AC11 pin the vignette phrases "it is a calibration, not an exactness guarantee" and "measured .06 to .11 at three populations chosen to bracket", and the rewrite had split both. Both phrases are restored in the vignette (under 25 words, no dash), and the tests are unchanged. Filtered run: 0 failures, 2974 passes.
 - claim audit: 44 claims read, 1 corrected — NEWS.md, tools/prose-sweep.R, tests/testthat/test-prose-sweep.R, vignettes/axes-reliability.Rmd(.orig), vignettes/sem-based-ssm-analysis.Rmd(.orig)
 - 2026-09-14: the corrected claim is the simulated-population sentence. It numbered block specificity as the fourth of five components, but `data-raw/simulated_items.R` counts the two axes separately and has no block component. The auditor's replacement text is applied. The header comment of `tools/prose-sweep.R` now lists knitr tables. The corrected sentence was not re-read, because it takes the auditor's own wording.
+- 2026-09-14: T4 done. `devtools::check(args = "--no-manual")` at `f51067f3` gave 0 errors, 0 warnings and 0 notes, with tests included. The head commit after it changes only vignette prose and a comment in the build-ignored script. At head, the vignette-reading and sweep tests give 0 failures and 3017 passes. Minor amendment: T4's push and `vignette-precompute` confirmation move to `/milestone-review`, because the git model opens the PR only after approval. AC3 evidence therefore comes from the PR run. Status set to review.
 
 ## Decisions
 
