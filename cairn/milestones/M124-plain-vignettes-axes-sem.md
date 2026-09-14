@@ -1,13 +1,13 @@
 # M124: The axes-reliability and SEM vignettes read as plain English
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M123
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the vignettes ship in the package and on the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** m124-plain-vignettes-axes-sem
 
 ## Goal
 
@@ -52,6 +52,7 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 ## Work log
 
 - 2026-09-14: created by /milestone-plan. The gate choices and the criteria audit are recorded in M123's work log. This milestone repeats M123's AC1-AC7 for its own two pages.
+- 2026-09-14: implement started on branch `m124-plain-vignettes-axes-sem`. Question gate skipped: the one open choice (NEWS) takes the plan's second option, an extension of M123's bullet. A local re-knit is not used to copy prose into the shipped `.Rmd`, because the installed circumplex is 2.0.0; edits are copied by hand, as in M123.
 
 ## Decisions
 
