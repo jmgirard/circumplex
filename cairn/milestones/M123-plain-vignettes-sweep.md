@@ -83,6 +83,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: fix-now commits ce770a4e and 5e7b38a9 on the branch. An [O] re-read of ce770a4e found 17 items, 12 fixed in 5e7b38a9. b5674f31 merged the two plain-English candidate rows and added the `ssm_plot_trajectory()` help-page row, to keep ROADMAP under 60 lines and 24,000 bytes.
 - 2026-09-14: step-7 approval: m123-plain-vignettes-sweep approved for merge
 - 2026-09-14: PR #156 opened. The CI watch hit its timeout: `vignette-precompute`, `pkgdown` and `matrix` pass, and the three R-CMD-check release jobs are still pending. Session stopped before merge. Marker `cairn/.merge-approved` written for PR #156.
+- 2026-09-14: resume route (c): PR #156 open with all six checks green, master unmoved, empty PR conversation read. step-7 approval: m123-plain-vignettes-sweep approved for merge (re-posed).
 
 ## Decisions
 
