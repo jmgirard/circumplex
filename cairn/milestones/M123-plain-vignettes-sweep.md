@@ -1,6 +1,6 @@
 # M123: The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -54,7 +54,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - [x] T5: Rewrite `vignettes/growth-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/growth-ssm-analysis.Rmd`.
 - [x] T6: Rewrite `vignettes/advanced-visualization.Rmd.orig` prose and copy each edit into `vignettes/advanced-visualization.Rmd`.
 - [x] T7: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add ledger rows. Add one NEWS bullet.
-- [ ] T8: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
+- [x] T8: Run check and test. Re-knit the pre-computed pages locally and run the staleness guard. `/milestone-review` pushes, opens the PR and confirms the `vignette-precompute` workflow passes on its head.
 
 ## Work log
 
@@ -77,6 +77,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: T8 in progress (checkpoint). Re-knitting growth and visualization at 3526c38b on a scratch worktree left the tree byte-identical, and `tools/check-vignette-staleness.R` exits 0. Opening the PR moves to review (git model), so the `vignette-precompute` run on the PR head is confirmed there.
 - 2026-09-14: claim audit: 81 claims read, 3 corrected — tools/prose-sweep.R, NEWS.md, vignettes/advanced-visualization.Rmd.orig (and its .Rmd). Re-read of the three corrections pending.
 - 2026-09-14: claim-audit re-read: NEWS and the visualization wording hold. The `--chunks` header claim was still wrong, because a page with no fenced block crashed `writeLines()`. A regression test reproduced that exact error, and the fix (`as.character()`) makes it pass. `test-prose-sweep.R` now passes 27 expectations, so the header claim holds.
+- 2026-09-14: T8 done. At f84cb531, `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings, 0 notes, and `devtools::test()` gives 0 failures. Minor amendment: T8's push step moves to `/milestone-review`, because the git model opens the PR only after approval. AC3 is unchanged. Status set to review.
 
 ## Decisions
 
