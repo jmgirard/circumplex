@@ -29,14 +29,16 @@ So it is worth asking how *reliably* the instrument measures each axis.
 `axes_reliability()` answers that question with the estimator of Strack, Jacobs,
 and Grosse Holtforth (2013). It fits an item-level measurement model. The model
 splits each item's variance into orthogonal pieces: a general factor shared by
-all items, the two circumplex **axes**, scale specificity, and item error. For an instrument administered in blocks, it adds a block-specificity
-component. The function reads axis reliability off the **axes** component alone.
-Reliability is then the Spearman–Brown "list-length" reliability of a composite
-of that length built from items that share only their axes variance.
+all items, the two circumplex **axes**, scale specificity, and item error. For
+an instrument administered in blocks, it adds a block-specificity component
+(Section 5 explains blocks). The function reads axis reliability off the
+**axes** component alone. Reliability is then the Spearman–Brown "list-length"
+reliability of a composite with the axis's effective test length, built from
+items that share only their axes variance.
 
 This is a different question from the other reliability-adjacent tools in the
-package. `ssm_sem()` disattenuates a *scale-level* SSM profile for measurement
-error. `fit_structure()` evaluates whether a correlation matrix has circumplex
+package. `ssm_sem()` disattenuates (corrects for measurement error) a
+*scale-level* SSM profile. `fit_structure()` evaluates whether a correlation matrix has circumplex
 *structure* at all. `axes_reliability()` instead reports a single, interpretable
 number per axis: how well the instrument measures communion and agency.
 
@@ -49,7 +51,7 @@ from a five-component population that implies an axis reliability of about .78.
 Three of its components are a general factor, two equal axes with axes variance
 .18, and a shared scale-specificity component of .10. The fourth, block
 specificity, is zero here, because the instrument is not blockwise. The fifth is
-free item error.
+item error, estimated freely for each item.
 
 `axes_reliability()` needs three things: the data, a map from items to scales,
 and the scales' angles. The map is a list with one character vector of item
@@ -99,8 +101,9 @@ instrument.)
 The header confirms how many complete cases were used. For each axis, the
 per-axis table reports the effective test length (`item_n`), the Strack axis
 `Reliability` and its standard error of measurement (`SEm`). It also reports the
-Nunnally–Bernstein reliability (`NB_Reliability`) for comparison. For a balanced
-instrument the two axes share one axes-variance estimate and carry equal
+Nunnally–Bernstein reliability (`NB_Reliability`), a simpler formula that
+Section 3 compares. For a balanced instrument (the same number of items on every
+scale), the two axes share one axes-variance estimate and carry equal
 `item_n`. So they report the same reliability, which is expected, not an error.
 
 The recovered reliability (about .77) lands close to the .78 built into the
@@ -164,7 +167,7 @@ on. The `axes` component is the only one that feeds reliability. The `general`,
 `scale_specificity` and `block_specificity` (when blocks were supplied)
 components and item error are isolated from it. This is why the
 Nunnally–Bernstein figure printed alongside runs **higher** than the Strack
-reliability. N–B charges scale-specificity variance to the axis rather than
+reliability. N–B counts scale-specificity variance as axis variance rather than
 isolating it. So it **overestimates** axis reliability whenever scale
 specificity is non-trivial (Strack et al., 2013, Figure 3). The gap between the
 two numbers shows how much scale-specific variance the simpler formula would
@@ -222,8 +225,8 @@ properties of the respondents, not of their correlations. The
 Nunnally–Bernstein comparison is reported as `NA`. It needs each scale's alpha
 and the axis composite's variance, and a correlation matrix carries neither.
 And `sd = "raw"` is refused, because there are no scale scores to take an
-observed SD from. If you want SEm on a raw scale, supply the axis SDs
-numerically. Both are reported rather than silently omitted, so a matrix-based
+observed SD from. If you want SEm on a raw scale, pass numeric axis SDs to
+`sd`. Both are reported rather than silently omitted, so a matrix-based
 result cannot be mistaken for a raw-data one.
 
 ## 5. Caveats to keep in mind
@@ -243,21 +246,23 @@ likelihood (ML) computes its standard errors for a sample **covariance** input.
 This estimator consumes a sample **correlation** matrix, whose diagonal cannot
 vary at all. Left uncorrected, that mismatch **overstates** sampling variability
 by about 40% for an instrument whose axes carry a lot of variance. It
-**understates** sampling variability slightly for weak-axes, strong-general
-instruments. So the error changes sign across the range of instruments that the
+**understates** sampling variability slightly for instruments with weak axes and
+a strong general factor. So the error changes sign across the range of instruments that the
 function accepts, which is why it could not be left to a caveat. The reported
 SEs are adjusted to the correlation metric and are calibrated uncertainty. They
 are typically **smaller** than the standard errors printed in Strack et al.
-(2013), whose LISREL values carry the uncorrected approximation. What the
+(2013). Their values come from LISREL (the SEM software they used) and carry the uncorrected approximation. What the
 estimator reported before the correction is kept in `details$se_uncorrected`.
 
 The **global fit statistics are corrected too**, for the same mismatch running
-the other way. Sample correlations vary *less* than the covariances that the
+the other way. (`chisq` and its `pvalue` test exact fit. `rmsea`, `cfi` and
+`srmr` are approximate-fit indices.) Sample correlations vary *less* than the covariances that the
 reference chi-square distribution is derived for. So an uncorrected test
 statistic comes out too small, and fit is flattered. `chisq`, `pvalue`, `rmsea`
 and `cfi` are therefore reported as Satorra–Bentler-type **scaled** values
 (Satorra & Bentler, 1994). A scaled value uses the chi-square divided by a
-factor computed at the fitted matrix. `cfi` also scales its own baseline model.
+factor computed at the fitted matrix. `cfi` also scales its own baseline model,
+the independence model in which all items are uncorrelated.
 The factor is recomputed for every fit, not held constant. That is the whole
 point, because how much fit was flattered depends on the instrument. `df` and
 `srmr` are unchanged, because they are a count of restrictions and a residual
@@ -270,7 +275,9 @@ built with the definitions that lavaan calls `chisq.scaled`, `pvalue.scaled`,
 `rmsea.scaled` and `cfi.scaled`, which are the mean-adjusted Satorra–Bentler
 forms. They are **not** the `*.robust` ones (`cfi.robust`, `rmsea.robust`),
 which apply a different (Brosseau-Liard/Savalei) adjustment and give different
-numbers. The model is estimated with plain ML, and this package applies the
+numbers.
+
+The model is estimated with plain ML, and this package applies the
 scaling, not lavaan. So `fitMeasures()` on an equivalent fit hands back the
 *uncorrected* values under the bare names `chisq`, `pvalue`, `rmsea` and `cfi`.
 It also reports no `*.scaled` or `*.robust` measure at all. lavaan supplies
@@ -283,14 +290,14 @@ a defect.
 Read the scaled statistic for what it is. The correction makes the test
 statistic match its reference distribution *in expectation*. It is a
 calibration, not an exactness guarantee, and it will not rescue a model that is
-badly wrong. The usual cutoffs (Hu & Bentler, 1999) are no more or less
+badly wrong. The usual fit-index cutoffs (Hu & Bentler, 1999) are no more or less
 appropriate than before. What changed is that the number compared to them no
 longer flatters fit in a systematic way.
 
 **How well calibrated is the test, and at what sample size?** The scaling fixes
 the metric error, and the χ² test built on it is asymptotically exact. Its
 rejection rate approaches the nominal α as N grows relative to the number of
-distinct moments, p\* = p(p+1)/2. The table below gives the rejection rate at
+distinct moments, p\* = p(p+1)/2 for p items. The table below gives the rejection rate at
 α = .05 from a simulation at one population (eight octant scales, three items
 each, axes variance .35).
 
@@ -303,7 +310,7 @@ single population, not a general threshold.
 
 You do not have to work out where your own fit sits on that row. The object
 reports both halves of the ratio. `details$n_moments` is p\*, and `details$n` is
-the N that the fit statistics use. On the raw-data paths, that N is the count of
+the N that the fit was computed at. On the raw-data paths, that N is the count of
 rows that the estimator was actually handed. It is smaller than
 `details$n_total` wherever cases were dropped. On the correlation-matrix path,
 it is the `n` you supplied. Divide the first by the second and read across the
@@ -322,13 +329,15 @@ are using deserves caution at moderate N with many items. But note the
 direction: the scaled test **over-flags** misfit rather than flattering it. That
 is the safer error, and the opposite of what the uncorrected statistic did.
 Second, all of this evidence is **complete-data**. Under `missing = "fiml"` the
-scaled statistic is calibrated in mean, but its rejection rate has not been
+scaled statistic is calibrated in mean (its average matches that of the reference
+distribution), but its rejection rate has not been
 measured. So none of these rates should be read as applying to that path.
 
-If you check the implied matrix, you will also find that it does not reproduce
-the unit diagonal exactly. That too is expected. With the loadings fixed, the
-condition that a free item error satisfies is the *weighted* diagonal, not the
-raw one. So off-diagonal sampling misfit leaks into the implied diagonal at
+The implied matrix is the correlation matrix that the fitted model predicts. If
+you check it, you will also find that it does not reproduce the unit diagonal
+exactly. That too is expected. The loadings (the items' weights on the factors)
+are fixed. So the condition that a free item error satisfies is the *weighted*
+diagonal, not the raw one. So off-diagonal sampling misfit leaks into the implied diagonal at
 roughly the sampling standard error of a correlation.
 
 **Missing data: listwise by default, FIML on request.** The default,
@@ -343,8 +352,8 @@ to be **missing at random** (MAR) **and multivariate normal**. Under MAR,
 missingness may depend on values you observed, but not on the unobserved values
 themselves. Under MCAR (missing completely at random), missingness is unrelated
 to anything. There, listwise deletion is already consistent and merely
-wasteful, so FIML buys precision rather than correctness. Under MAR, listwise
-deletion is genuinely biased and FIML is not.
+wasteful, so FIML buys precision rather than correctness. Under MAR that is not
+MCAR, listwise deletion is genuinely biased and FIML is not.
 
 Under FIML the standard errors are observed-information standard errors on the
 standardized metric, conditional on the standardization constants. They carry
@@ -364,7 +373,8 @@ SDs.
 Note the provenance, because it differs from the rest of this vignette. Strack
 et al. (2013) report no missing-data analyses at all, so nothing about the FIML
 path rests on their results. It is certified against this package's own
-synthetic oracle, where the true variance components are known by construction.
+simulated test data, where the true variance components are known by
+construction.
 
 **A boundary fit returns `NA`, not a clipped value.** The model can estimate an
 axes variance outside the interval (0, 1). At or below zero, the axes carry no
@@ -390,10 +400,11 @@ does not already know. Blocks that coincide with the scales, a single block
 holding every item, or one block per item all leave `zeta2` unidentified. That
 is, the data cannot pin down its value. It is then dropped with
 `details$zeta2_fitted` set to `FALSE`. This is the same treatment that scale
-specificity gets on a single-item instrument.
+specificity gets on a single-item instrument (Section 6).
 
 What it costs to *ignore* real blocks depends on their geometry. The general
-factor never hands block variance back. So `xi2`, the general-factor variance,
+factor can take up ignored block variance, but it never gives any back. So
+`xi2`, the general-factor variance,
 is inflated under most layouts and unchanged under a few, but never deflated.
 `xi1`, the axes variance, is the quantity that reliability is actually read
 from. It moves only when block membership carries information about the
@@ -445,7 +456,7 @@ scale-specificity variances cannot be told apart.
 Scales may also carry a **single item** each, as Strack et al.'s single-item
 circumplex types do. With one item at every position, no two items ever share a
 scale. So nothing in the data distinguishes scale specificity from item
-specificity. The scale-specificity component is not identified, and
+specificity (the item error component). The scale-specificity component is not identified, and
 `axes_reliability()` drops it from the model rather than estimating a quantity
 that the data cannot support. The components table then carries three rows
 instead of four, and `details$zeta1_fitted` records the drop.
@@ -470,6 +481,10 @@ reproduce them.
 
 * Cudeck, R. (1989). Analysis of correlation matrices using covariance
   structure models. _Psychological Bulletin, 105_(2), 317–327.
+
+* Hu, L., & Bentler, P. M. (1999). Cutoff criteria for fit indexes in
+  covariance structure analysis: Conventional criteria versus new
+  alternatives. _Structural Equation Modeling, 6_(1), 1–55.
 
 * Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics and
   standard errors in covariance structure analysis. In _Latent variables

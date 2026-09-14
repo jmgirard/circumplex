@@ -32,10 +32,11 @@ cat(
 
 The other vignettes model *observed* circumplex scores. These are the mean
 profile of a group, or the profile of correlations between the circumplex scales
-and an external measure. This vignette introduces a **latent** counterpart, built on a
-structural equation model (SEM) of the circumplex scales. `ssm_sem()` and its
-helpers expose it. The vignette teaches two products: the latent profile of a
-measure, and the invariance-gated latent contrast between groups. It shows how
+and an external measure. This vignette introduces a **latent** (not directly
+observed) counterpart, built on a structural equation model (SEM) of the
+circumplex scales. `ssm_sem()` and its helpers expose it. The vignette teaches
+two products: the latent profile of a measure, and the invariance-gated latent
+contrast between groups (Section 7 explains invariance). It shows how
 their confidence intervals are constructed, and the assumptions that make them
 interpretable.
 
@@ -81,8 +82,8 @@ below:
   estimates an angle. If an instrument's real geometry departs from theory,
   that departure is absorbed into misfit, not into the angles. To *examine*
   circumplex geometry and let the angles be free, use `cpm_fit()`. It fits
-  Browne's (1992) circumplex model, which is a different question and a
-  different tool.
+  Browne's (1992) circumplex model. Examining geometry is a different question,
+  and `cpm_fit()` is a different tool.
 
 ## 2. The measurement model
 
@@ -97,14 +98,16 @@ cat(syntax)
 ```
 
 Three latent factors carry the structure: a general factor `g` and the two
-plane axes `cx` and `cy`. Each scale loads on all three. But its plane loadings
-are tied to its **fixed angle** by a direction constraint
-(`sin(θ)·lx − cos(θ)·ly == 0`). So the scale's location in the plane is
-theoretical, while its *saturation* (how strongly it expresses the circumplex)
-is free. This is the default **`"scaled"`** tier. A stricter **`"strict"`** tier
-instead fixes every loading to the unit cosine pattern and frees the full factor
-covariance matrix. It is the fully theoretical benchmark, and it is what remains
-identified when the number of scales is small.
+plane axes `cx` and `cy`. Each scale loads on (has a weight on) all three. But
+its plane loadings are tied to its **fixed angle** by a direction constraint
+(`sin(θ)·lx − cos(θ)·ly == 0`). Here `lx` and `ly` are the scale's loadings on
+`cx` and `cy`. So the scale's location in the plane is theoretical, while its
+*saturation* (how strongly it expresses the circumplex) is free. This is the
+default **`"scaled"`** tier, one of two versions of the model. A stricter
+**`"strict"`** tier instead fixes every loading to the unit cosine pattern and
+frees the full factor covariance matrix. It is the fully theoretical benchmark.
+It is also what remains identified (estimable from the data) when the number of
+scales is small.
 
 The header and comments in the generated syntax record two design decisions
 that matter statistically:
@@ -116,14 +119,16 @@ that matter statistically:
   into the plane is expressible only under the strict tier (or it surfaces as
   misfit under the scaled tier). This matters for real interpersonal data.
   Wendt et al. (2019) found a general–agency correlation of roughly −.3,
-  replicated across four samples. So on IIP-family instruments, the
+  replicated across four samples. So on instruments in the family of the
+  Inventory of Interpersonal Problems (IIP), the
   orthogonality that the scaled tier assumes is known to be violated.
 - The final `NOTE` says that amplitude and displacement are **deliberately not
   defined** in the lavaan syntax. That is the subject of Section 4.
 
 You rarely call `ssm_sem_syntax()` directly, because `ssm_sem()` does. But it is
-the escape hatch for respecifications (for example, partial invariance) that you
-then fit yourself and hand back through `ssm_sem_parameters()`.
+the escape hatch for respecifications that you then fit yourself and hand back
+through `ssm_sem_parameters()`. One example is partial invariance, where only
+some parameters are held equal across groups.
 
 ## 3. Estimating a latent profile
 
@@ -185,17 +190,18 @@ knitr::kable(
 )
 ```
 
-By default `ssm_sem()` fits with a robust estimator (`estimator = "MLR"`) and
-reports robust global fit indices. This is because circumplex scale scores are
-typically skewed, and the naive chi-square over-rejects. The robust (sandwich)
-standard errors also feed the confidence intervals. The next section gives the
-reason.
+By default `ssm_sem()` fits with a robust estimator (`estimator = "MLR"`,
+maximum likelihood with robust corrections) and reports robust global fit
+indices. This is because circumplex scale scores are typically skewed, and the
+naive chi-square over-rejects. The robust (sandwich) standard errors, which do
+not rely on normal data, also feed the confidence intervals. Section 4 explains
+why that matters.
 
 ## 4. Where the confidence intervals come from
 
 Amplitude and displacement are **nonlinear** functions of the model
 parameters: amplitude is a square root and displacement is an `atan2`. lavaan
-can attach a delta-method or bootstrap-percentile interval to any derived
+can attach a delta-method (linear approximation) or bootstrap-percentile interval to any derived
 quantity. But for displacement those intervals are wrong in a way that is easy
 to miss. `atan2` has a branch cut, a place on the circle where its output jumps
 by a full turn. A displacement near 0°/360° can produce an interval that has
@@ -212,7 +218,7 @@ it reuses the same machinery that the observed bootstrap uses:
 2. `ssm_sem()` draws from that covariance and maps each draw through the profile
    and the SSM transform. This gives a replicate of every SSM parameter.
 3. Those replicates go through the package's existing interval assembly. The
-   linear parameters get percentile intervals. Displacement gets **circular
+   parameters other than displacement get percentile intervals. Displacement gets **circular
    quantiles** (centered on the circular mean, unwrapped, quantiled, and
    re-wrapped), with contrast intervals aligned to the estimate's branch.
 
@@ -251,9 +257,9 @@ a pure cosine wave. Differential saturation across scales drives that departure.
 Under the strict tier, anisotropy in the factor covariance (unequal spread in
 different directions) drives it too. What the latent fit removes, relative to
 the observed fit, is the contamination from **reliability heterogeneity**, not
-sampling error. Both the observed and the latent fit are population quantities
-that contain no sampling error at all. But as *estimates* at a finite sample
-size, both remain noisy. So a latent fit of, say, .85 in a modest sample is not
+sampling error. As population quantities, the observed and the latent fit
+contain no sampling error at all. But their *estimates* at a finite sample size
+both remain noisy. So a latent fit of, say, .85 in a modest sample is not
 automatically substantive structure.
 
 **Displacement.** Latent displacement is the first-harmonic direction (the peak
@@ -263,9 +269,9 @@ space." Heterogeneous saturations around the circle, or a general factor leaning
 into the plane, rotate it, exactly as they rotate the observed displacement. Fit
 can stay high while this happens. The latent layer's contribution is the removal
 of the *reliability* modulation that additionally rotates the observed
-displacement. It does not remove the saturation modulation. That removal is why
-the observed and latent displacements in Section 3 differ, and it is the honest
-description of what `d` estimates here.
+displacement. It does not remove the saturation modulation. The removal of the
+reliability modulation is why the observed and latent displacements in Section 3
+differ. It is also the honest description of what `d` estimates here.
 
 The interpretation aids you already know carry over unchanged. Amplitude is the
 gate for interpreting displacement. When the amplitude confidence interval's
@@ -338,7 +344,9 @@ That function computes the contrast from whatever multi-group fit you supply,
 and it leaves the comparability claim to you.
 
 The ladder table also carries `dcfi`, the change in the comparative fit index
-(CFI) from the previous fitted rung. This is Cheung and Rensvold's (2002)
+(CFI) from the previous fitted rung. CFI compares the model's fit with that of a
+baseline model in which the variables are uncorrelated, and values near 1 mean
+good fit. `dcfi` is Cheung and Rensvold's (2002)
 secondary criterion. Its general rule rejects an invariance step when CFI falls
 by more than .01. It is **reported, never gating**. Comparability, the verdict,
 and the model that the estimates are taken from are decided by the nested test
@@ -346,8 +354,8 @@ alone. The two criteria can disagree, and neither is a tiebreaker for the other.
 A change in CFI is insensitive to sample size, but the nested test is not. So in
 a large sample the nested test can reject a step whose CFI barely moves.
 
-That direction is worth stating carefully, because the article gives it two
-ways. Its Table 5 reports critical values that are the 1% *lower* tails of the
+The direction of that rule is worth stating carefully, because the article gives
+it two ways. Its Table 5 reports critical values that are the 1% *lower* tails of the
 simulated null distributions. So a ΔCFI at or below one of them is the 1%-level
 evidence *against* invariance, which is the sense used here. The sentence
 stating the general rule on the article's p. 251 reads the opposite way
@@ -428,7 +436,8 @@ documentation states them, and the vignette should too.
   refused rather than summarized.
 - **Invariance gating is a modeling decision** with a default test, not an
   oracle. The observed contrast remains available and answers its own
-  question. The secondary `dcfi` criterion printed beside it gates nothing.
+  question. The secondary `dcfi` criterion printed beside the nested test gates
+  nothing.
   Its .01 cutoff is validated only for two-group, ML, multivariate-normal
   fits, for Type I error only. The package withholds the verdict everywhere
   else rather than extrapolating it.
@@ -438,8 +447,9 @@ documentation states them, and the vignette should too.
 The nearest published models are the confirmatory factor analyses of the
 interpersonal circumplex itself. Wendt et al. (2019) fit a three-factor
 circumplex CFA with fixed unit-cosine plane loadings, which is the shape of this
-package's strict tier. They fit it across four large samples, and found the
-fully dimensional model competitive with categorical and hybrid alternatives.
+package's strict tier. They fit it across four large samples. They found the
+fully dimensional model competitive with categorical (types of people) and
+hybrid (types and dimensions together) alternatives.
 Their estimand, though, is the latent structure of the *octant scales* and
 persons' factor scores, not an external measure's disattenuated profile. Their
 model is context for the strict tier, not a validation target for the SSM
