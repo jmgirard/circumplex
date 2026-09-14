@@ -265,7 +265,7 @@ By default `ssm_sem()` fits with a robust estimator (`estimator = "MLR"`,
 maximum likelihood with robust corrections) and reports robust global fit
 indices. This is because circumplex scale scores are typically skewed, and the
 naive chi-square over-rejects. The robust (sandwich) standard errors, which do
-not rely on normal data, also feed the confidence intervals. Section 4 explains
+not assume normally distributed data but still need a reasonably large sample, also feed the confidence intervals. Section 4 explains
 why that matters.
 
 ## 4. Where the confidence intervals come from
@@ -289,7 +289,7 @@ it reuses the same machinery that the observed bootstrap uses:
 2. `ssm_sem()` draws from that covariance and maps each draw through the profile
    and the SSM transform. This gives a replicate of every SSM parameter.
 3. Those replicates go through the package's existing interval assembly. The
-   parameters other than displacement get percentile intervals. Displacement gets **circular
+   elevation, X value, Y value and amplitude get percentile intervals. Displacement gets **circular
    quantiles** (centered on the circular mean, unwrapped, quantiled, and
    re-wrapped), with contrast intervals aligned to the estimate's branch.
 
@@ -342,7 +342,8 @@ can stay high while this happens. The latent layer's contribution is the removal
 of the *reliability* modulation that additionally rotates the observed
 displacement. It does not remove the saturation modulation. The removal of the
 reliability modulation is why the observed and latent displacements in Section 3
-differ. It is also the honest description of what `d` estimates here.
+differ. This account, with the reliability modulation removed and the saturation
+modulation kept, is the honest description of what `d` estimates here.
 
 The interpretation aids you already know carry over unchanged. Amplitude is the
 gate for interpreting displacement. When the amplitude confidence interval's
@@ -460,7 +461,7 @@ alone. The two criteria can disagree, and neither is a tiebreaker for the other.
 A change in CFI is insensitive to sample size, but the nested test is not. So in
 a large sample the nested test can reject a step whose CFI barely moves.
 
-The direction of that rule is worth stating carefully, because the article gives
+The direction of the ΔCFI rule is worth stating carefully, because the article gives
 it two ways. Its Table 5 reports critical values that are the 1% *lower* tails of the
 simulated null distributions. So a ΔCFI at or below one of them is the 1%-level
 evidence *against* invariance, which is the sense used here. The sentence

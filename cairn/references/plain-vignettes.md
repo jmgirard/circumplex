@@ -127,8 +127,25 @@ Reader reports, numbered as the rows cite them: claims reader C1 to C20, one-rea
 
 ### M124 (axes-reliability, sem-based-ssm-analysis)
 
+Reader reports, numbered as the rows cite them: claims reader A1 to A2 (axes) and S1 (SEM), one-read reader R1 to R28 (axes) and E1 to E29 (SEM), and gloss re-read G1 to G7. Items not in a row were fixed.
+
 | Page | Item | Disposition | Evidence |
 |---|---|---|---|
+| axes, SEM | Inventory: `vignette("introduction-to-ssm-analysis")` added | Kept | Rule 3 asks for this link. The introduction vignette defines elevation, amplitude, displacement and fit. |
+| axes | Inventory: `sd` added (R7) | Kept | "pass numeric axis SDs to `sd`" names the argument that the base text used. `R/axes_reliability.R` accepts numeric SDs. |
+| SEM | Inventory: `lx`, `ly` added (E4) | Kept | The gloss names the loadings in the constraint. The generated syntax writes `cx =~ lx*` and `cy =~ ly*`. |
+| axes | A2: "`zeta2` row" became "`block_specificity` row (symbol `zeta2`)" | Kept | The component table rows are built with `Component = "block_specificity", Symbol = "zeta2"` in `R/axes_reliability.R`. |
+| axes | R19: "Under MAR" became "Under MAR that is not MCAR" | Kept | The base sentence contrasts MAR with the MCAR case just before it. MCAR is a special case of MAR, so the unqualified base contradicted itself. |
+| SEM | E12, G2: "linear parameters get percentile intervals" became "elevation, X value, Y value and amplitude" | Kept | Amplitude is nonlinear but gets a percentile interval, and fit gets none (`R/ssm_bootstrap.R`, `ssm_replicate_intervals`). |
+| axes | R6, R9, R10 (calibrated uncertainty), R14 (asymptotically exact), R15, R16, R20, R21, R23, R24, R27 | Rejected | Technical notes for a reader who checks the numbers. A gloss would need facts the page and `?axes_reliability` do not state, such as the band width or the FIML standardization details. |
+| axes | R8: "Four properties" | Rejected | Section 5 has four bold properties. The calibration question is a sub-point of the first. |
+| axes | R12: lavaan variant names | Rejected | The paragraph addresses readers who cross-check in lavaan. It is now split in two. |
+| SEM | E2, E3, E7, E10, E11, E13, E14, E15, E20, E23 | Rejected | The terms are explained by the sentences around them, or the text addresses readers who fit their own lavaan models. |
+| SEM | E18: table cells | Rejected | A code chunk writes the table. Chunks do not change in this pass. |
+| SEM | E19: configural and scalar rungs | Rejected | Standard SEM terms. A gloss of scalar invariance needs a claim about intercepts that the page does not make. |
+| SEM | E24, E25: "branch" | Rejected | The next sentence says what the branch means for the interval endpoints. |
+| SEM | E26: "plane factors are fixed isotropic and orthogonal" | Kept as a base claim | The generated syntax fixes them only under the scaled tier, and the strict tier frees the factor covariance. A candidate row holds the fix, because a form-only pass does not change the claim. |
+| SEM | E29: "point" then "boundary" | Rejected | The point is where the families meet. The boundary divides fixed from free angles. |
 
 ### M125 (evaluating-circumplex-structure)
 
