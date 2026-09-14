@@ -102,29 +102,31 @@
 </h2>
 <p>The Structural Summary Method (SSM) condenses a circumplex profile
 into a few interpretable parameters: elevation, amplitude, displacement,
-and fit. That condensation rests on two assumptions that are testable
-but often left untested:</p>
+and fit. <code><a href="../articles/introduction-to-ssm-analysis.html">vignette("introduction-to-ssm-analysis")</a></code> defines
+each of them. That condensation rests on two assumptions. Both are
+testable, but they are often left untested:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Does the instrument actually have circumplex
-structure?</strong> The SSM locates a profile on a circle whose
-positions are given by the scales’ theoretical angles. If the scales do
-not really form a circumplex — or sit at very different angles than the
-theory says — the summary is distorted before any profile is
-computed.</p></li>
+structure?</strong> The SSM locates a profile on a circle, at positions
+given by the scales’ theoretical angles. If the scales do not really
+form a circumplex, the summary is distorted before any profile is
+computed. The same holds if they sit at very different angles than the
+theory says.</p></li>
 <li><p><strong>Are the confidence intervals trustworthy at your sample
 size and profile?</strong> Zimmermann and Wright (2017) showed that the
-accuracy of bootstrap SSM intervals depends on the sample size, the
-instrument’s correlation structure, and — for amplitude and displacement
-— on how differentiated the profile really is in the population.
-Intervals that are accurate for one construct in your table can be
-inaccurate for the construct printed directly below it.</p></li>
+accuracy of bootstrap SSM intervals depends on the sample size and the
+instrument’s correlation structure. For amplitude and displacement, it
+also depends on how differentiated the profile really is in the
+population. Intervals that are accurate for one construct in your table
+can be inaccurate for the construct printed directly below it.</p></li>
 </ol>
-<p>This vignette shows how to answer both questions with
-<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> and <code><a href="../reference/fit_structure.html">fit_structure()</a></code> (question 1) and
-<code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> (question 2), using the
-<code>jz2017</code> dataset — the same sample of 1,166 undergraduates
-analyzed in Zimmermann and Wright (2017, Study 5), with octant scores on
-the IIP-SC and personality disorder (PD) scales from the PDQ-4+.</p>
+<p>This vignette shows how to answer both questions.
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> and <code><a href="../reference/fit_structure.html">fit_structure()</a></code> answer question
+1, and <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> answers question 2. The examples
+use the <code>jz2017</code> dataset. It holds the same sample of 1,166
+undergraduates that Zimmermann and Wright (2017, Study 5) analyzed. It
+has octant scores on the IIP-SC, and personality disorder (PD) scale
+scores from the PDQ-4+.</p>
 </div>
 <div class="section level2">
 <h2 id="does-the-instrument-fit-a-circumplex">2. Does the instrument fit a circumplex?<a class="anchor" aria-label="anchor" href="#does-the-instrument-fit-a-circumplex"></a>
@@ -136,16 +138,17 @@ the IIP-SC and personality disorder (PD) scales from the PDQ-4+.</p>
 model (CPM), the confirmatory model behind the CIRCUM and CircE
 programs. Each scale gets an estimated angle on the circle and a
 <em>communality index</em>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ζ</mi><annotation encoding="application/x-tex">\zeta</annotation></semantics></math>
-(the correlation between the scale and the common circumplex “factor”;
-its square,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ζ</mi><annotation encoding="application/x-tex">\zeta</annotation></semantics></math>.
+The communality index is the correlation between the scale and the
+common circumplex “factor”. Its square,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ζ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\zeta^2</annotation></semantics></math>,
-is the scale’s <em>communality</em> — the share of its variance the
-circumplex explains). The model also yields the usual
+is the scale’s <em>communality</em>, the share of its variance that the
+circumplex explains. The model also yields the usual
 covariance-structure fit indices.</p>
-<p>On the raw-data path the default confidence intervals are
-bootstrapped. We lower <code>boots</code> from its default of 2000 to
-keep this vignette quick to build; in practice, use the default.</p>
+<p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> accepts raw data or a correlation matrix. On
+the raw-data path, the default confidence intervals are bootstrapped. We
+lower <code>boots</code> from its default of 2000 to keep this vignette
+quick to build. In practice, use the default.</p>
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the reported condition number and the bootstrap
      acceptance counts move across BLAS implementations; the numbers this
@@ -227,31 +230,31 @@ keep this vignette quick to build; in practice, use the default.</p>
 <ul>
 <li>
 <strong>The estimated angles.</strong> Compare them with the
-theoretical angles, but read the comparison carefully: one scale is held
-fixed to identify the configuration (PA here, at 90°), so every other
-scale’s departure is measured from that anchor and a different anchor
-would redistribute them. Two things are worth separating. The
-<em>ordering</em> around the circle is preserved — the estimated angles
-run through the octants in the same cyclic order the instrument assigns
-them. The <em>spacing</em> is not: the gaps between circularly adjacent
-estimates run from under 20° to nearly 80° against a theoretical 45°,
-and the largest departure from a theoretical position is about 66°.
-Departures from perfect structure are common in well-validated
-circumplex instruments (Gurtman &amp; Pincus, 2000), and the model
-comparison below quantifies what this pattern costs: it is why forcing
-equal spacing fits these data poorly.</li>
+theoretical angles, but read the comparison carefully. One scale is held
+fixed to identify the configuration (PA here, at 90°). So every other
+scale’s departure is measured from that anchor, and a different anchor
+would redistribute the departures. Two things are worth separating. The
+<em>ordering</em> around the circle is preserved: the estimated angles
+run through the octants in the same cyclic order that the instrument
+assigns them. The <em>spacing</em> is not preserved. The gaps between
+circularly adjacent estimates run from under 20° to nearly 80°, against
+a theoretical 45°. The largest departure from a theoretical position is
+about 66°. Departures from perfect structure are common in
+well-validated circumplex instruments (Gurtman &amp; Pincus, 2000). The
+model comparison below quantifies what this pattern costs: it is why
+forcing equal spacing fits these data poorly.</li>
 <li>
 <strong>The communality indices.</strong> Scales with low
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ζ</mi><annotation encoding="application/x-tex">\zeta</annotation></semantics></math>
-are poorly described by the circle; a profile peak at such a scale’s
-angle means less than the same peak at a well-explained scale’s
-angle.</li>
+are poorly described by the circle. A profile peak at such a scale’s
+angle means less than the same peak at the angle of a well-explained
+scale.</li>
 </ul>
-<p>The estimated configuration is easiest to read on the circle itself:
-each scale is drawn at its estimated angle, at a radius equal to its
-communality
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ζ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\zeta^2</annotation></semantics></math>),
-with a joint confidence region where one is estimable.</p>
+<p>The estimated configuration is easiest to read on the circle itself.
+The plot draws each scale at its estimated angle, at a radius equal to
+its communality
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ζ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\zeta^2</annotation></semantics></math>).
+It adds a joint confidence region where one is estimable.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cpm</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-cpm_plot-1.png" alt="plot of chunk cpm_plot" width="100%"></p>
@@ -260,112 +263,118 @@ with a joint confidence region where one is estimable.</p>
 <h3 id="reading-the-fit-indices">Reading the fit indices<a class="anchor" aria-label="anchor" href="#reading-the-fit-indices"></a>
 </h3>
 <p>The <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> output reports the standard indices, and
-the standard benchmarks apply: RMSEA at or below about .08 suggests
-adequate approximate fit and above about .10 poor fit (Browne &amp;
-Cudeck, 1993); SRMR at or below about .08 suggests acceptable average
-residuals (Hu &amp; Bentler, 1999); CFI and TLI near .95 or above
-suggest good comparative fit (Hu &amp; Bentler, 1999). Treat these as
-conventions from the broader covariance-structure literature, not
-circumplex-specific laws.</p>
-<p>Two caveats come from the benchmark sources themselves. Browne and
-Cudeck call their own RMSEA thresholds “based on subjective judgment,”
-cautioning that such a figure “cannot be regarded as infallible or
-correct” (Browne &amp; Cudeck, 1993) — read the cutoffs as conventions,
-not decision rules. And these benchmarks are least dependable at small
-samples: Hu and Bentler (1999) found that the ML-based TLI and RMSEA
-tend to <em>overreject</em> true-population models when the sample is
-small (CFI is not among the indices they flag), and circumplex analyses
-are often run at modest sample sizes — the SSM accuracy thresholds in
-Section 3 span roughly
+the standard benchmarks apply:</p>
+<ul>
+<li>RMSEA at or below about .08 suggests adequate approximate fit, and
+above about .10 suggests poor fit (Browne &amp; Cudeck, 1993).</li>
+<li>SRMR at or below about .08 suggests acceptable average residuals (Hu
+&amp; Bentler, 1999).</li>
+<li>CFI and TLI near .95 or above suggest good comparative fit (Hu &amp;
+Bentler, 1999).</li>
+</ul>
+<p>Treat these as conventions from the broader covariance-structure
+literature, not circumplex-specific laws.</p>
+<p>Two caveats come from the benchmark sources themselves. First, Browne
+and Cudeck call their own RMSEA thresholds “based on subjective
+judgment.” They caution that such a figure “cannot be regarded as
+infallible or correct” (Browne &amp; Cudeck, 1993). So read the cutoffs
+as conventions, not decision rules. Second, these benchmarks are least
+dependable at small samples. Hu and Bentler (1999) found that the
+ML-based TLI and RMSEA tend to <em>overreject</em> true-population
+models when the sample is small. (CFI is not among the indices they
+flag.) Circumplex analyses are often run at modest sample sizes. The SSM
+accuracy thresholds in Section 3 span roughly
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n = 50</annotation></semantics></math>
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>200</mn><annotation encoding="application/x-tex">200</annotation></semantics></math>.
 At small
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
-then, a TLI or RMSEA that falls short of its benchmark can reflect the
-index’s small-sample behavior as much as the model’s fit.</p>
-<p>Two further cautions are circumplex-specific, both from this
+a TLI or RMSEA that falls short of its benchmark can reflect the index’s
+small-sample behavior as much as the model’s fit.</p>
+<p>Two further cautions are circumplex-specific, and both come from this
 package’s own validation simulations:</p>
 <ul>
 <li>
 <strong>Boundary solutions are common at realistic sample
-sizes</strong>, including in the fit above. What that means and what to
-do about it is the subject of the next subsection, <em>When a fit sits
-at a boundary</em>.</li>
+sizes</strong>, including in the fit above. The next subsection,
+<em>When a fit sits at a boundary</em>, says what that means and what to
+do about it.</li>
 <li>
 <strong>Do not lean hard on the chi-square p value.</strong> In
 simulations at field-typical sample sizes with octant-like population
 structures, the test statistic did not follow its nominal chi-square
-reference distribution, even for correctly specified models. Read the
-chi-square descriptively (bigger is worse), and prefer RMSEA/SRMR/CFI
-for judging approximate fit.</li>
+reference distribution. This held even for correctly specified models.
+Read the chi-square descriptively (bigger is worse), and prefer
+RMSEA/SRMR/CFI for judging approximate fit.</li>
 </ul>
-<p>For the same reasons, when the intervals are analytic (Wald) — the
-only option on the correlation-matrix input path —
-<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints a caution below
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>2000</mn></mrow><annotation encoding="application/x-tex">N = 2000</annotation></semantics></math>,
-and up to very large
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-when a boundary marker is present: in validation, analytic intervals
-mis-covered in exactly those regimes. Prefer the bootstrap (the raw-data
-default) when you have raw data.</p>
+<p>For the same reasons, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints a caution for
+analytic (Wald) intervals below
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>2000</mn></mrow><annotation encoding="application/x-tex">N = 2000</annotation></semantics></math>.
+When a boundary marker (defined in the next subsection) is present, the
+analytic caution prints up to very large
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>.
+In validation, analytic intervals mis-covered in exactly those regimes.
+Analytic intervals are the only option on the correlation-matrix input
+path. Prefer the bootstrap (the raw-data default) when you have raw
+data.</p>
 </div>
 <div class="section level3">
 <h3 id="when-a-fit-sits-at-a-boundary">When a fit sits at a boundary<a class="anchor" aria-label="anchor" href="#when-a-fit-sits-at-a-boundary"></a>
 </h3>
 <p>The fit above is one of these fits, and it says so. Its
 <code># Diagnostics</code> block prints a note that a communality index
-reached its upper boundary, and the results table shows which one: the
-NO scale’s communality index is 1.000, with a confidence interval of
-[1.000, 1.000]. A zero-width interval is not a precise estimate — it is
-an absent one. Both endpoints equal the estimate, which is to say that
-at least the middle 95% of the retained bootstrap resamples also sat on
-the boundary, leaving the percentile interval no width to report. The
-same chunk also emits a warning that the fit’s Hessian is
-ill-conditioned, a second signal from the same regime. When octant
-scales share a strong general factor, as interpersonal problem scales
-do, fitted solutions frequently sit at or near a parameter boundary;
-this is the estimator meeting real data at finite
+reached its upper boundary. The results table shows which one: the NO
+scale’s communality index is 1.000, with a confidence interval of
+[1.000, 1.000]. A zero-width interval is not a precise estimate. It is
+an absent one. Both endpoints equal the estimate. So at least the middle
+95% of the retained bootstrap resamples also sat on the boundary. That
+left the percentile interval no width to report. The same chunk also
+emits a warning that the fit’s Hessian is ill-conditioned, a second
+signal from the same regime. When octant scales share a strong general
+factor, as interpersonal problem scales do, fitted solutions frequently
+sit at or near a parameter boundary. This is the estimator meeting real
+data at finite
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
 not a data-entry error.</p>
 <p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> records five such markers, and
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> names the ones that fired:</p>
 <ul>
 <li>
-<strong>Heywood communality</strong> — a communality index estimated
+<strong>Heywood communality</strong>: a communality index estimated
 at its upper boundary
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>ζ</mi><mo accent="true">̂</mo></mover><mo>&gt;</mo><mn>0.995</mn></mrow><annotation encoding="application/x-tex">\hat\zeta &gt; 0.995</annotation></semantics></math>):
-the circle accounts for that scale essentially completely.</li>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>ζ</mi><mo accent="true">̂</mo></mover><mo>&gt;</mo><mn>0.995</mn></mrow><annotation encoding="application/x-tex">\hat\zeta &gt; 0.995</annotation></semantics></math>).
+The circle accounts for that scale essentially completely.</li>
 <li>
-<strong>boundary harmonic removed</strong> — a correlation-function
+<strong>boundary harmonic removed</strong>: a correlation-function
 weight sat at zero and was dropped from the model, with the degrees of
 freedom adjusted.</li>
 <li>
-<strong>small correlation-function weight</strong> — the smallest
+<strong>small correlation-function weight</strong>: the smallest
 weight is below 0.10, near enough to zero to matter for inference.</li>
 <li>
-<strong>ill-conditioned Hessian</strong> — the curvature matrix the
-analytic standard errors are computed from is close to singular; angles
-may be clustered or parameters weakly determined.</li>
+<strong>ill-conditioned Hessian</strong>: the curvature matrix that
+the analytic standard errors are computed from is close to singular.
+Angles may be clustered or parameters weakly determined.</li>
 <li>
-<strong>competing near-tied optima</strong> — the search found more
+<strong>competing near-tied optima</strong>: the search found more
 than one solution of nearly equal fit, so the reported one may not be
 uniquely determined.</li>
 </ul>
-<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints that list when markers fire, though on
-the analytic path only within a sample-size window. On the bootstrap
-path — as in the fit displayed above — it prints as a descriptive note
-at every sample size, alongside a statement that what has been measured
-about the markers covers analytic intervals only (and not every marker
-was measured — <em>What a fired marker does and does not tell you</em>,
-below, has the particulars), so they are not validated as predictors of
-the bootstrap intervals they accompany. When the intervals are analytic
-the list instead arrives inside a coverage caution printed when
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints that list when markers fire, but on the
+analytic path it prints the list only within a sample-size window. On
+the bootstrap path, as in the fit displayed above, the list prints as a
+descriptive note at every sample size. Beside the note, a statement says
+that what has been measured about the markers covers analytic intervals
+only. It also says that not every marker was measured. <em>What a fired
+marker does and does not tell you</em>, below, has the particulars. So
+the markers are not validated as predictors of the bootstrap intervals
+they accompany. When the intervals are analytic, the list instead
+arrives inside a coverage caution, printed when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-falls between 2000 and 50000; below 2000 an unconditional caution prints
-without the list, and above 50000 neither prints. To see that
+falls between 2000 and 50000. Below 2000, an unconditional caution
+prints without the list. Above 50000, neither prints. To see that
 caution-embedded form, we simulate a larger sample from the structure
-just estimated with <code><a href="../reference/cpm_simulate.html">cpm_simulate()</a></code>, then refit it on the
+just estimated with <code><a href="../reference/cpm_simulate.html">cpm_simulate()</a></code>. Then we refit it on the
 correlation-matrix path, where the intervals are analytic.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
@@ -429,116 +438,120 @@ correlation-matrix path, where the intervals are analytic.</p>
 <span><span class="co">#&gt;   analytic (Wald) confidence intervals mis-covered for such fits in validation</span></span>
 <span><span class="co">#&gt;   even at N in the tens of thousands. Interpret them with caution and prefer</span></span>
 <span><span class="co">#&gt;   the bootstrap on the raw-data path when available.</span></span></code></pre></div>
-<p>One marker fires here — a <strong>small correlation-function
-weight</strong> — and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> names it. Notice what did
-<em>not</em> happen: the population this sample was drawn from carries
-NO’s communality at the boundary, yet this draw produced no Heywood
-case. A boundary in the population does not guarantee a boundary in
-every sample from it, any more than a quiet fit guarantees there is no
-boundary behind the data.</p>
+<p>One marker fires here, a <strong>small correlation-function
+weight</strong>, and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> names it. Notice what did
+<em>not</em> happen. The population that this sample was drawn from
+carries NO’s communality at the boundary, yet this draw produced no
+Heywood case. A boundary in the population does not guarantee a boundary
+in every sample from it. In the same way, a quiet fit does not guarantee
+that there is no boundary behind the data.</p>
 <p><strong>What a fired marker does and does not tell you.</strong> The
 package’s validation simulations measured what these markers predict,
 and the measurement is narrower than the markers are. It covered
-<em>analytic</em> (Wald) intervals fitted from a correlation matrix, and
-it measured interval <strong>coverage</strong> — how often an interval
-contained the truth — not bias in the point estimates.</p>
+<em>analytic</em> (Wald) intervals fitted from a correlation matrix. It
+measured interval <strong>coverage</strong> (how often an interval
+contained the truth), not bias in the point estimates.</p>
 <ul>
 <li>
 <em>Communality indices</em> take the worst of it <strong>when an
-ill-conditioning, a Heywood, or a near-tied-optima marker fires</strong>
-— all three covered
+ill-conditioning, a Heywood, or a near-tied-optima marker
+fires</strong>. All three covered
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ζ</mi><annotation encoding="application/x-tex">\zeta</annotation></semantics></math>
-well below nominal, ill-conditioning worst of them. Two failure modes
-show up in the output rather than hiding in it: the analytic standard
-errors can come back missing, which happens for the angles and the
-weights at the same time because one singular curvature matrix takes all
-three families down together, or an interval can collapse to zero width
-because a negative asymptotic variance was clamped at zero. NO’s
-zero-width interval above arrives by a third route — it is a percentile
-interval whose resamples sat on the boundary — but it reaches the reader
-the same way, as an interval with no usable width.</li>
+well below nominal, and ill-conditioning was the worst of them. Two
+failure modes show up in the output rather than hiding in it. First, the
+analytic standard errors can come back missing. This happens for the
+communality indices, the angles and the weights at the same time. The
+reason is that one singular curvature matrix takes all three families
+down together. Second, an interval can collapse to zero width, because a
+negative asymptotic variance was clamped at zero. NO’s zero-width
+interval above arrives by a third route: it is a percentile interval
+whose resamples sat on the boundary. But it reaches the reader the same
+way, as an interval with no usable width.</li>
 <li>
 <em>Angles.</em> Taking all marker-firing fits together, angle
 intervals actually degraded somewhat <em>more</em> than communality
-intervals did, so the ranking above belongs to those markers rather than
-to the parameter families in general. The strongest single angle signal
-was the ill-conditioning marker, with the small-weight marker next and
-the Heywood marker weakest of the three.</li>
+intervals did. So the ranking above (communality indices worst under
+those three markers) belongs to those markers, not to the parameter
+families in general. The strongest single angle signal was the
+ill-conditioning marker. The small-weight marker was next, and the
+Heywood marker was the weakest of the three.</li>
 <li>
-<em>Correlation-function weights</em> moved least: marker-firing
+<em>Correlation-function weights</em> moved least. Marker-firing
 fits covered
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
 only slightly less often than quiet ones, so a fired marker tells you
 least here. The real
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
-problem is a different one and does not depend on any marker — in the
+problem is a different one, and it does not depend on any marker. In the
 package’s bootstrap validation, percentile intervals for a weight whose
 <em>population</em> value sits near zero under-covered at every sample
-size studied, and the shortfall did not shrink as
+size studied. The shortfall did not shrink as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
 grew. That is a property of percentile intervals at a boundary, not a
-small-sample artifact, and it is about where the truth sits, not about
-what the fit flagged.</li>
+small-sample artifact. It is about where the truth sits, not about what
+the fit flagged.</li>
 </ul>
-<p>Four things the record does <em>not</em> support, and which no
-reading of these markers should assume. Nothing was measured about bias
-in the point estimates. The marker study fitted analytic intervals only,
-so the markers are not validated as predictors on the bootstrap path
-this vignette uses by default. The <strong>boundary harmonic
-removed</strong> marker showed no evidence of predicting mis-coverage at
-all — fits carrying it covered as well as fits without it; it is kept
-because it names a real feature of the solution, not because it
-forecasts trouble. And the numbers behind <strong>Heywood
-communality</strong>, <strong>ill-conditioned Hessian</strong> and
-<strong>competing near-tied optima</strong> come almost entirely from
-one deliberately provoking configuration, where those markers fire often
-enough to measure, and near-tied optima fired only rarely even there.
-Read them as what happens where those markers fire, not as how often
-they fire.</p>
+<p>The record does <em>not</em> support four things, and no reading of
+these markers should assume them. First, nothing was measured about bias
+in the point estimates. Second, the marker study fitted analytic
+intervals only. So the markers are not validated as predictors on the
+bootstrap path that this vignette uses by default. Third, the
+<strong>boundary harmonic removed</strong> marker showed no evidence of
+predicting mis-coverage at all. Fits carrying it covered as well as fits
+without it. It is kept because it names a real feature of the solution,
+not because it forecasts trouble. Fourth, the numbers behind
+<strong>Heywood communality</strong>, <strong>ill-conditioned
+Hessian</strong> and <strong>competing near-tied optima</strong> come
+almost entirely from one simulated configuration, chosen deliberately to
+provoke them. In that configuration, those markers fire often enough to
+measure. Even there, near-tied optima fired only rarely. Read them as
+what happens where those markers fire, not as how often they fire.</p>
 <p><strong>What to do when one fires.</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<em>Locate it.</em> Read the results table beside the note and find
+<em>Locate it.</em> Read the results table beside the note, and find
 the scale or weight sitting at the boundary, as NO is above. A marker
 with no identified owner is not yet a diagnosis.</li>
 <li>
 <em>Re-fit to find out what the boundary is about.</em> The default
 <code>"quasi-circumplex"</code> model is the least constrained of the
-variants in the next subsection, so a boundary that appears only under a
-constrained variant was put there by the constraint, while one already
-present in the default fit belongs to the data and the model family
-rather than to an assumption you added. If you fitted from a correlation
-matrix, refitting from raw data also buys you bootstrap intervals in
-place of analytic ones.</li>
+variants in the next subsection. So a boundary that appears only under a
+constrained variant was put there by the constraint. A boundary already
+present in the default fit belongs to the data and the model family, not
+to an assumption you added. If you fitted from a correlation matrix,
+refitting from raw data also buys you bootstrap intervals in place of
+analytic ones.</li>
 <li>
 <em>Report it.</em> Quote the marker alongside the estimate it
 belongs to: which scales sat at the boundary, and that their intervals
 are degenerate or missing. An angle or communality reported without its
 diagnostic note is a number stripped of its own caveat.</li>
 <li>
-<em>Keep using what still holds.</em> These remain usable: the point
-estimates, as the solution the model actually fitted (their bias in this
-regime is unmeasured, so read them as estimates, not to the digit); the
-fit indices and the residual summary, which a boundary changes the
-behaviour of the <em>intervals</em> around, not the computation of —
-read them with the caution given earlier in this section, which is about
-field sample sizes rather than about markers; and parameter intervals
-that came back with ordinary width, read knowing that marked fits
-covered less well than unmarked ones across all three families. This
-does not: a parameter interval that is missing or zero-width. (The
-demonstration fit above prints <code>RMSEA = 0 [0, 0]</code>, which is
-not that failure — it is a fit statistic at its own floor, because the
-refit recovers almost exactly the structure it was simulated from.)</li>
+<em>Keep using what still holds.</em> Three things remain usable.
+The first is the point estimates, as the solution the model actually
+fitted. Their bias in this regime is unmeasured, so read them as
+estimates, not to the digit. The second is the fit indices and the
+residual summary. A boundary changes how the <em>intervals</em> around
+them behave. It does not change how the fit indices and the residual
+summary are computed. Read them with the caution given earlier in this
+section, which is about field sample sizes, not about markers. The third
+is parameter intervals that came back with ordinary width. Read them
+knowing that marked fits covered less well than unmarked ones across all
+three families. One thing does not remain usable: a parameter interval
+that is missing or zero-width. (The demonstration fit above prints
+<code>RMSEA = 0 [0, 0]</code>, which is not that failure. It is a fit
+statistic at its own floor, because the refit recovers almost exactly
+the structure it was simulated from.)</li>
 </ol>
 </div>
 <div class="section level3">
 <h3 id="comparing-model-variants">Comparing model variants<a class="anchor" aria-label="anchor" href="#comparing-model-variants"></a>
 </h3>
-<p>Constrained variants make the structural question sharp: is the
-instrument consistent with <em>equally spaced</em> scales? With
-<em>equal</em> communalities? The correlation-matrix path is convenient
-for this comparison (point estimates and fit indices are deterministic,
-so no bootstrap is needed):</p>
+<p>Constrained variants make the structural question sharp. Is the
+instrument consistent with <em>equally spaced</em> scales? Is it
+consistent with <em>equal</em> communalities? The correlation-matrix
+path is convenient for this comparison, because its point estimates and
+fit indices are deterministic. So no bootstrap is needed:</p>
 <!-- precompute:volatile-numbers start -- these three model variants
      refit the same ill-conditioned correlation matrix, so the reported
      condition number and the fit indices derived from that solution move
@@ -570,34 +583,37 @@ so no bootstrap is needed):</p>
 <span><span class="co">#&gt; 3         circulant 24 0.185 0.130 0.790 0.755</span></span></code></pre></div>
 <!-- precompute:volatile-numbers end -->
 <p>The pattern reproduces what Zimmermann and Wright (2017, p. 14)
-reported for these data with CircE: the fully constrained model (equal
-spacing <em>and</em> equal communality — the <code>"circulant"</code>
-variant) fits poorly, while relaxing the equal-spacing constraint
-improves fit to the edge of the conventional benchmarks (marginal by
-RMSEA, acceptable by SRMR and CFI); they reported CFI = .824, TLI =
-.795, RMSEA = .169 for the former and CFI = .958, TLI = .931, RMSEA =
-.098 for the latter. Do not expect the default fit’s indices to match
-theirs to the digit: CIRCUM/CircE fit a covariance version of the model
-with free scaling constants, whereas <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> by default
-fits the correlation structure directly, and the two differ slightly at
-finite sample sizes; pass <code>scaling = "free"</code> to fit their
-covariance parameterization and reproduce published CIRCUM/CircE output
-exactly. For the model test the choice does not matter here: with
-correlation input the two families’ test statistics are
-calibration-indistinguishable (differing by well under 1% of the model
-degrees of freedom in paired simulation at sample sizes 250–50,000; the
-free statistic never exceeds the default’s on the same input beyond
-numerical tolerance, since the free family nests the default and is
-additionally started from its solution), and the default is recommended
-for routine inference because free scaling adds parameters whose
-analytic standard errors are often undefined at small-to-moderate
-samples. The <em>conclusion</em> — ordered octants with unequal spacing,
-adequate approximate fit once equal spacing is not forced — is the
-same.</p>
-<p>A poor CPM fit does not make SSM output uncomputable; it makes the
-summary less meaningful, because the profile is being referred to scale
-positions the data contradict. If the ordering itself fails (scales out
-of sequence around the circle), SSM parameters should not be
+reported for these data with CircE. The fully constrained model (equal
+spacing <em>and</em> equal communality, the <code>"circulant"</code>
+variant) fits poorly. Relaxing the equal-spacing constraint improves fit
+to the edge of the conventional benchmarks: marginal by RMSEA, and
+acceptable by SRMR and CFI. They reported CFI = .824, TLI = .795 and
+RMSEA = .169 for the fully constrained model. For the model with the
+equal-spacing constraint relaxed, they reported CFI = .958, TLI = .931
+and RMSEA = .098.</p>
+<p>Do not expect the default fit’s indices to match theirs to the digit.
+CIRCUM/CircE fit a covariance version of the model with free scaling
+constants. By default, <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> fits the correlation
+structure directly, and the two versions differ slightly at finite
+sample sizes. Pass <code>scaling = "free"</code> to fit their covariance
+parameterization and reproduce published CIRCUM/CircE output
+exactly.</p>
+<p>For the model test, the scaling choice does not matter here. With
+correlation input, the two families’ test statistics are
+calibration-indistinguishable. In paired simulation at sample sizes
+250–50,000, they differed by well under 1% of the model degrees of
+freedom. The free statistic never exceeds the default’s on the same
+input, beyond numerical tolerance. This is because the free family nests
+the default and is also started from its solution. The default is
+recommended for routine inference, because free scaling adds parameters
+whose analytic standard errors are often undefined at small-to-moderate
+samples. The <em>conclusion</em> is the same: ordered octants with
+unequal spacing, and adequate approximate fit once equal spacing is not
+forced.</p>
+<p>A poor CPM fit does not make SSM output uncomputable. It makes the
+summary less meaningful, because the profile is referred to scale
+positions that the data contradict. If the ordering itself fails (scales
+out of sequence around the circle), SSM parameters should not be
 interpreted.</p>
 </div>
 </div>
@@ -609,10 +625,10 @@ interpreted.</p>
 </h3>
 <p>Zimmermann and Wright’s simulation studies (their Studies 1–4)
 evaluated the accuracy of 95% percentile bootstrap intervals for SSM
-parameters — the same interval type <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports —
-judging an interval accurate when its empirical coverage stayed within
-Bradley’s (1978) liberal band of 92.5% to 97.5%. Their headline
-results:</p>
+parameters. This is the same interval type that
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports. They judged an interval accurate
+when its empirical coverage stayed within Bradley’s (1978) liberal band
+of 92.5% to 97.5%. Their headline results:</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -673,7 +689,7 @@ amplitude is small</td>
 <td>biased downward</td>
 <td>population
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>&lt;</mo><mn>.9</mn></mrow><annotation encoding="application/x-tex">R^2 &lt; .9</annotation></semantics></math>
-only; unsuited near 1</td>
+only (unsuited near 1)</td>
 </tr>
 </tbody>
 </table>
@@ -683,58 +699,59 @@ pp. 6–11.)</em></p>
 <ul>
 <li>
 <strong>Amplitude overestimates differentiation.</strong> Across
-their conditions the relative bias averaged 15.5% and reached 135.8%;
-with
+their conditions, the relative bias averaged 15.5% and reached 135.8%.
+With
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n = 50</annotation></semantics></math>
 and no general factor, the <em>expected</em> sample amplitude was about
 .15 when the population amplitude was exactly zero (their pp. 6–7). An
-amplitude of .15 is commonly read as “marked”; at small
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+amplitude of .15 is commonly read as “marked”. At small
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
 it can be pure sampling artifact.</li>
 <li>
 <strong>Displacement is only as stable as amplitude is
 large.</strong> The standard error of the displacement grows as
-amplitude shrinks (e.g., roughly 50 degrees at
+amplitude shrinks. For example, it is roughly 50 degrees at
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">n = 100</annotation></semantics></math>
-for a weakly differentiated profile; their p. 8). A displacement
+for a weakly differentiated profile (their p. 8). A displacement
 estimate from a flat profile has no meaningful direction.</li>
 <li>
 <strong>The thresholds above are grid minima, not
 guarantees.</strong> They come from specific instruments, specific
 sample sizes, and population amplitudes of .10 or larger. Their Study 3
-quantified the frontier more finely: the minimum population
+quantified the frontier more finely. The minimum population
 affiliation/dominance component needed for accurate amplitude and
 displacement intervals is approximately
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.95</mn><mo>⋅</mo><msub><mi>f</mi><mi>a</mi></msub><mo>⋅</mo><msup><mi>n</mi><mrow><mi>−</mi><mn>0.587</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2.95 \cdot f_a \cdot n^{-0.587}</annotation></semantics></math>,
-where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.95</mn><mo>⋅</mo><msub><mi>f</mi><mi>a</mi></msub><mo>⋅</mo><msup><mi>n</mi><mrow><mi>−</mi><mn>0.587</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2.95 \cdot f_a \cdot n^{-0.587}</annotation></semantics></math>.
+Here
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>a</mi></msub><annotation encoding="application/x-tex">f_a</annotation></semantics></math>
-is an instrument constant (their Eq. 3; ≈ .55 for the IIP-C, .63 for the
-IIP-SC, .85 for the IAS). At
+is an instrument constant (their Eq. 3).
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>a</mi></msub><annotation encoding="application/x-tex">f_a</annotation></semantics></math>
+is about .55 for the IIP-C, .63 for the IIP-SC and .85 for the IAS. At
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">n = 100</annotation></semantics></math>
-with an IIP-C-like instrument that is a population component of about
-.11 — larger than many real construct profiles.</li>
+with an IIP-C-like instrument, that is a population component of about
+.11. That is larger than many real construct profiles.</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="simulating-coverage-for-your-own-analysis">Simulating coverage for your own analysis<a class="anchor" aria-label="anchor" href="#simulating-coverage-for-your-own-analysis"></a>
 </h3>
-<p>Published thresholds cover a coarse grid of conditions, and your
-analysis — your instrument, your
+<p>Published thresholds cover a coarse grid of conditions. Your analysis
+(your instrument, your
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
-your group sizes, your profile, your number of bootstrap resamples —
+your group sizes, your profile, your number of bootstrap resamples)
 usually falls between or outside the grid points.
 <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> answers the question directly at your
-configuration: it builds a population whose structure matches your
-fitted estimates (through the CPM by default), simulates many datasets
-of your exact sample size from it, replays your own CI procedure on
-each, and reports how often the intervals covered the known population
-values.</p>
+configuration. It builds a population whose structure matches your
+fitted estimates (through the CPM by default). It simulates many
+datasets of your exact sample size from that population, and it replays
+your own CI procedure on each. Then it reports how often the intervals
+covered the known population values.</p>
 <p>To see it catch a real problem, we analyze two PD scales at a modest
-sample size: paranoid PD (a well-differentiated interpersonal profile)
-and obsessive–compulsive PD, whose profile Zimmermann and Wright’s Table
-4 showed to be nearly flat (amplitude .012 at full sample size). We use
-the first 250 participants — a sample size many construct-validation
-studies would consider respectable.</p>
+sample size. Paranoid PD has a well-differentiated interpersonal
+profile. Obsessive–compulsive PD has a profile that Zimmermann and
+Wright’s Table 4 showed to be nearly flat (amplitude .012 at full sample
+size). We use the first 250 participants. Many construct-validation
+studies would consider that sample size respectable.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">23456</span><span class="op">)</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
@@ -776,20 +793,22 @@ studies would consider respectable.</p>
 <span><span class="co">#&gt; Model Fit         0.150                      </span></span>
 <span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span>
 <span><span class="co">#&gt;   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.</span></span></code></pre></div>
-<p>Note the guardrail in the printed output: when a profile’s amplitude
+<p>Note the guardrail in the printed output. When a profile’s amplitude
 CI lower bound sits less than 0.35 CI-widths above zero,
-<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> marks the displacement as uninterpretable
-rather than certifying its direction. That rule is scale-free (it
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> marks the displacement as uninterpretable,
+rather than certifying its direction. That rule is scale-free. It
 compares the lower bound to the interval’s own width, so it means the
-same thing on any score metric) and does not depend on the display
+same thing on any score metric. It also does not depend on the display
 precision. The diagnostic below measures, among other things, how well
 that certification rule performs at your configuration.</p>
-<p>We again use reduced settings (<code>reps = 200</code>, a short
-amplitude ladder, and the smaller <code>boots</code> above) to keep the
-vignette fast; the defaults (<code>reps = 1000</code>, four ladder
-rungs, on an object built with the default <code>boots = 2000</code>)
-give a Monte Carlo standard error under one percentage point for
-coverage near the nominal level and are recommended in practice. The
+<p>We again use reduced settings to keep the vignette fast:
+<code>reps = 200</code>, a short amplitude ladder, and the smaller
+<code>boots</code> above. The ladder is a set of scaling factors applied
+to the estimated amplitude (1 = as estimated), explained below. The
+defaults are <code>reps = 1000</code> and four ladder rungs, on an
+object built with the default <code>boots = 2000</code>. They give a
+Monte Carlo standard error under one percentage point for coverage near
+the nominal level, and they are recommended in practice. The
 <code>parallel</code>/<code>ncpus</code> arguments speed up real runs
 without changing results for a given seed.</p>
 <!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
@@ -966,86 +985,90 @@ without changing results for a given seed.</p>
 <p>How to read this output:</p>
 <ul>
 <li>
-<strong>The coverage table</strong> reports, for each parameter, how
-often your CI procedure covered the truth in the simulated replications,
-at the amplitude the profile was estimated to have
-(<code>Condition = 1</code>) and at fractions of it. Compare coverage
-against the nominal level using the Wilson interval and the Bradley
-band, which is what the verdict does for you.</li>
+<strong>The coverage table</strong> reports how often your CI
+procedure covered the truth in the simulated replications, for each
+parameter. It does so at the amplitude that the profile was estimated to
+have (<code>Condition = 1</code>) and at fractions of it. Compare
+coverage against the nominal level using the Wilson interval (an
+interval around the estimated coverage) and the Bradley band. The
+verdict does this for you.</li>
 <li>
 <strong>The amplitude ladder</strong> (<code>Condition</code>
-column) matters because your estimated amplitude is biased upward — the
+column) matters because your estimated amplitude is biased upward. The
 population that generated your data plausibly has <em>less</em>
 differentiation than your estimate. The rungs below 1 show what happens
-to coverage in that direction; the 0 rung shows the degenerate
-flat-profile case, where displacement has no true value at all and the
-amplitude interval cannot cover the boundary truth (its printed zero
-coverage is structural, flagged in the table). When a profile’s
-estimated amplitude is smaller than half its own CI width — as for
-obsessive–compulsive PD here — the diagnostic adds one more rung at a
-scaling factor above 1, the amplitude at which the population would sit
-exactly at the observed CI half-width.</li>
+to coverage in that direction. The 0 rung shows the degenerate
+flat-profile case. There, displacement has no true value at all, and the
+amplitude interval cannot cover the boundary truth. (Its printed zero
+coverage is structural, and the table flags it.) When a profile’s
+estimated amplitude is smaller than half its own CI width, the
+diagnostic adds one more rung at a scaling factor above 1. This is the
+case for obsessive–compulsive PD here. That rung is the amplitude at
+which the population would sit exactly at the observed CI
+half-width.</li>
 <li>
 <strong>The guardrail table</strong> reports how often profiles were
-<em>certified</em> (amplitude CI lower bound at least 0.35 CI-widths
-above zero) at each rung. At the 0 rung, any certification is a false
-certification: the summary prints a caution when the false-certification
-rate is materially above the rate a user would expect from the interval
-level. This is a measured property of the shipped display rule, not a
-hypothesis test.</li>
+<em>certified</em> at each rung. A certified profile has its amplitude
+CI lower bound at least 0.35 CI-widths above zero. At the 0 rung, any
+certification is a false certification. The summary prints a caution
+when the false-certification rate is materially above the rate that a
+user would expect from the interval level. This is a measured property
+of the shipped display rule, not a hypothesis test.</li>
 <li>
 <strong>The verdict</strong> classifies elevation, amplitude, and
 certification-conditional displacement coverage at your as-estimated
-amplitude, and the plain-language paragraph states the overall
-conclusion per profile.</li>
+amplitude. The plain-language paragraph states the overall conclusion
+per profile.</li>
 </ul>
 <p>For a visual summary across the ladder:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%"></p>
 <p>The two profiles tell usefully different stories. Paranoid PD is
-certified: its amplitude CI lower bound clears the 0.35-CI-width margin,
-so <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports its displacement, and nothing in
-its coverage table clearly leaves the Bradley band at the as-estimated
+certified. Its amplitude CI lower bound clears the 0.35-CI-width margin,
+so <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports its displacement. Nothing in its
+coverage table clearly leaves the Bradley band, at the as-estimated
 amplitude or with the population amplitude halved. Obsessive–compulsive
-PD is <em>not</em> certified — its amplitude (about .02 here) is far too
-close to zero relative to its CI width — so the printed output already
+PD is <em>not</em> certified. Its amplitude (about .02 here) is far too
+close to zero relative to its CI width. So the printed output already
 withholds its displacement as uninterpretable, before any coverage
-question is asked. On top of that, the diagnostic shows its amplitude
-and displacement CIs under-cover badly at this sample size (missing
-below the truth), so its verdict is a caution for a genuine reason: the
-intervals themselves are unreliable, not merely the point on the
-circle.</p>
-<p>The guardrail line confirms the rule is doing its job. At this
+question is asked. On top of that, the diagnostic shows that its
+amplitude and displacement CIs under-cover badly at this sample size
+(missing below the truth). So its verdict is a caution for a genuine
+reason. The intervals themselves are unreliable, not merely the point on
+the circle.</p>
+<p>The guardrail line confirms that the rule is doing its job. At this
 configuration
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>250</mn></mrow><annotation encoding="application/x-tex">n = 250</annotation></semantics></math>,
 eight octant correlations), a profile whose true amplitude is exactly
-zero would be certified only about the benchmark rate — roughly the
-one-sided error a user reading the guardrail would expect — so no
-caution fires from the guardrail itself. This is the scale-free rule’s
-payoff: unlike a fixed amplitude-unit cutoff, it holds
-false-certification near its intended rate even in the near-zero regime
-Zimmermann and Wright flagged, where a sample amplitude large enough to
-look non-zero is otherwise the <em>expected</em> outcome from a flat
-population.</p>
+zero would be certified only at about the benchmark rate. That rate is
+roughly the one-sided error that a user reading the guardrail would
+expect. So no caution fires from the guardrail itself. This is the
+payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff, it
+holds false-certification near its intended rate, even in the near-zero
+regime that Zimmermann and Wright flagged. In that regime, a sample
+amplitude large enough to look non-zero is otherwise the
+<em>expected</em> outcome from a flat population.</p>
 <p>One reading note: at reduced <code>reps</code>, classes tend to print
-as <code>borderline</code> — the Wilson interval around the estimated
-coverage is too wide to place it clearly inside or outside the Bradley
-band. That is the diagnostic being honest about its own Monte Carlo
-error; the default <code>reps = 1000</code> sharpens such
+as <code>borderline</code>. This is because the Wilson interval around
+the estimated coverage is too wide to place it clearly inside or outside
+the Bradley band. That is the diagnostic being honest about its own
+Monte Carlo error. The default <code>reps = 1000</code> sharpens such
 classifications into <code>adequate</code> or
 <code>inadequate</code>.</p>
-<p>Two settings worth knowing: <code>structure = "observed"</code>
-rebuilds the population from the pooled observed correlations instead of
-the CPM — if the two structures yield different verdicts, that
-disagreement is itself informative (structure uncertainty is material
-for your data); and the embedded CPM fit is returned as
-<code>acc$cpm</code> for inspection with the tools from Section 2.</p>
+<p>Two settings are worth knowing. First,
+<code>structure = "observed"</code> rebuilds the population from the
+pooled observed correlations instead of the CPM. If the two structures
+yield different verdicts, that disagreement is itself informative:
+structure uncertainty is material for your data. Second, the embedded
+CPM fit is returned as <code>acc$cpm</code>, for inspection with the
+tools from Section 2.</p>
 <p>The diagnostic itself was validated against Zimmermann and Wright’s
-published results: configured to their transcribed simulation
-conditions, it reproduces their accuracy classifications — coverage
-inside the Bradley band at conditions they found accurate, and the same
-one-sided under-coverage at conditions they found inaccurate.</p>
+published results. Configured to their transcribed simulation
+conditions, it reproduces their accuracy classifications. It gives
+coverage inside the Bradley band at conditions they found accurate. It
+gives the same one-sided under-coverage at conditions they found
+inaccurate.</p>
 </div>
 <div class="section level3">
 <h3 id="when-to-trust-ssm-parameters">When to trust SSM parameters<a class="anchor" aria-label="anchor" href="#when-to-trust-ssm-parameters"></a>
@@ -1055,14 +1078,14 @@ one-sided under-coverage at conditions they found inaccurate.</p>
 <li>
 <strong>Structure first.</strong> Fit <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> to your
 instrument in your sample. If the octant ordering fails or communalities
-are very low, stop; SSM positions mean little.</li>
+are very low, stop, because SSM positions mean little.</li>
 <li>
-<strong>Elevation is the robust parameter.</strong> Essentially
-unbiased, and its intervals were accurate from
+<strong>Elevation is the robust parameter.</strong> It is
+essentially unbiased, and its intervals were accurate from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n \ge 50</annotation></semantics></math>
 in every published and package-run condition. (On the correlation path,
-elevation is also the parameter ipsatizing destroys — see Section
-4.)</li>
+elevation is also the parameter that ipsatizing destroys. See Section
+5.)</li>
 <li>
 <strong>Treat amplitude as optimistic.</strong> It cannot go below
 zero, so it overshoots when true differentiation is weak. Before
@@ -1074,13 +1097,13 @@ rungs.</li>
 <strong>Only interpret displacement when amplitude is
 credible.</strong> The package already withholds the displacement
 interval when the amplitude CI lower bound sits less than 0.35 CI-widths
-above zero; the diagnostic tells you how reliable that certification is
+above zero. The diagnostic tells you how reliable that certification is
 at your configuration.</li>
 <li>
 <strong>Do not build claims on the fit parameter’s
 interval.</strong> Zimmermann and Wright found bootstrap
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>
-intervals accurate only when population fit was mediocre — near-perfect
+intervals accurate only when population fit was mediocre. Near-perfect
 prototypicality cannot be bracketed from below. Report
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>
 descriptively.</li>
@@ -1099,25 +1122,26 @@ not a certificate.</li>
 theory-driven circular model and asks how well it fits. A complementary,
 more exploratory question is whether the scales’ correlations show
 circumplex structure <em>at all</em>, without committing to the
-theoretical angles: are the scales spread evenly around a circle, with
-comparable communalities, rather than clustering into a small number of
-independent clusters (simple structure)? Acton and Revelle (2004)
-evaluated ten such criteria by simulation; <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
-implements four of them — Fisher, Gap, VT2, and Rotation — leaving out a
-variance-test variant A&amp;R found ineffective (VT1) and a criterion so
-highly correlated with Rotation as to be redundant (MT, r = .99 with RT
-in their Table 1). A fifth test, RANDALL, is not one of A&amp;R’s ten at
-all: it is an independent order-correspondence test (Hubert &amp;
-Arabie, 1987; Tracey, 1997) that A&amp;R excluded from their own
-simulation because, unlike their criteria, its null distribution is
-known analytically rather than needing simulated cutoffs (their footnote
-3).</p>
+theoretical angles. Are the scales spread evenly around a circle, with
+comparable communalities? Or do they cluster into a small number of
+independent clusters (simple structure)? Acton and Revelle (A&amp;R,
+2004) evaluated ten such criteria by simulation.
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code> implements four of them: Fisher, Gap, VT2,
+and Rotation. It leaves out a variance-test variant that A&amp;R found
+ineffective (VT1). It also leaves out MT, a criterion so highly
+correlated with the Rotation Test (RT) as to be redundant. In their
+Table 1, MT has r = .99 with RT. A fifth test, RANDALL, is not one of
+A&amp;R’s ten at all. It is an independent order-correspondence test
+(Hubert &amp; Arabie, 1987, and Tracey, 1997). A&amp;R excluded it from
+their own simulation because, unlike their criteria, its null
+distribution is known analytically rather than needing simulated cutoffs
+(their footnote 3).</p>
 <div class="section level3">
 <h3 id="the-five-tests">The five tests<a class="anchor" aria-label="anchor" href="#the-five-tests"></a>
 </h3>
 <p><code><a href="../reference/fit_structure.html">fit_structure()</a></code> extracts the first two unrotated
 principal-axis factors of the scales’ correlation matrix (Acton &amp;
-Revelle, 2004, p. 13) and computes four criteria from that two-factor
+Revelle, 2004, p. 13). It computes four criteria from that two-factor
 solution, plus a fifth test that works directly on the correlations:</p>
 <ul>
 <li>
@@ -1130,37 +1154,37 @@ scales’ vector lengths
 <strong>Gap Test</strong> (equal spacing). Are the scales evenly
 distributed in angle around the circle, rather than bunched together?
 The statistic is the variance of the angular gaps between angularly
-adjacent scales, including the gap that wraps from the last scale back
+adjacent scales. It includes the gap that wraps from the last scale back
 around to the first.</li>
 <li>
 <strong>Variance Test (VT2)</strong> and <strong>Rotation
 Test</strong> (interstitiality). Both ask whether the scales sit
-<em>between</em> a small number of dominant axes rather than on them —
-the signature of a genuine circumplex, as opposed to simple structure.
-Each takes a criterion computed at many rotations of the two-factor
-solution and summarizes it as a coefficient of variation across
-rotations; a true circumplex is indifferent to rotation, so both
+<em>between</em> a small number of dominant axes rather than on them.
+That is the signature of a genuine circumplex, as opposed to simple
+structure. Each takes a criterion computed at many rotations of the
+two-factor solution, and summarizes it as a coefficient of variation
+across rotations. A true circumplex is indifferent to rotation, so both
 criteria stay low.</li>
 <li>
-<strong>RANDALL</strong> (Hubert &amp; Arabie, 1987; Tracey, 1997).
-Does the <em>hypothesized circular order</em> you supplied (the order of
-<code>scales</code>) match the observed correlations, in the sense that
-closer-together scales correlate more strongly? Unlike the other four,
-this is a genuine randomization test: its null distribution (scales
-randomly relabeled onto the hypothesized positions) is enumerated
-exactly for up to nine scales, or estimated by Monte Carlo relabeling
-for more, so it returns an exact or Monte Carlo p value rather than a
-simulated cutoff.</li>
+<strong>RANDALL</strong> (Hubert &amp; Arabie, 1987, and Tracey,
+1997). Does the <em>hypothesized circular order</em> that you supplied
+(the order of <code>scales</code>) match the observed correlations? Here
+a match means that closer-together scales correlate more strongly.
+Unlike the other four, this is a genuine randomization test. Its null
+distribution (scales randomly relabeled onto the hypothesized positions)
+is enumerated exactly for up to nine scales. For more scales, it is
+estimated by Monte Carlo relabeling. So the test returns an exact or
+Monte Carlo p value rather than a simulated cutoff.</li>
 </ul>
-<p>The four factor-analytic criteria (Fisher, Gap, VT2, Rotation) have
-the most power to detect simple structure when there is no large general
-factor across the scales. <em>Deviation scoring</em> — centering each
-respondent on their own mean across the selected scales, exactly what
-<code><a href="../reference/ipsatize.html">ipsatize()</a></code> does — approximates removing that general factor
-(Acton &amp; Revelle, 2004, p. 9), so it is
-<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s default; pass
+<p>The four factor-analytic criteria are Fisher, Gap, VT2 and Rotation.
+They have the most power to detect simple structure when there is no
+large general factor across the scales. <em>Deviation scoring</em>
+centers each respondent on their own mean across the selected scales,
+which is exactly what <code><a href="../reference/ipsatize.html">ipsatize()</a></code> does. It approximates
+removing that general factor (Acton &amp; Revelle, 2004, p. 9), so it is
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s default. Pass
 <code>scoring = "raw"</code> to analyze the scores as given. Each of the
-two scorings carries its own set of cutoffs (next section), matched
+two scorings carries its own set of cutoffs (next subsection), matched
 automatically.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_structure.html">fit_structure</a></span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -1219,26 +1243,26 @@ automatically.</p>
 <span><span class="co">#&gt;   Interpretations are heuristic likelihood classifications from simulation, not</span></span>
 <span><span class="co">#&gt;   significance tests (Acton &amp; Revelle, 2004). RANDALL's p-value is exact.</span></span></code></pre></div>
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> adds the numeric cutoffs behind each
-classification and the estimated angle and communality of every scale on
-the two-factor solution — the same geometry the plot below draws. A
-clean circumplex shows scales at roughly the theoretical octant spacing
-with broadly similar communalities; <code>Fisher</code> measures
-departures in communality,
+classification. It also adds the estimated angle and communality of
+every scale on the two-factor solution, the same geometry that the plot
+below draws. A clean circumplex shows scales at roughly the theoretical
+octant spacing, with broadly similar communalities. <code>Fisher</code>
+measures departures in communality, and
 <code>Gap</code>/<code>VT2</code>/<code>Rotation</code> measure
 departures in even angular spread.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%"></p>
-<p>For the IIP-SC octants the picture agrees with Section 2’s CPM fit:
-the scales keep their theoretical circular <em>ordering</em> with
-comparable communalities and roughly even spacing, and the Fisher, Gap,
-and interstitiality criteria all classify the configuration as
-consistent with (or close to) a circumplex under deviation scoring. One
-caveat when reading the angles: the two-factor solution is
-<em>unrotated</em>, so its absolute orientation is arbitrary — it is the
-scales’ ordering and relative spacing that agree with theory, not their
-absolute angles (which is why <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> places PA well away
-from its nominal 90°). RANDALL’s p value confirms the hypothesized
+<p>For the IIP-SC octants, the picture agrees with Section 2’s CPM fit.
+The scales keep their theoretical circular <em>ordering</em>, with
+comparable communalities and roughly even spacing. The Fisher, Gap, and
+interstitiality criteria all classify the configuration as consistent
+with (or close to) a circumplex under deviation scoring. One caveat
+applies when reading the angles. The two-factor solution is
+<em>unrotated</em>, so its absolute orientation is arbitrary. The
+scales’ ordering and relative spacing agree with theory, not their
+absolute angles. (This is why <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> places PA well away
+from its nominal 90°.) RANDALL’s p value confirms the hypothesized
 circular order directly, independent of the factor-analytic
 criteria.</p>
 </div>
@@ -1246,87 +1270,102 @@ criteria.</p>
 <h3 id="where-the-cutoffs-come-from">Where the cutoffs come from<a class="anchor" aria-label="anchor" href="#where-the-cutoffs-come-from"></a>
 </h3>
 <p>The four factor-analytic criteria are only as good as the thresholds
-used to classify them, and this is where the published article cannot be
+used to classify them. This is where the published article cannot be
 used as-is. Acton and Revelle calibrated their cutoffs by simulation at
-64 and 128 variables and reported (their p. 18) that the Gap Test’s
-cutoffs shift sharply with the number of scales — far too sharply to
-reuse at the eight scales a typical circumplex instrument has. This
-package’s development process re-derived every cutoff at
+64 and 128 variables. They reported (their p. 18) that the Gap Test’s
+cutoffs shift sharply with the number of scales. The shift is far too
+sharp to reuse the cutoffs at the eight scales that a typical circumplex
+instrument has. This package’s development process re-derived every
+cutoff at
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>
-under Acton and Revelle’s own generating model (their Eqs. 11.1–11.3),
-in a script committed at <code>data-raw/structure-test-cutoffs.R</code>:
-it first reproduced their published 64/128-variable design as a sanity
-gate on the simulation machinery, then reran the same design at
+(eight scales) under Acton and Revelle’s own generating model (their
+Eqs. 11.1–11.3). The script is committed at
+<code>data-raw/structure-test-cutoffs.R</code>. It first reproduced
+their published 64/128-variable design, as a sanity gate on the
+simulation machinery. Then it reran the same design at
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>
-to derive the constants <code><a href="../reference/fit_structure.html">fit_structure()</a></code> actually uses. The
-nv effect the re-derivation found is large — the raw- scored Gap Test’s
-“almost certain” cutoff moves from .01 at
+to derive the constants that <code><a href="../reference/fit_structure.html">fit_structure()</a></code> actually uses.
+The effect of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>v</mi></msub><annotation encoding="application/x-tex">n_v</annotation></semantics></math>
+that the re-derivation found is large. The raw-scored Gap Test’s “almost
+certain” cutoff (a category that the next subsection defines) moves from
+.01 at
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>64</mn><mi>/</mi><mn>128</mn></mrow><annotation encoding="application/x-tex">n_v = 64/128</annotation></semantics></math>
 to .35 at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>
-— which is exactly why <code><a href="../reference/fit_structure.html">fit_structure()</a></code> refuses to interpret
-any scale count it has not calibrated: at any
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>≠</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v \ne 8</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>.
+That is exactly why <code><a href="../reference/fit_structure.html">fit_structure()</a></code> refuses to interpret
+any scale count it has not calibrated. At any
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>≠</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v \ne 8</annotation></semantics></math>,
 the statistics are still reported, but the classification column prints
 a dash rather than guessing.</p>
-<p>RANDALL needs no such calibration; its p value comes from enumerating
-(or Monte Carlo sampling) the randomization null directly on your data,
-so it is available at any scale count of four or more.</p>
+<p>RANDALL needs no such calibration. Its p value comes from enumerating
+(or Monte Carlo sampling) the randomization null directly on your data.
+So it is available at any scale count of four or more.</p>
 </div>
 <div class="section level3">
 <h3 id="reading-the-classifications">Reading the classifications<a class="anchor" aria-label="anchor" href="#reading-the-classifications"></a>
 </h3>
 <p>The classification categories describe where a statistic falls among
 the simulated distributions for competing structures (circumplex
-vs. simple structure): “almost certain” (below the 1st percentile of the
-competing distribution), “at least 3x/2x as likely as the alternative”
-(the criterion’s structure is at least three/two times as likely as its
-competitor at that statistic value), and “not clearly supported”. Those
-ratios are <em>likelihood ratios</em>, not posterior probabilities or p
-values. They are <strong>heuristic classifications read off simulated
-distributions, not significance tests</strong>, and
-<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s
+vs. simple structure). There are four categories:</p>
+<ul>
+<li>“almost certain”: below the 1st percentile of the competing
+distribution.</li>
+<li>“at least 3x as likely as the alternative”: the criterion’s
+structure is at least three times as likely as its competitor at that
+statistic value.</li>
+<li>“at least 2x as likely as the alternative”: the criterion’s
+structure is at least two times as likely as its competitor at that
+statistic value.</li>
+<li>“not clearly supported”.</li>
+</ul>
+<p>Those ratios are <em>likelihood ratios</em>, not posterior
+probabilities or p values. The classifications are <strong>heuristic
+classifications read off simulated distributions, not significance
+tests</strong>. <code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s
 <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>/<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> output repeats that caveat
 every time an interpretation is shown. Treat a “weak” or unsupported
-classification as a caution to inspect the loading configuration (the
-plot above) and Section 2’s CPM fit together, not as a rejection of any
-specific hypothesis.</p>
+classification as a caution, not as a rejection of any specific
+hypothesis. The caution is to inspect the loading configuration (the
+plot above) and Section 2’s CPM fit together.</p>
 </div>
 <div class="section level3">
 <h3 id="how-this-complements-the-cpm-fit">How this complements the CPM fit<a class="anchor" aria-label="anchor" href="#how-this-complements-the-cpm-fit"></a>
 </h3>
 <p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> (Section 2) and <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
 ask related but different questions. <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> commits to
-the theoretical angles and communality model and tests goodness of fit
-against that specific structure; a good overall RMSEA/CFI can still hide
-unequal spacing or a dominant general factor, both of which
-<code><a href="../reference/fit_structure.html">fit_structure()</a></code> is built to detect. Conversely,
+the theoretical angles and communality model, and it tests goodness of
+fit against that specific structure. A good overall RMSEA/CFI can still
+hide unequal spacing or a dominant general factor, and
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code> is built to detect both. Conversely,
 <code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s exploratory criteria say nothing about
-how well the scales match <em>your</em> theoretical angles — only
-RANDALL, via the order you supply, references a hypothesis at all, and
-even that is an order hypothesis, not the specific angles
+how well the scales match <em>your</em> theoretical angles. Only
+RANDALL, via the order you supply, references a hypothesis at all. Even
+that is an order hypothesis, not the specific angles that
 <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimates. Running both is more informative than
-either alone: agreement between a good CPM fit and circumplex-supporting
+either alone. Agreement between a good CPM fit and circumplex-supporting
 <code><a href="../reference/fit_structure.html">fit_structure()</a></code> classifications is stronger evidence than
-either result on its own, and disagreement (for example, adequate CPM
-fit alongside a Fisher Test flagging unequal axes) points to exactly
-which aspect of circumplex structure to examine further.</p>
+either result on its own. Disagreement points to exactly which aspect of
+circumplex structure to examine further. An example of disagreement is
+adequate CPM fit alongside a Fisher Test flagging unequal axes.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="ipsatization-and-what-it-costs">5. Ipsatization and what it costs<a class="anchor" aria-label="anchor" href="#ipsatization-and-what-it-costs"></a>
 </h2>
-<p>Ipsatizing — subtracting each respondent’s own mean across the octant
-scales from each of their scale scores (<code><a href="../reference/ipsatize.html">ipsatize()</a></code>) — is a
-common preprocessing step in circumplex work, used to remove individual
-differences in overall endorsement before examining profile shape.</p>
-<p>For SSM analyses its main cost is simple to state: <strong>ipsatizing
-discards elevation.</strong> After row-centering, every respondent’s
-octant scores sum to zero, so a group’s mean profile has zero mean by
-construction, and the covariances between the ipsatized scales and any
-external measure sum to exactly zero — forcing the mean correlation
-toward zero regardless of how strongly the construct relates to the
-instrument’s general factor (Zimmermann &amp; Wright, 2017, p. 4).</p>
+<p>Ipsatizing is a common preprocessing step in circumplex work. It
+subtracts each respondent’s own mean across the octant scales from each
+of their scale scores (<code><a href="../reference/ipsatize.html">ipsatize()</a></code>). It is used to remove
+individual differences in overall endorsement before examining profile
+shape.</p>
+<p>For SSM analyses, its main cost is simple to state:
+<strong>ipsatizing discards elevation.</strong> After row-centering,
+every respondent’s octant scores sum to zero. So a group’s mean profile
+has zero mean by construction. For the same reason, the covariances
+between the ipsatized scales and any external measure sum to exactly
+zero. This forces the mean correlation toward zero, regardless of how
+strongly the construct relates to the instrument’s general factor
+(Zimmermann &amp; Wright, 2017, p. 4).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">45678</span><span class="op">)</span></span>
 <span><span class="va">res_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
@@ -1354,37 +1393,37 @@ instrument’s general factor (Zimmermann &amp; Wright, 2017, p. 4).</p>
 <span><span class="co">#&gt;           e_est a_est   d_est</span></span>
 <span><span class="co">#&gt; raw       0.250 0.150 128.945</span></span>
 <span><span class="co">#&gt; ipsatized 0.007 0.113 132.949</span></span></code></pre></div>
-<p>The raw-score elevation — which matches the value Zimmermann and
-Wright report for this scale in their Table 4 — collapses to near zero
-after ipsatizing. The displacement stays close to its raw-score value,
-and the amplitude stays broadly similar — though not identical, because
-ipsatizing also changes the scales’ variances and intercorrelations, so
-shape parameters shift somewhat too. Guidance:</p>
+<p>The raw-score elevation collapses to near zero after ipsatizing. (The
+raw value matches the value that Zimmermann and Wright report for this
+scale in their Table 4.) The displacement stays close to its raw-score
+value. The amplitude stays broadly similar, though not identical,
+because ipsatizing also changes the scales’ variances and
+intercorrelations. So shape parameters shift somewhat too. Guidance:</p>
 <ul>
-<li>If elevation carries meaning in your application (for interpersonal
-problems it indexes association with generalized interpersonal
-distress), analyze raw scores and let the SSM separate elevation from
-shape — that separation is exactly what the model is for.</li>
+<li>If elevation carries meaning in your application, analyze raw scores
+and let the SSM separate elevation from shape. (For interpersonal
+problems, elevation indexes association with generalized interpersonal
+distress.) That separation is exactly what the model is for.</li>
 <li>If you receive data that were already ipsatized, do not interpret
-the elevation row, and say so in the write-up; amplitude and
+the elevation row, and say so in the write-up. Amplitude and
 displacement remain interpretable.</li>
 <li>Do not describe an ipsatized profile’s near-zero elevation as
-evidence that a construct is “not generally interpersonal” — the
+evidence that a construct is “not generally interpersonal”. The
 preprocessing made that value uninformative.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="wrap-up">6. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
-<p>Evaluating circumplex structure has two layers: whether the
-instrument behaves like a circumplex in your sample
-(<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>), and whether the inferential machinery of the
-SSM can be trusted at your sample size and profile
+<p>Evaluating circumplex structure has two layers. The first is whether
+the instrument behaves like a circumplex in your sample
+(<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>). The second is whether the inferential
+machinery of the SSM can be trusted at your sample size and profile
 (<code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>). Both are one function call, and both
-change what you should claim more often than users expect — amplitude
-and displacement intervals, in particular, earn their trust only when
-the profile is genuinely differentiated relative to the precision your
-sample size affords.</p>
+change what you should claim more often than users expect. In
+particular, amplitude and displacement intervals earn their trust only
+when the profile is genuinely differentiated relative to the precision
+that your sample size affords.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
