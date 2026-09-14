@@ -81,6 +81,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: review started. No PR existed, so resume route (d). The default branch had not moved. Five fresh reviewers ran: claims reader (23 items), one-read reader (62 paragraphs), diff-bug (22), blame-history (1), prior-review (no evidence).
 - 2026-09-14: triage questions at the gate. The user chose: fix all claim drift now, gloss the top one-read items and reject the rest with reasons, fix five sweep gaps and defer the rest to the prose-sweep candidate row.
 - 2026-09-14: fix-now commits ce770a4e and 5e7b38a9 on the branch. An [O] re-read of ce770a4e found 17 items, 12 fixed in 5e7b38a9. b5674f31 merged the two plain-English candidate rows and added the `ssm_plot_trajectory()` help-page row, to keep ROADMAP under 60 lines and 24,000 bytes.
+- 2026-09-14: step-7 approval: m123-plain-vignettes-sweep approved for merge
 
 ## Decisions
 
