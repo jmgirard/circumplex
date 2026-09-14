@@ -135,7 +135,7 @@ its plane loadings are tied to its **fixed angle** by a direction constraint
 default **`"scaled"`** tier, one of two versions of the model. A stricter
 **`"strict"`** tier instead fixes every loading to the unit cosine pattern and
 frees the full factor covariance matrix. It is the fully theoretical benchmark.
-It is also what remains identified (estimable from the data) when the number of
+It is also what remains identified (the data pin down its parameters) when the number of
 scales is small.
 
 The header and comments in the generated syntax record two design decisions
@@ -264,8 +264,8 @@ Table: Latent SSM profile of NARPD
 By default `ssm_sem()` fits with a robust estimator (`estimator = "MLR"`,
 maximum likelihood with robust corrections) and reports robust global fit
 indices. This is because circumplex scale scores are typically skewed, and the
-naive chi-square over-rejects. The robust (sandwich) standard errors, which do
-not assume normally distributed data but still need a reasonably large sample, also feed the confidence intervals. Section 4 explains
+naive chi-square over-rejects. The robust (sandwich) standard errors also feed
+the confidence intervals. Section 4 explains
 why that matters.
 
 ## 4. Where the confidence intervals come from
@@ -484,9 +484,9 @@ deliberate refusal rather than a gap. Extending the cutoff to a robust index,
 another estimator, or three or more groups would take simulation work that
 nobody has done.
 
-Sometimes invariance is not the obstacle. An example is a contrast of **two
-measures** within one group, where no cross-group invariance is at stake. Then
-the contrast is computed. It behaves like the observed contrast (second measure
+When invariance is not the obstacle, the contrast is computed. An example is a
+contrast of **two measures** within one group, where no cross-group invariance
+is at stake. That contrast behaves like the observed contrast (second measure
 minus first, displacement differences via the circular branch machinery):
 
 

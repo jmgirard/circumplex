@@ -99,6 +99,7 @@ The M123 review found these gaps and deferred them to the candidate row "The pro
 - The tests plant no References section followed by more prose, no id in a code span and no dash in math. They also plant no inline comment with prose on both sides, no tilde fence with an info string, no fence over three characters and no `-` (stdin) input.
 - The em dash test fails, not skips, on a machine without the `en_US.UTF-8` locale.
 - A hand-written pipe table with a `Table:` caption line above it is skipped as a knitr table. A `kable()` table without a caption is still swept, so its generated cells can produce findings (added M124).
+- A skipped knitr table is in neither swept prose nor `--chunks` output, so a changed table passes both. Only `vignette-precompute` compares it. The rule also misses a pandoc `: caption` line, a caption under the table, and an indented table. Prose right after the last row, with no blank line, can join the prose before the table (added M124 review).
 
 ### A vignette re-knit and the chunk comparison
 
@@ -146,6 +147,25 @@ Reader reports, numbered as the rows cite them: claims reader A1 to A2 (axes) an
 | SEM | E24, E25: "branch" | Rejected | The next sentence says what the branch means for the interval endpoints. |
 | SEM | E26: "plane factors are fixed isotropic and orthogonal" | Kept as a base claim | The generated syntax fixes them only under the scaled tier, and the strict tier frees the factor covariance. The `ssm_plot_trajectory()` doc-bug candidate row now holds the fix, because a form-only pass does not change the claim. |
 | SEM | E29: "point" then "boundary" | Rejected | The point is where the families meet. The boundary divides fixed from free angles. |
+
+The review readers read `53d94913`, and their items carry a V prefix. The claims readers gave VA1 to VA12 (axes) and VS1 to VS10 (SEM). The one-read readers gave VR1 to VR30 (axes) and VE1 to VE33 (SEM). The diff reviewer gave F1 to F7. The review fixed six items: VA1, VA2, VA4, VS1, VS3 and VS9. For VA1, the five components now count the axes as one and block specificity as the fifth (`strack2013.md` p. 4). For VA2, the gloss is gone and the base wording is back, because the mean match is a large-sample result. For VS1, the clause is gone, because the package uses robust SEs against misspecification. A fresh re-read checked the six fixes. It found problems in VA2, VS3 and VS9, and those three now use base wording or the re-reader's wording.
+
+| Page | Item | Disposition | Evidence |
+|---|---|---|---|
+| axes, SEM | VA3, VS2, VS8 | Matched | Rows R19, E12 and the inventory row above. |
+| axes | VA5 "misprices" became "comes out wrong", VA8 "direct read-out" became "shows" | Rejected | The scope clause stays, and the quantities named are the same. |
+| axes | VA6 "oracle" became "simulated test data" | Rejected | "Known by construction" keeps the known-truth sense. |
+| axes | VA7, F3: "item specificity (the item error component)" | Rejected | `strack2013.md` p. 4 names the free error term item specificity. The page calls the same component item error. |
+| axes | VA9 exact-fit and approximate-fit classes, VA10, VA11, VA12 | Rejected | Standard terms or a claim the base implied, and each is consistent with `R/axes_reliability.R` and `R/axes_scaled_fit.R`. VA11 adds the missing Hu and Bentler reference. |
+| SEM | VS4, VS5 (F5), VS6, VS10 | Rejected | Each names a referent or glosses a standard term correctly, and the reader found each accurate. |
+| SEM | VS7: categorical and hybrid glosses | Rejected | `wendt2019.md` names the categorical model (LCA) and the hybrid model (SP-FA). |
+| axes | VR1, VR2, VR3, VR5, VR6, VR7, VR11, VR12, VR13, VR14, VR17, VR19, VR20 | Rejected | Technical notes for a reader who checks the numbers or cross-checks in lavaan. A gloss needs facts the page and `?axes_reliability` do not state. |
+| axes | VR15, VR16, VR22, VR23, VR24, VR25 | Rejected | Base wording or base structure (VR16 as R8 above). An added reason why is a new claim. |
+| axes | VR4, VR8, VR9, VR10, VR18, VR21, VR26, VR27, VR28, VR29, VR30 | Rejected | A later paragraph, the linked introduction vignette or the instruments vignette defines the term. Otherwise the term is standard for the reader profile. |
+| SEM | VE1, VE3, VE4, VE7, VE8, VE9, VE11, VE12, VE13, VE14, VE17, VE18, VE19, VE21, VE23, VE24, VE25, VE26, VE27, VE28, VE30, VE32, VE33 | Rejected | Technical notes for a reader who fits their own lavaan models, as E2 and the related rows above. |
+| SEM | VE2 (the article's ΔCFI direction), VE5 (the E26 bullet), VE20 | Rejected | Base claims that a form-only pass keeps. VE5 is in the doc-bug candidate row. |
+| SEM | VE6, VE10, VE15, VE16, VE22, VE29, VE31 | Rejected | The term is defined in the introduction vignette that the page links, or in a later section that the text names. |
+| SEM | F6, F7: knitr tables are in neither the sweep nor `--chunks`, and the table rule misses other caption forms | Follow-up | Listed under "Known sweep gaps". `vignette-precompute` still compares the table output. |
 
 ### M125 (evaluating-circumplex-structure)
 

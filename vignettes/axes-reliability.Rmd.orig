@@ -60,9 +60,9 @@ The package ships `simulated_items`, a synthetic dataset of 1–7 Likert
 responses from 500 respondents on 32 items. There are four items on each of the
 eight octant scales, in the order that `octants()` returns. The items were drawn
 from a five-component population that implies an axis reliability of about .78.
-The five are a general factor, two equal axes with axes variance .18, a shared
-scale-specificity component of .10, and item error. The population has no block
-specificity, because the instrument is not blockwise.
+The five are a general factor, the two equal axes (axes variance .18), a shared
+scale-specificity component of .10, block specificity, and free item error.
+Block specificity is zero here, because the instrument is not blockwise.
 
 `axes_reliability()` needs three things: the data, a map from items to scales,
 and the scales' angles. The map is a list with one character vector of item
@@ -243,12 +243,11 @@ are using deserves caution at moderate N with many items. But note the
 direction: the scaled test **over-flags** misfit rather than flattering it. That
 is the safer error, and the opposite of what the uncorrected statistic did.
 Second, all of this evidence is **complete-data**. Under `missing = "fiml"` the
-scaled statistic is calibrated in mean. That is, in large samples its average
-matches that of the reference distribution. But its rejection rate has not been
+scaled statistic is calibrated in mean. But its rejection rate has not been
 measured. So none of these rates should be read as applying to that path.
 
-The implied matrix is the matrix of item correlations that the fitted model
-predicts. If
+The implied matrix is the matrix that the fitted model predicts for the item
+correlations. If
 you check it, you will also find that it does not reproduce the unit diagonal
 exactly. That too is expected. The loadings (the items' weights on the factors)
 are fixed. So the condition that a free item error satisfies is the *weighted*
