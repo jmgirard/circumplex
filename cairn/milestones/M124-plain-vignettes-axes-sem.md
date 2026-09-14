@@ -24,13 +24,13 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 
 ## Acceptance criteria
 
-- [ ] AC1: For each page and its shipped `.Rmd`, `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <file>` exits 0. So the swept prose has no sentence over 25 words, no dash, no semicolon, and no milestone, decision or review id. `cairn/references/plain-vignettes.md` defines "swept prose", "sentence" and "dash".
-- [ ] AC2: No code changed. For each page and its shipped `.Rmd`, `tools/prose-sweep.R --chunks` prints the same text at the base commit and at the head.
+- [x] AC1: For each page and its shipped `.Rmd`, `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <file>` exits 0. So the swept prose has no sentence over 25 words, no dash, no semicolon, and no milestone, decision or review id. `cairn/references/plain-vignettes.md` defines "swept prose", "sentence" and "dash".
+- [x] AC2: No code changed. For each page and its shipped `.Rmd`, `tools/prose-sweep.R --chunks` prints the same text at the base commit and at the head.
 - [ ] AC3: Each shipped `.Rmd` is what its `.Rmd.orig` knits to: the `vignette-precompute` workflow passes on the PR head.
-- [ ] AC4: For each page, every number, degree value, code-span name and precision-list term in the base prose also appears in the head prose, or the Review section records its removal with a reason. The `--inventory` output of `tools/prose-sweep.R` at the base commit and at the head, compared, lists these items.
+- [x] AC4: For each page, every number, degree value, code-span name and precision-list term in the base prose also appears in the head prose, or the Review section records its removal with a reason. The `--inventory` output of `tools/prose-sweep.R` at the base commit and at the head, compared, lists these items.
 - [ ] AC5: A fresh-context reader compares each page's base and head prose, section by section. It lists each claim added, dropped, or changed in meaning, a lost statistical qualifier included. The Review section gives each listed item one disposition: fixed, rejected with a reason, or matched by a ledger row with its evidence.
 - [ ] AC6: A fresh-context reader with the reader profile from `cairn/references/plain-vignettes.md` lists the paragraphs of each page that it cannot follow on one read. The Review section records each listed paragraph as fixed or as rejected with a reason.
-- [ ] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
+- [x] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
 
 ## Coverage
 
@@ -65,3 +65,13 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 ## Decisions
 
 ## Review
+
+Review at `53d94913`, base `29b64530` (master has not moved). Scratch outputs in the session scratchpad, not committed.
+
+- AC1 evidence (2026-09-14): `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R` exits 0 on all four files (243, 243, 251 and 253 `--prose` sentences). Discrimination: the same head script on the base copies exits 1 with 96, 96, 99 and 99 finding lines.
+- AC2 evidence (2026-09-14): `--chunks` output at base and head is byte-identical on all four files (36, 21, 99 and 67 lines). The base script on the base copies prints the same text.
+- AC3 evidence: pending. The named procedure is the `vignette-precompute` run on the PR head, which exists only after the step-8 push.
+- AC4 evidence (2026-09-14): head-script `--inventory`, base against head. Removed: nothing on any file. Added: `sd` and `vignette("introduction-to-ssm-analysis")` (axes, both copies), `lx`, `ly` and the same link (SEM, both copies), all ledgered. With the base script on the base shipped SEM `.Rmd`, 13 numbers also drop (-0.01 to 104.5). They are cells of the two `kable()` tables the chunks print, which the head sweep now skips, not prose. Other three files: nothing removed under either script.
+- AC7 evidence (2026-09-14): `devtools::check(args = "--no-manual")` at `53d94913`: 0 errors, 0 warnings, 0 notes (6 min 53 s). `devtools::test()`: 0 failures, 0 errors, 1 skip, 9319 passes.
+- Consistency gate (2026-09-14): `cairn_validate.py` exit 0. No principle changed, so `cairn_impact` skipped. `devtools::document()` gives no diff and 0 `resolve link` lines. `pkgdown::check_pkgdown()` no problems. README not touched. NEWS extends the M123 bullet, no milestone ids. No new top-level files. Master watches: newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master (`f594bd2c`) are `success`. `check-master-red-alert.R`, `master-red-alert-dryrun.R` and `check-branch-protection.R` exit 0. The manual step (`devtools::check()` without `--no-manual`) was not run, because `man/` is unchanged on this branch.
+- Fresh readers (2026-09-14, [O], at `53d94913`): AC5 claims readers found 12 axes items (A1-A12) and 10 SEM items (S1-S10). AC6 one-read readers found 30 axes paragraphs (R1-R30) and 33 SEM paragraphs (E1-E33). Review lenses: [O] diff-bug 7 findings (F1-F7), [S] blame-history 1 finding (same as S1), [S] prior-review none. Dispositions follow the gate.
