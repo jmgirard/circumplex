@@ -1,0 +1,71 @@
+# M123: The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep
+
+- **Status:** planned
+- **Priority:** normal
+- **Depends on:** —
+- **Driving RR:** —
+- **Principles touched:** GP5
+- **Resolves:** —
+- **Surface tier:** user-facing — the vignettes ship in the package and on the pkgdown site
+- **Branch/PR:** —
+
+## Goal
+
+The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced-visualization` read on one pass for an applied researcher, with every statistical claim kept.
+
+## Scope
+
+**In:** A prose sweep script, `tools/prose-sweep.R`, with its test. A rules page, `cairn/references/plain-vignettes.md`, that defines the reader, the rules and the sweep, and holds a ledger. A prose rewrite of the three pages. A page is the prose source: `vignettes/<name>.Rmd.orig` where one exists, else `vignettes/<name>.Rmd`. Where a page has a `.Rmd.orig`, the same prose edits go into its shipped `.Rmd`. One NEWS bullet.
+
+**Out:**
+- `axes-reliability` and `sem-based-ssm-analysis` → M124.
+- `evaluating-circumplex-structure` → M125.
+- `introduction-to-ssm-analysis`, `intermediate-ssm-analysis` and `using-instruments` → candidate row "Plain-English pass over the three older vignettes".
+- A CI workflow or testthat run of the sweep over the real vignettes → candidate row "The prose sweep as a merge gate".
+- Code chunks, chunk options, figure captions and alt text: unchanged here, and no row, because the pass is about prose.
+- Help pages (`man/`) and the README: not in this series. No row until the user asks.
+
+## Acceptance criteria
+
+- [ ] AC1: For each page, `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <page>` exits 0. Where the page has a `.Rmd.orig`, the same command on its shipped `.Rmd` also exits 0. So the swept prose has no sentence over 25 words, no dash, no semicolon, and no milestone, decision or review id. `cairn/references/plain-vignettes.md` defines "swept prose", "sentence" and "dash".
+- [ ] AC2: No code changed. For each page, and for the shipped `.Rmd` of each page that has a `.Rmd.orig`, `tools/prose-sweep.R --chunks` prints the same text at the base commit and at the head. That output is every fenced block with its opening line, minus `#>` output lines.
+- [ ] AC3: Where a page has a `.Rmd.orig`, its shipped `.Rmd` is what the source knits to: the `vignette-precompute` workflow passes on the PR head.
+- [ ] AC4: For each page, every number, degree value, code-span name and precision-list term in the base prose also appears in the head prose, or the Review section records its removal with a reason. The `--inventory` output of `tools/prose-sweep.R` at the base commit and at the head, compared, lists these items. `cairn/references/plain-vignettes.md` holds the precision list.
+- [ ] AC5: A fresh-context reader compares each page's base and head prose, section by section. It lists each claim added, dropped, or changed in meaning, a lost statistical qualifier included. The Review section gives each listed item one disposition: fixed, rejected with a reason, or matched by a ledger row with its evidence.
+- [ ] AC6: A fresh-context reader with the reader profile from `cairn/references/plain-vignettes.md` lists the paragraphs of each page that it cannot follow on one read. The Review section records each listed paragraph as fixed or as rejected with a reason.
+- [ ] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
+
+## Coverage
+
+- AC1 → T1, T3, T4, T5, T6
+- AC2 → T1, T4, T5, T6
+- AC3 → T5, T6, T8
+- AC4 → T1, T3, T7
+- AC5 → T7
+- AC6 → T3, T7
+- AC7 → T2, T8
+
+## Tasks
+
+- [ ] T1: Write `tools/prose-sweep.R`. It takes files, or `-` for standard input. It drops the YAML header, HTML comments (multi-line too), the References section and every fenced block (backtick or tilde, with or without an info string). A code span and a `$...$` math span each count as one word. A heading, list item, table cell, blockquote line and paragraph end each end a sentence. A period after a single capital letter does not end one. Report mode prints each sentence over 25 words, each dash (U+2014, `---`, ` -- `, `&mdash;`), each semicolon outside code spans, math and HTML entities, and each match of `\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\b`. It exits 0 clean, 1 on a finding, 2 when a file has no sentences, 3 on a usage error. `--prose` prints one sentence per line. `--chunks` prints fenced blocks as AC2 states. `--inventory` prints the AC4 items, one per line, sorted.
+- [ ] T2: Write `tests/testthat/test-prose-sweep.R`. It skips outside the source tree. Plant each finding kind in more than one form and place: a long sentence in a list item, heading, blockquote and table cell; each dash form; semicolons in prose (flagged) and in a code span, math and `&amp;` (not flagged); an id in prose, link text and a URL. Plant a long sentence, semicolon and dash inside each fence form and a multi-line comment, and assert silence. Assert which finding each plant produces, and that a clean fixture exits 0.
+- [ ] T3: Write `cairn/references/plain-vignettes.md` and its `INDEX.md` line. It holds the reader profile, the rules, the precision list, the sweep definition from T1 and a ledger section per milestone. The reader knows R, data frames, correlation, regression and confidence intervals. The rules: 25-word sentences; active voice and simple tenses; define a term at first use or link the introduction vignette; change form, not claims (tidymedia's rule 6); keep every statistical qualifier. Precision-list terms include interval, credible, confidence, significant, contrast, displacement, amplitude, elevation and fit. Also record the effect of a vignette re-knit on AC2.
+- [ ] T4: Rewrite `vignettes/bayesian-ssm-analysis.Rmd` prose.
+- [ ] T5: Rewrite `vignettes/growth-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/growth-ssm-analysis.Rmd`.
+- [ ] T6: Rewrite `vignettes/advanced-visualization.Rmd.orig` prose and copy each edit into `vignettes/advanced-visualization.Rmd`.
+- [ ] T7: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add ledger rows. Add one NEWS bullet.
+- [ ] T8: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
+
+## Work log
+
+- 2026-09-14: created by /milestone-plan.
+- 2026-09-14: criteria audit (full mode, [O] fresh reader) returned 10 findings, all fixed before the gate. Dash forms beyond U+2014; both fence forms and the References list; no `.Rmd.orig` for the Bayesian page; chunk headers and `#>` lines in AC2; AC3 limited to pages with a `.Rmd.orig`; plants varied by form and place; a mechanical inventory under the claims reader; the one-read criterion in nestedtune D-061's shape.
+- 2026-09-14: plan gate chose a 25-word cap over 30 (nestedtune's) because it matches tidymedia and the user's plain-English rules; falsified by a page where a 25-word split loses a statistical qualifier that a 30-word sentence keeps.
+- 2026-09-14: plan gate chose running the sweep at review only over a CI gate in this milestone, because nestedtune needed two follow-up milestones to fix its gate's parser; falsified by a rewritten vignette regressing past the sweep before the gate row is promoted.
+- 2026-09-14: plan gate chose the six newer vignettes over all nine, because the older three show fewer long sentences (8, 15, 30); falsified by a reader finding the older pages as hard to follow.
+- 2026-09-14: plan gate chose to proceed over holding for the ebook candidate, because that project is not open; falsified by the user opening the ebook project before M125 ships.
+- 2026-09-14: plan split the six pages across three milestones rather than one, because one milestone would exceed ~10 tasks and the 150-line cap; falsified by M123's review showing one page per task takes far less than a session.
+
+## Decisions
+
+## Review
