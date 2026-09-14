@@ -31,7 +31,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 - [x] AC4: Every number, degree value, code-span name and precision-list term in the base prose also appears in the head prose, or the Review section records its removal with a reason. The `--inventory` output of `tools/prose-sweep.R` at the base commit and at the head, compared, lists these items.
 - [x] AC5: A fresh-context reader compares the base and head prose, section by section. It lists each claim added, dropped, or changed in meaning, a lost statistical qualifier included. The Review section gives each listed item one disposition: fixed, rejected with a reason, or matched by a ledger row with its evidence.
 - [x] AC6: A fresh-context reader with the reader profile from `cairn/references/plain-vignettes.md` lists the paragraphs it cannot follow on one read. The Review section records each listed paragraph as fixed or as rejected with a reason.
-- [ ] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
+- [x] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
 
 ## Coverage
 
@@ -80,6 +80,10 @@ Base commit 68874adf (master, unchanged since the branch was cut, so no sync mer
   - Base wording or base structure, where a table, a reason or a new referent is a new claim: RP1, RP5, RP7, RP8, RP15, RP17, RP18, RP19, RP20, RP21, RP22, RP24, RP27, RP29, RP30, RP31, RP36. (RP21's "next section" was fixed at the gate as RD8.)
   - The linked introduction vignette defines the term, or the term is standard for the reader: RP11, RP34, RP35.
   - RP23 ("weak" matches no listed category): a base claim, sent to the doc-bug candidate row with RD4.
+- AC7: `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings, 0 notes (7 min). It ran on 1989191d, before the gate fixes, which changed vignette prose only. `devtools::test()` on the fixed tree reports FAIL 0, WARN 9, SKIP 1, PASS 9319.
+- AC3: not yet read. It needs the `vignette-precompute` run on the PR head, which opens at merge approval. Local proxy: `--prose` of the page and of the shipped `.Rmd` match except for the three knitr `<img>` lines.
+
+Consistency gate: `cairn_validate.py` passes all checks. `devtools::document()` prints 0 `resolve link` lines and leaves `man/` and `NAMESPACE` unchanged. `pkgdown::check_pkgdown()` finds no problems. NEWS carries the six-vignette bullet with no milestone id. The master-red alert audit, its dry run and the branch-protection check exit clean. The newest master push runs of `R-CMD-check.yaml` and `test-coverage.yaml` are both `success` (26664a3a). No principle changed, so no impact report.
 
 Independent review, a three-lens fan-out because the tier is user-facing. The maintainer triaged at the gate.
 
