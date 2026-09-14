@@ -169,5 +169,16 @@ The review readers read `53d94913`, and their items carry a V prefix. The claims
 
 ### M125 (evaluating-circumplex-structure)
 
+Reader reports, numbered as the rows cite them: claims reader K1 to K10, one-read reader P1 to P39, and gloss re-read G1 to G14. Items not in a row were fixed. `tests/testthat/test-cpm_boundary_vignette.R` matches phrases of this page's prose, so a rewrite of this page must keep those phrases word for word (added M125).
+
 | Page | Item | Disposition | Evidence |
 |---|---|---|---|
+| structure | Inventory: `vignette("introduction-to-ssm-analysis")` added | Kept | Rule 3 asks for this link. K1 found that the introduction vignette defines all four parameters. |
+| structure | Inventory: degree value 50 added | Kept | The base "roughly 50 degrees" was split across a line break. The head keeps it on one line, so the inventory now reads it. The number is the same. |
+| structure | Checklist "see Section 4" for ipsatizing became "See Section 5" | Kept | Section 5 covers ipsatizing and elevation. Section 4 names `ipsatize()` only as the deviation-scoring default. The claims reader confirmed this. |
+| structure | K2: "octant scores on the IIP-SC, and PD scale scores from the PDQ-4+" | Kept | The PD variables in `jz2017` are PDQ-4+ scales, not octants. |
+| structure | K6, K7: "So" and "because" make a link explicit | Kept | The base dash and semicolon implied the same link. |
+| structure | K8: "The classifications are heuristic classifications" | Kept | The base "They" pointed at the ratios by grammar but meant the classifications. The qualifier "not significance tests" stays. |
+| structure | P6, P9, P10, P17, P26, P27, P29, P33, P35, P38, P39 | Rejected | A gloss needs a fact that the page does not state: acronym expansions, "general factor", the correlation function and its harmonics, what each variant constrains, the expected false-certification rate, the VT2 and Rotation criterion, and which label "weak" means. |
+| structure | P5, P11, P12, P25, P28, P30, P31, P37 | Rejected | Base wording or base structure. An added reason, a table of print rules or a new referent is a new claim. |
+| structure | P1, P2, P3, P7, P21, P22, P34 | Rejected | The linked introduction vignette defines the term, or the term is standard for a reader who checks the numbers (ML, overreject, X and Y values, grid, $h^2$). |

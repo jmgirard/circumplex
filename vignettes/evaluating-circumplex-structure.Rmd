@@ -55,7 +55,8 @@ circumplex "factor". Its square, $\zeta^2$, is the scale's *communality*,
 the share of its variance that the circumplex explains. The model also
 yields the usual covariance-structure fit indices.
 
-On the raw-data path the default confidence intervals are bootstrapped. We
+`cpm_fit()` accepts raw data or a correlation matrix. On the raw-data path,
+the default confidence intervals are bootstrapped. We
 lower `boots` from its default of 2000 to keep this vignette quick to
 build. In practice, use the default.
 
@@ -212,12 +213,12 @@ package's own validation simulations:
   descriptively (bigger is worse), and prefer RMSEA/SRMR/CFI for judging
   approximate fit.
 
-For the same reasons, `summary()` prints a caution when the intervals are
-analytic (Wald). Analytic intervals are the only option on the
-correlation-matrix input path. The caution prints below $N = 2000$, and up
-to very large $N$ when a boundary marker is present. In validation, analytic
-intervals mis-covered in exactly those regimes. Prefer the bootstrap (the
-raw-data default) when you have raw data.
+For the same reasons, `summary()` prints a caution for analytic (Wald)
+intervals below $N = 2000$. When a boundary marker (defined in the next
+subsection) is present, the caution prints up to very large $N$. In
+validation, analytic intervals mis-covered in exactly those regimes.
+Analytic intervals are the only option on the correlation-matrix input path.
+Prefer the bootstrap (the raw-data default) when you have raw data.
 
 ### When a fit sits at a boundary
 
@@ -253,8 +254,8 @@ fired:
 `summary()` prints that list when markers fire, but on the analytic path it
 prints the list only within a sample-size window. On the bootstrap path, as
 in the fit displayed above, the list prints as a descriptive note at every
-sample size. Beside the note, a statement says that what was measured about
-the markers covers analytic intervals only. It also says that not every
+sample size. Beside the note, a statement says that what has been measured
+about the markers covers analytic intervals only. It also says that not every
 marker was measured, and *What a fired marker does and does not tell you*,
 below, has the particulars. So the markers are not validated as predictors
 of the bootstrap intervals they accompany. When the intervals are analytic,
@@ -348,15 +349,18 @@ interval contained the truth), not bias in the point estimates.
   well below nominal, and ill-conditioning was the worst of them. Two failure
   modes show up in the output rather than hiding in it. First, the analytic
   standard errors can come back missing. This happens for the angles and the
-  weights at the same time, because one singular curvature matrix takes all
-  three families down together. Second, an interval can collapse to zero
+  weights at the same time. The reason is that one singular curvature matrix
+  takes all three families (communality indices, angles and weights) down
+  together.
+  Second, an interval can collapse to zero
   width, because a negative asymptotic variance was clamped at zero. NO's
   zero-width interval above arrives by a third route: it is a percentile
   interval whose resamples sat on the boundary. But it reaches the reader the
   same way, as an interval with no usable width.
 - *Angles.* Taking all marker-firing fits together, angle intervals actually
   degraded somewhat *more* than communality intervals did. So the ranking
-  above belongs to those markers, not to the parameter families in general.
+  above (communality indices worst under those three markers) belongs to
+  those markers, not to the parameter families in general.
   The strongest single angle signal was the ill-conditioning marker. The
   small-weight marker was next, and the Heywood marker was the weakest of the
   three.
@@ -379,8 +383,8 @@ showed no evidence of predicting mis-coverage at all. Fits carrying it
 covered as well as fits without it. It is kept because it names a real
 feature of the solution, not because it forecasts trouble. Fourth, the
 numbers behind **Heywood communality**, **ill-conditioned Hessian** and
-**competing near-tied optima** come almost entirely from one deliberately
-provoking configuration. In that configuration, those markers fire often
+**competing near-tied optima** come almost entirely from one simulated
+configuration, chosen deliberately to provoke them. In that configuration, those markers fire often
 enough to measure. Even there, near-tied optima fired only rarely. Read them
 as what happens where those markers fire, not as how often they fire.
 
@@ -404,7 +408,8 @@ as what happens where those markers fire, not as how often they fire.
    the point estimates, as the solution the model actually fitted. Their bias
    in this regime is unmeasured, so read them as estimates, not to the digit.
    The second is the fit indices and the residual summary. A boundary changes
-   the behavior of the *intervals* around them, not how they are computed.
+   how the *intervals* around them behave. It does not change how the fit indices and
+   the residual summary are computed.
    Read them with the caution given earlier in this section, which is about
    field sample sizes, not about markers. The third is parameter intervals
    that came back with ordinary width. Read them knowing that marked fits
@@ -460,17 +465,18 @@ for these data with CircE. The fully constrained model (equal spacing *and*
 equal communality, the `"circulant"` variant) fits poorly. Relaxing the
 equal-spacing constraint improves fit to the edge of the conventional
 benchmarks: marginal by RMSEA, and acceptable by SRMR and CFI. They reported
-CFI = .824, TLI = .795 and RMSEA = .169 for the former. For the latter, they
-reported CFI = .958, TLI = .931 and RMSEA = .098.
+CFI = .824, TLI = .795 and RMSEA = .169 for the fully constrained model. For
+the model with the equal-spacing constraint relaxed, they reported CFI = .958, TLI = .931 and
+RMSEA = .098.
 
 Do not expect the default fit's indices to match theirs to the digit.
 CIRCUM/CircE fit a covariance version of the model with free scaling
 constants. By default, `cpm_fit()` fits the correlation structure directly,
-and the two differ slightly at finite sample sizes. Pass `scaling = "free"`
+and the two versions differ slightly at finite sample sizes. Pass `scaling = "free"`
 to fit their covariance parameterization and reproduce published
 CIRCUM/CircE output exactly.
 
-For the model test, the choice does not matter here. With correlation input,
+For the model test, the scaling choice does not matter here. With correlation input,
 the two families' test statistics are calibration-indistinguishable. In
 paired simulation at sample sizes 250–50,000, they differed by well under 1%
 of the model degrees of freedom. The free statistic never exceeds the
@@ -603,7 +609,9 @@ depend on the display precision. The diagnostic below measures, among other
 things, how well that certification rule performs at your configuration.
 
 We again use reduced settings to keep the vignette fast: `reps = 200`, a
-short amplitude ladder, and the smaller `boots` above. The defaults are
+short amplitude ladder, and the smaller `boots` above. The ladder is a set of
+scaling factors applied to the estimated amplitude (1 = as estimated),
+explained below. The defaults are
 `reps = 1000` and four ladder rungs, on an object built with the default
 `boots = 2000`. They give a Monte Carlo standard error under one percentage
 point for coverage near the nominal level, and they are recommended in
@@ -790,7 +798,8 @@ How to read this output:
   truth in the simulated replications, for each parameter. It does so at the
   amplitude that the profile was estimated to have (`Condition = 1`) and at
   fractions of it. Compare coverage against the nominal level using the
-  Wilson interval and the Bradley band. The verdict does this for you.
+  Wilson interval (an interval around the estimated coverage) and the
+  Bradley band. The verdict does this for you.
 - **The amplitude ladder** (`Condition` column) matters because your
   estimated amplitude is biased upward. The population that generated your
   data plausibly has *less* differentiation than your estimate. The rungs
@@ -904,9 +913,9 @@ around a circle, with comparable communalities? Or do they cluster into a
 small number of independent clusters (simple structure)? Acton and Revelle
 (A&R, 2004) evaluated ten such criteria by simulation. `fit_structure()`
 implements four of them: Fisher, Gap, VT2, and Rotation. It leaves out a
-variance-test variant that A&R found ineffective (VT1). It also leaves out a
-criterion so highly correlated with Rotation as to be redundant (MT, r = .99
-with RT in their Table 1). A fifth test, RANDALL, is not one of A&R's ten at
+variance-test variant that A&R found ineffective (VT1). It also leaves out MT,
+a criterion so highly correlated with the Rotation Test (RT) as to be
+redundant. In their Table 1, MT has r = .99 with RT. A fifth test, RANDALL, is not one of A&R's ten at
 all. It is an independent order-correspondence test (Hubert & Arabie, 1987,
 and Tracey, 1997). A&R excluded it from their own simulation because, unlike
 their criteria, its null distribution is known analytically rather than
@@ -1055,7 +1064,7 @@ It first reproduced their published 64/128-variable design, as a sanity gate
 on the simulation machinery. Then it reran the same design at $n_v = 8$ to
 derive the constants that `fit_structure()` actually uses. The effect of
 $n_v$ that the re-derivation found is large. The raw-scored Gap Test's
-"almost certain" cutoff moves from .01 at $n_v = 64/128$ to .35 at
+"almost certain" cutoff (a category that the next subsection defines) moves from .01 at $n_v = 64/128$ to .35 at
 $n_v = 8$. That is exactly why `fit_structure()` refuses to interpret any
 scale count it has not calibrated. At any $n_v \ne 8$, the statistics are
 still reported, but the classification column prints a dash rather than
@@ -1112,8 +1121,8 @@ overall endorsement before examining profile shape.
 
 For SSM analyses, its main cost is simple to state: **ipsatizing discards
 elevation.** After row-centering, every respondent's octant scores sum to
-zero. So a group's mean profile has zero mean by construction. Also, the
-covariances between the ipsatized scales and any external measure sum to
+zero. So a group's mean profile has zero mean by construction. For the same
+reason, the covariances between the ipsatized scales and any external measure sum to
 exactly zero. This forces the mean correlation toward zero, regardless of
 how strongly the construct relates to the instrument's general factor
 (Zimmermann & Wright, 2017, p. 4).
@@ -1174,7 +1183,7 @@ second is whether the inferential machinery of the SSM can be trusted at
 your sample size and profile (`ssm_ci_accuracy()`). Both are one function
 call, and both change what you should claim more often than users expect.
 In particular, amplitude and displacement intervals earn their trust only
-when the profile is genuinely differentiated, relative to the precision that
+when the profile is genuinely differentiated relative to the precision that
 your sample size affords.
 
 ## References

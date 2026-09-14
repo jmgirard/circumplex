@@ -47,7 +47,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 
 - [x] T1: Rewrite the first half of the page's prose, by section, and copy each edit into the shipped `.Rmd`. Coverage, CPM and fit-index statements keep their measured conditions. Check them against `cairn/DESIGN.md` "Statistical conventions and their rationale".
 - [x] T2: Rewrite the second half the same way.
-- [ ] T3: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add the M125 ledger rows. Update NEWS.
+- [x] T3: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add the M125 ledger rows. Update NEWS.
 - [ ] T4: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
 
 ## Work log
@@ -56,6 +56,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 - 2026-09-14: implement started on branch m125-plain-vignette-structure. Question gate skipped, because the plan left no choice open.
 - 2026-09-14: T1 done. Sections 1 and 2 rewritten in the page and copied into the shipped `.Rmd`. Both files sweep clean up to section 3, `--prose` output matches between them, and `--chunks` output matches base.
 - 2026-09-14: T2 done. Sections 3 to 6 rewritten and copied. Both files sweep with exit 0, `--prose` matches between them, `--chunks` matches base. The checklist's "see Section 4" for ipsatizing now says Section 5, the section that covers it. A ledger row at T3 records this.
+- 2026-09-14: T3 done. Inventory base-to-head: nothing removed, 2 items added (the intro link and "50" rejoined on one line). [O] claims reader: 10 items (K1 empty, K3 changed meaning), fixed K3, K4, K5, K9, K10. [O] one-read reader: 39 paragraphs, fixed 13, rejected 26 in grouped ledger rows. [O] gloss re-read of the fix round: 14 points, 2 problems (G8 ladder gloss, G13 RMSEA direction), both fixed with its wording. The full test run then failed `test-cpm_boundary_vignette.R:150`, because that test pins the phrase "what has been measured about the markers covers analytic intervals only". The phrase is restored, and that file passes with NOT_CRAN=true (43 pass). NEWS bullet extended to six vignettes. Ledger rows added.
 
 ## Decisions
 
