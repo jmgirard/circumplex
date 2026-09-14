@@ -203,8 +203,8 @@ for `cfi.robust` will come back empty rather than disagreeing. Neither outcome i
 a defect.
 
 Read the scaled statistic for what it is. The correction makes the test
-statistic match its reference distribution *in expectation*. It is a
-calibration, not an exactness guarantee, and it will not rescue a model that is
+statistic match its reference distribution *in expectation*, but it is a
+calibration, not an exactness guarantee. It will not rescue a model that is
 badly wrong. The usual fit-index cutoffs (Hu & Bentler, 1999) are no more or less
 appropriate than before. What changed is that the number compared to them no
 longer flatters fit in a systematic way.
@@ -231,9 +231,9 @@ rows that the estimator was actually handed. It is smaller than
 it is the `n` you supplied. Divide the first by the second and read across the
 row.
 
-At **N = 600** the test **over-rejects**. Its measured rejection rate was .06 to
-.11 at three populations, chosen to bracket the range of instruments that the
-function accepts. The uncorrected statistic under-rejects over the same range,
+At **N = 600** the test **over-rejects**, measured .06 to .11 at three
+populations chosen to bracket the range of instruments that the function
+accepts. The uncorrected statistic under-rejects over the same range,
 at .02 to .03. It also moves *further* from nominal as N grows. This is because
 its error is asymptotic, while the scaled statistic's error is a finite-sample
 one that shrinks away. The over-rejection at a fixed N grows with instrument
