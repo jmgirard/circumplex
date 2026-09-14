@@ -271,7 +271,7 @@ res <- ssm_analyze(
 # Small reps/boots keep the example fast; use the defaults in practice
 set.seed(23456)
 acc <- ssm_ci_accuracy(res, reps = 25, amplitude_factors = c(1, 0.25))
-#> Warning: CPM Hessian is ill-conditioned (condition number 6.69e+17): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 3.53e+17): angles may be clustered or parameters weakly determined.
 acc
 #> 
 #> SSM CI accuracy, simulated at your n and settings (25 replications per condition; bootstrap intervals with 100 replicates at level 0.95)
