@@ -1,13 +1,13 @@
 # M125: The circumplex-structure vignette reads as plain English
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M123
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the vignette ships in the package and on the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** m125-plain-vignette-structure
 
 ## Goal
 
@@ -45,7 +45,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 
 ## Tasks
 
-- [ ] T1: Rewrite the first half of the page's prose, by section, and copy each edit into the shipped `.Rmd`. Coverage, CPM and fit-index statements keep their measured conditions. Check them against `cairn/DESIGN.md` "Statistical conventions and their rationale".
+- [x] T1: Rewrite the first half of the page's prose, by section, and copy each edit into the shipped `.Rmd`. Coverage, CPM and fit-index statements keep their measured conditions. Check them against `cairn/DESIGN.md` "Statistical conventions and their rationale".
 - [ ] T2: Rewrite the second half the same way.
 - [ ] T3: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add the M125 ledger rows. Update NEWS.
 - [ ] T4: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
@@ -53,6 +53,8 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 ## Work log
 
 - 2026-09-14: created by /milestone-plan. The gate choices and the criteria audit are recorded in M123's work log. This milestone repeats M123's AC1-AC7 for its one page. It depends on M123 only, so it can run before or after M124.
+- 2026-09-14: implement started on branch m125-plain-vignette-structure. Question gate skipped, because the plan left no choice open.
+- 2026-09-14: T1 done. Sections 1 and 2 rewritten in the page and copied into the shipped `.Rmd`. Both files sweep clean up to section 3, `--prose` output matches between them, and `--chunks` output matches base.
 
 ## Decisions
 

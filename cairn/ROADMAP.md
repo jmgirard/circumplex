@@ -9,7 +9,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M125 | The circumplex-structure vignette reads as plain English | planned | M123 | normal | milestones/M125-plain-vignette-structure.md |
+| M125 | The circumplex-structure vignette reads as plain English | in-progress | M123 | normal | milestones/M125-plain-vignette-structure.md |
 | M124 | The axes-reliability and SEM vignettes read as plain English | done | M123 | normal | milestones/archive/M124-plain-vignettes-axes-sem.md |
 | M123 | The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep | done | — | normal | milestones/archive/M123-plain-vignettes-sweep.md |
 | M122 | Make the certificate suite exhaustive over the routes the shipped pricing can take | done | M121 | high | milestones/archive/M122-certificate-refusal-disposition.md |
