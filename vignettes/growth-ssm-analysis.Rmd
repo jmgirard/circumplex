@@ -40,11 +40,11 @@ circular-correct summaries.
 The division of labor is deliberate and mirrors the package's Bayesian
 vignette: **circumplex does not fit mixed models**. It prepares the
 coordinate data on the way in (`ssm_parameters_id()`). It converts fitted
-model draws on the way out (`ssm_draws()`). The growth model itself belongs
+model draws (random draws of the fitted model's estimates) on the way out
+(`ssm_draws()`). The growth model itself belongs
 to a dedicated mixed-modeling package. The reference recipe below uses
-**glmmTMB**. The same stacked-outcome model (Section 3) can also be fit with
-`nlme` (shipped with base R). There it uses `varIdent` for per-outcome
-variances and `corSymm` for a general correlation structure.
+**glmmTMB**. The same stacked-outcome formulation can also be fit with
+`nlme` (shipped with base R), using its `varIdent` and `corSymm` machinery.
 
 
 
@@ -96,9 +96,10 @@ head(coord, 3)
 ## 3. One joint model, not three separate ones
 
 The growth model treats the three coordinates as a *multivariate* outcome.
-Stack them into long format with an outcome indicator `dv`. Give each
-outcome its own intercept and slope. Let the person-level random effects be
-**correlated across outcomes**.
+Stack them into long format with an outcome indicator `dv`, a column that
+names the coordinate each row holds. Give each outcome its own intercept and
+slope. The person-level random effects are each person's own deviations from
+the group intercepts. Let them be **correlated across outcomes**.
 
 
 ``` r
@@ -132,26 +133,29 @@ covariance $\mathrm{Cov}(\hat{x}(t), \hat{y}(t))$.
 
 A tempting shortcut is to fit two (or three) univariate mixed models
 instead. It produces valid-looking output and **wrong $d(t)$ intervals**.
-Separate fits have independent covariance matrices, which silently sets
-$\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0$.
+Separate fits have independent covariance matrices, one per coordinate.
+Neither matrix holds the covariance between $\hat{x}(t)$ and $\hat{y}(t)$.
+So combining them silently sets $\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0$.
 
 The $x$ and $y$ person effects are each person's stable shifts in $x$ and
-$y$. One design in
-our validation simulations had strongly correlated $x$–$y$ person effects.
-This is a realistic situation, because the main direction along which
-person shifts vary is rarely the $x$ or $y$ axis. In that design, the shortcut's pointwise $d(t)$
-coverage drops from the nominal 95% to roughly 86%, while the joint recipe
-stays at nominal. Do not fit the coordinates separately.
+$y$. Our validation simulations included a design with strongly correlated
+$x$–$y$ person effects. In that design, the shortcut's pointwise $d(t)$
+coverage drops from the nominal 95% to roughly 86%. The joint recipe stays at
+nominal. Pointwise coverage is how often the interval at one wave contains
+the true direction. Such a
+design is realistic, because profile tilts are rarely aligned with an axis.
+Do not fit the coordinates separately.
 
 ## 4. From fixed effects to $(a(t), d(t))$ with intervals
 
-The fixed effects define the mean trajectory
-$(\hat{e}(t), \hat{x}(t), \hat{y}(t))$. Three steps carry uncertainty
+The fixed effects are the group intercepts and slopes. They define the mean
+trajectory $(\hat{e}(t), \hat{x}(t), \hat{y}(t))$. Three steps carry uncertainty
 through the nonlinear map from $(x, y)$ to $(a(t), d(t))$. First, draw
 coefficient vectors from the multivariate normal implied by the fixed-effect
-covariance matrix. This large-sample (asymptotic) approximation is the same
-one that `ssm_analyze(method = "montecarlo")` makes. Second, evaluate each
-draw at each wave. Third, hand the per-wave draws to `ssm_draws()`. It
+covariance matrix. That matrix holds the estimated sampling variances and
+covariances of the fixed effects. This is the same large-sample (asymptotic) step that the
+package's Monte Carlo engine takes. Second, evaluate each
+draw at each wave, which gives that draw's coordinates at that wave. Third, hand the per-wave draws to `ssm_draws()`. It
 applies the package's circular-statistics machinery (medians and circular
 means, equal-tailed intervals with correct wrapping at the boundary).
 
@@ -224,20 +228,20 @@ continuous. So the trajectory crosses the boundary as one continuous path
 instead of jumping a full turn. Values there may legitimately fall outside
 $[0°, 360°)$. Each interval is placed on its estimate's branch and keeps the
 width it was reported with. This holds even for an interval that straddles
-the boundary, which is stored with `d_lci > d_uci`.
+the boundary, which is stored with `d_lci > d_uci`, because each bound is
+wrapped into $[0°, 360°)$ on its own.
 
 Placing the intervals by hand is easy to get subtly wrong. The natural
-recipe is to "shift each bound by its signed distance from the estimate." A
-signed distance is never more than a half-turn. So that recipe silently
-cannot represent an interval wider than a half-turn. Such an interval is
-exactly the near-origin case that Section 5 is about. The function handles
-both cases: the interval that straddles the boundary and the interval wider
+recipe is to "shift each bound by its signed distance from the estimate."
+That recipe silently cannot represent an interval wider than a half-turn. Such an interval is
+exactly the near-origin case that Section 5 is about.
+`ssm_plot_trajectory()` handles both cases: the interval that straddles the boundary and the interval wider
 than a half-turn.
 
 ## 5. Certification: when $d(t)$ intervals are not interpretable
 
 A direction is only meaningful when the trajectory is far enough from the
-origin (amplitude well above zero). As $a(t) \to 0$, the draws of $d(t)$
+origin of the $(x, y)$ plane. As $a(t) \to 0$, the draws of $d(t)$
 become diffuse or bimodal. A quantile interval of them is then not a
 trustworthy statement about direction.
 
@@ -299,9 +303,8 @@ mid
 The printed note is the certification rule firing. At this wave, the
 amplitude interval sits too close to zero. The displacement interval, which
 here spans more than half the circle, is not a statement about direction.
-We simulated trajectories that pass near the origin like this one. In those
-validation simulations, the caution fires at the wave near the origin in
-essentially every replicate. Meanwhile, the waves far from the origin remain
+In our validation simulations of this near-origin case, the caution fires
+at the degraded wave in essentially every replicate. Meanwhile, the waves far from the origin remain
 certified, and their intervals keep their nominal coverage.
 
 Assembling this fit's full trajectory the same way, and carrying the
@@ -332,7 +335,7 @@ ssm_plot_trajectory(trajectory2, time = "wave")
 <img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"  />
 
 Uncertified waves are drawn as **hollow** points on the displacement panel.
-Read them as waves with no interpretable direction, not as estimates with
+Read them as gaps in the argument, not as estimates with
 wide intervals. The
 amplitude panel shows why: its interval collapses toward zero as the group
 passes the origin. The displacement interval at such a wave can cover most
@@ -355,8 +358,11 @@ anticonservative (too narrow). This is a property of the mixed-model
 machinery, not of the SSM transform, so the user must apply the remedy.
 
 With modest N, prefer degrees-of-freedom-adjusted inference or a parametric
-bootstrap of the fixed effects over raw normal-approximation draws.
-Degrees-of-freedom-adjusted inference includes the Kenward–Roger adjustment for
+bootstrap of the fixed effects over raw normal-approximation draws. A
+parametric bootstrap refits the model to data simulated from the fitted
+model.
+Degrees-of-freedom-adjusted inference widens intervals to account for a
+small sample. It includes the Kenward–Roger adjustment for
 `lme4` fits via **pbkrtest**, the approximate denominator degrees of freedom
 `nlme` supplies, or $t$-quantile-based intervals.
 
@@ -375,9 +381,10 @@ angle_unwrap(d_person)
 ```
 
 `angle_unwrap()` wraps its input into [0°, 360°). Then it accumulates the
-shortest signed rotation between successive waves. By the package's
+shortest signed rotation between successive waves: it adds up each
+wave-to-wave change, taking the shorter way around the circle. By the package's
 half-turn convention, an exact 180° step ascends (it counts as +180°). An
-`NA` means that no later wave can be placed on a branch, so `NA` propagates
+`NA` makes the branch of every later wave ambiguous, so `NA` propagates
 onward. The unwrapped values live on an ordinary line, so any
 univariate mixed model applies. This framing models the *mean of the
 person-level directions*. That is a legitimate (and different) estimand, or
@@ -423,7 +430,8 @@ statement:
   setting inherits it intact.
 
 Finally, the multivariate normal (MVN) draw propagation used here is a
-large-sample approximation. It is defensible in the concentrated regime
+large-sample approximation. Draw propagation is the Section 4 method of
+carrying uncertainty through random draws. It is defensible in the concentrated regime
 (Section 7). Outside that regime, the Section 5 certification guards it.
 The fully model-based upgrade is **projected-normal regression**, a
 regression model for angle outcomes. The **bpnreg** package is one

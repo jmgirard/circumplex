@@ -5,7 +5,7 @@
 # forbid. That page defines "swept prose", "sentence" and "dash"; this script is
 # the definition in code, so change the two together.
 #
-#   LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <file>...      # report
+#   Rscript tools/prose-sweep.R <file>...                         # report
 #   Rscript tools/prose-sweep.R --prose <file>...                 # one sentence per line
 #   Rscript tools/prose-sweep.R --chunks <file>...                # fenced blocks, no #> lines
 #   Rscript tools/prose-sweep.R --inventory [--terms <md>] <file>...
@@ -22,8 +22,9 @@
 # as one word, and neither is searched for a dash or a semicolon. Ids are
 # searched everywhere in the prose, code spans, link text and URLs included.
 #
-# Exit status: 0 clean, 1 on a finding, 2 when a file has no sentences, 3 on a
-# usage error. With several files the highest status wins. `--chunks` reads no
+# Input must be UTF-8, whatever the locale. Exit status: 0 clean, 1 on a
+# finding, 2 when a file has no sentences, 3 on a usage error (a line that is
+# not valid UTF-8 included). With several files the highest status wins. `--chunks` reads no
 # prose, so it never exits 1 or 2.
 #
 # Base R only.
@@ -31,6 +32,23 @@
 MAX_WORDS <- 25L
 ID_PATTERN <- "\\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\\b"
 EMDASH <- "—"
+MINUS <- "−"
+DEGREE <- "°"
+
+# paste0() in a non-UTF-8 locale returns unmarked bytes, which the regex engine
+# then refuses to translate, so each pattern built from the constants above is
+# marked UTF-8 again.
+utf8 <- function(x) {
+  Encoding(x) <- "UTF-8"
+  x
+}
+DASH_RE <- utf8(paste0(EMDASH, "|---|(?<=\\s)--(?=\\s)|&mdash;"))
+# A leading minus (a hyphen or U+2212) after a space, an opening bracket or the
+# start of the text stays on its number in the inventory, so a sign flip shows.
+SIGN_RE <- paste0("(?<=^|[\\s(\\[])[-", MINUS, "](?=[0-9])")
+DEGREE_RE <- utf8(paste0("(?:", SIGN_RE, ")?[0-9]+(\\.[0-9]+)?(", DEGREE, "| degrees?\\b)"))
+DEGREE_UNIT_RE <- utf8(paste0("(", DEGREE, "| degrees?)$"))
+NUMBER_RE <- utf8(paste0("(?:", SIGN_RE, "|(?<![A-Za-z0-9_.]))[0-9]+(\\.[0-9]+)?(?![A-Za-z0-9_])"))
 CODE_TOKEN <- "CODESPAN"
 MATH_TOKEN <- "MATHSPAN"
 DEFAULT_TERMS <- "cairn/references/plain-vignettes.md"
@@ -41,15 +59,21 @@ usage_error <- function(msg) {
   quit(status = 3L)
 }
 
+# Reads the bytes as they are and marks them UTF-8. A connection that
+# re-encodes would stop at the first invalid byte with only a warning, so the
+# rest of the page would go unswept; an invalid line is a usage error instead.
 read_input <- function(path) {
   if (identical(path, "-")) {
-    con <- file("stdin", encoding = "UTF-8")
+    con <- file("stdin")
   } else {
     if (!file.exists(path)) usage_error(paste0("no such file: ", path))
-    con <- file(path, encoding = "UTF-8")
+    con <- file(path)
   }
   on.exit(close(con))
-  readLines(con, warn = FALSE)
+  lines <- readLines(con, warn = FALSE, encoding = "UTF-8")
+  bad <- which(!validUTF8(lines))
+  if (length(bad)) usage_error(sprintf("%s: line %d is not valid UTF-8", path, bad[[1]]))
+  lines
 }
 
 # Splits a page into prose lines and fenced blocks. Returns the prose as a
@@ -300,8 +324,7 @@ sweep_findings <- function(units, label) {
       }
     }
     masked <- mask_spans(u$text)
-    dash_re <- paste0(EMDASH, "|---|(?<=\\s)--(?=\\s)|&mdash;")
-    for (pos in hits(masked, dash_re)) {
+    for (pos in hits(masked, DASH_RE)) {
       found <- c(found, sprintf("%s:%d: dash: %s", label, unit_line_of(u, masked, pos), context(masked, pos)))
     }
     no_entities <- gsub(ENTITY_RE, "ENTITY", masked, perl = TRUE)
@@ -352,10 +375,11 @@ inventory <- function(units, terms) {
     items <- c(items, paste0("code: ", trimws(gsub("^`+|`+$", "", codes))))
     no_code <- gsub(CODE_RE, " ", text, perl = TRUE)
     flat <- gsub("\n", " ", no_code, fixed = TRUE)
-    deg <- regmatches(flat, gregexpr("[0-9]+(\\.[0-9]+)?(°| degrees?\\b)", flat, perl = TRUE))[[1]]
-    items <- c(items, paste0("degree: ", sub("(°| degrees?)$", "", deg, perl = TRUE)))
-    nums <- regmatches(flat, gregexpr("(?<![A-Za-z0-9_.])[0-9]+(\\.[0-9]+)?(?![A-Za-z0-9_])", flat, perl = TRUE))[[1]]
-    items <- c(items, paste0("number: ", nums))
+    deg <- regmatches(flat, gregexpr(DEGREE_RE, flat, perl = TRUE))[[1]]
+    deg <- gsub(MINUS, "-", sub(DEGREE_UNIT_RE, "", deg, perl = TRUE), fixed = TRUE)
+    items <- c(items, paste0("degree: ", deg))
+    nums <- regmatches(flat, gregexpr(NUMBER_RE, flat, perl = TRUE))[[1]]
+    items <- c(items, paste0("number: ", gsub(MINUS, "-", nums, fixed = TRUE)))
     lower <- tolower(flat)
     for (t in terms) {
       if (grepl(paste0("\\b", t), lower, perl = TRUE)) items <- c(items, paste0("term: ", t))

@@ -7,17 +7,21 @@ sweep_script <- function() {
   normalizePath(path)
 }
 
-run_sweep <- function(lines, args = character(0)) {
+run_sweep <- function(lines, args = character(0), env = "LC_ALL=en_US.UTF-8") {
   script <- sweep_script()
   fixture <- tempfile(fileext = ".Rmd")
-  con <- file(fixture, open = "w", encoding = "UTF-8")
-  writeLines(lines, con)
-  close(con)
+  if (is.raw(lines)) {
+    writeBin(lines, fixture)
+  } else {
+    con <- file(fixture, open = "w", encoding = "UTF-8")
+    writeLines(lines, con)
+    close(con)
+  }
   out <- suppressWarnings(system2(
     file.path(R.home("bin"), "Rscript"),
     c(shQuote(script), args, shQuote(fixture)),
     stdout = TRUE, stderr = TRUE,
-    env = "LC_ALL=en_US.UTF-8"
+    env = env
   ))
   status <- attr(out, "status")
   list(out = as.character(out), status = if (is.null(status)) 0L else status)
@@ -215,4 +219,30 @@ test_that("--inventory lists numbers, degrees, code spans and precision terms", 
     "number: 0", "number: 360", "number: 90", "number: 95",
     "term: credible", "term: interval"
   )))
+
+  # A sign flip must change the inventory: a leading minus (hyphen or U+2212)
+  # stays on its number, but a hyphen inside a word does not become a sign.
+  page <- c("A turn of -30° is not −340° or 340 degrees, and x-3 is a label.")
+  res <- run_sweep(page, c("--inventory", "--terms", shQuote(terms)))
+  expect_identical(res$status, 0L)
+  expect_identical(res$out, sort(c(
+    "degree: -30", "degree: -340", "degree: 340",
+    "number: -30", "number: -340", "number: 340", "number: 3"
+  )))
+})
+
+test_that("a file that is not valid UTF-8 is refused, not silently truncated", {
+  # Line 3 holds a dash and a semicolon after a Latin-1 byte on line 1. A reader
+  # that stops at the bad byte would miss them and exit 0.
+  bytes <- c(charToRaw("Caf"), as.raw(0xe9), charToRaw(" line.\n\nA pause "),
+             as.raw(c(0xe2, 0x80, 0x94)), charToRaw(" then; more.\n"))
+  res <- run_sweep(bytes)
+  expect_identical(res$status, 3L)
+  expect_match(res$out, "line 1 is not valid UTF-8", all = FALSE)
+})
+
+test_that("an em dash is still found outside a UTF-8 locale", {
+  res <- run_sweep(c("Intro line.", "", "A pause — then more."), env = "LC_ALL=C")
+  expect_identical(res$status, 1L)
+  expect_identical(finding_keys(res$out), "3 dash")
 })

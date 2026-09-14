@@ -26,15 +26,19 @@ The package's `ssm_analyze()` estimates them with bootstrap or Monte Carlo
 confidence intervals.
 
 A Bayesian alternative is attractive when you want prior information or
-hierarchical structure. An example of hierarchical structure is partial
+hierarchical structure. Prior information is what you know about the
+parameters before you see the data. An example of hierarchical structure is partial
 pooling across persons or groups, where each person's or group's estimate is
 pulled toward the overall estimate. A Bayesian alternative is also attractive
-when you want full posterior distributions for derived quantities.
+when you want full posterior distributions for derived quantities, such as
+amplitude and displacement. A posterior distribution combines the prior and
+the data into one distribution for each parameter.
 
 The division of labor is deliberate. A general-purpose Bayesian package, such
 as **brms**, fits the model. Then `ssm_draws()` converts the resulting
-posterior draws into SSM parameter draws. It summarizes them with the same
-circular statistics that the rest of the package uses. Displacement is an
+posterior draws into SSM parameter draws. Posterior draws are random samples
+from the posterior distribution. `ssm_draws()` summarizes them with the same
+circular statistics (statistics for angles) that the rest of the package uses. Displacement is an
 angle, so its posterior needs circular treatment. In particular, an interval
 that straddles the 0°/360° boundary must wrap across 0° rather than invert.
 An inverted interval runs the long way around the circle. `ssm_draws()`
@@ -85,9 +89,11 @@ stopifnot(!isTRUE(all.equal(atan2(x_hat, y_hat) * 180 / pi, 90)))  # swapped
 We model raw octant scores from the `jz2017` data. Octant scores are scores
 on eight scales placed 45° apart around the circle. The data are in long
 format, with one row per person-scale observation. A random intercept per
-person is included to absorb the dependence among a person's eight scores. The fixed effects
-(intercept, cosine coefficient, sine coefficient) are then the group-level
-$(e, x, y)$. A seeded subsample of 200 persons keeps the example light.
+person gives each person their own baseline level. It is included to absorb
+the dependence among a person's eight scores. The fixed effects are the
+coefficients shared by all persons (intercept, cosine coefficient, sine
+coefficient). They are then the group-level $(e, x, y)$. A random subsample
+of 200 persons, drawn with a fixed seed, keeps the example light.
 
 ```{r data-prep}
 data("jz2017")
@@ -150,8 +156,11 @@ summary(res)
 
 Each posterior draw of $(x, y)$ was converted to a draw of $(a, d)$. Because
 $d$ is an angle, the displacement's credible interval comes from circular
-quantiles. The draws are centered on their circular mean and unwrapped, the
-quantiles are taken, and the bounds are re-wrapped. The interval never comes from naive
+quantiles. A credible interval is the Bayesian counterpart of a confidence
+interval. The circular mean is the direction of the average of the angles
+taken as unit vectors. The draws are centered on their circular mean and
+unwrapped (laid on a line with no jump at 360°). Then the quantiles are
+taken, and the bounds are re-wrapped. The interval never comes from naive
 linear quantiles that would misbehave near 0°/360°.
 
 Point estimates are posterior medians for the linear parameters: elevation,
@@ -160,7 +169,8 @@ would overstate it. For displacement, the point estimate is the circular
 mean.
 
 One caveat to keep in mind: these marginal summaries are not jointly
-coherent. The reported amplitude is the median of the amplitude draws. It is
+coherent. A marginal summary describes one parameter's draws on its own, so
+the summaries need not agree with each other. The reported amplitude is the median of the amplitude draws. It is
 not $\sqrt{x^2 + y^2}$ evaluated at the reported $x$ and $y$. Likewise, the
 reported displacement is not the direction of the reported $(x, y)$. Each is
 the honest marginal summary of its own posterior.
@@ -172,11 +182,13 @@ fit draws from `ssm_draws()`.
 ## 5. The induced prior on amplitude
 
 Independent priors on $x$ and $y$ do not induce a flat prior on the
-structural parameters. With $x, y \sim \mathrm{Normal}(0, 1)$, the implied
+structural parameters, amplitude and displacement. The induced prior is the
+prior on $a$ and $d$ that the priors on $x$ and $y$ imply. With $x, y \sim \mathrm{Normal}(0, 1)$, the implied
 prior on $a = \sqrt{x^2 + y^2}$ is Rayleigh-shaped: zero density at $a = 0$,
 then a single peak, with a right skew. Its mass is pushed *away* from $a = 0$.
 But the implied prior on $d$ is uniform. A ten-line prior-predictive
-simulation makes the amplitude prior visible:
+simulation draws $x$ and $y$ from their priors and computes $a$. It makes
+the amplitude prior visible:
 
 ```{r induced-prior, fig.width = 5, fig.height = 3}
 x_prior <- rnorm(10000, 0, 1)

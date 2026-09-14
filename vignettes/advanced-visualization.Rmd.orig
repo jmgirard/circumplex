@@ -121,8 +121,8 @@ The coordinate system owns the amplitude-to-radius mapping. So `amax` is set
 exactly once per plot, and the canvas and the data layers cannot disagree about
 what a given radius means. (Earlier versions of the package took an `amax`
 argument on each layer. Those arguments are now deprecated and ignored, with a
-one-time note.) Leaving `amax = NULL` sets it from the amplitude values in
-the data, as `ssm_plot_circle()` does.
+one-time note.) Leaving `amax = NULL` trains it from the data, as
+`ssm_plot_circle()` does.
 
 ### Moving the center
 
@@ -400,8 +400,7 @@ second to the third wave is drawn as the short 25 degree arc across the 0/360
 pole. It is not drawn as a 335 degree sweep the long way round. The path is curved
 because `coord_circumplex()` munches each segment along the polar geodesic: it
 splits the segment into short pieces that bend with the circle. The layer
-decides which points connect, in what order, and along the short route across
-the boundary. The coordinate system only curves each segment.
+supplies the ordering, not the drawing.
 
 Occasions are connected in the order the rows appear in the data, exactly as
 `geom_path()` does. Mapping `group` draws one path per series. When you

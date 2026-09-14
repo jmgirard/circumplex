@@ -49,6 +49,12 @@ The `--inventory` mode of `tools/prose-sweep.R` reads the terms below. It matche
 - undefined
 - deprecated
 - approximate
+- significance
+- hypothesis
+- unwrap
+- nominal
+- certif
+- simultaneous
 
 ## The prose sweep
 
@@ -65,13 +71,13 @@ A period after a single capital letter ("J.") does not end a sentence. A period 
 
 A dash is any of U+2014 (the em dash), `---`, ` -- ` (two hyphens with a space on each side) and `&mdash;`. The sweep does not search code spans or math spans for a dash or a semicolon. HTML entities such as `&amp;` do not count as semicolons. The sweep searches for ids everywhere in swept prose, code spans, link text and URLs included. The id pattern is `\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\b`.
 
-The sweep exits 0 on a clean page and 1 on a finding. If a file has no sentences, it exits 2. On a usage error, it exits 3. The `--chunks` mode reads no prose, so it never exits 1 or 2. If the locale is not UTF-8, the em dash does not match, so set it:
+The sweep exits 0 on a clean page and 1 on a finding. If a file has no sentences, it exits 2. On a usage error, it exits 3. The `--chunks` mode reads no prose, so it never exits 1 or 2. The sweep reads its input as UTF-8 in any locale. If a line is not valid UTF-8, it exits 3 and names the line (corrected M123 review: the page said a non-UTF-8 locale missed the em dash, but the script crashed with exit 1):
 
 ```
-LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R vignettes/<name>.Rmd.orig
+Rscript tools/prose-sweep.R vignettes/<name>.Rmd.orig
 ```
 
-`--prose` prints one sentence per line. `--chunks` prints every fenced block with its opening and closing lines and without its `#>` output lines. `--inventory` prints, sorted and once each, every number, degree value, code-span content and precision-list term in the swept prose.
+`--prose` prints one sentence per line. `--chunks` prints every fenced block with its opening and closing lines and without its `#>` output lines. `--inventory` prints, sorted and once each, every number, degree value, code-span content and precision-list term in the swept prose. A minus sign (a hyphen or U+2212) after a space, an opening bracket or the start of a unit stays on its number. The inventory records whether an item appears, not how often.
 
 `tests/testthat/test-prose-sweep.R` plants each finding kind in several forms and places and asserts which finding each plant produces.
 
@@ -91,7 +97,7 @@ Reader reports, numbered as the rows cite them: claims reader C1 to C20, one-rea
 |---|---|---|---|
 | bayesian, growth, visualization | Inventory: `vignette("introduction-to-ssm-analysis")` added (C1, C6, V1) | Kept | Rule 3 asks for this link. The introduction vignette exists in `vignettes/`. |
 | bayesian, growth, visualization | Inventory: "45°" added | Kept | The gloss "eight scales placed 45° apart" matches `octants()`, whose eight angles are the multiples of 45 from 45 to 360. |
-| growth | Inventory: `ssm_analyze(method = "montecarlo")` added (G7) | Kept | It names "the package's Monte Carlo engine". The `method` documentation in `R/ssm_analysis.R` describes draws from an asymptotic multivariate normal. |
+| growth | Inventory: `ssm_analyze(method = "montecarlo")` added (G7) | Removed at review (corrected M123 review) | The review's claims reader found "the same one" stronger than the base "the same asymptotic move", so the base wording returned. |
 | bayesian | C5: "Convert them to ..., or pass profile draws" is an instruction | Kept | The claim is the same: both routes make the draws summarizable. |
 | growth | C15: "multivariate normal (MVN)" gloss | Kept | The expansion is correct. |
 | growth | C16: "exact posterior inference" for projected-normal regression | Kept as a base claim | The base text makes the claim. The fix moved the claim back onto the method, not the package. Whether "exact" fits MCMC output is outside a form-only pass. |
