@@ -81,12 +81,24 @@ A pre-computed vignette ships as a knitted `.Rmd`, and `tools/precompute-vignett
 
 ## Ledger
 
-Each row records an item that a reader or the inventory comparison listed and that the pass kept as it is, with its evidence. Dispositions that fix the page need no row.
+Each row records an item that a reader or the inventory comparison listed and that the pass kept as it is, with its evidence. A fixed item needs no row. The milestone's work log gives the count of fixed items per reader.
 
 ### M123 (bayesian-ssm-analysis, growth-ssm-analysis, advanced-visualization)
 
+Reader reports, numbered as the rows cite them: claims reader C1 to C20, one-read reader B1 to B10 (Bayesian), G1 to G16 (growth), V1 to V11 (visualization).
+
 | Page | Item | Disposition | Evidence |
 |---|---|---|---|
+| bayesian, growth, visualization | Inventory: `vignette("introduction-to-ssm-analysis")` added (C1, C6, V1) | Kept | Rule 3 asks for this link. The introduction vignette exists in `vignettes/`. |
+| bayesian, growth, visualization | Inventory: "45°" added | Kept | The gloss "eight scales placed 45° apart" matches `octants()`, whose eight angles are the multiples of 45 from 45 to 360. |
+| growth | Inventory: `ssm_analyze(method = "montecarlo")` added (G7) | Kept | It names "the package's Monte Carlo engine". The `method` documentation in `R/ssm_analysis.R` describes draws from an asymptotic multivariate normal. |
+| bayesian | C5: "Convert them to ..., or pass profile draws" is an instruction | Kept | The claim is the same: both routes make the draws summarizable. |
+| growth | C15: "multivariate normal (MVN)" gloss | Kept | The expansion is correct. |
+| growth | C16: "exact posterior inference" for projected-normal regression | Kept as a base claim | The base text makes the claim. The fix moved the claim back onto the method, not the package. Whether "exact" fits MCMC output is outside a form-only pass. |
+| bayesian | B1: "derived quantities" has no example | Kept | The phrase is general on purpose. Partial pooling is now glossed. |
+| bayesian | B4: "group-level" can clash with "groups" | Kept | "Group-level" is the standard name for fixed effects in a mixed model. Octant is now glossed. |
+| growth | G2: "circular-correct summaries" not explained | Kept | Section 4 names them (circular means, wrapped intervals). $x$, $y$ and $(a(t), d(t))$ are now defined. |
+| growth | G7: "equal-tailed intervals" | Kept | This is a standard statistics term for the reader profile. |
 
 ### M124 (axes-reliability, sem-based-ssm-analysis)
 

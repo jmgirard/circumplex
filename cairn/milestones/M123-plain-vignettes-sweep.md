@@ -72,6 +72,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: T4 done. Bayesian page sweep exits 0 (was 11 long sentences, 11 dashes, 2 semicolons). `--chunks` unchanged. Inventory loses nothing and gains one link to the introduction vignette, added where the page first names the three parameters.
 - 2026-09-14: T5 done. Growth page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 29 long sentences, 28 dashes, 6 semicolons). `--chunks` unchanged on both. The added and removed lines of the two diffs are identical. Inventory gains only the introduction-vignette link.
 - 2026-09-14: T6 done. Visualization page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 33 long sentences, 15 dashes, 5 semicolons). `--chunks` unchanged on both, the two diffs carry identical edits, and the inventory is unchanged. Two glosses added in place: "resultant (the average vector)" and "munches (splits into short pieces)".
+- 2026-09-14: T7 in progress (checkpoint). Inventory comparison: no item lost on any page. The [O] claims reader listed 20 items (1 medium), and the [O] one-read reader listed 37 paragraphs. Fixed 16 claims items and 33 one-read items on all five files, with each gloss checked against the code. The other 8 kept items are ledger rows. NEWS bullet drafted. An [O] re-read of the fix diff is still running.
 
 ## Decisions
 

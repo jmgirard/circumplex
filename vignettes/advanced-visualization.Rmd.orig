@@ -31,6 +31,8 @@ they each produce a finished plot with a fixed set of layers. Sometimes you want
 more control. You may want to overlay individual respondents on a group profile,
 or to zoom in on a band of amplitudes. Or you may want to restyle the points, or
 to place several circumplex panels side by side.
+`vignette("introduction-to-ssm-analysis")` defines the SSM terms used here,
+such as profile, amplitude and displacement.
 
 To make that possible, `circumplex` exposes the building blocks that the
 built-in plots are themselves made of. These are ordinary
@@ -45,11 +47,11 @@ built-in plots are themselves made of. These are ordinary
 - `geom_ssm_point()` and `geom_ssm_arc()` are the **layers** that place profile
   points and their confidence regions in the circle, taking amplitude and
   displacement directly as aesthetics.
-- `theme_circumplex()` is the **theme** the canvas is drawn with, and the rings
-  and spokes are ordinary themed panel furniture that respond to further
-  theming.
+- `theme_circumplex()` is the **theme** the canvas is drawn with. The rings
+  and spokes are ordinary panel gridlines, so further theming restyles them.
 - `scale_x_circumplex()` is a **scale** for the angle axis of linear circumplex
-  plots (such as the score-by-angle curve).
+  plots. An example is the score-by-angle curve, with scale angle on a
+  straight x-axis and score on the y-axis.
 
 This vignette works through each of these and then combines them.
 
@@ -57,7 +59,8 @@ This vignette works through each of these and then combines them.
 
 `ggcircumplex()` returns a `ggplot2` object containing just the circular
 backdrop, with no data drawn on it yet. By default it uses octant scales
-labeled by their angular position in degrees:
+(eight scales placed 45° apart), labeled by their angular position in
+degrees:
 
 ```{r canvas-default}
 ggcircumplex()
@@ -118,8 +121,8 @@ The coordinate system owns the amplitude-to-radius mapping. So `amax` is set
 exactly once per plot, and the canvas and the data layers cannot disagree about
 what a given radius means. (Earlier versions of the package took an `amax`
 argument on each layer. Those arguments are now deprecated and ignored, with a
-one-time note.) Leaving `amax = NULL` trains it from the data, as
-`ssm_plot_circle()` does.
+one-time note.) Leaving `amax = NULL` sets it from the amplitude values in
+the data, as `ssm_plot_circle()` does.
 
 ### Moving the center
 
@@ -161,8 +164,8 @@ ggplot(results$results) +
 
 Note that these examples build the canvas from its parts: the coordinate
 system, an x-scale carrying the spoke breaks and labels, and the theme. They do
-not add a second coordinate system on top of `ggcircumplex()`, which `ggplot2`
-would replace with a message.
+not add a second coordinate system on top of `ggcircumplex()`. If they did,
+`ggplot2` would replace the existing coordinate system and print a message.
 
 ## Placing SSM results in the circle
 
@@ -201,9 +204,9 @@ It is not a single joint confidence region with its own coverage level, and it
 is not a hypothesis test.
 
 The angular extent in particular is a range of plausible *directions*. Zero
-degrees is an arbitrary reference direction rather than a null value. So the
-angular extent should not be read as a significance test. A confidence interval
-for a linear parameter (such as elevation) can be read that way. Displacement is
+degrees is an arbitrary reference direction rather than a null value. So,
+unlike a confidence interval for a linear parameter (such as elevation), the
+angular extent should not be read as a significance test. Displacement is
 only worth interpreting at all when the amplitude interval is clearly above zero
 and the model fits reasonably well. See the "Introduction to SSM Analysis"
 vignette and `?ssm_analyze`.
@@ -267,16 +270,16 @@ ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
 ```
 
 The individual points spread widely around the circle, while the group summary
-sits close to the origin. None of the built-in functions produce this picture
-directly. That contrast is not an artifact. The group profile is the SSM of the
-*mean* scale scores, so its position is the average of the individual positions
-in (x, y). Averaging vectors that point in different directions yields a
-resultant (the average vector) shorter than the typical individual vector. The
-two amplitudes printed above show this. A group
+sits close to the origin. That contrast is not an artifact. The group profile
+is the SSM of the *mean* scale scores. So its position is the average of the
+individual positions in (x, y), the Cartesian coordinates of each profile's
+point in the circle. Averaging vectors that point in different directions
+yields an average vector shorter than the typical individual vector. The two
+amplitudes printed above show this. A group
 amplitude smaller than a typical person's therefore indicates disagreement about
-*direction* among the respondents, not that each person's profile is flat. Any
-other `ggplot2` layer (text annotations, additional geoms, faceting) can be
-added the same way.
+*direction* among the respondents, not that each person's profile is flat. None
+of the built-in functions produce this picture directly. Any other `ggplot2`
+layer (text annotations, additional geoms, faceting) can be added the same way.
 
 ## Trajectories across occasions
 
@@ -330,7 +333,8 @@ ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
 
 Two things about the displacement panel are worth reading carefully. First, it
-is drawn on an *unwrapped* branch. The profile crosses the 0/360 boundary
+is drawn on an *unwrapped* branch, which lets angles go past 360 so that the
+line stays continuous. The profile crosses the 0/360 boundary
 between the second and third wave. Rather than jumping a full turn, the panel
 continues past 360, so values outside \[0, 360) are expected there.
 
@@ -342,15 +346,16 @@ factor, set its levels in temporal order.
 
 The unwrap carries an assumption that no data can check: that the profile
 rotates less than a half-turn between consecutive occasions. Waves that are far
-apart in time, or a series with a gap, could rotate further than that. They
-would be drawn as the shorter rotation regardless. So read widely spaced
-occasions with that in mind.
+apart in time, or a series with a gap, could rotate further than that. Such a
+rotation would be drawn as the shorter rotation regardless. So read widely
+spaced occasions with that in mind.
 
 A time point's amplitude interval can be too close to zero for its displacement
 to be interpretable. Such a time point is drawn as a hollow point. The hollow
 point marks an interpretability precondition, not a significance test.
-`drop_xy = TRUE` above omits the X-value and Y-value panels, leaving elevation,
-amplitude, and displacement.
+
+`drop_xy = TRUE` above omits the X-value and Y-value panels (the $x$ and $y$
+coordinates of each profile), leaving elevation, amplitude, and displacement.
 
 The bands are the per-occasion confidence intervals, one per time point. They
 are not a simultaneous confidence band for the trajectory as a whole. Overlap
@@ -393,14 +398,17 @@ The arrowhead marks the direction of time. Note what the layer does at the
 boundary. This profile moves from 330 to 355 to 20 degrees. The step from the
 second to the third wave is drawn as the short 25 degree arc across the 0/360
 pole. It is not drawn as a 335 degree sweep the long way round. The path is curved
-because `coord_circumplex()` munches (splits into short pieces) each segment
-along the polar geodesic. The layer supplies the ordering, not the drawing.
+because `coord_circumplex()` munches each segment along the polar geodesic: it
+splits the segment into short pieces that bend with the circle. The layer
+decides which points connect and in what order. The coordinate system decides
+how each connection is drawn.
 
 Occasions are connected in the order the rows appear in the data, exactly as
 `geom_path()` does. Mapping `group` draws one path per series. When you
 assemble a data frame by hand, sort it into time order first. For the reason
 noted above, sorting occasion labels as text puts `T10` before `T2` and
-silently reverses time. The wrapper below does that sorting for you.
+silently reverses time. `ssm_plot_circle()`, shown next, does that sorting
+for you.
 
 The same figure is available ready-made from `ssm_plot_circle()`, which adds the
 path to its usual points and confidence wedges:

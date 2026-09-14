@@ -25,18 +25,20 @@ elevation $e$, an amplitude $a$, and a displacement $d$.
 The package's `ssm_analyze()` estimates them with bootstrap or Monte Carlo
 confidence intervals.
 
-A Bayesian alternative is attractive in three cases. You want to use prior
-information. You want hierarchical structure, for example partial pooling
-across persons or groups. Or you want full posterior distributions for
-derived quantities.
+A Bayesian alternative is attractive when you want prior information or
+hierarchical structure. An example of hierarchical structure is partial
+pooling across persons or groups, where each person's or group's estimate is
+pulled toward the overall estimate. A Bayesian alternative is also attractive
+when you want full posterior distributions for derived quantities.
 
 The division of labor is deliberate. A general-purpose Bayesian package, such
 as **brms**, fits the model. Then `ssm_draws()` converts the resulting
 posterior draws into SSM parameter draws. It summarizes them with the same
 circular statistics that the rest of the package uses. Displacement is an
 angle, so its posterior needs circular treatment. In particular, an interval
-that straddles the 0°/360° boundary must wrap rather than invert.
-`ssm_draws()` handles that by construction.
+that straddles the 0°/360° boundary must wrap across 0° rather than invert.
+An inverted interval runs the long way around the circle. `ssm_draws()`
+handles that by construction.
 
 ## 2. The cosine model as a linear regression
 
@@ -52,7 +54,8 @@ $$S_j = e + \underbrace{a \cos d}_{x} \cos \theta_j +
 
 a linear regression of the scores on $\cos \theta_j$ and $\sin \theta_j$.
 The intercept is the elevation $e$, the *cosine* coefficient is $x$, and the
-*sine* coefficient is $y$. The structural parameters are recovered by
+*sine* coefficient is $y$. The amplitude $a$ and displacement $d$ are
+recovered by
 
 $$a = \sqrt{x^2 + y^2}, \qquad d = \operatorname{atan2}(y,\, x),$$
 
@@ -79,9 +82,10 @@ stopifnot(!isTRUE(all.equal(atan2(x_hat, y_hat) * 180 / pi, 90)))  # swapped
 
 ## 3. Fitting the model with brms
 
-We model raw octant scores from the `jz2017` data in long format, with one
-row per person-scale observation. A random intercept per person absorbs the
-dependence among a person's eight scores. The fixed effects
+We model raw octant scores from the `jz2017` data. Octant scores are scores
+on eight scales placed 45° apart around the circle. The data are in long
+format, with one row per person-scale observation. A random intercept per
+person is included to absorb the dependence among a person's eight scores. The fixed effects
 (intercept, cosine coefficient, sine coefficient) are then the group-level
 $(e, x, y)$. A seeded subsample of 200 persons keeps the example light.
 
@@ -100,7 +104,8 @@ dat <- data.frame(
 head(dat)
 ```
 
-Bayesian sampling requires a working Stan toolchain. So the model below is
+**brms** fits its models with Stan, and Bayesian sampling with Stan requires a
+working Stan toolchain. So the model below is
 not re-fitted when this vignette is rebuilt. Its posterior draws were
 generated once by the seeded script `data-raw/bayesian_ssm_draws.R`, and
 they ship with the package. The `normal(0, 1)` prior on the regression
@@ -131,8 +136,9 @@ head(round(draws, 3))
 ```
 
 `ssm_draws()` accepts two draw shapes. The first is three-column
-*parameter* draws like these. The second is *profile* draws, with one column
-per scale and `angles` supplied. A three-column matrix without angles is
+*parameter* draws like these. The second is *profile* draws: posterior draws
+of a whole profile of scale scores, with one column per scale and `angles`
+supplied. A three-column matrix without angles is
 ambiguous, because it could also be profile draws from a three-scale
 instrument. So the shape must be stated explicitly with
 `type = "parameters"`:
@@ -142,14 +148,16 @@ res <- ssm_draws(draws, type = "parameters")
 summary(res)
 ```
 
-Each posterior draw of $(x, y)$ was converted to a draw of $(a, d)$. So the
-displacement's credible interval comes from circular quantiles, centered on
-the circular mean and re-wrapped. It never comes from naive linear
-quantiles, which would misbehave near 0°/360°.
+Each posterior draw of $(x, y)$ was converted to a draw of $(a, d)$. Because
+$d$ is an angle, the displacement's credible interval comes from circular
+quantiles. The draws are centered on their circular mean and unwrapped, the
+quantiles are taken, and the bounds are re-wrapped. The interval never comes from naive
+linear quantiles that would misbehave near 0°/360°.
 
-Point estimates are posterior medians for the linear parameters. The
-amplitude posterior is right-skewed, so a mean would overstate it. For
-displacement, the point estimate is the circular mean.
+Point estimates are posterior medians for the linear parameters: elevation,
+$x$, $y$ and amplitude. The amplitude posterior is right-skewed, so a mean
+would overstate it. For displacement, the point estimate is the circular
+mean.
 
 One caveat to keep in mind: these marginal summaries are not jointly
 coherent. The reported amplitude is the median of the amplitude draws. It is
@@ -165,9 +173,10 @@ fit draws from `ssm_draws()`.
 
 Independent priors on $x$ and $y$ do not induce a flat prior on the
 structural parameters. With $x, y \sim \mathrm{Normal}(0, 1)$, the implied
-prior on $a = \sqrt{x^2 + y^2}$ is Rayleigh-shaped. Its mass is pushed
-*away* from $a = 0$. But the implied prior on $d$ is uniform. A ten-line
-prior-predictive simulation makes this visible:
+prior on $a = \sqrt{x^2 + y^2}$ is Rayleigh-shaped: zero density at $a = 0$,
+then a peak and a long right tail. Its mass is pushed *away* from $a = 0$.
+But the implied prior on $d$ is uniform. A ten-line prior-predictive
+simulation makes the amplitude prior visible:
 
 ```{r induced-prior, fig.width = 5, fig.height = 3}
 x_prior <- rnorm(10000, 0, 1)
@@ -185,8 +194,8 @@ round(c(prior_median = median(a_prior), prior_mass_below_0.1 =
           mean(a_prior < 0.1)), 3)
 ```
 
-This is not a defect. It is a modeling choice to be aware of: the prior
-mildly disfavors exactly-flat profiles. If your application needs prior
+The Rayleigh shape is not a defect. It is a modeling choice to be aware of:
+the prior mildly disfavors exactly-flat profiles ($a = 0$). If your application needs prior
 mass concentrated near $a = 0$, place priors on $(a, d)$ directly in a
 custom Stan model instead. Its posterior draws can still be summarized
 here. Convert them to $(x, y) = (a \cos d, a \sin d)$, or pass profile
