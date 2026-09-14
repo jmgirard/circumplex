@@ -13,8 +13,9 @@
 # A file argument of `-` reads standard input.
 #
 # Swept prose is the page minus its YAML header, its HTML comments (multi-line
-# ones too), its References section and every fenced block (backtick or tilde,
-# with or without an info string).
+# ones too), its References section, every fenced block (backtick or tilde,
+# with or without an info string) and every knitr table (a "Table:" caption
+# line with a pipe table under it).
 #
 # Report mode prints each sentence over 25 words, each dash (U+2014, `---`,
 # ` -- `, `&mdash;`), each semicolon outside code spans, math and HTML entities,
