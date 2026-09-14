@@ -60,6 +60,7 @@ The vignette `evaluating-circumplex-structure` reads on one pass for an applied 
 - 2026-09-14: claim audit: 41 claims read, 1 corrected — vignettes/evaluating-circumplex-structure.Rmd.orig, vignettes/evaluating-circumplex-structure.Rmd, NEWS.md. A38 ("three categories") fixed to four, and the A11 ambiguity split. The same reader re-read both, and both hold. A25 ("withholds" the displacement) is base wording, so it went to the doc-bug candidate row and a ledger row. Checkpoint: T4 still open, and `devtools::check()` is running.
 - 2026-09-14: T4 done. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes. `devtools::test()`: FAIL 0, PASS 9319. Local `tools/precompute-vignettes.R evaluating-circumplex-structure` then `tools/check-vignette-staleness.R`: all 7 up to date. The re-knit changed one masked `#>` line only, and the committed copy is restored. Minor amendment: T4's push step moves to `/milestone-review`, which opens the PR after approval (tracking rules). AC3 is read on the PR head there.
 - 2026-09-14: review started. Five fresh readers ran. Gate triage: five prose fixes and one ledger fix made, two base doc bugs added to the candidate row, 38 one-read paragraphs rejected in groups. AC1, AC2, AC4, AC5, AC6 verified. Checkpoint: AC7 test run in progress, AC3 waits for the PR head.
+- 2026-09-14: step-7 approval: m125-plain-vignette-structure approved for merge
 
 ## Decisions
 
