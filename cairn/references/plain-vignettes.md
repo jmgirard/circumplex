@@ -144,7 +144,7 @@ Reader reports, numbered as the rows cite them: claims reader A1 to A2 (axes) an
 | SEM | E18: table cells | Rejected | A code chunk writes the table. Chunks do not change in this pass. |
 | SEM | E19: configural and scalar rungs | Rejected | Standard SEM terms. A gloss of scalar invariance needs a claim about intercepts that the page does not make. |
 | SEM | E24, E25: "branch" | Rejected | The next sentence says what the branch means for the interval endpoints. |
-| SEM | E26: "plane factors are fixed isotropic and orthogonal" | Kept as a base claim | The generated syntax fixes them only under the scaled tier, and the strict tier frees the factor covariance. A candidate row holds the fix, because a form-only pass does not change the claim. |
+| SEM | E26: "plane factors are fixed isotropic and orthogonal" | Kept as a base claim | The generated syntax fixes them only under the scaled tier, and the strict tier frees the factor covariance. The `ssm_plot_trajectory()` doc-bug candidate row now holds the fix, because a form-only pass does not change the claim. |
 | SEM | E29: "point" then "boundary" | Rejected | The point is where the families meet. The boundary divides fixed from free angles. |
 
 ### M125 (evaluating-circumplex-structure)
