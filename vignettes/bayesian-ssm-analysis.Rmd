@@ -155,7 +155,7 @@ quantiles are taken, and the bounds are re-wrapped. The interval never comes fro
 linear quantiles that would misbehave near 0°/360°.
 
 Point estimates are posterior medians for the linear parameters: elevation,
-$x$, $y$ and amplitude. The amplitude posterior is right-skewed, so a mean
+$x$, $y$, amplitude, and fit where it is available. The amplitude posterior is right-skewed, so a mean
 would overstate it. For displacement, the point estimate is the circular
 mean.
 
@@ -174,7 +174,7 @@ fit draws from `ssm_draws()`.
 Independent priors on $x$ and $y$ do not induce a flat prior on the
 structural parameters. With $x, y \sim \mathrm{Normal}(0, 1)$, the implied
 prior on $a = \sqrt{x^2 + y^2}$ is Rayleigh-shaped: zero density at $a = 0$,
-then a peak and a long right tail. Its mass is pushed *away* from $a = 0$.
+then a single peak, with a right skew. Its mass is pushed *away* from $a = 0$.
 But the implied prior on $d$ is uniform. A ten-line prior-predictive
 simulation makes the amplitude prior visible:
 

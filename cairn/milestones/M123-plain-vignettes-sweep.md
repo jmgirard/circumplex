@@ -53,7 +53,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - [x] T4: Rewrite `vignettes/bayesian-ssm-analysis.Rmd` prose.
 - [x] T5: Rewrite `vignettes/growth-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/growth-ssm-analysis.Rmd`.
 - [x] T6: Rewrite `vignettes/advanced-visualization.Rmd.orig` prose and copy each edit into `vignettes/advanced-visualization.Rmd`.
-- [ ] T7: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add ledger rows. Add one NEWS bullet.
+- [x] T7: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add ledger rows. Add one NEWS bullet.
 - [ ] T8: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
 
 ## Work log
@@ -73,6 +73,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: T5 done. Growth page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 29 long sentences, 28 dashes, 6 semicolons). `--chunks` unchanged on both. The added and removed lines of the two diffs are identical. Inventory gains only the introduction-vignette link.
 - 2026-09-14: T6 done. Visualization page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 33 long sentences, 15 dashes, 5 semicolons). `--chunks` unchanged on both, the two diffs carry identical edits, and the inventory is unchanged. Two glosses added in place: "resultant (the average vector)" and "munches (splits into short pieces)".
 - 2026-09-14: T7 in progress (checkpoint). Inventory comparison: no item lost on any page. The [O] claims reader listed 20 items (1 medium), and the [O] one-read reader listed 37 paragraphs. Fixed 16 claims items and 33 one-read items on all five files, with each gloss checked against the code. The other 8 kept items are ledger rows. NEWS bullet drafted. An [O] re-read of the fix diff is still running.
+- 2026-09-14: T7 done. The [O] re-read of the fix diff (one pass) found 6 items (1 medium: the reason given for correlated person effects did not imply correlation). All 6 are fixed. All five files sweep clean, `--chunks` is unchanged, and each `.Rmd.orig` and `.Rmd` pair carries identical edits.
 
 ## Decisions
 

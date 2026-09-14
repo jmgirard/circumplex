@@ -139,8 +139,8 @@ $\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0$.
 The $x$ and $y$ person effects are each person's stable shifts in $x$ and
 $y$. One design in
 our validation simulations had strongly correlated $x$–$y$ person effects.
-This is a realistic situation, because a person's shift rarely lies along
-the $x$ or $y$ axis alone. In that design, the shortcut's pointwise $d(t)$
+This is a realistic situation, because the main direction along which
+person shifts vary is rarely the $x$ or $y$ axis. In that design, the shortcut's pointwise $d(t)$
 coverage drops from the nominal 95% to roughly 86%, while the joint recipe
 stays at nominal. Do not fit the coordinates separately.
 
@@ -351,8 +351,8 @@ angle_unwrap(d_person)
 `angle_unwrap()` wraps its input into [0°, 360°). Then it accumulates the
 shortest signed rotation between successive waves. By the package's
 half-turn convention, an exact 180° step ascends (it counts as +180°). An
-`NA` makes it impossible to place every later wave on a branch, so `NA`
-propagates onward. The unwrapped values live on an ordinary line, so any
+`NA` means that no later wave can be placed on a branch, so `NA` propagates
+onward. The unwrapped values live on an ordinary line, so any
 univariate mixed model applies. This framing models the *mean of the
 person-level directions*. That is a legitimate (and different) estimand, or
 target of estimation, from the direction of the mean trajectory in Section 4.

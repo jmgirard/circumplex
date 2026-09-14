@@ -32,7 +32,7 @@ more control. You may want to overlay individual respondents on a group profile,
 or to zoom in on a band of amplitudes. Or you may want to restyle the points, or
 to place several circumplex panels side by side.
 `vignette("introduction-to-ssm-analysis")` defines the SSM terms used here,
-such as profile, amplitude and displacement.
+such as amplitude and displacement.
 
 To make that possible, `circumplex` exposes the building blocks that the
 built-in plots are themselves made of. These are ordinary
@@ -333,8 +333,8 @@ ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
 
 Two things about the displacement panel are worth reading carefully. First, it
-is drawn on an *unwrapped* branch, which lets angles go past 360 so that the
-line stays continuous. The profile crosses the 0/360 boundary
+is drawn on an *unwrapped* branch, which lets angles go past 360 (or below 0)
+so that the line stays continuous. The profile crosses the 0/360 boundary
 between the second and third wave. Rather than jumping a full turn, the panel
 continues past 360, so values outside \[0, 360) are expected there.
 
