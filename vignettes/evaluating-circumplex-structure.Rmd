@@ -256,7 +256,7 @@ prints the list only within a sample-size window. On the bootstrap path, as
 in the fit displayed above, the list prints as a descriptive note at every
 sample size. Beside the note, a statement says that what has been measured
 about the markers covers analytic intervals only. It also says that not every
-marker was measured, and *What a fired marker does and does not tell you*,
+marker was measured. *What a fired marker does and does not tell you*,
 below, has the particulars. So the markers are not validated as predictors
 of the bootstrap intervals they accompany. When the intervals are analytic,
 the list instead arrives inside a coverage caution, printed when $N$ falls
@@ -1078,12 +1078,13 @@ is available at any scale count of four or more.
 
 The classification categories describe where a statistic falls among the
 simulated distributions for competing structures (circumplex vs. simple
-structure). There are three categories:
+structure). There are four categories:
 
 - "almost certain": below the 1st percentile of the competing distribution.
-- "at least 3x/2x as likely as the alternative": the criterion's structure
-  is at least three/two times as likely as its competitor at that statistic
-  value.
+- "at least 3x as likely as the alternative": the criterion's structure is
+  at least three times as likely as its competitor at that statistic value.
+- "at least 2x as likely as the alternative": the criterion's structure is
+  at least two times as likely as its competitor at that statistic value.
 - "not clearly supported".
 
 Those ratios are *likelihood ratios*, not posterior probabilities or
