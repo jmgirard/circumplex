@@ -27,13 +27,13 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 
 ## Acceptance criteria
 
-- [ ] AC1: For each page, `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <page>` exits 0. Where the page has a `.Rmd.orig`, the same command on its shipped `.Rmd` also exits 0. So the swept prose has no sentence over 25 words, no dash, no semicolon, and no milestone, decision or review id. `cairn/references/plain-vignettes.md` defines "swept prose", "sentence" and "dash".
-- [ ] AC2: No code changed. For each page, and for the shipped `.Rmd` of each page that has a `.Rmd.orig`, `tools/prose-sweep.R --chunks` prints the same text at the base commit and at the head. That output is every fenced block with its opening line, minus `#>` output lines.
+- [x] AC1: For each page, `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <page>` exits 0. Where the page has a `.Rmd.orig`, the same command on its shipped `.Rmd` also exits 0. So the swept prose has no sentence over 25 words, no dash, no semicolon, and no milestone, decision or review id. `cairn/references/plain-vignettes.md` defines "swept prose", "sentence" and "dash".
+- [x] AC2: No code changed. For each page, and for the shipped `.Rmd` of each page that has a `.Rmd.orig`, `tools/prose-sweep.R --chunks` prints the same text at the base commit and at the head. That output is every fenced block with its opening line, minus `#>` output lines.
 - [ ] AC3: Where a page has a `.Rmd.orig`, its shipped `.Rmd` is what the source knits to: the `vignette-precompute` workflow passes on the PR head.
-- [ ] AC4: For each page, every number, degree value, code-span name and precision-list term in the base prose also appears in the head prose, or the Review section records its removal with a reason. The `--inventory` output of `tools/prose-sweep.R` at the base commit and at the head, compared, lists these items. `cairn/references/plain-vignettes.md` holds the precision list.
+- [x] AC4: For each page, every number, degree value, code-span name and precision-list term in the base prose also appears in the head prose, or the Review section records its removal with a reason. The `--inventory` output of `tools/prose-sweep.R` at the base commit and at the head, compared, lists these items. `cairn/references/plain-vignettes.md` holds the precision list.
 - [ ] AC5: A fresh-context reader compares each page's base and head prose, section by section. It lists each claim added, dropped, or changed in meaning, a lost statistical qualifier included. The Review section gives each listed item one disposition: fixed, rejected with a reason, or matched by a ledger row with its evidence.
 - [ ] AC6: A fresh-context reader with the reader profile from `cairn/references/plain-vignettes.md` lists the paragraphs of each page that it cannot follow on one read. The Review section records each listed paragraph as fixed or as rejected with a reason.
-- [ ] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
+- [x] AC7: `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and 0 notes, and `Rscript -e 'devtools::test()'` reports no failures.
 
 ## Coverage
 
@@ -82,3 +82,12 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 ## Decisions
 
 ## Review
+
+Base commit 840fb0b0 (the merge base, equal to `origin/master`, so the default branch did not move). Head f6f167e7. The five files are the Bayesian `.Rmd`, and the `.Rmd.orig` and shipped `.Rmd` of the growth and visualization pages.
+
+- AC1 (2026-09-14): `LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R <file>` exits 0 on all five head files. Discrimination: the same command on the five base copies exits 1 each, with 24, 63, 63, 53 and 53 finding lines.
+- AC2 (2026-09-14): `--chunks` output of each base copy and head file compares byte-identical with `cmp` (69, 160, 145, 172 and 142 lines, so no empty domain). Both runs exit 0 on every file. The added and removed lines of each `.Rmd.orig` diff equal those of its shipped `.Rmd` diff.
+- AC4 (2026-09-14): `--inventory` at base and head, compared with `comm`, loses no item on any of the five files. Gains: `vignette("introduction-to-ssm-analysis")`, the degree and number 45 on every page, and `ssm_analyze(method = "montecarlo")` on the growth page. No removal needs a reason. The gains match ledger rows in `cairn/references/plain-vignettes.md`.
+- AC7 (2026-09-14, at f6f167e7): `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings, 0 notes. `devtools::test()` reports 0 failures, 9306 passes, 9 warnings and 1 skip (`test-axes-scaled-fit.R`, not the sweep test).
+- AC3: not yet verifiable. The `vignette-precompute` workflow runs on `pull_request`, and the PR opens only after the merge approval. The CI wait before merge supplies this evidence.
+- Consistency gate (2026-09-14): `cairn_validate.py` exits 0. No DESIGN principle changed, so no impact report. `devtools::document()` leaves no diff and prints no `resolve link` line. `pkgdown::check_pkgdown()` finds no problems. README untouched. NEWS has one Documentation bullet with no milestone id. No new top-level file (`tools/` is in `.Rbuildignore`). Newest master push runs of `R-CMD-check.yaml` and `test-coverage.yaml` (125b76db) are `success`. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit 0.
