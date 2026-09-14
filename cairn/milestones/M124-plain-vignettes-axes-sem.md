@@ -45,7 +45,7 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 ## Tasks
 
 - [x] T1: Rewrite `vignettes/axes-reliability.Rmd.orig` prose and copy each edit into `vignettes/axes-reliability.Rmd`. The estimator's corrections (standard errors, fit statistics, the correlation metric) keep every qualifier. Check each one against `?axes_reliability` and `cairn/references/strack2013.md`.
-- [ ] T2: Rewrite `vignettes/sem-based-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/sem-based-ssm-analysis.Rmd`. Fit-index and contrast statements keep their scope conditions. Check them against `?ssm_sem`.
+- [x] T2: Rewrite `vignettes/sem-based-ssm-analysis.Rmd.orig` prose and copy each edit into `vignettes/sem-based-ssm-analysis.Rmd`. Fit-index and contrast statements keep their scope conditions. Check them against `?ssm_sem`.
 - [ ] T3: Run the base-versus-head inventory comparison and both fresh readers (claims, then one-read). Fix or disposition every item, and add the M124 ledger rows. Update NEWS.
 - [ ] T4: Run check and test. Push, and confirm the `vignette-precompute` workflow passes.
 
@@ -54,6 +54,7 @@ The vignettes `axes-reliability` and `sem-based-ssm-analysis` read on one pass f
 - 2026-09-14: created by /milestone-plan. The gate choices and the criteria audit are recorded in M123's work log. This milestone repeats M123's AC1-AC7 for its own two pages.
 - 2026-09-14: implement started on branch `m124-plain-vignettes-axes-sem`. Question gate skipped: the one open choice (NEWS) takes the plan's second option, an extension of M123's bullet. A local re-knit is not used to copy prose into the shipped `.Rmd`, because the installed circumplex is 2.0.0. Edits are copied by hand, as in M123.
 - 2026-09-14: T1 done. `axes-reliability` sweep exits 0 on both files, `--chunks` matches base, and the only inventory change is the added introduction-vignette link. New glosses (FIML, MCAR, `xi1`, `xi2`, the `block_specificity` row name, the shared-value restriction) were read against `R/axes_reliability.R`. The `.Rmd` copy is the `.Rmd.orig` diff applied as a one-line-context patch, not Edit calls, and its changed lines equal the source's.
+- 2026-09-14: T2 done. `sem-based-ssm-analysis.Rmd.orig` sweep exits 0, `--chunks` matches base on both files, and the only inventory change is the added introduction-vignette link. Copied into the `.Rmd` the same way as T1. Open: the shipped `.Rmd` sweep exits 1 on one semicolon. The semicolon is in a table that the `estimand-table` chunk prints ("conditional on measurement invariance; not computed"), so AC1 and AC2 conflict on this page.
 
 ## Decisions
 
