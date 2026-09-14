@@ -492,9 +492,9 @@ the circle), SSM parameters should not be interpreted.
 ### What Zimmermann & Wright (2017) found
 
 Zimmermann and Wright's simulation studies (their Studies 1–4) evaluated
-the accuracy of 95% percentile bootstrap intervals for SSM parameters —
-the same interval type `ssm_analyze()` reports — judging an interval
-accurate when its empirical coverage stayed within Bradley's (1978)
+the accuracy of 95% percentile bootstrap intervals for SSM parameters. This
+is the same interval type that `ssm_analyze()` reports. They judged an
+interval accurate when its empirical coverage stayed within Bradley's (1978)
 liberal band of 92.5% to 97.5%. Their headline results:
 
 | Parameter | Point estimate | 95% bootstrap CI accurate when... |
@@ -504,50 +504,51 @@ liberal band of 92.5% to 97.5%. Their headline results:
 | Y value / dominance | essentially unbiased | $n \ge 50$ |
 | Amplitude ($a$) | **biased upward**, strongly so when population amplitude is small | $n \ge 75$ (general-factor instrument) or $n \ge 150$ (no general factor), *given* population amplitude $\ge .10$ |
 | Displacement ($\delta$) | unbiased but imprecise at low amplitude | $n \ge 100$ (general factor) or $n > 200$ (no general factor), *given* population amplitude $\ge .10$ |
-| Fit ($R^2$) | biased downward | population $R^2 < .9$ only; unsuited near 1 |
+| Fit ($R^2$) | biased downward | population $R^2 < .9$ only (unsuited near 1) |
 
 *(Transcribed from Zimmermann & Wright, 2017, Studies 1–2, pp. 6–11.)*
 
 Three implications are worth internalizing:
 
-- **Amplitude overestimates differentiation.** Across their conditions the
-  relative bias averaged 15.5% and reached 135.8%; with $n = 50$ and no
+- **Amplitude overestimates differentiation.** Across their conditions, the
+  relative bias averaged 15.5% and reached 135.8%. With $n = 50$ and no
   general factor, the *expected* sample amplitude was about .15 when the
   population amplitude was exactly zero (their pp. 6–7). An amplitude of
-  .15 is commonly read as "marked"; at small $n$ it can be pure sampling
+  .15 is commonly read as "marked". At small $n$, it can be pure sampling
   artifact.
 - **Displacement is only as stable as amplitude is large.** The standard
-  error of the displacement grows as amplitude shrinks (e.g., roughly 50
-  degrees at $n = 100$ for a weakly differentiated profile; their p. 8).
-  A displacement estimate from a flat profile has no meaningful direction.
+  error of the displacement grows as amplitude shrinks. For example, it is
+  roughly 50 degrees at $n = 100$ for a weakly differentiated profile (their
+  p. 8). A displacement estimate from a flat profile has no meaningful
+  direction.
 - **The thresholds above are grid minima, not guarantees.** They come from
   specific instruments, specific sample sizes, and population amplitudes
-  of .10 or larger. Their Study 3 quantified the frontier more finely: the
+  of .10 or larger. Their Study 3 quantified the frontier more finely. The
   minimum population affiliation/dominance component needed for accurate
   amplitude and displacement intervals is approximately
-  $2.95 \cdot f_a \cdot n^{-0.587}$, where $f_a$ is an instrument
-  constant (their Eq. 3; ≈ .55 for the IIP-C, .63 for the IIP-SC, .85 for
-  the IAS). At $n = 100$ with an IIP-C-like instrument that is a
-  population component of about .11 — larger than many real construct
+  $2.95 \cdot f_a \cdot n^{-0.587}$. Here $f_a$ is an instrument constant
+  (their Eq. 3). It is about .55 for the IIP-C, .63 for the IIP-SC and .85
+  for the IAS. At $n = 100$ with an IIP-C-like instrument, that is a
+  population component of about .11. That is larger than many real construct
   profiles.
 
 ### Simulating coverage for your own analysis
 
-Published thresholds cover a coarse grid of conditions, and your analysis
-— your instrument, your $n$, your group sizes, your profile, your number
-of bootstrap resamples — usually falls between or outside the grid points.
-`ssm_ci_accuracy()` answers the question directly at your configuration:
-it builds a population whose structure matches your fitted estimates
-(through the CPM by default), simulates many datasets of your exact sample
-size from it, replays your own CI procedure on each, and reports how often
-the intervals covered the known population values.
+Published thresholds cover a coarse grid of conditions. Your analysis (your
+instrument, your $n$, your group sizes, your profile, your number of
+bootstrap resamples) usually falls between or outside the grid points.
+`ssm_ci_accuracy()` answers the question directly at your configuration. It
+builds a population whose structure matches your fitted estimates (through
+the CPM by default). It simulates many datasets of your exact sample size
+from that population, and it replays your own CI procedure on each. Then it
+reports how often the intervals covered the known population values.
 
 To see it catch a real problem, we analyze two PD scales at a modest
-sample size: paranoid PD (a well-differentiated interpersonal profile) and
-obsessive–compulsive PD, whose profile Zimmermann and Wright's Table 4
+sample size. Paranoid PD has a well-differentiated interpersonal profile.
+Obsessive–compulsive PD has a profile that Zimmermann and Wright's Table 4
 showed to be nearly flat (amplitude .012 at full sample size). We use the
-first 250 participants — a sample size many construct-validation studies
-would consider respectable.
+first 250 participants. Many construct-validation studies would consider
+that sample size respectable.
 
 
 ``` r
@@ -593,21 +594,21 @@ summary(res)
 #>   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.
 ```
 
-Note the guardrail in the printed output: when a profile's amplitude CI
+Note the guardrail in the printed output. When a profile's amplitude CI
 lower bound sits less than 0.35 CI-widths above zero, `ssm_analyze()` marks
-the displacement as uninterpretable rather than certifying its direction.
-That rule is scale-free (it compares the lower bound to the interval's own
-width, so it means the same thing on any score metric) and does not depend
-on the display precision. The diagnostic below measures, among other things,
-how well that certification rule performs at your configuration.
+the displacement as uninterpretable, rather than certifying its direction.
+That rule is scale-free. It compares the lower bound to the interval's own
+width, so it means the same thing on any score metric. It also does not
+depend on the display precision. The diagnostic below measures, among other
+things, how well that certification rule performs at your configuration.
 
-We again use reduced settings (`reps = 200`, a short amplitude ladder, and
-the smaller `boots` above) to keep the vignette fast; the defaults
-(`reps = 1000`, four ladder rungs, on an object built with the default
-`boots = 2000`) give a Monte Carlo standard error under one percentage
-point for coverage near the nominal level and are recommended in practice.
-The `parallel`/`ncpus` arguments speed up real runs without changing
-results for a given seed.
+We again use reduced settings to keep the vignette fast: `reps = 200`, a
+short amplitude ladder, and the smaller `boots` above. The defaults are
+`reps = 1000` and four ladder rungs, on an object built with the default
+`boots = 2000`. They give a Monte Carlo standard error under one percentage
+point for coverage near the nominal level, and they are recommended in
+practice. The `parallel`/`ncpus` arguments speed up real runs without
+changing results for a given seed.
 
 <!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
      ill-conditioned CPM, whose solution moves in the third digit across
@@ -785,33 +786,33 @@ summary(acc)
 
 How to read this output:
 
-- **The coverage table** reports, for each parameter, how often your CI
-  procedure covered the truth in the simulated replications, at the
-  amplitude the profile was estimated to have (`Condition = 1`) and at
+- **The coverage table** reports how often your CI procedure covered the
+  truth in the simulated replications, for each parameter. It does so at the
+  amplitude that the profile was estimated to have (`Condition = 1`) and at
   fractions of it. Compare coverage against the nominal level using the
-  Wilson interval and the Bradley band, which is what the verdict does for
-  you.
+  Wilson interval and the Bradley band. The verdict does this for you.
 - **The amplitude ladder** (`Condition` column) matters because your
-  estimated amplitude is biased upward — the population that generated
-  your data plausibly has *less* differentiation than your estimate. The
-  rungs below 1 show what happens to coverage in that direction; the 0
-  rung shows the degenerate flat-profile case, where displacement has no
-  true value at all and the amplitude interval cannot cover the boundary
-  truth (its printed zero coverage is structural, flagged in the table).
-  When a profile's estimated amplitude is smaller than half its own CI
-  width — as for obsessive–compulsive PD here — the diagnostic adds one
-  more rung at a scaling factor above 1, the amplitude at which the
-  population would sit exactly at the observed CI half-width.
-- **The guardrail table** reports how often profiles were *certified*
-  (amplitude CI lower bound at least 0.35 CI-widths above zero) at each
-  rung. At the 0 rung, any certification is a false certification: the
-  summary prints a caution when the false-certification rate is materially
-  above the rate a user would expect from the interval level. This is a
-  measured property of the shipped display rule, not a hypothesis test.
+  estimated amplitude is biased upward. The population that generated your
+  data plausibly has *less* differentiation than your estimate. The rungs
+  below 1 show what happens to coverage in that direction. The 0 rung shows
+  the degenerate flat-profile case. There, displacement has no true value at
+  all, and the amplitude interval cannot cover the boundary truth. (Its
+  printed zero coverage is structural, and the table flags it.) When a
+  profile's estimated amplitude is smaller than half its own CI width, the
+  diagnostic adds one more rung at a scaling factor above 1. This is the
+  case for obsessive–compulsive PD here. That rung is the amplitude at which
+  the population would sit exactly at the observed CI half-width.
+- **The guardrail table** reports how often profiles were *certified* at
+  each rung. A certified profile has its amplitude CI lower bound at least
+  0.35 CI-widths above zero. At the 0 rung, any certification is a false
+  certification. The summary prints a caution when the false-certification
+  rate is materially above the rate that a user would expect from the
+  interval level. This is a measured property of the shipped display rule,
+  not a hypothesis test.
 - **The verdict** classifies elevation, amplitude, and
   certification-conditional displacement coverage at your as-estimated
-  amplitude, and the plain-language paragraph states the overall
-  conclusion per profile.
+  amplitude. The plain-language paragraph states the overall conclusion per
+  profile.
 
 For a visual summary across the ladder:
 
@@ -823,46 +824,47 @@ plot(acc)
 <img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%" />
 
 The two profiles tell usefully different stories. Paranoid PD is
-certified: its amplitude CI lower bound clears the 0.35-CI-width margin, so
-`ssm_analyze()` reports its displacement, and nothing in its coverage table
-clearly leaves the Bradley band at the as-estimated amplitude or with the
-population amplitude halved. Obsessive–compulsive PD is *not* certified —
-its amplitude (about .02 here) is far too close to zero relative to its CI
-width — so the printed output already withholds its displacement as
+certified. Its amplitude CI lower bound clears the 0.35-CI-width margin, so
+`ssm_analyze()` reports its displacement. Nothing in its coverage table
+clearly leaves the Bradley band, at the as-estimated amplitude or with the
+population amplitude halved. Obsessive–compulsive PD is *not* certified. Its
+amplitude (about .02 here) is far too close to zero relative to its CI
+width. So the printed output already withholds its displacement as
 uninterpretable, before any coverage question is asked. On top of that, the
-diagnostic shows its amplitude and displacement CIs under-cover badly at
-this sample size (missing below the truth), so its verdict is a caution for
-a genuine reason: the intervals themselves are unreliable, not merely the
+diagnostic shows that its amplitude and displacement CIs under-cover badly at
+this sample size (missing below the truth). So its verdict is a caution for
+a genuine reason. The intervals themselves are unreliable, not merely the
 point on the circle.
 
-The guardrail line confirms the rule is doing its job. At this
+The guardrail line confirms that the rule is doing its job. At this
 configuration ($n = 250$, eight octant correlations), a profile whose true
-amplitude is exactly zero would be certified only about the benchmark rate
-— roughly the one-sided error a user reading the guardrail would expect —
-so no caution fires from the guardrail itself. This is the scale-free
-rule's payoff: unlike a fixed amplitude-unit cutoff, it holds
-false-certification near its intended rate even in the near-zero regime
-Zimmermann and Wright flagged, where a sample amplitude large enough to
-look non-zero is otherwise the *expected* outcome from a flat population.
+amplitude is exactly zero would be certified only at about the benchmark
+rate. That rate is roughly the one-sided error that a user reading the
+guardrail would expect. So no caution fires from the guardrail itself. This
+is the payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff,
+it holds false-certification near its intended rate, even in the near-zero
+regime that Zimmermann and Wright flagged. In that regime, a sample
+amplitude large enough to look non-zero is otherwise the *expected* outcome
+from a flat population.
 
 One reading note: at reduced `reps`, classes tend to print as
-`borderline` — the Wilson interval around the estimated coverage is too
-wide to place it clearly inside or outside the Bradley band. That is the
-diagnostic being honest about its own Monte Carlo error; the default
-`reps = 1000` sharpens such classifications into `adequate` or
+`borderline`. This is because the Wilson interval around the estimated
+coverage is too wide to place it clearly inside or outside the Bradley band.
+That is the diagnostic being honest about its own Monte Carlo error. The
+default `reps = 1000` sharpens such classifications into `adequate` or
 `inadequate`.
 
-Two settings worth knowing: `structure = "observed"` rebuilds the
-population from the pooled observed correlations instead of the CPM — if
+Two settings are worth knowing. First, `structure = "observed"` rebuilds the
+population from the pooled observed correlations instead of the CPM. If
 the two structures yield different verdicts, that disagreement is itself
-informative (structure uncertainty is material for your data); and the
-embedded CPM fit is returned as `acc$cpm` for inspection with the tools
+informative: structure uncertainty is material for your data. Second, the
+embedded CPM fit is returned as `acc$cpm`, for inspection with the tools
 from Section 2.
 
 The diagnostic itself was validated against Zimmermann and Wright's
-published results: configured to their transcribed simulation conditions,
-it reproduces their accuracy classifications — coverage inside the Bradley
-band at conditions they found accurate, and the same one-sided
+published results. Configured to their transcribed simulation conditions,
+it reproduces their accuracy classifications. It gives coverage inside the
+Bradley band at conditions they found accurate. It gives the same one-sided
 under-coverage at conditions they found inaccurate.
 
 ### When to trust SSM parameters
@@ -870,25 +872,24 @@ under-coverage at conditions they found inaccurate.
 Putting Sections 2 and 3 together into a checklist:
 
 1. **Structure first.** Fit `cpm_fit()` to your instrument in your sample.
-   If the octant ordering fails or communalities are very low, stop; SSM
-   positions mean little.
-2. **Elevation is the robust parameter.** Essentially unbiased, and its
-   intervals were accurate from $n \ge 50$ in every published and
-   package-run condition.
-   (On the correlation path, elevation is also the parameter ipsatizing
-   destroys — see Section 4.)
+   If the octant ordering fails or communalities are very low, stop,
+   because SSM positions mean little.
+2. **Elevation is the robust parameter.** It is essentially unbiased, and
+   its intervals were accurate from $n \ge 50$ in every published and
+   package-run condition. (On the correlation path, elevation is also the
+   parameter that ipsatizing destroys. See Section 5.)
 3. **Treat amplitude as optimistic.** It cannot go below zero, so it
    overshoots when true differentiation is weak. Before interpreting a
    "marked" amplitude at modest $n$, run `ssm_ci_accuracy()` and look at
    the sub-1 ladder rungs.
 4. **Only interpret displacement when amplitude is credible.** The package
    already withholds the displacement interval when the amplitude CI lower
-   bound sits less than 0.35 CI-widths above zero; the diagnostic tells you
+   bound sits less than 0.35 CI-widths above zero. The diagnostic tells you
    how reliable that certification is at your configuration.
 5. **Do not build claims on the fit parameter's interval.** Zimmermann and
    Wright found bootstrap $R^2$ intervals accurate only when population
-   fit was mediocre — near-perfect prototypicality cannot be bracketed
-   from below. Report $R^2$ descriptively.
+   fit was mediocre. Near-perfect prototypicality cannot be bracketed from
+   below. Report $R^2$ descriptively.
 6. **Remember what the diagnostic conditions on.** It asks "would my CI
    procedure work in a population *like my estimates*", under multivariate
    normality, with complete data. It is a strong check, not a certificate.
@@ -898,23 +899,23 @@ Putting Sections 2 and 3 together into a checklist:
 Section 2's confirmatory model (`cpm_fit()`) fits one theory-driven circular
 model and asks how well it fits. A complementary, more exploratory question
 is whether the scales' correlations show circumplex structure *at all*,
-without committing to the theoretical angles: are the scales spread evenly
-around a circle, with comparable communalities, rather than clustering into
-a small number of independent clusters (simple structure)? Acton and Revelle
-(2004) evaluated ten such criteria by simulation; `fit_structure()`
-implements four of them — Fisher, Gap, VT2, and Rotation — leaving out a
-variance-test variant A&R found ineffective (VT1) and a criterion so highly
-correlated with Rotation as to be redundant (MT, r = .99 with RT in their
-Table 1). A fifth test, RANDALL, is not one of A&R's ten at all: it is an
-independent order-correspondence test (Hubert & Arabie, 1987; Tracey, 1997)
-that A&R excluded from their own simulation because, unlike their criteria,
-its null distribution is known analytically rather than needing simulated
-cutoffs (their footnote 3).
+without committing to the theoretical angles. Are the scales spread evenly
+around a circle, with comparable communalities? Or do they cluster into a
+small number of independent clusters (simple structure)? Acton and Revelle
+(A&R, 2004) evaluated ten such criteria by simulation. `fit_structure()`
+implements four of them: Fisher, Gap, VT2, and Rotation. It leaves out a
+variance-test variant that A&R found ineffective (VT1). It also leaves out a
+criterion so highly correlated with Rotation as to be redundant (MT, r = .99
+with RT in their Table 1). A fifth test, RANDALL, is not one of A&R's ten at
+all. It is an independent order-correspondence test (Hubert & Arabie, 1987,
+and Tracey, 1997). A&R excluded it from their own simulation because, unlike
+their criteria, its null distribution is known analytically rather than
+needing simulated cutoffs (their footnote 3).
 
 ### The five tests
 
 `fit_structure()` extracts the first two unrotated principal-axis factors
-of the scales' correlation matrix (Acton & Revelle, 2004, p. 13) and
+of the scales' correlation matrix (Acton & Revelle, 2004, p. 13). It
 computes four criteria from that two-factor solution, plus a fifth test
 that works directly on the correlations:
 
@@ -924,30 +925,30 @@ that works directly on the correlations:
   $\sqrt{h^2}$.
 - **Gap Test** (equal spacing). Are the scales evenly distributed in angle
   around the circle, rather than bunched together? The statistic is the
-  variance of the angular gaps between angularly adjacent scales, including
-  the gap that wraps from the last scale back around to the first.
+  variance of the angular gaps between angularly adjacent scales. It
+  includes the gap that wraps from the last scale back around to the first.
 - **Variance Test (VT2)** and **Rotation Test** (interstitiality). Both ask
   whether the scales sit *between* a small number of dominant axes rather
-  than on them — the signature of a genuine circumplex, as opposed to simple
-  structure. Each takes a criterion computed at many rotations of the
-  two-factor solution and summarizes it as a coefficient of variation across
-  rotations; a true circumplex is indifferent to rotation, so both criteria
-  stay low.
-- **RANDALL** (Hubert & Arabie, 1987; Tracey, 1997). Does the *hypothesized
-  circular order* you supplied (the order of `scales`) match the observed
-  correlations, in the sense that closer-together scales correlate more
-  strongly? Unlike the other four, this is a genuine randomization test: its
-  null distribution (scales randomly relabeled onto the hypothesized
-  positions) is enumerated exactly for up to nine scales, or estimated by
-  Monte Carlo relabeling for more, so it returns an exact or Monte Carlo
-  p value rather than a simulated cutoff.
+  than on them. That is the signature of a genuine circumplex, as opposed to
+  simple structure. Each takes a criterion computed at many rotations of the
+  two-factor solution, and summarizes it as a coefficient of variation
+  across rotations. A true circumplex is indifferent to rotation, so both
+  criteria stay low.
+- **RANDALL** (Hubert & Arabie, 1987, and Tracey, 1997). Does the
+  *hypothesized circular order* that you supplied (the order of `scales`)
+  match the observed correlations? Here a match means that closer-together
+  scales correlate more strongly. Unlike the other four, this is a genuine
+  randomization test. Its null distribution (scales randomly relabeled onto
+  the hypothesized positions) is enumerated exactly for up to nine scales.
+  For more scales, it is estimated by Monte Carlo relabeling. So the test
+  returns an exact or Monte Carlo p value rather than a simulated cutoff.
 
-The four factor-analytic criteria (Fisher, Gap, VT2, Rotation) have the most
-power to detect simple structure when there is no large general factor
-across the scales. *Deviation scoring* — centering each respondent on their
-own mean across the selected scales, exactly what `ipsatize()` does —
-approximates removing that general factor (Acton & Revelle, 2004, p. 9), so
-it is `fit_structure()`'s default; pass `scoring = "raw"` to analyze the
+The four factor-analytic criteria are Fisher, Gap, VT2 and Rotation. They
+have the most power to detect simple structure when there is no large
+general factor across the scales. *Deviation scoring* centers each respondent on their own
+mean across the selected scales, which is exactly what `ipsatize()` does.
+It approximates removing that general factor (Acton & Revelle, 2004, p. 9),
+so it is `fit_structure()`'s default. Pass `scoring = "raw"` to analyze the
 scores as given. Each of the two scorings carries its own set of cutoffs
 (next section), matched automatically.
 
@@ -1013,12 +1014,12 @@ summary(res)
 #>   significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
 ```
 
-`summary()` adds the numeric cutoffs behind each classification and the
-estimated angle and communality of every scale on the two-factor solution —
-the same geometry the plot below draws. A clean circumplex shows scales at
-roughly the theoretical octant spacing with broadly similar communalities;
-`Fisher` measures departures in communality, `Gap`/`VT2`/`Rotation` measure
-departures in even angular spread.
+`summary()` adds the numeric cutoffs behind each classification. It also
+adds the estimated angle and communality of every scale on the two-factor
+solution, the same geometry that the plot below draws. A clean circumplex
+shows scales at roughly the theoretical octant spacing, with broadly similar
+communalities. `Fisher` measures departures in communality, and
+`Gap`/`VT2`/`Rotation` measure departures in even angular spread.
 
 
 ``` r
@@ -1027,88 +1028,94 @@ plot(res)
 
 <img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%" />
 
-For the IIP-SC octants the picture agrees with Section 2's CPM fit: the
-scales keep their theoretical circular *ordering* with comparable
-communalities and roughly even spacing, and the Fisher, Gap, and
+For the IIP-SC octants, the picture agrees with Section 2's CPM fit. The
+scales keep their theoretical circular *ordering*, with comparable
+communalities and roughly even spacing. The Fisher, Gap, and
 interstitiality criteria all classify the configuration as consistent with
-(or close to) a circumplex under deviation scoring. One caveat when reading
-the angles: the two-factor solution is *unrotated*, so its absolute
-orientation is arbitrary — it is the scales' ordering and relative spacing
-that agree with theory, not their absolute angles (which is why `summary()`
-places PA well away from its nominal 90°). RANDALL's p value confirms the
+(or close to) a circumplex under deviation scoring. One caveat applies when
+reading the angles. The two-factor solution is *unrotated*, so its absolute
+orientation is arbitrary. The scales' ordering and relative spacing agree
+with theory, not their absolute angles. (This is why `summary()` places PA
+well away from its nominal 90°.) RANDALL's p value confirms the
 hypothesized circular order directly, independent of the factor-analytic
 criteria.
 
 ### Where the cutoffs come from
 
 The four factor-analytic criteria are only as good as the thresholds used
-to classify them, and this is where the published article cannot be used
-as-is. Acton and Revelle calibrated their cutoffs by simulation at 64 and
-128 variables and reported (their p. 18) that the Gap Test's cutoffs shift
-sharply with the number of scales — far too sharply to reuse at the eight
-scales a typical circumplex instrument has. This package's development
-process re-derived every cutoff at $n_v = 8$ under Acton and Revelle's own
-generating model (their Eqs. 11.1–11.3), in a script committed at
-`data-raw/structure-test-cutoffs.R`: it first reproduced their published
-64/128-variable design as a sanity gate on the simulation machinery, then
-reran the same design at $n_v = 8$ to derive the constants `fit_structure()`
-actually uses. The nv effect the re-derivation found is large — the raw-
-scored Gap Test's "almost certain" cutoff moves from .01 at $n_v = 64/128$
-to .35 at $n_v = 8$ — which is exactly why `fit_structure()` refuses to
-interpret any scale count it has not calibrated: at any $n_v \ne 8$ the
-statistics are still reported, but the classification column prints a dash
-rather than guessing.
+to classify them. This is where the published article cannot be used as-is.
+Acton and Revelle calibrated their cutoffs by simulation at 64 and 128
+variables. They reported (their p. 18) that the Gap Test's cutoffs shift
+sharply with the number of scales. The shift is far too sharp to reuse the
+cutoffs at the eight scales that a typical circumplex instrument has. This
+package's development process re-derived every cutoff at $n_v = 8$ (eight
+scales) under Acton and Revelle's own generating model (their
+Eqs. 11.1–11.3). The script is committed at `data-raw/structure-test-cutoffs.R`.
+It first reproduced their published 64/128-variable design, as a sanity gate
+on the simulation machinery. Then it reran the same design at $n_v = 8$ to
+derive the constants that `fit_structure()` actually uses. The effect of
+$n_v$ that the re-derivation found is large. The raw-scored Gap Test's
+"almost certain" cutoff moves from .01 at $n_v = 64/128$ to .35 at
+$n_v = 8$. That is exactly why `fit_structure()` refuses to interpret any
+scale count it has not calibrated. At any $n_v \ne 8$, the statistics are
+still reported, but the classification column prints a dash rather than
+guessing.
 
-RANDALL needs no such calibration; its p value comes from enumerating (or
-Monte Carlo sampling) the randomization null directly on your data, so it
+RANDALL needs no such calibration. Its p value comes from enumerating (or
+Monte Carlo sampling) the randomization null directly on your data. So it
 is available at any scale count of four or more.
 
 ### Reading the classifications
 
 The classification categories describe where a statistic falls among the
 simulated distributions for competing structures (circumplex vs. simple
-structure): "almost certain" (below the 1st percentile of the competing
-distribution), "at least 3x/2x as likely as the alternative" (the criterion's
-structure is at least three/two times as likely as its competitor at that
-statistic value), and "not clearly supported". Those ratios are *likelihood
-ratios*, not posterior probabilities or p values. They are **heuristic
-classifications read off simulated distributions, not significance tests**,
-and `fit_structure()`'s `print()`/`summary()` output repeats that caveat
-every time an interpretation is shown. Treat a "weak"
-or unsupported classification as a caution to inspect the loading
-configuration (the plot above) and Section 2's CPM fit together, not as a
-rejection of any specific hypothesis.
+structure). There are three categories:
+
+- "almost certain": below the 1st percentile of the competing distribution.
+- "at least 3x/2x as likely as the alternative": the criterion's structure
+  is at least three/two times as likely as its competitor at that statistic
+  value.
+- "not clearly supported".
+
+Those ratios are *likelihood ratios*, not posterior probabilities or
+p values. The classifications are **heuristic classifications read off
+simulated distributions, not significance tests**. `fit_structure()`'s
+`print()`/`summary()` output repeats that caveat every time an
+interpretation is shown. Treat a "weak" or unsupported classification as a
+caution, not as a rejection of any specific hypothesis. The caution is to
+inspect the loading configuration (the plot above) and Section 2's CPM fit
+together.
 
 ### How this complements the CPM fit
 
 `cpm_fit()` (Section 2) and `fit_structure()` ask related but different
 questions. `cpm_fit()` commits to the theoretical angles and communality
-model and tests goodness of fit against that specific structure; a good
+model, and it tests goodness of fit against that specific structure. A good
 overall RMSEA/CFI can still hide unequal spacing or a dominant general
-factor, both of which `fit_structure()` is built to detect. Conversely,
+factor, and `fit_structure()` is built to detect both. Conversely,
 `fit_structure()`'s exploratory criteria say nothing about how well the
-scales match *your* theoretical angles — only RANDALL, via the order you
-supply, references a hypothesis at all, and even that is an order
-hypothesis, not the specific angles `cpm_fit()` estimates. Running both is
-more informative than either alone: agreement between a good CPM fit and
+scales match *your* theoretical angles. Only RANDALL, via the order you
+supply, references a hypothesis at all. Even that is an order hypothesis,
+not the specific angles that `cpm_fit()` estimates. Running both is more
+informative than either alone. Agreement between a good CPM fit and
 circumplex-supporting `fit_structure()` classifications is stronger evidence
-than either result on its own, and disagreement (for example, adequate CPM
-fit alongside a Fisher Test flagging unequal axes) points to exactly which
-aspect of circumplex structure to examine further.
+than either result on its own. Disagreement points to exactly which aspect
+of circumplex structure to examine further. An example of disagreement is
+adequate CPM fit alongside a Fisher Test flagging unequal axes.
 
 ## 5. Ipsatization and what it costs
 
-Ipsatizing — subtracting each respondent's own mean across the octant
-scales from each of their scale scores (`ipsatize()`) — is a common
-preprocessing step in circumplex work, used to remove individual
-differences in overall endorsement before examining profile shape.
+Ipsatizing is a common preprocessing step in circumplex work. It subtracts
+each respondent's own mean across the octant scales from each of their
+scale scores (`ipsatize()`). It is used to remove individual differences in
+overall endorsement before examining profile shape.
 
-For SSM analyses its main cost is simple to state: **ipsatizing discards
+For SSM analyses, its main cost is simple to state: **ipsatizing discards
 elevation.** After row-centering, every respondent's octant scores sum to
-zero, so a group's mean profile has zero mean by construction, and the
+zero. So a group's mean profile has zero mean by construction. Also, the
 covariances between the ipsatized scales and any external measure sum to
-exactly zero — forcing the mean correlation toward zero regardless of how
-strongly the construct relates to the instrument's general factor
+exactly zero. This forces the mean correlation toward zero, regardless of
+how strongly the construct relates to the instrument's general factor
 (Zimmermann & Wright, 2017, p. 4).
 
 
@@ -1141,34 +1148,34 @@ round(comparison, 3)
 #> ipsatized 0.007 0.113 132.949
 ```
 
-The raw-score elevation — which matches the value Zimmermann and Wright
-report for this scale in their Table 4 — collapses to near zero after
-ipsatizing. The displacement stays close to its raw-score value, and the
-amplitude stays broadly similar — though not identical, because ipsatizing
-also changes the scales' variances and intercorrelations, so shape
+The raw-score elevation collapses to near zero after ipsatizing. (The raw
+value matches the value that Zimmermann and Wright report for this scale in
+their Table 4.) The displacement stays close to its raw-score value. The
+amplitude stays broadly similar, though not identical, because ipsatizing
+also changes the scales' variances and intercorrelations. So shape
 parameters shift somewhat too. Guidance:
 
-- If elevation carries meaning in your application (for interpersonal
-  problems it indexes association with generalized interpersonal
-  distress), analyze raw scores and let the SSM separate elevation from
-  shape — that separation is exactly what the model is for.
+- If elevation carries meaning in your application, analyze raw scores and
+  let the SSM separate elevation from shape. (For interpersonal problems,
+  elevation indexes association with generalized interpersonal distress.)
+  That separation is exactly what the model is for.
 - If you receive data that were already ipsatized, do not interpret the
-  elevation row, and say so in the write-up; amplitude and displacement
+  elevation row, and say so in the write-up. Amplitude and displacement
   remain interpretable.
 - Do not describe an ipsatized profile's near-zero elevation as evidence
-  that a construct is "not generally interpersonal" — the preprocessing
-  made that value uninformative.
+  that a construct is "not generally interpersonal". The preprocessing made
+  that value uninformative.
 
 ## 6. Wrap-up
 
-Evaluating circumplex structure has two layers: whether the instrument
-behaves like a circumplex in your sample (`cpm_fit()`), and whether the
-inferential machinery of the SSM can be trusted at your sample size and
-profile (`ssm_ci_accuracy()`). Both are one function call, and both change
-what you should claim more often than users expect — amplitude and
-displacement intervals, in particular, earn their trust only when the
-profile is genuinely differentiated relative to the precision your sample
-size affords.
+Evaluating circumplex structure has two layers. The first is whether the
+instrument behaves like a circumplex in your sample (`cpm_fit()`). The
+second is whether the inferential machinery of the SSM can be trusted at
+your sample size and profile (`ssm_ci_accuracy()`). Both are one function
+call, and both change what you should claim more often than users expect.
+In particular, amplitude and displacement intervals earn their trust only
+when the profile is genuinely differentiated, relative to the precision that
+your sample size affords.
 
 ## References
 
