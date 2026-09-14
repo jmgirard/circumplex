@@ -193,6 +193,11 @@ test_that("--chunks prints every fenced block without #> lines", {
   )
   res <- run_sweep(page, "--chunks")
   expect_identical(res$out, c("```{r named, echo = FALSE}", "x <- 1", "x", "```", "~~~", "raw", "~~~"))
+
+  # A page with no fenced block prints nothing and exits 0, not an R error.
+  res <- run_sweep(c("Only prose here.", "", "More prose."), "--chunks")
+  expect_identical(res$status, 0L)
+  expect_identical(res$out, character(0))
 })
 
 test_that("--inventory lists numbers, degrees, code spans and precision terms", {

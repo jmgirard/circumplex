@@ -76,6 +76,7 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: T7 done. The [O] re-read of the fix diff (one pass) found 6 items (1 medium: the reason given for correlated person effects did not imply correlation). All 6 are fixed. All five files sweep clean, `--chunks` is unchanged, and each `.Rmd.orig` and `.Rmd` pair carries identical edits.
 - 2026-09-14: T8 in progress (checkpoint). Re-knitting growth and visualization at 3526c38b on a scratch worktree left the tree byte-identical, and `tools/check-vignette-staleness.R` exits 0. Opening the PR moves to review (git model), so the `vignette-precompute` run on the PR head is confirmed there.
 - 2026-09-14: claim audit: 81 claims read, 3 corrected — tools/prose-sweep.R, NEWS.md, vignettes/advanced-visualization.Rmd.orig (and its .Rmd). Re-read of the three corrections pending.
+- 2026-09-14: claim-audit re-read: NEWS and the visualization wording hold. The `--chunks` header claim was still wrong, because a page with no fenced block crashed `writeLines()`. A regression test reproduced that exact error, and the fix (`as.character()`) makes it pass. `test-prose-sweep.R` now passes 27 expectations, so the header claim holds.
 
 ## Decisions
 

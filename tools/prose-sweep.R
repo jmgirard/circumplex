@@ -326,7 +326,7 @@ context <- function(text, pos) {
 }
 
 chunk_lines <- function(blocks) {
-  unlist(lapply(blocks, function(b) b[!grepl("^\\s*#>", b)]), use.names = FALSE)
+  as.character(unlist(lapply(blocks, function(b) b[!grepl("^\\s*#>", b)]), use.names = FALSE))
 }
 
 read_terms <- function(path) {
