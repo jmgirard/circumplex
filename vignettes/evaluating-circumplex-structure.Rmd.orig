@@ -124,7 +124,7 @@ rules. Second, these benchmarks are least dependable at small samples. Hu
 and Bentler (1999) found that the ML-based TLI and RMSEA tend to
 *overreject* true-population models when the sample is small. (CFI is not
 among the indices they flag.) Circumplex analyses are often run at modest
-sample sizes. For example, the SSM accuracy thresholds in Section 3 span
+sample sizes. The SSM accuracy thresholds in Section 3 span
 roughly $n = 50$ to $200$. At small $n$, a TLI or RMSEA that falls short
 of its benchmark can reflect the index's small-sample behavior as much as the
 model's fit.
@@ -145,7 +145,7 @@ package's own validation simulations:
 
 For the same reasons, `summary()` prints a caution for analytic (Wald)
 intervals below $N = 2000$. When a boundary marker (defined in the next
-subsection) is present, the caution prints up to very large $N$. In
+subsection) is present, the analytic caution prints up to very large $N$. In
 validation, analytic intervals mis-covered in exactly those regimes.
 Analytic intervals are the only option on the correlation-matrix input path.
 Prefer the bootstrap (the raw-data default) when you have raw data.
@@ -222,10 +222,9 @@ interval contained the truth), not bias in the point estimates.
   Heywood, or a near-tied-optima marker fires**. All three covered $\zeta$
   well below nominal, and ill-conditioning was the worst of them. Two failure
   modes show up in the output rather than hiding in it. First, the analytic
-  standard errors can come back missing. This happens for the angles and the
-  weights at the same time. The reason is that one singular curvature matrix
-  takes all three families (communality indices, angles and weights) down
-  together.
+  standard errors can come back missing. This happens for the communality
+  indices, the angles and the weights at the same time. The reason is that
+  one singular curvature matrix takes all three families down together.
   Second, an interval can collapse to zero
   width, because a negative asymptotic variance was clamped at zero. NO's
   zero-width interval above arrives by a third route: it is a percentile
@@ -400,7 +399,7 @@ Three implications are worth internalizing:
   minimum population affiliation/dominance component needed for accurate
   amplitude and displacement intervals is approximately
   $2.95 \cdot f_a \cdot n^{-0.587}$. Here $f_a$ is an instrument constant
-  (their Eq. 3). It is about .55 for the IIP-C, .63 for the IIP-SC and .85
+  (their Eq. 3). $f_a$ is about .55 for the IIP-C, .63 for the IIP-SC and .85
   for the IAS. At $n = 100$ with an IIP-C-like instrument, that is a
   population component of about .11. That is larger than many real construct
   profiles.
@@ -629,7 +628,7 @@ mean across the selected scales, which is exactly what `ipsatize()` does.
 It approximates removing that general factor (Acton & Revelle, 2004, p. 9),
 so it is `fit_structure()`'s default. Pass `scoring = "raw"` to analyze the
 scores as given. Each of the two scorings carries its own set of cutoffs
-(next section), matched automatically.
+(next subsection), matched automatically.
 
 ```{r fit_structure}
 res <- fit_structure(jz2017, scales = PANO())

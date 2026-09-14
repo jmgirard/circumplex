@@ -169,7 +169,7 @@ The review readers read `53d94913`, and their items carry a V prefix. The claims
 
 ### M125 (evaluating-circumplex-structure)
 
-Reader reports, numbered as the rows cite them: claims reader K1 to K10, one-read reader P1 to P39, and gloss re-read G1 to G14. Items not in a row were fixed. `tests/testthat/test-cpm_boundary_vignette.R` matches phrases of this page's prose, so a rewrite of this page must keep those phrases word for word (added M125).
+Reader reports, numbered as the rows cite them: claims reader K1 to K10, one-read reader P1 to P39, and gloss re-read G1 to G14. Items not in a row were fixed. The exception is the gloss re-read points other than G8 and G13, which confirmed a gloss (corrected M125 review). Review readers carry an R prefix: claims reader RK1 to RK17, one-read reader RP1 to RP38 and diff-bug lens RD1 to RD10. The M125 Review section gives every review item its disposition. `tests/testthat/test-cpm_boundary_vignette.R` matches phrases of this page's prose, so a rewrite of this page must keep those phrases word for word (added M125).
 
 | Page | Item | Disposition | Evidence |
 |---|---|---|---|
@@ -183,3 +183,5 @@ Reader reports, numbered as the rows cite them: claims reader K1 to K10, one-rea
 | structure | P5, P11, P12, P25, P28, P30, P31, P37 | Rejected | Base wording or base structure. An added reason, a table of print rules or a new referent is a new claim. |
 | structure | Claim audit A25: "withholds its displacement" and "withholds the displacement interval" | Kept as a base claim | The `accuracy` chunk output prints the displacement and its interval with a not-interpretable note (`R/ssm_oop.R`). A form-only pass does not change the claim. The doc-bug candidate row holds the fix. |
 | structure | P1, P2, P3, P7, P21, P22, P34 | Rejected | The linked introduction vignette defines the term, or the term is standard for a reader who checks the numbers (ML, overreject, X and Y values, grid, $h^2$). |
+| structure | RD8: "(next section)" for the cutoffs became "(next subsection)" | Kept | "Where the cutoffs come from" is a subsection of Section 4. The base cross-reference named the wrong level. |
+| structure | RD4, RD5: "a 'weak' classification" and "`cpm_fit()` commits to the theoretical angles" | Kept as base claims | Print shows "not clearly supported" and summary shows "unsupported" (`R/fit_structure_oop.R`). The default quasi-circumplex model estimates the angles. The doc-bug candidate row holds both fixes. |
