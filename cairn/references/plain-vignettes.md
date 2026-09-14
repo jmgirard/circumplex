@@ -65,7 +65,7 @@ A period after a single capital letter ("J.") does not end a sentence. A period 
 
 A dash is any of U+2014 (the em dash), `---`, ` -- ` (two hyphens with a space on each side) and `&mdash;`. The sweep does not search code spans or math spans for a dash or a semicolon. HTML entities such as `&amp;` do not count as semicolons. The sweep searches for ids everywhere in swept prose, code spans, link text and URLs included. The id pattern is `\b(M[0-9]{2,3}|D-[0-9]{3}|RR[0-9]{2})\b`.
 
-The sweep exits 0 on a clean page and 1 on a finding. If a file has no sentences, it exits 2. On a usage error, it exits 3. If the locale is not UTF-8, the em dash does not match, so set it:
+The sweep exits 0 on a clean page and 1 on a finding. If a file has no sentences, it exits 2. On a usage error, it exits 3. The `--chunks` mode reads no prose, so it never exits 1 or 2. If the locale is not UTF-8, the em dash does not match, so set it:
 
 ```
 LC_ALL=en_US.UTF-8 Rscript tools/prose-sweep.R vignettes/<name>.Rmd.orig

@@ -23,7 +23,8 @@
 # searched everywhere in the prose, code spans, link text and URLs included.
 #
 # Exit status: 0 clean, 1 on a finding, 2 when a file has no sentences, 3 on a
-# usage error. With several files the highest status wins.
+# usage error. With several files the highest status wins. `--chunks` reads no
+# prose, so it never exits 1 or 2.
 #
 # Base R only.
 

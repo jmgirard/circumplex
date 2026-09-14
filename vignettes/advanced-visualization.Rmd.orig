@@ -400,8 +400,8 @@ second to the third wave is drawn as the short 25 degree arc across the 0/360
 pole. It is not drawn as a 335 degree sweep the long way round. The path is curved
 because `coord_circumplex()` munches each segment along the polar geodesic: it
 splits the segment into short pieces that bend with the circle. The layer
-decides which points connect and in what order. The coordinate system decides
-how each connection is drawn.
+decides which points connect, in what order, and along the short route across
+the boundary. The coordinate system only curves each segment.
 
 Occasions are connected in the order the rows appear in the data, exactly as
 `geom_path()` does. Mapping `group` draws one path per series. When you

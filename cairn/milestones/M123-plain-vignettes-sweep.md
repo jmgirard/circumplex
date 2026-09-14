@@ -74,6 +74,8 @@ The three vignettes `bayesian-ssm-analysis`, `growth-ssm-analysis` and `advanced
 - 2026-09-14: T6 done. Visualization page sweep exits 0 on both `.Rmd.orig` and `.Rmd` (was 33 long sentences, 15 dashes, 5 semicolons). `--chunks` unchanged on both, the two diffs carry identical edits, and the inventory is unchanged. Two glosses added in place: "resultant (the average vector)" and "munches (splits into short pieces)".
 - 2026-09-14: T7 in progress (checkpoint). Inventory comparison: no item lost on any page. The [O] claims reader listed 20 items (1 medium), and the [O] one-read reader listed 37 paragraphs. Fixed 16 claims items and 33 one-read items on all five files, with each gloss checked against the code. The other 8 kept items are ledger rows. NEWS bullet drafted. An [O] re-read of the fix diff is still running.
 - 2026-09-14: T7 done. The [O] re-read of the fix diff (one pass) found 6 items (1 medium: the reason given for correlated person effects did not imply correlation). All 6 are fixed. All five files sweep clean, `--chunks` is unchanged, and each `.Rmd.orig` and `.Rmd` pair carries identical edits.
+- 2026-09-14: T8 in progress (checkpoint). Re-knitting growth and visualization at 3526c38b on a scratch worktree left the tree byte-identical, and `tools/check-vignette-staleness.R` exits 0. Opening the PR moves to review (git model), so the `vignette-precompute` run on the PR head is confirmed there.
+- 2026-09-14: claim audit: 81 claims read, 3 corrected — tools/prose-sweep.R, NEWS.md, vignettes/advanced-visualization.Rmd.orig (and its .Rmd). Re-read of the three corrections pending.
 
 ## Decisions
 

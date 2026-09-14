@@ -4,9 +4,9 @@
 
 * Three vignettes now use plain English: "Bayesian SSM Analysis", "Growth
   Models on SSM Parameters" and "Advanced Circumplex Visualization". Their
-  sentences are shorter and carry no dashes or semicolons. Two of them link the
-  introduction vignette where they first name the SSM parameters. Their code
-  and its output did not change.
+  sentences are shorter and carry no dashes or semicolons. Each now links the
+  introduction vignette near its start. Their code and its output did not
+  change.
 
 # circumplex 2.0.1
 
