@@ -25,8 +25,8 @@
 * `print()` for a multi-group `ssm_sem()` result shows the invariance verdict
   as a `Verdict:` line followed by short labeled lines: `Test:` and `Result:`,
   `Also:` for a rung rejected above the required one when the groups can be
-  compared, and `Contrast:`, `Profiles:` and `Instead:` when they cannot. The
-  labeled values wrap to the console width, and at 77 and 80 columns every
+  compared, and `Contrast:` and `Profiles:` when they cannot, plus `Instead:`
+  when a contrast was requested. The labeled values wrap to the console width, and at 77 and 80 columns every
   line of the block fits. The stored verdict text, and the warning and error
   that quote it, do not change.
 
@@ -36,7 +36,8 @@
   was simulated for, and only when a rung has a `dcfi` value. For other fits,
   including the default `estimator = "MLR"`, the `dcfi` values are still in
   the `invariance` element of the result, and `invariance$dcfi_scope` records
-  the number of groups, the estimator and whether the CFI is plain.
+  the number of groups, the estimator as lavaan reports it (`"ML"` for
+  `"MLR"` and `"MLM"`) and whether the CFI is plain.
 
 * The printed output of `ssm_ci_accuracy()`, `axes_reliability()` and
   `ssm_sem()` results, and the refusal warning of `axes_reliability()` for

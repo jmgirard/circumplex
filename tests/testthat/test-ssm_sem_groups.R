@@ -934,7 +934,8 @@ test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nest
 # Printed ladder layout (M130) -------------------------------------------------
 
 # The fixtures are the cached cases of helper-ssm-sem-ladder.R, one per verdict
-# arm of sem_fit_ladder() and per Delta-CFI scope branch.
+# arm of sem_verdict_facts(), per Delta-CFI scope branch, and for the clause
+# naming the untested rung a contrast needs.
 
 # The verdict line and the labeled lines under it. A labeled line is two
 # spaces, a capitalized label, a colon and a value; a continuation line is
@@ -1108,7 +1109,7 @@ test_that("the verdict prints as a Verdict: line and labeled lines for every ver
   ))
 })
 
-test_that("print() rebuilds the stored verdict, and a rung note never decides the gate (M130)", {
+test_that("print() rebuilds the stored verdict, and a rung note does not decide the gate when the model tier is given (M130)", {
   skip_on_cran()
   skip_if_not_installed("lavaan")
   for (name in ladder_case_names) {
@@ -1119,8 +1120,9 @@ test_that("print() rebuilds the stored verdict, and a rung note never decides th
     expect_identical(facts$verdict, inv$verdict, label = name)
     expect_identical(facts$comparable, inv$comparable, label = name)
   }
-  # A note on the metric row of a fit outside the strict tier: the stored
-  # verdict and comparability come from the model tier, not from the note
+  # With vacuous_metric = FALSE (what sem_fit_ladder() passes outside the
+  # strict tier), a note on the metric row changes neither the verdict nor
+  # comparability
   inv <- ladder_case("rejected_plain")$res$invariance
   tab <- inv$table
   tab$note[tab$rung == "metric"] <- "a remark that is not the strict tier's"

@@ -1,6 +1,7 @@
 # Fixtures for the printed invariance-ladder block of a grouped ssm_sem()
-# result (M130): one fitted case per verdict arm of sem_fit_ladder() and per
-# Delta-CFI scope branch. Each case is fitted once per test run and cached,
+# result (M130): one fitted case per verdict arm of sem_verdict_facts(), per
+# Delta-CFI scope branch, and for the clause naming the untested rung a
+# contrast needs. Each case is fitted once per test run and cached,
 # because several tests read the same fit. The populations are built with
 # sem_pop() (helper-ssm-sem.R), so they need no test-file helpers.
 
@@ -178,7 +179,7 @@ ladder_case <- function(name) {
 }
 
 # The ladder block as print() shows it, from the "Invariance ladder" line to
-# the line before the first "# Profile" line
+# the last non-blank line before the first "# Profile" line after it
 ladder_block_lines <- function(res, width = 80) {
   old <- options(width = width)
   on.exit(options(old), add = TRUE)

@@ -1288,8 +1288,9 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   `print()` shows the `dcfi` and `cr` columns and a short note only inside
 #'   it, and only when a rung has a `dcfi` value. Three separate things put a
 #'   fit outside it. `dcfi_scope` in the returned `invariance` element records
-#'   the number of groups, the estimator, whether it is ML estimation and
-#'   whether the CFI is plain, and the conditions that apply follow from those
+#'   the number of groups, the estimator as lavaan reports it (`"ML"` for
+#'   `"MLR"` and `"MLM"`), whether it is ML estimation and whether the CFI is
+#'   plain, and the conditions that apply follow from those
 #'   fields. A robust estimator -- the default `"MLR"`, or `"MLM"` -- makes lavaan report a robust CFI; so does `missing = "fiml"`, even
 #'   under `estimator = "ML"`, so plain ML is necessary for the label but not
 #'   sufficient. `"GLS"`, `"WLS"`, `"ULS"` and `"DWLS"` are not ML estimation
@@ -1862,8 +1863,9 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 
 # The invariance-ladder block of print.circumplex_ssm_sem(): heading, table,
 # rung notes, the Delta-CFI note (in scope only) and the verdict block. The
-# rung notes, the Delta-CFI note and the labeled verdict values wrap to
-# getOption("width"); the heading and the Verdict: line do not.
+# rung notes, the Delta-CFI note and the labeled verdict values (or, in the
+# fallback, the stored verdict) wrap to getOption("width"); the heading and the
+# Verdict: line of the labeled block do not.
 sem_print_invariance <- function(inv, digits = 3, path = NULL) {
   width <- getOption("width")
   wrap <- function(text, indent = 0, exdent = 2) {
@@ -1906,8 +1908,8 @@ sem_print_invariance <- function(inv, digits = 3, path = NULL) {
   if (dcfi_shown) {
     cat(sem_dcfi_note(width = width))
   }
-  # A ladder without the fields the facts are rebuilt from (for example an
-  # object saved by an older version) prints its stored verdict instead
+  # A ladder without the fields the facts are rebuilt from (for example a
+  # hand-modified object) prints its stored verdict instead
   rebuildable <- !is.null(tab$note) &&
     isTRUE(inv$required %in% sem_invariance_rungs()) &&
     is.numeric(inv$alpha) && length(inv$alpha) == 1
