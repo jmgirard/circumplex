@@ -1,6 +1,6 @@
 # M126: Package figures show every point, interval and axis label clearly
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -61,6 +61,9 @@
 - 2026-09-14: T5 done. The `occasions-path` chunk now builds its canvas from parts with `coord_circumplex(amax = 0.8, r_axis_angle = 67.5)`, matching the vignette's no-second-coord note. After `devtools::install()`, all six grep-listed vignettes were re-knitted. Only four figure PNGs changed, and the other `.Rmd` diff is one elapsed-time line.
 - 2026-09-14: T5 figure verdicts (PNG viewed). `occasions-plot` PASS: 3 panels in one row, each wider than tall, no label over a point. `occasions-path` PASS: axis labels in the 45-90 gap, points near LM clear. `occasions-path-wrapper` PASS: axis labels in the 45-90 gap, clear of the three points and wedges. `cpm_plot` PASS: axis in the JK-LM gap with no label on a point, PA radial line and NO rim arc visible.
 - 2026-09-14: T6 done. The changed snapshots were regenerated under `NOT_CRAN=true` in T1 and T2 (`cpm_plot` x2, `cross-zero circle`). NEWS.md has three improvement entries and two documentation entries. `devtools::test()` FAIL 0, WARN 9 (the same Hessian, zero-SD and lavaan warnings seen before this branch's changes). `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes.
+- claim audit: 22 claims read, 1 corrected — tests/testthat/test-cpm_plot.R
+- 2026-09-14: the claim auditor noted that the `occasions-path` figure's spoke labels changed from degrees to PA to NO, which NEWS did not mention. The NEWS vignette entry now says so (figure viewed in T5).
+- 2026-09-14: all tasks checked, status set to review.
 
 ## Decisions
 

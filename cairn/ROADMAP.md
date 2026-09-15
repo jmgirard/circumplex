@@ -9,7 +9,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M126 | Package figures show every point, interval and axis label clearly | in-progress | — | normal | milestones/M126-clear-package-figures.md |
+| M126 | Package figures show every point, interval and axis label clearly | review | — | normal | milestones/M126-clear-package-figures.md |
 | M127 | Printed reports are shorter and easier to scan | planned | — | normal | milestones/M127-shorter-printed-reports.md |
 | M128 | Vignette code is short and reads on one pass | planned | M126, M127 | normal | milestones/M128-readable-vignette-code.md |
 | M125 | The circumplex-structure vignette reads as plain English | done | M123 | normal | milestones/archive/M125-plain-vignette-structure.md |

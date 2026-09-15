@@ -32,6 +32,8 @@
 * In the "Advanced Circumplex Visualization" vignette, the three panels of the
   occasions trajectory figure are no longer tall and narrow, and the axis
   labels of the two circle figures of the occasions no longer cover a point.
+  The first of those circle figures now labels its spokes with the octant
+  abbreviations (PA to NO) instead of degrees.
 
 * Six vignettes now use plain English: "Bayesian SSM Analysis", "Growth
   Models on SSM Parameters", "Advanced Circumplex Visualization", "Axes

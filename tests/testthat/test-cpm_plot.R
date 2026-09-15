@@ -214,7 +214,7 @@ test_that("plot.circumplex_cpm puts the amplitude axis in a gap with no point", 
     ggplot2::ggplot_build(p)$layout$coord$r_axis_inside
   }
   # With each estimate exactly on its own spoke, every gap holds a point and the
-  # default widest-gap rule applies. (The fitted estimates sit about 1e-7
+  # default widest-gap rule applies. (The fitted estimates sit under 1e-6
   # degrees off their spokes, which leaves a gap empty, so pin them.)
   fit$results$Angle <- fit$results$Angle_theory
   expect_equal(axis_angle(fit), 22.5)
