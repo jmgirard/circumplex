@@ -1,6 +1,6 @@
 # M130: The invariance-ladder verdict prints as labeled lines
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -54,8 +54,8 @@ Verdict:  metric invariance rejected
 - [x] T3: Add the internal verdict-facts helper next to `sem_fit_ladder()` (`R/ssm_sem.R`, about lines 955 to 1040). `sem_fit_ladder()` builds its unchanged `verdict` string from the helper. The print method reads the facts from fields that `res$invariance` already holds.
 - [x] T4: Rewrite `sem_print_invariance()` (about line 1748) and `sem_dcfi_note()` (about line 795) to the layout in Scope. Hide `dcfi`, `cr` and the note outside the ΔCFI scope. Run the T2 tests until they pass.
 - [x] T5: Run the T1 script at the branch head and compare. `res$invariance`, the warnings and the errors must be identical. For the printed text, write a ledger per case in `## Decisions`. The ledger maps each number, verdict and caution in master's block to the new line that carries it, or to the AC2 removal.
-- [ ] T6: Set `options(width = 77)` in the vignette setup chunk and update the AC5 prose. Run `tools/precompute-vignettes.R` for this vignette, the AC5 width count and `tools/check-vignette-staleness.R`. Update the roxygen, run `devtools::document()` and edit NEWS.md.
-- [ ] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T6: Set `options(width = 77)` in the vignette setup chunk and update the AC5 prose. Run `tools/precompute-vignettes.R` for this vignette, the AC5 width count and `tools/check-vignette-staleness.R`. Update the roxygen, run `devtools::document()` and edit NEWS.md.
+- [x] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -72,6 +72,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: claim audit: 31 claims read, 5 corrected — NEWS.md, R/ssm_sem.R, vignettes/sem-based-ssm-analysis.Rmd.orig (width claims held only at 77 and 80, the note is two lines only at 80, `Also:` prints only when comparable, and `dcfi_scope` records fields rather than one reason).
 - 2026-09-15: T7 tests: `devtools::test()` at `08cf7b8a` code gave FAIL 0, WARN 9, SKIP 1, PASS 9788. The 9 warnings match the count M129 recorded on master. Later commits changed only a comment, roxygen and prose.
 - 2026-09-15: T7 first check at `c86ff63d`: 0 errors, 2 warnings, 0 notes, tests OK. Both warnings came from this branch. `sem_verdict_facts()` held a literal `Δχ²` where master had `\u` escapes, because the Edit tool wrote the characters, so a byte-level replace restored the escapes. The test helper called `withr::`, which is not declared, and base `options()` replaces it.
+- 2026-09-15: T7 done. The second check at `c0596ba2` gave Status OK: 0 errors, 0 warnings, 0 notes, and the tests passed. The staleness check passed after the last re-knit. Status is set to review.
 - 2026-09-15: T5 done. The branch head gives `identical()` invariance, warnings and plot errors in all 13 cases, and the printed-text ledger is in `## Decisions`.
 
 ## Decisions
