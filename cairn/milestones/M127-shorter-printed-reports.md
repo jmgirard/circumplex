@@ -21,10 +21,10 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 
 ## Acceptance criteria
 
-- [ ] AC1: At `options(width = 80)`, `summary()` of the seeded object in `tests/testthat/test-ci_accuracy.R`'s "print and summary snapshots" test prints at most half as many lines as at commit `845fb5e7`. Each line that `ssm_ci_verdict_blocks()`, `ssm_ci_structure_note()` and `ssm_ci_cat_para()` wrote in the old output still appears in the new output, with changes only to dashes and line wrapping. Every table column that the summary no longer prints stays in the returned object. The same line rule holds on objects that fire the CAUTION branch (`R/ssm_ci_oop.R:335`), the near-zero regime with its margin rung, a contrast block and an occasions block.
-- [ ] AC2: At `options(width = 80)`, every line of the invariance-ladder block in `print()` output of a multi-group `ssm_sem()` result is at most 80 characters by `nchar(type = "width")`. The block covers the ladder heading, the table, the rung notes, the ΔCFI note and the verdict lines. When lavaan is installed, tests run a fit whose invariance holds and fits whose invariance is rejected with and without a requested contrast. They also run a fit with a rung note and fits with the ΔCFI note in and out of scope.
-- [ ] AC3: The search `grep -nE -- '-- |--"|"--|--\\n|\\u2014|—' R/*.R` lists every candidate. On lines that are not comments, no hit sits in a string that the package prints or signals as a message, warning or error, except the table placeholder named in Out.
-- [ ] AC4: NEWS.md has an entry for each changed printed report. `devtools::test()` and `devtools::check(args = "--no-manual")` report no failure, warning or note that is new relative to master.
+- [x] AC1: At `options(width = 80)`, `summary()` of the seeded object in `tests/testthat/test-ci_accuracy.R`'s "print and summary snapshots" test prints at most half as many lines as at commit `845fb5e7`. Each line that `ssm_ci_verdict_blocks()`, `ssm_ci_structure_note()` and `ssm_ci_cat_para()` wrote in the old output still appears in the new output, with changes only to dashes and line wrapping. Every table column that the summary no longer prints stays in the returned object. The same line rule holds on objects that fire the CAUTION branch (`R/ssm_ci_oop.R:335`), the near-zero regime with its margin rung, a contrast block and an occasions block.
+- [x] AC2: At `options(width = 80)`, every line of the invariance-ladder block in `print()` output of a multi-group `ssm_sem()` result is at most 80 characters by `nchar(type = "width")`. The block covers the ladder heading, the table, the rung notes, the ΔCFI note and the verdict lines. When lavaan is installed, tests run a fit whose invariance holds and fits whose invariance is rejected with and without a requested contrast. They also run a fit with a rung note and fits with the ΔCFI note in and out of scope.
+- [x] AC3: The search `grep -nE -- '-- |--"|"--|--\\n|\\u2014|—' R/*.R` lists every candidate. On lines that are not comments, no hit sits in a string that the package prints or signals as a message, warning or error, except the table placeholder named in Out.
+- [x] AC4: NEWS.md has an entry for each changed printed report. `devtools::test()` and `devtools::check(args = "--no-manual")` report no failure, warning or note that is new relative to master.
 
 ## Coverage
 
@@ -60,3 +60,29 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 
 - 2026-09-14 (question gate): `summary.circumplex_ci_accuracy()` prints one merged table with one row per profile and condition. Its columns are the coverage of e, x, y, a and d, the conditional displacement coverage, the certification rate and the Structural flag. All other coverage and guardrail columns stay only in the returned object (D-057).
 - 2026-09-14 (question gate): the nine tab-aligned setting lines become three prose lines that keep every number.
+
+## Review
+
+Sync: the branch contains `origin/master` (29271ef7). No merge was needed.
+
+- AC1 evidence (2026-09-14, a review script outside the test suite). The five probe objects were built once with the branch code. `summary()` was captured at width 80 from the branch and from a `git archive` of `845fb5e7`. Line counts, old to new: seeded 80 to 35, CAUTION 79 to 34, near-zero 81 to 36, contrast 146 to 68, occasions 134 to 55. Each new count is at most half. The script captured 130 old lines from the three named functions. It squashed whitespace, ignored case, and let `--` become a colon, comma, period, ", because" or ". This is". After that, 0 old lines were missing from the new output. The new test helper asserts every coverage and guardrail column name in the returned object, and the suite passes.
+- AC2 evidence. With lavaan installed, a `NOT_CRAN=true` run of the ladder width test gave 25 expectations and 0 failures. It covers a fit whose invariance holds with the ΔCFI note out of scope. It covers rejected fits with and without a requested contrast, with the note in scope. It covers a strict-tier fit with a rung note. The full `devtools::test()` run also ran it. The work log records the planted width-1000 failure.
+- AC3 evidence. AC3's search over `R/*.R`, with comment lines removed, gives 1 hit on the branch and 15 on `master`. The branch hit is the exempt placeholder at `R/axes_reliability_oop.R:33`. A wider search for any `--` on lines that are not comments finds only that placeholder.
+- AC4 evidence. NEWS.md has three new entries: the accuracy summary, the ladder print, and the dash rewrite. Branch `devtools::test()`: FAIL 0, WARN 9, SKIP 1, PASS 9501. A `git archive` of `master` gave FAIL 0, WARN 9, SKIP 1, PASS 9435. The 9 warnings come from the same tests on both, so none is new. Branch `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes.
+
+Consistency gate (2026-09-14). `cairn_validate.py` exits 0, with one advisory on M128 sizing. No DESIGN.md principle changed, so `cairn_impact` was skipped. `devtools::document()` leaves no diff and prints 0 `resolve link` lines. README.Rmd is unchanged on the branch. `pkgdown::check_pkgdown()` finds no problems. `devtools::build_manual()` builds the PDF. On master, the newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` (6dfc4dc6) are `success`. The two alert audits and the branch-protection check each exit 0.
+
+Independent review: [O] diff-bug, [S] blame-history and [S] prior-review lenses, each in a fresh context. The prior-review lens found no prior-review evidence that the diff contradicts. The PR-comment probe returned no comments. Findings, most severe first, with dispositions set at the merge gate:
+
+- O1. `R/ssm_ci_oop.R:314`: the occasions rank-deficiency CAUTION says the "coverage and width remain valid" and the "fit-statistic pass rate is descriptive only". `summary()` no longer prints the width or the pass rate.
+- O2. `R/ssm_sem.R:1018`: the verdict string stored in `$invariance$verdict` lost "not required for this contrast" for rejected rungs above the required one. No test runs that branch, and NEWS does not name it.
+- O3. `R/ssm_ci_oop.R:516`: the verdict heading dropped "liberal" from "Bradley's (1978) liberal band".
+- O4. `R/ssm_ci_oop.R:397`: the table keys rows on `details$conditions`. A hand-edited object whose conditions differ from `coverage$Condition` loses a rung without a message.
+- O5. `tests/testthat/helper-ci-accuracy-summary.R:17`: the text check compares output to the current helper functions, so wording drift cannot fail it. The seeded and contrast length checks skip on CI.
+- O6. `vignettes/evaluating-circumplex-structure.Rmd:713` still names "the guardrail table", which is no longer printed.
+- O7. `strwrap` splits "alpha =" from its value in the ladder verdict, and "elapsed" from its value in the summary. If "elapsed" splits from its value, the snapshot's per-line mask misses it.
+- O8. `R/ssm_ci_oop.R:404`: with `digits = 0`, Condition values round together, and the `e` column prints with one decimal beside three. The old table did the same.
+- O9. The table prints `d_cert` without `N_conditional`, so a rate from 3 certified reps looks precise.
+- O10. The file header comment at `R/ssm_ci_oop.R:1` still says `summary()` shows the full tables. The certification rule lost "(scale-free, print-independent)". `R/axes_reliability_oop.R:227` is now 77 characters.
+- S1. The new table prints the contrast row's `d_cert` and `cert`. M15-D1 calls these a selection-effect quantity that no display uses. The review checked the old summary. Its raw tables already printed both numbers for the contrast row.
+- S2. Same as the second part of O10.
