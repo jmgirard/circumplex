@@ -56,6 +56,15 @@
 
 ## Documentation
 
+* The code shown in six vignettes now keeps to the package calls and model
+  fits they teach. Code that simulates data, builds or formats a display table,
+  or checks internals is hidden, and the prose says what it does. The "Advanced
+  Circumplex Visualization" and "Growth Models on SSM Parameters" vignettes now
+  load the new simulated datasets with `data()`. The growth vignette shows one
+  `ssm_draws()` call for a single wave and hides the loop over waves. The
+  "Evaluating Circumplex Structure" vignette writes out its three `cpm_fit()`
+  calls.
+
 * The `ssm_plot_trajectory()` help page now describes correctly where each
   confidence bound is drawn on the displacement panel. The lower bound sits
   below the estimate by the counterclockwise angle from the lower bound to the
