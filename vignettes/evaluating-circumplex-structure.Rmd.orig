@@ -530,9 +530,9 @@ a genuine reason. The intervals themselves are unreliable, not merely the
 point on the circle.
 
 The guardrail line confirms that the rule is doing its job. At this
-configuration ($n = 250$, eight octant correlations), a profile whose true
-amplitude is exactly zero would be certified no more often than the benchmark
-rate. That rate is roughly the one-sided error that a user reading the
+configuration ($n = 250$, eight octant correlations), take a profile whose true
+amplitude is exactly zero. Its estimated certification rate does not clearly
+exceed the benchmark rate. That rate is roughly the one-sided error that a user reading the
 guardrail would expect. So no caution fires from the guardrail itself. This
 is the payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff,
 it holds false-certification near its intended rate, even in the near-zero
@@ -731,9 +731,10 @@ together.
 
 `cpm_fit()` (Section 2) and `fit_structure()` ask related but different
 questions. `cpm_fit()` fits a circular process model and tests goodness of fit
-against it. Its default quasi-circumplex model estimates each scale's angle and
-communality, and `model = "constrained-angles"` fixes the angles at their
-theoretical values. A good
+against it. Its default quasi-circumplex model estimates each scale's
+communality and every angle except the `reference` scale's, which stays at its
+theoretical value to fix the rotation. `model = "constrained-angles"` fixes
+all the angles at their theoretical values. A good
 overall RMSEA/CFI can still hide unequal spacing or a dominant general
 factor, and `fit_structure()` is built to detect both. Conversely,
 `fit_structure()`'s exploratory criteria say nothing about how well the

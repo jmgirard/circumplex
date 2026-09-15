@@ -92,8 +92,8 @@
   that the displacement is not interpretable. It does not withhold them. The
   `fit_structure()` label is "not clearly supported" in `print()` and
   "unsupported" in `summary()`, not "weak". And the default `cpm_fit()` model
-  estimates the scale angles instead of fixing them at their theoretical
-  values.
+  estimates every scale angle except the reference scale's, which anchors the
+  rotation. It does not fix them all at their theoretical values.
 
 * The latent profile table in "SEM-Based SSM Analysis" now leaves out the X
   and Y values, and keeps each estimate and its interval on one line.
