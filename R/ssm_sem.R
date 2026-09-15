@@ -973,8 +973,11 @@ sem_verdict_facts <- function(table, required, alpha,
     match(table$rung, rung_order) > req_i & table$p < alpha, , drop = FALSE]
   if (nrow(above) > 0) {
     facts$also <- paste0(
-      "the ", paste(above$rung, collapse = ", "),
-      " rung(s) were also rejected (reported only and not required for this ",
+      "the ", paste(above$rung, collapse = ", "), " rung(s) were ",
+      # "also" reads against something else: a retained verdict, or a rung at
+      # or below the required one that was rejected. Not the untestable arm.
+      if (comparable || nrow(failed) > 0) "also ",
+      "rejected (reported only and not required for this ",
       "contrast, whose estimand is defined at the ", required, " level)"
     )
     if (comparable) {

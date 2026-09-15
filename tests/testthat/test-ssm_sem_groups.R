@@ -1231,6 +1231,26 @@ test_that("a rejection above the required rung is named when the groups cannot b
       ))
     }
   }
+
+  # The required rung's nested test could not be computed: no other rung was
+  # rejected, so the above-rung rejection is not called "also" rejected
+  untestable <- res$invariance$table
+  untestable[untestable$rung == "metric", c("dchisq", "ddf", "p")] <- NA
+  facts <- sem_verdict_facts(untestable, "metric", inv$alpha, FALSE)
+  expect_false(facts$comparable)
+  expect_identical(
+    facts$verdict,
+    ladder_case("untestable_plain")$res$invariance$verdict
+  )
+  planted <- res
+  planted$invariance$table <- untestable
+  planted$invariance$contrast_requested <- FALSE
+  x <- ladder_verdict(ladder_block_lines(planted, 80))
+  expect_identical(x$decision, "comparability cannot be established")
+  expect_identical(x$fields$Also, paste0(
+    "the scalar rung(s) were rejected (reported only and not required ",
+    "for this contrast, whose estimand is defined at the metric level)"
+  ))
 })
 
 test_that("dcfi, cr and a Delta-CFI note of at most two lines print only inside the criterion's scope (M130, D-059)", {

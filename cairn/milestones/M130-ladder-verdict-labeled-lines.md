@@ -104,6 +104,8 @@ Verdict:  metric invariance rejected
 - 2026-09-15: T15 to T18 ticked. At `402ada8c`, `tools/check-vignette-staleness.R` reports all 7 vignettes up to date. The full `devtools::test()` gave FAIL 0, WARN 9, SKIP 1, PASS 10030, on R and test code identical to `402ada8c`. `devtools::check(args = "--no-manual")` is still running for T19.
 - 2026-09-15: T19 done. One script recorded the 14 cases at master `0f8f3289` (a scratch worktree) and at `b4e29054`, both with the head's fixture helper. Invariance, stored verdicts, warnings and plot errors are `identical()` in all 14. The widest block line is 75 at width 77 and 79 at width 80. The 14 printed blocks match the review-pass-2 head. The T15 `Also:` change shows only in the planted-table test. `devtools::check(args = "--no-manual")` gave Status OK with 0 errors, 0 warnings and 0 notes. Status is set to review.
 - 2026-09-15: review pass 3 checkpoint: AC1 to AC6 verified and ticked at `f0f53aaa`, and the consistency gate passes. Reviewers found no failing criterion. Findings R1 to R5 wait for maintainer triage at the merge gate.
+- 2026-09-15: step-7 approval: m130-ladder-verdict-labeled-lines approved for merge
+- 2026-09-15: gate fix R1 (tests first): the `Also:` line drops "also" in the untestable arm. R2 to R4 are folded into two candidate rows, and R5 is rejected. ROADMAP rows are compressed to bring the file under its byte budget.
 
 ## Decisions
 
@@ -193,3 +195,9 @@ Reviewers: [S] prior-review found no prior-review evidence that the diff regress
 - R3: a strict-tier fit with a configural gate says metric invariance "was not tested", though under that tier it holds by construction. The line is true.
 - R4: test gaps. No test covers the untestable arm with an above-rung rejection. The fallback test removes only `required` for non-comparable cases, and no test covers `comparable = NULL`.
 - R5: two rejected rungs at or below the required rung name only the first. Same as master, close to the rejected N7.
+
+Gate dispositions, 2026-09-15, by the maintainer. No finding fails a criterion, so no status change.
+- R1: fix now. `sem_verdict_facts()` says "also" only when the groups are comparable, or when a rung at or below the required one was rejected. The test first failed with "were also rejected" on the planted untestable table. A first version of the fix keyed on the rejected rungs alone. The 14-case comparison caught it at once: it changed the stored verdict of vacuous_above and retained_above, which AC3 forbids. The comparison after the corrected fix gives `identical()` invariance, stored verdicts, warnings and plot errors in all 14 cases, and the 14 printed blocks are unchanged.
+- R2, R3: follow-up, folded into the "Ladder print edge cases" candidate row.
+- R4: follow-up, folded into the "Ladder print test gaps" candidate row. The R1 test covers its untestable-arm gap.
+- R5: rejected, because it matches master and the rejected N7.
