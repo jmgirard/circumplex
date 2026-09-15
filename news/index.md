@@ -102,7 +102,34 @@
   Reliability”, “SEM-Based SSM Analysis” and “Evaluating Circumplex
   Structure”. Their sentences are shorter and carry no em dashes or
   semicolons. Each now links the introduction vignette near its start.
-  Their code and its output did not change.
+  That pass changed neither their code nor its output.
+
+- Four statements in two vignettes now match what the package does. In
+  “SEM-Based SSM Analysis”, the plane factors are fixed isotropic and
+  orthogonal only under the default scaled tier. The strict tier frees
+  the factor variances and covariances. In “Evaluating Circumplex
+  Structure”, [`print()`](https://rdrr.io/r/base/print.html) shows an
+  uncertified displacement and its interval with a note that the
+  displacement is not interpretable. It does not withhold them. The
+  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
+  label is “not clearly supported” in
+  [`print()`](https://rdrr.io/r/base/print.html) and “unsupported” in
+  [`summary()`](https://rdrr.io/r/base/summary.html), not “weak”. And
+  the default
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  model estimates every scale angle except the reference scale’s, which
+  anchors the rotation. It does not fix them all at their theoretical
+  values.
+
+- The latent profile table in “SEM-Based SSM Analysis” now leaves out
+  the X and Y values. On the package website, each estimate and its
+  interval now stay on one line.
+
+- The prose of “Evaluating Circumplex Structure” now names what the
+  shorter printed reports show. For example, it reads the certification
+  rate from the `cert` column of the accuracy summary’s coverage table.
+  “Axes Reliability” now says that its table prints a missing
+  Nunnally-Bernstein comparison as `--`.
 
 ## circumplex 2.0.1
 

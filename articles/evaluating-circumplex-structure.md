@@ -638,7 +638,7 @@ summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 4.7s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 8.3s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -717,17 +717,18 @@ How to read this output:
   factor above 1. This is the case for obsessive–compulsive PD here.
   That rung is the amplitude at which the population would sit exactly
   at the observed CI half-width.
-- **The guardrail table** reports how often profiles were *certified* at
-  each rung. A certified profile has its amplitude CI lower bound at
-  least 0.35 CI-widths above zero. At the 0 rung, any certification is a
-  false certification. The summary prints a caution when the
-  false-certification rate is materially above the rate that a user
-  would expect from the interval level. This is a measured property of
-  the shipped display rule, not a hypothesis test.
-- **The verdict** classifies elevation, amplitude, and
-  certification-conditional displacement coverage at your as-estimated
-  amplitude. The plain-language paragraph states the overall conclusion
-  per profile.
+- **The `cert` column** of the coverage table reports how often profiles
+  were *certified* at each rung. Each profile’s `Guardrail` line gives
+  the rate at the 0 rung. A certified profile has its amplitude CI lower
+  bound at least 0.35 CI-widths above zero. At the 0 rung, any
+  certification is a false certification. The summary prints a caution
+  when the false-certification rate is materially above the rate that a
+  user would expect from the interval level. This is a measured property
+  of the shipped display rule, not a hypothesis test.
+- **The lines under `Verdicts at c = 1`** classify elevation, amplitude,
+  and certification-conditional displacement coverage at your
+  as-estimated amplitude. Each profile’s `Verdict:` paragraph states the
+  overall conclusion.
 
 For a visual summary across the ladder:
 
@@ -741,36 +742,39 @@ accuracy_plot](figures/evaluating-circumplex-structure-accuracy_plot-1.png)
 
 The two profiles tell usefully different stories. Paranoid PD is
 certified. Its amplitude CI lower bound clears the 0.35-CI-width margin,
-so
+so the printed output adds no displacement note. Nothing in its coverage
+table clearly leaves the Bradley band, at the as-estimated amplitude or
+with the population amplitude halved. Obsessive–compulsive PD is *not*
+certified. Its amplitude (about .02 here) is far too close to zero
+relative to its CI width. So the printed output still shows its
+displacement and interval, but with a note that the displacement is not
+interpretable. The
 [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
-reports its displacement. Nothing in its coverage table clearly leaves
-the Bradley band, at the as-estimated amplitude or with the population
-amplitude halved. Obsessive–compulsive PD is *not* certified. Its
-amplitude (about .02 here) is far too close to zero relative to its CI
-width. So the printed output already withholds its displacement as
-uninterpretable, before any coverage question is asked. On top of that,
-the diagnostic shows that its amplitude and displacement CIs under-cover
-badly at this sample size (missing below the truth). So its verdict is a
-caution for a genuine reason. The intervals themselves are unreliable,
-not merely the point on the circle.
+result flags this on its own, before any coverage question is asked. On
+top of that, the diagnostic shows that its amplitude and displacement
+CIs under-cover badly at this sample size. Almost all amplitude misses
+fall below the interval, so the amplitude CI tends to sit above the
+truth. So its verdict is a caution for a genuine reason. The intervals
+themselves are unreliable, not merely the point on the circle.
 
 The guardrail line confirms that the rule is doing its job. At this
-configuration ($`n = 250`$, eight octant correlations), a profile whose
-true amplitude is exactly zero would be certified only at about the
-benchmark rate. That rate is roughly the one-sided error that a user
-reading the guardrail would expect. So no caution fires from the
-guardrail itself. This is the payoff of the scale-free rule. Unlike a
-fixed amplitude-unit cutoff, it holds false-certification near its
-intended rate, even in the near-zero regime that Zimmermann and Wright
-flagged. In that regime, a sample amplitude large enough to look
-non-zero is otherwise the *expected* outcome from a flat population.
+configuration ($`n = 250`$, eight octant correlations), take a profile
+whose true amplitude is exactly zero. Its estimated certification rate
+does not clearly exceed the benchmark rate. That rate is roughly the
+one-sided error that a user reading the guardrail would expect. So no
+caution fires from the guardrail itself. This is the payoff of the
+scale-free rule. Unlike a fixed amplitude-unit cutoff, it keeps
+false-certification from clearly exceeding the benchmark, even in the
+near-zero regime that Zimmermann and Wright flagged. In that regime, a
+sample amplitude large enough to look non-zero is otherwise the
+*expected* outcome from a flat population.
 
 One reading note: at reduced `reps`, classes tend to print as
 `borderline`. This is because the Wilson interval around the estimated
 coverage is too wide to place it clearly inside or outside the Bradley
 band. That is the diagnostic being honest about its own Monte Carlo
 error. The default `reps = 1000` sharpens such classifications into
-`adequate` or `inadequate`.
+`adequate` or `INADEQUATE`.
 
 Two settings are worth knowing. First, `structure = "observed"` rebuilds
 the population from the pooled observed correlations instead of the CPM.
@@ -803,9 +807,9 @@ Putting Sections 2 and 3 together into a checklist:
     “marked” amplitude at modest $`n`$, run
     [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
     and look at the sub-1 ladder rungs.
-4.  **Only interpret displacement when amplitude is credible.** The
-    package already withholds the displacement interval when the
-    amplitude CI lower bound sits less than 0.35 CI-widths above zero.
+4.  **Only interpret displacement when amplitude is credible.** When the
+    amplitude CI lower bound sits less than 0.35 CI-widths above zero,
+    the printed output notes that the displacement is not interpretable.
     The diagnostic tells you how reliable that certification is at your
     configuration.
 5.  **Do not build claims on the fit parameter’s interval.** Zimmermann
@@ -953,8 +957,9 @@ cutoffs behind each classification. It also adds the estimated angle and
 communality of every scale on the two-factor solution, the same geometry
 that the plot below draws. A clean circumplex shows scales at roughly
 the theoretical octant spacing, with broadly similar communalities.
-`Fisher` measures departures in communality, and `Gap`/`VT2`/`Rotation`
-measure departures in even angular spread.
+`Fisher` measures departures in communality, and `Gap` measures
+departures in even angular spacing. `Variance` (VT2) and `Rotation` test
+interstitiality.
 
 ``` r
 
@@ -1027,9 +1032,11 @@ simulated distributions, not significance tests**.
 [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)’s
 [`print()`](https://rdrr.io/r/base/print.html)/[`summary()`](https://rdrr.io/r/base/summary.html)
 output repeats that caveat every time an interpretation is shown. Treat
-a “weak” or unsupported classification as a caution, not as a rejection
-of any specific hypothesis. The caution is to inspect the loading
-configuration (the plot above) and Section 2’s CPM fit together.
+a “not clearly supported” classification
+([`summary()`](https://rdrr.io/r/base/summary.html) prints
+“unsupported”) as a caution, not as a rejection of any specific
+hypothesis. The caution is to inspect the loading configuration (the
+plot above) and Section 2’s CPM fit together.
 
 ### How this complements the CPM fit
 
@@ -1037,9 +1044,12 @@ configuration (the plot above) and Section 2’s CPM fit together.
 (Section 2) and
 [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
 ask related but different questions.
-[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-commits to the theoretical angles and communality model, and it tests
-goodness of fit against that specific structure. A good overall
+[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md) fits
+a circular process model and tests goodness of fit against it. Its
+default quasi-circumplex model estimates each scale’s communality and
+every angle except the `reference` scale’s, which stays at its
+theoretical value to fix the rotation. `model = "constrained-angles"`
+fixes all the angles at their theoretical values. A good overall
 RMSEA/CFI can still hide unequal spacing or a dominant general factor,
 and
 [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)

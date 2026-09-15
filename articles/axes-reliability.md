@@ -229,12 +229,13 @@ items).
 
 Two things are unavailable here, and both for the same reason: they are
 properties of the respondents, not of their correlations. The
-Nunnally–Bernstein comparison is reported as `NA`. It needs each scale’s
-alpha and the axis composite’s variance, and a correlation matrix
-carries neither. And `sd = "raw"` is refused, because there are no scale
-scores to take an observed SD from. If you want SEm on a raw scale, pass
-numeric axis SDs to `sd`. Both are reported rather than silently
-omitted, so a matrix-based result cannot be mistaken for a raw-data one.
+Nunnally–Bernstein comparison is `NA`, which the table prints as `--`.
+It needs each scale’s alpha and the axis composite’s variance, and a
+correlation matrix carries neither. And `sd = "raw"` is refused, because
+there are no scale scores to take an observed SD from. If you want SEm
+on a raw scale, pass numeric axis SDs to `sd`. Both are reported rather
+than silently omitted, so a matrix-based result cannot be mistaken for a
+raw-data one.
 
 ## 5. Caveats to keep in mind
 

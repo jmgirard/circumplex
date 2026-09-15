@@ -822,7 +822,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per</span></span>
 <span><span class="co">#&gt; condition.</span></span>
-<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 4.7s.</span></span>
+<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 8.3s.</span></span>
 <span><span class="co">#&gt; Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) &gt;= 0.35.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
@@ -905,18 +905,20 @@ case for obsessive–compulsive PD here. That rung is the amplitude at
 which the population would sit exactly at the observed CI
 half-width.</li>
 <li>
-<strong>The guardrail table</strong> reports how often profiles were
-<em>certified</em> at each rung. A certified profile has its amplitude
-CI lower bound at least 0.35 CI-widths above zero. At the 0 rung, any
-certification is a false certification. The summary prints a caution
-when the false-certification rate is materially above the rate that a
-user would expect from the interval level. This is a measured property
-of the shipped display rule, not a hypothesis test.</li>
+<strong>The <code>cert</code> column</strong> of the coverage table
+reports how often profiles were <em>certified</em> at each rung. Each
+profile’s <code>Guardrail</code> line gives the rate at the 0 rung. A
+certified profile has its amplitude CI lower bound at least 0.35
+CI-widths above zero. At the 0 rung, any certification is a false
+certification. The summary prints a caution when the false-certification
+rate is materially above the rate that a user would expect from the
+interval level. This is a measured property of the shipped display rule,
+not a hypothesis test.</li>
 <li>
-<strong>The verdict</strong> classifies elevation, amplitude, and
-certification-conditional displacement coverage at your as-estimated
-amplitude. The plain-language paragraph states the overall conclusion
-per profile.</li>
+<strong>The lines under <code>Verdicts at c = 1</code></strong>
+classify elevation, amplitude, and certification-conditional
+displacement coverage at your as-estimated amplitude. Each profile’s
+<code>Verdict:</code> paragraph states the overall conclusion.</li>
 </ul>
 <p>For a visual summary across the ladder:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -924,36 +926,39 @@ per profile.</li>
 <p><img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%"></p>
 <p>The two profiles tell usefully different stories. Paranoid PD is
 certified. Its amplitude CI lower bound clears the 0.35-CI-width margin,
-so <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports its displacement. Nothing in its
-coverage table clearly leaves the Bradley band, at the as-estimated
-amplitude or with the population amplitude halved. Obsessive–compulsive
-PD is <em>not</em> certified. Its amplitude (about .02 here) is far too
-close to zero relative to its CI width. So the printed output already
-withholds its displacement as uninterpretable, before any coverage
-question is asked. On top of that, the diagnostic shows that its
-amplitude and displacement CIs under-cover badly at this sample size
-(missing below the truth). So its verdict is a caution for a genuine
-reason. The intervals themselves are unreliable, not merely the point on
-the circle.</p>
+so the printed output adds no displacement note. Nothing in its coverage
+table clearly leaves the Bradley band, at the as-estimated amplitude or
+with the population amplitude halved. Obsessive–compulsive PD is
+<em>not</em> certified. Its amplitude (about .02 here) is far too close
+to zero relative to its CI width. So the printed output still shows its
+displacement and interval, but with a note that the displacement is not
+interpretable. The <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> result flags this on its
+own, before any coverage question is asked. On top of that, the
+diagnostic shows that its amplitude and displacement CIs under-cover
+badly at this sample size. Almost all amplitude misses fall below the
+interval, so the amplitude CI tends to sit above the truth. So its
+verdict is a caution for a genuine reason. The intervals themselves are
+unreliable, not merely the point on the circle.</p>
 <p>The guardrail line confirms that the rule is doing its job. At this
 configuration
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>250</mn></mrow><annotation encoding="application/x-tex">n = 250</annotation></semantics></math>,
-eight octant correlations), a profile whose true amplitude is exactly
-zero would be certified only at about the benchmark rate. That rate is
-roughly the one-sided error that a user reading the guardrail would
-expect. So no caution fires from the guardrail itself. This is the
-payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff, it
-holds false-certification near its intended rate, even in the near-zero
-regime that Zimmermann and Wright flagged. In that regime, a sample
-amplitude large enough to look non-zero is otherwise the
-<em>expected</em> outcome from a flat population.</p>
+eight octant correlations), take a profile whose true amplitude is
+exactly zero. Its estimated certification rate does not clearly exceed
+the benchmark rate. That rate is roughly the one-sided error that a user
+reading the guardrail would expect. So no caution fires from the
+guardrail itself. This is the payoff of the scale-free rule. Unlike a
+fixed amplitude-unit cutoff, it keeps false-certification from clearly
+exceeding the benchmark, even in the near-zero regime that Zimmermann
+and Wright flagged. In that regime, a sample amplitude large enough to
+look non-zero is otherwise the <em>expected</em> outcome from a flat
+population.</p>
 <p>One reading note: at reduced <code>reps</code>, classes tend to print
 as <code>borderline</code>. This is because the Wilson interval around
 the estimated coverage is too wide to place it clearly inside or outside
 the Bradley band. That is the diagnostic being honest about its own
 Monte Carlo error. The default <code>reps = 1000</code> sharpens such
 classifications into <code>adequate</code> or
-<code>inadequate</code>.</p>
+<code>INADEQUATE</code>.</p>
 <p>Two settings are worth knowing. First,
 <code>structure = "observed"</code> rebuilds the population from the
 pooled observed correlations instead of the CPM. If the two structures
@@ -993,10 +998,10 @@ run <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></cod
 rungs.</li>
 <li>
 <strong>Only interpret displacement when amplitude is
-credible.</strong> The package already withholds the displacement
-interval when the amplitude CI lower bound sits less than 0.35 CI-widths
-above zero. The diagnostic tells you how reliable that certification is
-at your configuration.</li>
+credible.</strong> When the amplitude CI lower bound sits less than 0.35
+CI-widths above zero, the printed output notes that the displacement is
+not interpretable. The diagnostic tells you how reliable that
+certification is at your configuration.</li>
 <li>
 <strong>Do not build claims on the fit parameter’s
 interval.</strong> Zimmermann and Wright found bootstrap
@@ -1145,9 +1150,9 @@ classification. It also adds the estimated angle and communality of
 every scale on the two-factor solution, the same geometry that the plot
 below draws. A clean circumplex shows scales at roughly the theoretical
 octant spacing, with broadly similar communalities. <code>Fisher</code>
-measures departures in communality, and
-<code>Gap</code>/<code>VT2</code>/<code>Rotation</code> measure
-departures in even angular spread.</p>
+measures departures in communality, and <code>Gap</code> measures
+departures in even angular spacing. <code>Variance</code> (VT2) and
+<code>Rotation</code> test interstitiality.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%"></p>
@@ -1222,26 +1227,31 @@ probabilities or p values. The classifications are <strong>heuristic
 classifications read off simulated distributions, not significance
 tests</strong>. <code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s
 <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>/<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> output repeats that caveat
-every time an interpretation is shown. Treat a “weak” or unsupported
-classification as a caution, not as a rejection of any specific
-hypothesis. The caution is to inspect the loading configuration (the
-plot above) and Section 2’s CPM fit together.</p>
+every time an interpretation is shown. Treat a “not clearly supported”
+classification (<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints “unsupported”) as a
+caution, not as a rejection of any specific hypothesis. The caution is
+to inspect the loading configuration (the plot above) and Section 2’s
+CPM fit together.</p>
 </div>
 <div class="section level3">
 <h3 id="how-this-complements-the-cpm-fit">How this complements the CPM fit<a class="anchor" aria-label="anchor" href="#how-this-complements-the-cpm-fit"></a>
 </h3>
 <p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> (Section 2) and <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
-ask related but different questions. <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> commits to
-the theoretical angles and communality model, and it tests goodness of
-fit against that specific structure. A good overall RMSEA/CFI can still
-hide unequal spacing or a dominant general factor, and
-<code><a href="../reference/fit_structure.html">fit_structure()</a></code> is built to detect both. Conversely,
-<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s exploratory criteria say nothing about
-how well the scales match <em>your</em> theoretical angles. Only
-RANDALL, via the order you supply, references a hypothesis at all. Even
-that is an order hypothesis, not the specific angles that
-<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimates. Running both is more informative than
-either alone. Agreement between a good CPM fit and circumplex-supporting
+ask related but different questions. <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> fits a
+circular process model and tests goodness of fit against it. Its default
+quasi-circumplex model estimates each scale’s communality and every
+angle except the <code>reference</code> scale’s, which stays at its
+theoretical value to fix the rotation.
+<code>model = "constrained-angles"</code> fixes all the angles at their
+theoretical values. A good overall RMSEA/CFI can still hide unequal
+spacing or a dominant general factor, and <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
+is built to detect both. Conversely, <code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s
+exploratory criteria say nothing about how well the scales match
+<em>your</em> theoretical angles. Only RANDALL, via the order you
+supply, references a hypothesis at all. Even that is an order
+hypothesis, not the specific angles that <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>
+estimates. Running both is more informative than either alone. Agreement
+between a good CPM fit and circumplex-supporting
 <code><a href="../reference/fit_structure.html">fit_structure()</a></code> classifications is stronger evidence than
 either result on its own. Disagreement points to exactly which aspect of
 circumplex structure to examine further. An example of disagreement is

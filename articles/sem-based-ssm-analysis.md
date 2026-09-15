@@ -260,12 +260,12 @@ latent-plot](figures/sem-based-ssm-analysis-latent-plot-1.png)
 
 ``` r
 
-ssm_table(latent)
+ssm_table(latent, drop_xy = TRUE)
 ```
 
-| Profile | Elevation | X.Value | Y.Value | Amplitude | Displacement | Fit |
-|:---|:---|:---|:---|:---|:---|:---|
-| NARPD | 0.25 (0.21, 0.29) | -0.01 (-0.05, 0.03) | 0.23 (0.19, 0.27) | 0.23 (0.19, 0.27) | 92.1 (82.5, 104.5) | 0.975 |
+| Profile | Elevation         | Amplitude         | Displacement       | Fit   |
+|:--------|:------------------|:------------------|:-------------------|:------|
+| NARPD   | 0.25 (0.21, 0.29) | 0.23 (0.19, 0.27) | 92.1 (82.5, 104.5) | 0.975 |
 
 Latent SSM profile of NARPD {.table}
 
@@ -609,9 +609,10 @@ assumptions. The documentation states them, and the vignette should too.
   geometry load into misfit, not into the angles. Use
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md) to
   examine geometry.
-- **Latent-plane stationarity is assumed, not tested.** The plane
-  factors are fixed isotropic and orthogonal. Anisotropic latent
-  dispersion surfaces only as global misfit.
+- **The scaled tier assumes latent-plane stationarity and does not test
+  it.** That tier fixes the plane factors isotropic and orthogonal, so
+  anisotropic latent dispersion surfaces only as global misfit. The
+  strict tier frees the factor variances and covariances.
 - **The scaled tier assumes the general factor is orthogonal to the
   plane.** A true general-factor lean surfaces as misfit under the
   scaled tier. Use the strict tier to model it.

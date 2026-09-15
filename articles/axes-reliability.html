@@ -304,13 +304,14 @@ symmetric, positive definite, and have a unit diagonal (the model
 assumes unit-variance items).</p>
 <p>Two things are unavailable here, and both for the same reason: they
 are properties of the respondents, not of their correlations. The
-Nunnally–Bernstein comparison is reported as <code>NA</code>. It needs
-each scale’s alpha and the axis composite’s variance, and a correlation
-matrix carries neither. And <code>sd = "raw"</code> is refused, because
-there are no scale scores to take an observed SD from. If you want SEm
-on a raw scale, pass numeric axis SDs to <code>sd</code>. Both are
-reported rather than silently omitted, so a matrix-based result cannot
-be mistaken for a raw-data one.</p>
+Nunnally–Bernstein comparison is <code>NA</code>, which the table prints
+as <code>--</code>. It needs each scale’s alpha and the axis composite’s
+variance, and a correlation matrix carries neither. And
+<code>sd = "raw"</code> is refused, because there are no scale scores to
+take an observed SD from. If you want SEm on a raw scale, pass numeric
+axis SDs to <code>sd</code>. Both are reported rather than silently
+omitted, so a matrix-based result cannot be mistaken for a raw-data
+one.</p>
 </div>
 <div class="section level2">
 <h2 id="caveats-to-keep-in-mind">5. Caveats to keep in mind<a class="anchor" aria-label="anchor" href="#caveats-to-keep-in-mind"></a>
