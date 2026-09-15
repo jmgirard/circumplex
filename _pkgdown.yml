@@ -102,6 +102,9 @@ reference:
   - jz2017
   - raw_iipsc
   - simulated_items
+  - simulated_occasions
+  - simulated_growth
+  - simulated_growth_origin
 navbar:
   title: circumplex
   left:

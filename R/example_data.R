@@ -78,3 +78,71 @@
 #'   reliability of circumplex axes. \emph{SAGE Open}, 3(2).
 #'   \doi{10.1177/2158244013486115}
 "simulated_items"
+
+#' Simulated octant scores at three occasions
+#'
+#' A simulated dataset for demonstrating [ssm_analyze_long()] and
+#' [ssm_plot_trajectory()]. The data are simulated, not collected from people.
+#' 200 persons have scores on the eight octant scales at three waves. At each
+#' wave the group profile is a cosine curve with elevation 0 and amplitude 0.6.
+#' Its displacement
+#' is 330 degrees at `T1`, 355 degrees at `T2` and 20 degrees at `T3`, so the
+#' profile crosses the 0/360 degree boundary between `T2` and `T3`. Each person
+#' has one offset, added to all eight scales at every wave, drawn from a normal
+#' distribution with standard deviation 0.5. Each score also has its own noise,
+#' drawn from a normal distribution with standard deviation 0.5.
+#'
+#' The data are written by a seeded script, `data-raw/simulated_occasions.R`,
+#' which is not in the installed package. Read it on GitHub:
+#' <https://github.com/jmgirard/circumplex/blob/master/data-raw/simulated_occasions.R>.
+#'
+#' @format A data frame with 600 rows (one per person per wave) and 10 columns:
+#' \describe{
+#'   \item{id}{Person identifier, 1 to 200.}
+#'   \item{wave}{Occasion, a factor with levels `T1`, `T2` and `T3` in that
+#'     order.}
+#'   \item{PA, BC, DE, FG, HI, JK, LM, NO}{Scores on the eight octant scales,
+#'     at the angles given by [octants()].}
+#' }
+"simulated_occasions"
+
+#' Simulated octant scores for growth models
+#'
+#' Two simulated datasets for demonstrating growth models on SSM parameters with
+#' [ssm_parameters_id()] and [ssm_draws()]. The data are simulated, not collected
+#' from people. In both datasets, 150 persons have scores on the eight octant
+#' scales at waves 0 to 4.
+#'
+#' A person's score on a scale at a wave is the elevation 0.5, plus a person
+#' elevation effect, plus
+#' \eqn{(x + v_x)\cos\theta + (y + v_y)\sin\theta}{(x + v_x) cos(theta) + (y + v_y) sin(theta)},
+#' plus noise. Here \eqn{\theta}{theta} is the scale angle and \eqn{(x, y)} is the group
+#' coordinate at that wave. The person elevation effect has standard deviation
+#' 0.30, the person effects \eqn{v_x} and \eqn{v_y} have standard deviation 0.15,
+#' and the noise has standard deviation 0.40. All of them are drawn from normal
+#' distributions. The person effects stay the same at every wave, and the two
+#' datasets share them, so each person has the same effects in both.
+#'
+#' The two datasets differ in the group coordinates:
+#' * In `simulated_growth`, \eqn{(x, y)} moves in a straight line, in equal steps,
+#'   from the point with amplitude 0.6 at 350 degrees to the point with amplitude
+#'   0.6 at 10 degrees. The displacement crosses the 0/360 degree boundary.
+#' * In `simulated_growth_origin`, \eqn{x} moves in equal steps from 0.5 to -0.5,
+#'   and \eqn{y} stays at 0.02. The group passes near the origin at wave 2.
+#'
+#' Both datasets are written by one seeded script, `data-raw/simulated_growth.R`,
+#' which is not in the installed package. Read it on GitHub:
+#' <https://github.com/jmgirard/circumplex/blob/master/data-raw/simulated_growth.R>.
+#'
+#' @format Each is a data frame with 750 rows (one per person per wave) and 10
+#'   columns:
+#' \describe{
+#'   \item{person}{Person identifier, 1 to 150.}
+#'   \item{wave}{Wave number, an integer from 0 to 4.}
+#'   \item{PA, BC, DE, FG, HI, JK, LM, NO}{Scores on the eight octant scales,
+#'     at the angles given by [octants()].}
+#' }
+"simulated_growth"
+
+#' @rdname simulated_growth
+"simulated_growth_origin"

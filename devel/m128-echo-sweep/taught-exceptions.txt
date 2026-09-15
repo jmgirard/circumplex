@@ -1,0 +1,10 @@
+# Taught statements at the branch cut (66f8c2ed) that may leave the echoed code.
+# Read by: Rscript tools/vignette-echo-sweep.R --compare-taught
+#   devel/m128-echo-sweep/branch-cut-taught.txt devel/m128-echo-sweep/taught-exceptions.txt
+# One line per exception: `<file>:<line>: <reason>`. Each names a nested
+# statement in branch-cut-taught.txt. The structure vignette's nested cpm_fit()
+# is not an exception: its three fits are written out as shown calls.
+vignettes/growth-ssm-analysis.Rmd.orig:96: simulates data. `colnames(scores) <- PANO()` names the simulated score matrix inside the simulation loop, which moved to data-raw/simulated_growth.R.
+vignettes/growth-ssm-analysis.Rmd.orig:185: builds a display table. The ssm_draws() call inside the loop fills the trajectory table; one shown ssm_draws() call for a single wave teaches the call.
+vignettes/growth-ssm-analysis.Rmd.orig:257: simulates data. `colnames(scores) <- PANO()` names the simulated score matrix inside the origin simulation loop, which moved to data-raw/simulated_growth.R.
+vignettes/growth-ssm-analysis.Rmd.orig:295: builds a display table. The ssm_draws() call inside the loop fills the origin trajectory table that ssm_plot_trajectory() draws.

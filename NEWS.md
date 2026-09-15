@@ -1,5 +1,14 @@
 # circumplex (development version)
 
+## New features
+
+* The package has three new simulated datasets. `simulated_occasions` holds
+  octant scores for 200 persons at three waves. `simulated_growth` and
+  `simulated_growth_origin` hold octant scores for 150 persons at five waves.
+  Their help pages state how the data were simulated. The "Advanced Circumplex
+  Visualization" and "Growth Models on SSM Parameters" vignettes load them with
+  `data()`.
+
 ## Minor improvements and fixes
 
 * `summary()` for an `ssm_ci_accuracy()` result is about half as long. The
@@ -46,6 +55,15 @@
   can still cover a point.
 
 ## Documentation
+
+* The code shown in six vignettes now keeps to the package calls and model
+  fits they teach. Code that simulates data, builds or formats a display table,
+  or checks internals is hidden, and the prose says what it does. The "Advanced
+  Circumplex Visualization" and "Growth Models on SSM Parameters" vignettes now
+  load the new simulated datasets with `data()`. The growth vignette shows
+  `ssm_draws()` called for a single wave and hides the loop over waves. The
+  "Evaluating Circumplex Structure" vignette writes out its three `cpm_fit()`
+  calls.
 
 * The `ssm_plot_trajectory()` help page now describes correctly where each
   confidence bound is drawn on the displacement panel. The lower bound sits

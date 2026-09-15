@@ -125,7 +125,9 @@ For many circumplex instruments, the data needed to perform standardization is i
 
 Before choosing, it is worth knowing what these reference samples generally are.
 
-```{r}
+The counts below come from the sample descriptions in the `Norms` element of every instrument object the package ships. (The code that gathers and counts them is omitted.)
+
+```{r norm-counts, echo = FALSE}
 inst <- Filter(
   function(x) inherits(x, "circumplex_instrument"),
   mget(

@@ -306,15 +306,27 @@ So no bootstrap is needed:
      across BLAS implementations. -->
 ```{r variants}
 R <- cpm$matrices$R # the sample correlation matrix stored by cpm_fit()
-fits <- lapply(
-  c("quasi-circumplex", "equal-communality", "circulant"),
-  function(mod) {
-    cpm_fit(
-      cormat = R, scales = PANO(), angles = octants(),
-      n = nrow(jz2017), model = mod
-    )
-  }
+fit_quasi <- cpm_fit(
+  cormat = R, scales = PANO(), angles = octants(),
+  n = nrow(jz2017), model = "quasi-circumplex"
 )
+fit_equal <- cpm_fit(
+  cormat = R, scales = PANO(), angles = octants(),
+  n = nrow(jz2017), model = "equal-communality"
+)
+fit_circulant <- cpm_fit(
+  cormat = R, scales = PANO(), angles = octants(),
+  n = nrow(jz2017), model = "circulant"
+)
+```
+
+The table below has one row for each of the three fits. It shows the model
+name from `$details$model`, and the degrees of freedom and four fit indices
+from `$fit`. The indices are rounded to three decimals. (The code that builds the table is
+omitted.)
+
+```{r variants-table, echo = FALSE}
+fits <- list(fit_quasi, fit_equal, fit_circulant)
 data.frame(
   model = vapply(fits, function(f) f$details$model, character(1)),
   df = vapply(fits, function(f) f$fit$df, numeric(1)),
@@ -759,6 +771,13 @@ res_ips <- ssm_analyze(
   measures = "PARPD",
   boots = 100
 )
+```
+
+The table below puts the elevation, amplitude and displacement estimates of
+the two analyses side by side, rounded to three decimals. Its rows are `raw`
+and `ipsatized`. (The code that builds the table is omitted.)
+
+```{r ipsatize-table, echo = FALSE}
 comparison <- rbind(
   res_raw$results[, c("e_est", "a_est", "d_est")],
   res_ips$results[, c("e_est", "a_est", "d_est")]

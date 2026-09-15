@@ -1,0 +1,11 @@
+---
+title: "Fixture: a knit-at-build page with no .Rmd.orig, so it is a source"
+---
+
+```{r hidden-count, echo = FALSE}
+n <- nrow(do.call(rbind, list(mtcars)))
+```
+
+```{r shown}
+x_prior <- rnorm(10)
+```
