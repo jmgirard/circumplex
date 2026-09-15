@@ -2046,3 +2046,22 @@ own gate under GP4.
 
 **Reopens.** A user report of a script or tool that parses one of these printed
 reports and broke on the new layout.
+
+### D-057 (2026-09-14): a printed table column may stop printing when it stays in the returned object; corrects D-056's "every number stays printed" condition (M127 plan re-audit)
+
+**Context.** D-056 has two conditions that conflict. One says that every number
+a report printed stays printed. Another says that a table column that stops
+printing stays in the returned object. A column that stops printing removes
+printed numbers, so the first condition makes the second unreachable. The plan
+gate chose an option that said dropped table columns stay in the returned
+object. M127 cannot halve the accuracy summary without dropping columns.
+
+**Decision.** D-056's first condition reads as follows. Every verdict and
+caution that a report printed stays printed. Every number stays printed,
+except the numbers of a table column that stops printing and stays in the
+object that the function returns. D-056's other conditions stand.
+
+**Consequences.** M127 may leave the MC_se, miss and width columns of the
+accuracy coverage table out of `summary()`, because they stay in
+`acc$coverage`. Removing a verdict, a caution or a number that the returned
+object does not hold still needs its own gate under GP4.
