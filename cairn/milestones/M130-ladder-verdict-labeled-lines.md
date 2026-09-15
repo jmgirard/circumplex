@@ -1,6 +1,6 @@
 # M130: The invariance-ladder verdict prints as labeled lines
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -40,12 +40,12 @@ Verdict:  metric invariance rejected
 
 ## Coverage
 
-- AC1 → T2, T3, T4
+- AC1 → T2, T3, T4, T8, T9, T13
 - AC2 → T2, T4
-- AC3 → T1, T3, T5
+- AC3 → T1, T3, T5, T8, T11, T14
 - AC4 → T2, T4
-- AC5 → T6
-- AC6 → T6, T7
+- AC5 → T6, T10
+- AC6 → T6, T7, T10, T14
 
 ## Tasks
 
@@ -56,6 +56,13 @@ Verdict:  metric invariance rejected
 - [x] T5: Run the T1 script at the branch head and compare. `res$invariance`, the warnings and the errors must be identical. For the printed text, write a ledger per case in `## Decisions`. The ledger maps each number, verdict and caution in master's block to the new line that carries it, or to the AC2 removal.
 - [x] T6: Set `options(width = 77)` in the vignette setup chunk and update the AC5 prose. Run `tools/precompute-vignettes.R` for this vignette, the AC5 width count and `tools/check-vignette-staleness.R`. Update the roxygen, run `devtools::document()` and edit NEWS.md.
 - [x] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [ ] T8: (review return, finding O2) For a non-comparable fit with no requested contrast whose nested test could not be computed, print the meaning master printed: a latent contrast is not computable on this instrument's latent metric. The stored verdict stays unchanged. Assert it in the `untestable_plain` test.
+- [ ] T9: (finding O1) When no contrast is requested and the required rung is lowered to the gate (for example the latent-mean path with `invariance = "metric"`), the `Result:` line makes no claim that latent means can be compared. Name the rung retained instead. Add that case as a fixture and a test.
+- [ ] T10: (findings O3 to O5) Correct the "Invariance gating is a modeling decision" vignette bullet (the condition is two groups, ML and a plain CFI, not multivariate normality). In NEWS.md and the `ssm_sem()` roxygen, say that nothing prints when every `dcfi` is NA. In NEWS.md, say that `dcfi_scope` records the fields. Rewrap the roxygen line over 80 characters. Re-knit, re-document, and run the AC5 width count and the staleness check.
+- [ ] T11: (finding O6) Base the vacuous-tier arm on `sem_strict_metric_vacuous()` again, or add a test that fails when a non-vacuous note on the metric row changes the verdict or `comparable`.
+- [ ] T12: (finding O7) `print()` of an `invariance` element that lacks the fields the facts helper reads falls back to printing `inv$verdict`, with a test.
+- [ ] T13: (finding O11) Start the `Verdict:` value in the same column as the labeled values, and stop repeating the rung name on a `Test:` line when only one rung was tested. Keep AC4 widths.
+- [ ] T14: Re-run the T5 comparison over all cases (identical `res$invariance`, warnings, plot errors, stored verdicts), `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -74,9 +81,33 @@ Verdict:  metric invariance rejected
 - 2026-09-15: T7 first check at `c86ff63d`: 0 errors, 2 warnings, 0 notes, tests OK. Both warnings came from this branch. `sem_verdict_facts()` held a literal `Δχ²` where master had `\u` escapes, because the Edit tool wrote the characters, so a byte-level replace restored the escapes. The test helper called `withr::`, which is not declared, and base `options()` replaces it.
 - 2026-09-15: T7 done. The second check at `c0596ba2` gave Status OK: 0 errors, 0 warnings, 0 notes, and the tests passed. The staleness check passed after the last re-knit. Status is set to review.
 - 2026-09-15: T5 done. The branch head gives `identical()` invariance, warnings and plot errors in all 13 cases, and the printed-text ledger is in `## Decisions`.
+- 2026-09-15: review return 1 (defect): AC1 and AC3 fail. For `untestable_plain`, the print says the latent contrast is not computed, where master and AC1 say a latent contrast is not computable. Maintainer triage added T8 to T13 and a candidate row. Status back to in-progress.
 
 ## Decisions
 
 - 2026-09-15 (T5 ledger): master `0f8f3289` against the branch head, over the 13 cases of `helper-ssm-sem-ladder.R`. `res$invariance`, the warnings and the `ssm_plot_contrast()` errors are `identical()` in all 13. The printed block maps as follows. The table's rung, chisq, df, cfi, rmsea, dchisq, ddf and p columns and the `note [rung]` lines print unchanged. In scope with a dcfi value (vacuous_above, rejected, untestable), the dcfi and cr columns print unchanged. Note: "Cheung & Rensvold (2002)", "alpha = .01", "two-group ML simulation" and "ΔCFI < -0.01 rejects that step" become the note's "Cheung & Rensvold (2002), two-group ML simulation, alpha = .01; cr = reject when ΔCFI < -0.01". "It is secondary and reported only: the verdict below gates on the nested chi-square difference test alone" becomes "the verdict does not use it", because the verdict block states its own nested test. Out of scope (retained_one, retained_above, gls, groups3_ml, groups3_mlr), the dcfi column, "NOT validated here (<reason>)" and "descriptive only, with no binary verdict" are removed under D-059. In scope with every dcfi NA (configural, vacuous), master printed an all-blank dcfi column and no note, and the column no longer prints. Verdict: each retained, rejected or untestable test string (Δχ², df, p, alpha) moves whole to a `Test:` line. "these groups cannot be compared on this instrument's latent metric", "no cross-group constraints required", "(not testable)", "strict tier's fixed loadings", "holds by construction", "comparability cannot be established", "Inspect the ladder fits directly" and the above-rung sentence move to the decision, `Test:`, `Result:` or `Also:`. "so the latent contrast is not computed" and "The requested latent contrast was therefore not computed" become `Contrast:`. "A latent contrast is not computable on this instrument's latent metric" becomes `Contrast:` for the rejected case and "the latent contrast is not computed" for the untestable case without a requested contrast, as the stored verdict says. "The rows below are each group's separate (configural) latent profile" becomes `Profiles:`. "The observed-score contrast from ssm_analyze() answers a different question and remains available" becomes `Instead:`. The new `Result:` lines "the groups can be compared at the <required> level" state `comparable = TRUE` in words.
 
 ## Review
+
+First pass, 2026-09-15, at `609ca47e`. The default branch had not moved, so no merge was needed.
+
+Evidence:
+- AC1: FAILS. At the branch head, `untestable_plain` prints `Contrast: the latent contrast is not computed`. The criterion requires that, with no requested contrast, the lines say a latent contrast is not computable. Master's print of the same case said "A latent contrast is not computable on this instrument's latent metric". The other cases print the required lines (verdict blocks read at width 80 for all 13 cases). Not ticked.
+- AC2: `dcfi` and the note print in exactly the 5 cases where `dcfi_scope$in_scope` is TRUE and a `dcfi` value is not NA, and in none of the other 8. The note is 2 lines at width 77 (read for `vacuous_above` and `untestable_plain`). `res$invariance` is `identical()` to master in all 13 cases. Not ticked, because the milestone returns and the evidence is re-run at re-review.
+- AC3: FAILS on meaning for `untestable_plain` (the AC1 line above). `res$invariance`, warnings, `ssm_plot_contrast()` errors and stored verdict strings are `identical()` at `0f8f3289` and the branch head in all 13 cases (`m130-baseline.R` re-run in a scratch worktree of `0f8f3289`). Not ticked.
+- AC4: maximum block width over the 13 cases is 75 at width 77 and 79 at width 80, with `nchar(type = "width")`. Not ticked (return).
+- AC5: the re-knitted ladder block (lines 408 to 421) has 14 `#>` lines, maximum width 75, none over 80. `tools/check-vignette-staleness.R` passes. The prose has the defect in finding O3. Not ticked.
+- AC6: `devtools::test()` FAIL 0, WARN 9, SKIP 1, PASS 9788. `devtools::check(args = "--no-manual")` Status OK, 0 errors, 0 warnings, 0 notes. NEWS.md has the defect in finding O4. Not ticked.
+
+Consistency gate: `cairn_validate.py` passes. `document()` leaves no diff and prints no `resolve link` line. `pkgdown::check_pkgdown()` finds no problems. README.Rmd is unchanged. The newest verdict push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master (`af167d0e`) are success. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit clean. No DESIGN principle changed.
+
+Reviewers: [S] blame-history found nothing. [S] prior-review found no prior-review evidence that the diff regresses (M57, M127, M129 archives read; no PR review comments). [O] diff-bug reported 12 findings, dispositions by the maintainer at the gate:
+- O2 (untestable arm without a contrast changes meaning): AC1 and AC3 failure, defect return, T8.
+- O1 (`Result:` claims comparability at a lowered required rung on the latent-mean path): fix in this return, T9.
+- O3 to O5 (vignette bullet cites multivariate normality; NEWS and roxygen omit the all-NA case; NEWS says `dcfi_scope` records why; long roxygen line): fix in this return, T10.
+- O6 (vacuous arm inferred from a non-empty metric-row note): fix in this return, T11.
+- O7 (`print()` errors on an `invariance` element lacking `required` or `alpha`): fix in this return, T12.
+- O8 (`test_stat()` rebuilds the expected string with the code's own formatting) and O9 (no test requires a line to wrap): follow-up, candidate row.
+- O10 (literal non-ASCII characters in test code): rejected, because tests are read as UTF-8 and check does not flag them.
+- O11 (`Verdict:` value column differs from labeled values; `Test:` repeats the rung): alignment and repeat fixed in this return, T13.
+- O12 (released 2.0.0 NEWS entry describes the old print): rejected, because released history stays as written.
