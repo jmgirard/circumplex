@@ -62,7 +62,7 @@ test_that("plot.circumplex_cpm names scales whose CI wedge is inestimable", {
   )
   expect_true(all(is.na(fit$results$Angle_lci)))  # confirm the fixture
 
-  expect_warning(p <- plot(fit), "wedge omitted")
+  expect_warning(p <- plot(fit), "PA \\(inestimable interval\\)")
   expect_true(ggplot2::is_ggplot(p))
 
   b <- ggplot2::ggplot_build(p)
@@ -156,8 +156,11 @@ test_that("a both-zero interval draws a cap centered on the interval (AC1)", {
   skip_on_cran()
   fit <- clean_cpm_fit()
   for (ang in list(c(0, 0), c(360, 360))) {
-    # The communality estimate (0.8464) sits away from the zero-width bound.
+    # The communality estimate (0.8464) sits away from the zero-width bound,
+    # and the angle estimate is moved to 20 so that a cap centred on the point
+    # would fail the midpoint check.
     f <- with_bounds(fit, "LM", angle = ang, zeta = c(0.8, 0.8))
+    f$results$Angle[f$results$Scale == "LM"] <- 20
     m <- expect_visible_mark(f, "LM")
     expect_equal(m$y, 0.64)
     expect_equal(m$yend, 0.64)
@@ -196,6 +199,18 @@ test_that("a communality interval with upper bound 0 warns and draws a point (AC
   expect_equal(nrow(cpm_layer(b, p, "GeomSsmPoint")), 8L)
 })
 
+test_that("a full-circle angle interval warns with its reason and draws a point (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  f <- with_bounds(fit, "DE", angle = c(0, 360))
+  expect_warning(p <- plot(f), "DE \\(full-circle angle interval\\)")
+  m <- zero_width_marks(p, "DE")
+  expect_true(is.null(m) || nrow(m) == 0)
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmArc")), 6L)
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmPoint")), 8L)
+})
+
 test_that("plot.circumplex_cpm validates its arguments", {
   skip_on_cran()
   fit <- clean_cpm_fit()
@@ -213,9 +228,14 @@ test_that("plot.circumplex_cpm puts the amplitude axis in a gap with no point", 
     p <- suppressWarnings(plot(fit))
     ggplot2::ggplot_build(p)$layout$coord$r_axis_inside
   }
-  # With each estimate exactly on its own spoke, every gap holds a point and the
-  # default widest-gap rule applies. (The fitted estimates sit under 1e-6
-  # degrees off their spokes, which leaves a gap empty, so pin them.)
+  # The fitted estimates sit off their spokes by rounding error only, under 1e-6
+  # degrees either way. They count as on their spokes, so every gap holds a
+  # point and the default widest-gap rule applies.
+  # Circular distance, so LM's estimate near 0 compares with its 360 spoke.
+  off <- abs((fit$results$Angle - fit$results$Angle_theory + 180) %% 360 - 180)
+  expect_true(any(off > 0))
+  expect_true(all(off < 1e-6))
+  expect_equal(axis_angle(fit), 22.5)
   fit$results$Angle <- fit$results$Angle_theory
   expect_equal(axis_angle(fit), 22.5)
   # Moving two estimates off their spokes clears the 45-90 gap first.

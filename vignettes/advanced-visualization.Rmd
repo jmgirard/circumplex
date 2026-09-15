@@ -160,8 +160,9 @@ center to resolve closely spaced profiles, and say so in the caption.
 
 The amplitude (radial) axis and its tick labels are placed automatically in the
 widest gap between the displacement spokes. So they never collide with a spoke
-label. You can override that with `r_axis_angle`, given as a displacement in
-degrees:
+label. `ssm_plot_circle()` and `plot()` for a CPM fit go one step further and
+use the widest gap that holds no plotted point. You can override the placement
+with `r_axis_angle`, given as a displacement in degrees:
 
 
 ``` r
@@ -478,10 +479,13 @@ label their scales identically.
 
 The built-in plotting functions are implemented on exactly these components:
 `ssm_plot_circle()` is `ggcircumplex()` plus `geom_ssm_arc()` and
-`geom_ssm_point()`, and `ssm_plot_curve()` uses `scale_x_circumplex()` for its
-angle axis. So you can always start from a built-in plot and add to it, or
-rebuild it from the pieces when you need finer control. Whichever route you
-take, the coordinates are computed the same way, so the results line up.
+`geom_ssm_point()`, with the amplitude axis moved to a gap that holds no point.
+`ssm_plot_curve()` uses `scale_x_circumplex()` for its angle axis. So you can
+always start from a built-in plot and add to it, or rebuild it from the pieces
+when you need finer control. Whichever route you take, the coordinates are
+computed the same way, so the results line up. Only the amplitude axis can
+differ: to put it where `ssm_plot_circle()` puts it, pass `r_axis_angle` to
+`coord_circumplex()`, as in the path figure above.
 
 ## References
 

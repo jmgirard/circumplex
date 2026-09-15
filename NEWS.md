@@ -5,9 +5,9 @@
 * `plot()` for a `cpm_fit()` result now draws a confidence interval of zero
   width as a visible line. Before, a zero-width angle interval was not drawn at
   all. A zero-width angle interval is now drawn as a line along the radius. A
-  zero-width
-  communality interval is drawn as a line along the arc. When both widths are
-  zero, a short cap of fixed length is drawn across the interval. The
+  zero-width communality interval is drawn as a line along the arc. When both
+  widths are zero, a short cap is drawn across the interval. The cap has the
+  same length at every radius except near the centre, where it is shorter. The
   reference scale, whose angle is fixed, now shows its communality interval
   this way.
 
@@ -18,8 +18,9 @@
 
 * `ssm_plot_circle()` and `plot()` for a `cpm_fit()` result now draw the
   amplitude (or communality) axis in the widest gap between spokes that holds
-  no plotted point. The axis labels therefore no longer sit on top of a point.
-  When every gap holds a point, the axis goes in the widest gap, as before.
+  no plotted point, so that the axis labels do not cover a point. When every
+  gap holds a point, the axis goes in the widest gap, as before, and a label
+  can still cover a point.
 
 ## Documentation
 

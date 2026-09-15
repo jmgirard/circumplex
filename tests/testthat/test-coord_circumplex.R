@@ -246,9 +246,15 @@ test_that("ssm_r_axis_angle_clear() picks the widest gap holding no point", {
   expect_equal(ssm_r_axis_angle_clear(octants(), c(0, 360)), 67.5)
   # A point on any spoke holds both gaps next to it.
   expect_equal(ssm_r_axis_angle_clear(octants(), 45), 112.5)
+  # A point within 1e-4 degrees of a spoke is on it, on either side, so the
+  # sign of a fit's rounding error does not pick the gap.
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45 - 1e-7), 112.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45 + 1e-7), 112.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 360 - 1e-7), 67.5)
   # A point just inside a gap holds only that gap.
   expect_equal(ssm_r_axis_angle_clear(octants(), 44.9), 67.5)
   expect_equal(ssm_r_axis_angle_clear(octants(), 45.1), 22.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45 + 1e-3), 22.5)
   # Uneven spokes: the widest gap holds a point, so the axis moves to the
   # widest empty one, and the tie between the two 45-degree gaps breaks low.
   expect_equal(ssm_r_axis_angle_clear(c(0, 45, 90), 200), 22.5)

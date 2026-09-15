@@ -37,8 +37,10 @@ estimated angle departed from the hypothesised one. Where the confidence
 intervals are estimable, a wedge spans each item's angle CI (angularly) and
 communality CI (radially). An interval of zero width has no area, so it is
 drawn as a line instead: along the radius for a zero-width angle CI, along
-the arc for a zero-width communality CI, and as a short fixed-length cap
-when both are zero. A scale whose communality CI is zero at both ends has no
+the arc for a zero-width communality CI, and as a short cap across the
+interval when both are zero. The cap has the same drawn length at every
+radius except near the centre, where it spans at most a quarter turn and so
+is shorter. A scale whose communality CI is zero at both ends has no
 visible interval at the centre and is drawn as a point, with a warning.
 }
 \details{

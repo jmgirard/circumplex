@@ -96,3 +96,12 @@ Independent review (three fresh reviewers). Blame-history: no findings. Prior-re
 - F11 (diff-bug): a zero-width interval stored as 0/360 is reported as a full-circle interval. Proposed: reject. By the package convention `ssm_arc_span(0, 360)` is 360, a full circle.
 - F12 (diff-bug): the vignette hard-codes `r_axis_angle = 67.5`. Proposed: reject. The chunk teaches the argument, and 67.5 is what the rule gives for this data.
 - F13 (prior-review): the hand-built `occasions-path` canvas drops `ggcircumplex()`'s blank extent layer and y-scale name, the kind of chunk rewrite that broke in an earlier vignette review. Proposed: reject. The figure was viewed and renders with the correct range and no axis title.
+
+Gate triage (2026-09-14): the user accepted every proposed disposition. F1, F2, F4, F5, F7 and F8 are fixed now. F3, F6 and F9 to F13 are rejected for the reasons above. No finding showed a criterion failing, so status stays `review`.
+
+Fix-now evidence:
+- F1: `ssm_r_axis_angle_clear()` counts a point within 1e-4 degrees of a spoke as on it. New tests assert 112.5 for 45 ± 1e-7, 67.5 for 360 - 1e-7 and 22.5 for 45 + 1e-3. The CPM axis test now uses the fitted angles, which are off their spokes by more than 0 and less than 1e-6, and gets 22.5. The two `cpm_plot` snapshots were regenerated under `NOT_CRAN=true`. Each differs from master's copy by one added line, the PA radial mark. For the vignette's jz2017 fit, the nearest non-reference estimate is 0.509 degrees from a spoke and the rule still gives 337.5, so `cpm_plot` does not change.
+- F2 and F5: the help page and NEWS now say the cap is shorter near the centre, and NEWS says a label can still cover a point when every gap holds one.
+- F4: both vignette passages now name the data-aware axis, identically in `.Rmd.orig` and `.Rmd`.
+- F7: the jz2017 test asserts "PA (inestimable interval)", and a new test asserts "DE (full-circle angle interval)" with 6 wedges and 8 points.
+- F8: the both-zero test moves LM's angle estimate to 20, so the midpoint check fails for a cap centred on the point.
