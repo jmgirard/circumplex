@@ -182,9 +182,9 @@ ssm_r_axis_angle_clear <- function(breaks, points) {
   b <- sort(unique(breaks[is.finite(breaks)] %% 360))
   pts <- points[is.finite(points)] %% 360
   if (length(b) < 1L || length(pts) < 1L) return(ssm_r_axis_angle(breaks))
-  # A fitted estimate meant to sit on a spoke lands a little off it (a clean CPM
-  # fit's estimates sit under 1e-6 degrees away, per the `clean_cpm_fit()` axis
-  # test in tests/testthat/test-cpm_plot.R), and the sign of that error
+  # A fitted estimate meant to sit on a spoke lands a little off it, by an
+  # amount that varies by platform (the `clean_cpm_fit()` axis test in
+  # tests/testthat/test-cpm_plot.R checks it stays inside `on_spoke`), and the sign of that error
   # would otherwise pick the gap. Within `on_spoke` degrees a point counts as on
   # the spoke; no plotted difference is that small.
   on_spoke <- 1e-4

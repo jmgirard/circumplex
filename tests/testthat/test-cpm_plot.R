@@ -228,13 +228,14 @@ test_that("plot.circumplex_cpm puts the amplitude axis in a gap with no point", 
     p <- suppressWarnings(plot(fit))
     ggplot2::ggplot_build(p)$layout$coord$r_axis_inside
   }
-  # The fitted estimates sit off their spokes by rounding error only, under 1e-6
-  # degrees either way. They count as on their spokes, so every gap holds a
-  # point and the default widest-gap rule applies.
+  # The fitted estimates sit off their spokes by optimizer error only, and how
+  # far varies by platform. Inside the 1e-4 degree on-spoke tolerance they count
+  # as on their spokes, so every gap holds a point and the default widest-gap
+  # rule applies.
   # Circular distance, so LM's estimate near 0 compares with its 360 spoke.
   off <- abs((fit$results$Angle - fit$results$Angle_theory + 180) %% 360 - 180)
   expect_true(any(off > 0))
-  expect_true(all(off < 1e-6))
+  expect_true(all(off < 1e-4))
   expect_equal(axis_angle(fit), 22.5)
   fit$results$Angle <- fit$results$Angle_theory
   expect_equal(axis_angle(fit), 22.5)

@@ -67,6 +67,7 @@
 - 2026-09-14: review gate: user accepted the proposed triage (6 fix now, 7 rejected). Fixes landed in c8878ded, re-verified clean.
 - step-7 approval: m126-clear-package-figures approved for merge
 - 2026-09-14: CI wait on PR #159 reached the time limit. matrix, pkgdown and vignette-precompute passed, and the three R-CMD-check jobs were still pending. Merge not yet made.
+- 2026-09-15: resume: PR #159 open with approval recorded. CI ubuntu-latest failed at `test-cpm_plot.R:237` (`all(off < 1e-06)` FALSE), so the fitted CPM angles sit more than 1e-6 degrees off their spokes there. The axis assertion after it passed. The bound now matches the 1e-4 on-spoke tolerance the code uses, and the code comment no longer states 1e-6. Master (cairn-only commits) merged into the branch.
 
 ## Decisions
 
@@ -108,4 +109,5 @@ Fix-now evidence:
 - F4: both vignette passages now name the data-aware axis, identically in `.Rmd.orig` and `.Rmd`.
 - F7: the jz2017 test asserts "PA (inestimable interval)", and a new test asserts "DE (full-circle angle interval)" with 6 wedges and 8 points.
 - F8: the both-zero test moves LM's angle estimate to 20, so the midpoint check fails for a cap centred on the point.
+- Correction (2026-09-15): the F1 line above says the fitted angles are off their spokes by less than 1e-6. That holds on macOS only. Ubuntu CI measured more, so the test now bounds them by the 1e-4 tolerance. Both affected test files pass locally under `NOT_CRAN=true` (111 and 203 expectations). Master moved only in `cairn/` files (`git diff --stat` over the merge), so the code evidence above stands, and CI re-runs on the merged head.
 - Re-verification after the fixes (commit c8878ded): `devtools::test()` FAIL 0, WARN 9, SKIP 1, PASS 9435, with the same warning and skip sites as master. `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. `document()` gave 0 `resolve link` lines.
