@@ -38,7 +38,7 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 ## Tasks
 
 - [x] T1: Cut the branch after M127 and M128 merge. Build the `bayesian-ssm-analysis` and `using-instruments` articles with pkgdown at 73218afa as AC2's baseline. Run `devtools::install()` so the knit reads the new package (lesson M21 family).
-- [ ] T2: Make the SEM latent table text smaller with non-breaking spaces or an inline style in its hidden `kable()` chunk, and add `drop_xy = TRUE` if that fits the prose. Build the article with pkgdown and view it at 1280 px.
+- [x] T2: Make the SEM latent table text smaller with non-breaking spaces or an inline style in its hidden `kable()` chunk, and add `drop_xy = TRUE` if that fits the prose. Build the article with pkgdown and view it at 1280 px.
 - [x] T3: Fix doc claims (ii) to (v), checking each against its `R/` file, and re-read each corrected sentence against the code (plain-vignettes rule 9). Keep the phrases that `tests/testthat/test-cpm_boundary_vignette.R` matches.
 - [ ] T4: Re-knit every precomputed vignette and build the two knit-at-build articles. List each sentence AC2 selects with the output line it names, in the work log. Update the prose that no longer matches, and run AC4's search.
 - [ ] T5: Run `tools/prose-sweep.R`, `tools/check-vignette-staleness.R`, `devtools::test()` and `devtools::check(args = "--no-manual")`. Add a NEWS.md documentation entry.
@@ -51,5 +51,6 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 - 2026-09-15: implement started, branch cut from master at 714d5c78. T1: pkgdown built the baseline `bayesian-ssm-analysis` and `using-instruments` in a 73218afa worktree against a 73218afa scratch-library install, saved outside the repo. The branch package is installed with `R CMD INSTALL`.
 - 2026-09-15: question gate: the SEM latent table uses `drop_xy = TRUE` with non-breaking spaces (maintainer choice over keeping X/Y with sideways scroll or smaller text).
 - 2026-09-15: T3 fixed four claims against the code. (ii) The plane constraint is scoped to the scaled tier, and the strict tier frees the factor covariance (`R/ssm_sem_syntax.R`). (iii) Three sentences say print shows the displacement with a not-interpretable note (`R/ssm_oop.R`). (iv) "weak" became "not clearly supported" (print) and "unsupported" (summary), per `R/fit_structure_oop.R`. (v) The `cpm_fit()` default estimates angles, and constrained-angles fixes them (`R/cpm_fit.R`). Grep hits kept as true: sem 448 (`sem_dcfi_flag()` gives no verdict out of scope), evaluating 180 (`R/cpm_fit.R` Hessian marker text), 238 and 405 (simulation and literature findings), 573 (amplitude bias). prose-sweep exits 0 on both sources. The T2 chunk edit rides in this commit, not yet verified.
+- 2026-09-15: T2: the SEM latent table uses `drop_xy = TRUE` and non-breaking spaces, and the shown call matches. The pkgdown article, served locally at 1280 px with site CSS, gives 1 line per cell (table 776 px in an 800 px column). A control with the old 7-column spaced markup in the same column wrapped 5 cells to 2 lines.
 
 ## Decisions
