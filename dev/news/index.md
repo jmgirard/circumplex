@@ -4,6 +4,36 @@
 
 ### Minor improvements and fixes
 
+- [`summary()`](https://rdrr.io/r/base/summary.html) for an
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  result is about half as long. The settings print as three short
+  sentences, usually on three lines. The coverage and guardrail tables
+  are replaced by one table with a row for each profile and amplitude
+  condition. That table shows the coverage of each parameter, the
+  displacement coverage when certified, the certification rate and the
+  `Structural` flag. The other columns are no longer printed, but they
+  are still in the `coverage` and `guardrail` elements of the result.
+  The verdicts and cautions say the same things. Only their punctuation
+  and a few joining words change (see the entry on dashes below).
+
+- [`print()`](https://rdrr.io/r/base/print.html) for a multi-group
+  [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
+  result wraps the notes and verdict of the invariance ladder to the
+  console width. The ΔCFI note and the text shown when the groups cannot
+  be compared are shorter and name the same conditions. A verdict that
+  already ends in a period no longer gets a second one.
+
+- The printed output of
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  and
+  [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
+  results, and the refusal warning of
+  [`axes_reliability()`](http://circumplex.jmgirard.com/dev/reference/axes_reliability.md)
+  for nearly collinear items, no longer use `--` as a dash. For example,
+  a verdict now reads `Verdict: CAUTION. Amplitude CIs ...` and a
+  coverage line reads `coverage 96.7%: borderline`.
+
 - [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
   [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
   result now draws a confidence interval of zero width as a visible

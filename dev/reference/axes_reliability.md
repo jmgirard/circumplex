@@ -590,11 +590,11 @@ res
 #>  Y    16     0.773       0.476 0.823         
 #> 
 #>   Note: the two axes share one axes-variance estimate and, with equal
-#>   items per axis, carry the same reliability -- expected, not an error.
+#>   items per axis, carry the same reliability. This is expected, not an error.
 #> 
 #>   Note: the model is fit to the item correlation matrix as if it were a
 #>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
-#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
+#>   corrected, so these numbers differ from LISREL's, and from lavaan's
 #>   own, by design.
 #>   The component standard errors are adjusted to the correlation metric
 #>   and are calibrated; they are typically smaller than the values printed
@@ -614,11 +614,11 @@ summary(res)
 #>  Y    16     0.773       0.476 0.823         
 #> 
 #>   Note: the two axes share one axes-variance estimate and, with equal
-#>   items per axis, carry the same reliability -- expected, not an error.
+#>   items per axis, carry the same reliability. This is expected, not an error.
 #> 
 #>   Note: the model is fit to the item correlation matrix as if it were a
 #>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
-#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
+#>   corrected, so these numbers differ from LISREL's, and from lavaan's
 #>   own, by design.
 #>   The component standard errors are adjusted to the correlation metric
 #>   and are calibrated; they are typically smaller than the values printed
@@ -639,7 +639,7 @@ summary(res)
 #>   The global fit statistics chisq, pvalue, rmsea and cfi are scaled to
 #>   that metric (Satorra & Bentler, 1994), which removes a distortion that
 #>   flatters fit; df and srmr are unchanged. The scaled test can modestly
-#>   over-reject at typical sample sizes -- it over-flags misfit rather than
+#>   over-reject at typical sample sizes: it over-flags misfit rather than
 #>   flattering it; see ?axes_reliability for the measured rates.
 #>   They follow lavaan's *.scaled definitions, not its *.robust ones, and
 #>   differ from what fitMeasures() reports for an equivalent ML fit.
@@ -664,7 +664,7 @@ axes_reliability(
 #>  Y    16     0.773       0.476 --            
 #> 
 #>   Note: the two axes share one axes-variance estimate and, with equal
-#>   items per axis, carry the same reliability -- expected, not an error.
+#>   items per axis, carry the same reliability. This is expected, not an error.
 #> 
 #>   Note: the Nunnally-Bernstein comparison needs the raw item scores
 #>   (scale alphas and the axis-composite variance), so it is NA on the
@@ -672,7 +672,7 @@ axes_reliability(
 #> 
 #>   Note: the model is fit to the item correlation matrix as if it were a
 #>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
-#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
+#>   corrected, so these numbers differ from LISREL's, and from lavaan's
 #>   own, by design.
 #>   The component standard errors are adjusted to the correlation metric
 #>   and are calibrated; they are typically smaller than the values printed

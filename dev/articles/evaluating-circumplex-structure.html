@@ -822,15 +822,10 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; be clustered or parameters weakly determined.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
-<span><span class="co">#&gt; Assessed Engine:  bootstrap with 500 replicates </span></span>
-<span><span class="co">#&gt; Confidence Level:     0.95 </span></span>
-<span><span class="co">#&gt; Simulation Reps:  200 per condition </span></span>
-<span><span class="co">#&gt; Amplitude Ladder:     1 0.5 0 2.077 </span></span>
-<span><span class="co">#&gt; Population Structure:     Browne circular model (CPM) </span></span>
-<span><span class="co">#&gt; Group Sizes:      All = 250 </span></span>
-<span><span class="co">#&gt; Certification Rule:   a_lci / (a_uci - a_lci) &gt;= 0.35 (scale-free, print-independent) </span></span>
-<span><span class="co">#&gt; Elapsed:      8.2 s</span></span>
+<span><span class="co">#&gt; Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per</span></span>
+<span><span class="co">#&gt; condition.</span></span>
+<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 4.8s.</span></span>
+<span><span class="co">#&gt; Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) &gt;= 0.35.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
 <span><span class="co">#&gt; RMSEA = 0.064, SRMR = 0.038).</span></span>
@@ -844,143 +839,48 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; regime; an absolute rung at the certification margin (c = 2.08, population</span></span>
 <span><span class="co">#&gt; amplitude = the observed CI half-width) was added to the ladder.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; CI trustworthiness at the as-estimated condition (c = 1), classified</span></span>
-<span><span class="co">#&gt; against Bradley's (1978) liberal band via 95% Wilson intervals:</span></span>
+<span><span class="co">#&gt; Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
-<span><span class="co">#&gt;     Elevation      coverage 93.0% -- borderline</span></span>
-<span><span class="co">#&gt;     Amplitude      coverage 94.5% -- borderline</span></span>
-<span><span class="co">#&gt;     Displacement   coverage 89.1% when certified -- borderline</span></span>
+<span><span class="co">#&gt;     Elevation      coverage 93.0%: borderline</span></span>
+<span><span class="co">#&gt;     Amplitude      coverage 94.5%: borderline</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 89.1% when certified: borderline</span></span>
 <span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
 <span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
 <span><span class="co">#&gt;                    2.5%)</span></span>
-<span><span class="co">#&gt;   Verdict: BORDERLINE -- elevation, amplitude, and certified displacement</span></span>
+<span><span class="co">#&gt;   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement</span></span>
 <span><span class="co">#&gt;   coverage rates are borderline at this number of replications; a larger</span></span>
 <span><span class="co">#&gt;   `reps` would sharpen the verdict.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
-<span><span class="co">#&gt;     Elevation      coverage 95.0% -- borderline</span></span>
-<span><span class="co">#&gt;     Amplitude      coverage 83.0% -- INADEQUATE (under-coverage; misses are</span></span>
+<span><span class="co">#&gt;     Elevation      coverage 95.0%: borderline</span></span>
+<span><span class="co">#&gt;     Amplitude      coverage 83.0%: INADEQUATE (under-coverage; misses are</span></span>
 <span><span class="co">#&gt;                    almost all below the interval: the amplitude CI tends to</span></span>
 <span><span class="co">#&gt;                    sit above the truth)</span></span>
-<span><span class="co">#&gt;     Displacement   coverage 50.0% when certified -- INADEQUATE</span></span>
-<span><span class="co">#&gt;                    (under-coverage)</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 50.0% when certified: INADEQUATE (under-coverage)</span></span>
 <span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
 <span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
 <span><span class="co">#&gt;                    2.5%)</span></span>
-<span><span class="co">#&gt;   Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this</span></span>
+<span><span class="co">#&gt;   Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this</span></span>
 <span><span class="co">#&gt;   sample size and displacement CIs mis-cover even when certified. Elevation</span></span>
 <span><span class="co">#&gt;   coverage is borderline at this number of replications; a larger `reps`</span></span>
 <span><span class="co">#&gt;   would sharpen the verdict. Consider a larger sample or treat near-zero</span></span>
 <span><span class="co">#&gt;   amplitudes as inconclusive rather than absent.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coverage by profile, parameter, and amplitude condition:</span></span>
-<span><span class="co">#&gt;  Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width</span></span>
-<span><span class="co">#&gt;    PARPD         e     1.000    0.930 0.018     0.035      0.035        0.151</span></span>
-<span><span class="co">#&gt;    PARPD         x     1.000    0.940 0.017     0.030      0.030        0.122</span></span>
-<span><span class="co">#&gt;    PARPD         y     1.000    0.930 0.018     0.020      0.050        0.131</span></span>
-<span><span class="co">#&gt;    PARPD         a     1.000    0.945 0.016     0.040      0.015        0.125</span></span>
-<span><span class="co">#&gt;    PARPD         d     1.000    0.920 0.019     0.035      0.045       63.326</span></span>
-<span><span class="co">#&gt;     OCPD         e     1.000    0.950 0.015     0.025      0.025        0.156</span></span>
-<span><span class="co">#&gt;     OCPD         x     1.000    0.945 0.016     0.025      0.030        0.126</span></span>
-<span><span class="co">#&gt;     OCPD         y     1.000    0.965 0.013     0.030      0.005        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     1.000    0.830 0.027     0.170      0.000        0.103</span></span>
-<span><span class="co">#&gt;     OCPD         d     1.000    0.830 0.027     0.075      0.095      220.815</span></span>
-<span><span class="co">#&gt;    PARPD         e     0.500    0.945 0.016     0.025      0.030        0.151</span></span>
-<span><span class="co">#&gt;    PARPD         x     0.500    0.935 0.017     0.025      0.040        0.124</span></span>
-<span><span class="co">#&gt;    PARPD         y     0.500    0.935 0.017     0.015      0.050        0.128</span></span>
-<span><span class="co">#&gt;    PARPD         a     0.500    0.935 0.017     0.065      0.000        0.111</span></span>
-<span><span class="co">#&gt;    PARPD         d     0.500    0.905 0.021     0.050      0.045      154.830</span></span>
-<span><span class="co">#&gt;     OCPD         e     0.500    0.940 0.017     0.030      0.030        0.158</span></span>
-<span><span class="co">#&gt;     OCPD         x     0.500    0.940 0.017     0.030      0.030        0.128</span></span>
-<span><span class="co">#&gt;     OCPD         y     0.500    0.935 0.017     0.020      0.045        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     0.500    0.485 0.035     0.515      0.000        0.102</span></span>
-<span><span class="co">#&gt;     OCPD         d     0.500    0.710 0.032     0.170      0.120      256.592</span></span>
-<span><span class="co">#&gt;    PARPD         e     0.000    0.940 0.017     0.025      0.035        0.153</span></span>
-<span><span class="co">#&gt;    PARPD         x     0.000    0.935 0.017     0.030      0.035        0.124</span></span>
-<span><span class="co">#&gt;    PARPD         y     0.000    0.950 0.015     0.040      0.010        0.131</span></span>
-<span><span class="co">#&gt;    PARPD         a     0.000    0.000 0.000     1.000      0.000        0.098</span></span>
-<span><span class="co">#&gt;    PARPD         d     0.000       NA    NA        NA         NA           NA</span></span>
-<span><span class="co">#&gt;     OCPD         e     0.000    0.920 0.019     0.040      0.040        0.157</span></span>
-<span><span class="co">#&gt;     OCPD         x     0.000    0.955 0.015     0.035      0.010        0.124</span></span>
-<span><span class="co">#&gt;     OCPD         y     0.000    0.945 0.016     0.020      0.035        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     0.000    0.000 0.000     1.000      0.000        0.100</span></span>
-<span><span class="co">#&gt;     OCPD         d     0.000       NA    NA        NA         NA           NA</span></span>
-<span><span class="co">#&gt;    PARPD         e     2.077    0.945 0.016     0.025      0.030        0.150</span></span>
-<span><span class="co">#&gt;    PARPD         x     2.077    0.950 0.015     0.025      0.025        0.118</span></span>
-<span><span class="co">#&gt;    PARPD         y     2.077    0.935 0.017     0.035      0.030        0.127</span></span>
-<span><span class="co">#&gt;    PARPD         a     2.077    0.930 0.018     0.035      0.035        0.125</span></span>
-<span><span class="co">#&gt;    PARPD         d     2.077    0.955 0.015     0.015      0.030       31.504</span></span>
-<span><span class="co">#&gt;     OCPD         e     2.077    0.930 0.018     0.040      0.030        0.157</span></span>
-<span><span class="co">#&gt;     OCPD         x     2.077    0.915 0.020     0.055      0.030        0.127</span></span>
-<span><span class="co">#&gt;     OCPD         y     2.077    0.945 0.016     0.030      0.025        0.131</span></span>
-<span><span class="co">#&gt;     OCPD         a     2.077    0.930 0.018     0.070      0.000        0.109</span></span>
-<span><span class="co">#&gt;     OCPD         d     2.077    0.885 0.023     0.050      0.065      160.646</span></span>
-<span><span class="co">#&gt;  Coverage_conditional N_conditional Structural N_reps</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.891           147      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.500             8      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.893            28      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.333             3      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA       TRUE    200</span></span>
-<span><span class="co">#&gt;                    NA             0      FALSE      0</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA       TRUE    200</span></span>
-<span><span class="co">#&gt;                    NA             0      FALSE      0</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.955           200      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.833            18      FALSE    200</span></span>
+<span><span class="co">#&gt; Coverage by condition (d_cert: d when certified; cert: certification rate):</span></span>
+<span><span class="co">#&gt;  Profile Condition     e     x     y     a     d d_cert  cert Structural</span></span>
+<span><span class="co">#&gt;    PARPD     1.000 0.930 0.940 0.930 0.945 0.920  0.891 0.735      FALSE</span></span>
+<span><span class="co">#&gt;    PARPD     0.500 0.945 0.935 0.935 0.935 0.905  0.893 0.140      FALSE</span></span>
+<span><span class="co">#&gt;    PARPD     0.000 0.940 0.935 0.950 0.000    NA     NA 0.010       TRUE</span></span>
+<span><span class="co">#&gt;    PARPD     2.077 0.945 0.950 0.935 0.930 0.955  0.955 1.000      FALSE</span></span>
+<span><span class="co">#&gt;     OCPD     1.000 0.950 0.945 0.965 0.830 0.830  0.500 0.040      FALSE</span></span>
+<span><span class="co">#&gt;     OCPD     0.500 0.940 0.940 0.935 0.485 0.710  0.333 0.015      FALSE</span></span>
+<span><span class="co">#&gt;     OCPD     0.000 0.920 0.955 0.945 0.000    NA     NA 0.010       TRUE</span></span>
+<span><span class="co">#&gt;     OCPD     2.077 0.930 0.915 0.945 0.930 0.885  0.833 0.090      FALSE</span></span>
 <span><span class="co">#&gt;   Note: amplitude coverage on rows flagged Structural is structurally 0 (a</span></span>
 <span><span class="co">#&gt;   percentile interval of strictly positive amplitude replicates cannot</span></span>
-<span><span class="co">#&gt;   contain a zero truth) -- a theorem, not a measurement; the informative</span></span>
-<span><span class="co">#&gt;   near-zero rungs are the small c &gt; 0 ones.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Guardrail operating characteristics:</span></span>
-<span><span class="co">#&gt;  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate</span></span>
-<span><span class="co">#&gt;    PARPD     1.000     0.735    0.670    0.791     0.025      NA         0.555</span></span>
-<span><span class="co">#&gt;     OCPD     1.000     0.040    0.020    0.077     0.025      NA         0.075</span></span>
-<span><span class="co">#&gt;    PARPD     0.500     0.140    0.099    0.195     0.025      NA         0.115</span></span>
-<span><span class="co">#&gt;     OCPD     0.500     0.015    0.005    0.043     0.025      NA         0.045</span></span>
-<span><span class="co">#&gt;    PARPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.020</span></span>
-<span><span class="co">#&gt;     OCPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.070</span></span>
-<span><span class="co">#&gt;    PARPD     2.077     1.000    0.981    1.000     0.025      NA         0.985</span></span>
-<span><span class="co">#&gt;     OCPD     2.077     0.090    0.058    0.138     0.025      NA         0.115</span></span>
-<span><span class="co">#&gt;  Branch_pathology_rate N_reps</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span>
-<span><span class="co">#&gt;                      0    200</span></span></code></pre></div>
+<span><span class="co">#&gt;   contain a zero truth). This is a theorem, not a measurement; the</span></span>
+<span><span class="co">#&gt;   informative near-zero rungs are the small c &gt; 0 ones.</span></span></code></pre></div>
 <!-- precompute:volatile-numbers end -->
 <p>How to read this output:</p>
 <ul>

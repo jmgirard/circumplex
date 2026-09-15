@@ -271,29 +271,23 @@ res <- ssm_analyze(
 # Small reps/boots keep the example fast; use the defaults in practice
 set.seed(23456)
 acc <- ssm_ci_accuracy(res, reps = 25, amplitude_factors = c(1, 0.25))
-#> Warning: CPM Hessian is ill-conditioned (condition number 3.53e+17): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 6.69e+17): angles may be clustered or parameters weakly determined.
 acc
 #> 
 #> SSM CI accuracy, simulated at your n and settings (25 replications per condition; bootstrap intervals with 100 replicates at level 0.95)
 #> 
 #>   # Profile [All] (n = 200; 95% bootstrap CIs, 100 replicates):
-#>     Elevation      coverage 92.0% -- borderline
-#>     Amplitude      coverage 88.0% -- borderline
-#>     Displacement   coverage 92.0% when certified -- borderline
-#>   Verdict: BORDERLINE -- elevation, amplitude, and certified displacement
+#>     Elevation      coverage 92.0%: borderline
+#>     Amplitude      coverage 88.0%: borderline
+#>     Displacement   coverage 92.0% when certified: borderline
+#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
 #>   coverage rates are borderline at this number of replications; a larger
 #>   `reps` would sharpen the verdict.
 summary(acc)
 #> 
-#> Statistical Basis:    Mean Scores 
-#> Assessed Engine:  bootstrap with 100 replicates 
-#> Confidence Level:     0.95 
-#> Simulation Reps:  25 per condition 
-#> Amplitude Ladder:     1 0.25 
-#> Population Structure:     Browne circular model (CPM) 
-#> Group Sizes:      All = 200 
-#> Certification Rule:   a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:      0.2 s
+#> Mean scores; bootstrap, 100 replicates, level 0.95; 25 reps per condition.
+#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.5s.
+#> Ladder c = 1, 0.25; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.049, SRMR = 0.035).
@@ -303,47 +297,19 @@ summary(acc)
 #>   Boundary markers: Heywood communality; small correlation-function weight;
 #>   ill-conditioned Hessian.
 #> 
-#> CI trustworthiness at the as-estimated condition (c = 1), classified
-#> against Bradley's (1978) liberal band via 95% Wilson intervals:
+#> Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:
 #> 
 #>   # Profile [All] (n = 200; 95% bootstrap CIs, 100 replicates):
-#>     Elevation      coverage 92.0% -- borderline
-#>     Amplitude      coverage 88.0% -- borderline
-#>     Displacement   coverage 92.0% when certified -- borderline
-#>   Verdict: BORDERLINE -- elevation, amplitude, and certified displacement
+#>     Elevation      coverage 92.0%: borderline
+#>     Amplitude      coverage 88.0%: borderline
+#>     Displacement   coverage 92.0% when certified: borderline
+#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
 #>   coverage rates are borderline at this number of replications; a larger
 #>   `reps` would sharpen the verdict.
 #> 
-#> Coverage by profile, parameter, and amplitude condition:
-#>  Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width
-#>      All         e      1.00     0.92 0.054      0.04       0.04        0.138
-#>      All         x      1.00     0.92 0.054      0.08       0.00        0.109
-#>      All         y      1.00     1.00 0.000      0.00       0.00        0.111
-#>      All         a      1.00     0.88 0.065      0.12       0.00        0.116
-#>      All         d      1.00     0.92 0.054      0.00       0.08       15.104
-#>      All         e      0.25     0.96 0.039      0.04       0.00        0.139
-#>      All         x      0.25     0.96 0.039      0.00       0.04        0.105
-#>      All         y      0.25     0.92 0.054      0.04       0.04        0.108
-#>      All         a      0.25     1.00 0.000      0.00       0.00        0.108
-#>      All         d      0.25     0.96 0.039      0.04       0.00       58.050
-#>  Coverage_conditional N_conditional Structural N_reps
-#>                    NA            NA      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                 0.920            25      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                    NA            NA      FALSE     25
-#>                 0.957            23      FALSE     25
-#> 
-#> Guardrail operating characteristics:
-#>  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate
-#>      All      1.00      1.00    0.867    1.000     0.025      NA             1
-#>      All      0.25      0.92    0.750    0.978     0.025      NA             0
-#>  Branch_pathology_rate N_reps
-#>                      0     25
-#>                      0     25
+#> Coverage by condition (d_cert: d when certified; cert: certification rate):
+#>  Profile Condition    e    x    y    a    d d_cert cert Structural
+#>      All      1.00 0.92 0.92 1.00 0.88 0.92  0.920 1.00      FALSE
+#>      All      0.25 0.96 0.96 0.92 1.00 0.96  0.957 0.92      FALSE
 # }
 ```
