@@ -36,7 +36,7 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 ## Tasks
 
 - [x] T1: Confirm that D-056 and D-057 are in `cairn/DECISIONS.md`. They are the gate record for this milestone.
-- [ ] T2: Record the line count of the old summary at width 80 from commit `845fb5e7`. Write tests for AC1's five objects first: the seeded snapshot, CAUTION, near-zero regime, contrast and occasions. Then redesign the summary. Candidates are verdict blocks first and a compact coverage table with one row per profile and condition, with the MC_se, miss and width columns left to `acc$coverage`. The phrase tests at `test-ci_accuracy.R:743`, `:827` and `:863` pass with changes only to dashes and line wrapping.
+- [x] T2: Record the line count of the old summary at width 80 from commit `845fb5e7`. Write tests for AC1's five objects first: the seeded snapshot, CAUTION, near-zero regime, contrast and occasions. Then redesign the summary. Candidates are verdict blocks first and a compact coverage table with one row per profile and condition, with the MC_se, miss and width columns left to `acc$coverage`. The phrase tests at `test-ci_accuracy.R:743`, `:827` and `:863` pass with changes only to dashes and line wrapping.
 - [ ] T3: Wrap the prose in the ladder section with `strwrap()` at `getOption("width")`, and shorten the ΔCFI note (`sem_dcfi_note()`) and the verdict text without dropping a condition they name. Add the lavaan-gated tests from AC2. Skip them with `skip_if_not_installed("lavaan")` (lesson M65 family).
 - [ ] T4: Run AC3's search, list each hit in the work log with its disposition, and rewrite each printed dash as a period, a comma or a connecting word. Then update the phrase tests that match the old text (lesson M56 family: sweep both directions).
 - [ ] T5: Regenerate the changed `expect_snapshot()` files, review each diff line by line against AC1 and AC2, and add the NEWS.md entries. After `devtools::install()`, re-knit the precomputed vignettes with `tools/precompute-vignettes.R` and run `tools/check-vignette-staleness.R`. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
@@ -49,6 +49,7 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 - 2026-09-14: the M128 re-cut moved the vignette prose that reads this output to M129. The re-knit stays here, because the `vignette-precompute` job fails on a PR whose print changes leave a precomputed vignette stale.
 - 2026-09-14: implement started on branch `m127-shorter-printed-reports`. The old seeded summary prints 80 lines at width 80, so AC1's limit is 40. The AC3 search found 15 non-comment hits: 14 printed dashes and the exempt placeholder.
 - 2026-09-14: T1 done. D-056 and D-057 are in `cairn/DECISIONS.md`. The question gate chose one merged table, a three-line header and kept the x and y columns.
+- 2026-09-14: T2 done. The probes are seeded, non-converged CAUTION, near-zero, contrast and occasions. Their summary line counts at width 80 were 80, 79, 81, 146 and 134 at `845fb5e7`. They are now 35, 34, 36, 69 and 57. A diff of old and new output showed only header and table lines changed. The new tests failed on length before the change. `devtools::test()` is clean.
 
 ## Decisions
 

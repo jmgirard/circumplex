@@ -743,6 +743,10 @@ test_that("an amplitude estimate below half its CI width adds the margin rung", 
   # summary() names the regime (whitespace normalized: the phrase may wrap)
   out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
   expect_match(out, "near-zero regime")
+  expect_match(out, "absolute rung at the certification margin", fixed = TRUE)
+  # Length contract. Old line count at width 80, commit 845fb5e7: 81
+  # (procedure: helper file header).
+  expect_short_ci_summary(res, old_lines = 81)
   # The verdict stays keyed to c = 1 (margin rung adds no verdict rows)
   expect_identical(unique(res$verdict$Profile), res$coverage$Profile[1])
 })
@@ -879,10 +883,20 @@ test_that("print and summary snapshots (seeded)", {
   set.seed(1702)
   res <- ssm_ci_accuracy(obj, reps = 30, amplitude_factors = c(1, 0.25, 0))
   mask_elapsed <- function(lines) {
-    sub("Elapsed:.*$", "Elapsed:\t\t<masked>", lines)
+    sub("elapsed [0-9.]+s", "elapsed <masked>", lines)
   }
   expect_snapshot(print(res))
   expect_snapshot(summary(res), transform = mask_elapsed)
+
+  # Length contract. Old line counts at width 80, commit 845fb5e7: 80 for this
+  # object and 79 for the non-converged copy (procedure: helper file header).
+  flat <- expect_short_ci_summary(res, old_lines = 80)
+  expect_match(flat, "structurally 0", fixed = TRUE)
+  expect_match(flat, "Boundary markers:", fixed = TRUE)
+  unconverged <- res
+  unconverged$details$cpm_diagnostics$accepted <- FALSE
+  flat <- expect_short_ci_summary(unconverged, old_lines = 79)
+  expect_match(flat, "CAUTION: verdict unreliable", fixed = TRUE)
 })
 
 test_that("contrast print block reports displacement unconditionally (M15 snapshot)", {
@@ -900,6 +914,10 @@ test_that("contrast print block reports displacement unconditionally (M15 snapsh
   res <- ssm_ci_accuracy(obj, reps = 12, amplitude_factors = c(1, 0),
                          structure = "observed")
   expect_snapshot(print(res))
+  # Length contract. Old summary line count at width 80, commit 845fb5e7: 146
+  # (procedure: helper file header).
+  flat <- expect_short_ci_summary(res, old_lines = 146)
+  expect_match(flat, "Contrast [Male - Female]", fixed = TRUE)
 })
 
 # ---- plot method (spec sec. 7) --------------------------------------------------
