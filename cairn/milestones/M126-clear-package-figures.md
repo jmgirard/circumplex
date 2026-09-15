@@ -66,6 +66,7 @@
 - 2026-09-14: all tasks checked, status set to review.
 - 2026-09-14: review gate: user accepted the proposed triage (6 fix now, 7 rejected). Fixes landed in c8878ded, re-verified clean.
 - step-7 approval: m126-clear-package-figures approved for merge
+- 2026-09-14: CI wait on PR #159 reached the time limit. matrix, pkgdown and vignette-precompute passed, and the three R-CMD-check jobs were still pending. Merge not yet made.
 
 ## Decisions
 
