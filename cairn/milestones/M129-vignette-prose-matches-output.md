@@ -21,10 +21,10 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 
 ## Acceptance criteria
 
-- [ ] AC1: In the article from `pkgdown::build_article("sem-based-ssm-analysis")`, viewed 1280 pixels wide, each SSM results table has each estimate and its interval on one line.
-- [ ] AC2: Take each vignette whose `#>` output lines differ between 73218afa, before M127 and M128, and the branch head: the precomputed `.Rmd` files by their `#>` lines, and `bayesian-ssm-analysis` and `using-instruments` by the `#>` lines of their `pkgdown::build_article()` HTML built at both commits. In its `tools/prose-sweep.R --prose` output, each sentence that holds a number, a code span or a quoted label and names a value, column, row, line or label of a chunk's printed output names one that the re-knitted output shows.
-- [ ] AC3: Four vignette claims are checked against the code and corrected where wrong. (ii) `sem-based-ssm-analysis.Rmd.orig` says the plane factors are "fixed isotropic and orthogonal", but `R/ssm_sem_syntax.R` fixes them only under the scaled tier. (iii) `evaluating-circumplex-structure.Rmd.orig` says the output "withholds" the OCPD displacement and its interval, but `print.circumplex_ssm` (`R/ssm_oop.R`) prints both with a not-interpretable note. (iv) It names a "weak" classification, but `R/fit_structure_oop.R` prints "not clearly supported" or "unsupported". (v) It says `cpm_fit()` "commits to" the theoretical angles, but its default quasi-circumplex model (`R/cpm_fit.R`) estimates them. Each line that `grep -n "withholds\|isotropic\|commits to\|weak"` returns over those two files either is corrected or states what the code does.
-- [ ] AC4: The search `grep -nE -- '^#>.*(-- |--$|—)' vignettes/*.Rmd` returns only lines that also match `^#>.*[0-9.]\s+--\s*$`, the missing-value cells of the axes-reliability tables. The same search over the `#>` lines of the text extracted, with entities decoded, from the `bayesian-ssm-analysis` and `using-instruments` HTML built by `pkgdown::build_article()` returns no line.
+- [x] AC1: In the article from `pkgdown::build_article("sem-based-ssm-analysis")`, viewed 1280 pixels wide, each SSM results table has each estimate and its interval on one line.
+- [x] AC2: Take each vignette whose `#>` output lines differ between 73218afa, before M127 and M128, and the branch head: the precomputed `.Rmd` files by their `#>` lines, and `bayesian-ssm-analysis` and `using-instruments` by the `#>` lines of their `pkgdown::build_article()` HTML built at both commits. In its `tools/prose-sweep.R --prose` output, each sentence that holds a number, a code span or a quoted label and names a value, column, row, line or label of a chunk's printed output names one that the re-knitted output shows.
+- [x] AC3: Four vignette claims are checked against the code and corrected where wrong. (ii) `sem-based-ssm-analysis.Rmd.orig` says the plane factors are "fixed isotropic and orthogonal", but `R/ssm_sem_syntax.R` fixes them only under the scaled tier. (iii) `evaluating-circumplex-structure.Rmd.orig` says the output "withholds" the OCPD displacement and its interval, but `print.circumplex_ssm` (`R/ssm_oop.R`) prints both with a not-interpretable note. (iv) It names a "weak" classification, but `R/fit_structure_oop.R` prints "not clearly supported" or "unsupported". (v) It says `cpm_fit()` "commits to" the theoretical angles, but its default quasi-circumplex model (`R/cpm_fit.R`) estimates them. Each line that `grep -n "withholds\|isotropic\|commits to\|weak"` returns over those two files either is corrected or states what the code does.
+- [x] AC4: The search `grep -nE -- '^#>.*(-- |--$|—)' vignettes/*.Rmd` returns only lines that also match `^#>.*[0-9.]\s+--\s*$`, the missing-value cells of the axes-reliability tables. The same search over the `#>` lines of the text extracted, with entities decoded, from the `bayesian-ssm-analysis` and `using-instruments` HTML built by `pkgdown::build_article()` returns no line.
 - [ ] AC5: `tools/prose-sweep.R` exits 0 on each touched source. `tools/check-vignette-staleness.R` passes after `tools/precompute-vignettes.R`, and the `vignette-precompute` CI job passes on the PR. `devtools::test()` and `devtools::check(args = "--no-manual")` report no failure, warning or note that is new relative to master.
 
 ## Coverage
@@ -59,4 +59,52 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 - 2026-09-15: the fresh [O] reader found the `cpm_fit()` angle claim imprecise in the vignette and NEWS (one reference angle stays fixed) and "no more often than the benchmark" imprecise (the caution rule reads the interval's lower bound). Its one re-read cleared all 3. The split sentence passes prose-sweep.
 - 2026-09-15: T5: `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings, 0 notes (Status: OK). Its tarball was built at 72acdfcf, before the prose-only audit corrections in 4d705fa3, which change no code or chunk. prose-sweep exits 0 on the three touched sources. The `vignette-precompute` CI job runs on the PR at review. Status set to review.
 
+- 2026-09-15: review checkpoint, half done. AC1 to AC4 hold on fresh evidence and are ticked. AC5 waits on a `devtools::check()` run in the primary checkout. The worktree run gave 0 errors, 0 warnings and 1 note, and that note names `.git`, which a worktree checkout creates.
+
 ## Decisions
+
+## Review
+
+Fresh evidence, 2026-09-15, at branch head 00799721 with master at 714d5c78.
+The branch already contains master, so no merge was needed.
+
+- AC1: pkgdown built `sem-based-ssm-analysis` in a clean worktree at the
+  branch head. The build read a scratch-library install of that same commit.
+  The article was served over HTTP with its built site CSS and measured at a
+  1280 px viewport. The latent SSM results table is 776 px wide in an 800 px
+  column, and no cell wraps. Its one data row reads `NARPD | 0.25 (0.21,
+  0.29) | 0.23 (0.19, 0.27) | 92.1 (82.5, 104.5) | 0.975`. The article's
+  other table, "Two estimands for a group difference", holds prose only. It
+  carries no estimate and no interval, so it is not an SSM results table.
+  PASS.
+- AC2: the selection was recomputed. Five pre-computed vignettes have `#>`
+  lines that differ from 73218afa: advanced-visualization, axes-reliability,
+  evaluating-circumplex-structure, growth-ssm-analysis and
+  sem-based-ssm-analysis. Both knit-at-build articles were rebuilt at 73218afa
+  and at the branch head, each against a scratch-library install of its own
+  commit. Their decoded `#>` lines are identical across the two commits, 35
+  lines for bayesian-ssm-analysis and 275 for using-instruments, so neither
+  enters the selection. A fresh [O] reader then read the `--prose` output of
+  the five selected vignettes against their `#>` lines. It selected 92
+  sentences, 8 in advanced-visualization, 16 in axes-reliability, 38 in
+  evaluating-circumplex-structure, 15 in growth-ssm-analysis and 15 in
+  sem-based-ssm-analysis. It found no mismatch. The session recomputed its
+  harder arithmetic and agreed. PASS.
+- AC3: `grep -n "withholds\|isotropic\|commits to\|weak"` over the two sources
+  returns 6 lines. Each was read against the code. `sem...orig:432` matches
+  `R/ssm_sem_syntax.R:395-407` and `:425-430`, where the scaled tier emits
+  `cx ~~ 0*cy` with unit plane variances and the strict tier frees them.
+  `sem...orig:448` matches `R/ssm_sem.R:782`, where `sem_dcfi_flag()` returns
+  `NA_character_` outside the two-group ML scope. `evaluating...orig:180`
+  matches the marker text at `R/cpm_fit.R:876` and its label at `:1429`. The
+  other 3 hits state a literature or simulation finding, not a code claim. The
+  four named claims were also checked at their corrected sites.
+  `R/ssm_oop.R:198` prints the displacement with a not-interpretable note.
+  `R/fit_structure_oop.R:59` and `:85` give "not clearly supported" and
+  "unsupported". `R/cpm_fit.R:1481` makes `"quasi-circumplex"` the default.
+  That variant frees every angle but the reference scale's. PASS.
+- AC4: the `.Rmd` search returns 3 lines, all in axes-reliability. Each also
+  matches the exemption pattern `^#>.*[0-9.]\s+--\s*$`, so each is a
+  missing-value cell. The same search over the decoded `#>` lines of both
+  branch-head knit-at-build articles returns no line. PASS.
+
