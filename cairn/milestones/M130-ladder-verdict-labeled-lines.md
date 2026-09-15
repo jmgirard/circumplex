@@ -1,6 +1,6 @@
 # M130: The invariance-ladder verdict prints as labeled lines
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -67,7 +67,7 @@ Verdict:  metric invariance rejected
 - [x] T16: (finding N3) Limit the NEWS.md width sentence to a UTF-8 locale.
 - [x] T17: (findings N2, N5) The fallback print for an `invariance` element without `required` or `alpha` also prints the `Profiles:`, `Contrast:` and `Instead:` cautions from `comparable` and `contrast_requested`. Test it with a non-comparable case.
 - [x] T18: (findings N1, N13, N14) Rewrap the 136-character `@details` line in `R/ssm_sem.R` and the long reworded `.orig` prose lines. Add "and a rung has a `dcfi` value" to the gating bullet. Re-document, re-knit, and run the AC5 width count and the staleness check.
-- [ ] T19: Re-run the 14-case comparison, `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T19: Re-run the 14-case comparison, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -102,6 +102,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: claim-audit re-read: both corrected claims hold. The re-knit after the setup-comment fix changed no `#>` line.
 - 2026-09-15: checkpoint: the T15 to T18 code, docs and re-knit are committed with their boxes unticked. The full `devtools::test()` and `devtools::check(args = "--no-manual")` are still running, and the staleness check runs after this commit.
 - 2026-09-15: T15 to T18 ticked. At `402ada8c`, `tools/check-vignette-staleness.R` reports all 7 vignettes up to date. The full `devtools::test()` gave FAIL 0, WARN 9, SKIP 1, PASS 10030, on R and test code identical to `402ada8c`. `devtools::check(args = "--no-manual")` is still running for T19.
+- 2026-09-15: T19 done. One script recorded the 14 cases at master `0f8f3289` (a scratch worktree) and at `b4e29054`, both with the head's fixture helper. Invariance, stored verdicts, warnings and plot errors are `identical()` in all 14. The widest block line is 75 at width 77 and 79 at width 80. The 14 printed blocks match the review-pass-2 head. The T15 `Also:` change shows only in the planted-table test. `devtools::check(args = "--no-manual")` gave Status OK with 0 errors, 0 warnings and 0 notes. Status is set to review.
 
 ## Decisions
 
