@@ -182,3 +182,11 @@ No finding shows an acceptance criterion failing, so no return is due.
 Gate triage: the maintainer took F1 to F7 as fix now. Every finding proposed
 for rejection is rejected for the reason given beside it.
 
+Fix-now re-check at f8a23a76: `prose-sweep` exits 0 on the edited source, and
+the re-knit changes no `#>` line. The lint counts of NEWS.md and
+plain-vignettes.md are unchanged. A second re-knit, then the staleness check,
+passes on all 7 vignettes. `devtools::check(args = "--no-manual")` gives 0
+errors, 0 warnings, 0 notes. The second re-knit changed only `elapsed 8.3s`
+to `8.2s`, and that change was discarded. The AC4 search still returns only
+the 3 missing-value lines.
+
