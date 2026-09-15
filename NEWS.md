@@ -23,21 +23,23 @@
   entry on dashes below).
 
 * `print()` for a multi-group `ssm_sem()` result shows the invariance verdict
-  as a `Verdict:` line followed by short labeled lines: `Test:` and `Result:`,
-  `Also:` for a rung rejected above the required one when the groups can be
-  compared, and `Contrast:` and `Profiles:` when they cannot, plus `Instead:`
-  when a contrast was requested. The labeled values wrap to the console
-  width, and at 77 and 80 columns every line of the block fits. The stored
-  verdict text, and the warning and error that quote it, do not change.
+  as a `Verdict:` line and short labeled lines under it. The labels are
+  `Test:` and `Result:`, and `Also:` for a rung rejected above the required
+  one. `Contrast:` and `Profiles:` print when the groups cannot be compared.
+  If they cannot be compared and a contrast was requested, `Instead:` also
+  prints. The labeled values wrap to the console width. In a UTF-8 locale,
+  every line of the block fits at 77 and 80 columns. The stored verdict text
+  does not change, and the warning and the error that quote it do not change.
 
 * `print()` for a multi-group `ssm_sem()` result shows the `dcfi` and `cr`
-  columns and a short ΔCFI note (two lines at 80 columns) only for a
-  two-group fit estimated by ML with a plain CFI, the only case the .01 rule
-  was simulated for, and only when a rung has a `dcfi` value. For other fits,
-  including the default `estimator = "MLR"`, the `dcfi` values are still in
-  the `invariance` element of the result, and `invariance$dcfi_scope` records
-  the number of groups, the estimator as lavaan reports it (`"ML"` for
-  `"MLR"` and `"MLM"`) and whether the CFI is plain.
+  columns and a short ΔCFI note only for a two-group fit estimated by ML with
+  a plain CFI. The .01 rule was simulated only for that case. The columns and
+  the note also need a rung with a `dcfi` value. The note is two lines at 80
+  columns. For other fits, including the default `estimator = "MLR"`, the
+  `dcfi` values stay in the `invariance` element of the result.
+  `invariance$dcfi_scope` records the number of groups and the estimator as
+  lavaan reports it (`"ML"` for `"MLR"` and `"MLM"`). It also records
+  whether the CFI is plain.
 
 * The printed output of `ssm_ci_accuracy()`, `axes_reliability()` and
   `ssm_sem()` results, and the refusal warning of `axes_reliability()` for

@@ -805,7 +805,8 @@ sem_dcfi_note <- function(width = getOption("width")) {
 
 # The verdict block of the printed ladder: "Verdict:" and the decision, then
 # one labeled line per fact from sem_verdict_facts(). A value too long for its
-# line continues on further lines indented to the value column.
+# line continues on further lines indented to the value column. With no
+# decision (the print() fallback), only the labeled lines are returned.
 sem_format_verdict <- function(facts, width = getOption("width")) {
   col <- 12L
   labeled <- function(label, values) {
@@ -818,7 +819,9 @@ sem_format_verdict <- function(facts, width = getOption("width")) {
     }))
   }
   c(
-    paste0(formatC("Verdict:", width = -col), facts$decision),
+    if (!is.null(facts$decision)) {
+      paste0(formatC("Verdict:", width = -col), facts$decision)
+    },
     labeled("Test", facts$test),
     labeled("Result", facts$result),
     labeled("Also", facts$also),
@@ -963,39 +966,54 @@ sem_verdict_facts <- function(table, required, alpha,
       " contrast needs ", contrast_rung, " invariance, which was not tested"
     )
   }
-  # Rejections ABOVE the required rung: reported, never gating
+  # Rejections ABOVE the required rung: reported, never gating. The stored
+  # verdict names them only when the groups are comparable; print() names
+  # them either way.
   above <- table[!is.na(table$p) &
     match(table$rung, rung_order) > req_i & table$p < alpha, , drop = FALSE]
-  if (comparable && nrow(above) > 0) {
+  if (nrow(above) > 0) {
     facts$also <- paste0(
       "the ", paste(above$rung, collapse = ", "),
       " rung(s) were also rejected (reported only and not required for this ",
       "contrast, whose estimand is defined at the ", required, " level)"
     )
-    verdict <- paste0(verdict, "; ", facts$also)
+    if (comparable) {
+      verdict <- paste0(verdict, "; ", facts$also)
+    }
   }
   if (!comparable) {
-    facts$profiles <- paste(
+    why <- if (nrow(failed) > 0) {
+      " on this instrument's latent metric"
+    } else {
+      ", because comparability cannot be established"
+    }
+    cautions <- sem_noncomparable_facts(contrast_requested, why)
+    facts[names(cautions)] <- cautions
+  }
+  c(list(comparable = comparable, verdict = verdict), facts)
+}
+
+# The labeled cautions for groups that cannot be compared. `why` completes the
+# Contrast: line when no contrast was requested; the print() fallback, which
+# cannot tell a rejection from a test that could not be computed, passes "".
+sem_noncomparable_facts <- function(contrast_requested, why = "") {
+  requested <- isTRUE(contrast_requested)
+  list(
+    contrast = if (requested) {
+      "the requested latent contrast was not computed"
+    } else {
+      paste0("a latent contrast is not computable", why)
+    },
+    profiles = paste(
       "the rows below are each group's separate (configural) latent profile"
-    )
-    if (isTRUE(contrast_requested)) {
-      facts$contrast <- "the requested latent contrast was not computed"
-      facts$instead <- paste(
+    ),
+    instead = if (requested) {
+      paste(
         "the observed-score contrast from ssm_analyze() answers a different",
         "question and remains available"
       )
-    } else if (nrow(failed) > 0) {
-      facts$contrast <- paste(
-        "a latent contrast is not computable on this instrument's latent metric"
-      )
-    } else {
-      facts$contrast <- paste(
-        "a latent contrast is not computable, because comparability cannot be",
-        "established"
-      )
     }
-  }
-  c(list(comparable = comparable, verdict = verdict), facts)
+  )
 }
 
 # Fit the rung sequence up to `gate`, run lavaan's own nested-model test
@@ -1290,11 +1308,12 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   fit outside it. `dcfi_scope` in the returned `invariance` element records
 #'   the number of groups, the estimator as lavaan reports it (`"ML"` for
 #'   `"MLR"` and `"MLM"`), whether it is ML estimation and whether the CFI is
-#'   plain, and the conditions that apply follow from those
-#'   fields. A robust estimator -- the default `"MLR"`, or `"MLM"` -- makes lavaan report a robust CFI; so does `missing = "fiml"`, even
-#'   under `estimator = "ML"`, so plain ML is necessary for the label but not
-#'   sufficient. `"GLS"`, `"WLS"`, `"ULS"` and `"DWLS"` are not ML estimation
-#'   at all, though their CFI is plain-named. And more than two groups is
+#'   plain, and the conditions that apply follow from those fields. A robust
+#'   estimator -- the default `"MLR"`, or `"MLM"` -- makes lavaan report a
+#'   robust CFI; so does `missing = "fiml"`, even under `estimator = "ML"`,
+#'   so plain ML is necessary for the label but not sufficient. `"GLS"`,
+#'   `"WLS"`, `"ULS"` and `"DWLS"` are not ML estimation at all, though their
+#'   CFI is plain-named. And more than two groups is
 #'   outside the simulation whatever the estimator. In each case the `dcfi`
 #'   value stays in the returned ladder table with no label attached, and
 #'   `print()` shows neither the value nor a note.
@@ -1909,7 +1928,8 @@ sem_print_invariance <- function(inv, digits = 3, path = NULL) {
     cat(sem_dcfi_note(width = width))
   }
   # A ladder without the fields the facts are rebuilt from (for example a
-  # hand-modified object) prints its stored verdict instead
+  # hand-modified object) prints its stored verdict instead, followed by the
+  # cautions for groups that cannot be compared
   rebuildable <- !is.null(tab$note) &&
     isTRUE(inv$required %in% sem_invariance_rungs()) &&
     is.numeric(inv$alpha) && length(inv$alpha) == 1
@@ -1921,6 +1941,10 @@ sem_print_invariance <- function(inv, digits = 3, path = NULL) {
     cat(sem_format_verdict(facts, width = width), sep = "\n")
   } else {
     wrap(paste("Verdict:", inv$verdict))
+    if (isFALSE(inv$comparable)) {
+      cautions <- sem_noncomparable_facts(inv$contrast_requested)
+      cat(sem_format_verdict(cautions, width = width), sep = "\n")
+    }
   }
   invisible(inv)
 }

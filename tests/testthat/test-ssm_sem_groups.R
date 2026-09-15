@@ -1150,6 +1150,87 @@ test_that("print() of a ladder without the fields the verdict facts need prints 
       expect_identical(flat, paste("Verdict:", res$invariance$verdict))
     }
   }
+
+  # Groups that cannot be compared: the stored verdict, then the cautions
+  # that follow from `comparable` and `contrast_requested`
+  profiles <- paste(
+    "the rows below are each group's separate (configural) latent profile"
+  )
+  for (name in c("rejected_contrast", "untestable_plain")) {
+    res <- ladder_case(name)$res
+    requested <- isTRUE(res$invariance$contrast_requested)
+    expect_identical(requested, name == "rejected_contrast")
+    old <- res
+    old$invariance$required <- NULL
+    for (width in c(77, 80)) {
+      lines <- ladder_block_lines(old, width)
+      expect_true(all(nchar(lines, type = "width") <= width), label = name)
+      v <- grep("^Verdict: ", lines)
+      expect_length(v, 1)
+      at <- grep("^  [A-Z][a-z]+: ", lines)
+      expect_true(all(at > v))
+      labels <- sub("^  ([A-Z][a-z]+):.*$", "\\1", lines[at])
+      expect_identical(labels, c(
+        "Contrast", "Profiles", if (requested) "Instead"
+      ), label = name)
+      flat <- gsub("\\s+", " ", paste(lines[v:(at[[1]] - 1)], collapse = " "))
+      expect_identical(flat, paste("Verdict:", res$invariance$verdict))
+      value <- function(label) {
+        i <- at[labels == label]
+        j <- c(at, length(lines) + 1)[match(i, at) + 1] - 1
+        sub("^ *[A-Z][a-z]+: +", "", gsub("\\s+", " ",
+          paste(lines[i:j], collapse = " ")))
+      }
+      expect_identical(value("Contrast"), if (requested) {
+        "the requested latent contrast was not computed"
+      } else {
+        "a latent contrast is not computable"
+      })
+      expect_identical(value("Profiles"), profiles)
+    }
+  }
+})
+
+test_that("a rejection above the required rung is named when the groups cannot be compared, and the stored verdict does not change (M130)", {
+  skip_on_cran()
+  skip_if_not_installed("lavaan")
+  skip_if_not(l10n_info()[["UTF-8"]], "the ladder block prints Greek letters")
+  # retained_above: metric required and retained, scalar rejected. Planting a
+  # metric p below alpha rejects the required rung as well.
+  res <- ladder_case("retained_above")$res
+  inv <- res$invariance
+  expect_identical(inv$required, "metric")
+  expect_true(inv$table$p[inv$table$rung == "scalar"] < inv$alpha)
+  inv$table$p[inv$table$rung == "metric"] <- 1e-6
+  # The same table with the scalar rung retained gives the stored verdict
+  kept <- inv$table
+  kept$p[kept$rung == "scalar"] <- 0.9
+  for (requested in c(TRUE, FALSE)) {
+    facts <- sem_verdict_facts(inv$table, "metric", inv$alpha, requested)
+    expect_false(facts$comparable)
+    expect_identical(
+      facts$verdict,
+      sem_verdict_facts(kept, "metric", inv$alpha, requested)$verdict
+    )
+    expect_no_match(facts$verdict, "also rejected", fixed = TRUE)
+    planted <- res
+    planted$invariance <- inv
+    planted$invariance$contrast_requested <- requested
+    for (width in c(77, 80)) {
+      lines <- ladder_block_lines(planted, width)
+      expect_true(all(nchar(lines, type = "width") <= width))
+      x <- ladder_verdict(lines)
+      expect_identical(x$decision, "metric invariance rejected")
+      expect_identical(x$labels, c(
+        "Test", "Result", "Also", "Contrast", "Profiles",
+        if (requested) "Instead"
+      ))
+      expect_identical(x$fields$Also, paste0(
+        "the scalar rung(s) were also rejected (reported only and not required ",
+        "for this contrast, whose estimand is defined at the metric level)"
+      ))
+    }
+  }
 })
 
 test_that("dcfi, cr and a Delta-CFI note of at most two lines print only inside the criterion's scope (M130, D-059)", {
