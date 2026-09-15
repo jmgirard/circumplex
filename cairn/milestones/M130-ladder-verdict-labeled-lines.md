@@ -1,6 +1,6 @@
 # M130: The invariance-ladder verdict prints as labeled lines
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -62,7 +62,7 @@ Verdict:  metric invariance rejected
 - [x] T11: (finding O6) Base the vacuous-tier arm on `sem_strict_metric_vacuous()` again, or add a test that fails when a non-vacuous note on the metric row changes the verdict or `comparable`.
 - [x] T12: (finding O7) `print()` of an `invariance` element that lacks the fields the facts helper reads falls back to printing `inv$verdict`, with a test.
 - [x] T13: (finding O11) Start the `Verdict:` value in the same column as the labeled values, and stop repeating the rung name on a `Test:` line when only one rung was tested. Keep AC4 widths.
-- [ ] T14: Re-run the T5 comparison over all cases (identical `res$invariance`, warnings, plot errors, stored verdicts), `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T14: Re-run the T5 comparison over all cases (identical `res$invariance`, warnings, plot errors, stored verdicts), `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -88,6 +88,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: T14 in progress (checkpoint): the 14-case comparison at `b854388d` gives `identical()` invariance, warnings, plot errors and stored verdicts, and every block line fits at 77 and 80. `devtools::test()`, `devtools::check()` and the claim audit are still running.
 - 2026-09-15: claim audit: 68 claims read, 7 corrected — NEWS.md, R/ssm_sem.R, man/ssm_sem.Rd, tests/testthat/helper-ssm-sem-ladder.R, tests/testthat/test-ssm_sem_groups.R (`Instead:` prints only with a requested contrast, `dcfi_scope$estimator` is lavaan's name and reads ML for MLR, no released object reaches the print fallback, the fallback verdict wraps, fixture and test comments name `sem_verdict_facts()` and what the note test calls). The same reader's re-read of the 7 is pending.
 - 2026-09-15: claim-audit re-read: all 7 corrected claims hold. A NEWS.md line over 80 characters in the source is rewrapped.
+- 2026-09-15: T14 done. `devtools::test()` at `b854388d` code gave FAIL 0, WARN 9, SKIP 1, PASS 9948 (later commits changed only comments, a test title, roxygen and NEWS wrapping). `devtools::check(args = "--no-manual")` at `d01ed148` gave Status OK, 0 errors, 0 warnings, 0 notes. After that, only NEWS.md line breaks changed. The staleness check passes at the head. Status is set to review.
 
 ## Decisions
 
