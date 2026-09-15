@@ -85,5 +85,6 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - re-audit: AC8 (full) — three wording gaps: touched fixture `.Rmd` files, the `<stdin>` label, and repeated findings. Fixed wording proposed. The amended state holds at head.
 - re-audit: AC8 (full) — one gap: the head run's exit status is unbounded, and the cut run's input form is unstated. Replacement second sentence proposed. The other questions returned nothing.
 - 2026-09-15: amendment: AC8 narrowed at the user's selection to the second reader's wording. using-instruments.Rmd must add no prose-sweep finding over the branch cut, and every other touched vignette file must exit 0. This is the second `re-audit: AC8` line, so any further AC8 change goes to the user.
+- claim audit: 84 claims read, 4 corrected — tools/vignette-echo-sweep.R
 
 ## Decisions
