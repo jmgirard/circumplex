@@ -107,4 +107,74 @@ The branch already contains master, so no merge was needed.
   matches the exemption pattern `^#>.*[0-9.]\s+--\s*$`, so each is a
   missing-value cell. The same search over the decoded `#>` lines of both
   branch-head knit-at-build articles returns no line. PASS.
+- AC5, local clauses: `tools/prose-sweep.R` exits 0 on each of the 3 touched
+  `.Rmd.orig` sources. In a clean worktree at the branch head,
+  `tools/precompute-vignettes.R` exits 0 and `tools/check-vignette-staleness.R`
+  then exits 0, with all 7 pre-computed vignettes up to date.
+  `devtools::test()` gives FAIL 0, WARN 9, SKIP 1, PASS 9512. The 9 warnings
+  come from `test-ci_accuracy.R`, `test-pole-values.R` and `test-ssm_sem.R`.
+  The branch leaves `R/`, `src/` and `tests/` identical to master, so no test
+  result is new. `devtools::check(args = "--no-manual")` in the primary
+  checkout gives 0 errors, 0 warnings, 0 notes. A first run in a worktree gave
+  1 note naming `.git`, because a worktree's `.git` is a plain file that
+  `.Rbuildignore` does not exclude. AC5, CI clause: no PR exists before the
+  approval gate, so the `vignette-precompute` job on the PR is not yet
+  evidenced. The box stays unticked until that job passes at the merge step.
+
+Consistency gate: `cairn_validate.py` exits 0 with every check passing and no
+`release window` advisory. No DESIGN.md principle changed, so `cairn_impact`
+was skipped. In the worktree, `devtools::document()` with `cli.width = 500`
+leaves no diff and prints no `resolve link` line. `pkgdown::check_pkgdown()`
+finds no problem. README files and top-level files are untouched, and NEWS.md
+has 3 documentation entries. `tools/check-master-red-alert.R`,
+`tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit
+0. Master watches: the newest `R-CMD-check.yaml` push run with a verdict is
+66f8c2ed, success, and the run on 8d8cbb93 was still in progress. The newest
+`test-coverage.yaml` push run is 8d8cbb93, success. PASS.
+
+Independent review: [O] diff-bug, [S] blame-history and [S] prior-review
+lenses, plus the [O] AC2 reader's doubts. The prior-review lens found no
+prior-review evidence against the diff, and its PR-comment probe returned
+nothing. The blame-history lens found no undone intent. Findings, most severe
+first, with proposed dispositions for the gate:
+
+- F1 [O]: `evaluating...orig:538` says the rule "holds false-certification
+  near its intended rate". D-007 rejects a nominal level for the rule. The
+  line is unchanged, but it sits in a paragraph this branch corrected.
+  Proposed: fix now.
+- F2 [O]: the NEWS table entry reads as a line-wrap fix. The session rendered
+  both markups with `html_vignette` at 1280 px. The old 7-column table was
+  700 px wide and already one line per cell, so only the pkgdown article
+  wrapped. Proposed: fix now.
+- F3 [O]: in the new `cert` bullet, "that table" has no clear antecedent.
+  Proposed: fix now.
+- F4 [O]: "That note comes before any coverage question is asked" can read as
+  page position, but the note prints last. Proposed: fix now.
+- F5 [O]: the NEWS axes-reliability change is filed under "shorter printed
+  reports", but `--` predates those changes. An older bullet says the
+  vignettes' code did not change, and this branch adds `drop_xy = TRUE`.
+  Proposed: fix now.
+- F6 [O] and AC2 reader doubt 8: the edited line says `Gap`, `Variance` and
+  `Rotation` measure even angular spread. The printed output and the
+  vignette's own section call the last two interstitiality. Proposed: fix now.
+- F7 [O]: `cairn/references/plain-vignettes.md:148,166,184,187` still point at
+  the removed doc-bug candidate row. Proposed: fix now.
+- F8 [O]: the shown `ssm_table()` call renders an htmlTable with another
+  caption than the hidden kable chunk. This predates the branch. Proposed:
+  reject, pre-existing.
+- F9 [O]: the non-breaking-space substitution also runs over the `Profile`
+  column. No cell is corrupted. Proposed: reject, no current effect.
+- F10 [O]: over-long lines, unwrapped paragraphs and repeated sentence
+  openers. Proposed: reject, style nit.
+- F11 [O]: the FIML section still says the comparison "is `NA`" without the
+  printed `--`. That line is unmodified. Proposed: reject.
+- F12 [O] and [S]: `elapsed 8.3s` is a machine timing inside a masked region.
+  Proposed: reject, no information.
+- F13 [S]: "the `reference` scale's" puts a backtick on a noun phrase.
+  Proposed: reject, style nit.
+- AC2 reader doubts 1 to 5, 7, 9 and 10: each sits on a line this branch did
+  not modify, or in a vignette it did not touch. Proposed: reject,
+  unmodified lines. Doubt 6 sits on an unmodified line too. Proposed: reject.
+
+No finding shows an acceptance criterion failing, so no return is due.
 
