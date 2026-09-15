@@ -392,7 +392,11 @@ change in (amplitude, displacement) reads as movement through circumplex space.
 
 
 ``` r
-ggcircumplex(octants(), amax = 0.8) +
+ggplot() +
+  # The amplitude axis goes in the 45-90 gap, clear of the three occasions
+  coord_circumplex(amax = 0.8, r_axis_angle = 67.5) +
+  scale_x_continuous(breaks = octants(), labels = PANO()) +
+  theme_circumplex() +
   geom_ssm_point(
     data = results_long$results,
     mapping = aes(amplitude = a_est, displacement = d_est),
