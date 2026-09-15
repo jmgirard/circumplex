@@ -9,6 +9,7 @@
 #   Rscript tools/vignette-echo-sweep.R --taught [<file>...]       # taught calls
 #   Rscript tools/vignette-echo-sweep.R --hidden-names [<file>...] # hidden names used later
 #   Rscript tools/vignette-echo-sweep.R --other [<file>...]        # other shown calls
+#   Rscript tools/vignette-echo-sweep.R --compare-taught <baseline> <exceptions>
 #   Rscript tools/vignette-echo-sweep.R --self-test
 #
 # With no file, the sources are every vignettes/*.Rmd.orig and every
@@ -32,11 +33,17 @@
 #
 # --hidden-names prints `<file>:<line>: <name> (assigned in hidden chunk at
 # line <n>)` for each name that a hidden chunk assigns and a later echoed chunk
-# uses (`all.names()` of its parsed code), at that name's first later use.
+# uses (`all.names()` of its parsed code), at that name's first later use,
+# unless echoed code has assigned the name again before that use.
 #
 # --other prints each echoed R statement that calls no function from circumplex,
 # glmmTMB, brms or ggplot2 and does more than ROUTINE calls, so a reader can
-# judge whether it is plumbing. Those packages must be installed.
+# judge whether it is plumbing. A package that is not installed contributes no
+# exports, so its calls are listed too.
+#
+# --compare-taught checks a saved --taught list against the current sources,
+# allowing the nested statements the exceptions file lists, and prints each
+# unmatched statement or bad exception. It exits 1 when it prints a line.
 #
 # --self-test runs the search on the fixtures in tools/vignette-echo-sweep-fixtures/
 # and compares the output with expected-search.txt there. It exits 0 on a match.
@@ -104,7 +111,8 @@ search_file <- function(path, label = path) {
   out
 }
 
-# Parses an R chunk; drops `#|` option lines, which are comments to R.
+# Parses an R chunk. Its `#|` option lines are comments to R, so parse() skips
+# them.
 parse_chunk <- function(ch) {
   tryCatch(
     parse(text = ch$text, keep.source = TRUE),
