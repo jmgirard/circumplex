@@ -703,6 +703,21 @@ test_that("occasions ci_accuracy flags Structural rows at c=0 and runs a near-ze
   g0 <- acc$guardrail[acc$guardrail$Condition == 0, ]
   expect_true(all(is.finite(g0$Cert_rate)))
   expect_false(any(is.na(g0$Caution[g0$Profile %in% c("T1", "T2")])))
+  # Length contract of summary(). Old line count at width 80, commit
+  # 845fb5e7: 134 (procedure: helper-ci-accuracy-summary.R header).
+  flat <- expect_short_ci_summary(acc, old_lines = 134)
+  expect_match(flat, "stacked cross-occasion covariance", fixed = TRUE)
+  expect_match(flat, "Contrast [T2 - T1]", fixed = TRUE)
+  # The rank-deficiency caution names where its unprinted numbers are. The
+  # old count of 134 omits this caution's lines, so the limit is stricter.
+  deficient <- acc
+  deficient$details$rank_deficiency <- list(All = list(deficient = TRUE))
+  flat <- expect_short_ci_summary(deficient, old_lines = 134)
+  expect_match(flat, "rank-deficient in group(s) All", fixed = TRUE)
+  expect_match(flat, paste0(
+    "The widths and pass rates are in the coverage and guardrail elements ",
+    "of the result."
+  ), fixed = TRUE)
 
   # (b) a genuinely near-zero-amplitude occasion (occasion 2 nearly flat, but
   # not zero-variance) runs without erroring and reports a certification rate.

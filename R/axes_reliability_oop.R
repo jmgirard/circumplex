@@ -72,15 +72,15 @@ axes_metric_note <- function(se_live, fit_live) {
   # shared tail wraps one of the three badly.
   tail <- if (se_live && fit_live) {
     paste0("both sides of that mismatch are\n",
-           "  corrected -- so these numbers differ from LISREL's, and from",
+           "  corrected, so these numbers differ from LISREL's, and from",
            " lavaan's\n  own, by design.")
   } else if (se_live) {
     paste0("the standard-error side of that\n",
-           "  mismatch is corrected -- so those numbers differ from LISREL's,",
+           "  mismatch is corrected, so those numbers differ from LISREL's,",
            " and\n  from lavaan's own, by design.")
   } else {
     paste0("the global-fit side of that\n",
-           "  mismatch is corrected -- so those numbers differ from LISREL's,",
+           "  mismatch is corrected, so those numbers differ from LISREL's,",
            " and\n  from lavaan's own, by design.")
   }
   paste0(
@@ -111,7 +111,7 @@ axes_fit_scaled_note <- paste0(
   "  The global fit statistics chisq, pvalue, rmsea and cfi are scaled to\n",
   "  that metric (Satorra & Bentler, 1994), which removes a distortion that\n",
   "  flatters fit; df and srmr are unchanged. The scaled test can modestly\n",
-  "  over-reject at typical sample sizes -- it over-flags misfit rather than\n",
+  "  over-reject at typical sample sizes: it over-flags misfit rather than\n",
   "  flattering it; see ?axes_reliability for the measured rates.\n",
   # Named here and not only in the help page because the cross-check a reader
   # runs is prompted by seeing these four numbers, and both of the obvious
@@ -224,7 +224,7 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
     # user does not read the identical rows as a bug.
     cat(
       "\n  Note: the two axes share one axes-variance estimate and, with equal",
-      "\n  items per axis, carry the same reliability -- expected, not an error.\n",
+      "\n  items per axis, carry the same reliability. This is expected, not an error.\n",
       sep = ""
     )
   }

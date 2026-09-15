@@ -445,6 +445,10 @@ test_that("a rejection ABOVE the required rung is reported only, never gating (s
   expect_lt(scal$p, 0.05) # the construction really did break scalar
   expect_true(isTRUE(inv$comparable))
   expect_match(inv$verdict, "reported only")
+  expect_match(inv$verdict, paste0(
+    "the scalar rung(s) were also rejected (reported only and not required ",
+    "for this contrast, whose estimand is defined at the metric level)"
+  ), fixed = TRUE)
   expect_true(isTRUE(res$details$contrast))
   expect_equal(nrow(res$results), 3)
 })
@@ -932,4 +936,125 @@ test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nest
   expect_match(res$results$Label[3], "B - A")
   expect_match(inv$verdict, "metric invariance retained")
   expect_no_match(inv$verdict, "CFI", ignore.case = TRUE)
+})
+
+# Printed ladder width (M127) --------------------------------------------------
+
+# The invariance-ladder block as print() shows it: the lines from the ladder
+# heading through the verdict and, when the groups cannot be compared, the
+# text that follows it. The block is located inside the full print()
+# output, so the assertion reads what a user sees.
+ladder_block <- function(res) {
+  out <- utils::capture.output(print(res))
+  block <- utils::capture.output(sem_print_invariance(res$invariance))
+  n <- length(block)
+  starts <- which(out == block[[1]])
+  hit <- Filter(function(s) identical(out[s:(s + n - 1)], block), starts)
+  expect_length(hit, 1)
+  expect_true(any(grepl("^Invariance ladder", block)))
+  expect_true(any(grepl("^Verdict: ", block)))
+  block
+}
+
+test_that("every line of the printed invariance-ladder block fits in 80 columns", {
+  skip_on_cran()
+  skip_if_not_installed("lavaan")
+  local_reproducible_output(width = 80)
+  fits_80 <- function(block) {
+    expect_true(all(nchar(block, type = "width") <= 80))
+  }
+  flat <- function(block) gsub("\\s+", " ", paste(block, collapse = " "))
+
+  # Invariance holds, contrast requested, default MLR: the Delta-CFI note is
+  # out of scope
+  pop <- interior_2g()
+  dat <- sim_2g(pop, n_per = 400, seed = 17)
+  set.seed(6)
+  holds <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    contrast = TRUE, boots = 20
+  )
+  expect_true(isTRUE(holds$invariance$comparable))
+  b <- ladder_block(holds)
+  fits_80(b)
+  expect_match(flat(b), "metric invariance retained", fixed = TRUE)
+  expect_match(flat(b), "NOT validated here (robust CFI)", fixed = TRUE)
+
+  # Invariance rejected under plain ML, with and without a requested contrast:
+  # the Delta-CFI note is in scope
+  bad <- dcfi_pop_2g(0.35)
+  dat_bad <- sim_groups(bad$sigma, n_per = 700, seed = 61)
+  set.seed(35)
+  rej <- suppressWarnings(ssm_sem(dat_bad,
+    scales = bad$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  ))
+  expect_false(isTRUE(rej$invariance$comparable))
+  b <- ladder_block(rej)
+  fits_80(b)
+  expect_match(flat(b), "rejects that step", fixed = TRUE)
+  expect_match(flat(b), "cannot be compared", fixed = TRUE)
+  expect_match(flat(b), "A latent contrast is not computable", fixed = TRUE)
+  set.seed(35)
+  rej_con <- suppressWarnings(ssm_sem(dat_bad,
+    scales = bad$scales, measures = "m1", grouping = "grp",
+    contrast = TRUE, estimator = "ML", boots = 20
+  ))
+  b <- ladder_block(rej_con)
+  fits_80(b)
+  expect_match(flat(b), "requested latent contrast was therefore not computed",
+               fixed = TRUE)
+
+  # A rung note: the strict tier's vacuous metric rung
+  p <- 8
+  th <- oct * pi / 180
+  lambda <- cbind(1, cos(th), sin(th))
+  sig <- lambda %*% diag(c(0.8, 0.5, 0.5)) %*% t(lambda) +
+    diag(seq(0.3, 0.6, length.out = p))
+  nm <- paste0("s", 1:p)
+  dimnames(sig) <- list(nm, nm)
+  set.seed(32)
+  mk <- function(grp, n = 600) {
+    x <- as.data.frame(matrix(rnorm(n * p), n) %*% chol(sig))
+    colnames(x) <- nm
+    x$grp <- grp
+    x
+  }
+  dat_s <- rbind(mk("A"), mk("B"))
+  set.seed(33)
+  strict <- ssm_sem(dat_s,
+    scales = nm, grouping = "grp", contrast = TRUE, model = "strict",
+    estimator = "ML", boots = 20
+  )
+  b <- ladder_block(strict)
+  fits_80(b)
+  expect_match(flat(b), "note [metric]: vacuous", fixed = TRUE)
+})
+
+test_that("a non-comparable verdict that ends in a period prints no second period", {
+  inv <- list(
+    gate = "metric", alpha = 0.05, comparable = FALSE,
+    contrast_requested = FALSE,
+    verdict = paste0(
+      "the metric nested test could not be computed (lavaan returned NA); ",
+      "comparability cannot be established, so the latent contrast is not ",
+      "computed. Inspect the ladder fits directly."
+    ),
+    table = data.frame(
+      rung = c("configural", "metric"), chisq = c(50, 60), df = c(34, 48),
+      cfi = c(0.99, 0.99), rmsea = c(0.03, 0.03), dchisq = c(NA, NA),
+      ddf = c(NA, 14), p = c(NA, NA), dcfi = c(NA_real_, NA_real_),
+      cr = c(NA_character_, NA_character_), note = c("", "")
+    )
+  )
+  local_reproducible_output(width = 80)
+  out <- utils::capture.output(sem_print_invariance(inv))
+  flat <- paste(out, collapse = " ")
+  expect_match(flat, "Inspect the ladder fits directly.", fixed = TRUE)
+  expect_no_match(flat, "directly..", fixed = TRUE)
+  expect_true(all(nchar(out, type = "width") <= 80))
+  # A verdict with no closing period still gets one
+  inv$verdict <- "metric invariance rejected: these groups cannot be compared"
+  flat <- paste(utils::capture.output(sem_print_invariance(inv)), collapse = " ")
+  expect_match(flat, "cannot be compared.", fixed = TRUE)
 })

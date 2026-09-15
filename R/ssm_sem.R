@@ -792,12 +792,11 @@ sem_dcfi_flag <- function(dcfi, in_scope) {
 # The attribution + scope block printed beneath the ladder table. The
 # attribution and the published scope label accompany the value ALWAYS; out of
 # scope the block additionally names why no verdict is given.
-sem_dcfi_note <- function(scope, width = 72) {
+sem_dcfi_note <- function(scope, width = getOption("width")) {
   dcfi <- "\u0394CFI"
   scope_part <- if (isTRUE(scope$in_scope)) {
     paste0(
-      "; ", dcfi, " < ", format(sem_dcfi_cutoff),
-      " rejects that invariance step."
+      "; ", dcfi, " < ", format(sem_dcfi_cutoff), " rejects that step."
     )
   } else {
     # The reason list is variable-length (up to three), which is why the block
@@ -809,7 +808,7 @@ sem_dcfi_note <- function(scope, width = 72) {
       if (!identical(scope$n_groups, 2L)) paste(scope$n_groups, "groups")
     )
     paste0(
-      ". The cutoff is NOT validated for this configuration (",
+      ". The cutoff is NOT validated here (",
       paste(why, collapse = "; "),
       "), so the value is descriptive only, with no binary verdict."
     )
@@ -817,8 +816,9 @@ sem_dcfi_note <- function(scope, width = 72) {
   body <- paste0(
     dcfi, ": Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML ",
     "simulation scope", scope_part,
-    " Secondary and reported only -- the verdict below gates on the nested ",
-    "chi-square difference test alone."
+    " It is secondary and reported only: the verdict below gates on the ",
+    "nested chi-square ",
+    "difference test alone."
   )
   paste0(paste(strwrap(body, width = width, exdent = 2), collapse = "\n"), "\n")
 }
@@ -1015,9 +1015,8 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   if (comparable && nrow(above) > 0) {
     verdict <- paste0(
       verdict, "; the ", paste(above$rung, collapse = ", "),
-      " rung(s) were additionally rejected (reported only -- not required ",
-      "for this contrast, whose estimand is defined at the ", required,
-      " level)"
+      " rung(s) were also rejected (reported only and not required for this ",
+      "contrast, whose estimand is defined at the ", required, " level)"
     )
   }
 
@@ -1738,67 +1737,78 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
     ))
   }
   if (!is.null(x$invariance)) {
-    inv <- x$invariance
-    cat(
-      "\nInvariance ladder (gate: ", inv$gate, ", alpha = ",
-      format(inv$alpha), "):\n",
-      sep = ""
-    )
-    tab <- inv$table
-    show <- data.frame(
-      rung = tab$rung,
-      chisq = round(tab$chisq, digits),
-      df = tab$df,
-      cfi = round(tab$cfi, digits),
-      rmsea = round(tab$rmsea, digits),
-      dchisq = round(tab$dchisq, digits),
-      ddf = tab$ddf,
-      p = sem_fmt_p(tab$p, digits),
-      # At least 4 decimals, whatever `digits` is: the label is decided on the
-      # unrounded value against a 2-decimal cutoff, so printing at `digits = 3`
-      # would render -0.0096 (retain) and -0.0104 (reject) identically as
-      # "-0.01" -- one number shown under two opposite verdicts, directly
-      # beneath a rule stated in terms of that number.
-      dcfi = round(tab$dcfi, max(digits, 4))
-    )
-    # The retain/reject column appears ONLY inside the criterion's validated
-    # scope; outside it the value stands alone and the note below says why.
-    if (any(!is.na(tab$cr))) {
-      show$cr <- tab$cr
-    }
-    print(show, row.names = FALSE, na.print = "")
-    if (any(nzchar(tab$note))) {
-      for (i in which(nzchar(tab$note))) {
-        cat("  note [", tab$rung[i], "]: ", tab$note[i], "\n", sep = "")
-      }
-    }
-    if (any(!is.na(tab$dcfi))) {
-      cat(sem_dcfi_note(inv$dcfi_scope))
-    }
-    if (isTRUE(inv$comparable)) {
-      cat("Verdict: ", inv$verdict, "\n", sep = "")
-    } else {
-      cat(
-        "Verdict: ", inv$verdict, ".\n",
-        if (isTRUE(inv$contrast_requested)) {
-          paste0(
-            "The requested latent contrast was therefore not computed; the ",
-            "rows below are each group's separate (configural) latent ",
-            "profile. The observed-score contrast (ssm_analyze()) answers ",
-            "its own, different question and remains available.\n"
-          )
-        } else {
-          paste0(
-            "The rows below are each group's separate (configural) latent ",
-            "profile; a latent contrast would not be computable on this ",
-            "instrument's latent metric.\n"
-          )
-        },
-        sep = ""
-      )
-    }
+    sem_print_invariance(x$invariance, digits)
   }
   NextMethod()
+}
+
+# The invariance-ladder block of print.circumplex_ssm_sem(): heading, table,
+# rung notes, the Delta-CFI note and the verdict. The notes, the Delta-CFI
+# note, the verdict and the text after it are wrapped to getOption("width").
+sem_print_invariance <- function(inv, digits = 3) {
+  width <- getOption("width")
+  wrap <- function(text, indent = 0, exdent = 2) {
+    cat(strwrap(text, width = width, indent = indent, exdent = exdent),
+        sep = "\n")
+  }
+  cat(
+    "\nInvariance ladder (gate: ", inv$gate, ", alpha = ",
+    format(inv$alpha), "):\n",
+    sep = ""
+  )
+  tab <- inv$table
+  show <- data.frame(
+    rung = tab$rung,
+    chisq = round(tab$chisq, digits),
+    df = tab$df,
+    cfi = round(tab$cfi, digits),
+    rmsea = round(tab$rmsea, digits),
+    dchisq = round(tab$dchisq, digits),
+    ddf = tab$ddf,
+    p = sem_fmt_p(tab$p, digits),
+    # At least 4 decimals, whatever `digits` is: the label is decided on the
+    # unrounded value against a 2-decimal cutoff, so printing at `digits = 3`
+    # would render -0.0096 (retain) and -0.0104 (reject) identically as
+    # "-0.01" -- one number shown under two opposite verdicts, directly
+    # beneath a rule stated in terms of that number.
+    dcfi = round(tab$dcfi, max(digits, 4))
+  )
+  # The retain/reject column appears ONLY inside the criterion's validated
+  # scope; outside it the value stands alone and the note below says why.
+  if (any(!is.na(tab$cr))) {
+    show$cr <- tab$cr
+  }
+  print(show, row.names = FALSE, na.print = "")
+  for (i in which(nzchar(tab$note))) {
+    wrap(paste0("note [", tab$rung[i], "]: ", tab$note[i]),
+         indent = 2, exdent = 4)
+  }
+  if (any(!is.na(tab$dcfi))) {
+    cat(sem_dcfi_note(inv$dcfi_scope, width = width))
+  }
+  if (isTRUE(inv$comparable)) {
+    wrap(paste0("Verdict: ", inv$verdict))
+  } else {
+    # A verdict that already ends in a sentence gets no second period
+    wrap(paste0(
+      "Verdict: ", inv$verdict, if (!grepl("\\.$", inv$verdict)) "."
+    ))
+    wrap(if (isTRUE(inv$contrast_requested)) {
+      paste0(
+        "The requested latent contrast was therefore not computed. The rows ",
+        "below are each group's separate (configural) latent profile. The ",
+        "observed-score contrast from ssm_analyze() answers a different ",
+        "question and remains available."
+      )
+    } else {
+      paste0(
+        "The rows below are each group's separate (configural) latent ",
+        "profile. A latent contrast is not computable on this instrument's ",
+        "latent metric."
+      )
+    }, exdent = 0)
+  }
+  invisible(inv)
 }
 
 # Summary method for objects of ssm_sem class: owns the inferential-method and

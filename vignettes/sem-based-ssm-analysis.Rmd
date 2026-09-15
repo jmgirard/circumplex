@@ -413,13 +413,15 @@ by_gender
 #>        rung   chisq df   cfi rmsea dchisq ddf       p   dcfi
 #>  configural 287.272 34 0.938 0.123     NA  NA             NA
 #>      metric 337.356 48 0.927 0.112 54.781  14 < 0.001 -0.011
-#> ΔCFI: Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML
-#>   simulation scope. The cutoff is NOT validated for this configuration
-#>   (robust CFI), so the value is descriptive only, with no binary
-#>   verdict. Secondary and reported only -- the verdict below gates on
-#>   the nested chi-square difference test alone.
-#> Verdict: metric invariance rejected (Δχ²(14) = 54.78, p < 0.0001, alpha = 0.05): these groups cannot be compared on this instrument's latent metric.
-#> The requested latent contrast was therefore not computed; the rows below are each group's separate (configural) latent profile. The observed-score contrast (ssm_analyze()) answers its own, different question and remains available.
+#> ΔCFI: Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML simulation
+#>   scope. The cutoff is NOT validated here (robust CFI), so the value is
+#>   descriptive only, with no binary verdict. It is secondary and reported only:
+#>   the verdict below gates on the nested chi-square difference test alone.
+#> Verdict: metric invariance rejected (Δχ²(14) = 54.78, p < 0.0001, alpha =
+#>   0.05): these groups cannot be compared on this instrument's latent metric.
+#> The requested latent contrast was therefore not computed. The rows below are
+#> each group's separate (configural) latent profile. The observed-score contrast
+#> from ssm_analyze() answers a different question and remains available.
 #> 
 #> # Profile [NARPD: Female]:
 #> 

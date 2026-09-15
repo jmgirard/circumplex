@@ -1,8 +1,8 @@
 # S3 class for the SSM CI-trustworthiness diagnostic (M4/Z1 + Z2). print()
 # shows the per-profile verdict blocks of spec sec. 5.2 (coverage lines, the
 # guardrail false-certification caution, and the plain-language verdict);
-# summary() adds the structure note with its downgrade annotations, the full
-# coverage and guardrail tables, and the amplitude-ladder notes; plot() draws
+# summary() adds the settings, the structure note with its downgrade
+# annotations, a compact coverage table, and the amplitude-ladder notes; plot() draws
 # coverage across the ladder against the Bradley band.
 
 # S3 Constructor
@@ -107,7 +107,7 @@ ssm_ci_verdict_blocks <- function(x) {
       }
       ssm_ci_cat_line(leader, paste0(
         "coverage ", ssm_ci_pct(row$Coverage),
-        if (is_dcond) " when certified", " -- ", shown, qual
+        if (is_dcond) " when certified", ": ", shown, qual
       ))
     }
 
@@ -128,7 +128,7 @@ ssm_ci_verdict_blocks <- function(x) {
         paste0(
           "if the true amplitude were zero, displacement would still be ",
           "certified ", ssm_ci_pct(guard_rate),
-          " of the time -- far more often than the ", ssm_ci_pct(gr0$Benchmark),
+          " of the time, far more often than the ", ssm_ci_pct(gr0$Benchmark),
           " error rate the guardrail's wording suggests"
         )
       } else {
@@ -272,18 +272,14 @@ ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate,
     ))
   }
 
-  # The first sentence continues the "Verdict: HEADLINE --" lead-in
-  # (lowercase); later sentences stand alone
+  # Every sentence follows the "Verdict: HEADLINE." lead-in and stands alone
   upper_first <- function(s) {
     substr(s, 1, 1) <- toupper(substr(s, 1, 1))
     s
   }
-  if (length(sentences) > 1) {
-    sentences[-1] <- vapply(sentences[-1], upper_first, character(1),
-                            USE.NAMES = FALSE)
-  }
+  sentences <- vapply(sentences, upper_first, character(1), USE.NAMES = FALSE)
 
-  paste0("Verdict: ", headline, " -- ", paste(sentences, collapse = " "))
+  paste0("Verdict: ", headline, ". ", paste(sentences, collapse = " "))
 }
 
 # Structure note with the sec. 5.2 downgrade annotations, in severity order:
@@ -311,7 +307,8 @@ ssm_ci_structure_note <- function(object) {
         paste(names(def), collapse = ", "), " (n <= k*p); the reported ",
         "coverage and width remain valid (a singular covariance is a proper ",
         "degenerate normal), but the fit-statistic pass rate is descriptive ",
-        "only."
+        "only. The widths and pass rates are in the coverage and guardrail ",
+        "elements of the result."
       ), indent = 2)
     }
     return(invisible(object))
@@ -332,7 +329,7 @@ ssm_ci_structure_note <- function(object) {
     ), indent = 0)
     if (!isTRUE(cd$accepted)) {
       ssm_ci_cat_para(paste0(
-        "CAUTION: verdict unreliable -- the structural model did not ",
+        "CAUTION: verdict unreliable, because the structural model did not ",
         "converge cleanly."
       ), indent = 2)
     } else if (is.na(cd$rmsea) || cd$rmsea > ssm_ci_rmsea_poor) {
@@ -394,8 +391,47 @@ print.circumplex_ci_accuracy <- function(x, digits = 3, ...) {
   invisible(x)
 }
 
-# Summary method: details, the structure note with downgrade annotations,
-# the verdict blocks, and the full coverage and guardrail tables
+# The compact table summary() prints: one row per profile and amplitude
+# condition, in profile order and then ladder order. It holds the coverage of
+# each parameter, the certification-conditional displacement coverage, the
+# certification rate and the Structural flag. Every other column stays in
+# $coverage and $guardrail (D-057).
+ssm_ci_summary_table <- function(object, digits = 3) {
+  cov <- object$coverage
+  gr <- object$guardrail
+  profiles <- unique(cov$Profile)
+  conds <- unique(cov$Condition)
+  keys <- expand.grid(Condition = conds, Profile = profiles,
+                      stringsAsFactors = FALSE)[, c("Profile", "Condition")]
+  keys <- keys[paste(keys$Profile, keys$Condition) %in%
+                 paste(cov$Profile, cov$Condition), , drop = FALSE]
+  pick <- function(prof, cond, pm, col) {
+    v <- cov[[col]][cov$Profile == prof & cov$Condition == cond &
+                      cov$Parameter == pm]
+    if (length(v) == 1) v else NA_real_
+  }
+  out <- data.frame(Profile = keys$Profile, Condition = round(keys$Condition, digits),
+                    stringsAsFactors = FALSE)
+  for (pm in c("e", "x", "y", "a", "d")) {
+    out[[pm]] <- round(mapply(pick, keys$Profile, keys$Condition,
+                              MoreArgs = list(pm = pm, col = "Coverage"),
+                              USE.NAMES = FALSE), digits)
+  }
+  out$d_cert <- round(mapply(pick, keys$Profile, keys$Condition,
+                             MoreArgs = list(pm = "d", col = "Coverage_conditional"),
+                             USE.NAMES = FALSE), digits)
+  out$cert <- round(mapply(function(prof, cond) {
+    v <- gr$Cert_rate[gr$Profile == prof & gr$Condition == cond]
+    if (length(v) == 1) v else NA_real_
+  }, keys$Profile, keys$Condition, USE.NAMES = FALSE), digits)
+  out$Structural <- mapply(function(prof, cond) {
+    any(cov$Structural[cov$Profile == prof & cov$Condition == cond])
+  }, keys$Profile, keys$Condition, USE.NAMES = FALSE)
+  out
+}
+
+# Summary method: the settings, the structure note with downgrade annotations,
+# the verdict blocks, and the compact coverage table
 #' Summarize the accuracy of SSM confidence intervals
 #'
 #' Print the full report of an [ssm_ci_accuracy()] run: the assessed
@@ -404,8 +440,14 @@ print.circumplex_ci_accuracy <- function(x, digits = 3, ...) {
 #' benchmarks per Browne & Cudeck, 1993, and Hu & Bentler, 1999), the
 #' per-profile verdict blocks (coverage of elevation, amplitude, and
 #' certification-conditional displacement classified against Bradley's
-#' liberal band; the guardrail false-certification caution), and the
-#' coverage and guardrail tables across the amplitude ladder.
+#' liberal band; the guardrail false-certification caution), and a compact
+#' table with one row per profile and amplitude condition. That table shows the
+#' coverage of each parameter, the displacement coverage when certified, the
+#' certification rate and the `Structural` flag. On a contrast row, "certified"
+#' means that both profiles were certified. The Monte Carlo standard errors, the
+#' one-sided miss rates, the interval widths, the conditional and replication
+#' counts, and the other guardrail columns are not printed; read them from the
+#' `coverage` and `guardrail` elements of the object.
 #'
 #' @param object A `circumplex_ci_accuracy` object from [ssm_ci_accuracy()].
 #' @param digits Number of digits to which table entries are rounded
@@ -423,25 +465,30 @@ print.circumplex_ci_accuracy <- function(x, digits = 3, ...) {
 #' @export
 summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
   d <- object$details
-  cat(
-    "\nStatistical Basis:\t", d$score_type, "Scores",
-    "\nAssessed Engine:\t", d$method, "with", d$boots, "replicates",
-    "\nConfidence Level:\t", d$interval,
-    "\nSimulation Reps:\t", d$reps, "per condition",
+  cat("\n")
+  ssm_ci_cat_para(c(
+    paste0(
+      d$score_type, " scores; ",
+      if (identical(d$method, "montecarlo")) "Monte Carlo" else "bootstrap",
+      ", ", d$boots, " replicates, level ", d$interval, "; ",
+      d$reps, " reps per condition."
+    ),
+    paste0(
+      "Population: ",
+      if (!is.null(d$occ_k)) "observed stacked cross-occasion covariance"
+      else if (identical(d$structure, "cpm")) "Browne circular model (CPM)"
+      else "observed correlations",
+      "; groups ", paste0(names(d$n), " = ", d$n, collapse = ", "),
+      "; elapsed ", round(d$elapsed, 1), "s."
+    ),
     # The full simulated ladder (margin rung included), so this line always
-    # enumerates the Condition values in the tables below
-    "\nAmplitude Ladder:\t", round(d$conditions, 3),
-    "\nPopulation Structure:\t",
-    if (!is.null(d$occ_k)) "observed stacked cross-occasion covariance"
-    else if (identical(d$structure, "cpm")) "Browne circular model (CPM)"
-    else "observed correlations",
-    "\nGroup Sizes:\t\t", paste0(names(d$n), " = ", d$n, collapse = ", "),
-    "\nCertification Rule:\t",
-    paste0("a_lci / (a_uci - a_lci) >= ", d$cert_k,
-           " (scale-free, print-independent)"),
-    "\nElapsed:\t\t", round(d$elapsed, 1), "s\n\n",
-    sep = " "
-  )
+    # enumerates the Condition values in the table below
+    paste0(
+      "Ladder c = ", paste(round(d$conditions, 3), collapse = ", "),
+      "; certified if a_lci / (a_uci - a_lci) >= ", d$cert_k, "."
+    )
+  ), indent = 0)
+  cat("\n")
   ssm_ci_structure_note(object)
   if (length(d$near_zero_rows) > 0) {
     ssm_ci_cat_para(paste0(
@@ -467,32 +514,19 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
     print(d$failed_reps)
   }
 
-  cat(
-    "\nCI trustworthiness at the as-estimated condition (c = 1), classified",
-    "\nagainst Bradley's (1978) liberal band via 95% Wilson intervals:\n",
-    sep = ""
-  )
+  cat("\nVerdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:\n")
   ssm_ci_verdict_blocks(object)
 
-  round_numeric <- function(df) {
-    num <- vapply(df, is.numeric, logical(1))
-    df[num] <- lapply(df[num], round, digits = digits)
-    df
-  }
-  cat("\nCoverage by profile, parameter, and amplitude condition:\n")
-  print(round_numeric(object$coverage), row.names = FALSE)
+  cat("\nCoverage by condition (d_cert: d when certified; cert: certification rate):\n")
+  print(ssm_ci_summary_table(object, digits), row.names = FALSE)
   if (any(object$coverage$Structural)) {
     ssm_ci_cat_para(paste0(
       "Note: amplitude coverage on rows flagged Structural is structurally ",
       "0 (a percentile interval of strictly positive amplitude replicates ",
-      "cannot contain a zero truth) -- a theorem, not a measurement; the ",
+      "cannot contain a zero truth). This is a theorem, not a measurement; the ",
       "informative near-zero rungs are the small c > 0 ones."
     ), indent = 2)
   }
-  cat("\nGuardrail operating characteristics:\n")
-  gr <- round_numeric(object$guardrail)
-  print(gr, row.names = FALSE)
-
   # R12 breadcrumb (M29-D2): for an occasions paired contrast, the c = 1
   # joint-certification rate (both occasions certified in the same simulated
   # dataset) quantifies the sec. 2.2 both-occasions-nonzero caveat. When it
