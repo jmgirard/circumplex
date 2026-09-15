@@ -42,7 +42,7 @@
 - [x] T3: Make the `occasions-plot` panels at least as wide as tall. First try the chunk's figure size in `advanced-visualization.Rmd.orig:331` and in the growth vignette's `plot` chunks. If that is not enough, change the legend, caption or facet layout in `ssm_trajectory_ggplot()`. Keep `panel.spacing.x` (lesson M50).
 - [x] T4: Fix the roxygen at `R/ssm_trajectory.R:412` against `ssm_interval_on_branch()` (`R/ssm_trajectory.R:58`), then run `devtools::document()`. Revert any `Config/roxygen2/version` change (lesson M85).
 - [x] T5: In `advanced-visualization.Rmd.orig`, set `r_axis_angle` in the `occasions-path` chunk's canvas. After `devtools::install()`, re-knit with `tools/precompute-vignettes.R` every vignette the Scope's grep lists. View each AC3 figure's PNG, and record one verdict per figure as review evidence.
-- [ ] T6: Regenerate the changed vdiffr snapshots under `NOT_CRAN=true` (lesson M31), and add the NEWS.md entries. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T6: Regenerate the changed vdiffr snapshots under `NOT_CRAN=true` (lesson M31), and add the NEWS.md entries. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -60,6 +60,7 @@
 - 2026-09-14: T4 done. The help text now states the lower bound's counterclockwise offset below the estimate and the upper bound's arc-span offset, as read from `ssm_interval_on_branch()`. `document()` left `Config/roxygen2/version` unchanged. Trajectory tests pass, including the existing wider-than-half-turn tests that back the new sentence.
 - 2026-09-14: T5 done. The `occasions-path` chunk now builds its canvas from parts with `coord_circumplex(amax = 0.8, r_axis_angle = 67.5)`, matching the vignette's no-second-coord note. After `devtools::install()`, all six grep-listed vignettes were re-knitted. Only four figure PNGs changed, and the other `.Rmd` diff is one elapsed-time line.
 - 2026-09-14: T5 figure verdicts (PNG viewed). `occasions-plot` PASS: 3 panels in one row, each wider than tall, no label over a point. `occasions-path` PASS: axis labels in the 45-90 gap, points near LM clear. `occasions-path-wrapper` PASS: axis labels in the 45-90 gap, clear of the three points and wedges. `cpm_plot` PASS: axis in the JK-LM gap with no label on a point, PA radial line and NO rim arc visible.
+- 2026-09-14: T6 done. The changed snapshots were regenerated under `NOT_CRAN=true` in T1 and T2 (`cpm_plot` x2, `cross-zero circle`). NEWS.md has three improvement entries and two documentation entries. `devtools::test()` FAIL 0, WARN 9 (the same Hessian, zero-SD and lavaan warnings seen before this branch's changes). `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes.
 
 ## Decisions
 

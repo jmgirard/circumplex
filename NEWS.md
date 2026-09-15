@@ -1,6 +1,37 @@
 # circumplex (development version)
 
+## Minor improvements and fixes
+
+* `plot()` for a `cpm_fit()` result now draws a confidence interval of zero
+  width as a visible line. Before, a zero-width angle interval was not drawn at
+  all. A zero-width angle interval is now drawn as a line along the radius. A
+  zero-width
+  communality interval is drawn as a line along the arc. When both widths are
+  zero, a short cap of fixed length is drawn across the interval. The
+  reference scale, whose angle is fixed, now shows its communality interval
+  this way.
+
+* `plot()` for a `cpm_fit()` result now warns about a scale whose
+  communality interval is 0 at both ends, and draws that scale as a point. The
+  warning for a scale drawn without its interval now names the reason for each
+  scale.
+
+* `ssm_plot_circle()` and `plot()` for a `cpm_fit()` result now draw the
+  amplitude (or communality) axis in the widest gap between spokes that holds
+  no plotted point. The axis labels therefore no longer sit on top of a point.
+  When every gap holds a point, the axis goes in the widest gap, as before.
+
 ## Documentation
+
+* The `ssm_plot_trajectory()` help page now describes correctly where each
+  confidence bound is drawn on the displacement panel. The lower bound sits
+  below the estimate by the counterclockwise angle from the lower bound to the
+  estimate, and the upper bound sits above the lower bound by the interval's
+  counterclockwise width. The plot itself did not change.
+
+* In the "Advanced Circumplex Visualization" vignette, the three panels of the
+  occasions trajectory figure are no longer tall and narrow, and the axis
+  labels of the two circle figures of the occasions no longer cover a point.
 
 * Six vignettes now use plain English: "Bayesian SSM Analysis", "Growth
   Models on SSM Parameters", "Advanced Circumplex Visualization", "Axes
