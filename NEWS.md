@@ -22,11 +22,19 @@
   things. Only their punctuation and a few joining words change (see the
   entry on dashes below).
 
-* `print()` for a multi-group `ssm_sem()` result wraps the notes and verdict
-  of the invariance ladder to the console width. The ΔCFI note and the text
-  shown when the groups cannot be compared are shorter and name the same
-  conditions. A verdict that already ends in a period no longer gets a second
-  one.
+* `print()` for a multi-group `ssm_sem()` result shows the invariance verdict
+  as a `Verdict:` line followed by short labeled lines: `Test:` and `Result:`,
+  `Also:` for a rung rejected above the required one, and `Contrast:`,
+  `Profiles:` and `Instead:` when the groups cannot be compared. Every line
+  fits the console width. The stored verdict text, and the warning and error
+  that quote it, do not change.
+
+* `print()` for a multi-group `ssm_sem()` result shows the `dcfi` and `cr`
+  columns and a two-line ΔCFI note only for a two-group fit estimated by ML
+  with a plain CFI, the only case the .01 rule was simulated for. For other
+  fits, including the default `estimator = "MLR"`, the `dcfi` values are still
+  in the `invariance` element of the result, and `invariance$dcfi_scope`
+  records why no label applies.
 
 * The printed output of `ssm_ci_accuracy()`, `axes_reliability()` and
   `ssm_sem()` results, and the refusal warning of `axes_reliability()` for

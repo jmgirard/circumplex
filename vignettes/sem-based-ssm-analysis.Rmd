@@ -406,18 +406,18 @@ by_gender
 #> 			CFI = 0.938, RMSEA = 0.123, SRMR = 0.06
 #> 
 #> Invariance ladder (gate: metric, alpha = 0.05):
-#>        rung   chisq df   cfi rmsea dchisq ddf       p   dcfi
-#>  configural 287.272 34 0.938 0.123     NA  NA             NA
-#>      metric 337.356 48 0.927 0.112 54.781  14 < 0.001 -0.011
-#> ΔCFI: Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML simulation
-#>   scope. The cutoff is NOT validated here (robust CFI), so the value is
-#>   descriptive only, with no binary verdict. It is secondary and reported only:
-#>   the verdict below gates on the nested chi-square difference test alone.
-#> Verdict: metric invariance rejected (Δχ²(14) = 54.78, p < 0.0001, alpha =
-#>   0.05): these groups cannot be compared on this instrument's latent metric.
-#> The requested latent contrast was therefore not computed. The rows below are
-#> each group's separate (configural) latent profile. The observed-score contrast
-#> from ssm_analyze() answers a different question and remains available.
+#>        rung   chisq df   cfi rmsea dchisq ddf       p
+#>  configural 287.272 34 0.938 0.123     NA  NA        
+#>      metric 337.356 48 0.927 0.112 54.781  14 < 0.001
+#> Verdict:  metric invariance rejected
+#>   Test:     metric: Δχ²(14) = 54.78, p < 0.0001, alpha = 0.05
+#>   Result:   these groups cannot be compared on this instrument's latent
+#>             metric
+#>   Contrast: the requested latent contrast was not computed
+#>   Profiles: the rows below are each group's separate (configural) latent
+#>             profile
+#>   Instead:  the observed-score contrast from ssm_analyze() answers a
+#>             different question and remains available
 #> 
 #> # Profile [NARPD: Female]:
 #> 
@@ -442,14 +442,16 @@ by_gender
 ```
 
 The invariance ladder is printed with the decision, and no contrast is rendered.
-`ssm_plot_contrast()` on this object would have nothing to draw. This is
-deliberate: there is no `force = TRUE`. If you have a principled
+The `Verdict:` line names the decision. The labeled lines under it give the
+nested test, what the decision means for comparing the groups, and what to use
+instead. `ssm_plot_contrast()` on this object would have nothing to draw. This
+is deliberate: there is no `force = TRUE`. If you have a principled
 partial-invariance model, fit it yourself and pass it to `ssm_sem_parameters()`.
 That function computes the contrast from whatever multi-group fit you supply,
 and it leaves the comparability claim to you.
 
-The ladder table also carries `dcfi`, the change in the comparative fit index
-(CFI) from the previous fitted rung. CFI compares the model's fit with that of a
+The ladder table in the returned object also carries `dcfi`, the change in the
+comparative fit index (CFI) from the previous fitted rung. CFI compares the model's fit with that of a
 baseline model in which the variables are uncorrelated, and values near 1 mean
 good fit. `dcfi` is Cheung and Rensvold's (2002)
 secondary criterion. Its general rule rejects an invariance step when CFI falls
@@ -470,13 +472,15 @@ Read the retain/reject label narrowly on the occasions it appears. Cheung and
 Rensvold simulated two groups, maximum likelihood (ML) estimation, and
 multivariate normal data. They examined Type I error only, not power, and robust
 CFI variants were not part of their study. `ssm_sem()` therefore prints the
-label only for a two-group fit estimated by ML whose CFI is the plain,
-non-robust one. Note that `estimator = "ML"` is necessary but not sufficient.
-`missing = "fiml"` also makes lavaan report a robust CFI, so a fit can be ML and
-still fall outside the envelope. The default estimator is `"MLR"`. So the ladder
-above prints its `dcfi` value marked as outside that scope, with no verdict
-attached and the note naming which condition applies. The same withholding
-covers a non-ML estimator such as `"GLS"`. Its CFI is plain-named, but its fit
+`dcfi` and `cr` columns and a short ΔCFI note only for a two-group fit
+estimated by ML whose CFI is the plain, non-robust one. Note that
+`estimator = "ML"` is necessary but not sufficient. `missing = "fiml"` also
+makes lavaan report a robust CFI, so a fit can be ML and still fall outside the
+envelope. The default estimator is `"MLR"`. So the ladder above prints no `dcfi`
+column and no ΔCFI note. The values are still in
+`by_gender$invariance$table$dcfi` with no label, and
+`by_gender$invariance$dcfi_scope` records which condition applies. The same
+withholding covers a non-ML estimator such as `"GLS"`. Its CFI is plain-named, but its fit
 function is not the one that the criterion was simulated under. That is a
 deliberate refusal rather than a gap. Extending the cutoff to a robust index,
 another estimator, or three or more groups would take simulation work that
@@ -584,8 +588,8 @@ documentation states them, and the vignette should too.
   refused rather than summarized.
 - **Invariance gating is a modeling decision** with a default test, not an
   oracle. The observed contrast remains available and answers its own
-  question. The secondary `dcfi` criterion printed beside the nested test gates
-  nothing.
+  question. The secondary `dcfi` criterion gates nothing, and it prints beside
+  the nested test only for the fits described next.
   Its .01 cutoff is validated only for two-group, ML, multivariate-normal
   fits, for Type I error only. The package withholds the verdict everywhere
   else rather than extrapolating it.
