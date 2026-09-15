@@ -1,6 +1,6 @@
 # M128: Vignettes show the package calls they teach, not the plumbing around them
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M126
 - **Driving RR:** —
@@ -50,7 +50,7 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - [x] T5: growth Sections 2 to 5: load both datasets, show `ssm_parameters_id()` on the octant scores, hide the reshape and the draws loop, and show one `ssm_draws()` call for one wave. Describe each hidden step and every name it defines (lesson M50).
 - [x] T6: structure `variants` and `ipsatize`, SEM `latent-table`, the four Bayesian chunks and the using-instruments count chunk: keep the package calls shown, hide table assembly, checks and data building, and add the `ssm_table()` code blocks that AC5 needs.
 - [x] T7: Re-knit every precomputed vignette with `tools/precompute-vignettes.R`, and build the two knit-at-build articles with pkgdown. Count figures, and check the named outputs and the certification verdicts. Read the prose of the sources AC7 names against the new output, fix what no longer matches, and record one work-log line per vignette.
-- [ ] T8: Run `tools/prose-sweep.R`, `tools/check-vignette-staleness.R`, `devtools::test()`, `devtools::check(args = "--no-manual")` and `devtools::check(manual = TRUE)`. Add a NEWS.md documentation entry for the vignette changes.
+- [x] T8: Run `tools/prose-sweep.R`, `tools/check-vignette-staleness.R`, `devtools::test()`, `devtools::check(args = "--no-manual")` and `devtools::check(manual = TRUE)`. Add a NEWS.md documentation entry for the vignette changes.
 
 ## Work log
 
@@ -86,5 +86,7 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - re-audit: AC8 (full) — one gap: the head run's exit status is unbounded, and the cut run's input form is unstated. Replacement second sentence proposed. The other questions returned nothing.
 - 2026-09-15: amendment: AC8 narrowed at the user's selection to the second reader's wording. using-instruments.Rmd must add no prose-sweep finding over the branch cut, and every other touched vignette file must exit 0. This is the second `re-audit: AC8` line, so any further AC8 change goes to the user.
 - claim audit: 84 claims read, 4 corrected — tools/vignette-echo-sweep.R
+- 2026-09-15: T8 done. The prose sweep exits 0 on the 9 touched vignette files other than using-instruments. That file's head run gives the same 38 findings as the branch cut, with none new. The staleness check passes. `devtools::test()`: 0 failures, 9512 passes. On the branch, both `check(args = "--no-manual")` and `check(manual = TRUE)` give Status OK, and the PDF manual builds. Master at 66f8c2ed, checked from a worktree, gave 1 NOTE in both runs, the worktree's `.git` file. No result is new relative to master. NEWS has a documentation entry. The `vignette-precompute` CI job runs on the PR at review.
+- 2026-09-15: status set to review.
 
 ## Decisions
