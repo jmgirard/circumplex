@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-09-14 (M126 to M128 planned, doc-bug row absorbed into M126 and M128, two closed tombstones pruned.)_
+_Last hygiene check: 2026-09-15 (M126 archived, M128 re-cut and M129 planned, M123 row pruned.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M126 | Package figures show every point, interval and axis label clearly | review | — | normal | milestones/M126-clear-package-figures.md |
 | M127 | Printed reports are shorter and easier to scan | planned | — | normal | milestones/M127-shorter-printed-reports.md |
 | M128 | Vignettes show the package calls they teach, not the plumbing around them | planned | M126 | normal | milestones/M128-hide-vignette-plumbing.md |
 | M129 | Vignette prose matches the package's code and printed output | planned | M127, M128 | normal | milestones/M129-vignette-prose-matches-output.md |
+| M126 | Package figures show every point, interval and axis label clearly | done | — | normal | milestones/archive/M126-clear-package-figures.md |
 | M125 | The circumplex-structure vignette reads as plain English | done | M123 | normal | milestones/archive/M125-plain-vignette-structure.md |
 | M124 | The axes-reliability and SEM vignettes read as plain English | done | M123 | normal | milestones/archive/M124-plain-vignettes-axes-sem.md |
-| M123 | The Bayesian, growth and visualization vignettes read as plain English, checked by a prose sweep | done | — | normal | milestones/archive/M123-plain-vignettes-sweep.md |
 
 ## Candidates
 
