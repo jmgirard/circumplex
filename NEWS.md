@@ -24,13 +24,14 @@
 
 * `print()` for a multi-group `ssm_sem()` result shows the invariance verdict
   as a `Verdict:` line followed by short labeled lines: `Test:` and `Result:`,
-  `Also:` for a rung rejected above the required one, and `Contrast:`,
-  `Profiles:` and `Instead:` when the groups cannot be compared. Every line
-  fits the console width. The stored verdict text, and the warning and error
+  `Also:` for a rung rejected above the required one when the groups can be
+  compared, and `Contrast:`, `Profiles:` and `Instead:` when they cannot. The
+  labeled values wrap to the console width, and at 77 and 80 columns every
+  line of the block fits. The stored verdict text, and the warning and error
   that quote it, do not change.
 
 * `print()` for a multi-group `ssm_sem()` result shows the `dcfi` and `cr`
-  columns and a two-line ΔCFI note only for a two-group fit estimated by ML
+  columns and a short ΔCFI note (two lines at 80 columns) only for a two-group fit estimated by ML
   with a plain CFI, the only case the .01 rule was simulated for. For other
   fits, including the default `estimator = "MLR"`, the `dcfi` values are still
   in the `invariance` element of the result, and `invariance$dcfi_scope`

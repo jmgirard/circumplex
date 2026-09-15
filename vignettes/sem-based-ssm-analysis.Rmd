@@ -479,7 +479,8 @@ makes lavaan report a robust CFI, so a fit can be ML and still fall outside the
 envelope. The default estimator is `"MLR"`. So the ladder above prints no `dcfi`
 column and no ΔCFI note. The values are still in
 `by_gender$invariance$table$dcfi` with no label, and
-`by_gender$invariance$dcfi_scope` records which condition applies. The same
+`by_gender$invariance$dcfi_scope` records the fields that show which condition
+applies. The same
 withholding covers a non-ML estimator such as `"GLS"`. Its CFI is plain-named, but its fit
 function is not the one that the criterion was simulated under. That is a
 deliberate refusal rather than a gap. Extending the cutoff to a robust index,

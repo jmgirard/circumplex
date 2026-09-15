@@ -1256,8 +1256,10 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   The retain/reject label is set **only inside the envelope that simulation
 #'   covers**: exactly two groups, ML estimation, and a plain (non-robust) CFI.
 #'   `print()` shows the `dcfi` and `cr` columns and a short note only inside
-#'   it. Three separate things put a fit outside it, and `dcfi_scope` in the
-#'   returned `invariance` element records which one applies. A robust estimator -- the default `"MLR"`, or `"MLM"`
+#'   it. Three separate things put a fit outside it. `dcfi_scope` in the
+#'   returned `invariance` element records the number of groups, the
+#'   estimator, whether it is ML estimation and whether the CFI is plain, and
+#'   the conditions that apply follow from those fields. A robust estimator -- the default `"MLR"`, or `"MLM"`
 #'   -- makes lavaan report a robust CFI; so does `missing = "fiml"`, even
 #'   under `estimator = "ML"`, so plain ML is necessary for the label but not
 #'   sufficient. `"GLS"`, `"WLS"`, `"ULS"` and `"DWLS"` are not ML estimation
@@ -1824,8 +1826,9 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 }
 
 # The invariance-ladder block of print.circumplex_ssm_sem(): heading, table,
-# rung notes, the Delta-CFI note (in scope only) and the verdict block. Every
-# line is fitted to getOption("width").
+# rung notes, the Delta-CFI note (in scope only) and the verdict block. The
+# rung notes, the Delta-CFI note and the labeled verdict values wrap to
+# getOption("width"); the heading and the Verdict: line do not.
 sem_print_invariance <- function(inv, digits = 3) {
   width <- getOption("width")
   wrap <- function(text, indent = 0, exdent = 2) {
