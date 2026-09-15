@@ -1025,3 +1025,31 @@ test_that("every line of the printed invariance-ladder block fits in 80 columns"
   fits_80(b)
   expect_match(flat(b), "note [metric]: vacuous", fixed = TRUE)
 })
+
+test_that("a non-comparable verdict that ends in a period prints no second period", {
+  inv <- list(
+    gate = "metric", alpha = 0.05, comparable = FALSE,
+    contrast_requested = FALSE,
+    verdict = paste0(
+      "the metric nested test could not be computed (lavaan returned NA); ",
+      "comparability cannot be established, so the latent contrast is not ",
+      "computed. Inspect the ladder fits directly."
+    ),
+    table = data.frame(
+      rung = c("configural", "metric"), chisq = c(50, 60), df = c(34, 48),
+      cfi = c(0.99, 0.99), rmsea = c(0.03, 0.03), dchisq = c(NA, NA),
+      ddf = c(NA, 14), p = c(NA, NA), dcfi = c(NA_real_, NA_real_),
+      cr = c(NA_character_, NA_character_), note = c("", "")
+    )
+  )
+  local_reproducible_output(width = 80)
+  out <- utils::capture.output(sem_print_invariance(inv))
+  flat <- paste(out, collapse = " ")
+  expect_match(flat, "Inspect the ladder fits directly.", fixed = TRUE)
+  expect_no_match(flat, "directly..", fixed = TRUE)
+  expect_true(all(nchar(out, type = "width") <= 80))
+  # A verdict with no closing period still gets one
+  inv$verdict <- "metric invariance rejected: these groups cannot be compared"
+  flat <- paste(utils::capture.output(sem_print_invariance(inv)), collapse = " ")
+  expect_match(flat, "cannot be compared.", fixed = TRUE)
+})

@@ -2,6 +2,26 @@
 
 ## Minor improvements and fixes
 
+* `summary()` for an `ssm_ci_accuracy()` result is about half as long. The
+  settings print in three lines. The coverage and guardrail tables are replaced
+  by one table with a row for each profile and amplitude condition. That table
+  shows the coverage of each parameter, the displacement coverage when
+  certified, the certification rate and the `Structural` flag. The other
+  columns are no longer printed, but they are still in the `coverage` and
+  `guardrail` elements of the result. The verdicts and cautions are unchanged.
+
+* `print()` for a multi-group `ssm_sem()` result wraps the notes and verdict
+  of the invariance ladder to the console width. The ΔCFI note and the text
+  shown when the groups cannot be compared are shorter and name the same
+  conditions. A verdict that already ends in a period no longer gets a second
+  one.
+
+* The printed output of `ssm_ci_accuracy()`, `axes_reliability()` and
+  `ssm_sem()` results, and the refusal warning of `axes_reliability()` for
+  nearly collinear items, no longer use `--` as a dash. For example, a verdict
+  now reads `Verdict: CAUTION. Amplitude CIs ...` and a coverage line reads
+  `coverage 96.7%: borderline`.
+
 * `plot()` for a `cpm_fit()` result now draws a confidence interval of zero
   width as a visible line. Before, a zero-width angle interval was not drawn at
   all. A zero-width angle interval is now drawn as a line along the radius. A
