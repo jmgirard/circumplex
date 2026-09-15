@@ -50,7 +50,7 @@ Verdict:  metric invariance rejected
 ## Tasks
 
 - [x] T1: Write the AC1 and AC2 fixtures as one scratchpad script. Run it in a `git worktree` of `0f8f3289`. For each case, save the printed ladder block at width 80, `res$invariance`, and any warning and `ssm_plot_contrast()` error as RDS. Use the same mock at both refs for the mocked case.
-- [ ] T2: Write the tests first in `tests/testthat/test-ssm_sem_groups.R`. Cover the labeled lines for each AC1 arm, the ΔCFI show or hide for each AC2 case, and the AC4 width limit at 77 and 80. Skip a test in a locale where Δ does not print as one character. Rewrite the M127 width and wording tests (about lines 935 to 1075) for the new layout. Make sure that each new test fails on master for the reason it claims.
+- [x] T2: Write the tests first in `tests/testthat/test-ssm_sem_groups.R`. Cover the labeled lines for each AC1 arm, the ΔCFI show or hide for each AC2 case, and the AC4 width limit at 77 and 80. Skip a test in a locale where Δ does not print as one character. Rewrite the M127 width and wording tests (about lines 935 to 1075) for the new layout. Make sure that each new test fails on master for the reason it claims.
 - [ ] T3: Add the internal verdict-facts helper next to `sem_fit_ladder()` (`R/ssm_sem.R`, about lines 955 to 1040). `sem_fit_ladder()` builds its unchanged `verdict` string from the helper. The print method reads the facts from fields that `res$invariance` already holds.
 - [ ] T4: Rewrite `sem_print_invariance()` (about line 1748) and `sem_dcfi_note()` (about line 795) to the layout in Scope. Hide `dcfi`, `cr` and the note outside the ΔCFI scope. Run the T2 tests until they pass.
 - [ ] T5: Run the T1 script at the branch head and compare. `res$invariance`, the warnings and the errors must be identical. For the printed text, write a ledger per case in `## Decisions`. The ledger maps each number, verdict and caution in master's block to the new line that carries it, or to the AC2 removal.
@@ -66,6 +66,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: The plan gate chose to hide out-of-scope ΔCFI (D-059) over a short note in every case, because the default MLR estimator never gets a label. Falsified by users who need the out-of-scope `dcfi` value in printed output.
 - 2026-09-15: The plan chose width 77 in this vignette only over all vignettes, because the other long lines come from warning text, data frames and lavaan syntax, which the width option does not wrap. Falsified by a knit that shows the option wraps them.
 - 2026-09-15: T1 done. `tests/testthat/helper-ssm-sem-ladder.R` fits 13 cached cases, and at master `0f8f3289` each one reaches its intended verdict arm and ΔCFI scope branch (the mocked `lavTestLRT` gives the untestable arm). The baseline is in the scratchpad as `m130-master.rds`.
+- 2026-09-15: T2 done. Three M130 tests replace the two M127 print tests, and three older tests now assert that out-of-scope ΔCFI does not print. The M127 double-period test is gone, because the verdict no longer prints as a sentence. On the unchanged code the new tests fail as claimed: no labeled lines after `Verdict:`, an in-scope note of 3 to 4 lines without "the verdict does not use it", and a `dcfi` column out of scope.
 
 ## Decisions
 

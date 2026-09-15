@@ -721,7 +721,7 @@ test_that("the -.01 cutoff is a >= boundary and never fires outside its validate
   expect_true(all(is.na(sem_dcfi_flag(c(0.004, -0.03), NA))))
 })
 
-test_that("outside the validated scope (robust CFI, or more than two groups) dcfi prints with a not-validated note and NO binary flag", {
+test_that("outside the validated scope (robust CFI, or more than two groups) dcfi stays in the object with NO binary flag and does not print (D-059)", {
   skip_on_cran()
   skip_if_not_installed("lavaan")
   # (a) robust CFI: the package's DEFAULT estimator (MLR), two groups
@@ -736,12 +736,9 @@ test_that("outside the validated scope (robust CFI, or more than two groups) dcf
   expect_false(isTRUE(inv$dcfi_scope$cfi_plain))
   expect_false(is.na(inv$table$dcfi[inv$table$rung == "metric"])) # value kept
   expect_true(all(is.na(inv$table$cr))) # verdict withheld
-  out <- dcfi_printed(mlr)
-  expect_match(out, "Cheung & Rensvold \\(2002\\)")
-  expect_match(out, "not validated", ignore.case = TRUE)
-  expect_match(out, "robust CFI", fixed = TRUE)
-  expect_match(out, "descriptive only", fixed = TRUE)
-  expect_no_match(dcfi_header(mlr), "cr\\s*$") # no flag column at all
+  # Printed: no dcfi or cr column and no Delta-CFI text (D-059)
+  expect_no_match(dcfi_printed(mlr), "Cheung & Rensvold", fixed = TRUE)
+  expect_no_match(dcfi_header(mlr), "dcfi|cr\\s*$")
   # (b) three groups under plain ML
   pop3 <- list(
     A = dcfi_pop_2g(0)$sigma$A,
@@ -760,10 +757,8 @@ test_that("outside the validated scope (robust CFI, or more than two groups) dcf
   expect_false(isTRUE(inv3$dcfi_scope$in_scope))
   expect_false(is.na(inv3$table$dcfi[inv3$table$rung == "metric"]))
   expect_true(all(is.na(inv3$table$cr)))
-  out3 <- dcfi_printed(g3)
-  expect_match(out3, "not validated", ignore.case = TRUE)
-  expect_match(out3, "3 groups", fixed = TRUE)
-  expect_no_match(dcfi_header(g3), "cr\\s*$")
+  expect_no_match(dcfi_printed(g3), "Cheung & Rensvold", fixed = TRUE)
+  expect_no_match(dcfi_header(g3), "dcfi|cr\\s*$")
 })
 
 test_that("Delta-CFI is REPORTED ONLY: it never moves the gate, the verdict, or the estimation fit, even when it disagrees with Delta-chi-square", {
@@ -850,10 +845,8 @@ test_that("a non-ML estimator that still yields a plain CFI is OUT of scope (Che
   expect_false(isTRUE(sc$in_scope))
   expect_false(is.na(gls$invariance$table$dcfi[2])) # value still reported
   expect_true(all(is.na(gls$invariance$table$cr))) # verdict withheld
-  expect_no_match(dcfi_header(gls), "cr\\s*$")
-  out <- dcfi_printed(gls)
-  expect_match(out, "not validated", ignore.case = TRUE)
-  expect_match(out, "non-ML estimator: GLS", fixed = TRUE)
+  expect_no_match(dcfi_header(gls), "dcfi|cr\\s*$")
+  expect_no_match(dcfi_printed(gls), "Cheung & Rensvold", fixed = TRUE)
   # And the ML family stays IN scope: MLR/MLM are ML estimation, excluded only
   # by their robust CFI, so the plain-CFI test must remain the operative one
   set.seed(42)
@@ -938,123 +931,225 @@ test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nest
   expect_no_match(inv$verdict, "CFI", ignore.case = TRUE)
 })
 
-# Printed ladder width (M127) --------------------------------------------------
+# Printed ladder layout (M130) -------------------------------------------------
 
-# The invariance-ladder block as print() shows it: the lines from the ladder
-# heading through the verdict and, when the groups cannot be compared, the
-# text that follows it. The block is located inside the full print()
-# output, so the assertion reads what a user sees.
-ladder_block <- function(res) {
-  out <- utils::capture.output(print(res))
-  block <- utils::capture.output(sem_print_invariance(res$invariance))
-  n <- length(block)
-  starts <- which(out == block[[1]])
-  hit <- Filter(function(s) identical(out[s:(s + n - 1)], block), starts)
-  expect_length(hit, 1)
-  expect_true(any(grepl("^Invariance ladder", block)))
-  expect_true(any(grepl("^Verdict: ", block)))
-  block
+# The fixtures are the cached cases of helper-ssm-sem-ladder.R, one per verdict
+# arm of sem_fit_ladder() and per Delta-CFI scope branch.
+
+# The verdict line and the labeled lines under it. A labeled line is two
+# spaces, a capitalized label, a colon and a value; a continuation line is
+# indented to the value column. Returns the decision, the labels in printed
+# order, and each label's values with their continuations joined.
+ladder_verdict <- function(lines) {
+  v <- grep("^Verdict: ", lines)
+  expect_length(v, 1)
+  body <- lines[-seq_len(v)]
+  labeled <- grepl("^  [A-Z][a-z]+: +\\S", body)
+  continued <- grepl("^ {12}\\S", body)
+  expect_true(all(labeled | continued))
+  expect_true(labeled[[1]])
+  values <- vapply(split(body, cumsum(labeled)), function(x) {
+    x[[1]] <- sub("^  [A-Z][a-z]+: +", "", x[[1]])
+    paste(trimws(x), collapse = " ")
+  }, character(1))
+  labels <- sub("^  ([A-Z][a-z]+):.*$", "\\1", body[labeled])
+  list(
+    decision = sub("^Verdict: +", "", lines[[v]]),
+    labels = labels,
+    fields = split(unname(values), factor(labels, unique(labels)))
+  )
 }
 
-test_that("every line of the printed invariance-ladder block fits in 80 columns", {
+test_that("the verdict prints as a Verdict: line and labeled lines for every verdict arm (M130)", {
   skip_on_cran()
   skip_if_not_installed("lavaan")
-  local_reproducible_output(width = 80)
-  fits_80 <- function(block) {
-    expect_true(all(nchar(block, type = "width") <= 80))
+  skip_if_not(l10n_info()[["UTF-8"]], "the ladder block prints Greek letters")
+  verdict_of <- function(name) {
+    res <- ladder_case(name)$res
+    list(v = ladder_verdict(ladder_block_lines(res)), inv = res$invariance)
   }
-  flat <- function(block) gsub("\\s+", " ", paste(block, collapse = " "))
-
-  # Invariance holds, contrast requested, default MLR: the Delta-CFI note is
-  # out of scope
-  pop <- interior_2g()
-  dat <- sim_2g(pop, n_per = 400, seed = 17)
-  set.seed(6)
-  holds <- ssm_sem(dat,
-    scales = pop$scales, measures = "m1", grouping = "grp",
-    contrast = TRUE, boots = 20
+  # The nested test as the table holds it, stated independently of print()
+  test_stat <- function(inv, rung) {
+    row <- inv$table[inv$table$rung == rung, ]
+    paste0(
+      rung, ": Δχ²(", row$ddf, ") = ",
+      format(round(row$dchisq, 2))
+    )
+  }
+  profiles <- paste(
+    "the rows below are each group's separate (configural) latent profile"
   )
-  expect_true(isTRUE(holds$invariance$comparable))
-  b <- ladder_block(holds)
-  fits_80(b)
-  expect_match(flat(b), "metric invariance retained", fixed = TRUE)
-  expect_match(flat(b), "NOT validated here (robust CFI)", fixed = TRUE)
 
-  # Invariance rejected under plain ML, with and without a requested contrast:
-  # the Delta-CFI note is in scope
-  bad <- dcfi_pop_2g(0.35)
-  dat_bad <- sim_groups(bad$sigma, n_per = 700, seed = 61)
-  set.seed(35)
-  rej <- suppressWarnings(ssm_sem(dat_bad,
-    scales = bad$scales, measures = "m1", grouping = "grp",
-    estimator = "ML", boots = 20
-  ))
-  expect_false(isTRUE(rej$invariance$comparable))
-  b <- ladder_block(rej)
-  fits_80(b)
-  expect_match(flat(b), "rejects that step", fixed = TRUE)
-  expect_match(flat(b), "cannot be compared", fixed = TRUE)
-  expect_match(flat(b), "A latent contrast is not computable", fixed = TRUE)
-  set.seed(35)
-  rej_con <- suppressWarnings(ssm_sem(dat_bad,
-    scales = bad$scales, measures = "m1", grouping = "grp",
-    contrast = TRUE, estimator = "ML", boots = 20
-  ))
-  b <- ladder_block(rej_con)
-  fits_80(b)
-  expect_match(flat(b), "requested latent contrast was therefore not computed",
+  # Configural gate: no cross-group constraints, so nothing is tested
+  x <- verdict_of("configural")
+  expect_identical(x$v$decision, "configural gate")
+  expect_identical(x$v$labels, c("Test", "Result"))
+  expect_match(x$v$fields$Result, "no cross-group constraints required",
                fixed = TRUE)
 
-  # A rung note: the strict tier's vacuous metric rung
-  p <- 8
-  th <- oct * pi / 180
-  lambda <- cbind(1, cos(th), sin(th))
-  sig <- lambda %*% diag(c(0.8, 0.5, 0.5)) %*% t(lambda) +
-    diag(seq(0.3, 0.6, length.out = p))
-  nm <- paste0("s", 1:p)
-  dimnames(sig) <- list(nm, nm)
-  set.seed(32)
-  mk <- function(grp, n = 600) {
-    x <- as.data.frame(matrix(rnorm(n * p), n) %*% chol(sig))
-    colnames(x) <- nm
-    x$grp <- grp
-    x
+  # Strict tier: the metric rung holds by construction, with and without a
+  # rejection above the required rung
+  for (name in c("vacuous", "vacuous_above")) {
+    x <- verdict_of(name)
+    expect_identical(x$v$decision, "metric invariance holds by construction")
+    expect_match(x$v$fields$Test, "not testable", fixed = TRUE)
+    expect_match(x$v$fields$Result, "strict tier's fixed loadings", fixed = TRUE)
+    expect_match(x$v$fields$Result, "compared at the metric level", fixed = TRUE)
   }
-  dat_s <- rbind(mk("A"), mk("B"))
-  set.seed(33)
-  strict <- ssm_sem(dat_s,
-    scales = nm, grouping = "grp", contrast = TRUE, model = "strict",
-    estimator = "ML", boots = 20
+  expect_identical(verdict_of("vacuous")$v$labels, c("Test", "Result"))
+  x <- verdict_of("vacuous_above")
+  expect_identical(x$v$labels, c("Test", "Result", "Also"))
+  expect_match(x$v$fields$Also, paste0(
+    "the scalar rung(s) were also rejected (reported only and not required ",
+    "for this contrast, whose estimand is defined at the metric level)"
+  ), fixed = TRUE)
+
+  # Retained: one tested rung, two tested rungs, and a rejection above
+  x <- verdict_of("retained_one")
+  expect_identical(x$v$decision, "metric invariance retained")
+  expect_identical(x$v$labels, c("Test", "Result"))
+  expect_match(x$v$fields$Test, test_stat(x$inv, "metric"), fixed = TRUE)
+  expect_match(x$v$fields$Test, ">= alpha = 0.05", fixed = TRUE)
+  expect_match(x$v$fields$Result, "compared at the metric level", fixed = TRUE)
+  x <- verdict_of("retained_two")
+  expect_identical(x$v$decision, "metric and scalar invariance retained")
+  expect_length(x$v$fields$Test, 2)
+  expect_match(x$v$fields$Test[[1]], test_stat(x$inv, "metric"), fixed = TRUE)
+  expect_match(x$v$fields$Test[[2]], test_stat(x$inv, "scalar"), fixed = TRUE)
+  expect_match(x$v$fields$Result, "compared at the scalar level", fixed = TRUE)
+  x <- verdict_of("retained_above")
+  expect_identical(x$v$labels, c("Test", "Result", "Also"))
+  expect_match(x$v$fields$Also, "(reported only and not required", fixed = TRUE)
+
+  # Rejected, with and without a requested contrast
+  for (name in c("rejected_contrast", "rejected_plain")) {
+    x <- verdict_of(name)
+    expect_identical(x$v$decision, "metric invariance rejected")
+    expect_match(x$v$fields$Test, test_stat(x$inv, "metric"), fixed = TRUE)
+    expect_match(x$v$fields$Test, "p < 0.0001, alpha = 0.05", fixed = TRUE)
+    expect_match(x$v$fields$Result,
+      "these groups cannot be compared on this instrument's latent metric",
+      fixed = TRUE
+    )
+    expect_identical(x$v$fields$Profiles, profiles)
+  }
+  x <- verdict_of("rejected_contrast")
+  expect_identical(
+    x$v$labels, c("Test", "Result", "Contrast", "Profiles", "Instead")
   )
-  b <- ladder_block(strict)
-  fits_80(b)
-  expect_match(flat(b), "note [metric]: vacuous", fixed = TRUE)
+  expect_match(x$v$fields$Contrast, "the requested latent contrast was not computed",
+               fixed = TRUE)
+  expect_match(x$v$fields$Instead, paste(
+    "the observed-score contrast from ssm_analyze() answers a different",
+    "question and remains available"
+  ), fixed = TRUE)
+  x <- verdict_of("rejected_plain")
+  expect_identical(x$v$labels, c("Test", "Result", "Contrast", "Profiles"))
+  expect_match(x$v$fields$Contrast,
+    "a latent contrast is not computable on this instrument's latent metric",
+    fixed = TRUE
+  )
+
+  # The nested test could not be computed (lavaan's test mocked to NA)
+  for (name in c("untestable_contrast", "untestable_plain")) {
+    x <- verdict_of(name)
+    expect_identical(x$v$decision, "comparability cannot be established")
+    expect_match(x$v$fields$Test,
+      "the metric nested test could not be computed (lavaan returned NA)",
+      fixed = TRUE
+    )
+    expect_match(x$v$fields$Result, "inspect the ladder fits directly",
+                 fixed = TRUE)
+    expect_match(x$v$fields$Contrast, "not computed", fixed = TRUE)
+    expect_identical(x$v$fields$Profiles, profiles)
+  }
+  expect_identical(
+    verdict_of("untestable_contrast")$v$labels,
+    c("Test", "Result", "Contrast", "Profiles", "Instead")
+  )
+  expect_identical(
+    verdict_of("untestable_plain")$v$labels,
+    c("Test", "Result", "Contrast", "Profiles")
+  )
 })
 
-test_that("a non-comparable verdict that ends in a period prints no second period", {
-  inv <- list(
-    gate = "metric", alpha = 0.05, comparable = FALSE,
-    contrast_requested = FALSE,
-    verdict = paste0(
-      "the metric nested test could not be computed (lavaan returned NA); ",
-      "comparability cannot be established, so the latent contrast is not ",
-      "computed. Inspect the ladder fits directly."
-    ),
-    table = data.frame(
-      rung = c("configural", "metric"), chisq = c(50, 60), df = c(34, 48),
-      cfi = c(0.99, 0.99), rmsea = c(0.03, 0.03), dchisq = c(NA, NA),
-      ddf = c(NA, 14), p = c(NA, NA), dcfi = c(NA_real_, NA_real_),
-      cr = c(NA_character_, NA_character_), note = c("", "")
+test_that("dcfi, cr and a Delta-CFI note of at most two lines print only inside the criterion's scope (M130, D-059)", {
+  skip_on_cran()
+  skip_if_not_installed("lavaan")
+  skip_if_not(l10n_info()[["UTF-8"]], "the ladder block prints Greek letters")
+  shows <- function(name, width = 80) {
+    lines <- ladder_block_lines(ladder_case(name)$res, width)
+    list(
+      lines = lines,
+      header = grep("^ +rung ", lines, value = TRUE)[[1]],
+      note_at = grep("^ΔCFI", lines)
     )
-  )
-  local_reproducible_output(width = 80)
-  out <- utils::capture.output(sem_print_invariance(inv))
-  flat <- paste(out, collapse = " ")
-  expect_match(flat, "Inspect the ladder fits directly.", fixed = TRUE)
-  expect_no_match(flat, "directly..", fixed = TRUE)
-  expect_true(all(nchar(out, type = "width") <= 80))
-  # A verdict with no closing period still gets one
-  inv$verdict <- "metric invariance rejected: these groups cannot be compared"
-  flat <- paste(utils::capture.output(sem_print_invariance(inv)), collapse = " ")
-  expect_match(flat, "cannot be compared.", fixed = TRUE)
+  }
+
+  # In scope with a dcfi value: both columns and the note
+  expect_true(isTRUE(
+    ladder_case("rejected_contrast")$res$invariance$dcfi_scope$in_scope
+  ))
+  for (width in c(77, 80)) {
+    s <- shows("rejected_contrast", width)
+    expect_match(s$header, "dcfi")
+    expect_match(s$header, "cr\\s*$")
+    expect_length(s$note_at, 1)
+    note <- s$lines[s$note_at:(grep("^Verdict: ", s$lines) - 1)]
+    expect_lte(length(note), 2)
+    flat <- gsub("\\s+", " ", paste(note, collapse = " "))
+    expect_match(flat, "Cheung & Rensvold (2002)", fixed = TRUE)
+    expect_match(flat, "two-group ML simulation", fixed = TRUE)
+    expect_match(flat, "alpha = .01", fixed = TRUE)
+    expect_match(flat, "-0.01", fixed = TRUE)
+    expect_match(flat, "the verdict does not use it", fixed = TRUE)
+  }
+
+  # In scope but no dcfi value (configural only; the strict tier's vacuous
+  # metric rung): no column and no note
+  for (name in c("configural", "vacuous")) {
+    inv <- ladder_case(name)$res$invariance
+    expect_true(isTRUE(inv$dcfi_scope$in_scope))
+    expect_true(all(is.na(inv$table$dcfi)))
+    s <- shows(name)
+    expect_no_match(s$header, "dcfi")
+    expect_length(s$note_at, 0)
+  }
+
+  # Out of scope for each reason and one combination: no column and no
+  # Delta-CFI text, while the value and the reason stay in the object
+  for (name in c("retained_one", "gls", "groups3_ml", "groups3_mlr")) {
+    inv <- ladder_case(name)$res$invariance
+    expect_false(isTRUE(inv$dcfi_scope$in_scope))
+    expect_false(is.na(inv$table$dcfi[inv$table$rung == "metric"]))
+    s <- shows(name)
+    expect_no_match(s$header, "dcfi")
+    expect_no_match(s$header, "cr\\s*$")
+    expect_false(any(grepl("ΔCFI|Cheung", s$lines)))
+  }
+  scope <- function(name) ladder_case(name)$res$invariance$dcfi_scope
+  expect_false(scope("retained_one")$cfi_plain)
+  expect_identical(scope("retained_one")$n_groups, 2L)
+  expect_identical(scope("gls")$estimator, "GLS")
+  expect_false(scope("gls")$ml)
+  expect_identical(scope("groups3_ml")$n_groups, 3L)
+  expect_true(scope("groups3_ml")$cfi_plain)
+  expect_identical(scope("groups3_mlr")$n_groups, 3L)
+  expect_false(scope("groups3_mlr")$cfi_plain)
+})
+
+test_that("every line of the ladder block fits the console width at 77 and 80 columns (M130)", {
+  skip_on_cran()
+  skip_if_not_installed("lavaan")
+  skip_if_not(l10n_info()[["UTF-8"]], "the ladder block prints Greek letters")
+  for (name in ladder_case_names) {
+    for (width in c(77, 80)) {
+      lines <- ladder_block_lines(ladder_case(name)$res, width)
+      expect_true(
+        all(nchar(lines, type = "width") <= width),
+        label = sprintf("%s at width %d", name, width)
+      )
+      ladder_verdict(lines)
+    }
+  }
 })
