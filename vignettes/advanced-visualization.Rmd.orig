@@ -151,8 +151,9 @@ center to resolve closely spaced profiles, and say so in the caption.
 
 The amplitude (radial) axis and its tick labels are placed automatically in the
 widest gap between the displacement spokes. So they never collide with a spoke
-label. You can override that with `r_axis_angle`, given as a displacement in
-degrees:
+label. `ssm_plot_circle()` and `plot()` for a CPM fit go one step further and
+use the widest gap that holds no plotted point. You can override the placement
+with `r_axis_angle`, given as a displacement in degrees:
 
 ```{r coord-r-axis}
 ggplot(results$results) +
@@ -328,7 +329,7 @@ results_long <- ssm_analyze_long(
 subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
 ```
 
-```{r occasions-plot, fig.height = 6}
+```{r occasions-plot, fig.height = 3.2}
 ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
 
@@ -378,7 +379,11 @@ The amplitude and displacement of a single occasion are split across two panels.
 change in (amplitude, displacement) reads as movement through circumplex space.
 
 ```{r occasions-path}
-ggcircumplex(octants(), amax = 0.8) +
+ggplot() +
+  # The amplitude axis goes in the 45-90 gap, clear of the three occasions
+  coord_circumplex(amax = 0.8, r_axis_angle = 67.5) +
+  scale_x_continuous(breaks = octants(), labels = PANO()) +
+  theme_circumplex() +
   geom_ssm_point(
     data = results_long$results,
     mapping = aes(amplitude = a_est, displacement = d_est),
@@ -452,10 +457,13 @@ label their scales identically.
 
 The built-in plotting functions are implemented on exactly these components:
 `ssm_plot_circle()` is `ggcircumplex()` plus `geom_ssm_arc()` and
-`geom_ssm_point()`, and `ssm_plot_curve()` uses `scale_x_circumplex()` for its
-angle axis. So you can always start from a built-in plot and add to it, or
-rebuild it from the pieces when you need finer control. Whichever route you
-take, the coordinates are computed the same way, so the results line up.
+`geom_ssm_point()`, with the amplitude axis moved to a gap that holds no point.
+`ssm_plot_curve()` uses `scale_x_circumplex()` for its angle axis. So you can
+always start from a built-in plot and add to it, or rebuild it from the pieces
+when you need finer control. Whichever route you take, the coordinates are
+computed the same way, so the results line up. Only the amplitude axis can
+differ: to put it where `ssm_plot_circle()` puts it, pass `r_axis_angle` to
+`coord_circumplex()`, as in the path figure above.
 
 ## References
 

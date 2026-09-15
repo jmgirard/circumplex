@@ -13,6 +13,12 @@ has_ggrepel <- function() {
 #' point and interval estimate for each row (e.g., group or measure) in a
 #' circular space quantified by displacement and amplitude.
 #'
+#' The amplitude axis and its labels are drawn along the midpoint of the widest
+#' gap between displacement spokes that holds no plotted point estimate (ties go
+#' to the smallest midpoint; a point on a spoke counts as in both gaps next to
+#' it). When every gap holds a point, the axis goes in the widest gap, as
+#' [coord_circumplex()] places it by default.
+#'
 #' @param ssm_object Required. The output of `ssm_analyze()`.
 #' @param amax A positive real number corresponding to the radius of the circle.
 #'   It is used to scale the amplitude values and will determine which amplitude
@@ -194,7 +200,9 @@ ssm_plot_circle <- function(ssm_object,
     amax = amax,
     font_size = scale_font_size
   )
-  
+  # Keep the amplitude axis labels off the plotted points.
+  p$coordinates$r_axis_angle <- ssm_r_axis_angle_clear(angles, df_plot$d_est)
+
   ## Set color scales depending on palette
   if (is.null(palette)) {
     fill_color <- "#0072B2"

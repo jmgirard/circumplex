@@ -62,13 +62,152 @@ test_that("plot.circumplex_cpm names scales whose CI wedge is inestimable", {
   )
   expect_true(all(is.na(fit$results$Angle_lci)))  # confirm the fixture
 
-  expect_warning(p <- plot(fit), "wedge omitted")
+  expect_warning(p <- plot(fit), "PA \\(inestimable interval\\)")
   expect_true(ggplot2::is_ggplot(p))
 
   b <- ggplot2::ggplot_build(p)
   # No arc layer is added when nothing is drawable; every scale still draws a
   # point.
   expect_null(cpm_layer(b, p, "GeomSsmArc"))
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmPoint")), 8L)
+})
+
+# ---- zero-width interval marks ----------------------------------------------
+# A zero-width interval names no wedge, so the arc layer drops it. The plot must
+# still show it: a line along its nonzero side, or a short cap when both widths
+# are zero. These tests edit one scale's bounds in a clean fit and measure the
+# mark that scale gets on the canvas.
+
+# Set scale `scale`'s angle bounds and zeta bounds (communality = zeta^2).
+with_bounds <- function(fit, scale, angle = NULL, zeta = NULL, comm = NULL) {
+  i <- match(scale, as.character(fit$results$Scale))
+  if (!is.null(angle)) {
+    fit$results$Angle_lci[i] <- angle[[1]]
+    fit$results$Angle_uci[i] <- angle[[2]]
+  }
+  if (!is.null(zeta)) {
+    fit$results$Zeta_lci[i] <- zeta[[1]]
+    fit$results$Zeta_uci[i] <- zeta[[2]]
+  }
+  if (!is.null(comm)) fit$results$Communality[i] <- comm
+  fit
+}
+
+# The zero-width mark layer's rows for one scale, with the chord length between
+# each mark's two ends measured in canvas coordinates after the coord transform.
+# A chord above 0 means the drawn line has a length above 0.
+zero_width_marks <- function(p, scale) {
+  b <- ggplot2::ggplot_build(p)
+  idx <- which(vapply(p$layers, function(l) inherits(l$geom, "GeomSegment"),
+                      logical(1)))
+  if (length(idx) == 0) return(NULL)
+  idx <- idx[[1]]
+  rows <- which(as.character(p$layers[[idx]]$data$Scale) == scale)
+  d <- b$data[[idx]][rows, , drop = FALSE]
+  if (nrow(d) == 0) return(d)
+  pp <- b$layout$panel_params[[1]]
+  from <- b$layout$coord$transform(data.frame(x = d$x, y = d$y), pp)
+  to <- b$layout$coord$transform(data.frame(x = d$xend, y = d$yend), pp)
+  d$canvas_length <- sqrt((to$x - from$x)^2 + (to$y - from$y)^2)
+  d
+}
+
+expect_visible_mark <- function(fit, scale) {
+  p <- expect_no_warning(plot(fit))
+  m <- zero_width_marks(p, scale)
+  expect_false(is.null(m))
+  expect_gt(nrow(m), 0)
+  expect_true(all(m$linewidth > 0))
+  expect_true(all(m$canvas_length > 1e-3))
+  invisible(m)
+}
+
+test_that("a zero-width angle interval draws a radial line (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  # The reference scale's angle is fixed, so its interval already has zero width.
+  expect_equal(fit$results$Angle_lci[1], fit$results$Angle_uci[1])
+  m <- expect_visible_mark(fit, "PA")
+  expect_equal(m$x, m$xend)
+  expect_equal(m$y, fit$results$Zeta_lci[1]^2)
+  expect_equal(m$yend, fit$results$Zeta_uci[1]^2)
+  # Stored at the seam in each of its three forms.
+  for (ang in list(c(0, 0), c(360, 360), c(360, 0))) {
+    expect_visible_mark(with_bounds(fit, "LM", angle = ang), "LM")
+  }
+})
+
+test_that("a zero-width communality interval draws an arc (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  for (cm in c(0.5, 1)) {
+    # Crossing the seam, and with a negative lower bound.
+    for (ang in list(c(350, 10), c(-10.85758, 10.85758))) {
+      f <- with_bounds(fit, "LM", angle = ang, zeta = sqrt(c(cm, cm)))
+      m <- expect_visible_mark(f, "LM")
+      expect_equal(m$y, cm)
+      expect_equal(m$yend, cm)
+      expect_equal(m$xend - m$x, ssm_arc_span(ang[[1]], ang[[2]]))
+    }
+  }
+})
+
+test_that("a both-zero interval draws a cap centered on the interval (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  for (ang in list(c(0, 0), c(360, 360))) {
+    # The communality estimate (0.8464) sits away from the zero-width bound,
+    # and the angle estimate is moved to 20 so that a cap centred on the point
+    # would fail the midpoint check.
+    f <- with_bounds(fit, "LM", angle = ang, zeta = c(0.8, 0.8))
+    f$results$Angle[f$results$Scale == "LM"] <- 20
+    m <- expect_visible_mark(f, "LM")
+    expect_equal(m$y, 0.64)
+    expect_equal(m$yend, 0.64)
+    expect_equal((m$x + m$xend) / 2, ang[[1]])
+  }
+})
+
+test_that("a zero-width angle interval from communality 0 draws a line (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  f <- with_bounds(fit, "PA", zeta = c(-0.1, 0.9))
+  m <- expect_visible_mark(f, "PA")
+  expect_equal(m$y, 0)
+  expect_equal(m$yend, 0.81)
+})
+
+test_that("a scale with nonzero widths gets a wedge and no line mark (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  p <- plot(fit)
+  m <- zero_width_marks(p, "BC")
+  expect_true(is.null(m) || nrow(m) == 0)
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmArc")), 7L)
+})
+
+test_that("a communality interval with upper bound 0 warns and draws a point (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  f <- with_bounds(fit, "BC", zeta = c(-0.2, -0.05))
+  expect_warning(p <- plot(f), "BC \\(communality interval at 0\\)")
+  m <- zero_width_marks(p, "BC")
+  expect_true(is.null(m) || nrow(m) == 0)
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmArc")), 6L)
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmPoint")), 8L)
+})
+
+test_that("a full-circle angle interval warns with its reason and draws a point (AC1)", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  f <- with_bounds(fit, "DE", angle = c(0, 360))
+  expect_warning(p <- plot(f), "DE \\(full-circle angle interval\\)")
+  m <- zero_width_marks(p, "DE")
+  expect_true(is.null(m) || nrow(m) == 0)
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmArc")), 6L)
   expect_equal(nrow(cpm_layer(b, p, "GeomSsmPoint")), 8L)
 })
 
@@ -80,4 +219,28 @@ test_that("plot.circumplex_cpm validates its arguments", {
   expect_error(plot(fit, legend = "yes"))
   expect_error(plot(fit, angle_labels = c("A", "B")))  # wrong length
   expect_warning(plot(fit, bogus_arg = 1), "disregarded")
+})
+
+test_that("plot.circumplex_cpm puts the amplitude axis in a gap with no point", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  axis_angle <- function(fit) {
+    p <- suppressWarnings(plot(fit))
+    ggplot2::ggplot_build(p)$layout$coord$r_axis_inside
+  }
+  # The fitted estimates sit off their spokes by optimizer error only, and how
+  # far varies by platform. Inside the 1e-4 degree on-spoke tolerance they count
+  # as on their spokes, so every gap holds a point and the default widest-gap
+  # rule applies.
+  # Circular distance, so LM's estimate near 0 compares with its 360 spoke.
+  off <- abs((fit$results$Angle - fit$results$Angle_theory + 180) %% 360 - 180)
+  expect_true(any(off > 0))
+  expect_true(all(off < 1e-4))
+  expect_equal(axis_angle(fit), 22.5)
+  fit$results$Angle <- fit$results$Angle_theory
+  expect_equal(axis_angle(fit), 22.5)
+  # Moving two estimates off their spokes clears the 45-90 gap first.
+  fit$results$Angle[fit$results$Scale == "PA"] <- 100
+  fit$results$Angle[fit$results$Scale == "NO"] <- 30
+  expect_equal(axis_angle(fit), 67.5)
 })

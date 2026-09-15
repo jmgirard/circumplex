@@ -76,6 +76,13 @@ Take in the results of a Structural Summary Method analysis and plot the
 point and interval estimate for each row (e.g., group or measure) in a
 circular space quantified by displacement and amplitude.
 }
+\details{
+The amplitude axis and its labels are drawn along the midpoint of the widest
+gap between displacement spokes that holds no plotted point estimate (ties go
+to the smallest midpoint; a point on a spoke counts as in both gaps next to
+it). When every gap holds a point, the axis goes in the widest gap, as
+\code{\link[=coord_circumplex]{coord_circumplex()}} places it by default.
+}
 \examples{
 # `boots` is lowered from its default of 2000 throughout these examples so
 # they run quickly; a reported analysis should use the default.

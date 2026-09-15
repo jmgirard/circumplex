@@ -329,7 +329,19 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
 #' [cpm_fit()], so the gap between a point and its spoke shows how far the
 #' estimated angle departed from the hypothesised one. Where the confidence
 #' intervals are estimable, a wedge spans each item's angle CI (angularly) and
-#' communality CI (radially).
+#' communality CI (radially). An interval of zero width has no area, so it is
+#' drawn as a line instead: along the radius for a zero-width angle CI, along
+#' the arc for a zero-width communality CI, and as a short cap across the
+#' interval when both are zero. The cap has the same drawn length at every
+#' radius except near the centre, where it spans at most a quarter turn and so
+#' is shorter. A scale whose communality CI is zero at both ends has no
+#' visible interval at the centre and is drawn as a point, with a warning.
+#'
+#' The communality axis and its labels are drawn along the midpoint of the
+#' widest gap between spokes that holds no estimated angle (ties go to the
+#' smallest midpoint; a point on a spoke counts as in both gaps next to it).
+#' When every gap holds a point, the axis goes in the widest gap, as
+#' [coord_circumplex()] places it by default.
 #'
 #' @param x A `circumplex_cpm` object from [cpm_fit()].
 #' @param amax A single positive number giving the communality represented by
@@ -372,25 +384,66 @@ plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
   df$comm_uci <- pmin(pmax(df$Zeta_uci, 0), 1)^2
 
   # A scale is drawn as a point whenever it has a location (cpm angles are
-  # always estimated, so this holds unless a future path yields NA) and as a
-  # wedge only when its CI region is estimable AND names a proper arc (< 360
-  # deg span). A Heywood/weakly-identified fit can leave the CI NA (no region)
-  # or produce a near-full-circle angle CI; such scales render as a point with
-  # no wedge, and we name them rather than let the wedge vanish silently.
+  # always estimated, so this holds unless a future path yields NA) and gets an
+  # interval mark only when its CI region is estimable, names a proper arc
+  # (< 360 deg span), and reaches past the centre. A Heywood/weakly-identified
+  # fit can leave the CI NA (no region), produce a near-full-circle angle CI, or
+  # clamp both zeta bounds to 0; at communality 0 every angle maps to the one
+  # centre point, so no mark there has any length. Such scales render as a point
+  # only, and we name each with its reason rather than let the mark vanish
+  # silently.
   df$Scale <- factor(df$Scale, levels = unique(as.character(df$Scale)))
   span <- ssm_arc_span(df$Angle_lci, df$Angle_uci)
-  drawable <- ssm_has_region(df$comm_lci, df$comm_uci,
-                             df$Angle_lci, df$Angle_uci) &
-    is.finite(span) & span >= 0 & span < 360
+  has_region <- ssm_has_region(df$comm_lci, df$comm_uci,
+                               df$Angle_lci, df$Angle_uci)
+  proper_arc <- is.finite(span) & span >= 0 & span < 360
+  off_centre <- has_region & df$comm_uci > 0
+  drawable <- has_region & proper_arc & off_centre
   pointable <- ssm_has_location(df$comm_est, df$Angle)
   no_wedge <- pointable & !drawable
   if (any(no_wedge)) {
+    reason <- ifelse(
+      !has_region, "inestimable interval",
+      ifelse(!proper_arc, "full-circle angle interval",
+             "communality interval at 0")
+    )
     warning(
-      "Confidence wedge omitted for scale(s) with an inestimable or ",
-      "full-circle interval: ",
-      paste(as.character(df$Scale)[no_wedge], collapse = ", "),
+      "Confidence wedge omitted for scale(s): ",
+      paste(
+        paste0(as.character(df$Scale), " (", reason, ")")[no_wedge],
+        collapse = ", "
+      ),
       "; drawn as a point only.",
       call. = FALSE
+    )
+  }
+
+  # A zero-width interval names no wedge (geom_ssm_arc() drops a zero angle
+  # span, and a zero communality span has no area), so it is drawn as a line
+  # instead: along the radius for a zero-width angle interval, along the arc for
+  # a zero-width communality interval, and as a short cap across the interval's
+  # own location when both widths are zero. The cap's angular extent is chosen
+  # so its drawn length is the same at every radius: `cap_length` is a fraction
+  # of the rim radius, limited to a quarter turn near the centre.
+  angle_zero <- drawable & span == 0
+  comm_zero <- drawable & df$comm_lci == df$comm_uci
+  wedge <- drawable & !angle_zero & !comm_zero
+  marked <- angle_zero | comm_zero
+  marks <- NULL
+  if (any(marked)) {
+    cap_length <- 0.12
+    m <- df[marked, ]
+    m_span <- span[marked]
+    both <- angle_zero[marked] & comm_zero[marked]
+    cap_half <- pmin(
+      cap_length / 2 / (m$comm_lci / amax) * 180 / pi, 45
+    )
+    marks <- data.frame(
+      Scale = m$Scale,
+      x = ifelse(both, m$Angle_lci - cap_half, m$Angle_lci),
+      xend = ifelse(both, m$Angle_lci + cap_half, m$Angle_lci + m_span),
+      y = m$comm_lci,
+      yend = m$comm_uci
     )
   }
 
@@ -406,11 +459,17 @@ plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
     ggplot2::theme(
       legend.position = if (legend) "right" else "none"
     )
+  # Keep the amplitude axis labels off the plotted points. The canvas coord is
+  # built fresh by ggcircumplex() above, so setting its field changes no other
+  # plot.
+  p$coordinates$r_axis_angle <- ssm_r_axis_angle_clear(
+    angles, df$Angle[pointable]
+  )
 
-  if (any(drawable)) {
+  if (any(wedge)) {
     p <- p +
       geom_ssm_arc(
-        data = df[drawable, ],
+        data = df[wedge, ],
         mapping = ggplot2::aes(
           amplitude_min = .data$comm_lci,
           amplitude_max = .data$comm_uci,
@@ -421,6 +480,27 @@ plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
         alpha = 0.4,
         color = "grey40",
         linewidth = 0.5
+      )
+  }
+
+  if (!is.null(marks)) {
+    # geom_segment() under the circumplex coord is munched, so an angular
+    # segment follows the arc. The stroke takes the scale's colour so it
+    # matches the fill of the point drawn on top of it.
+    p <- p +
+      ggplot2::geom_segment(
+        data = marks,
+        mapping = ggplot2::aes(
+          x = .data$x, xend = .data$xend, y = .data$y, yend = .data$yend,
+          colour = .data$Scale
+        ),
+        linewidth = 2.5,
+        lineend = "round",
+        show.legend = FALSE,
+        inherit.aes = FALSE
+      ) +
+      ggplot2::scale_colour_brewer(
+        palette = "Set2", limits = levels(df$Scale), guide = "none"
       )
   }
 

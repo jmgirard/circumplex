@@ -171,6 +171,36 @@ ssm_r_axis_angle <- function(breaks) {
   min(mids[gaps > max(gaps) - 1e-9])             # widest gap, smallest midpoint
 }
 
+# Data-aware variant for the plot wrappers (ssm_plot_circle(),
+# plot.circumplex_cpm()): the amplitude tick labels run along the axis, so an
+# axis through a plotted point draws a label over it. Pick the midpoint of the
+# widest spoke gap that holds no point estimate, ties to the smallest midpoint.
+# A point on a spoke counts as in both gaps next to it (the pole spoke takes a
+# point at 0 or at 360 alike). When every gap holds a point, or there are no
+# finite points, the default ssm_r_axis_angle() rule applies unchanged.
+ssm_r_axis_angle_clear <- function(breaks, points) {
+  b <- sort(unique(breaks[is.finite(breaks)] %% 360))
+  pts <- points[is.finite(points)] %% 360
+  if (length(b) < 1L || length(pts) < 1L) return(ssm_r_axis_angle(breaks))
+  # A fitted estimate meant to sit on a spoke lands a little off it, by an
+  # amount that varies by platform (the `clean_cpm_fit()` axis test in
+  # tests/testthat/test-cpm_plot.R checks it stays inside `on_spoke`), and the sign of that error
+  # would otherwise pick the gap. Within `on_spoke` degrees a point counts as on
+  # the spoke; no plotted difference is that small.
+  on_spoke <- 1e-4
+  tol <- 1e-9
+  gaps <- diff(c(b, b[[1]] + 360))
+  holds <- vapply(seq_along(b), function(i) {
+    offset <- (pts - b[[i]]) %% 360    # counterclockwise from the gap's start
+    any(offset <= gaps[[i]] + on_spoke | offset >= 360 - on_spoke)
+  }, logical(1))
+  if (all(holds)) return(ssm_r_axis_angle(breaks))
+  mids <- (b + gaps / 2) %% 360
+  open <- !holds
+  widest <- max(gaps[open])
+  min(mids[open & gaps > widest - tol])
+}
+
 # Semi-opaque plates drawn behind the amplitude tick labels (M39).
 #
 # The radial axis is a FOREGROUND guide: `CoordRadial$render_fg` emits it after

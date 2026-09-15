@@ -233,6 +233,43 @@ test_that("ssm_r_axis_angle() picks the widest-gap midpoint, off every spoke (T3
   expect_equal(ssm_r_axis_angle(0), 180)                   # one spoke -> opposite
 })
 
+test_that("ssm_r_axis_angle_clear() picks the widest gap holding no point", {
+  # The three occasions of the advanced-visualization vignette. The default
+  # rule's 22.5 sits in the 0-45 gap beside the 17.8 point; the next empty
+  # gaps all tie at 45 degrees, and the tie breaks to the smallest midpoint.
+  expect_equal(ssm_r_axis_angle(octants()), 22.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), c(332.4, 355.9, 17.8)), 67.5)
+  # A point at 0 or at 360 sits on the pole spoke, so it holds both the
+  # 315-360 gap and the 0-45 gap.
+  expect_equal(ssm_r_axis_angle_clear(octants(), 0), 67.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 360), 67.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), c(0, 360)), 67.5)
+  # A point on any spoke holds both gaps next to it.
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45), 112.5)
+  # A point within 1e-4 degrees of a spoke is on it, on either side, so the
+  # sign of a fit's rounding error does not pick the gap.
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45 - 1e-7), 112.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45 + 1e-7), 112.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 360 - 1e-7), 67.5)
+  # A point just inside a gap holds only that gap.
+  expect_equal(ssm_r_axis_angle_clear(octants(), 44.9), 67.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45.1), 22.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), 45 + 1e-3), 22.5)
+  # Uneven spokes: the widest gap holds a point, so the axis moves to the
+  # widest empty one, and the tie between the two 45-degree gaps breaks low.
+  expect_equal(ssm_r_axis_angle_clear(c(0, 45, 90), 200), 22.5)
+  expect_equal(ssm_r_axis_angle_clear(c(0, 45, 90), 10), 225)
+  # No points, or no finite points, keep the default rule.
+  expect_equal(ssm_r_axis_angle_clear(octants(), numeric(0)), 22.5)
+  expect_equal(ssm_r_axis_angle_clear(octants(), NA_real_), 22.5)
+  # Every gap holds a point: the default widest-gap rule applies.
+  expect_equal(ssm_r_axis_angle_clear(octants(), octants() + 10), 22.5)
+  expect_equal(ssm_r_axis_angle_clear(c(0, 45, 90), c(10, 50, 200)), 225)
+  # Degenerate spoke sets keep the default rule's fallbacks.
+  expect_equal(ssm_r_axis_angle_clear(numeric(0), 30), 90)
+  expect_equal(ssm_r_axis_angle_clear(0, 30), 180)
+})
+
 test_that("the built canvas draws its amplitude axis off the due-East spoke (T3)", {
   p <- ggcircumplex(octants(), amax = 0.5)
   co <- ggplot2::ggplot_build(p)$layout$coord
