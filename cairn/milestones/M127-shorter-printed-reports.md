@@ -1,6 +1,6 @@
 # M127: Printed reports are shorter and easier to scan
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -52,7 +52,9 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 - 2026-09-14: T2 done. The probes are seeded, non-converged CAUTION, near-zero, contrast and occasions. Their summary line counts at width 80 were 80, 79, 81, 146 and 134 at `845fb5e7`. They are now 35, 34, 36, 69 and 57.
 - 2026-09-14: T3 done. The ladder block moved to the internal `sem_print_invariance()`, which wraps its prose to the console width. Before the change, ladder lines reached 148 and 230 characters. The new test covers four fits and passes. With a planted width of 1000, its width check failed on all four. It also fixes a doubled period after an untestable-rung verdict. `devtools::test()` is clean.
 - 2026-09-14: T4 done. AC3 hits and dispositions follow. `axes_corrected_se.R:1013,1027` (collinearity message) became a colon. `axes_reliability_oop.R:75,79,83` became a comma, `:114` a colon, and `:227` a period with "This is". `ssm_ci_oop.R:110` became a colon, `:131` a comma, `:286` a period with each sentence capitalized, `:335` ", because", and `:488` a period with "This is". `ssm_sem.R:820,1018` were rewritten in T3. `axes_reliability_oop.R:33` is the exempt placeholder. No phrase test matched the old dashes. The accepted snapshot diff changes only dashes and wrapping. `devtools::test()` is clean.
-- 2026-09-14: T5 done. Three NEWS entries were added, and a unit test pins the single closing period. That test failed with the fix removed. The re-knit changed only output lines in three vignettes, and `tools/check-vignette-staleness.R` reports all 7 up to date. `devtools::test()` is clean. `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings and 0 notes. A diff of old and new output showed only header and table lines changed. The new tests failed on length before the change. `devtools::test()` is clean.
+- 2026-09-14: T5 done. Three NEWS entries were added, and a unit test pins the single closing period. That test failed with the fix removed. The re-knit changed only output lines in three vignettes, and `tools/check-vignette-staleness.R` reports all 7 up to date. `devtools::test()` is clean. `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings and 0 notes.
+- 2026-09-14: claim audit: 41 claims read, 6 corrected — NEWS.md, R/ssm_ci_oop.R, man/summary.circumplex_ci_accuracy.Rd, R/ssm_sem.R, tests/testthat/test-ssm_sem_groups.R
+- 2026-09-14: the claim reader re-read the six once. Five were fixed, and the NEWS wording on verdicts got one more fix. Status set to review. A diff of old and new output showed only header and table lines changed. The new tests failed on length before the change. `devtools::test()` is clean.
 
 ## Decisions
 

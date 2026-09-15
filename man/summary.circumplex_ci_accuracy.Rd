@@ -26,10 +26,12 @@ per-profile verdict blocks (coverage of elevation, amplitude, and
 certification-conditional displacement classified against Bradley's
 liberal band; the guardrail false-certification caution), and a compact
 table with one row per profile and amplitude condition. That table shows the
-coverage of each parameter, the displacement coverage when certified, and
-the certification rate. The Monte Carlo standard errors, the one-sided miss
-rates, the interval widths and the other guardrail columns are not printed;
-read them from the \code{coverage} and \code{guardrail} elements of the object.
+coverage of each parameter, the displacement coverage when certified, the
+certification rate and the \code{Structural} flag. On a contrast row, "certified"
+means that both profiles were certified. The Monte Carlo standard errors, the
+one-sided miss rates, the interval widths, the conditional and replication
+counts, and the other guardrail columns are not printed; read them from the
+\code{coverage} and \code{guardrail} elements of the object.
 }
 \references{
 Browne, M. W., & Cudeck, R. (1993). Alternative ways of

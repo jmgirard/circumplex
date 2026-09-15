@@ -3,12 +3,15 @@
 ## Minor improvements and fixes
 
 * `summary()` for an `ssm_ci_accuracy()` result is about half as long. The
-  settings print in three lines. The coverage and guardrail tables are replaced
+  settings print as three short sentences, usually on three lines. The
+  coverage and guardrail tables are replaced
   by one table with a row for each profile and amplitude condition. That table
   shows the coverage of each parameter, the displacement coverage when
   certified, the certification rate and the `Structural` flag. The other
   columns are no longer printed, but they are still in the `coverage` and
-  `guardrail` elements of the result. The verdicts and cautions are unchanged.
+  `guardrail` elements of the result. The verdicts and cautions say the same
+  things. Only their punctuation and a few joining words change (see the
+  entry on dashes below).
 
 * `print()` for a multi-group `ssm_sem()` result wraps the notes and verdict
   of the invariance ladder to the console width. The ΔCFI note and the text

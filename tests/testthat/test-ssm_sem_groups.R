@@ -937,7 +937,8 @@ test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nest
 # Printed ladder width (M127) --------------------------------------------------
 
 # The invariance-ladder block as print() shows it: the lines from the ladder
-# heading through the verdict. The block is located inside the full print()
+# heading through the verdict and, when the groups cannot be compared, the
+# text that follows it. The block is located inside the full print()
 # output, so the assertion reads what a user sees.
 ladder_block <- function(res) {
   out <- utils::capture.output(print(res))

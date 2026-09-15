@@ -1743,8 +1743,8 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 }
 
 # The invariance-ladder block of print.circumplex_ssm_sem(): heading, table,
-# rung notes, the Delta-CFI note and the verdict. Every prose line is wrapped
-# to getOption("width").
+# rung notes, the Delta-CFI note and the verdict. The notes, the Delta-CFI
+# note, the verdict and the text after it are wrapped to getOption("width").
 sem_print_invariance <- function(inv, digits = 3) {
   width <- getOption("width")
   wrap <- function(text, indent = 0, exdent = 2) {
