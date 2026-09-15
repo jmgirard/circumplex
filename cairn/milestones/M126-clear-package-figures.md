@@ -1,13 +1,13 @@
 # M126: Package figures show every point, interval and axis label clearly
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — changes the figures that three exported plot functions draw
-- **Branch/PR:** —
+- **Branch/PR:** m126-clear-package-figures
 
 ## Goal
 
