@@ -7,7 +7,7 @@
 - **Principles touched:** GP2, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — changes the figures that three exported plot functions draw
-- **Branch/PR:** m126-clear-package-figures
+- **Branch/PR:** m126-clear-package-figures · https://github.com/jmgirard/circumplex/pull/159
 
 ## Goal
 
