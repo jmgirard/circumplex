@@ -60,6 +60,7 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 - 2026-09-15: T5: `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings, 0 notes (Status: OK). Its tarball was built at 72acdfcf, before the prose-only audit corrections in 4d705fa3, which change no code or chunk. prose-sweep exits 0 on the three touched sources. The `vignette-precompute` CI job runs on the PR at review. Status set to review.
 
 - 2026-09-15: review checkpoint, half done. AC1 to AC4 hold on fresh evidence and are ticked. AC5 waits on a `devtools::check()` run in the primary checkout. The worktree run gave 0 errors, 0 warnings and 1 note, and that note names `.git`, which a worktree checkout creates.
+- 2026-09-15: step-7 approval: m129-vignette-prose-matches-output approved for merge, after the fix-now findings F1 to F7 land and pass prose-sweep, the staleness check and check() again.
 
 ## Decisions
 
@@ -177,4 +178,7 @@ first, with proposed dispositions for the gate:
   unmodified lines. Doubt 6 sits on an unmodified line too. Proposed: reject.
 
 No finding shows an acceptance criterion failing, so no return is due.
+
+Gate triage: the maintainer took F1 to F7 as fix now. Every finding proposed
+for rejection is rejected for the reason given beside it.
 

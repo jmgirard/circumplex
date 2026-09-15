@@ -714,7 +714,7 @@ How to read this output:
   diagnostic adds one more rung at a scaling factor above 1. This is the
   case for obsessive–compulsive PD here. That rung is the amplitude at which
   the population would sit exactly at the observed CI half-width.
-- **The `cert` column** of that table reports how often profiles were
+- **The `cert` column** of the coverage table reports how often profiles were
   *certified* at each rung. Each profile's `Guardrail` line gives the rate at
   the 0 rung. A certified profile has its amplitude CI lower bound at least
   0.35 CI-widths above zero. At the 0 rung, any certification is a false
@@ -743,8 +743,9 @@ clearly leaves the Bradley band, at the as-estimated amplitude or with the
 population amplitude halved. Obsessive–compulsive PD is *not* certified. Its
 amplitude (about .02 here) is far too close to zero relative to its CI
 width. So the printed output still shows its displacement and interval, but
-with a note that the displacement is not interpretable. That note comes before
-any coverage question is asked. On top of that, the
+with a note that the displacement is not interpretable. The `ssm_analyze()`
+result flags this on its own, before any coverage question is asked. On top
+of that, the
 diagnostic shows that its amplitude and displacement CIs under-cover badly at
 this sample size. Almost all amplitude misses fall below the interval, so the
 amplitude CI tends to sit above the truth. So its verdict is a caution for
@@ -757,8 +758,8 @@ amplitude is exactly zero. Its estimated certification rate does not clearly
 exceed the benchmark rate. That rate is roughly the one-sided error that a user reading the
 guardrail would expect. So no caution fires from the guardrail itself. This
 is the payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff,
-it holds false-certification near its intended rate, even in the near-zero
-regime that Zimmermann and Wright flagged. In that regime, a sample
+it keeps false-certification from clearly exceeding the benchmark, even in the
+near-zero regime that Zimmermann and Wright flagged. In that regime, a sample
 amplitude large enough to look non-zero is otherwise the *expected* outcome
 from a flat population.
 
@@ -934,9 +935,9 @@ summary(res)
 adds the estimated angle and communality of every scale on the two-factor
 solution, the same geometry that the plot below draws. A clean circumplex
 shows scales at roughly the theoretical octant spacing, with broadly similar
-communalities. `Fisher` measures departures in communality, and
-`Gap`, `Variance` (VT2) and `Rotation` measure departures in even angular
-spread.
+communalities. `Fisher` measures departures in communality, and `Gap`
+measures departures in even angular spacing. `Variance` (VT2) and `Rotation`
+test interstitiality.
 
 
 ``` r

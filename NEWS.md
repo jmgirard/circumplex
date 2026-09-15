@@ -82,7 +82,7 @@
   Reliability", "SEM-Based SSM Analysis" and "Evaluating Circumplex
   Structure". Their sentences are shorter and
   carry no em dashes or semicolons. Each now links the introduction vignette
-  near its start. Their code and its output did not change.
+  near its start. That pass changed neither their code nor its output.
 
 * Four statements in two vignettes now match what the package does. In
   "SEM-Based SSM Analysis", the plane factors are fixed isotropic and
@@ -96,12 +96,14 @@
   rotation. It does not fix them all at their theoretical values.
 
 * The latent profile table in "SEM-Based SSM Analysis" now leaves out the X
-  and Y values, and keeps each estimate and its interval on one line.
+  and Y values. On the package website, each estimate and its interval now
+  stay on one line.
 
-* The prose of "Evaluating Circumplex Structure" and "Axes Reliability" now
-  names what the shorter printed reports show. For example, it reads the
-  certification rate from the `cert` column of the accuracy summary's coverage
-  table.
+* The prose of "Evaluating Circumplex Structure" now names what the shorter
+  printed reports show. For example, it reads the certification rate from the
+  `cert` column of the accuracy summary's coverage table. "Axes Reliability"
+  now says that its table prints a missing Nunnally-Bernstein comparison as
+  `--`.
 
 # circumplex 2.0.1
 
