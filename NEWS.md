@@ -31,11 +31,12 @@
   that quote it, do not change.
 
 * `print()` for a multi-group `ssm_sem()` result shows the `dcfi` and `cr`
-  columns and a short ΔCFI note (two lines at 80 columns) only for a two-group fit estimated by ML
-  with a plain CFI, the only case the .01 rule was simulated for. For other
-  fits, including the default `estimator = "MLR"`, the `dcfi` values are still
-  in the `invariance` element of the result, and `invariance$dcfi_scope`
-  records why no label applies.
+  columns and a short ΔCFI note (two lines at 80 columns) only for a
+  two-group fit estimated by ML with a plain CFI, the only case the .01 rule
+  was simulated for, and only when a rung has a `dcfi` value. For other fits,
+  including the default `estimator = "MLR"`, the `dcfi` values are still in
+  the `invariance` element of the result, and `invariance$dcfi_scope` records
+  the number of groups, the estimator and whether the CFI is plain.
 
 * The printed output of `ssm_ci_accuracy()`, `axes_reliability()` and
   `ssm_sem()` results, and the refusal warning of `axes_reliability()` for

@@ -451,7 +451,7 @@ documentation states them, and the vignette should too.
 - **Invariance gating is a modeling decision** with a default test, not an
   oracle. The observed contrast remains available and answers its own
   question. The secondary `dcfi` criterion gates nothing, and it prints beside
-  the nested test only for the fits described next.
+  the nested test only for a two-group fit estimated by ML with a plain CFI.
   Its .01 cutoff is validated only for two-group, ML, multivariate-normal
   fits, for Type I error only. The package withholds the verdict everywhere
   else rather than extrapolating it.

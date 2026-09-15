@@ -70,7 +70,7 @@ ladder_na_lrt <- function(...) {
 ladder_case_names <- c(
   "configural", "vacuous", "vacuous_above", "retained_one", "retained_two",
   "retained_above", "rejected_contrast", "rejected_plain", "untestable_contrast",
-  "untestable_plain", "gls", "groups3_ml", "groups3_mlr"
+  "untestable_plain", "gls", "groups3_ml", "groups3_mlr", "means_metric"
 )
 
 # Fit one case: the result, the warning messages it raised and, when it has
@@ -144,6 +144,11 @@ ladder_fit_case <- function(name) {
           C = ladder_pop(-0.02)$B
         ), 400, 41), 11,
         measures = "m1"
+      ),
+      # The latent-mean path stopped at metric with no contrast, so the
+      # required rung is lowered below the scalar rung a mean contrast needs
+      means_metric = fit(ladder_sim(ladder_pop(0), 400, 16), 12,
+        invariance = "metric"
       ),
       stop("unknown ladder case: ", name)
     )

@@ -409,8 +409,8 @@ by_gender
 #>        rung   chisq df   cfi rmsea dchisq ddf       p
 #>  configural 287.272 34 0.938 0.123     NA  NA        
 #>      metric 337.356 48 0.927 0.112 54.781  14 < 0.001
-#> Verdict:  metric invariance rejected
-#>   Test:     metric: Δχ²(14) = 54.78, p < 0.0001, alpha = 0.05
+#> Verdict:    metric invariance rejected
+#>   Test:     Δχ²(14) = 54.78, p < 0.0001, alpha = 0.05
 #>   Result:   these groups cannot be compared on this instrument's latent
 #>             metric
 #>   Contrast: the requested latent contrast was not computed
@@ -590,7 +590,7 @@ documentation states them, and the vignette should too.
 - **Invariance gating is a modeling decision** with a default test, not an
   oracle. The observed contrast remains available and answers its own
   question. The secondary `dcfi` criterion gates nothing, and it prints beside
-  the nested test only for the fits described next.
+  the nested test only for a two-group fit estimated by ML with a plain CFI.
   Its .01 cutoff is validated only for two-group, ML, multivariate-normal
   fits, for Type I error only. The package withholds the verdict everywhere
   else rather than extrapolating it.

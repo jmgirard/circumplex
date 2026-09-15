@@ -91,11 +91,11 @@ change in CFI is insensitive to sample size where the nested test is not).
 The retain/reject label is set \strong{only inside the envelope that simulation
 covers}: exactly two groups, ML estimation, and a plain (non-robust) CFI.
 \code{print()} shows the \code{dcfi} and \code{cr} columns and a short note only inside
-it. Three separate things put a fit outside it. \code{dcfi_scope} in the
-returned \code{invariance} element records the number of groups, the
-estimator, whether it is ML estimation and whether the CFI is plain, and
-the conditions that apply follow from those fields. A robust estimator -- the default \code{"MLR"}, or \code{"MLM"}
--- makes lavaan report a robust CFI; so does \code{missing = "fiml"}, even
+it, and only when a rung has a \code{dcfi} value. Three separate things put a
+fit outside it. \code{dcfi_scope} in the returned \code{invariance} element records
+the number of groups, the estimator, whether it is ML estimation and
+whether the CFI is plain, and the conditions that apply follow from those
+fields. A robust estimator -- the default \code{"MLR"}, or \code{"MLM"} -- makes lavaan report a robust CFI; so does \code{missing = "fiml"}, even
 under \code{estimator = "ML"}, so plain ML is necessary for the label but not
 sufficient. \code{"GLS"}, \code{"WLS"}, \code{"ULS"} and \code{"DWLS"} are not ML estimation
 at all, though their CFI is plain-named. And more than two groups is

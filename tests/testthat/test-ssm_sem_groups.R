@@ -948,6 +948,11 @@ ladder_verdict <- function(lines) {
   continued <- grepl("^ {12}\\S", body)
   expect_true(all(labeled | continued))
   expect_true(labeled[[1]])
+  # The decision and every labeled value start in the same column
+  expect_identical(attr(regexpr("^Verdict: +", lines[[v]]), "match.length"), 12L)
+  expect_true(all(
+    attr(regexpr("^  [A-Z][a-z]+: +", body[labeled]), "match.length") == 12L
+  ))
   values <- vapply(split(body, cumsum(labeled)), function(x) {
     x[[1]] <- sub("^  [A-Z][a-z]+: +", "", x[[1]])
     paste(trimws(x), collapse = " ")
@@ -971,9 +976,12 @@ test_that("the verdict prints as a Verdict: line and labeled lines for every ver
   # The nested test as the table holds it, stated independently of print()
   test_stat <- function(inv, rung) {
     row <- inv$table[inv$table$rung == rung, ]
+    paste0("Δχ²(", row$ddf, ") = ", format(round(row$dchisq, 2)))
+  }
+  lowered <- function(kind, rung) {
     paste0(
-      rung, ": Δχ²(", row$ddf, ") = ",
-      format(round(row$dchisq, 2))
+      "; a latent ", kind, " contrast needs ", rung,
+      " invariance, which was not tested"
     )
   }
   profiles <- paste(
@@ -984,8 +992,9 @@ test_that("the verdict prints as a Verdict: line and labeled lines for every ver
   x <- verdict_of("configural")
   expect_identical(x$v$decision, "configural gate")
   expect_identical(x$v$labels, c("Test", "Result"))
-  expect_match(x$v$fields$Result, "no cross-group constraints required",
-               fixed = TRUE)
+  expect_identical(x$v$fields$Result, paste0(
+    "no cross-group constraints required", lowered("measure-profile", "metric")
+  ))
 
   # Strict tier: the metric rung holds by construction, with and without a
   # rejection above the required rung
@@ -1008,15 +1017,36 @@ test_that("the verdict prints as a Verdict: line and labeled lines for every ver
   x <- verdict_of("retained_one")
   expect_identical(x$v$decision, "metric invariance retained")
   expect_identical(x$v$labels, c("Test", "Result"))
-  expect_match(x$v$fields$Test, test_stat(x$inv, "metric"), fixed = TRUE)
+  # One tested rung: the Verdict: line already names it
+  expect_true(startsWith(x$v$fields$Test, test_stat(x$inv, "metric")))
   expect_match(x$v$fields$Test, ">= alpha = 0.05", fixed = TRUE)
-  expect_match(x$v$fields$Result, "compared at the metric level", fixed = TRUE)
+  expect_identical(
+    x$v$fields$Result, "the groups can be compared at the metric level"
+  )
   x <- verdict_of("retained_two")
   expect_identical(x$v$decision, "metric and scalar invariance retained")
   expect_length(x$v$fields$Test, 2)
-  expect_match(x$v$fields$Test[[1]], test_stat(x$inv, "metric"), fixed = TRUE)
-  expect_match(x$v$fields$Test[[2]], test_stat(x$inv, "scalar"), fixed = TRUE)
-  expect_match(x$v$fields$Result, "compared at the scalar level", fixed = TRUE)
+  expect_true(startsWith(
+    x$v$fields$Test[[1]], paste0("metric: ", test_stat(x$inv, "metric"))
+  ))
+  expect_true(startsWith(
+    x$v$fields$Test[[2]], paste0("scalar: ", test_stat(x$inv, "scalar"))
+  ))
+  expect_identical(
+    x$v$fields$Result, "the groups can be compared at the scalar level"
+  )
+  # No contrast requested, but the ladder reached the rung a contrast needs
+  expect_identical(
+    verdict_of("gls")$v$fields$Result,
+    "the groups can be compared at the metric level"
+  )
+  # The latent-mean path stopped below scalar with no contrast requested
+  x <- verdict_of("means_metric")
+  expect_identical(x$v$decision, "metric invariance retained")
+  expect_true(startsWith(x$v$fields$Test, test_stat(x$inv, "metric")))
+  expect_identical(x$v$fields$Result, paste0(
+    "the groups can be compared at the metric level", lowered("mean", "scalar")
+  ))
   x <- verdict_of("retained_above")
   expect_identical(x$v$labels, c("Test", "Result", "Also"))
   expect_match(x$v$fields$Also, "(reported only and not required", fixed = TRUE)
@@ -1025,7 +1055,7 @@ test_that("the verdict prints as a Verdict: line and labeled lines for every ver
   for (name in c("rejected_contrast", "rejected_plain")) {
     x <- verdict_of(name)
     expect_identical(x$v$decision, "metric invariance rejected")
-    expect_match(x$v$fields$Test, test_stat(x$inv, "metric"), fixed = TRUE)
+    expect_true(startsWith(x$v$fields$Test, test_stat(x$inv, "metric")))
     expect_match(x$v$fields$Test, "p < 0.0001, alpha = 0.05", fixed = TRUE)
     expect_match(x$v$fields$Result,
       "these groups cannot be compared on this instrument's latent metric",
@@ -1060,17 +1090,64 @@ test_that("the verdict prints as a Verdict: line and labeled lines for every ver
     )
     expect_match(x$v$fields$Result, "inspect the ladder fits directly",
                  fixed = TRUE)
-    expect_match(x$v$fields$Contrast, "not computed", fixed = TRUE)
     expect_identical(x$v$fields$Profiles, profiles)
   }
+  x <- verdict_of("untestable_contrast")
   expect_identical(
-    verdict_of("untestable_contrast")$v$labels,
-    c("Test", "Result", "Contrast", "Profiles", "Instead")
+    x$v$labels, c("Test", "Result", "Contrast", "Profiles", "Instead")
   )
   expect_identical(
-    verdict_of("untestable_plain")$v$labels,
-    c("Test", "Result", "Contrast", "Profiles")
+    x$v$fields$Contrast, "the requested latent contrast was not computed"
   )
+  # No rejection happened, so the reason is that comparability is unknown
+  x <- verdict_of("untestable_plain")
+  expect_identical(x$v$labels, c("Test", "Result", "Contrast", "Profiles"))
+  expect_identical(x$v$fields$Contrast, paste(
+    "a latent contrast is not computable, because comparability cannot be",
+    "established"
+  ))
+})
+
+test_that("print() rebuilds the stored verdict, and a rung note never decides the gate (M130)", {
+  skip_on_cran()
+  skip_if_not_installed("lavaan")
+  for (name in ladder_case_names) {
+    inv <- ladder_case(name)$res$invariance
+    facts <- sem_verdict_facts(
+      inv$table, inv$required, inv$alpha, inv$contrast_requested
+    )
+    expect_identical(facts$verdict, inv$verdict, label = name)
+    expect_identical(facts$comparable, inv$comparable, label = name)
+  }
+  # A note on the metric row of a fit outside the strict tier: the stored
+  # verdict and comparability come from the model tier, not from the note
+  inv <- ladder_case("rejected_plain")$res$invariance
+  tab <- inv$table
+  tab$note[tab$rung == "metric"] <- "a remark that is not the strict tier's"
+  facts <- sem_verdict_facts(tab, inv$required, inv$alpha,
+    vacuous_metric = FALSE
+  )
+  expect_identical(facts$verdict, inv$verdict)
+  expect_false(facts$comparable)
+})
+
+test_that("print() of a ladder without the fields the verdict facts need prints the stored verdict (M130)", {
+  skip_on_cran()
+  skip_if_not_installed("lavaan")
+  skip_if_not(l10n_info()[["UTF-8"]], "the ladder block prints Greek letters")
+  res <- ladder_case("retained_one")$res
+  for (field in c("required", "alpha")) {
+    old <- res
+    old$invariance[[field]] <- NULL
+    for (width in c(77, 80)) {
+      lines <- ladder_block_lines(old, width)
+      expect_true(all(nchar(lines, type = "width") <= width))
+      v <- grep("^Verdict: ", lines)
+      expect_length(v, 1)
+      flat <- gsub("\\s+", " ", paste(lines[v:length(lines)], collapse = " "))
+      expect_identical(flat, paste("Verdict:", res$invariance$verdict))
+    }
+  }
 })
 
 test_that("dcfi, cr and a Delta-CFI note of at most two lines print only inside the criterion's scope (M130, D-059)", {
