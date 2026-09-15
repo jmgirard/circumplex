@@ -328,7 +328,7 @@ results_long <- ssm_analyze_long(
 subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
 ```
 
-```{r occasions-plot, fig.height = 6}
+```{r occasions-plot, fig.height = 3.2}
 ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
 
