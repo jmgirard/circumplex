@@ -98,6 +98,11 @@
 * The latent profile table in "SEM-Based SSM Analysis" now leaves out the X
   and Y values, and keeps each estimate and its interval on one line.
 
+* The prose of "Evaluating Circumplex Structure" and "Axes Reliability" now
+  names what the shorter printed reports show. For example, it reads the
+  certification rate from the `cert` column of the accuracy summary's coverage
+  table.
+
 # circumplex 2.0.1
 
 ## Minor improvements and fixes

@@ -635,7 +635,7 @@ summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 8.1s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 8.2s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -714,17 +714,18 @@ How to read this output:
   diagnostic adds one more rung at a scaling factor above 1. This is the
   case for obsessive–compulsive PD here. That rung is the amplitude at which
   the population would sit exactly at the observed CI half-width.
-- **The guardrail table** reports how often profiles were *certified* at
-  each rung. A certified profile has its amplitude CI lower bound at least
+- **The `cert` column** of that table reports how often profiles were
+  *certified* at each rung. Each profile's `Guardrail` line gives the rate at
+  the 0 rung. A certified profile has its amplitude CI lower bound at least
   0.35 CI-widths above zero. At the 0 rung, any certification is a false
   certification. The summary prints a caution when the false-certification
   rate is materially above the rate that a user would expect from the
   interval level. This is a measured property of the shipped display rule,
   not a hypothesis test.
-- **The verdict** classifies elevation, amplitude, and
+- **The lines under `Verdicts at c = 1`** classify elevation, amplitude, and
   certification-conditional displacement coverage at your as-estimated
-  amplitude. The plain-language paragraph states the overall conclusion per
-  profile.
+  amplitude. Each profile's `Verdict:` paragraph states the overall
+  conclusion.
 
 For a visual summary across the ladder:
 
@@ -745,13 +746,14 @@ width. So the printed output still shows its displacement and interval, but
 with a note that the displacement is not interpretable. That note comes before
 any coverage question is asked. On top of that, the
 diagnostic shows that its amplitude and displacement CIs under-cover badly at
-this sample size (missing below the truth). So its verdict is a caution for
+this sample size. Almost all amplitude misses fall below the interval, so the
+amplitude CI tends to sit above the truth. So its verdict is a caution for
 a genuine reason. The intervals themselves are unreliable, not merely the
 point on the circle.
 
 The guardrail line confirms that the rule is doing its job. At this
 configuration ($n = 250$, eight octant correlations), a profile whose true
-amplitude is exactly zero would be certified only at about the benchmark
+amplitude is exactly zero would be certified no more often than the benchmark
 rate. That rate is roughly the one-sided error that a user reading the
 guardrail would expect. So no caution fires from the guardrail itself. This
 is the payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff,
@@ -765,7 +767,7 @@ One reading note: at reduced `reps`, classes tend to print as
 coverage is too wide to place it clearly inside or outside the Bradley band.
 That is the diagnostic being honest about its own Monte Carlo error. The
 default `reps = 1000` sharpens such classifications into `adequate` or
-`inadequate`.
+`INADEQUATE`.
 
 Two settings are worth knowing. First, `structure = "observed"` rebuilds the
 population from the pooled observed correlations instead of the CPM. If
@@ -933,7 +935,8 @@ adds the estimated angle and communality of every scale on the two-factor
 solution, the same geometry that the plot below draws. A clean circumplex
 shows scales at roughly the theoretical octant spacing, with broadly similar
 communalities. `Fisher` measures departures in communality, and
-`Gap`/`VT2`/`Rotation` measure departures in even angular spread.
+`Gap`, `Variance` (VT2) and `Rotation` measure departures in even angular
+spread.
 
 
 ``` r
