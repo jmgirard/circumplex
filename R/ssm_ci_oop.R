@@ -107,7 +107,7 @@ ssm_ci_verdict_blocks <- function(x) {
       }
       ssm_ci_cat_line(leader, paste0(
         "coverage ", ssm_ci_pct(row$Coverage),
-        if (is_dcond) " when certified", " -- ", shown, qual
+        if (is_dcond) " when certified", ": ", shown, qual
       ))
     }
 
@@ -128,7 +128,7 @@ ssm_ci_verdict_blocks <- function(x) {
         paste0(
           "if the true amplitude were zero, displacement would still be ",
           "certified ", ssm_ci_pct(guard_rate),
-          " of the time -- far more often than the ", ssm_ci_pct(gr0$Benchmark),
+          " of the time, far more often than the ", ssm_ci_pct(gr0$Benchmark),
           " error rate the guardrail's wording suggests"
         )
       } else {
@@ -272,18 +272,14 @@ ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate,
     ))
   }
 
-  # The first sentence continues the "Verdict: HEADLINE --" lead-in
-  # (lowercase); later sentences stand alone
+  # Every sentence follows the "Verdict: HEADLINE." lead-in and stands alone
   upper_first <- function(s) {
     substr(s, 1, 1) <- toupper(substr(s, 1, 1))
     s
   }
-  if (length(sentences) > 1) {
-    sentences[-1] <- vapply(sentences[-1], upper_first, character(1),
-                            USE.NAMES = FALSE)
-  }
+  sentences <- vapply(sentences, upper_first, character(1), USE.NAMES = FALSE)
 
-  paste0("Verdict: ", headline, " -- ", paste(sentences, collapse = " "))
+  paste0("Verdict: ", headline, ". ", paste(sentences, collapse = " "))
 }
 
 # Structure note with the sec. 5.2 downgrade annotations, in severity order:
@@ -332,7 +328,7 @@ ssm_ci_structure_note <- function(object) {
     ), indent = 0)
     if (!isTRUE(cd$accepted)) {
       ssm_ci_cat_para(paste0(
-        "CAUTION: verdict unreliable -- the structural model did not ",
+        "CAUTION: verdict unreliable, because the structural model did not ",
         "converge cleanly."
       ), indent = 2)
     } else if (is.na(cd$rmsea) || cd$rmsea > ssm_ci_rmsea_poor) {
@@ -524,7 +520,7 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
     ssm_ci_cat_para(paste0(
       "Note: amplitude coverage on rows flagged Structural is structurally ",
       "0 (a percentile interval of strictly positive amplitude replicates ",
-      "cannot contain a zero truth) -- a theorem, not a measurement; the ",
+      "cannot contain a zero truth). This is a theorem, not a measurement; the ",
       "informative near-zero rungs are the small c > 0 ones."
     ), indent = 2)
   }

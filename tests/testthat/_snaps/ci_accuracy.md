@@ -7,13 +7,13 @@
       SSM CI accuracy, simulated at your n and settings (30 replications per condition; bootstrap intervals with 60 replicates at level 0.95)
       
         # Profile [All] (n = 120; 95% bootstrap CIs, 60 replicates):
-          Elevation      coverage 100.0% -- borderline
-          Amplitude      coverage 96.7% -- borderline
-          Displacement   coverage 93.3% when certified -- borderline
+          Elevation      coverage 100.0%: borderline
+          Amplitude      coverage 96.7%: borderline
+          Displacement   coverage 93.3% when certified: borderline
           Guardrail      under a truly zero amplitude, displacement would be
                          certified 0.0% of the time (user-expectation benchmark
                          2.5%)
-        Verdict: BORDERLINE -- elevation, amplitude, and certified displacement
+        Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
         coverage rates are borderline at this number of replications; a larger
         `reps` would sharpen the verdict.
 
@@ -38,13 +38,13 @@
       Verdicts at c = 1 (as estimated), Bradley (1978) band via 95% Wilson CIs:
       
         # Profile [All] (n = 120; 95% bootstrap CIs, 60 replicates):
-          Elevation      coverage 100.0% -- borderline
-          Amplitude      coverage 96.7% -- borderline
-          Displacement   coverage 93.3% when certified -- borderline
+          Elevation      coverage 100.0%: borderline
+          Amplitude      coverage 96.7%: borderline
+          Displacement   coverage 93.3% when certified: borderline
           Guardrail      under a truly zero amplitude, displacement would be
                          certified 0.0% of the time (user-expectation benchmark
                          2.5%)
-        Verdict: BORDERLINE -- elevation, amplitude, and certified displacement
+        Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
         coverage rates are borderline at this number of replications; a larger
         `reps` would sharpen the verdict.
       
@@ -55,8 +55,8 @@
            All      0.00 0.9 0.967 1.000 0.000    NA     NA 0.000       TRUE
         Note: amplitude coverage on rows flagged Structural is structurally 0 (a
         percentile interval of strictly positive amplitude replicates cannot
-        contain a zero truth) -- a theorem, not a measurement; the informative
-        near-zero rungs are the small c > 0 ones.
+        contain a zero truth). This is a theorem, not a measurement; the
+        informative near-zero rungs are the small c > 0 ones.
 
 # contrast print block reports displacement unconditionally (M15 snapshot)
 
@@ -67,14 +67,14 @@
       SSM CI accuracy, simulated at your n and settings (12 replications per condition; bootstrap intervals with 60 replicates at level 0.95)
       
         # Profile [Female] (n = 118; 95% bootstrap CIs, 60 replicates):
-          Elevation      coverage 91.7% -- borderline
-          Amplitude      coverage 75.0% -- INADEQUATE (under-coverage; misses fall
-                         on both sides of the interval)
-          Displacement   coverage 83.3% when certified -- borderline
+          Elevation      coverage 91.7%: borderline
+          Amplitude      coverage 75.0%: INADEQUATE (under-coverage; misses fall on
+                         both sides of the interval)
+          Displacement   coverage 83.3% when certified: borderline
           Guardrail      if the true amplitude were zero, displacement would still
-                         be certified 16.7% of the time -- far more often than the
+                         be certified 16.7% of the time, far more often than the
                          2.5% error rate the guardrail's wording suggests
-        Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
+        Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this
         sample size and the interpretability guardrail certifies a truly zero
         amplitude more often than its wording suggests. Elevation and certified
         displacement coverage rates are borderline at this number of replications;
@@ -82,16 +82,15 @@
         treat near-zero amplitudes as inconclusive rather than absent.
       
         # Profile [Male] (n = 122; 95% bootstrap CIs, 60 replicates):
-          Elevation      coverage 91.7% -- borderline
-          Amplitude      coverage 75.0% -- INADEQUATE (under-coverage; misses are
+          Elevation      coverage 91.7%: borderline
+          Amplitude      coverage 75.0%: INADEQUATE (under-coverage; misses are
                          almost all below the interval: the amplitude CI tends to
                          sit above the truth)
-          Displacement   coverage 66.7% when certified -- INADEQUATE
-                         (under-coverage)
+          Displacement   coverage 66.7% when certified: INADEQUATE (under-coverage)
           Guardrail      if the true amplitude were zero, displacement would still
-                         be certified 16.7% of the time -- far more often than the
+                         be certified 16.7% of the time, far more often than the
                          2.5% error rate the guardrail's wording suggests
-        Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
+        Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this
         sample size, displacement CIs mis-cover even when certified, and the
         interpretability guardrail certifies a truly zero amplitude more often than
         its wording suggests. Elevation coverage is borderline at this number of
@@ -99,12 +98,12 @@
         sample or treat near-zero amplitudes as inconclusive rather than absent.
       
         # Contrast [Male - Female] (95% bootstrap CIs, 60 replicates):
-          Elevation      coverage 100.0% -- borderline
-          Amplitude      coverage 75.0% -- INADEQUATE (under-coverage; misses are
+          Elevation      coverage 100.0%: borderline
+          Amplitude      coverage 75.0%: INADEQUATE (under-coverage; misses are
                          almost all below the interval: the amplitude CI tends to
                          sit above the truth)
-          Displacement   coverage 91.7% -- borderline
-        Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
+          Displacement   coverage 91.7%: borderline
+        Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this
         sample size. Elevation and displacement coverage rates are borderline at
         this number of replications; a larger `reps` would sharpen the verdict.
         Consider a larger sample or treat near-zero amplitudes as inconclusive

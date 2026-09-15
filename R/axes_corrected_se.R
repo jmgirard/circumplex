@@ -1010,7 +1010,7 @@ axes_degeneracy_hint <- function(sigma) {
 
   if (nrow(ij) == 1L) {
     return(paste0(hint, sprintf(
-      paste0("; items %s and %s are nearly collinear (r %s) -- ",
+      paste0("; items %s and %s are nearly collinear (r %s): ",
              "near-duplicate items make the fitted matrix numerically ",
              "degenerate, so consider dropping one"),
       nms[ij[1L, 1L]], nms[ij[1L, 2L]],
@@ -1024,7 +1024,7 @@ axes_degeneracy_hint <- function(sigma) {
     lst <- paste0(lst, sprintf(", and %d more", nrow(ij) - shown))
   }
   paste0(hint, sprintf(
-    paste0("; %d item pairs are nearly collinear (%s) -- near-duplicate items ",
+    paste0("; %d item pairs are nearly collinear (%s): near-duplicate items ",
            "make the fitted matrix numerically degenerate, so consider ",
            "dropping the redundant ones"),
     nrow(ij), lst
