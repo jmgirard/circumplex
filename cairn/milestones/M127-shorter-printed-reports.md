@@ -55,6 +55,8 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 - 2026-09-14: T5 done. Three NEWS entries were added, and a unit test pins the single closing period. That test failed with the fix removed. The re-knit changed only output lines in three vignettes, and `tools/check-vignette-staleness.R` reports all 7 up to date. `devtools::test()` is clean. `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings and 0 notes.
 - 2026-09-14: claim audit: 41 claims read, 6 corrected — NEWS.md, R/ssm_ci_oop.R, man/summary.circumplex_ci_accuracy.Rd, R/ssm_sem.R, tests/testthat/test-ssm_sem_groups.R
 - 2026-09-14: the claim reader re-read the six once. Five were fixed, and the NEWS wording on verdicts got one more fix. Status set to review. A diff of old and new output showed only header and table lines changed. The new tests failed on length before the change. `devtools::test()` is clean.
+- 2026-09-15: review found all four criteria passing, and the gate chose fixes for O1 to O4 and the O10 header comment. They are committed on the branch, and the suite passes.
+- 2026-09-15: step-7 approval: m127-shorter-printed-reports approved for merge
 
 ## Decisions
 
@@ -86,3 +88,9 @@ Independent review: [O] diff-bug, [S] blame-history and [S] prior-review lenses,
 - O10. The file header comment at `R/ssm_ci_oop.R:1` still says `summary()` shows the full tables. The certification rule lost "(scale-free, print-independent)". `R/axes_reliability_oop.R:227` is now 77 characters.
 - S1. The new table prints the contrast row's `d_cert` and `cert`. M15-D1 calls these a selection-effect quantity that no display uses. The review checked the old summary. Its raw tables already printed both numbers for the contrast row.
 - S2. Same as the second part of O10.
+
+Dispositions (merge gate, 2026-09-15):
+
+- Fix now: O1, O2, O3, O4 and the header comment in O10. The caution now names the coverage and guardrail elements, and the heading says "liberal band". The stored verdict says "reported only and not required for this contrast". The table keys rows on `coverage$Condition`. Two tests were extended: the rank-deficiency caution on the occasions test and the full verdict clause on the above-required-rung test. The snapshot changed one heading line, and `evaluating-circumplex-structure` was re-knitted. After that, `devtools::test()` gave FAIL 0, WARN 9, SKIP 1, PASS 9510, and the staleness check passed.
+- Follow-up: O5 is a candidate row in `cairn/ROADMAP.md`.
+- Rejected: O6, because M129 owns that vignette prose. O7, because the maintainer did not select it and the snapshot mask works on the current output. O8, because the old table behaved the same. O9, the dropped qualifier and the 77-character line, because D-056 and D-057 allow them. S1, because the old summary already printed the contrast row's conditional coverage and certification rate, and the help page says what "certified" means on a contrast row.
