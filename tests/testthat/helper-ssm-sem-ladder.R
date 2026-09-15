@@ -182,5 +182,8 @@ ladder_block_lines <- function(res, width = 80) {
   expect_length(start, 1)
   end <- grep("^# Profile", out)
   end <- end[end > start][[1]] - 1
+  while (end > start && !nzchar(trimws(out[[end]]))) {
+    end <- end - 1
+  }
   out[start:end]
 }

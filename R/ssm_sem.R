@@ -789,38 +789,185 @@ sem_dcfi_flag <- function(dcfi, in_scope) {
   out
 }
 
-# The attribution + scope block printed beneath the ladder table. The
-# attribution and the published scope label accompany the value ALWAYS; out of
-# scope the block additionally names why no verdict is given.
-sem_dcfi_note <- function(scope, width = getOption("width")) {
+# The note printed beneath the ladder table, only inside the criterion's
+# validated scope, where the cr column carries its label. Outside that scope
+# print() shows neither the dcfi column nor this note: the values stay in the
+# returned table and the reason in `dcfi_scope` (D-059).
+sem_dcfi_note <- function(width = getOption("width")) {
   dcfi <- "\u0394CFI"
-  scope_part <- if (isTRUE(scope$in_scope)) {
-    paste0(
-      "; ", dcfi, " < ", format(sem_dcfi_cutoff), " rejects that step."
-    )
-  } else {
-    # The reason list is variable-length (up to three), which is why the block
-    # is wrapped programmatically rather than by hand -- a hand-wrapped layout
-    # silently overflows once a second reason appears.
-    why <- c(
-      if (!isTRUE(scope$ml)) paste("non-ML estimator:", scope$estimator),
-      if (!isTRUE(scope$cfi_plain)) "robust CFI",
-      if (!identical(scope$n_groups, 2L)) paste(scope$n_groups, "groups")
-    )
-    paste0(
-      ". The cutoff is NOT validated here (",
-      paste(why, collapse = "; "),
-      "), so the value is descriptive only, with no binary verdict."
-    )
-  }
   body <- paste0(
-    dcfi, ": Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML ",
-    "simulation scope", scope_part,
-    " It is secondary and reported only: the verdict below gates on the ",
-    "nested chi-square ",
-    "difference test alone."
+    dcfi, ": Cheung & Rensvold (2002), two-group ML simulation, alpha = .01; ",
+    "cr = reject when ", dcfi, " < ", format(sem_dcfi_cutoff),
+    "; the verdict does not use it."
   )
   paste0(paste(strwrap(body, width = width, exdent = 2), collapse = "\n"), "\n")
+}
+
+# The verdict block of the printed ladder: "Verdict:" and the decision, then
+# one labeled line per fact from sem_verdict_facts(). A value too long for its
+# line continues on further lines indented to the value column.
+sem_format_verdict <- function(facts, width = getOption("width")) {
+  col <- 12L
+  labeled <- function(label, values) {
+    unlist(lapply(values, function(v) {
+      lines <- strwrap(v, width = max(width - col, 20L))
+      c(
+        paste0(formatC(paste0("  ", label, ":"), width = -col), lines[[1]]),
+        if (length(lines) > 1) paste0(strrep(" ", col), lines[-1])
+      )
+    }))
+  }
+  c(
+    paste0(formatC("Verdict:", width = -10), facts$decision),
+    labeled("Test", facts$test),
+    labeled("Result", facts$result),
+    labeled("Also", facts$also),
+    labeled("Contrast", facts$contrast),
+    labeled("Profiles", facts$profiles),
+    labeled("Instead", facts$instead)
+  )
+}
+
+# The invariance verdict, both as the one stored string (`verdict`, pasted
+# into the ssm_sem() warning and the ssm_plot_contrast() error) and as the
+# facts print() shows on labeled lines. `table`, `required` and `alpha` are
+# fields of the returned `invariance` element, so print() rebuilds the same
+# facts from the object. The strict tier's vacuous metric rung is the only
+# ladder row that carries a note (sem_fit_ladder()), so a note on the metric
+# row identifies that tier here without the model argument.
+#
+# Comparability: EVERY tested rung up through `required` must be retained.
+# Configural has no test; the strict tier's vacuous metric rung holds by
+# construction. A rejection at any tested rung <= required rejects the
+# constraints the contrast would be computed under -- even if a later
+# increment happens to pass, gating on that later increment alone would be
+# anti-conservative. Rungs above `required` are reported, never required.
+sem_verdict_facts <- function(table, required, alpha,
+                              contrast_requested = FALSE) {
+  rung_order <- sem_invariance_rungs()
+  req_i <- match(required, rung_order)
+  fmt_test <- function(row) {
+    sprintf(
+      "%s(%g) = %s, p %s", "Δχ²", row$ddf,
+      format(round(row$dchisq, 2)), sem_fmt_p(row$p, 4, prose = TRUE)
+    )
+  }
+  gating <- table[match(table$rung, rung_order) <= req_i &
+    !nzchar(table$note) & table$rung != "configural", , drop = FALSE]
+  untestable <- gating[is.na(gating$p), , drop = FALSE]
+  tested <- gating[!is.na(gating$p), , drop = FALSE]
+  failed <- tested[tested$p < alpha, , drop = FALSE]
+  # An NA p at a gating rung (e.g., a scaled-difference test lavaan could
+  # not compute) is NOT a rejection -- but it is also not a retention:
+  # comparability cannot be established, and the verdict must say that
+  # rather than assert a hypothesis test that never happened.
+  comparable <- nrow(failed) == 0 && nrow(untestable) == 0
+  vacuous <- required == "metric" &&
+    any(table$rung == "metric" & nzchar(table$note))
+  facts <- list(
+    decision = NULL, test = NULL, result = NULL, also = NULL,
+    contrast = NULL, profiles = NULL, instead = NULL
+  )
+  if (required == "configural" || vacuous) {
+    # Nothing testable at or below the required rung
+    comparable <- TRUE
+    if (required == "configural") {
+      verdict <- "configural gate: no cross-group constraints required"
+      facts$decision <- "configural gate"
+      facts$test <- "none run"
+      facts$result <- "no cross-group constraints required"
+    } else {
+      verdict <- paste0(
+        "metric invariance is imposed by the strict tier's fixed loadings ",
+        "(not testable); it holds by construction"
+      )
+      facts$decision <- "metric invariance holds by construction"
+      facts$test <- "none run (not testable under the strict tier)"
+      facts$result <- paste(
+        "the groups can be compared at the metric level, imposed by the",
+        "strict tier's fixed loadings"
+      )
+    }
+  } else if (comparable) {
+    tests <- vapply(seq_len(nrow(tested)), function(i) {
+      fmt_test(tested[i, ])
+    }, character(1))
+    verdict <- paste0(
+      paste(
+        sprintf(
+          "%s invariance retained (%s >= alpha = %s)",
+          tested$rung, tests, format(alpha)
+        ),
+        collapse = "; "
+      )
+    )
+    facts$decision <- paste(
+      paste(tested$rung, collapse = " and "), "invariance retained"
+    )
+    facts$test <- sprintf(
+      "%s: %s >= alpha = %s", tested$rung, tests, format(alpha)
+    )
+    facts$result <- paste0(
+      "the groups can be compared at the ", required, " level"
+    )
+  } else if (nrow(failed) > 0) {
+    first_fail <- failed[1, ]
+    verdict <- sprintf(
+      "%s invariance rejected (%s, alpha = %s): these groups cannot be compared on this instrument's latent metric",
+      first_fail$rung, fmt_test(first_fail), format(alpha)
+    )
+    facts$decision <- paste(first_fail$rung, "invariance rejected")
+    facts$test <- sprintf(
+      "%s: %s, alpha = %s", first_fail$rung, fmt_test(first_fail),
+      format(alpha)
+    )
+    facts$result <-
+      "these groups cannot be compared on this instrument's latent metric"
+  } else {
+    verdict <- paste0(
+      "the ", untestable$rung[[1]], " nested test could not be computed ",
+      "(lavaan returned NA); comparability cannot be established, so the ",
+      "latent contrast is not computed. Inspect the ladder fits directly."
+    )
+    facts$decision <- "comparability cannot be established"
+    facts$test <- paste0(
+      "the ", untestable$rung[[1]], " nested test could not be computed ",
+      "(lavaan returned NA)"
+    )
+    facts$result <- paste(
+      "comparability cannot be established; inspect the ladder fits directly"
+    )
+  }
+  # Rejections ABOVE the required rung: reported, never gating
+  above <- table[!is.na(table$p) &
+    match(table$rung, rung_order) > req_i & table$p < alpha, , drop = FALSE]
+  if (comparable && nrow(above) > 0) {
+    facts$also <- paste0(
+      "the ", paste(above$rung, collapse = ", "),
+      " rung(s) were also rejected (reported only and not required for this ",
+      "contrast, whose estimand is defined at the ", required, " level)"
+    )
+    verdict <- paste0(verdict, "; ", facts$also)
+  }
+  if (!comparable) {
+    facts$profiles <- paste(
+      "the rows below are each group's separate (configural) latent profile"
+    )
+    if (isTRUE(contrast_requested)) {
+      facts$contrast <- "the requested latent contrast was not computed"
+      facts$instead <- paste(
+        "the observed-score contrast from ssm_analyze() answers a different",
+        "question and remains available"
+      )
+    } else if (nrow(failed) > 0) {
+      facts$contrast <- paste(
+        "a latent contrast is not computable on this instrument's latent metric"
+      )
+    } else {
+      facts$contrast <- "the latent contrast is not computed"
+    }
+  }
+  c(list(comparable = comparable, verdict = verdict), facts)
 }
 
 # Fit the rung sequence up to `gate`, run lavaan's own nested-model test
@@ -949,76 +1096,9 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
     dcfi_scope$ml && dcfi_scope$cfi_plain
   table$cr <- sem_dcfi_flag(table$dcfi, dcfi_scope$in_scope)
 
-  # Comparability: EVERY tested rung up through `required` must be retained.
-  # Configural has no test; the strict tier's vacuous metric rung holds by
-  # construction. A rejection at any tested rung <= required rejects the
-  # constraints the contrast would be computed under -- even if a later
-  # increment happens to pass, gating on that later increment alone would be
-  # anti-conservative. Rungs above `required` are reported, never required.
-  req_i <- match(required, rung_order)
-  fmt_test <- function(row) {
-    sprintf(
-      "%s(%g) = %s, p %s", "\u0394\u03c7\u00b2", row$ddf,
-      format(round(row$dchisq, 2)), sem_fmt_p(row$p, 4, prose = TRUE)
-    )
-  }
-  gating <- table[match(table$rung, rung_order) <= req_i &
-    !nzchar(table$note) & table$rung != "configural", , drop = FALSE]
-  untestable <- gating[is.na(gating$p), , drop = FALSE]
-  tested <- gating[!is.na(gating$p), , drop = FALSE]
-  failed <- tested[tested$p < alpha, , drop = FALSE]
-  # An NA p at a gating rung (e.g., a scaled-difference test lavaan could
-  # not compute) is NOT a rejection -- but it is also not a retention:
-  # comparability cannot be established, and the verdict must say that
-  # rather than assert a hypothesis test that never happened.
-  comparable <- nrow(failed) == 0 && nrow(untestable) == 0
-  if (required == "configural" ||
-    sem_strict_metric_vacuous(model, required)) {
-    # Nothing testable at or below the required rung
-    comparable <- TRUE
-    verdict <- if (required == "configural") {
-      "configural gate: no cross-group constraints required"
-    } else {
-      paste0(
-        "metric invariance is imposed by the strict tier's fixed loadings ",
-        "(not testable); it holds by construction"
-      )
-    }
-  } else if (comparable) {
-    verdict <- paste0(
-      paste(
-        sprintf(
-          "%s invariance retained (%s >= alpha = %s)",
-          tested$rung, vapply(seq_len(nrow(tested)), function(i) {
-            fmt_test(tested[i, ])
-          }, character(1)), format(alpha)
-        ),
-        collapse = "; "
-      )
-    )
-  } else if (nrow(failed) > 0) {
-    first_fail <- failed[1, ]
-    verdict <- sprintf(
-      "%s invariance rejected (%s, alpha = %s): these groups cannot be compared on this instrument's latent metric",
-      first_fail$rung, fmt_test(first_fail), format(alpha)
-    )
-  } else {
-    verdict <- paste0(
-      "the ", untestable$rung[[1]], " nested test could not be computed ",
-      "(lavaan returned NA); comparability cannot be established, so the ",
-      "latent contrast is not computed. Inspect the ladder fits directly."
-    )
-  }
-  # Rejections ABOVE the required rung: reported, never gating
-  above <- table[!is.na(table$p) &
-    match(table$rung, rung_order) > req_i & table$p < alpha, , drop = FALSE]
-  if (comparable && nrow(above) > 0) {
-    verdict <- paste0(
-      verdict, "; the ", paste(above$rung, collapse = ", "),
-      " rung(s) were also rejected (reported only and not required for this ",
-      "contrast, whose estimand is defined at the ", required, " level)"
-    )
-  }
+  verdict_facts <- sem_verdict_facts(table, required, alpha)
+  comparable <- verdict_facts$comparable
+  verdict <- verdict_facts$verdict
 
   # The estimation model: the REQUIRED rung's fit when comparable (exactly
   # the constraints the estimand is defined under; for the strict tier's
@@ -1173,17 +1253,18 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   verdict, and the fit the estimation layer consumes are decided by the
 #'   nested test alone, and the two criteria can legitimately disagree (a
 #'   change in CFI is insensitive to sample size where the nested test is not).
-#'   The retain/reject label prints **only inside the envelope that simulation
+#'   The retain/reject label is set **only inside the envelope that simulation
 #'   covers**: exactly two groups, ML estimation, and a plain (non-robust) CFI.
-#'   Three separate things put a fit outside it, and the printed note names
-#'   which one applies. A robust estimator -- the default `"MLR"`, or `"MLM"`
+#'   `print()` shows the `dcfi` and `cr` columns and a short note only inside
+#'   it. Three separate things put a fit outside it, and `dcfi_scope` in the
+#'   returned `invariance` element records which one applies. A robust estimator -- the default `"MLR"`, or `"MLM"`
 #'   -- makes lavaan report a robust CFI; so does `missing = "fiml"`, even
 #'   under `estimator = "ML"`, so plain ML is necessary for the label but not
 #'   sufficient. `"GLS"`, `"WLS"`, `"ULS"` and `"DWLS"` are not ML estimation
 #'   at all, though their CFI is plain-named. And more than two groups is
 #'   outside the simulation whatever the estimator. In each case the `dcfi`
-#'   value still prints, marked as not validated for that configuration and
-#'   with no verdict attached.
+#'   value stays in the returned ladder table with no label attached, and
+#'   `print()` shows neither the value nor a note.
 #'
 #'   Cheung and Rensvold simulated two groups, ML estimation, multivariate
 #'   normal data, and Type I error only; robust CFI variants were not in their
@@ -1743,8 +1824,8 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 }
 
 # The invariance-ladder block of print.circumplex_ssm_sem(): heading, table,
-# rung notes, the Delta-CFI note and the verdict. The notes, the Delta-CFI
-# note, the verdict and the text after it are wrapped to getOption("width").
+# rung notes, the Delta-CFI note (in scope only) and the verdict block. Every
+# line is fitted to getOption("width").
 sem_print_invariance <- function(inv, digits = 3) {
   width <- getOption("width")
   wrap <- function(text, indent = 0, exdent = 2) {
@@ -1765,17 +1846,18 @@ sem_print_invariance <- function(inv, digits = 3) {
     rmsea = round(tab$rmsea, digits),
     dchisq = round(tab$dchisq, digits),
     ddf = tab$ddf,
-    p = sem_fmt_p(tab$p, digits),
+    p = sem_fmt_p(tab$p, digits)
+  )
+  # The dcfi and cr columns and the note print ONLY inside the criterion's
+  # validated scope, and only when a rung has a dcfi value (D-059).
+  dcfi_shown <- isTRUE(inv$dcfi_scope$in_scope) && any(!is.na(tab$dcfi))
+  if (dcfi_shown) {
     # At least 4 decimals, whatever `digits` is: the label is decided on the
     # unrounded value against a 2-decimal cutoff, so printing at `digits = 3`
     # would render -0.0096 (retain) and -0.0104 (reject) identically as
     # "-0.01" -- one number shown under two opposite verdicts, directly
     # beneath a rule stated in terms of that number.
-    dcfi = round(tab$dcfi, max(digits, 4))
-  )
-  # The retain/reject column appears ONLY inside the criterion's validated
-  # scope; outside it the value stands alone and the note below says why.
-  if (any(!is.na(tab$cr))) {
+    show$dcfi <- round(tab$dcfi, max(digits, 4))
     show$cr <- tab$cr
   }
   print(show, row.names = FALSE, na.print = "")
@@ -1783,31 +1865,13 @@ sem_print_invariance <- function(inv, digits = 3) {
     wrap(paste0("note [", tab$rung[i], "]: ", tab$note[i]),
          indent = 2, exdent = 4)
   }
-  if (any(!is.na(tab$dcfi))) {
-    cat(sem_dcfi_note(inv$dcfi_scope, width = width))
+  if (dcfi_shown) {
+    cat(sem_dcfi_note(width = width))
   }
-  if (isTRUE(inv$comparable)) {
-    wrap(paste0("Verdict: ", inv$verdict))
-  } else {
-    # A verdict that already ends in a sentence gets no second period
-    wrap(paste0(
-      "Verdict: ", inv$verdict, if (!grepl("\\.$", inv$verdict)) "."
-    ))
-    wrap(if (isTRUE(inv$contrast_requested)) {
-      paste0(
-        "The requested latent contrast was therefore not computed. The rows ",
-        "below are each group's separate (configural) latent profile. The ",
-        "observed-score contrast from ssm_analyze() answers a different ",
-        "question and remains available."
-      )
-    } else {
-      paste0(
-        "The rows below are each group's separate (configural) latent ",
-        "profile. A latent contrast is not computable on this instrument's ",
-        "latent metric."
-      )
-    }, exdent = 0)
-  }
+  facts <- sem_verdict_facts(
+    tab, inv$required, inv$alpha, inv$contrast_requested
+  )
+  cat(sem_format_verdict(facts, width = width), sep = "\n")
   invisible(inv)
 }
 
