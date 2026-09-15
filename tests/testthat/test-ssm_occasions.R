@@ -708,6 +708,16 @@ test_that("occasions ci_accuracy flags Structural rows at c=0 and runs a near-ze
   flat <- expect_short_ci_summary(acc, old_lines = 134)
   expect_match(flat, "stacked cross-occasion covariance", fixed = TRUE)
   expect_match(flat, "Contrast [T2 - T1]", fixed = TRUE)
+  # The rank-deficiency caution names where its unprinted numbers are. The
+  # old count of 134 omits this caution's lines, so the limit is stricter.
+  deficient <- acc
+  deficient$details$rank_deficiency <- list(All = list(deficient = TRUE))
+  flat <- expect_short_ci_summary(deficient, old_lines = 134)
+  expect_match(flat, "rank-deficient in group(s) All", fixed = TRUE)
+  expect_match(flat, paste0(
+    "The widths and pass rates are in the coverage and guardrail elements ",
+    "of the result."
+  ), fixed = TRUE)
 
   # (b) a genuinely near-zero-amplitude occasion (occasion 2 nearly flat, but
   # not zero-variance) runs without erroring and reports a certification rate.

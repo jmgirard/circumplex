@@ -445,6 +445,10 @@ test_that("a rejection ABOVE the required rung is reported only, never gating (s
   expect_lt(scal$p, 0.05) # the construction really did break scalar
   expect_true(isTRUE(inv$comparable))
   expect_match(inv$verdict, "reported only")
+  expect_match(inv$verdict, paste0(
+    "the scalar rung(s) were also rejected (reported only and not required ",
+    "for this contrast, whose estimand is defined at the metric level)"
+  ), fixed = TRUE)
   expect_true(isTRUE(res$details$contrast))
   expect_equal(nrow(res$results), 3)
 })

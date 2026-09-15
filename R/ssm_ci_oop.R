@@ -1,8 +1,8 @@
 # S3 class for the SSM CI-trustworthiness diagnostic (M4/Z1 + Z2). print()
 # shows the per-profile verdict blocks of spec sec. 5.2 (coverage lines, the
 # guardrail false-certification caution, and the plain-language verdict);
-# summary() adds the structure note with its downgrade annotations, the full
-# coverage and guardrail tables, and the amplitude-ladder notes; plot() draws
+# summary() adds the settings, the structure note with its downgrade
+# annotations, a compact coverage table, and the amplitude-ladder notes; plot() draws
 # coverage across the ladder against the Bradley band.
 
 # S3 Constructor
@@ -307,7 +307,8 @@ ssm_ci_structure_note <- function(object) {
         paste(names(def), collapse = ", "), " (n <= k*p); the reported ",
         "coverage and width remain valid (a singular covariance is a proper ",
         "degenerate normal), but the fit-statistic pass rate is descriptive ",
-        "only."
+        "only. The widths and pass rates are in the coverage and guardrail ",
+        "elements of the result."
       ), indent = 2)
     }
     return(invisible(object))
@@ -399,7 +400,7 @@ ssm_ci_summary_table <- function(object, digits = 3) {
   cov <- object$coverage
   gr <- object$guardrail
   profiles <- unique(cov$Profile)
-  conds <- unique(object$details$conditions)
+  conds <- unique(cov$Condition)
   keys <- expand.grid(Condition = conds, Profile = profiles,
                       stringsAsFactors = FALSE)[, c("Profile", "Condition")]
   keys <- keys[paste(keys$Profile, keys$Condition) %in%
@@ -513,7 +514,7 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
     print(d$failed_reps)
   }
 
-  cat("\nVerdicts at c = 1 (as estimated), Bradley (1978) band via 95% Wilson CIs:\n")
+  cat("\nVerdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:\n")
   ssm_ci_verdict_blocks(object)
 
   cat("\nCoverage by condition (d_cert: d when certified; cert: certification rate):\n")

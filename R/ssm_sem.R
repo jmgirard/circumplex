@@ -1015,8 +1015,8 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   if (comparable && nrow(above) > 0) {
     verdict <- paste0(
       verdict, "; the ", paste(above$rung, collapse = ", "),
-      " rung(s) were also rejected (reported only, because this contrast's ",
-      "estimand is defined at the ", required, " level)"
+      " rung(s) were also rejected (reported only and not required for this ",
+      "contrast, whose estimand is defined at the ", required, " level)"
     )
   }
 
