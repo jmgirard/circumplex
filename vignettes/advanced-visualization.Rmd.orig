@@ -16,11 +16,11 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 set.seed(12345)
-library(ggplot2)
 ```
 
 ```{r setup}
 library(circumplex)
+library(ggplot2)
 ```
 
 ## Beyond the built-in plots
@@ -95,14 +95,23 @@ circumplex plot circular is `coord_circumplex()`. You can add that to a bare
 coordinate system you supply three things: an x-scale carrying the spoke breaks
 and labels, a data layer, and the theme.
 
-```{r coord-built}
+```{r coord-built-fit}
 results <- ssm_analyze(
   jz2017,
   scales = PANO(),
   measures = c("NARPD", "ASPD")
 )
-subset(results$results, select = c(Label, a_est, d_est, a_lci, a_uci))
+```
 
+The table below shows five columns of `results$results`: the profile label,
+the amplitude and displacement estimates, and the amplitude interval. (The code
+that selects these columns is omitted.)
+
+```{r coord-built-table, echo = FALSE}
+subset(results$results, select = c(Label, a_est, d_est, a_lci, a_uci))
+```
+
+```{r coord-built}
 ggplot(results$results) +
   coord_circumplex(amax = 0.3) +
   scale_x_continuous(breaks = octants(), labels = PANO()) +
@@ -240,17 +249,24 @@ fall relative to a summary. We can compute each person's own amplitude and
 displacement with `ssm_score()` and draw them as a faint cloud behind a
 group-level point.
 
-```{r individuals, warning = FALSE}
-# Per-person SSM parameters for a subset of the sample. A respondent whose
-# scores are flat has no displacement and is returned as NA (with a warning),
-# so we keep only the well-defined profiles.
+```{r individuals-score, warning = FALSE}
+# Per-person SSM parameters for a subset of the sample
 people <- ssm_score(
   jz2017[1:100, ],
   scales = PANO(),
   append = FALSE
 )
-people <- subset(people, !is.na(Disp))
+```
 
+A respondent whose scores are flat has no displacement. `ssm_score()` returns
+`NA` for that person, with a warning. So we drop the rows of `people` whose
+`Disp` is `NA` and keep only the well-defined profiles. (That code is omitted.)
+
+```{r individuals-drop, echo = FALSE}
+people <- subset(people, !is.na(Disp))
+```
+
+```{r individuals, warning = FALSE}
 # Group-level profile for the same subset
 group <- ssm_analyze(jz2017[1:100, ], scales = PANO())
 
@@ -291,41 +307,29 @@ occasion. It resamples persons so that within-person dependence across
 occasions is respected. `ssm_plot_trajectory()` then draws each SSM parameter
 against time.
 
-Here is a small simulated three-wave data set, `long`. Its group profile
-rotates counterclockwise across the 0/360 degree boundary, which is the case
-worth seeing drawn. (The code that simulates it is omitted, because it is not
-the point here.
-The data frame has one row per person per wave, the eight `PANO()` scale
-columns, an `id`, and a `wave` label.) We estimate one profile per wave with
+The package ships a small simulated three-wave data set, `simulated_occasions`.
+Its group profile rotates counterclockwise across the 0/360 degree boundary,
+which is the case worth seeing drawn. The data frame has one row per person
+per wave. Its columns are an `id`, a `wave` factor with levels `T1`, `T2` and
+`T3`, and the eight `PANO()` scales. `?simulated_occasions` states how it was
+simulated. We load it and estimate one profile per wave with
 `ssm_analyze_long()`:
 
-```{r occasions-data-sim, echo = FALSE}
-# Simulation machinery, hidden: each wave is the group cosine signal at a known
-# displacement, plus a stable per-person offset and fresh noise.
-angles <- octants()
-n <- 200
-waves <- c(T1 = 330, T2 = 355, T3 = 20)
-elevation <- rnorm(n) * 0.5
-make_wave <- function(w) {
-  signal <- 0.6 * cos((angles - waves[[w]]) * pi / 180)
-  scores <- matrix(signal, n, length(angles), byrow = TRUE) +
-    elevation + matrix(rnorm(n * length(angles), sd = 0.5), n)
-  out <- as.data.frame(scores)
-  names(out) <- PANO()
-  out$id <- seq_len(n)
-  out$wave <- w
-  out
-}
-long <- rbind(make_wave("T1"), make_wave("T2"), make_wave("T3"))
-```
-
 ```{r occasions-data}
+data("simulated_occasions")
 results_long <- ssm_analyze_long(
-  long,
+  simulated_occasions,
   scales = PANO(),
   id = "id",
   occasion = "wave"
 )
+```
+
+The table below shows five columns of `results_long$results`: the occasion,
+the amplitude and displacement estimates, and the displacement interval. (The
+code that selects these columns is omitted.)
+
+```{r occasions-data-table, echo = FALSE}
 subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
 ```
 
@@ -400,9 +404,10 @@ ggplot() +
 ```
 
 The arrowhead marks the direction of time. Note what the layer does at the
-boundary. This profile moves from 330 to 355 to 20 degrees. The step from the
-second to the third wave is drawn as the short 25 degree arc across the 0/360
-pole. It is not drawn as a 335 degree sweep the long way round. The path is curved
+boundary. The estimated profile moves from about 332 to 355 to 21 degrees. The
+step from the second to the third wave is drawn as the short arc of about 26
+degrees across the 0/360 pole. It is not drawn as a sweep of about 334 degrees
+the long way round. The path is curved
 because `coord_circumplex()` munches each segment along the polar geodesic: it
 splits the segment into short pieces that bend with the circle. The layer
 supplies the ordering, not the drawing.
@@ -434,13 +439,24 @@ Not every circumplex figure is circular. The score-by-angle curve drawn by
 by default with the angle in degrees, or with custom labels or an instrument's
 abbreviations.
 
-```{r curve-axis}
+The example below draws a made-up profile at the octant angles:
+
+```{r curve-axis-angles}
 angles <- octants()
+```
+
+The data frame `curve` has one row per angle in `angles`, in its `angle`
+column. Its `score` column follows a cosine curve with elevation 1, amplitude
+0.8 and displacement 135 degrees. (The code that builds `curve` is omitted.)
+
+```{r curve-axis-data, echo = FALSE}
 curve <- data.frame(
   angle = angles,
   score = 1 + 0.8 * cos((angles - 135) * pi / 180)
 )
+```
 
+```{r curve-axis}
 ggplot(curve, aes(x = angle, y = score)) +
   geom_line() +
   geom_point(size = 2) +
@@ -457,7 +473,8 @@ label their scales identically.
 
 The built-in plotting functions are implemented on exactly these components:
 `ssm_plot_circle()` is `ggcircumplex()` plus `geom_ssm_arc()` and
-`geom_ssm_point()`, with the amplitude axis moved to a gap that holds no point.
+`geom_ssm_point()`. It also moves the amplitude axis to a gap that holds no
+point.
 `ssm_plot_curve()` uses `scale_x_circumplex()` for its angle axis. So you can
 always start from a built-in plot and add to it, or rebuild it from the pieces
 when you need finer control. Whichever route you take, the coordinates are
