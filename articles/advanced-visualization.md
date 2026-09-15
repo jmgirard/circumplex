@@ -3,6 +3,7 @@
 ``` r
 
 library(circumplex)
+library(ggplot2)
 ```
 
 ## Beyond the built-in plots
@@ -102,10 +103,11 @@ Throughout, displacement runs counterclockwise from the right, and the
 is a convenience wrapper. Underneath it, the piece that makes a
 circumplex plot circular is
 [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md).
-You can add that to a bare `ggplot()` yourself when you want to build a
-figure from scratch. On top of the coordinate system you supply three
-things: an x-scale carrying the spoke breaks and labels, a data layer,
-and the theme.
+You can add that to a bare
+[`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+yourself when you want to build a figure from scratch. On top of the
+coordinate system you supply three things: an x-scale carrying the spoke
+breaks and labels, a data layer, and the theme.
 
 ``` r
 
@@ -114,10 +116,17 @@ results <- ssm_analyze(
   scales = PANO(),
   measures = c("NARPD", "ASPD")
 )
-subset(results$results, select = c(Label, a_est, d_est, a_lci, a_uci))
-#>   Label    a_est    d_est     a_lci     a_uci
-#> 1 NARPD 0.189244 108.9667 0.1537900 0.2271848
-#> 2  ASPD 0.226159 115.9267 0.1905403 0.2640428
+```
+
+The table below shows five columns of `results$results`: the profile
+label, the amplitude and displacement estimates, and the amplitude
+interval. (The code that selects these columns is omitted.)
+
+    #>   Label    a_est    d_est     a_lci     a_uci
+    #> 1 NARPD 0.189244 108.9667 0.1537900 0.2271848
+    #> 2  ASPD 0.226159 115.9267 0.1905403 0.2640428
+
+``` r
 
 ggplot(results$results) +
   coord_circumplex(amax = 0.3) +
@@ -129,10 +138,12 @@ ggplot(results$results) +
 ![plot of chunk
 coord-built](figures/advanced-visualization-coord-built-1.png)
 
-The `scale_x_continuous()` line is the one that tells the coordinate
-system where the scale angles are. Without it, the spokes would fall on
-`ggplot2`’s default breaks rather than on the octants. Supplying those
-breaks and labels, along with the theme, is what
+The
+[`scale_x_continuous()`](https://ggplot2.tidyverse.org/reference/scale_continuous.html)
+line is the one that tells the coordinate system where the scale angles
+are. Without it, the spokes would fall on `ggplot2`’s default breaks
+rather than on the octants. Supplying those breaks and labels, along
+with the theme, is what
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
 does on top of the coordinate system. Build from the parts when you want
 to vary one of those pieces. Reach for
@@ -267,7 +278,8 @@ is the theme
 applies. Because the rings, spokes, and labels are themed panel
 furniture rather than drawn geometry, any further theming reaches them.
 Adjust the base font size through the theme, and restyle the gridlines
-with an ordinary `theme()` call:
+with an ordinary
+[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call:
 
 ``` r
 
@@ -296,15 +308,21 @@ and draw them as a faint cloud behind a group-level point.
 
 ``` r
 
-# Per-person SSM parameters for a subset of the sample. A respondent whose
-# scores are flat has no displacement and is returned as NA (with a warning),
-# so we keep only the well-defined profiles.
+# Per-person SSM parameters for a subset of the sample
 people <- ssm_score(
   jz2017[1:100, ],
   scales = PANO(),
   append = FALSE
 )
-people <- subset(people, !is.na(Disp))
+```
+
+A respondent whose scores are flat has no displacement.
+[`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md)
+returns `NA` for that person, with a warning. So we drop the rows of
+`people` whose `Disp` is `NA` and keep only the well-defined profiles.
+(That code is omitted.)
+
+``` r
 
 # Group-level profile for the same subset
 group <- ssm_analyze(jz2017[1:100, ], scales = PANO())
@@ -354,30 +372,36 @@ dependence across occasions is respected.
 [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
 then draws each SSM parameter against time.
 
-Here is a small simulated three-wave data set, `long`. Its group profile
-rotates counterclockwise across the 0/360 degree boundary, which is the
-case worth seeing drawn. (The code that simulates it is omitted, because
-it is not the point here. The data frame has one row per person per
-wave, the eight
-[`PANO()`](http://circumplex.jmgirard.com/reference/PANO.md) scale
-columns, an `id`, and a `wave` label.) We estimate one profile per wave
-with
+The package ships a small simulated three-wave data set,
+`simulated_occasions`. Its group profile rotates counterclockwise across
+the 0/360 degree boundary, which is the case worth seeing drawn. The
+data frame has one row per person per wave. Its columns are an `id`, a
+`wave` factor with levels `T1`, `T2` and `T3`, and the eight
+[`PANO()`](http://circumplex.jmgirard.com/reference/PANO.md) scales.
+[`?simulated_occasions`](http://circumplex.jmgirard.com/reference/simulated_occasions.md)
+states how it was simulated. We load it and estimate one profile per
+wave with
 [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md):
 
 ``` r
 
+data("simulated_occasions")
 results_long <- ssm_analyze_long(
-  long,
+  simulated_occasions,
   scales = PANO(),
   id = "id",
   occasion = "wave"
 )
-subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
-#>   Occasion     a_est     d_est     d_lci     d_uci
-#> 1       T1 0.6133765 332.44652 329.70848 335.43024
-#> 2       T2 0.5879017 355.92454 352.64902 359.30751
-#> 3       T3 0.5907495  17.84307  14.57562  21.11586
 ```
+
+The table below shows five columns of `results_long$results`: the
+occasion, the amplitude and displacement estimates, and the displacement
+interval. (The code that selects these columns is omitted.)
+
+    #>   Occasion     a_est     d_est     d_lci     d_uci
+    #> 1       T1 0.5707423 332.41252 329.10979 335.70188
+    #> 2       T2 0.5968632 354.84909 351.81938 357.84738
+    #> 3       T3 0.5959438  21.05834  17.95188  24.08043
 
 ``` r
 
@@ -469,20 +493,23 @@ ggplot() +
 occasions-path](figures/advanced-visualization-occasions-path-1.png)
 
 The arrowhead marks the direction of time. Note what the layer does at
-the boundary. This profile moves from 330 to 355 to 20 degrees. The step
-from the second to the third wave is drawn as the short 25 degree arc
-across the 0/360 pole. It is not drawn as a 335 degree sweep the long
-way round. The path is curved because
+the boundary. The estimated profile moves from about 332 to 355 to 21
+degrees. The step from the second to the third wave is drawn as the
+short arc of about 26 degrees across the 0/360 pole. It is not drawn as
+a sweep of about 334 degrees the long way round. The path is curved
+because
 [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md)
 munches each segment along the polar geodesic: it splits the segment
 into short pieces that bend with the circle. The layer supplies the
 ordering, not the drawing.
 
 Occasions are connected in the order the rows appear in the data,
-exactly as `geom_path()` does. Mapping `group` draws one path per
-series. When you assemble a data frame by hand, sort it into time order
-first. For the reason noted above, sorting occasion labels as text puts
-`T10` before `T2` and silently reverses time.
+exactly as
+[`geom_path()`](https://ggplot2.tidyverse.org/reference/geom_path.html)
+does. Mapping `group` draws one path per series. When you assemble a
+data frame by hand, sort it into time order first. For the reason noted
+above, sorting occasion labels as text puts `T10` before `T2` and
+silently reverses time.
 [`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md),
 shown next, does that sorting for you.
 
@@ -514,13 +541,19 @@ labels that axis consistently with the circular canvas: by default with
 the angle in degrees, or with custom labels or an instrument’s
 abbreviations.
 
+The example below draws a made-up profile at the octant angles:
+
 ``` r
 
 angles <- octants()
-curve <- data.frame(
-  angle = angles,
-  score = 1 + 0.8 * cos((angles - 135) * pi / 180)
-)
+```
+
+The data frame `curve` has one row per angle in `angles`, in its `angle`
+column. Its `score` column follows a cosine curve with elevation 1,
+amplitude 0.8 and displacement 135 degrees. (The code that builds
+`curve` is omitted.)
+
+``` r
 
 ggplot(curve, aes(x = angle, y = score)) +
   geom_line() +
@@ -550,8 +583,8 @@ is
 plus
 [`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md)
 and
-[`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md),
-with the amplitude axis moved to a gap that holds no point.
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md).
+It also moves the amplitude axis to a gap that holds no point.
 [`ssm_plot_curve()`](http://circumplex.jmgirard.com/reference/ssm_plot_curve.md)
 uses
 [`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md)

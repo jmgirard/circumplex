@@ -436,30 +436,31 @@ deterministic. So no bootstrap is needed:
 ``` r
 
 R <- cpm$matrices$R # the sample correlation matrix stored by cpm_fit()
-fits <- lapply(
-  c("quasi-circumplex", "equal-communality", "circulant"),
-  function(mod) {
-    cpm_fit(
-      cormat = R, scales = PANO(), angles = octants(),
-      n = nrow(jz2017), model = mod
-    )
-  }
+fit_quasi <- cpm_fit(
+  cormat = R, scales = PANO(), angles = octants(),
+  n = nrow(jz2017), model = "quasi-circumplex"
 )
 #> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may
 #> be clustered or parameters weakly determined.
-data.frame(
-  model = vapply(fits, function(f) f$details$model, character(1)),
-  df = vapply(fits, function(f) f$fit$df, numeric(1)),
-  rmsea = round(vapply(fits, function(f) f$fit$rmsea, numeric(1)), 3),
-  srmr = round(vapply(fits, function(f) f$fit$srmr, numeric(1)), 3),
-  cfi = round(vapply(fits, function(f) f$fit$cfi, numeric(1)), 3),
-  tli = round(vapply(fits, function(f) f$fit$tli, numeric(1)), 3)
+fit_equal <- cpm_fit(
+  cormat = R, scales = PANO(), angles = octants(),
+  n = nrow(jz2017), model = "equal-communality"
 )
-#>               model df rmsea  srmr   cfi   tli
-#> 1  quasi-circumplex 10 0.078 0.042 0.984 0.956
-#> 2 equal-communality 17 0.100 0.063 0.956 0.928
-#> 3         circulant 24 0.185 0.130 0.790 0.755
+fit_circulant <- cpm_fit(
+  cormat = R, scales = PANO(), angles = octants(),
+  n = nrow(jz2017), model = "circulant"
+)
 ```
+
+The table below has one row for each of the three fits. It shows the
+model name from `$details$model`, and the degrees of freedom and four
+fit indices from `$fit`. The indices are rounded to three decimals. (The
+code that builds the table is omitted.)
+
+    #>               model df rmsea  srmr   cfi   tli
+    #> 1  quasi-circumplex 10 0.078 0.042 0.984 0.956
+    #> 2 equal-communality 17 0.100 0.063 0.956 0.928
+    #> 3         circulant 24 0.185 0.130 0.790 0.755
 
 The pattern reproduces what Zimmermann and Wright (2017, p. 14) reported
 for these data with CircE. The fully constrained model (equal spacing
@@ -637,7 +638,7 @@ summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 4.8s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 4.7s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -1094,16 +1095,15 @@ res_ips <- ssm_analyze(
   measures = "PARPD",
   boots = 100
 )
-comparison <- rbind(
-  res_raw$results[, c("e_est", "a_est", "d_est")],
-  res_ips$results[, c("e_est", "a_est", "d_est")]
-)
-rownames(comparison) <- c("raw", "ipsatized")
-round(comparison, 3)
-#>           e_est a_est   d_est
-#> raw       0.250 0.150 128.945
-#> ipsatized 0.007 0.113 132.949
 ```
+
+The table below puts the elevation, amplitude and displacement estimates
+of the two analyses side by side, rounded to three decimals. Its rows
+are `raw` and `ipsatized`. (The code that builds the table is omitted.)
+
+    #>           e_est a_est   d_est
+    #> raw       0.250 0.150 128.945
+    #> ipsatized 0.007 0.113 132.949
 
 The raw-score elevation collapses to near zero after ipsatizing. (The
 raw value matches the value that Zimmermann and Wright report for this

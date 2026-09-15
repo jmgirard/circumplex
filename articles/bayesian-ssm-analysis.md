@@ -67,7 +67,7 @@ with the displacement wrapped into $`[0°, 360°)`$.
 
 Note the argument order: `atan2(y, x)` takes the **sine coefficient
 first**. Swapping the arguments is a classic silent error. It returns a
-valid-looking angle that is wrong for almost every profile. The check
+valid-looking angle that is wrong for almost every profile. The example
 below pins the convention with a profile whose displacement is known to
 be 90°. The swapped call would return 0° instead:
 
@@ -83,9 +83,11 @@ d_hat <- atan2(y_hat, x_hat) * 180 / pi
 round(c(x = x_hat, y = y_hat, d = d_hat), 6)
 #>  x  y  d 
 #>  0  2 90
-stopifnot(isTRUE(all.equal(d_hat, 90)))          # atan2(y, x): correct
-stopifnot(!isTRUE(all.equal(atan2(x_hat, y_hat) * 180 / pi, 90)))  # swapped
 ```
+
+The printed `d` is 90. A hidden check stops the vignette build unless
+`atan2(y_hat, x_hat)` gives 90° and the swapped `atan2(x_hat, y_hat)`
+does not.
 
 ## 3. Fitting the model with brms
 
@@ -99,19 +101,16 @@ cosine coefficient, sine coefficient). They are then the group-level
 $`(e, x, y)`$. A random subsample of 200 persons, drawn with a fixed
 seed, keeps the example light.
 
+The long data frame is `dat`, with 1600 rows: one per person and octant
+scale. Its columns are the person `id`, `cos_theta` and `sin_theta` (the
+cosine and sine of the scale’s angle from
+[`octants()`](http://circumplex.jmgirard.com/reference/octants.md)), and
+the `score`. (The code that draws the subsample and builds `dat` is
+omitted. It builds the same data as the seeded script named below.) Its
+first rows are:
+
 ``` r
 
-data("jz2017")
-set.seed(12345)
-sub <- jz2017[sample(nrow(jz2017), 200), ]
-scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
-theta <- as.numeric(octants()) * pi / 180
-dat <- data.frame(
-  id = rep(seq_len(200), times = length(scales)),
-  cos_theta = rep(cos(theta), each = 200),
-  sin_theta = rep(sin(theta), each = 200),
-  score = unlist(sub[scales], use.names = FALSE)
-)
 head(dat)
 #>   id    cos_theta sin_theta score
 #> 1  1 6.123234e-17         1  1.00
@@ -146,11 +145,12 @@ draws <- as.matrix(bfit,
 ## 4. From posterior draws to SSM summaries
 
 The draws form a matrix with one row per posterior draw and three
-columns interpreted **in column order** as $`(e, x, y)`$:
+columns interpreted **in column order** as $`(e, x, y)`$. The vignette
+reads the shipped draws into the matrix `draws`. (The code that reads
+the file is omitted.)
 
 ``` r
 
-draws <- readRDS("bayesian_ssm_draws.rds")
 dim(draws)
 #> [1] 4000    3
 head(round(draws, 3))
@@ -229,33 +229,17 @@ that the priors on $`x`$ and $`y`$ imply. With
 $`x, y \sim \mathrm{Normal}(0, 1)`$, the implied prior on
 $`a = \sqrt{x^2 + y^2}`$ is Rayleigh-shaped: zero density at $`a = 0`$,
 then a single peak, with a right skew. Its mass is pushed *away* from
-$`a = 0`$. But the implied prior on $`d`$ is uniform. A ten-line
-prior-predictive simulation makes the amplitude prior visible:
-
-``` r
-
-x_prior <- rnorm(10000, 0, 1)
-y_prior <- rnorm(10000, 0, 1)
-a_prior <- sqrt(x_prior^2 + y_prior^2)
-ggplot(data.frame(a = a_prior), aes(x = a)) +
-  geom_histogram(bins = 60, fill = "grey35") +
-  labs(
-    x = "Amplitude implied by the priors on x and y",
-    y = "Prior draws",
-    title = "Rayleigh-shaped induced prior on amplitude"
-  ) +
-  theme_minimal()
-```
+$`a = 0`$. But the implied prior on $`d`$ is uniform. A prior-predictive
+simulation makes the amplitude prior visible. It draws 10000 values each
+of $`x`$ and $`y`$ from $`\mathrm{Normal}(0, 1)`$ and computes
+$`a = \sqrt{x^2 + y^2}`$ for each pair. The histogram shows those draws
+of $`a`$. The two printed numbers are their median and the share of them
+below 0.1. (The simulation and plotting code is omitted.)
 
 ![](bayesian-ssm-analysis_files/figure-html/induced-prior-1.png)
 
-``` r
-
-round(c(prior_median = median(a_prior), prior_mass_below_0.1 =
-          mean(a_prior < 0.1)), 3)
-#>         prior_median prior_mass_below_0.1 
-#>                1.164                0.005
-```
+    #>         prior_median prior_mass_below_0.1 
+    #>                1.164                0.005
 
 The Rayleigh shape is not a defect. It is a modeling choice to be aware
 of: the prior mildly disfavors exactly-flat profiles ($`a = 0`$). If

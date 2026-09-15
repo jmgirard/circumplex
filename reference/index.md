@@ -163,3 +163,8 @@ Functions that make your life easier
   Raw item responses on real circumplex scales
 - [`simulated_items`](http://circumplex.jmgirard.com/reference/simulated_items.md)
   : Simulated item responses on octant circumplex scales
+- [`simulated_occasions`](http://circumplex.jmgirard.com/reference/simulated_occasions.md)
+  : Simulated octant scores at three occasions
+- [`simulated_growth`](http://circumplex.jmgirard.com/reference/simulated_growth.md)
+  [`simulated_growth_origin`](http://circumplex.jmgirard.com/reference/simulated_growth.md)
+  : Simulated octant scores for growth models

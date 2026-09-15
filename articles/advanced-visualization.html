@@ -95,7 +95,8 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="beyond-the-built-in-plots">Beyond the built-in plots<a class="anchor" aria-label="anchor" href="#beyond-the-built-in-plots"></a>
 </h2>
@@ -176,7 +177,7 @@ the 0/360 degree position is labeled 360.</p>
 <p><code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> is a convenience wrapper. Underneath it,
 the piece that makes a circumplex plot circular is
 <code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>. You can add that to a bare
-<code>ggplot()</code> yourself when you want to build a figure from
+<code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> yourself when you want to build a figure from
 scratch. On top of the coordinate system you supply three things: an
 x-scale carrying the spoke breaks and labels, a data layer, and the
 theme.</p>
@@ -185,19 +186,22 @@ theme.</p>
 <span>  <span class="va">jz2017</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Label</span>, <span class="va">a_est</span>, <span class="va">d_est</span>, <span class="va">a_lci</span>, <span class="va">a_uci</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Label    a_est    d_est     a_lci     a_uci</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The table below shows five columns of <code>results$results</code>:
+the profile label, the amplitude and displacement estimates, and the
+amplitude interval. (The code that selects these columns is
+omitted.)</p>
+<pre><code><span><span class="co">#&gt;   Label    a_est    d_est     a_lci     a_uci</span></span>
 <span><span class="co">#&gt; 1 NARPD 0.189244 108.9667 0.1537900 0.2271848</span></span>
-<span><span class="co">#&gt; 2  ASPD 0.226159 115.9267 0.1905403 0.2640428</span></span>
-<span></span>
-<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="co">#&gt; 2  ASPD 0.226159 115.9267 0.1905403 0.2640428</span></span></code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-coord-built-1.png" alt="plot of chunk coord-built" width="100%"></p>
-<p>The <code>scale_x_continuous()</code> line is the one that tells the
+<p>The <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous()</a></code> line is the one that tells the
 coordinate system where the scale angles are. Without it, the spokes
 would fall on <code>ggplot2</code>’s default breaks rather than on the
 octants. Supplying those breaks and labels, along with the theme, is
@@ -220,11 +224,11 @@ differentiation among the scales.” The <code>center</code> argument
 moves that inner limit. This is useful when every profile sits in a
 narrow band of amplitudes and the interesting variation is squeezed
 against the rim:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.28</span>, center <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-coord-center-1.png" alt="plot of chunk coord-center" width="100%"></p>
 <p>This is a zoom, and it changes how the figure should be read. With a
@@ -244,11 +248,11 @@ never collide with a spoke label. <code><a href="../reference/ssm_plot_circle.ht
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a CPM fit go one step further and use the widest
 gap that holds no plotted point. You can override the placement with
 <code>r_axis_angle</code>, given as a displacement in degrees:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.3</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-coord-r-axis-1.png" alt="plot of chunk coord-r-axis" width="100%"></p>
 <p>Note that these examples build the canvas from its parts: the
@@ -271,11 +275,11 @@ displacement confidence interval angularly. Both take the SSM parameters
 directly as aesthetics and handle the conversion into circular
 coordinates internally. That includes wrap-around when a displacement
 interval crosses the 0/360 degree boundary.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_arc.html">geom_ssm_arc</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>      amplitude_min <span class="op">=</span> <span class="va">a_lci</span>, amplitude_max <span class="op">=</span> <span class="va">a_uci</span>,</span>
 <span>      displacement_min <span class="op">=</span> <span class="va">d_lci</span>, displacement_max <span class="op">=</span> <span class="va">d_uci</span>,</span>
 <span>      fill <span class="op">=</span> <span class="va">Label</span></span>
@@ -284,7 +288,7 @@ interval crosses the 0/360 degree boundary.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-results-plot-1.png" alt="plot of chunk results-plot" width="100%"></p>
 <p>Each arc displays two separate confidence intervals for one profile
@@ -308,17 +312,17 @@ reasonably well. See the “Introduction to SSM Analysis” vignette and
 <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> applies. Because the rings, spokes, and
 labels are themed panel furniture rather than drawn geometry, any
 further theming reaches them. Adjust the base font size through the
-theme, and restyle the gridlines with an ordinary <code>theme()</code>
+theme, and restyle the gridlines with an ordinary <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code>
 call:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span></span>
-<span>    panel.grid.major <span class="op">=</span> <span class="fu">element_line</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span><span class="op">)</span>,</span>
 <span>    legend.position <span class="op">=</span> <span class="st">"bottom"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-theming-1.png" alt="plot of chunk theming" width="100%"></p>
@@ -332,18 +336,20 @@ where individual respondents fall relative to a summary. We can compute
 each person’s own amplitude and displacement with
 <code><a href="../reference/ssm_score.html">ssm_score()</a></code> and draw them as a faint cloud behind a
 group-level point.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Per-person SSM parameters for a subset of the sample. A respondent whose</span></span>
-<span><span class="co"># scores are flat has no displacement and is returned as NA (with a warning),</span></span>
-<span><span class="co"># so we keep only the well-defined profiles.</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Per-person SSM parameters for a subset of the sample</span></span>
 <span><span class="va">people</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_score.html">ssm_score</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  append <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">people</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">people</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Disp</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Group-level profile for the same subset</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>A respondent whose scores are flat has no displacement.
+<code><a href="../reference/ssm_score.html">ssm_score()</a></code> returns <code>NA</code> for that person, with a
+warning. So we drop the rows of <code>people</code> whose
+<code>Disp</code> is <code>NA</code> and keep only the well-defined
+profiles. (That code is omitted.)</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Group-level profile for the same subset</span></span>
 <span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The group amplitude is shorter than a typical individual amplitude</span></span>
@@ -354,12 +360,12 @@ group-level point.</p>
 <span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">1.75</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">people</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">Ampl</span>, displacement <span class="op">=</span> <span class="va">Disp</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">Ampl</span>, displacement <span class="op">=</span> <span class="va">Disp</span><span class="op">)</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"grey70"</span>, size <span class="op">=</span> <span class="fl">1.5</span>, alpha <span class="op">=</span> <span class="fl">0.6</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">group</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"#0072B2"</span>, size <span class="op">=</span> <span class="fl">4</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-individuals-1.png" alt="plot of chunk individuals" width="100%"></p>
@@ -387,26 +393,32 @@ profile per occasion. It resamples persons so that within-person
 dependence across occasions is respected.
 <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> then draws each SSM parameter against
 time.</p>
-<p>Here is a small simulated three-wave data set, <code>long</code>. Its
-group profile rotates counterclockwise across the 0/360 degree boundary,
-which is the case worth seeing drawn. (The code that simulates it is
-omitted, because it is not the point here. The data frame has one row
-per person per wave, the eight <code><a href="../reference/PANO.html">PANO()</a></code> scale columns, an
-<code>id</code>, and a <code>wave</code> label.) We estimate one profile
-per wave with <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze_long.html">ssm_analyze_long</a></span><span class="op">(</span></span>
-<span>  <span class="va">long</span>,</span>
+<p>The package ships a small simulated three-wave data set,
+<code>simulated_occasions</code>. Its group profile rotates
+counterclockwise across the 0/360 degree boundary, which is the case
+worth seeing drawn. The data frame has one row per person per wave. Its
+columns are an <code>id</code>, a <code>wave</code> factor with levels
+<code>T1</code>, <code>T2</code> and <code>T3</code>, and the eight
+<code><a href="../reference/PANO.html">PANO()</a></code> scales. <code><a href="../reference/simulated_occasions.html">?simulated_occasions</a></code> states how
+it was simulated. We load it and estimate one profile per wave with
+<code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code>:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_occasions"</span><span class="op">)</span></span>
+<span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze_long.html">ssm_analyze_long</a></span><span class="op">(</span></span>
+<span>  <span class="va">simulated_occasions</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  id <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  occasion <span class="op">=</span> <span class="st">"wave"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">results_long</span><span class="op">$</span><span class="va">results</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Occasion</span>, <span class="va">a_est</span>, <span class="va">d_est</span>, <span class="va">d_lci</span>, <span class="va">d_uci</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Occasion     a_est     d_est     d_lci     d_uci</span></span>
-<span><span class="co">#&gt; 1       T1 0.6133765 332.44652 329.70848 335.43024</span></span>
-<span><span class="co">#&gt; 2       T2 0.5879017 355.92454 352.64902 359.30751</span></span>
-<span><span class="co">#&gt; 3       T3 0.5907495  17.84307  14.57562  21.11586</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<span><span class="op">)</span></span></code></pre></div>
+<p>The table below shows five columns of
+<code>results_long$results</code>: the occasion, the amplitude and
+displacement estimates, and the displacement interval. (The code that
+selects these columns is omitted.)</p>
+<pre><code><span><span class="co">#&gt;   Occasion     a_est     d_est     d_lci     d_uci</span></span>
+<span><span class="co">#&gt; 1       T1 0.5707423 332.41252 329.10979 335.70188</span></span>
+<span><span class="co">#&gt; 2       T2 0.5968632 354.84909 351.81938 357.84738</span></span>
+<span><span class="co">#&gt; 3       T3 0.5959438  21.05834  17.95188  24.08043</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">results_long</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-plot-1.png" alt="plot of chunk occasions-plot" width="100%"></p>
 <p>Two things about the displacement panel are worth reading carefully.
@@ -462,36 +474,36 @@ occasion are split across two panels. <code><a href="../reference/geom_ssm_path.
 the same series as a path on the circular canvas, so a change in
 (amplitude, displacement) reads as movement through circumplex
 space.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># The amplitude axis goes in the 45-90 gap, clear of the three occasions</span></span>
 <span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.8</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results_long</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Drawn after the points so the terminal arrowhead is not covered by the</span></span>
 <span>  <span class="co"># final occasion's marker, and sized to clear it</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results_long</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
-<span>    arrow <span class="op">=</span> <span class="fu">arrow</span><span class="op">(</span>length <span class="op">=</span> <span class="fu">unit</span><span class="op">(</span><span class="fl">0.18</span>, <span class="st">"inches"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
+<span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.18</span>, <span class="st">"inches"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>    linewidth <span class="op">=</span> <span class="fl">0.7</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-path-1.png" alt="plot of chunk occasions-path" width="100%"></p>
 <p>The arrowhead marks the direction of time. Note what the layer does
-at the boundary. This profile moves from 330 to 355 to 20 degrees. The
-step from the second to the third wave is drawn as the short 25 degree
-arc across the 0/360 pole. It is not drawn as a 335 degree sweep the
-long way round. The path is curved because
-<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> munches each segment along the polar
-geodesic: it splits the segment into short pieces that bend with the
-circle. The layer supplies the ordering, not the drawing.</p>
+at the boundary. The estimated profile moves from about 332 to 355 to 21
+degrees. The step from the second to the third wave is drawn as the
+short arc of about 26 degrees across the 0/360 pole. It is not drawn as
+a sweep of about 334 degrees the long way round. The path is curved
+because <code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> munches each segment along the
+polar geodesic: it splits the segment into short pieces that bend with
+the circle. The layer supplies the ordering, not the drawing.</p>
 <p>Occasions are connected in the order the rows appear in the data,
-exactly as <code>geom_path()</code> does. Mapping <code>group</code>
+exactly as <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_path()</a></code> does. Mapping <code>group</code>
 draws one path per series. When you assemble a data frame by hand, sort
 it into time order first. For the reason noted above, sorting occasion
 labels as text puts <code>T10</code> before <code>T2</code> and silently
@@ -500,7 +512,7 @@ sorting for you.</p>
 <p>The same figure is available ready-made from
 <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, which adds the path to its usual points
 and confidence wedges:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results_long</span>, path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-path-wrapper-1.png" alt="plot of chunk occasions-path-wrapper" width="100%"></p>
 <p>An occasion whose displacement is undefined (a flat or zero-amplitude
@@ -519,19 +531,21 @@ runs through the scale angles. <code><a href="../reference/scale_x_circumplex.ht
 that axis consistently with the circular canvas: by default with the
 angle in degrees, or with custom labels or an instrument’s
 abbreviations.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">angles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  angle <span class="op">=</span> <span class="va">angles</span>,</span>
-<span>  score <span class="op">=</span> <span class="fl">1</span> <span class="op">+</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="op">(</span><span class="va">angles</span> <span class="op">-</span> <span class="fl">135</span><span class="op">)</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">curve</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">angle</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<p>The example below draws a made-up profile at the octant angles:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">angles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The data frame <code>curve</code> has one row per angle in
+<code>angles</code>, in its <code>angle</code> column. Its
+<code>score</code> column follows a cosine curve with elevation 1,
+amplitude 0.8 and displacement 135 degrees. (The code that builds
+<code>curve</code> is omitted.)</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">curve</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">angle</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/scale_x_circumplex.html">scale_x_circumplex</a></span><span class="op">(</span><span class="va">angles</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Scale"</span>, y <span class="op">=</span> <span class="st">"Score"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Scale"</span>, y <span class="op">=</span> <span class="st">"Score"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-curve-axis-1.png" alt="plot of chunk curve-axis" width="100%"></p>
 <p>Pass the same <code>labels</code> (or the same
 <code>instrument</code>) to both <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> and
@@ -544,7 +558,7 @@ figure and a linear one label their scales identically.</p>
 <p>The built-in plotting functions are implemented on exactly these
 components: <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> is
 <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> plus <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> and
-<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code>, with the amplitude axis moved to a gap
+<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code>. It also moves the amplitude axis to a gap
 that holds no point. <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> uses
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> for its angle axis. So you can always
 start from a built-in plot and add to it, or rebuild it from the pieces

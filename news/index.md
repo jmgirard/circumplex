@@ -2,6 +2,16 @@
 
 ## circumplex (development version)
 
+### New features
+
+- The package has three new simulated datasets. `simulated_occasions`
+  holds octant scores for 200 persons at three waves. `simulated_growth`
+  and `simulated_growth_origin` hold octant scores for 150 persons at
+  five waves. Their help pages state how the data were simulated. The
+  “Advanced Circumplex Visualization” and “Growth Models on SSM
+  Parameters” vignettes load them with
+  [`data()`](https://rdrr.io/r/utils/data.html).
+
 ### Minor improvements and fixes
 
 - [`summary()`](https://rdrr.io/r/base/summary.html) for an
@@ -59,6 +69,19 @@
   widest gap, as before, and a label can still cover a point.
 
 ### Documentation
+
+- The code shown in six vignettes now keeps to the package calls and
+  model fits they teach. Code that simulates data, builds or formats a
+  display table, or checks internals is hidden, and the prose says what
+  it does. The “Advanced Circumplex Visualization” and “Growth Models on
+  SSM Parameters” vignettes now load the new simulated datasets with
+  [`data()`](https://rdrr.io/r/utils/data.html). The growth vignette
+  shows
+  [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+  called for a single wave and hides the loop over waves. The
+  “Evaluating Circumplex Structure” vignette writes out its three
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  calls.
 
 - The
   [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
@@ -1292,9 +1315,10 @@ on a real ggplot2 coordinate system.
   circle center and amplitude-axis placement, restyling the canvas
   through
   [`theme_circumplex()`](http://circumplex.jmgirard.com/reference/theme_circumplex.md)
-  and ordinary `theme()` calls, subclassing the exported
-  `GeomSsmPoint`/`GeomSsmArc` objects to build reusable layers, and
-  plotting a trajectory across occasions.
+  and ordinary
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) calls,
+  subclassing the exported `GeomSsmPoint`/`GeomSsmArc` objects to build
+  reusable layers, and plotting a trajectory across occasions.
 
 - The reference index now groups the plotting API into “Complete Plots”
   and “Building Blocks”. The `ssm_plot_*` functions cross-link to each

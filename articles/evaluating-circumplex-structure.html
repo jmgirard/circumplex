@@ -557,29 +557,28 @@ fit indices are deterministic. So no bootstrap is needed:</p>
      across BLAS implementations. -->
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="va">cpm</span><span class="op">$</span><span class="va">matrices</span><span class="op">$</span><span class="va">R</span> <span class="co"># the sample correlation matrix stored by cpm_fit()</span></span>
-<span><span class="va">fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quasi-circumplex"</span>, <span class="st">"equal-communality"</span>, <span class="st">"circulant"</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">mod</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/cpm_fit.html">cpm_fit</a></span><span class="op">(</span></span>
-<span>      cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>      n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>, model <span class="op">=</span> <span class="va">mod</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
+<span><span class="va">fit_quasi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cpm_fit.html">cpm_fit</a></span><span class="op">(</span></span>
+<span>  cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"quasi-circumplex"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may</span></span>
 <span><span class="co">#&gt; be clustered or parameters weakly determined.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="va">f</span><span class="op">$</span><span class="va">details</span><span class="op">$</span><span class="va">model</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="va">f</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  rmsea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="va">f</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">rmsea</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  srmr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="va">f</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">srmr</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  cfi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="va">f</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">cfi</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  tli <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="va">f</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">tli</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">fit_equal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cpm_fit.html">cpm_fit</a></span><span class="op">(</span></span>
+<span>  cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"equal-communality"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;               model df rmsea  srmr   cfi   tli</span></span>
+<span><span class="va">fit_circulant</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cpm_fit.html">cpm_fit</a></span><span class="op">(</span></span>
+<span>  cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"circulant"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The table below has one row for each of the three fits. It shows the
+model name from <code>$details$model</code>, and the degrees of freedom
+and four fit indices from <code>$fit</code>. The indices are rounded to
+three decimals. (The code that builds the table is omitted.)</p>
+<pre><code><span><span class="co">#&gt;               model df rmsea  srmr   cfi   tli</span></span>
 <span><span class="co">#&gt; 1  quasi-circumplex 10 0.078 0.042 0.984 0.956</span></span>
 <span><span class="co">#&gt; 2 equal-communality 17 0.100 0.063 0.956 0.928</span></span>
-<span><span class="co">#&gt; 3         circulant 24 0.185 0.130 0.790 0.755</span></span></code></pre></div>
+<span><span class="co">#&gt; 3         circulant 24 0.185 0.130 0.790 0.755</span></span></code></pre>
 <!-- precompute:volatile-numbers end -->
 <p>The pattern reproduces what Zimmermann and Wright (2017, p. 14)
 reported for these data with CircE. The fully constrained model (equal
@@ -751,7 +750,7 @@ profile. Obsessive–compulsive PD has a profile that Zimmermann and
 Wright’s Table 4 showed to be nearly flat (amplitude .012 at full sample
 size). We use the first 250 participants. Many construct-validation
 studies would consider that sample size respectable.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">23456</span><span class="op">)</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">250</span>, <span class="op">]</span>,</span>
@@ -814,7 +813,7 @@ without changing results for a given seed.</p>
      ill-conditioned CPM, whose solution moves in the third digit across
      BLAS implementations; every simulated replication moves with it, so
      this chunk's printed numbers are not reproducible across machines. -->
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">34567</span><span class="op">)</span></span>
 <span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy</a></span><span class="op">(</span><span class="va">res</span>, reps <span class="op">=</span> <span class="fl">200</span>, amplitude_factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles may</span></span>
@@ -823,7 +822,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per</span></span>
 <span><span class="co">#&gt; condition.</span></span>
-<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 4.8s.</span></span>
+<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 4.7s.</span></span>
 <span><span class="co">#&gt; Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) &gt;= 0.35.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
@@ -920,7 +919,7 @@ amplitude. The plain-language paragraph states the overall conclusion
 per profile.</li>
 </ul>
 <p>For a visual summary across the ladder:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%"></p>
 <p>The two profiles tell usefully different stories. Paranoid PD is
@@ -1085,7 +1084,7 @@ removing that general factor (Acton &amp; Revelle, 2004, p. 9), so it is
 <code>scoring = "raw"</code> to analyze the scores as given. Each of the
 two scorings carries its own set of cutoffs (next subsection), matched
 automatically.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_structure.html">fit_structure</a></span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">res</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1107,7 +1106,7 @@ automatically.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Interpretations are heuristic likelihood classifications from simulation, not</span></span>
 <span><span class="co">#&gt;   significance tests (Acton &amp; Revelle, 2004). RANDALL's p-value is exact.</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Circumplex Structure Tests (Acton &amp; Revelle, 2004)</span></span>
@@ -1149,7 +1148,7 @@ octant spacing, with broadly similar communalities. <code>Fisher</code>
 measures departures in communality, and
 <code>Gap</code>/<code>VT2</code>/<code>Rotation</code> measure
 departures in even angular spread.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%"></p>
 <p>For the IIP-SC octants, the picture agrees with Section 2’s CPM fit.
@@ -1265,7 +1264,7 @@ between the ipsatized scales and any external measure sum to exactly
 zero. This forces the mean correlation toward zero, regardless of how
 strongly the construct relates to the instrument’s general factor
 (Zimmermann &amp; Wright, 2017, p. 4).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">45678</span><span class="op">)</span></span>
 <span><span class="va">res_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span>,</span>
@@ -1282,16 +1281,14 @@ strongly the construct relates to the instrument’s general factor
 <span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  measures <span class="op">=</span> <span class="st">"PARPD"</span>,</span>
 <span>  boots <span class="op">=</span> <span class="fl">100</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="va">res_raw</span><span class="op">$</span><span class="va">results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e_est"</span>, <span class="st">"a_est"</span>, <span class="st">"d_est"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  <span class="va">res_ips</span><span class="op">$</span><span class="va">results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e_est"</span>, <span class="st">"a_est"</span>, <span class="st">"d_est"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw"</span>, <span class="st">"ipsatized"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">comparison</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           e_est a_est   d_est</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The table below puts the elevation, amplitude and displacement
+estimates of the two analyses side by side, rounded to three decimals.
+Its rows are <code>raw</code> and <code>ipsatized</code>. (The code that
+builds the table is omitted.)</p>
+<pre><code><span><span class="co">#&gt;           e_est a_est   d_est</span></span>
 <span><span class="co">#&gt; raw       0.250 0.150 128.945</span></span>
-<span><span class="co">#&gt; ipsatized 0.007 0.113 132.949</span></span></code></pre></div>
+<span><span class="co">#&gt; ipsatized 0.007 0.113 132.949</span></span></code></pre>
 <p>The raw-score elevation collapses to near zero after ipsatizing. (The
 raw value matches the value that Zimmermann and Wright report for this
 scale in their Table 4.) The displacement stays close to its raw-score

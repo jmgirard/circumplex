@@ -144,48 +144,43 @@ be fit with <code>nlme</code> (shipped with base R), using its
 <h2 id="from-repeated-measures-to-a-coordinate-table">2. From repeated measures to a coordinate table<a class="anchor" aria-label="anchor" href="#from-repeated-measures-to-a-coordinate-table"></a>
 </h2>
 <p>The input to the growth model is a person-by-wave table of SSM
-coordinates. <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code> computes each person’s
+coordinates. <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code> computes
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>e</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(e, x, y)</annotation></semantics></math>
 (and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
-fit) from their circumplex scale scores. Applied per wave, it yields
-exactly the tidy input that a mixed model wants.</p>
-<p>We simulate five waves of octant scores for 150 persons. Octant
-scores are scores on eight scales placed 45° apart around the circle.
-The group-level displacement drifts from 350° to 10°, deliberately
-crossing the 0°/360° boundary. The group-level amplitude stays near 0.6
-throughout.</p>
+fit) from circumplex scale scores. Applied to a table with one row per
+person per wave, it yields exactly the tidy input that a mixed model
+wants.</p>
+<p>The package ships a simulated data set,
+<code>simulated_growth</code>, with five waves (0 to 4) of octant scores
+for 150 persons. Octant scores are scores on eight scales placed 45°
+apart around the circle. The data frame has one row per person per wave,
+with columns <code>person</code>, <code>wave</code> and the eight
+<code><a href="../reference/PANO.html">PANO()</a></code> scales. The group-level displacement drifts from
+350° to 10°, deliberately crossing the 0°/360° boundary. The group-level
+amplitude stays near 0.6 throughout. <code><a href="../reference/simulated_growth.html">?simulated_growth</a></code>
+states how the data were simulated.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">150</span></span>
-<span><span class="va">waves</span> <span class="op">&lt;-</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span></span>
-<span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span></span>
-<span></span>
-<span><span class="co"># Group trajectory: (x, y) linear between 0.6*(cos, sin)(350 deg) and</span></span>
-<span><span class="co"># 0.6*(cos, sin)(10 deg); elevation constant at 0.5</span></span>
-<span><span class="va">xy_start</span> <span class="op">&lt;-</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fl">350</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">350</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">xy_end</span> <span class="op">&lt;-</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fl">10</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">10</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">x_t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">xy_start</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">xy_end</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">waves</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">y_t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">xy_start</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">xy_end</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">waves</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Person effects: elevation shifts and profile tilts, stable across waves</span></span>
-<span><span class="va">u_e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.30</span><span class="op">)</span></span>
-<span><span class="va">v_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span></span>
-<span><span class="va">v_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">coord</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">waves</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="op">(</span><span class="va">x_t</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">+</span> <span class="va">v_x</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="va">y_t</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">+</span> <span class="va">v_y</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
-<span>  <span class="va">scores</span> <span class="op">&lt;-</span> <span class="va">mu</span> <span class="op">+</span> <span class="va">u_e</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fl">0.40</span><span class="op">)</span>, <span class="va">n</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>person <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">id</span>, wave <span class="op">=</span> <span class="va">waves</span><span class="op">[</span><span class="va">k</span><span class="op">]</span>,</span>
-<span>             e <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">Elev</span>, x <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">Xval</span>, y <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">Yval</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_growth"</span><span class="op">)</span></span>
+<span><span class="va">coord</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="va">simulated_growth</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">coord</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="va">simulated_growth</span><span class="op">$</span><span class="va">person</span></span>
+<span><span class="va">coord</span><span class="op">$</span><span class="va">wave</span> <span class="op">&lt;-</span> <span class="va">simulated_growth</span><span class="op">$</span><span class="va">wave</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">coord</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   person wave         e         x          y</span></span>
-<span><span class="co">#&gt; 1      1    0 0.4595363 0.5697631 -0.1920113</span></span>
-<span><span class="co">#&gt; 2      2    0 0.8644617 0.9896316  0.2426116</span></span>
-<span><span class="co">#&gt; 3      3    0 0.5354376 0.6640467 -0.2164674</span></span></code></pre></div>
+<span><span class="co">#&gt;   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp       Fit</span></span>
+<span><span class="co">#&gt; 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608 0.5912013</span></span>
+<span><span class="co">#&gt; 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459 0.7171530</span></span>
+<span><span class="co">#&gt; 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495 0.8516460</span></span>
+<span><span class="co">#&gt;   person wave</span></span>
+<span><span class="co">#&gt; 1      1    0</span></span>
+<span><span class="co">#&gt; 2      2    0</span></span>
+<span><span class="co">#&gt; 3      3    0</span></span></code></pre></div>
+<p>With no <code>id</code> argument, <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>
+treats each row as its own profile. So <code>coord</code> has one row
+per person per wave, and its <code>id</code> column is the row number.
+The two assignments copy each row’s person and wave onto it. (Passing
+<code>id = "person"</code> would instead average each person’s waves
+into one profile, which is not what a growth model needs.)</p>
 </div>
 <div class="section level2">
 <h2 id="one-joint-model-not-three-separate-ones">3. One joint model, not three separate ones<a class="anchor" aria-label="anchor" href="#one-joint-model-not-three-separate-ones"></a>
@@ -197,14 +192,15 @@ each row holds. Give each outcome its own intercept and slope. The
 person-level random effects are each person’s own deviations from the
 group intercepts. Let them be <strong>correlated across
 outcomes</strong>.</p>
+<p>The stacked data frame is <code>long</code>, with one row per person,
+wave and coordinate. Its columns are <code>person</code> (a factor),
+<code>wave</code>, <code>dv</code> (a factor with levels <code>e</code>,
+<code>x</code> and <code>y</code>) and <code>value</code>. The
+<code>value</code> of <code>e</code>, <code>x</code> and <code>y</code>
+comes from the <code>Elev</code>, <code>Xval</code> and
+<code>Yval</code> columns of <code>coord</code>. (The reshaping code is
+omitted.)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span><span class="va">coord</span>, direction <span class="op">=</span> <span class="st">"long"</span>,</span>
-<span>                varying <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span>, v.names <span class="op">=</span> <span class="st">"value"</span>,</span>
-<span>                timevar <span class="op">=</span> <span class="st">"dv"</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span>,</span>
-<span>                idvar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person"</span>, <span class="st">"wave"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">long</span><span class="op">$</span><span class="va">dv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">long</span><span class="op">$</span><span class="va">dv</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">long</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">long</span><span class="op">$</span><span class="va">person</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">value</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">+</span> <span class="va">dv</span><span class="op">:</span><span class="va">wave</span> <span class="op">+</span> <span class="fu">us</span><span class="op">(</span><span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">|</span> <span class="va">person</span><span class="op">)</span>,</span>
 <span>  dispformula <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span>,</span>
@@ -275,60 +271,58 @@ draw’s coordinates at that wave. Third, hand the per-wave draws to
 <code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>. It applies the package’s circular-statistics
 machinery (medians and circular means, equal-tailed intervals with
 correct wrapping at the boundary).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fe</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
-<span><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># MVN draws of the coefficient vector (eigen root, robust to tiny</span></span>
-<span><span class="co"># negative eigenvalues from floating point)</span></span>
-<span><span class="va">mvn_draw</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_draws</span>, <span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">eig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eigen.html" class="external-link">eigen</a></span><span class="op">(</span><span class="va">sigma</span>, symmetric <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="va">root</span> <span class="op">&lt;-</span> <span class="va">eig</span><span class="op">$</span><span class="va">vectors</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="va">eig</span><span class="op">$</span><span class="va">values</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">eig</span><span class="op">$</span><span class="va">vectors</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sweep.html" class="external-link">sweep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_draws</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n_draws</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">root</span>,</span>
-<span>        <span class="fl">2</span>, <span class="va">mu</span>, <span class="st">"+"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu">mvn_draw</span><span class="op">(</span><span class="fl">4000</span>, <span class="va">fe</span>, <span class="va">V</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fe</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">per_wave</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">waves</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">draws_t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
-<span>    e <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
-<span>    x <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="va">draws_t</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">trajectory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  wave <span class="op">=</span> <span class="va">waves</span>,</span>
-<span>  a_est <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span><span class="op">)</span>,</span>
-<span>  a_lci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_lci</span><span class="op">)</span>,</span>
-<span>  a_uci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_uci</span><span class="op">)</span>,</span>
-<span>  d_est <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  d_lci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_lci</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  d_uci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_uci</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">details</span><span class="op">$</span><span class="va">certified</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">round_df</span> <span class="op">&lt;-</span> <span class="va">trajectory</span></span>
-<span><span class="va">round_df</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">round_df</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">v</span>, <span class="fl">2</span><span class="op">)</span> <span class="kw">else</span> <span class="va">v</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="va">round_df</span></span>
-<span><span class="co">#&gt;   wave a_est a_lci a_uci  d_est  d_lci  d_uci certified</span></span>
-<span><span class="co">#&gt; 1    0  0.62  0.58  0.66 350.37 347.01 353.71      TRUE</span></span>
-<span><span class="co">#&gt; 2    1  0.61  0.58  0.64 356.39 353.44 359.27      TRUE</span></span>
-<span><span class="co">#&gt; 3    2  0.61  0.58  0.64   2.51 359.69   5.34      TRUE</span></span>
-<span><span class="co">#&gt; 4    3  0.61  0.58  0.64   8.61   5.58  11.69      TRUE</span></span>
-<span><span class="co">#&gt; 5    4  0.62  0.59  0.66  14.53  11.21  17.97      TRUE</span></span></code></pre></div>
-<p>The displacement estimates hug the 0°/360° boundary by design. Values
-are near 350° at early waves and near 10° at late waves. The intervals
-wrap correctly rather than spanning “the long way around.”</p>
+<span><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span></span></code></pre></div>
+<p>The first step draws 4000 coefficient vectors from the multivariate
+normal distribution with mean <code>fe</code> and covariance matrix
+<code>V</code>. The draws are stored in the matrix <code>B</code>, with
+one row per draw and one column per fixed effect. Its columns carry the
+names of <code>fe</code>, such as <code>dvx</code> and
+<code>dvx:wave</code>. (The code that draws them is omitted.)</p>
+<p>The second and third steps, at wave 2, look like this. Each draw’s
+coordinate at wave 2 is its intercept plus 2 times its slope:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wave2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
+<span>  e <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
+<span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
+<span><span class="va">wave2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Posterior Summary:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                Estimate   Lower CrI   Upper CrI</span></span>
+<span><span class="co">#&gt; Elevation         0.524       0.475       0.573</span></span>
+<span><span class="co">#&gt; X-Value           0.607       0.576       0.638</span></span>
+<span><span class="co">#&gt; Y-Value           0.026      -0.005       0.055</span></span>
+<span><span class="co">#&gt; Amplitude         0.607       0.576       0.639</span></span>
+<span><span class="co">#&gt; Displacement      2.456     359.517       5.184</span></span>
+<span><span class="co">#&gt; Model Fit</span></span></code></pre></div>
+<p>The same call at each of the waves 0 to 4 gives one result per wave.
+The table <code>trajectory</code> collects them, with one row per wave.
+Its columns are <code>wave</code>, the six columns <code>a_est</code>,
+<code>a_lci</code>, <code>a_uci</code>, <code>d_est</code>,
+<code>d_lci</code> and <code>d_uci</code> from each result’s
+<code>$results</code>, and <code>certified</code> from its
+<code>$details</code>. (The loop that builds the table is omitted.)
+Rounded to two decimals, it reads:</p>
+<pre><code><span><span class="co">#&gt;   wave a_est a_lci a_uci  d_est  d_lci  d_uci certified</span></span>
+<span><span class="co">#&gt; 1    0  0.62  0.58  0.66 350.30 346.93 353.69      TRUE</span></span>
+<span><span class="co">#&gt; 2    1  0.61  0.58  0.64 356.33 353.24 359.28      TRUE</span></span>
+<span><span class="co">#&gt; 3    2  0.61  0.58  0.64   2.46 359.52   5.18      TRUE</span></span>
+<span><span class="co">#&gt; 4    3  0.61  0.58  0.64   8.55   5.48  11.48      TRUE</span></span>
+<span><span class="co">#&gt; 5    4  0.62  0.59  0.66  14.48  11.14  17.80      TRUE</span></span></code></pre>
+<p>The displacement estimates hug the 0°/360° boundary by design. The
+estimate is near 350° at wave 0, crosses 0° between waves 1 and 2, and
+reaches about 14° at wave 4. The intervals wrap correctly rather than
+spanning “the long way around.”</p>
 <p><code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> plots a table in this shape
 directly. The table has one row per time point, with
 <code>a_est</code>/<code>a_lci</code>/<code>a_uci</code>,
 <code>d_est</code>/<code>d_lci</code>/<code>d_uci</code>, and optionally
 <code>certified</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/growth-ssm-analysis-plot-1.png" alt="plot of chunk plot"></p>
 <p>The displacement panel is drawn on an <em>unwrapped</em> branch. An
@@ -379,31 +373,30 @@ where that fails: the group crosses near the origin mid-study (its
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
 coordinate changes sign while
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-stays near zero).</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">x_t2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">waves</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">coord2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">waves</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="op">(</span><span class="va">x_t2</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">+</span> <span class="va">v_x</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">0.02</span> <span class="op">+</span> <span class="va">v_y</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
-<span>  <span class="va">scores</span> <span class="op">&lt;-</span> <span class="va">mu</span> <span class="op">+</span> <span class="va">u_e</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fl">0.40</span><span class="op">)</span>, <span class="va">n</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>person <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">id</span>, wave <span class="op">=</span> <span class="va">waves</span><span class="op">[</span><span class="va">k</span><span class="op">]</span>,</span>
-<span>             e <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">Elev</span>, x <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">Xval</span>, y <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">Yval</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">long2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span><span class="va">coord2</span>, direction <span class="op">=</span> <span class="st">"long"</span>,</span>
-<span>                 varying <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span>, v.names <span class="op">=</span> <span class="st">"value"</span>,</span>
-<span>                 timevar <span class="op">=</span> <span class="st">"dv"</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span>,</span>
-<span>                 idvar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person"</span>, <span class="st">"wave"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">long2</span><span class="op">$</span><span class="va">dv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">long2</span><span class="op">$</span><span class="va">dv</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">long2</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">long2</span><span class="op">$</span><span class="va">person</span><span class="op">)</span></span>
-<span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
+stays near zero). The package ships these data too, as
+<code>simulated_growth_origin</code>. It has the same persons, waves and
+columns as <code>simulated_growth</code>, and
+<code><a href="../reference/simulated_growth.html">?simulated_growth</a></code> describes both. We compute its
+coordinates the same way:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_growth_origin"</span><span class="op">)</span></span>
+<span><span class="va">coord2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="va">simulated_growth_origin</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">coord2</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="va">simulated_growth_origin</span><span class="op">$</span><span class="va">person</span></span>
+<span><span class="va">coord2</span><span class="op">$</span><span class="va">wave</span> <span class="op">&lt;-</span> <span class="va">simulated_growth_origin</span><span class="op">$</span><span class="va">wave</span></span></code></pre></div>
+<p>As before, <code>coord2</code> is stacked into <code>long2</code>,
+with the same four columns as <code>long</code>. (The reshaping code is
+omitted.) The model is the same:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">value</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">+</span> <span class="va">dv</span><span class="op">:</span><span class="va">wave</span> <span class="op">+</span> <span class="fu">us</span><span class="op">(</span><span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">|</span> <span class="va">person</span><span class="op">)</span>,</span>
 <span>  dispformula <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span>, data <span class="op">=</span> <span class="va">long2</span>, REML <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">fe2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
-<span><span class="va">B2</span> <span class="op">&lt;-</span> <span class="fu">mvn_draw</span><span class="op">(</span><span class="fl">4000</span>, <span class="va">fe2</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">B2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fe2</span><span class="op">)</span></span>
-<span><span class="va">mid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
+<span><span class="va">fe2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span></code></pre></div>
+<p>Its 4000 coefficient draws are stored in <code>B2</code>, drawn the
+same way as <code>B</code>. (That code is omitted.) The summary at wave
+2 is:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>  e <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
@@ -413,11 +406,11 @@ stays near zero).</p>
 <span><span class="co">#&gt; # Posterior Summary:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CrI   Upper CrI</span></span>
-<span><span class="co">#&gt; Elevation         0.516       0.468       0.565</span></span>
-<span><span class="co">#&gt; X-Value           0.001      -0.030       0.031</span></span>
-<span><span class="co">#&gt; Y-Value           0.023      -0.005       0.051</span></span>
-<span><span class="co">#&gt; Amplitude         0.028       0.006       0.055</span></span>
-<span><span class="co">#&gt; Displacement     87.741     356.372     178.957</span></span>
+<span><span class="co">#&gt; Elevation         0.512       0.463       0.562</span></span>
+<span><span class="co">#&gt; X-Value           0.003      -0.026       0.033</span></span>
+<span><span class="co">#&gt; Y-Value           0.017      -0.011       0.044</span></span>
+<span><span class="co">#&gt; Amplitude         0.023       0.005       0.049</span></span>
+<span><span class="co">#&gt; Displacement     80.714     322.335     214.098</span></span>
 <span><span class="co">#&gt; Model Fit                                      </span></span>
 <span><span class="co">#&gt;   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the displacement is not interpretable.</span></span></code></pre></div>
 <p>The printed note is the certification rule firing. At this wave, the
@@ -429,26 +422,10 @@ Meanwhile, the waves far from the origin remain certified, and their
 intervals keep their nominal coverage.</p>
 <p>Assembling this fit’s full trajectory the same way, and carrying the
 <code>certified</code> verdict into the table, lets the plot mark the
-verdict itself:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">per_wave2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">waves</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
-<span>    e <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
-<span>    x <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
-<span>  <span class="op">)</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="va">trajectory2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  wave <span class="op">=</span> <span class="va">waves</span>,</span>
-<span>  a_est <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span><span class="op">)</span>,</span>
-<span>  a_lci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_lci</span><span class="op">)</span>,</span>
-<span>  a_uci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_uci</span><span class="op">)</span>,</span>
-<span>  d_est <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  d_lci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_lci</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  d_uci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_uci</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">details</span><span class="op">$</span><span class="va">certified</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
+verdict itself. The table <code>trajectory2</code> has the same columns
+as <code>trajectory</code>. (The loop that builds it is omitted.)</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"></p>
 <p>Uncertified waves are drawn as <strong>hollow</strong> points on the
 displacement panel. Read them as gaps in the argument, not as estimates
@@ -490,7 +467,7 @@ intervals.</p>
 displacement at each wave. <strong>Unwrap</strong> each person’s
 sequence onto a continuous branch. Then fit an ordinary univariate
 growth model to the unwrapped angles.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One person's displacement over five waves, drifting across the boundary</span></span>
 <span><span class="va">d_person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">350</span>, <span class="fl">355</span>, <span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/angle_unwrap.html">angle_unwrap</a></span><span class="op">(</span><span class="va">d_person</span><span class="op">)</span></span>

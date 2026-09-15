@@ -541,25 +541,9 @@ secondary consideration.
 Before choosing, it is worth knowing what these reference samples
 generally are.
 
-``` r
-
-inst <- Filter(
-  function(x) inherits(x, "circumplex_instrument"),
-  mget(
-    utils::data(package = "circumplex")$results[, "Item"],
-    envir = as.environment("package:circumplex"),
-    ifnotfound = list(NULL)
-  )
-)
-samples <- do.call(rbind, lapply(inst, function(x) x$Norms[[2]]))
-
-n_instruments <- length(inst)
-n_samples <- nrow(samples)
-n_college <- sum(grepl("college|undergraduate", samples$Population))
-n_small <- sum(samples$Size < 300)
-n_standardization <- sum(samples$Kind == "standardization")
-n_unsourced <- sum(samples$Kind == "unsourced")
-```
+The counts below come from the sample descriptions in the `Norms`
+element of every instrument object the package ships. (The code that
+gathers and counts them is omitted.)
 
 The package ships 23 reference samples across 15 instruments. 10 of them
 describe college or undergraduate students, and 6 have fewer than 300

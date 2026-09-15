@@ -260,10 +260,7 @@ latent-plot](figures/sem-based-ssm-analysis-latent-plot-1.png)
 
 ``` r
 
-knitr::kable(
-  ssm_table(latent, render = FALSE),
-  caption = "Latent SSM profile of NARPD"
-)
+ssm_table(latent)
 ```
 
 | Profile | Elevation | X.Value | Y.Value | Amplitude | Displacement | Fit |
