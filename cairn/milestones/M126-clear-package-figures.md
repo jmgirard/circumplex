@@ -105,3 +105,4 @@ Fix-now evidence:
 - F4: both vignette passages now name the data-aware axis, identically in `.Rmd.orig` and `.Rmd`.
 - F7: the jz2017 test asserts "PA (inestimable interval)", and a new test asserts "DE (full-circle angle interval)" with 6 wedges and 8 points.
 - F8: the both-zero test moves LM's angle estimate to 20, so the midpoint check fails for a cap centred on the point.
+- Re-verification after the fixes (commit c8878ded): `devtools::test()` FAIL 0, WARN 9, SKIP 1, PASS 9435, with the same warning and skip sites as master. `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. `document()` gave 0 `resolve link` lines.
