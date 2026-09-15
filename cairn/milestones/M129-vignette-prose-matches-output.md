@@ -1,6 +1,6 @@
 # M129: Vignette prose matches the package's code and printed output
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M127, M128
 - **Driving RR:** —
@@ -41,7 +41,7 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 - [x] T2: Make the SEM latent table text smaller with non-breaking spaces or an inline style in its hidden `kable()` chunk, and add `drop_xy = TRUE` if that fits the prose. Build the article with pkgdown and view it at 1280 px.
 - [x] T3: Fix doc claims (ii) to (v), checking each against its `R/` file, and re-read each corrected sentence against the code (plain-vignettes rule 9). Keep the phrases that `tests/testthat/test-cpm_boundary_vignette.R` matches.
 - [x] T4: Re-knit every precomputed vignette and build the two knit-at-build articles. List each sentence AC2 selects with the output line it names, in the work log. Update the prose that no longer matches, and run AC4's search.
-- [ ] T5: Run `tools/prose-sweep.R`, `tools/check-vignette-staleness.R`, `devtools::test()` and `devtools::check(args = "--no-manual")`. Add a NEWS.md documentation entry.
+- [x] T5: Run `tools/prose-sweep.R`, `tools/check-vignette-staleness.R`, `devtools::test()` and `devtools::check(args = "--no-manual")`. Add a NEWS.md documentation entry.
 
 ## Work log
 
@@ -57,5 +57,6 @@ Four known wrong vignette claims are corrected, the SEM results tables fit on on
 - 2026-09-15: T5 tests. `devtools::test()` gives FAIL 0, WARN 9, SKIP 1, PASS 9512. The warnings come from `test-ci_accuracy.R`, `test-pole-values.R` and `test-ssm_sem.R`, which read no vignette, and the branch leaves `R/` and `tests/` identical to master. `test-cpm_boundary_vignette.R` with `NOT_CRAN=true` passes 43 expectations after the T4 edits. The staleness check exits 0 on all 7 vignettes after the T4 commit.
 - 2026-09-15: claim audit: 27 claims read, 3 corrected — NEWS.md, vignettes/evaluating-circumplex-structure.Rmd.orig
 - 2026-09-15: the fresh [O] reader found the `cpm_fit()` angle claim imprecise in the vignette and NEWS (one reference angle stays fixed) and "no more often than the benchmark" imprecise (the caution rule reads the interval's lower bound). Its one re-read cleared all 3. The split sentence passes prose-sweep.
+- 2026-09-15: T5: `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings, 0 notes (Status: OK). Its tarball was built at 72acdfcf, before the prose-only audit corrections in 4d705fa3, which change no code or chunk. prose-sweep exits 0 on the three touched sources. The `vignette-precompute` CI job runs on the PR at review. Status set to review.
 
 ## Decisions
