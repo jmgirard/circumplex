@@ -2094,3 +2094,34 @@ R CMD check reports it if the data size draws a note.
 
 **Reopens.** A CRAN note or request about the size of `data/`, or a move of
 the teaching vignettes into an ebook that no longer needs the datasets.
+
+### D-059 (2026-09-15): out of the ΔCFI scope, print() no longer shows the dcfi column or its not-validated note; narrows D-027 part (3), D-028's printed-reason consequence and D-056 for this caution (M130 plan gate)
+
+**Context.** D-027 part (3) says that outside the envelope Cheung and Rensvold
+simulated, the `dcfi` value prints with a not-validated note and no verdict.
+D-028 made that note name the reason. The default estimator is MLR, which
+reports a robust CFI, so a default fit is always out of scope. The maintainer
+read the printed note and could not tell what to take from it. It shows a
+number and then a paragraph that says not to judge it. D-056 lets a printed
+report change its layout without a deprecation cycle, but a removed caution
+needs its own gate. This entry is that gate.
+
+**Decision.** `print()` of a grouped `ssm_sem()` result shows the `dcfi` and
+`cr` columns and a short ΔCFI note only when the fit is in scope (two groups,
+ML estimation, plain CFI). Out of scope, no `dcfi` column and no ΔCFI text
+print. The values stay in `res$invariance$table$dcfi`, and the reason stays in
+`res$invariance$dcfi_scope`. `?ssm_sem` and the SEM vignette say where to find
+them. D-027 parts (1) and (2) stand. The refusal to label a value outside the
+envelope stands, and hiding the value makes that refusal stronger. D-028's
+three-part scope test stands.
+
+**Rejected.** A short note in every case was rejected. Under the default
+estimator it would print on almost every fit and still say only that the
+number is not to be judged.
+
+**Consequences.** M130 changes `print.circumplex_ssm_sem()`, `?ssm_sem`, the
+SEM vignette and NEWS.md under this entry. The returned object does not change.
+
+**Reopens.** A user report that needs the out-of-scope `dcfi` value in the
+printed output, or a report of a reader who applied the .01 rule to a robust
+CFI taken from the returned table.
