@@ -84,6 +84,20 @@
   carry no em dashes or semicolons. Each now links the introduction vignette
   near its start. Their code and its output did not change.
 
+* Four statements in two vignettes now match what the package does. In
+  "SEM-Based SSM Analysis", the plane factors are fixed isotropic and
+  orthogonal only under the default scaled tier. The strict tier frees the
+  factor variances and covariances. In "Evaluating Circumplex Structure",
+  `print()` shows an uncertified displacement and its interval with a note
+  that the displacement is not interpretable. It does not withhold them. The
+  `fit_structure()` label is "not clearly supported" in `print()` and
+  "unsupported" in `summary()`, not "weak". And the default `cpm_fit()` model
+  estimates the scale angles instead of fixing them at their theoretical
+  values.
+
+* The latent profile table in "SEM-Based SSM Analysis" now leaves out the X
+  and Y values, and keeps each estimate and its interval on one line.
+
 # circumplex 2.0.1
 
 ## Minor improvements and fixes
