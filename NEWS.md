@@ -1,5 +1,14 @@
 # circumplex (development version)
 
+## New features
+
+* The package has three new simulated datasets. `simulated_occasions` holds
+  octant scores for 200 persons at three waves. `simulated_growth` and
+  `simulated_growth_origin` hold octant scores for 150 persons at five waves.
+  Their help pages state how the data were simulated. The "Advanced Circumplex
+  Visualization" and "Growth Models on SSM Parameters" vignettes load them with
+  `data()`.
+
 ## Minor improvements and fixes
 
 * `summary()` for an `ssm_ci_accuracy()` result is about half as long. The
