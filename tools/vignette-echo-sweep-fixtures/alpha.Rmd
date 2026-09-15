@@ -1,0 +1,7 @@
+---
+title: "Fixture: rendered page beside its .Rmd.orig, so it is not a source"
+---
+
+```r
+rendered_only <- lapply(1:3, identity)
+```

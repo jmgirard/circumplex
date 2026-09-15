@@ -1,0 +1,100 @@
+---
+title: "Fixture: hidden and echoed forms"
+---
+
+Prose is never searched: lapply( rnorm( data.frame( stay silent here.
+
+```{r, include = FALSE}
+hidden_include <- lapply(1:3, identity)
+```
+
+```{r hide-echo, echo = FALSE}
+hidden_echo <- sapply(1:3, identity)
+```
+
+```{r hide-echo-f, echo=F, fig.width = 5}
+hidden_echo_f <- vapply(1:3, identity, numeric(1))
+```
+
+```{r hide-pipe}
+#| echo: false
+hidden_pipe <- rnorm(3)
+```
+
+```{r hide-include-tight, include=FALSE}
+hidden_include_tight <- runif(3)
+```
+
+```{r shown-plain}
+a1 <- lapply(1:3, identity)
+a2 <- sapply(1:3, identity)
+a3 <- vapply(1:3, identity, numeric(1))
+a4 <- mapply(sum, 1:3, 4:6)
+a5 <- Map(sum, 1:3, 4:6)
+a6 <- do.call(sum, list(1, 2))
+a7 <- Filter(isTRUE, list(TRUE))
+a8 <- Reduce(`+`, 1:3)
+a9 <- apply(matrix(1:4, 2), 1, sum)
+a10 <- tapply(1:4, c(1, 1, 2, 2), sum)
+stopifnot(TRUE)
+if (FALSE) stop("never")
+identical(1, 1)
+all.equal(1, 1)
+knitr::kable(head(mtcars))
+b1 <- rnorm(2)
+b2 <- runif(2)
+b3 <- rbinom(2, 1, 0.5)
+b4 <- rpois(2, 1)
+b5 <- rexp(2)
+b6 <- rgamma(2, 1)
+b7 <- rbeta(2, 1, 1)
+b8 <- rchisq(2, 1)
+b9 <- rt(2, 1)
+b10 <- sample(1:3)
+b11 <- MASS::mvrnorm(2, 0, 1)
+f1 <- function(x) x
+f2 <- function (x) x
+f3 <- \(x) x
+for (i in 1:2) i
+for(i in 1:2) i
+r1 <- rbind(1, 2)
+r2 <- reshape(Indometh, direction = "wide", idvar = "Subject", timevar = "time")
+r3 <- subset(mtcars, cyl == 4)
+r4 <- data.frame(x = 1)
+rownames(r4) <- "one"
+r5 <- readRDS("x.rds")
+```
+
+The next chunk holds calls that must stay silent.
+
+```{r shown-silent}
+s1 <- sort(c(3, 1, 2))
+s2 <- my_rnorm(2)
+s3 <- x.rnorm(2)
+s4 <- start(ts(1:3))
+s5 <- cbind(1, 2)
+s6 <- head(mtcars)
+```
+
+```r
+ssm_table(results)
+plain_r <- lapply(1:2, identity)
+```
+
+~~~{r tilde}
+tilde_r <- rnorm(2)
+~~~
+
+```{r not-run, eval = FALSE}
+not_run <- data.frame(y = 2)
+```
+
+````{r long-fence}
+long_fence <- sample(1:4)
+```
+still_inside <- rbind(1)
+````
+
+```
+bare_fence <- subset(mtcars, am == 1)
+```
