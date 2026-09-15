@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,11 +56,29 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.0.1/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/jmgirard/circumplex/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.0.1" id="circumplex-201">circumplex 2.0.1<a class="anchor" aria-label="anchor" href="#circumplex-201"></a></h2>
+<h2 class="pkg-version" data-toc-text="development version" id="circumplex-development-version">circumplex (development version)<a class="anchor" aria-label="anchor" href="#circumplex-development-version"></a></h2>
+<div class="section level3">
+<h3 id="minor-improvements-and-fixes-development-version">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-development-version"></a></h3>
+<ul><li><p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for an <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> result is about half as long. The settings print as three short sentences, usually on three lines. The coverage and guardrail tables are replaced by one table with a row for each profile and amplitude condition. That table shows the coverage of each parameter, the displacement coverage when certified, the certification rate and the <code>Structural</code> flag. The other columns are no longer printed, but they are still in the <code>coverage</code> and <code>guardrail</code> elements of the result. The verdicts and cautions say the same things. Only their punctuation and a few joining words change (see the entry on dashes below).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> for a multi-group <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> result wraps the notes and verdict of the invariance ladder to the console width. The ΔCFI note and the text shown when the groups cannot be compared are shorter and name the same conditions. A verdict that already ends in a period no longer gets a second one.</p></li>
+<li><p>The printed output of <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>, <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> and <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> results, and the refusal warning of <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> for nearly collinear items, no longer use <code>--</code> as a dash. For example, a verdict now reads <code>Verdict: CAUTION. Amplitude CIs ...</code> and a coverage line reads <code>coverage 96.7%: borderline</code>.</p></li>
+<li><p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> result now draws a confidence interval of zero width as a visible line. Before, a zero-width angle interval was not drawn at all. A zero-width angle interval is now drawn as a line along the radius. A zero-width communality interval is drawn as a line along the arc. When both widths are zero, a short cap is drawn across the interval. The cap has the same length at every radius except near the centre, where it is shorter. The reference scale, whose angle is fixed, now shows its communality interval this way.</p></li>
+<li><p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> result now warns about a scale whose communality interval is 0 at both ends, and draws that scale as a point. The warning for a scale drawn without its interval now names the reason for each scale.</p></li>
+<li><p><code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> result now draw the amplitude (or communality) axis in the widest gap between spokes that holds no plotted point, so that the axis labels do not cover a point. When every gap holds a point, the axis goes in the widest gap, as before, and a label can still cover a point.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<ul><li><p>The <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> help page now describes correctly where each confidence bound is drawn on the displacement panel. The lower bound sits below the estimate by the counterclockwise angle from the lower bound to the estimate, and the upper bound sits above the lower bound by the interval’s counterclockwise width. The plot itself did not change.</p></li>
+<li><p>In the “Advanced Circumplex Visualization” vignette, the three panels of the occasions trajectory figure are no longer tall and narrow, and the axis labels of the two circle figures of the occasions no longer cover a point. The first of those circle figures now labels its spokes with the octant abbreviations (PA to NO) instead of degrees.</p></li>
+<li><p>Six vignettes now use plain English: “Bayesian SSM Analysis”, “Growth Models on SSM Parameters”, “Advanced Circumplex Visualization”, “Axes Reliability”, “SEM-Based SSM Analysis” and “Evaluating Circumplex Structure”. Their sentences are shorter and carry no em dashes or semicolons. Each now links the introduction vignette near its start. Their code and its output did not change.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.1" id="circumplex-201">circumplex 2.0.1<a class="anchor" aria-label="anchor" href="#circumplex-201"></a></h2><p class="text-muted">CRAN release: 2026-09-06</p>
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-2-0-1">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-2-0-1"></a></h3>
 <ul><li><p>The package’s tests now pass on CRAN’s macOS x86_64 flavors. The check of <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code>’s single-group output against a stored copy compared cosine and sine loadings printed at 17 significant digits, and that platform’s math library rounds one of them a single unit in the last place differently. The comparison now ignores differences beyond 12 significant digits and nothing else. <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code>’s output is unchanged.</p></li>
@@ -70,7 +88,7 @@
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.0.0" id="circumplex-200">circumplex 2.0.0<a class="anchor" aria-label="anchor" href="#circumplex-200"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.0.0" id="circumplex-200">circumplex 2.0.0<a class="anchor" aria-label="anchor" href="#circumplex-200"></a></h2><p class="text-muted">CRAN release: 2026-09-02</p>
 <p>This is a major release. Its flagship addition is <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>, a native reimplementation of Browne’s (1992) circular stochastic process model for the correlational structure of circumplex scales — filling the gap left by the archived CircE package, the previous R implementation. Alongside it come four other new analysis families: latent-variable SSM analysis with <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code>, repeated-measures (longitudinal) SSM analysis, <code><a href="../reference/fit_structure.html">fit_structure()</a></code> for exploratory circumplex-structure tests, <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> for the reliability of the circumplex axes (Strack et al., 2013), and <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>, a diagnostic for whether an <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> result’s confidence intervals can be trusted at your sample size and profile (Zimmermann &amp; Wright, 2017). The plotting layer has been rebuilt on a real ggplot2 coordinate system.</p>
 <div class="section level3">
 <h3 id="breaking-changes-and-changed-behavior-2-0-0">Breaking changes and changed behavior<a class="anchor" aria-label="anchor" href="#breaking-changes-and-changed-behavior-2-0-0"></a></h3>

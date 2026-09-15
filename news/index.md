@@ -1,6 +1,89 @@
 # Changelog
 
+## circumplex (development version)
+
+### Minor improvements and fixes
+
+- [`summary()`](https://rdrr.io/r/base/summary.html) for an
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
+  result is about half as long. The settings print as three short
+  sentences, usually on three lines. The coverage and guardrail tables
+  are replaced by one table with a row for each profile and amplitude
+  condition. That table shows the coverage of each parameter, the
+  displacement coverage when certified, the certification rate and the
+  `Structural` flag. The other columns are no longer printed, but they
+  are still in the `coverage` and `guardrail` elements of the result.
+  The verdicts and cautions say the same things. Only their punctuation
+  and a few joining words change (see the entry on dashes below).
+
+- [`print()`](https://rdrr.io/r/base/print.html) for a multi-group
+  [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
+  result wraps the notes and verdict of the invariance ladder to the
+  console width. The ΔCFI note and the text shown when the groups cannot
+  be compared are shorter and name the same conditions. A verdict that
+  already ends in a period no longer gets a second one.
+
+- The printed output of
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md),
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  and [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
+  results, and the refusal warning of
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  for nearly collinear items, no longer use `--` as a dash. For example,
+  a verdict now reads `Verdict: CAUTION. Amplitude CIs ...` and a
+  coverage line reads `coverage 96.7%: borderline`.
+
+- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  result now draws a confidence interval of zero width as a visible
+  line. Before, a zero-width angle interval was not drawn at all. A
+  zero-width angle interval is now drawn as a line along the radius. A
+  zero-width communality interval is drawn as a line along the arc. When
+  both widths are zero, a short cap is drawn across the interval. The
+  cap has the same length at every radius except near the centre, where
+  it is shorter. The reference scale, whose angle is fixed, now shows
+  its communality interval this way.
+
+- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  result now warns about a scale whose communality interval is 0 at both
+  ends, and draws that scale as a point. The warning for a scale drawn
+  without its interval now names the reason for each scale.
+
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md)
+  and [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  result now draw the amplitude (or communality) axis in the widest gap
+  between spokes that holds no plotted point, so that the axis labels do
+  not cover a point. When every gap holds a point, the axis goes in the
+  widest gap, as before, and a label can still cover a point.
+
+### Documentation
+
+- The
+  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
+  help page now describes correctly where each confidence bound is drawn
+  on the displacement panel. The lower bound sits below the estimate by
+  the counterclockwise angle from the lower bound to the estimate, and
+  the upper bound sits above the lower bound by the interval’s
+  counterclockwise width. The plot itself did not change.
+
+- In the “Advanced Circumplex Visualization” vignette, the three panels
+  of the occasions trajectory figure are no longer tall and narrow, and
+  the axis labels of the two circle figures of the occasions no longer
+  cover a point. The first of those circle figures now labels its spokes
+  with the octant abbreviations (PA to NO) instead of degrees.
+
+- Six vignettes now use plain English: “Bayesian SSM Analysis”, “Growth
+  Models on SSM Parameters”, “Advanced Circumplex Visualization”, “Axes
+  Reliability”, “SEM-Based SSM Analysis” and “Evaluating Circumplex
+  Structure”. Their sentences are shorter and carry no em dashes or
+  semicolons. Each now links the introduction vignette near its start.
+  Their code and its output did not change.
+
 ## circumplex 2.0.1
+
+CRAN release: 2026-09-06
 
 ### Minor improvements and fixes
 
@@ -47,6 +130,8 @@
   they looked soft on high-resolution screens.
 
 ## circumplex 2.0.0
+
+CRAN release: 2026-09-02
 
 This is a major release. Its flagship addition is
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md), a

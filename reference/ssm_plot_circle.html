@@ -11,7 +11,7 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Create a Circular Plot of SSM Results</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.0.1/R/ssm_plot.R" class="external-link"><code>R/ssm_plot.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/ssm_plot.R" class="external-link"><code>R/ssm_plot.R</code></a></small>
       <div class="d-none name"><code>ssm_plot_circle.Rd</code></div>
     </div>
 
@@ -165,6 +165,14 @@ through. See <code><a href="geom_ssm_path.html">geom_ssm_path()</a></code> for t
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A ggplot variable containing a completed circular plot.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The amplitude axis and its labels are drawn along the midpoint of the widest
+gap between displacement spokes that holds no plotted point estimate (ties go
+to the smallest midpoint; a point on a spoke counts as in both gaps next to
+it). When every gap holds a point, the axis goes in the widest gap, as
+<code><a href="coord_circumplex.html">coord_circumplex()</a></code> places it by default.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

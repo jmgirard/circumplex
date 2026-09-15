@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>SEM-Based SSM Analysis</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.0.1/vignettes/sem-based-ssm-analysis.Rmd" class="external-link"><code>vignettes/sem-based-ssm-analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/sem-based-ssm-analysis.Rmd" class="external-link"><code>vignettes/sem-based-ssm-analysis.Rmd</code></a></small>
       <div class="d-none name"><code>sem-based-ssm-analysis.Rmd</code></div>
     </div>
 
@@ -96,58 +96,63 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
-<p>The other vignettes model <em>observed</em> circumplex scores: the
-mean profile of a group, or the profile of correlations between the
-circumplex scales and an external measure. This vignette introduces a
-<strong>latent</strong> counterpart, built on a structural equation
-model (SEM) of the circumplex scales, and exposed through
-<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> and its helpers. It teaches two products — the
-latent profile of a measure and the invariance-gated latent contrast
-between groups — how their confidence intervals are constructed, and the
-assumptions that make them interpretable.</p>
-<p>The latent-level Structural Summary Method appears to be new: a
+<p>The other vignettes model <em>observed</em> circumplex scores. These
+are the mean profile of a group, or the profile of correlations between
+the circumplex scales and an external measure. This vignette introduces
+a <strong>latent</strong> (not directly observed) counterpart, built on
+a structural equation model (SEM) of the circumplex scales.
+<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> and its helpers expose it. The vignette teaches
+two products: the latent profile of a measure, and the invariance-gated
+latent contrast between groups (Section 7 explains invariance). It shows
+how their confidence intervals are constructed, and the assumptions that
+make them interpretable.</p>
+<p>The latent-level Structural Summary Method appears to be new. A
 search of the SEM–circumplex literature (2019 onward) found related work
 on the latent structure of circumplex <em>scales</em> (e.g., Wendt et
-al., 2019) and on inference for disattenuated correlations (Moss, 2026),
-but no prior work applying the SSM decomposition — elevation, amplitude,
-displacement, and fit — to a measure’s <em>latent</em> profile with
-circular-aware intervals. Treat this layer as a research tool whose
-assumptions you should understand before relying on it.</p>
+al., 2019). It also found work on inference for disattenuated
+correlations, which are correlations corrected for measurement error
+(Moss, 2026). But it found no prior work applying the SSM decomposition
+(elevation, amplitude, displacement, and fit) to a measure’s
+<em>latent</em> profile with circular-aware intervals.
+<code><a href="../articles/introduction-to-ssm-analysis.html">vignette("introduction-to-ssm-analysis")</a></code> defines these four
+parameters. Treat this layer as a research tool whose assumptions you
+should understand before relying on it.</p>
 <div class="section level2">
 <h2 id="why-a-latent-ssm">1. Why a latent SSM?<a class="anchor" aria-label="anchor" href="#why-a-latent-ssm"></a>
 </h2>
 <p>An observed correlation profile is <em>attenuated</em> by measurement
-error: because each circumplex scale is imperfectly reliable, the
+error. Each circumplex scale is imperfectly reliable, so the
 correlations between the scales and an external measure are pulled
-toward zero, and — because the scales are not equally reliable — pulled
-toward zero by <em>different amounts</em>. The observed SSM parameters
-inherit both effects. Amplitude is deflated by the average
-unreliability, and displacement is rotated by the <em>heterogeneity</em>
-of reliability around the circle.</p>
-<p>The latent SSM estimates the profile the measure would show against
-the <strong>latent circumplex content</strong> of the scales — the
-disattenuated analog of the observed correlation profile (Zimmermann
-&amp; Wright, 2017, defined the observed version; this is its latent
-counterpart). It fits a measurement model in which each scale loads on
-latent factors placed at that scale’s <em>fixed theoretical angle</em>,
-then reads the measure’s correlations with the common circumplex content
-and summarizes them with the usual SSM transform.</p>
+toward zero. The scales are not equally reliable, so the correlations
+are pulled toward zero by <em>different amounts</em>. The observed SSM
+parameters inherit both effects. Amplitude is deflated by the average
+unreliability. Displacement is rotated by the <em>heterogeneity</em> of
+reliability around the circle.</p>
+<p>The latent SSM estimates the profile that the measure would show
+against the <strong>latent circumplex content</strong> of the scales.
+This profile is the disattenuated analog of the observed correlation
+profile. Zimmermann and Wright (2017) defined the observed version, and
+this is its latent counterpart. The latent SSM fits a measurement model
+in which each scale loads on latent factors placed at that scale’s
+<em>fixed theoretical angle</em>. It then reads the measure’s
+correlations with the common circumplex content, and it summarizes them
+with the usual SSM transform.</p>
 <p>Two consequences are worth stating up front, because they shape
 everything below:</p>
 <ul>
 <li>The latent profile is <strong>model-conditional</strong>. Every
 latent parameter is conditional on the fixed-angle measurement model
 being an adequate description of the data. A poorly fitting model does
-not make the latent parameters merely imprecise; it makes them
+not make the latent parameters merely imprecise. It makes them
 uninterpretable. Global fit is therefore reported alongside every
 result.</li>
 <li>The angles are <strong>theoretical claims, not estimates</strong>.
 <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> never estimates an angle. If an instrument’s real
 geometry departs from theory, that departure is absorbed into misfit,
-not into the angles. To <em>examine</em> circumplex geometry — to let
-the angles be free — use <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>, which fits Browne’s
-(1992) circumplex model; that is a different question and a different
-tool.</li>
+not into the angles. To <em>examine</em> circumplex geometry and let the
+angles be free, use <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>. It fits Browne’s (1992)
+circumplex model. Examining geometry is a different question, and
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> is a different tool.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -204,16 +209,19 @@ you, but it is worth seeing the model it generates.
 <span><span class="co">#&gt; # delta-method CIs (which ignore the angular branch cut).</span></span></code></pre></div>
 <p>Three latent factors carry the structure: a general factor
 <code>g</code> and the two plane axes <code>cx</code> and
-<code>cy</code>. Each scale loads on all three, but its plane loadings
-are tied to its <strong>fixed angle</strong> by a direction constraint
-(<code>sin(θ)·lx − cos(θ)·ly == 0</code>), so the scale’s location in
-the plane is theoretical while its <em>saturation</em> (how strongly it
+<code>cy</code>. Each scale loads on (has a weight on) all three. But
+its plane loadings are tied to its <strong>fixed angle</strong> by a
+direction constraint (<code>sin(θ)·lx − cos(θ)·ly == 0</code>). Here
+<code>lx</code> and <code>ly</code> are the scale’s loadings on
+<code>cx</code> and <code>cy</code>. So the scale’s location in the
+plane is theoretical, while its <em>saturation</em> (how strongly it
 expresses the circumplex) is free. This is the default
-<strong><code>"scaled"</code></strong> tier. A stricter
-<strong><code>"strict"</code></strong> tier instead fixes every loading
-to the unit cosine pattern and frees the full factor covariance matrix;
-it is the fully theoretical benchmark, and it is what remains identified
-when the number of scales is small.</p>
+<strong><code>"scaled"</code></strong> tier, one of two versions of the
+model. A stricter <strong><code>"strict"</code></strong> tier instead
+fixes every loading to the unit cosine pattern and frees the full factor
+covariance matrix. It is the fully theoretical benchmark. It is also
+what remains identified (the data pin down its parameters) when the
+number of scales is small.</p>
 <p>The header and comments in the generated syntax record two design
 decisions that matter statistically:</p>
 <ul>
@@ -221,21 +229,23 @@ decisions that matter statistically:</p>
 <strong>orthogonal</strong> to the plane (<code>g ~~ 0*cx</code>,
 <code>g ~~ 0*cy</code>). Freeing those covariances alongside free
 per-scale saturations is locally unidentified exactly at the null they
-would test, so they cannot be estimated in this tier. A general factor
+would test. So they cannot be estimated in this tier. A general factor
 that leans into the plane is expressible only under the strict tier (or
-surfaces as misfit under the scaled tier). This matters for real
-interpersonal data: Wendt et al. (2019) found a general–agency
-correlation of roughly −.3 replicated across four samples, so on
-IIP-family instruments the orthogonality the scaled tier assumes is
-known to be violated.</li>
-<li>The final <code>NOTE</code> says amplitude and displacement are
+it surfaces as misfit under the scaled tier). This matters for real
+interpersonal data. Wendt et al. (2019) found a general–agency
+correlation of roughly −.3, replicated across four samples. So on
+instruments in the family of the Inventory of Interpersonal Problems
+(IIP), the orthogonality that the scaled tier assumes is known to be
+violated.</li>
+<li>The final <code>NOTE</code> says that amplitude and displacement are
 <strong>deliberately not defined</strong> in the lavaan syntax. That is
 the subject of Section 4.</li>
 </ul>
-<p>You rarely call <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code> directly —
-<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> does — but it is the escape hatch for
-respecifications (for example, partial invariance) that you then fit
-yourself and hand back through <code><a href="../reference/ssm_sem_parameters.html">ssm_sem_parameters()</a></code>.</p>
+<p>You rarely call <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code> directly, because
+<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> does. But it is the escape hatch for
+respecifications that you then fit yourself and hand back through
+<code><a href="../reference/ssm_sem_parameters.html">ssm_sem_parameters()</a></code>. One example is partial invariance,
+where only some parameters are held equal across groups.</p>
 </div>
 <div class="section level2">
 <h2 id="estimating-a-latent-profile">3. Estimating a latent profile<a class="anchor" aria-label="anchor" href="#estimating-a-latent-profile"></a>
@@ -243,10 +253,10 @@ yourself and hand back through <code><a href="../reference/ssm_sem_parameters.ht
 <p>The everyday entry point is <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code>. Its arguments
 mirror <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code>: the data, the <code>scales</code> and
 their <code>angles</code>, and one or more <code>measures</code>. The
-<code>measures</code> argument is required in the single-group case —
-the single-group latent SSM <em>is</em> the correlation path (a
+<code>measures</code> argument is required in the single-group case,
+because the single-group latent SSM <em>is</em> the correlation path. (A
 single-group latent <em>mean</em> profile is not identified, so it is
-not offered).</p>
+not offered.)</p>
 <p>Because the confidence intervals are simulated, set a seed
 immediately before the call for reproducibility.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -297,15 +307,15 @@ same measure:</p>
 <span><span class="co">#&gt; Amplitude         0.189      0.154      0.227</span></span>
 <span><span class="co">#&gt; Displacement    108.967     98.633    118.537</span></span>
 <span><span class="co">#&gt; Model Fit         0.957</span></span></code></pre></div>
-<p>The two profiles tell the same broad story — narcissistic PD relates
-to the upper (dominant) region of the circumplex — but the disattenuated
-profile has a <strong>larger amplitude</strong> and a <strong>higher
-fit</strong>, and its displacement sits at a somewhat different angle.
-The amplitude increase is the removal of attenuation: the latent
-correlations are not pulled toward zero by scale unreliability. The
-displacement shift and the fit increase are the removal of
-<em>reliability heterogeneity</em> around the circle (Section 5 explains
-why each moves).</p>
+<p>The two profiles tell the same broad story: narcissistic PD
+(personality disorder) relates to the upper (dominant) region of the
+circumplex. But the disattenuated profile has a <strong>larger
+amplitude</strong> and a <strong>higher fit</strong>, and its
+displacement sits at a somewhat different angle. The amplitude increase
+is the removal of attenuation. The latent correlations are not pulled
+toward zero by scale unreliability. The displacement shift and the fit
+increase are the removal of <em>reliability heterogeneity</em> around
+the circle. (Section 5 explains why each moves.)</p>
 <p><code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> returns a <code>circumplex_ssm_sem</code>
 object, a subclass of the ordinary <code>circumplex_ssm</code> object,
 so the familiar table and plot functions work on it:</p>
@@ -348,101 +358,107 @@ so the familiar table and plot functions work on it:</p>
 </tr></tbody>
 </table>
 <p>By default <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> fits with a robust estimator
-(<code>estimator = "MLR"</code>) and reports robust global fit indices,
-because circumplex scale scores are typically skewed and the naive
-chi-square over-rejects. The robust (sandwich) standard errors also feed
-the confidence intervals — for a reason that is the subject of the next
-section.</p>
+(<code>estimator = "MLR"</code>, maximum likelihood with robust
+corrections) and reports robust global fit indices. This is because
+circumplex scale scores are typically skewed, and the naive chi-square
+over-rejects. The robust (sandwich) standard errors also feed the
+confidence intervals. Section 4 explains why that matters.</p>
 </div>
 <div class="section level2">
 <h2 id="where-the-confidence-intervals-come-from">4. Where the confidence intervals come from<a class="anchor" aria-label="anchor" href="#where-the-confidence-intervals-come-from"></a>
 </h2>
 <p>Amplitude and displacement are <strong>nonlinear</strong> functions
 of the model parameters: amplitude is a square root and displacement is
-an <code>atan2</code>. lavaan can attach a delta-method or
-bootstrap-percentile interval to any derived quantity, but for
-displacement those intervals are wrong in a way that is easy to miss.
-<code>atan2</code> has a branch cut: a displacement near 0°/360° can
-produce an interval that has been unwrapped across the cut, or whose
-endpoints have sign-flipped, so a naive percentile interval straddling
-the boundary points the wrong way around the circle.</p>
+an <code>atan2</code>. lavaan can attach a delta-method (linear
+approximation) or bootstrap-percentile interval to any derived quantity.
+But for displacement those intervals are wrong in a way that is easy to
+miss. <code>atan2</code> has a branch cut, a place on the circle where
+its output jumps by a full turn. A displacement near 0°/360° can produce
+an interval that has been unwrapped across the cut, or whose endpoints
+have sign-flipped. So a naive percentile interval straddling the
+boundary points the wrong way around the circle.</p>
 <p><code>circumplex</code> therefore <strong>never delegates amplitude
-or displacement intervals to lavaan</strong> — the reason the generated
-syntax refuses to define them. Instead it reuses the same machinery the
-observed bootstrap uses:</p>
+or displacement intervals to lavaan</strong>, which is why the generated
+syntax refuses to define them. Instead it reuses the same machinery that
+the observed bootstrap uses:</p>
 <ol style="list-style-type: decimal">
 <li>lavaan supplies only the point estimates and their covariance (or
 bootstrap replicates) of the model’s <em>free</em> parameters.</li>
 <li>
-<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> draws from that covariance, maps each draw
-through the profile and the SSM transform, and obtains a replicate of
+<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> draws from that covariance and maps each draw
+through the profile and the SSM transform. This gives a replicate of
 every SSM parameter.</li>
-<li>Those replicates go through the package’s existing interval assembly
-— percentile intervals for the linear parameters, and <strong>circular
-quantiles</strong> for displacement (centered on the circular mean,
-unwrapped, quantiled, and re-wrapped), with contrast intervals aligned
-to the estimate’s branch.</li>
+<li>Those replicates go through the package’s existing interval
+assembly. The elevation, X value, Y value and amplitude get percentile
+intervals. Displacement gets <strong>circular quantiles</strong>
+(centered on the circular mean, unwrapped, quantiled, and re-wrapped),
+with contrast intervals aligned to the estimate’s branch.</li>
 </ol>
-<p>The result is that a latent displacement interval behaves correctly
-at the 0°/360° pole: it can straddle the boundary contiguously, and the
-point estimate always sits inside its own interval. This is the same
-architecture the Monte Carlo engine uses for observed profiles, with
-lavaan supplying the mean and covariance rather than resampling.</p>
+<p>As a result, a latent displacement interval behaves correctly at the
+0°/360° pole. It can straddle the boundary contiguously, and the point
+estimate always sits inside its own interval. This is the same
+architecture that the Monte Carlo engine uses for observed profiles,
+with lavaan supplying the mean and covariance rather than
+resampling.</p>
 <p>Two engines feed step 2, selected by <code>ci_method</code>:</p>
 <ul>
 <li>
 <strong><code>"mvn"</code> (default):</strong> draw from a
-multivariate normal centered at the estimates with the model’s (robust)
-covariance. Fast — one model fit plus vectorized draws.</li>
+multivariate normal centered at the estimates, with the model’s (robust)
+covariance. It is fast: one model fit plus vectorized draws.</li>
 <li>
 <strong><code>"boot"</code>:</strong> refit the model on each
-bootstrap resample. Far more expensive, but it does not lean on
+bootstrap resample. This is far more expensive, but it does not lean on
 asymptotic normality.</li>
 </ul>
-<p>A coverage study across constructed populations (reported in the
-package’s design notes) found <code>"mvn"</code> well-calibrated at
-realistic sample sizes <em>when the covariance is the robust
-sandwich</em> — which is why robust SEs are the default. Under a
-misspecified fixed-angle model, plain (non-robust) SEs undercovered
-displacement; the sandwich restored nominal coverage. If you supply your
-own lavaan fit through <code><a href="../reference/ssm_sem_parameters.html">ssm_sem_parameters()</a></code> and intend to
-use <code>"mvn"</code>, fit it with
-<code>se = "robust.huber.white"</code> so the propagated covariance
-stays valid.</p>
+<p>The package’s design notes report a coverage study across constructed
+populations. It found <code>"mvn"</code> well-calibrated at realistic
+sample sizes <em>when the covariance is the robust sandwich</em>. That
+is why robust SEs are the default. Under a misspecified fixed-angle
+model, plain (non-robust) SEs undercovered displacement: their intervals
+held the true displacement less often than nominal. The sandwich
+restored nominal coverage. If you supply your own lavaan fit through
+<code><a href="../reference/ssm_sem_parameters.html">ssm_sem_parameters()</a></code> and intend to use <code>"mvn"</code>,
+fit it with <code>se = "robust.huber.white"</code> so that the
+propagated covariance stays valid.</p>
 </div>
 <div class="section level2">
 <h2 id="what-the-parameters-mean-now">5. What the parameters mean now<a class="anchor" aria-label="anchor" href="#what-the-parameters-mean-now"></a>
 </h2>
-<p>Disattenuation changes what two of the parameters <em>mean</em>, and
-the vignette would be misleading if it did not say so.</p>
+<p>Disattenuation changes what two of the parameters <em>mean</em>. The
+vignette would be misleading if it did not say so.</p>
 <p><strong>Fit.</strong> Under the scaled tier the latent profile is not
-forced to be a perfect cosine — the scales have different saturations —
-so a latent fit below 1 is <em>informative</em>: it measures how far the
-measure’s latent profile departs from a pure cosine wave, driven by
-differential saturation across scales (and, under the strict tier, by
-anisotropy in the factor covariance). What the latent fit removes,
+forced to be a perfect cosine, because the scales have different
+saturations. So a latent fit below 1 is <em>informative</em>. It
+measures how far the measure’s latent profile departs from a pure cosine
+wave. Differential saturation across scales drives that departure. Under
+the strict tier, anisotropy in the factor covariance (unequal spread in
+different directions) drives it too. What the latent fit removes,
 relative to the observed fit, is the contamination from
-<strong>reliability heterogeneity</strong> — not sampling error. Both
-the observed and the latent fit are population quantities that contain
-no sampling error at all; as <em>estimates</em> at a finite sample size,
-both remain noisy, so a latent fit of, say, .85 in a modest sample is
-not automatically substantive structure.</p>
+<strong>reliability heterogeneity</strong>, not sampling error. As
+population quantities, the observed and the latent fit contain no
+sampling error at all. But their <em>estimates</em> at a finite sample
+size both remain noisy. So a latent fit of, say, .85 in a modest sample
+is not automatically substantive structure.</p>
 <p><strong>Displacement.</strong> Latent displacement is the
-first-harmonic direction of the <em>saturation-modulated</em>
-disattenuated profile. It is <strong>not</strong> simply “the measure’s
-angle in the latent space.” Heterogeneous saturations around the circle,
-or a general factor leaning into the plane, rotate it — with fit
-possibly staying high — exactly as they rotate the observed
-displacement. The latent layer’s contribution is the removal of the
-<em>reliability</em> modulation that additionally rotates the observed
-displacement; it does not remove the saturation modulation. That removal
-is why the observed and latent displacements in Section 3 differ, and it
-is the honest description of what <code>d</code> estimates here.</p>
+first-harmonic direction (the peak direction of the best-fitting cosine)
+of the <em>saturation-modulated</em> disattenuated profile. It is
+<strong>not</strong> simply “the measure’s angle in the latent space.”
+Heterogeneous saturations around the circle, or a general factor leaning
+into the plane, rotate it, exactly as they rotate the observed
+displacement. Fit can stay high while this happens. The latent layer’s
+contribution is the removal of the <em>reliability</em> modulation that
+additionally rotates the observed displacement. It does not remove the
+saturation modulation. The removal of the reliability modulation is why
+the observed and latent displacements in Section 3 differ. This account,
+with the reliability modulation removed and the saturation modulation
+kept, is the honest description of what <code>d</code> estimates
+here.</p>
 <p>The interpretation aids you already know carry over unchanged.
-Amplitude is the gate for interpreting displacement: when the amplitude
+Amplitude is the gate for interpreting displacement. When the amplitude
 confidence interval’s lower bound sits too close to zero relative to its
-width, the profile has no well-defined direction and the displacement is
-not interpretable — the low-fit dashing on plots and the displacement
+width, the profile has no well-defined direction. Then the displacement
+is not interpretable. The low-fit dashing on plots and the displacement
 caution in <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> behave exactly as they do for observed
 profiles.</p>
 </div>
@@ -450,8 +466,8 @@ profiles.</p>
 <h2 id="two-questions-about-group-differences">6. Two questions about group differences<a class="anchor" aria-label="anchor" href="#two-questions-about-group-differences"></a>
 </h2>
 <p>When you have groups, there are <strong>two</strong> distinct
-estimands, and <code>circumplex</code> keeps them separate on
-purpose.</p>
+estimands (quantities to be estimated), and <code>circumplex</code>
+keeps them separate on purpose.</p>
 <table class="table">
 <caption>Two estimands for a group difference</caption>
 <colgroup>
@@ -487,25 +503,25 @@ invariance; not computed when invariance fails.</td>
 <p>Neither is more correct in the abstract. The observed contrast
 answers a question about <em>scores</em> and is always available. The
 latent contrast answers a question about <em>constructs</em>, but only
-<em>if</em> the instrument behaves the same way in both groups — and
-when it does not, the honest answer is that the groups cannot be
-compared on the latent metric, not a number.</p>
+<em>if</em> the instrument behaves the same way in both groups. When it
+does not, the honest answer is that the groups cannot be compared on the
+latent metric. That answer is not a number.</p>
 </div>
 <div class="section level2">
 <h2 id="invariance-gated-latent-contrasts">7. Invariance-gated latent contrasts<a class="anchor" aria-label="anchor" href="#invariance-gated-latent-contrasts"></a>
 </h2>
 <p>Before it computes a latent group contrast, <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code>
-fits an invariance ladder — configural, then metric, then scalar — and
+fits an invariance ladder: configural, then metric, then scalar. It
 tests each rung against the previous one with lavaan’s own nested-model
 test (the scaled difference test under the robust estimator). The latent
 <em>measure-profile</em> contrast requires <strong>metric</strong>
-invariance (equal saturations across groups); the latent <em>mean</em>
+invariance (equal saturations across groups). The latent <em>mean</em>
 contrast additionally requires scalar invariance. If the required rung
 is rejected, the contrast is <strong>not</strong> computed.</p>
 <p>On real data this gate does its job. Comparing the NARPD profile
 across the <code>Gender</code> groups in <code>jz2017</code> rejects
-metric invariance, so <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> returns each group’s
-separate profile and an explicit non-comparison verdict rather than a
+metric invariance. So <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> returns each group’s
+separate profile and an explicit non-comparison verdict, rather than a
 contrast:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span>
@@ -530,13 +546,15 @@ contrast:</p>
 <span><span class="co">#&gt;        rung   chisq df   cfi rmsea dchisq ddf       p   dcfi</span></span>
 <span><span class="co">#&gt;  configural 287.272 34 0.938 0.123     NA  NA             NA</span></span>
 <span><span class="co">#&gt;      metric 337.356 48 0.927 0.112 54.781  14 &lt; 0.001 -0.011</span></span>
-<span><span class="co">#&gt; ΔCFI: Cheung &amp; Rensvold (2002) criterion, alpha = .01, two-group ML</span></span>
-<span><span class="co">#&gt;   simulation scope. The cutoff is NOT validated for this configuration</span></span>
-<span><span class="co">#&gt;   (robust CFI), so the value is descriptive only, with no binary</span></span>
-<span><span class="co">#&gt;   verdict. Secondary and reported only -- the verdict below gates on</span></span>
-<span><span class="co">#&gt;   the nested chi-square difference test alone.</span></span>
-<span><span class="co">#&gt; Verdict: metric invariance rejected (Δχ²(14) = 54.78, p &lt; 0.0001, alpha = 0.05): these groups cannot be compared on this instrument's latent metric.</span></span>
-<span><span class="co">#&gt; The requested latent contrast was therefore not computed; the rows below are each group's separate (configural) latent profile. The observed-score contrast (ssm_analyze()) answers its own, different question and remains available.</span></span>
+<span><span class="co">#&gt; ΔCFI: Cheung &amp; Rensvold (2002) criterion, alpha = .01, two-group ML simulation</span></span>
+<span><span class="co">#&gt;   scope. The cutoff is NOT validated here (robust CFI), so the value is</span></span>
+<span><span class="co">#&gt;   descriptive only, with no binary verdict. It is secondary and reported only:</span></span>
+<span><span class="co">#&gt;   the verdict below gates on the nested chi-square difference test alone.</span></span>
+<span><span class="co">#&gt; Verdict: metric invariance rejected (Δχ²(14) = 54.78, p &lt; 0.0001, alpha =</span></span>
+<span><span class="co">#&gt;   0.05): these groups cannot be compared on this instrument's latent metric.</span></span>
+<span><span class="co">#&gt; The requested latent contrast was therefore not computed. The rows below are</span></span>
+<span><span class="co">#&gt; each group's separate (configural) latent profile. The observed-score contrast</span></span>
+<span><span class="co">#&gt; from ssm_analyze() answers a different question and remains available.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Profile [NARPD: Female]:</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -559,51 +577,54 @@ contrast:</p>
 <span><span class="co">#&gt; Displacement     86.611     70.075    103.660</span></span>
 <span><span class="co">#&gt; Model Fit         0.977</span></span></code></pre></div>
 <p>The invariance ladder is printed with the decision, and no contrast
-is rendered — <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code> on this object would have
+is rendered. <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code> on this object would have
 nothing to draw. This is deliberate: there is no
 <code>force = TRUE</code>. If you have a principled partial-invariance
-model, fit it yourself and pass it to <code><a href="../reference/ssm_sem_parameters.html">ssm_sem_parameters()</a></code>,
-which computes the contrast from whatever multi-group fit you supply and
-leaves the comparability claim to you.</p>
-<p>The ladder table also carries <code>dcfi</code>, the change in CFI
-from the previous fitted rung. This is Cheung and Rensvold’s (2002)
-secondary criterion, whose general rule rejects an invariance step when
-CFI falls by more than .01. It is <strong>reported, never
-gating</strong>: comparability, the verdict, and the model the estimates
-are taken from are decided by the nested test alone. The two criteria
-can disagree, and neither is a tiebreaker for the other — a change in
-CFI is insensitive to sample size, which the nested test is not, so in a
-large sample the nested test can reject a step whose CFI barely
-moves.</p>
-<p>That direction is worth stating carefully, because the article gives
-it two ways. Its Table 5 reports critical values that are the 1%
-<em>lower</em> tails of the simulated null distributions, so a ΔCFI at
-or below one of them is the 1%-level evidence <em>against</em>
-invariance — the sense used here. The sentence stating the general rule
-on the article’s p. 251 reads the opposite way relative to that same
-table. This package follows the simulation.</p>
+model, fit it yourself and pass it to <code><a href="../reference/ssm_sem_parameters.html">ssm_sem_parameters()</a></code>.
+That function computes the contrast from whatever multi-group fit you
+supply, and it leaves the comparability claim to you.</p>
+<p>The ladder table also carries <code>dcfi</code>, the change in the
+comparative fit index (CFI) from the previous fitted rung. CFI compares
+the model’s fit with that of a baseline model in which the variables are
+uncorrelated, and values near 1 mean good fit. <code>dcfi</code> is
+Cheung and Rensvold’s (2002) secondary criterion. Its general rule
+rejects an invariance step when CFI falls by more than .01. It is
+<strong>reported, never gating</strong>. Comparability, the verdict, and
+the model that the estimates are taken from are decided by the nested
+test alone. The two criteria can disagree, and neither is a tiebreaker
+for the other. A change in CFI is insensitive to sample size, but the
+nested test is not. So in a large sample the nested test can reject a
+step whose CFI barely moves.</p>
+<p>The direction of the ΔCFI rule is worth stating carefully, because
+the article gives it two ways. Its Table 5 reports critical values that
+are the 1% <em>lower</em> tails of the simulated null distributions. So
+a ΔCFI at or below one of them is the 1%-level evidence <em>against</em>
+invariance, which is the sense used here. The sentence stating the
+general rule on the article’s p. 251 reads the opposite way relative to
+that same table. This package follows the simulation.</p>
 <p>Read the retain/reject label narrowly on the occasions it appears.
-Cheung and Rensvold simulated two groups, ML estimation, and
-multivariate normal data, and examined Type I error only — not power —
-and robust CFI variants were not part of their study.
+Cheung and Rensvold simulated two groups, maximum likelihood (ML)
+estimation, and multivariate normal data. They examined Type I error
+only, not power, and robust CFI variants were not part of their study.
 <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> therefore prints the label only for a two-group
 fit estimated by ML whose CFI is the plain, non-robust one. Note that
-<code>estimator = "ML"</code> is necessary but not sufficient:
+<code>estimator = "ML"</code> is necessary but not sufficient.
 <code>missing = "fiml"</code> also makes lavaan report a robust CFI, so
-a fit can be ML and still fall outside the envelope. Because the default
-estimator is <code>"MLR"</code>, the ladder above prints its
+a fit can be ML and still fall outside the envelope. The default
+estimator is <code>"MLR"</code>. So the ladder above prints its
 <code>dcfi</code> value marked as outside that scope, with no verdict
 attached and the note naming which condition applies. The same
-withholding covers a non-ML estimator such as <code>"GLS"</code>, whose
-CFI is plain-named but whose fit function is not the one the criterion
-was simulated under. That is a deliberate refusal rather than a gap:
-extending the cutoff to a robust index, another estimator, or three or
-more groups would take simulation work nobody has done.</p>
-<p>When invariance is not the obstacle — for example, contrasting
-<strong>two measures</strong> within one group, where no cross-group
-invariance is at stake — the contrast is computed and behaves like the
-observed contrast (second measure minus first, displacement differences
-via the circular branch machinery):</p>
+withholding covers a non-ML estimator such as <code>"GLS"</code>. Its
+CFI is plain-named, but its fit function is not the one that the
+criterion was simulated under. That is a deliberate refusal rather than
+a gap. Extending the cutoff to a robust index, another estimator, or
+three or more groups would take simulation work that nobody has
+done.</p>
+<p>When invariance is not the obstacle, the contrast is computed. An
+example is a contrast of <strong>two measures</strong> within one group,
+where no cross-group invariance is at stake. That contrast behaves like
+the observed contrast (second measure minus first, displacement
+differences via the circular branch machinery):</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span>
 <span><span class="va">contrast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_sem.html">ssm_sem</a></span><span class="op">(</span></span>
@@ -659,55 +680,62 @@ via the circular branch machinery):</p>
 <p>The contrast block reports the difference in each SSM parameter with
 its confidence interval. As with the observed contrast, an elevation or
 amplitude difference whose interval excludes zero is a difference in
-that parameter; the displacement difference is reported on the
-estimate’s angular branch, so its interval endpoints can legitimately
-fall outside ±180° near the boundary while still containing the
+that parameter. The displacement difference is reported on the
+estimate’s angular branch. So its interval endpoints can legitimately
+fall outside ±180° near the boundary, while still containing the
 estimate.</p>
 </div>
 <div class="section level2">
 <h2 id="when-to-trust-it-limitations">8. When to trust it: limitations<a class="anchor" aria-label="anchor" href="#when-to-trust-it-limitations"></a>
 </h2>
 <p>The latent layer buys disattenuation at the price of a set of
-assumptions. The documentation states them; the vignette should too.</p>
+assumptions. The documentation states them, and the vignette should
+too.</p>
 <ul>
 <li>
 <strong>Model-conditional.</strong> Every latent quantity is
 conditional on the fixed-angle model being adequate. Read the global fit
-first. As a real-data benchmark, Wendt et al. (2019) reported RMSEA
-between .075 and .111 for the fixed-loading circumplex CFA across four
-large samples — a real but imperfect approximation (their model targets
-the octants’ own latent structure, not an external measure’s profile, so
-the number is a benchmark, not a like-for-like comparison). The example
-fits here are of the same order (RMSEA around .12) and should likewise
-be read as approximations, not exact structure.</li>
+first. Wendt et al.
+<ol start="2019" style="list-style-type: decimal">
+<li>give a real-data benchmark. They reported RMSEA (a misfit index,
+where lower is better) between .075 and .111 across four large samples.
+Their model was the fixed-loading circumplex confirmatory factor
+analysis (CFA), and these values show a real but imperfect
+approximation. Their model targets the octants’ own latent structure,
+not an external measure’s profile. So the number is a benchmark, not a
+like-for-like comparison. The example fits here are of the same order
+(RMSEA around .12). They should likewise be read as approximations, not
+exact structure.</li>
+</ol>
+</li>
 <li>
 <strong>Fixed angles are theoretical.</strong> Departures from the
 theoretical geometry load into misfit, not into the angles. Use
 <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> to examine geometry.</li>
 <li>
 <strong>Latent-plane stationarity is assumed, not tested.</strong>
-The plane factors are fixed isotropic and orthogonal; anisotropic latent
+The plane factors are fixed isotropic and orthogonal. Anisotropic latent
 dispersion surfaces only as global misfit.</li>
 <li>
 <strong>The scaled tier assumes the general factor is orthogonal to
 the plane.</strong> A true general-factor lean surfaces as misfit under
-the scaled tier; use the strict tier to model it.</li>
+the scaled tier. Use the strict tier to model it.</li>
 <li>
 <strong>Displacement and fit have the disattenuated meanings of
 Section 5</strong>, not the naive “angle in latent space” and
 “cosine-ness” readings.</li>
 <li>
 <strong>Disattenuated correlations can be large.</strong> Removing
-attenuation moves correlations toward ±1; values at or beyond 1 signal
+attenuation moves correlations toward ±1. Values at or beyond 1 signal
 misspecification and are refused rather than summarized.</li>
 <li>
 <strong>Invariance gating is a modeling decision</strong> with a
 default test, not an oracle. The observed contrast remains available and
 answers its own question. The secondary <code>dcfi</code> criterion
-printed beside it gates nothing, and its .01 cutoff is validated only
-for two-group, ML, multivariate-normal fits, for Type I error only — the
-package withholds the verdict everywhere else rather than extrapolating
-it.</li>
+printed beside the nested test gates nothing. Its .01 cutoff is
+validated only for two-group, ML, multivariate-normal fits, for Type I
+error only. The package withholds the verdict everywhere else rather
+than extrapolating it.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -715,30 +743,32 @@ it.</li>
 </h2>
 <p>The nearest published models are the confirmatory factor analyses of
 the interpersonal circumplex itself. Wendt et al. (2019) fit a
-three-factor circumplex CFA with fixed unit-cosine plane loadings — the
-shape of this package’s strict tier — across four large samples, and
-found the fully dimensional model competitive with categorical and
-hybrid alternatives. Their estimand, though, is the latent structure of
-the <em>octant scales</em> and persons’ factor scores, not an external
-measure’s disattenuated profile; their model is context for the strict
+three-factor circumplex CFA with fixed unit-cosine plane loadings, which
+is the shape of this package’s strict tier. They fit it across four
+large samples. They found the fully dimensional model competitive with
+categorical (types of people) and hybrid (types and dimensions together)
+alternatives. Their estimand, though, is the latent structure of the
+<em>octant scales</em> and persons’ factor scores, not an external
+measure’s disattenuated profile. Their model is context for the strict
 tier, not a validation target for the SSM estimand.</p>
 <p>At the level of a single disattenuated correlation, Moss (2026)
-showed that treating reliability as a <em>known</em> constant collapses
-interval coverage (to roughly .35 in one scenario), whereas propagating
-reliability uncertainty restores nominal coverage. That is exactly the
-logic behind fitting the model and propagating its full covariance
-rather than plugging in reliability point estimates. One estimand
-caveat: Moss’s disattenuated correlation corrects <em>both</em>
-variables for unreliability, whereas the latent SSM here corrects only
-the <em>scale</em> side — the external measure remains an observed
-variable — so the two are relatives, not the same quantity.</p>
+showed the following. Treating reliability as a <em>known</em> constant
+collapses interval coverage (to roughly .35 in one scenario).
+Propagating reliability uncertainty instead restores nominal coverage.
+That is exactly the logic behind fitting the model and propagating its
+full covariance, rather than plugging in reliability point estimates.
+One estimand caveat applies. Moss’s disattenuated correlation corrects
+<em>both</em> variables for unreliability. The latent SSM here corrects
+only the <em>scale</em> side, and the external measure remains an
+observed variable. So the two are relatives, not the same quantity.</p>
 <p>Finally, the two model families in this package meet at a single
-point: at a general factor orthogonal to the plane, equal saturations,
-and equally spaced angles, the fixed-loading circumplex CFA coincides
-with the one-harmonic, equal-communality version of Browne’s (1992)
-circumplex model that <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimates. The SEM-based
-SSM sits on the fixed-angle side of that boundary; to cross to freely
-estimated angles, use <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>.</p>
+point. At that point the general factor is orthogonal to the plane, the
+saturations are equal, and the angles are equally spaced. At that point,
+the fixed-loading circumplex CFA coincides with the one-harmonic,
+equal-communality version of Browne’s (1992) circumplex model that
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimates. The SEM-based SSM sits on the
+fixed-angle side of that boundary. To cross to freely estimated angles,
+use <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

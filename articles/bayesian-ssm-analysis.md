@@ -8,22 +8,33 @@ library(circumplex)
 ## 1. Why a Bayesian SSM?
 
 The Structural Summary Method (SSM) describes a circumplex profile with
-an elevation $`e`$, an amplitude $`a`$, and a displacement $`d`$. The
-package’s
+an elevation $`e`$, an amplitude $`a`$, and a displacement $`d`$.
+[`vignette("introduction-to-ssm-analysis")`](http://circumplex.jmgirard.com/articles/introduction-to-ssm-analysis.md)
+defines these three parameters. The package’s
 [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
-estimates these with bootstrap or Monte Carlo confidence intervals. A
-Bayesian alternative is attractive when you want prior information,
-hierarchical structure (e.g., partial pooling across persons or groups),
-or full posterior distributions for derived quantities.
+estimates them with bootstrap or Monte Carlo confidence intervals.
 
-The division of labor is deliberate: a general-purpose Bayesian package
-such as **brms** fits the model, and
+A Bayesian alternative is attractive when you want prior information or
+hierarchical structure. Prior information is what you know about the
+parameters before you see the data. An example of hierarchical structure
+is partial pooling across persons or groups, where each person’s or
+group’s estimate is pulled toward the overall estimate. A Bayesian
+alternative is also attractive when you want full posterior
+distributions for derived quantities, such as amplitude and
+displacement. A posterior distribution combines the prior and the data
+into one distribution over the parameters.
+
+The division of labor is deliberate. A general-purpose Bayesian package,
+such as **brms**, fits the model. Then
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
-converts the resulting posterior draws into SSM parameter draws and
-summarizes them with the same circular-statistics machinery the rest of
-the package uses. Displacement is an angle, so its posterior needs
-circular treatment — an interval straddling the 0°/360° boundary must
-wrap rather than invert — and
+converts the resulting posterior draws into SSM parameter draws.
+Posterior draws are samples from the posterior distribution.
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+summarizes them with the same circular statistics (statistics for
+angles) that the rest of the package uses. Displacement is an angle, so
+its posterior needs circular treatment. In particular, an interval that
+straddles the 0°/360° boundary must wrap across 0° rather than invert.
+An inverted interval runs the long way around the circle.
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
 handles that by construction.
 
@@ -45,8 +56,8 @@ S_j = e + \underbrace{a \cos d}_{x} \cos \theta_j +
 
 a linear regression of the scores on $`\cos \theta_j`$ and
 $`\sin \theta_j`$. The intercept is the elevation $`e`$, the *cosine*
-coefficient is $`x`$, and the *sine* coefficient is $`y`$. The
-structural parameters are recovered by
+coefficient is $`x`$, and the *sine* coefficient is $`y`$. The amplitude
+$`a`$ and displacement $`d`$ are recovered by
 
 ``` math
 a = \sqrt{x^2 + y^2}, \qquad d = \operatorname{atan2}(y,\, x),
@@ -55,10 +66,10 @@ a = \sqrt{x^2 + y^2}, \qquad d = \operatorname{atan2}(y,\, x),
 with the displacement wrapped into $`[0°, 360°)`$.
 
 Note the argument order: `atan2(y, x)` takes the **sine coefficient
-first**. Swapping the arguments is a classic silent error — it returns a
-valid-looking angle that is wrong for almost every profile. The
-following check pins the convention with a profile whose displacement is
-known to be 90°, where the swapped call would instead return 0°:
+first**. Swapping the arguments is a classic silent error. It returns a
+valid-looking angle that is wrong for almost every profile. The check
+below pins the convention with a profile whose displacement is known to
+be 90°. The swapped call would return 0° instead:
 
 ``` r
 
@@ -78,12 +89,15 @@ stopifnot(!isTRUE(all.equal(atan2(x_hat, y_hat) * 180 / pi, 90)))  # swapped
 
 ## 3. Fitting the model with brms
 
-We model raw octant scores from the `jz2017` data in long format (one
-row per person-scale observation), with a random intercept per person to
-absorb the dependence among a person’s eight scores. The fixed effects
-(intercept, cosine coefficient, sine coefficient) are then the
-group-level $`(e, x, y)`$. A seeded subsample of 200 persons keeps the
-example light.
+We model raw octant scores from the `jz2017` data. Octant scores are
+scores on eight scales placed 45° apart around the circle. The data are
+in long format, with one row per person-scale observation. A random
+intercept per person gives each person their own baseline level. It is
+included to absorb the dependence among a person’s eight scores. The
+fixed effects are the coefficients shared by all persons (intercept,
+cosine coefficient, sine coefficient). They are then the group-level
+$`(e, x, y)`$. A random subsample of 200 persons, drawn with a fixed
+seed, keeps the example light.
 
 ``` r
 
@@ -108,13 +122,13 @@ head(dat)
 #> 6  6 6.123234e-17         1  0.50
 ```
 
-Because Bayesian sampling requires a working Stan toolchain, the model
-below is not re-fitted when this vignette is rebuilt; its posterior
-draws were generated once by the seeded script
-`data-raw/bayesian_ssm_draws.R` and ship with the package. The
-`normal(0, 1)` prior on the regression coefficients is a deliberate
-modeling choice whose consequences for the amplitude we examine in
-Section 5.
+**brms** fits its models with Stan, and Bayesian sampling with Stan
+requires a working Stan toolchain. So the model below is not re-fitted
+when this vignette is rebuilt. Its posterior draws were generated once
+by the seeded script `data-raw/bayesian_ssm_draws.R`, and they ship with
+the package. The `normal(0, 1)` prior on the regression coefficients is
+a deliberate modeling choice. Section 5 examines its consequences for
+the amplitude.
 
 ``` r
 
@@ -151,11 +165,12 @@ head(round(draws, 3))
 ```
 
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
-accepts two draw shapes: three-column *parameter* draws like these, or
-*profile* draws (one column per scale, with `angles` supplied). A
-three-column matrix without angles is ambiguous — it could also be
-profile draws from a three-scale instrument — so the shape must be
-stated explicitly with `type = "parameters"`:
+accepts two draw shapes. The first is three-column *parameter* draws
+like these. The second is *profile* draws: posterior draws of a whole
+profile of scale scores, with one column per scale and `angles`
+supplied. A three-column matrix without angles is ambiguous, because it
+could also be profile draws from a three-scale instrument. So the shape
+must be stated explicitly with `type = "parameters"`:
 
 ``` r
 
@@ -178,31 +193,44 @@ summary(res)
 #> Model Fit
 ```
 
-Each posterior draw of $`(x, y)`$ was converted to a draw of $`(a, d)`$,
-so the displacement’s credible interval comes from circular quantiles
-(centered on the circular mean and re-wrapped), never from naive linear
-quantiles that would misbehave near 0°/360°. Point estimates are
-posterior medians for the linear parameters — the amplitude posterior is
-right-skewed, so a mean would overstate it — and the circular mean for
-displacement. One caveat to keep in mind: these marginal summaries are
-not jointly coherent. The reported amplitude is the median of the
-amplitude draws, which is not $`\sqrt{x^2 + y^2}`$ evaluated at the
-reported $`x`$ and $`y`$, and the reported displacement is not the
-direction of the reported $`(x, y)`$. Each is the honest marginal
-summary of its own posterior.
+Each posterior draw of $`(x, y)`$ was converted to a draw of $`(a, d)`$.
+Because $`d`$ is an angle, the displacement’s credible interval comes
+from circular quantiles. A credible interval is the Bayesian counterpart
+of a confidence interval. The circular mean is the direction of the
+average of the angles taken as unit vectors. The draws are centered on
+their circular mean and unwrapped (laid on a line with no jump near the
+mean). Then the quantiles are taken, and the bounds are re-wrapped. The
+interval never comes from naive linear quantiles that would misbehave
+near 0°/360°.
 
-Model fit ($`R^2`$) is not reported here: parameter draws carry no
-profile to measure fit against. Feeding
-[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
-profile draws (shape B) does yield fit draws.
+Point estimates are posterior medians for the linear parameters:
+elevation, $`x`$, $`y`$, amplitude, and fit where it is available. The
+amplitude posterior is right-skewed, so a mean would overstate it. For
+displacement, the point estimate is the circular mean.
+
+One caveat to keep in mind: these marginal summaries are not jointly
+coherent. A marginal summary describes one parameter’s draws on its own,
+so the summaries need not agree with each other. The reported amplitude
+is the median of the amplitude draws. It is not $`\sqrt{x^2 + y^2}`$
+evaluated at the reported $`x`$ and $`y`$. Likewise, the reported
+displacement is not the direction of the reported $`(x, y)`$. Each is
+the honest marginal summary of its own posterior.
+
+Model fit ($`R^2`$) is not reported here, because parameter draws carry
+no profile to measure fit against. Profile draws (the second shape) do
+yield fit draws from
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
 
 ## 5. The induced prior on amplitude
 
 Independent priors on $`x`$ and $`y`$ do not induce a flat prior on the
-structural parameters. With $`x, y \sim \mathrm{Normal}(0, 1)`$, the
-implied prior on $`a = \sqrt{x^2 + y^2}`$ is Rayleigh-shaped — its mass
-is pushed *away* from $`a = 0`$ — while the implied prior on $`d`$ is
-uniform. A ten-line prior-predictive simulation makes this visible:
+structural parameters. The induced prior is the prior on $`a`$ and $`d`$
+that the priors on $`x`$ and $`y`$ imply. With
+$`x, y \sim \mathrm{Normal}(0, 1)`$, the implied prior on
+$`a = \sqrt{x^2 + y^2}`$ is Rayleigh-shaped: zero density at $`a = 0`$,
+then a single peak, with a right skew. Its mass is pushed *away* from
+$`a = 0`$. But the implied prior on $`d`$ is uniform. A ten-line
+prior-predictive simulation makes the amplitude prior visible:
 
 ``` r
 
@@ -229,12 +257,12 @@ round(c(prior_median = median(a_prior), prior_mass_below_0.1 =
 #>                1.164                0.005
 ```
 
-This is not a defect — it is a modeling choice to be aware of: the prior
-mildly disfavors exactly-flat profiles. If your application needs prior
-mass concentrated near $`a = 0`$, place priors on $`(a, d)`$ directly in
-a custom Stan model instead; its posterior draws can still be summarized
-here by converting them to $`(x, y) = (a \cos d, a \sin d)`$ or by
-passing profile draws.
+The Rayleigh shape is not a defect. It is a modeling choice to be aware
+of: the prior mildly disfavors exactly-flat profiles ($`a = 0`$). If
+your application needs prior mass concentrated near $`a = 0`$, place
+priors on $`(a, d)`$ directly in a custom Stan model instead. Its
+posterior draws can still be summarized here. Convert them to
+$`(x, y) = (a \cos d, a \sin d)`$, or pass profile draws.
 
 ## 6. Where to go next
 
@@ -242,7 +270,7 @@ passing profile draws.
   [`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md)
   and its [`summary()`](https://rdrr.io/r/base/summary.html) method.
 - Hierarchical pooling across persons or groups is exactly what the
-  brms/Stan route is for — fit the model you need and feed the posterior
+  brms/Stan route is for. Fit the model you need, and feed the posterior
   draws (parameter or profile shape) back through
   [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
 - Frequentist inference on group profiles and contrasts:

@@ -5,15 +5,27 @@ cautions when the structural model converged badly or fits poorly –
 benchmarks per Browne &amp;amp; Cudeck, 1993, and Hu &amp;amp; Bentler, 1999), the
 per-profile verdict blocks (coverage of elevation, amplitude, and
 certification-conditional displacement classified against Bradley's
-liberal band; the guardrail false-certification caution), and the
-coverage and guardrail tables across the amplitude ladder."><meta property="og:description" content="Print the full report of an ssm_ci_accuracy() run: the assessed
+liberal band; the guardrail false-certification caution), and a compact
+table with one row per profile and amplitude condition. That table shows the
+coverage of each parameter, the displacement coverage when certified, the
+certification rate and the Structural flag. On a contrast row, &quot;certified&quot;
+means that both profiles were certified. The Monte Carlo standard errors, the
+one-sided miss rates, the interval widths, the conditional and replication
+counts, and the other guardrail columns are not printed; read them from the
+coverage and guardrail elements of the object."><meta property="og:description" content="Print the full report of an ssm_ci_accuracy() run: the assessed
 configuration, a structure note describing the simulated population (with
 cautions when the structural model converged badly or fits poorly –
 benchmarks per Browne &amp;amp; Cudeck, 1993, and Hu &amp;amp; Bentler, 1999), the
 per-profile verdict blocks (coverage of elevation, amplitude, and
 certification-conditional displacement classified against Bradley's
-liberal band; the guardrail false-certification caution), and the
-coverage and guardrail tables across the amplitude ladder."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.png"></head><body>
+liberal band; the guardrail false-certification caution), and a compact
+table with one row per profile and amplitude condition. That table shows the
+coverage of each parameter, the displacement coverage when certified, the
+certification rate and the Structural flag. On a contrast row, &quot;certified&quot;
+means that both profiles were certified. The Monte Carlo standard errors, the
+one-sided miss rates, the interval widths, the conditional and replication
+counts, and the other guardrail columns are not printed; read them from the
+coverage and guardrail elements of the object."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -21,7 +33,7 @@ coverage and guardrail tables across the amplitude ladder."><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +82,7 @@ coverage and guardrail tables across the amplitude ladder."><meta property="og:i
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Summarize the accuracy of SSM confidence intervals</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.0.1/R/ssm_ci_oop.R" class="external-link"><code>R/ssm_ci_oop.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/ssm_ci_oop.R" class="external-link"><code>R/ssm_ci_oop.R</code></a></small>
       <div class="d-none name"><code>summary.circumplex_ci_accuracy.Rd</code></div>
     </div>
 
@@ -81,8 +93,14 @@ cautions when the structural model converged badly or fits poorly –
 benchmarks per Browne &amp; Cudeck, 1993, and Hu &amp; Bentler, 1999), the
 per-profile verdict blocks (coverage of elevation, amplitude, and
 certification-conditional displacement classified against Bradley's
-liberal band; the guardrail false-certification caution), and the
-coverage and guardrail tables across the amplitude ladder.</p>
+liberal band; the guardrail false-certification caution), and a compact
+table with one row per profile and amplitude condition. That table shows the
+coverage of each parameter, the displacement coverage when certified, the
+certification rate and the <code>Structural</code> flag. On a contrast row, "certified"
+means that both profiles were certified. The Monte Carlo standard errors, the
+one-sided miss rates, the interval widths, the conditional and replication
+counts, and the other guardrail columns are not printed; read them from the
+<code>coverage</code> and <code>guardrail</code> elements of the object.</p>
     </div>
 
     <div class="section level2">

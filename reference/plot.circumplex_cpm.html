@@ -9,7 +9,13 @@ near the centre. The canvas spokes mark the theoretical angles supplied to
 cpm_fit(), so the gap between a point and its spoke shows how far the
 estimated angle departed from the hypothesised one. Where the confidence
 intervals are estimable, a wedge spans each item's angle CI (angularly) and
-communality CI (radially)."><meta property="og:description" content="Draw the estimated item configuration of a cpm_fit() object on the circular
+communality CI (radially). An interval of zero width has no area, so it is
+drawn as a line instead: along the radius for a zero-width angle CI, along
+the arc for a zero-width communality CI, and as a short cap across the
+interval when both are zero. The cap has the same drawn length at every
+radius except near the centre, where it spans at most a quarter turn and so
+is shorter. A scale whose communality CI is zero at both ends has no
+visible interval at the centre and is drawn as a point, with a warning."><meta property="og:description" content="Draw the estimated item configuration of a cpm_fit() object on the circular
 canvas from ggcircumplex(). Each scale is placed at its estimated angle
 (\(\theta\)), at a radius given by its communality
 (\(\zeta^2\), the share of
@@ -19,7 +25,13 @@ near the centre. The canvas spokes mark the theoretical angles supplied to
 cpm_fit(), so the gap between a point and its spoke shows how far the
 estimated angle departed from the hypothesised one. Where the confidence
 intervals are estimable, a wedge spans each item's angle CI (angularly) and
-communality CI (radially)."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.png"></head><body>
+communality CI (radially). An interval of zero width has no area, so it is
+drawn as a line instead: along the radius for a zero-width angle CI, along
+the arc for a zero-width communality CI, and as a short cap across the
+interval when both are zero. The cap has the same drawn length at every
+radius except near the centre, where it spans at most a quarter turn and so
+is shorter. A scale whose communality CI is zero at both ends has no
+visible interval at the centre and is drawn as a point, with a warning."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -27,7 +39,7 @@ communality CI (radially)."><meta property="og:image" content="http://circumplex
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +88,7 @@ communality CI (radially)."><meta property="og:image" content="http://circumplex
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot a circular process model fit</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.0.1/R/cpm_oop.R" class="external-link"><code>R/cpm_oop.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/cpm_oop.R" class="external-link"><code>R/cpm_oop.R</code></a></small>
       <div class="d-none name"><code>plot.circumplex_cpm.Rd</code></div>
     </div>
 
@@ -91,7 +103,13 @@ near the centre. The canvas spokes mark the <em>theoretical</em> angles supplied
 <code><a href="cpm_fit.html">cpm_fit()</a></code>, so the gap between a point and its spoke shows how far the
 estimated angle departed from the hypothesised one. Where the confidence
 intervals are estimable, a wedge spans each item's angle CI (angularly) and
-communality CI (radially).</p>
+communality CI (radially). An interval of zero width has no area, so it is
+drawn as a line instead: along the radius for a zero-width angle CI, along
+the arc for a zero-width communality CI, and as a short cap across the
+interval when both are zero. The cap has the same drawn length at every
+radius except near the centre, where it spans at most a quarter turn and so
+is shorter. A scale whose communality CI is zero at both ends has no
+visible interval at the centre and is drawn as a point, with a warning.</p>
     </div>
 
     <div class="section level2">
@@ -131,6 +149,14 @@ scale names.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <span class="pkg">ggplot2</span> object.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The communality axis and its labels are drawn along the midpoint of the
+widest gap between spokes that holds no estimated angle (ties go to the
+smallest midpoint; a point on a spoke counts as in both gaps next to it).
+When every gap holds a point, the axis goes in the widest gap, as
+<code><a href="coord_circumplex.html">coord_circumplex()</a></code> places it by default.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

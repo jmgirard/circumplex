@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Advanced Circumplex Visualization</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.0.1/vignettes/advanced-visualization.Rmd" class="external-link"><code>vignettes/advanced-visualization.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/advanced-visualization.Rmd" class="external-link"><code>vignettes/advanced-visualization.Rmd</code></a></small>
       <div class="d-none name"><code>advanced-visualization.Rmd</code></div>
     </div>
 
@@ -101,11 +101,13 @@
 </h2>
 <p>The <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code>,
 <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code>, and <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code>
-functions cover the most common circumplex figures, but they each
+functions cover the most common circumplex figures. But they each
 produce a finished plot with a fixed set of layers. Sometimes you want
-more control: to overlay individual respondents on a group profile, to
-zoom in on a band of amplitudes, to restyle the points, or to place
-several circumplex panels side by side.</p>
+more control. You may want to overlay individual respondents on a group
+profile, or to zoom in on a band of amplitudes. Or you may want to
+restyle the points, or to place several circumplex panels side by side.
+<code><a href="../articles/introduction-to-ssm-analysis.html">vignette("introduction-to-ssm-analysis")</a></code> defines the SSM
+terms used here, such as amplitude and displacement.</p>
 <p>To make that possible, <code>circumplex</code> exposes the building
 blocks that the built-in plots are themselves made of. These are
 ordinary <a href="https://ggplot2.tidyverse.org/" class="external-link"><code>ggplot2</code></a>
@@ -117,12 +119,12 @@ themes:</p>
 <code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> is the <strong>coordinate
 system</strong>. It maps the <code>displacement</code> aesthetic
 (degrees) onto the angle and the <code>amplitude</code> aesthetic onto
-the radius, and it owns the amplitude-to-radius scaling for the whole
+the radius. It also owns the amplitude-to-radius scaling for the whole
 plot.</li>
 <li>
 <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> assembles the empty circular
-<strong>canvas</strong> — the coordinate system plus the amplitude
-rings, displacement spokes, and scale labels.</li>
+<strong>canvas</strong>: the coordinate system plus the amplitude rings,
+displacement spokes, and scale labels.</li>
 <li>
 <code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code> and <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> are
 the <strong>layers</strong> that place profile points and their
@@ -130,12 +132,13 @@ confidence regions in the circle, taking amplitude and displacement
 directly as aesthetics.</li>
 <li>
 <code><a href="../reference/theme_circumplex.html">theme_circumplex()</a></code> is the <strong>theme</strong> the
-canvas is drawn with, and the rings and spokes are ordinary themed panel
-furniture that respond to further theming.</li>
+canvas is drawn with. The rings and spokes are ordinary panel gridlines,
+so further theming restyles them.</li>
 <li>
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> is a <strong>scale</strong> for
-the angle axis of linear circumplex plots (such as the score-by-angle
-curve).</li>
+the angle axis of linear circumplex plots. An example is the
+score-by-angle curve, with scale angle on a straight x-axis and score on
+the y-axis.</li>
 </ul>
 <p>This vignette works through each of these and then combines them.</p>
 </div>
@@ -144,8 +147,8 @@ curve).</li>
 </h2>
 <p><code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> returns a <code>ggplot2</code> object
 containing just the circular backdrop, with no data drawn on it yet. By
-default it uses octant scales labeled by their angular position in
-degrees:</p>
+default it uses octant scales (eight scales placed 45° apart), labeled
+by their angular position in degrees:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-canvas-default-1.png" alt="plot of chunk canvas-default" width="100%"></p>
@@ -159,10 +162,10 @@ full interpersonal names, which you can put on the spokes instead:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="va">csip</span><span class="op">$</span><span class="va">Scales</span><span class="op">$</span><span class="va">Label</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-canvas-descriptive-1.png" alt="plot of chunk canvas-descriptive" width="100%"></p>
-<p>If you are working with one of the instruments bundled with the
-package, you can pass it directly with
-<code>ggcircumplex(instrument = csip)</code>, and its scale angles and
-abbreviations are taken from the instrument rather than typed by
+<p>You may be working with one of the instruments bundled with the
+package. If so, you can pass it directly with
+<code>ggcircumplex(instrument = csip)</code>. Its scale angles and
+abbreviations are then taken from the instrument rather than typed by
 hand.</p>
 <p>Throughout, displacement runs counterclockwise from the right, and
 the 0/360 degree position is labeled 360.</p>
@@ -172,7 +175,7 @@ the 0/360 degree position is labeled 360.</p>
 </h2>
 <p><code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> is a convenience wrapper. Underneath it,
 the piece that makes a circumplex plot circular is
-<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>, and you can add that to a bare
+<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>. You can add that to a bare
 <code>ggplot()</code> yourself when you want to build a figure from
 scratch. On top of the coordinate system you supply three things: an
 x-scale carrying the spoke breaks and labels, a data layer, and the
@@ -195,26 +198,26 @@ theme.</p>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-coord-built-1.png" alt="plot of chunk coord-built" width="100%"></p>
 <p>The <code>scale_x_continuous()</code> line is the one that tells the
-coordinate system where the scale angles are; without it the spokes
+coordinate system where the scale angles are. Without it, the spokes
 would fall on <code>ggplot2</code>’s default breaks rather than on the
 octants. Supplying those breaks and labels, along with the theme, is
 what <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> does on top of the coordinate system.
-Build from the parts when you want to vary one of those pieces; reach
+Build from the parts when you want to vary one of those pieces. Reach
 for <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> when you do not.</p>
-<p>Because the coordinate system owns the amplitude-to-radius mapping,
-<code>amax</code> is set exactly once per plot and the canvas and the
+<p>The coordinate system owns the amplitude-to-radius mapping. So
+<code>amax</code> is set exactly once per plot, and the canvas and the
 data layers cannot disagree about what a given radius means. (Earlier
 versions of the package took an <code>amax</code> argument on each
-layer; those arguments are now deprecated and ignored, with a one-time
+layer. Those arguments are now deprecated and ignored, with a one-time
 note.) Leaving <code>amax = NULL</code> trains it from the data, as
 <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> does.</p>
 <div class="section level3">
 <h3 id="moving-the-center">Moving the center<a class="anchor" aria-label="anchor" href="#moving-the-center"></a>
 </h3>
-<p>By default the center of the circle is amplitude 0, so radial
-distance is proportional to amplitude and the origin means “no
+<p>By default, the center of the circle is amplitude 0. So radial
+distance is proportional to amplitude, and the origin means “no
 differentiation among the scales.” The <code>center</code> argument
-moves that inner limit, which is useful when every profile sits in a
+moves that inner limit. This is useful when every profile sits in a
 narrow band of amplitudes and the interesting variation is squeezed
 against the rim:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -225,19 +228,21 @@ against the rim:</p>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-coord-center-1.png" alt="plot of chunk coord-center" width="100%"></p>
 <p>This is a zoom, and it changes how the figure should be read. With a
-nonzero center, radial distance is no longer proportional to amplitude
-and the origin no longer represents zero amplitude, so differences in
-radius are exaggerated relative to the default view. The amplitude ring
-labels still report the true amplitudes, and they are what the reader
-should be directed to. Use a nonzero center to resolve closely spaced
-profiles, and say so in the caption.</p>
+nonzero center, radial distance is no longer proportional to amplitude.
+The origin no longer represents zero amplitude. So differences in radius
+are exaggerated relative to the default view. The amplitude ring labels
+still report the true amplitudes, and they are what the reader should be
+directed to. Use a nonzero center to resolve closely spaced profiles,
+and say so in the caption.</p>
 </div>
 <div class="section level3">
 <h3 id="moving-the-amplitude-axis">Moving the amplitude axis<a class="anchor" aria-label="anchor" href="#moving-the-amplitude-axis"></a>
 </h3>
 <p>The amplitude (radial) axis and its tick labels are placed
-automatically in the widest gap between the displacement spokes, so they
-never collide with a spoke label. You can override that with
+automatically in the widest gap between the displacement spokes. So they
+never collide with a spoke label. <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> and
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a CPM fit go one step further and use the widest
+gap that holds no plotted point. You can override the placement with
 <code>r_axis_angle</code>, given as a displacement in degrees:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
@@ -246,11 +251,11 @@ never collide with a spoke label. You can override that with
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-coord-r-axis-1.png" alt="plot of chunk coord-r-axis" width="100%"></p>
-<p>Note that these examples build the canvas from its parts — the
+<p>Note that these examples build the canvas from its parts: the
 coordinate system, an x-scale carrying the spoke breaks and labels, and
-the theme — rather than adding a second coordinate system on top of
-<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code>, which <code>ggplot2</code> would replace
-with a message.</p>
+the theme. They do not add a second coordinate system on top of
+<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code>. If they did, <code>ggplot2</code> would
+replace the existing coordinate system and print a message.</p>
 </div>
 </div>
 <div class="section level2">
@@ -259,13 +264,13 @@ with a message.</p>
 <p>Let’s draw the two-measure profile from above on a labeled canvas
 ourselves, rather than calling <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>.</p>
 <p><code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code> places a point for each profile at its
-amplitude (<code>a_est</code>) and displacement (<code>d_est</code>),
-and <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> draws the wedge spanning each profile’s
-amplitude confidence interval radially and its displacement confidence
-interval angularly. Both take the SSM parameters directly as aesthetics
-and handle the conversion into circular coordinates internally,
-including wrap-around when a displacement interval crosses the 0/360
-degree boundary.</p>
+amplitude (<code>a_est</code>) and displacement (<code>d_est</code>).
+<code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> draws a wedge for each profile. The wedge
+spans the profile’s amplitude confidence interval radially and its
+displacement confidence interval angularly. Both take the SSM parameters
+directly as aesthetics and handle the conversion into circular
+coordinates internally. That includes wrap-around when a displacement
+interval crosses the 0/360 degree boundary.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_arc.html">geom_ssm_arc</a></span><span class="op">(</span></span>
@@ -283,17 +288,18 @@ degree boundary.</p>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-results-plot-1.png" alt="plot of chunk results-plot" width="100%"></p>
 <p>Each arc displays two separate confidence intervals for one profile
-at once: its radial extent is the amplitude interval and its angular
+at once. Its radial extent is the amplitude interval, and its angular
 extent is the displacement interval. It is a convenient way to show both
-intervals together, not a single joint confidence region with its own
-coverage level, and not a hypothesis test. The angular extent in
-particular is a range of plausible <em>directions</em>: because zero
-degrees is an arbitrary reference direction rather than a null value, it
-should not be read as a significance test the way a confidence interval
-for a linear parameter (such as elevation) can be. Displacement is only
-worth interpreting at all when the amplitude interval is clearly above
-zero and the model fits reasonably well (see the “Introduction to SSM
-Analysis” vignette and <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code>).</p>
+intervals together. It is not a single joint confidence region with its
+own coverage level, and it is not a hypothesis test.</p>
+<p>The angular extent in particular is a range of plausible
+<em>directions</em>. Zero degrees is an arbitrary reference direction
+rather than a null value. So, unlike a confidence interval for a linear
+parameter (such as elevation), the angular extent should not be read as
+a significance test. Displacement is only worth interpreting at all when
+the amplitude interval is clearly above zero and the model fits
+reasonably well. See the “Introduction to SSM Analysis” vignette and
+<code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="restyling-the-canvas">Restyling the canvas<a class="anchor" aria-label="anchor" href="#restyling-the-canvas"></a>
@@ -357,34 +363,35 @@ group-level point.</p>
 <span>    fill <span class="op">=</span> <span class="st">"#0072B2"</span>, size <span class="op">=</span> <span class="fl">4</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-individuals-1.png" alt="plot of chunk individuals" width="100%"></p>
-<p>The individual points spread widely around the circle while the group
-summary sits close to the origin, a picture that none of the built-in
-functions produce directly. That contrast is not an artifact: the group
-profile is the SSM of the <em>mean</em> scale scores, so its position is
-the average of the individual positions in (x, y) — and averaging
-vectors that point in different directions yields a resultant shorter
-than the typical individual vector, as the two amplitudes printed above
-show. A group amplitude smaller than a typical person’s therefore
-indicates disagreement about <em>direction</em> among the respondents,
-not that each person’s profile is flat. Any other <code>ggplot2</code>
-layer — text annotations, additional geoms, faceting — can be added the
-same way.</p>
+<p>The individual points spread widely around the circle, while the
+group summary sits close to the origin. That contrast is not an
+artifact. The group profile is the SSM of the <em>mean</em> scale
+scores. So its position is the average of the individual positions in
+(x, y), the Cartesian coordinates of each profile’s point in the circle.
+Averaging vectors that point in different directions yields an average
+vector shorter than the typical individual vector. The two amplitudes
+printed above show this. A group amplitude smaller than a typical
+person’s therefore indicates disagreement about <em>direction</em> among
+the respondents, not that each person’s profile is flat. None of the
+built-in functions produce this picture directly. Any other
+<code>ggplot2</code> layer (text annotations, additional geoms,
+faceting) can be added the same way.</p>
 </div>
 <div class="section level2">
 <h2 id="trajectories-across-occasions">Trajectories across occasions<a class="anchor" aria-label="anchor" href="#trajectories-across-occasions"></a>
 </h2>
-<p>When the same people are measured on the same scales at two or more
-occasions, <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code> (for long data) or
+<p>Sometimes the same people are measured on the same scales at two or
+more occasions. Then <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code> (for long data) or
 <code>ssm_analyze(occasions = )</code> (for wide data) estimates one SSM
-profile per occasion, resampling persons so that within-person
+profile per occasion. It resamples persons so that within-person
 dependence across occasions is respected.
 <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> then draws each SSM parameter against
 time.</p>
-<p>Here is a small simulated three-wave data set, <code>long</code>,
-whose group profile rotates counterclockwise across the 0/360 degree
-boundary — the case worth seeing drawn. (The code that simulates it is
-omitted; it is not the point here. The data frame has one row per person
-per wave, the eight <code><a href="../reference/PANO.html">PANO()</a></code> scale columns, an
+<p>Here is a small simulated three-wave data set, <code>long</code>. Its
+group profile rotates counterclockwise across the 0/360 degree boundary,
+which is the case worth seeing drawn. (The code that simulates it is
+omitted, because it is not the point here. The data frame has one row
+per person per wave, the eight <code><a href="../reference/PANO.html">PANO()</a></code> scale columns, an
 <code>id</code>, and a <code>wave</code> label.) We estimate one profile
 per wave with <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -403,51 +410,64 @@ per wave with <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_lon
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">results_long</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-plot-1.png" alt="plot of chunk occasions-plot" width="100%"></p>
 <p>Two things about the displacement panel are worth reading carefully.
-First, it is drawn on an <em>unwrapped</em> branch: the profile crosses
-the 0/360 boundary between the second and third wave, and rather than
-jumping a full turn the panel continues past 360, so values outside [0,
-360) are expected there. Second, the occasion order comes from the data
-rather than from the plot: for a character occasion column it is
-first-appearance order, and for a factor it is the factor’s level order.
-Note that <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code> sorts its levels alphabetically by
-default, which would place <code>T10</code> before <code>T2</code> — so
-if your occasion column is a factor, set its levels in temporal
-order.</p>
+First, it is drawn on an <em>unwrapped</em> branch, which lets angles go
+past 360 (or below 0) so that the line stays continuous. The profile
+crosses the 0/360 boundary between the second and third wave. Rather
+than jumping a full turn, the panel continues past 360, so values
+outside [0, 360) are expected there.</p>
+<p>Second, the occasion order comes from the data rather than from the
+plot. For a character occasion column, it is first-appearance order. For
+a factor, it is the factor’s level order. Note that
+<code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code> sorts its levels alphabetically by default, which
+would place <code>T10</code> before <code>T2</code>. So if your occasion
+column is a factor, set its levels in temporal order.</p>
 <p>The unwrap carries an assumption that no data can check: that the
 profile rotates less than a half-turn between consecutive occasions.
 Waves that are far apart in time, or a series with a gap, could rotate
-further than that and would be drawn as the shorter rotation regardless,
-so read widely spaced occasions with that in mind.</p>
-<p>A time point whose amplitude interval is too close to zero for its
-displacement to be interpretable is drawn as a hollow point — a marker
-of an interpretability precondition, not a significance test.
-<code>drop_xy = TRUE</code> above omits the X-value and Y-value panels,
-leaving elevation, amplitude, and displacement.</p>
+further than that. Such a rotation would be drawn as the shorter
+rotation regardless. So read widely spaced occasions with that in
+mind.</p>
+<p>A time point’s amplitude interval can be too close to zero for its
+displacement to be interpretable. Such a time point is drawn as a hollow
+point. The hollow point marks an interpretability precondition, not a
+significance test.</p>
+<p><code>drop_xy = TRUE</code> above omits the X-value and Y-value
+panels (the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+coordinates of each profile), leaving elevation, amplitude, and
+displacement.</p>
 <p>The bands are the per-occasion confidence intervals, one per time
 point. They are not a simultaneous confidence band for the trajectory as
-a whole, and overlap (or its absence) between two occasions’ bands is
-not a test of change between them; for that, estimate the contrast
-directly (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> and
+a whole. Overlap (or its absence) between two occasions’ bands is not a
+test of change between them. For that, estimate the contrast directly
+(see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> and
 <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code>).</p>
-<p><code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> also accepts a trajectory table —
-a data frame of <code>a_est</code>/<code>a_lci</code>/<code>a_uci</code>
-and <code>d_est</code>/<code>d_lci</code>/<code>d_uci</code> triples at
-numeric time points — which is how you plot a <em>model-based</em>
-trajectory evaluated from a fitted growth model rather than one
-estimated separately at each wave. That workflow is the subject of the
-“Growth Models on SSM Parameters” vignette.</p>
+<p><code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> also accepts a trajectory table.
+This is a data frame of
+<code>a_est</code>/<code>a_lci</code>/<code>a_uci</code> and
+<code>d_est</code>/<code>d_lci</code>/<code>d_uci</code> triples at
+numeric time points. With it, you plot a <em>model-based</em> trajectory
+evaluated from a fitted growth model, rather than one estimated
+separately at each wave. That workflow is the subject of the “Growth
+Models on SSM Parameters” vignette.</p>
 <div class="section level3">
 <h3 id="the-same-change-as-movement-on-the-circle">The same change as movement on the circle<a class="anchor" aria-label="anchor" href="#the-same-change-as-movement-on-the-circle"></a>
 </h3>
-<p>The panels above show each parameter against time separately, which
-is the right figure for reading a confidence interval but a poor one for
-seeing <em>motion</em>: the amplitude and displacement of a single
+<p>The panels above show each parameter against time separately. That is
+the right figure for reading a confidence interval, but a poor one for
+seeing <em>motion</em>. The amplitude and displacement of a single
 occasion are split across two panels. <code><a href="../reference/geom_ssm_path.html">geom_ssm_path()</a></code> draws
 the same series as a path on the circular canvas, so a change in
 (amplitude, displacement) reads as movement through circumplex
 space.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># The amplitude axis goes in the 45-90 gap, clear of the three occasions</span></span>
+<span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.8</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results_long</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
@@ -463,29 +483,31 @@ space.</p>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-path-1.png" alt="plot of chunk occasions-path" width="100%"></p>
 <p>The arrowhead marks the direction of time. Note what the layer does
-at the boundary: this profile moves from 330 to 355 to 20 degrees, and
-the step from the second to the third wave is drawn as the short 25
-degree arc across the 0/360 pole rather than a 335 degree sweep the long
-way round. The path is curved because <code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>
-munches each segment along the polar geodesic — the layer supplies the
-ordering, not the drawing.</p>
+at the boundary. This profile moves from 330 to 355 to 20 degrees. The
+step from the second to the third wave is drawn as the short 25 degree
+arc across the 0/360 pole. It is not drawn as a 335 degree sweep the
+long way round. The path is curved because
+<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> munches each segment along the polar
+geodesic: it splits the segment into short pieces that bend with the
+circle. The layer supplies the ordering, not the drawing.</p>
 <p>Occasions are connected in the order the rows appear in the data,
-exactly as <code>geom_path()</code> does, and mapping <code>group</code>
+exactly as <code>geom_path()</code> does. Mapping <code>group</code>
 draws one path per series. When you assemble a data frame by hand, sort
-it into time order first — for the reason noted above, sorting occasion
+it into time order first. For the reason noted above, sorting occasion
 labels as text puts <code>T10</code> before <code>T2</code> and silently
-reverses time. The wrapper below does that sorting for you.</p>
+reverses time. <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, shown next, does that
+sorting for you.</p>
 <p>The same figure is available ready-made from
 <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, which adds the path to its usual points
 and confidence wedges:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results_long</span>, path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-path-wrapper-1.png" alt="plot of chunk occasions-path-wrapper" width="100%"></p>
-<p>An occasion whose displacement is undefined — a flat or
-zero-amplitude profile — <em>breaks</em> the path rather than being
-interpolated through, and the segment after the gap is still drawn on
-the correct branch. A path that skipped such an occasion would draw a
-movement that never happened.</p>
+<p>An occasion whose displacement is undefined (a flat or zero-amplitude
+profile) <em>breaks</em> the path rather than being interpolated
+through. The segment after the gap is still drawn on the correct branch.
+A path that skipped such an occasion would draw a movement that never
+happened.</p>
 </div>
 </div>
 <div class="section level2">
@@ -511,10 +533,10 @@ abbreviations.</p>
 <span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Scale"</span>, y <span class="op">=</span> <span class="st">"Score"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-curve-axis-1.png" alt="plot of chunk curve-axis" width="100%"></p>
-<p>Passing the same <code>labels</code> (or the same
+<p>Pass the same <code>labels</code> (or the same
 <code>instrument</code>) to both <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> and
-<code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> guarantees that a circular figure and
-a linear one label their scales identically.</p>
+<code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code>. This guarantees that a circular
+figure and a linear one label their scales identically.</p>
 </div>
 <div class="section level2">
 <h2 id="relationship-to-the-built-in-plots">Relationship to the built-in plots<a class="anchor" aria-label="anchor" href="#relationship-to-the-built-in-plots"></a>
@@ -522,11 +544,15 @@ a linear one label their scales identically.</p>
 <p>The built-in plotting functions are implemented on exactly these
 components: <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> is
 <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> plus <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> and
-<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code>, and <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> uses
+<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code>, with the amplitude axis moved to a gap
+that holds no point. <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> uses
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> for its angle axis. So you can always
 start from a built-in plot and add to it, or rebuild it from the pieces
 when you need finer control. Whichever route you take, the coordinates
-are computed the same way, so the results line up.</p>
+are computed the same way, so the results line up. Only the amplitude
+axis can differ: to put it where <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> puts it,
+pass <code>r_axis_angle</code> to <code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>, as in
+the path figure above.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

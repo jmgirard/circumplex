@@ -8,32 +8,38 @@ library(circumplex)
 ## 1. The question growth modeling answers
 
 A single Structural Summary Method (SSM) analysis describes one profile:
-an elevation $`e`$, an amplitude $`a`$, and a displacement $`d`$. With
-repeated measurements — the same persons assessed at several waves — a
-new question opens up: *how does the profile change over time?* Does the
-group’s interpersonal style drift toward warmth? Does its
+an elevation $`e`$, an amplitude $`a`$, and a displacement $`d`$.
+[`vignette("introduction-to-ssm-analysis")`](http://circumplex.jmgirard.com/articles/introduction-to-ssm-analysis.md)
+defines these three parameters. Repeated measurements assess the same
+persons at several waves. With them, a new question opens up: *how does
+the profile change over time?* Does the group’s interpersonal style
+drift toward warmth, one of the directions on the circle? Does its
 distinctiveness (amplitude) grow or fade?
 
-Displacement is an angle, and angles resist ordinary growth modeling: a
-trajectory drifting from 350° to 10° has moved 20°, not −340°, and a
-linear model fit directly to raw displacements will get this wrong
-whenever a trajectory crosses the 0°/360° boundary. This vignette
-presents the package’s recommended recipe, which avoids the boundary
-entirely by modeling growth in the Cartesian coordinates $`(x, y)`$ —
-the same coordinates the SSM estimator itself uses — and converting
-fitted trajectories back to $`(a(t), d(t))`$ with circular-correct
-summaries at the end.
+Displacement is an angle, and angles resist ordinary growth modeling. A
+trajectory drifting from 350° to 10° has moved 20°, not −340°. A linear
+model fit directly to raw displacements will get this wrong whenever a
+trajectory crosses the 0°/360° boundary.
+
+This vignette presents the package’s recommended recipe. The recipe
+avoids the boundary entirely by modeling growth in the Cartesian
+coordinates $`(x, y)`$. Here $`x = a \cos d`$ and $`y = a \sin d`$ place
+the profile as a point on a plane. These are the same coordinates that
+the SSM estimator itself uses. At the end, the recipe converts the
+fitted trajectories back to amplitude and displacement at each time,
+$`(a(t), d(t))`$, with circular-correct summaries.
 
 The division of labor is deliberate and mirrors the package’s Bayesian
 vignette: **circumplex does not fit mixed models**. It prepares the
 coordinate data on the way in
-([`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md))
-and converts fitted model draws on the way out
-([`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md));
-the growth model itself belongs to a dedicated mixed-modeling package.
-The reference recipe below uses **glmmTMB**; the same stacked-outcome
-formulation can be fit with `nlme` (shipped with base R) using its
-`varIdent`/`corSymm` machinery.
+([`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md)).
+It converts fitted model draws (draws that describe the uncertainty in
+the fitted model’s estimates) on the way out
+([`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)).
+The growth model itself belongs to a dedicated mixed-modeling package.
+The reference recipe below uses **glmmTMB**. The same stacked-outcome
+formulation can also be fit with `nlme` (shipped with base R), using its
+`varIdent` and `corSymm` machinery.
 
 ## 2. From repeated measures to a coordinate table
 
@@ -41,12 +47,14 @@ The input to the growth model is a person-by-wave table of SSM
 coordinates.
 [`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md)
 computes each person’s $`(e, x, y)`$ (and $`a`$, $`d`$, fit) from their
-circumplex scale scores; applied per wave, it yields exactly the tidy
-input a mixed model wants.
+circumplex scale scores. Applied per wave, it yields exactly the tidy
+input that a mixed model wants.
 
-We simulate five waves of octant scores for 150 persons whose
-group-level displacement drifts from 350° to 10° — deliberately crossing
-the 0°/360° boundary — with amplitude near 0.6 throughout.
+We simulate five waves of octant scores for 150 persons. Octant scores
+are scores on eight scales placed 45° apart around the circle. The
+group-level displacement drifts from 350° to 10°, deliberately crossing
+the 0°/360° boundary. The group-level amplitude stays near 0.6
+throughout.
 
 ``` r
 
@@ -84,9 +92,11 @@ head(coord, 3)
 ## 3. One joint model, not three separate ones
 
 The growth model treats the three coordinates as a *multivariate*
-outcome: stack them into long format with an outcome indicator `dv`,
-give each outcome its own intercept and slope, and let the person-level
-random effects be **correlated across outcomes**.
+outcome. Stack them into long format with an outcome indicator `dv`, a
+column that names the coordinate each row holds. Give each outcome its
+own intercept and slope. The person-level random effects are each
+person’s own deviations from the group intercepts. Let them be
+**correlated across outcomes**.
 
 ``` r
 
@@ -113,30 +123,41 @@ glmmTMB::fixef(fit)$cond
 #>  0.0649480442
 ```
 
-Why joint? The displacement $`d(t)`$ is derived from $`\hat{x}(t)`$ and
-$`\hat{y}(t)`$*together*, so its uncertainty depends on their **joint**
-sampling distribution — including the covariance
-$`\mathrm{Cov}(\hat{x}(t), \hat{y}(t))`$. Fitting two (or three)
-univariate mixed models instead is a tempting shortcut that produces
-valid-looking output and **wrong $`d(t)`$ intervals**: separate fits
-have independent covariance matrices, which silently sets
-$`\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0`$. In our validation
-simulations, a design with strongly correlated $`x`$–$`y`$ person
-effects (a realistic situation — profile tilts are rarely axis-aligned)
-drops the shortcut’s pointwise $`d(t)`$ coverage from the nominal 95% to
-roughly 86%, while the joint recipe stays at nominal. Do not fit the
-coordinates separately.
+Why joint? The displacement $`d(t)`$ is derived from the estimated mean
+coordinates at time $`t`$, $`\hat{x}(t)`$ and $`\hat{y}(t)`$,
+*together*. So its uncertainty depends on their **joint** sampling
+distribution, including the covariance
+$`\mathrm{Cov}(\hat{x}(t), \hat{y}(t))`$.
+
+A tempting shortcut is to fit two (or three) univariate mixed models
+instead. It produces valid-looking output and **wrong $`d(t)`$
+intervals**. Separate fits have independent covariance matrices, one per
+coordinate. Neither matrix holds the covariance between $`\hat{x}(t)`$
+and $`\hat{y}(t)`$. So combining them silently sets
+$`\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0`$.
+
+The $`x`$ and $`y`$ person effects are each person’s stable shifts in
+$`x`$ and $`y`$. Our validation simulations included a design with
+strongly correlated $`x`$–$`y`$ person effects. In that design, the
+shortcut’s pointwise $`d(t)`$ coverage drops from the nominal 95% to
+roughly 86%. Pointwise coverage is how often the interval at one wave
+contains the true direction. The joint recipe stays at nominal. Strongly
+correlated person effects are realistic, because profile tilts are
+rarely aligned with an axis. Do not fit the coordinates separately.
 
 ## 4. From fixed effects to $`(a(t), d(t))`$ with intervals
 
-The fixed effects define the mean trajectory
-$`(\hat{e}(t), \hat{x}(t), \hat{y}(t))`$. To carry uncertainty through
-the nonlinear map to $`(a(t), d(t))`$, draw coefficient vectors from the
-multivariate normal implied by the fixed-effect covariance matrix — the
-same asymptotic move the package’s Monte Carlo engine makes — evaluate
-each draw at each wave, and hand the per-wave draws to
-[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md),
-which applies the package’s circular-statistics machinery (medians and
+The fixed effects are the group intercepts and slopes. They define the
+mean trajectory $`(\hat{e}(t), \hat{x}(t), \hat{y}(t))`$. Three steps
+carry uncertainty through the nonlinear map from $`(x, y)`$ to
+$`(a(t), d(t))`$. First, draw coefficient vectors from the multivariate
+normal implied by the fixed-effect covariance matrix. That matrix holds
+the estimated sampling variances and covariances of the fixed effects.
+This is the same large-sample (asymptotic) step that the package’s Monte
+Carlo engine takes. Second, evaluate each draw at each wave, which gives
+that draw’s coordinates at that wave. Third, hand the per-wave draws to
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
+It applies the package’s circular-statistics machinery (medians and
 circular means, equal-tailed intervals with correct wrapping at the
 boundary).
 
@@ -188,13 +209,14 @@ round_df
 #> 5    4  0.62  0.59  0.66  14.53  11.21  17.97      TRUE
 ```
 
-The displacement estimates hug the 0°/360° boundary by design — values
-near 350° at early waves and near 10° at late waves — and the intervals
-wrap correctly rather than spanning “the long way around.” A table in
-this shape — one row per time point, with `a_est`/`a_lci`/`a_uci`,
-`d_est`/`d_lci`/`d_uci`, and optionally `certified` — is what
+The displacement estimates hug the 0°/360° boundary by design. Values
+are near 350° at early waves and near 10° at late waves. The intervals
+wrap correctly rather than spanning “the long way around.”
+
 [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
-plots directly:
+plots a table in this shape directly. The table has one row per time
+point, with `a_est`/`a_lci`/`a_uci`, `d_est`/`d_lci`/`d_uci`, and
+optionally `certified`:
 
 ``` r
 
@@ -203,29 +225,42 @@ ssm_plot_trajectory(trajectory, time = "wave")
 
 ![plot of chunk plot](figures/growth-ssm-analysis-plot-1.png)
 
-The displacement panel is drawn on an *unwrapped* branch, so the
-trajectory crosses the boundary as one continuous path instead of
-jumping a full turn, and values there may legitimately fall outside
-$`[0°, 360°)`$. Each interval is placed on its estimate’s branch and
-keeps the width it was reported with — including an interval that
-straddles the seam, which is stored with `d_lci > d_uci`. Doing this by
-hand is easy to get subtly wrong: the natural “shift each bound by its
-signed distance from the estimate” recipe silently cannot represent an
-interval wider than a half-turn, which is exactly the near-origin case
-Section 5 is about. The function handles both.
+The displacement panel is drawn on an *unwrapped* branch. An unwrapped
+branch lets angles go past 360° (or below 0°) so that the line stays
+continuous. So the trajectory crosses the boundary as one continuous
+path instead of jumping a full turn. Values there may legitimately fall
+outside $`[0°, 360°)`$. Each interval is placed on its estimate’s branch
+and keeps the width it was reported with. This holds even for an
+interval that straddles the boundary, which is stored with
+`d_lci > d_uci`. It is stored that way because each bound is wrapped
+onto the circle on its own.
+
+Placing the intervals by hand is easy to get subtly wrong. The natural
+recipe is to “shift each bound by its signed distance from the
+estimate.” That recipe silently cannot represent an interval wider than
+a half-turn. Such an interval is exactly the near-origin case that
+Section 5 is about.
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
+handles both cases: the interval that straddles the boundary and the
+interval wider than a half-turn.
 
 ## 5. Certification: when $`d(t)`$ intervals are not interpretable
 
 A direction is only meaningful when the trajectory is far enough from
-the origin. As $`a(t) \to 0`$ the draws of $`d(t)`$ become diffuse or
-bimodal, and a quantile interval of them is not a trustworthy statement
-about direction. At each wave,
+the origin of the $`(x, y)`$ plane. As $`a(t) \to 0`$, the draws of
+$`d(t)`$ become diffuse or bimodal. A quantile interval of them is then
+not a trustworthy statement about direction.
+
+At each wave,
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
-applies the package’s scale-free certification rule to the amplitude
-interval (lower bound at least 0.35 interval-widths above zero) and
-records the verdict in `$details$certified` — the `certified` column
-above. **At any uncertified wave, the $`d(t)`$ interval is not
-interpretable** and should be reported as such, not narrated as a
+applies the package’s certification rule to the amplitude interval. The
+rule requires the interval’s lower bound to be at least 0.35 times the
+interval’s width. The rule is scale-free: it does not depend on the
+units of the scores.
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+records the verdict in `$details$certified`, which is the `certified`
+column above. **At any uncertified wave, the $`d(t)`$ interval is not
+interpretable.** It should be reported as such, not narrated as a
 direction.
 
 Every wave in our worked example is certified. Here is a trajectory
@@ -275,12 +310,13 @@ mid
 #>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the displacement is not interpretable.
 ```
 
-The printed note is the certification rule firing: at this wave the
-amplitude interval sits too close to zero, and the displacement interval
-— here spanning more than half the circle — is not a statement about
-direction. In our validation simulations of this regime, the caution
-fires at the degraded wave in essentially every replicate while the
-origin-distal waves remain certified and nominally covered.
+The printed note is the certification rule firing. At this wave, the
+amplitude interval sits too close to zero. The displacement interval,
+which here spans more than half the circle, is not a statement about
+direction. In our validation simulations of this near-origin case, the
+caution fires at the degraded wave in essentially every replicate.
+Meanwhile, the waves far from the origin remain certified, and their
+intervals keep their nominal coverage.
 
 Assembling this fit’s full trajectory the same way, and carrying the
 `certified` verdict into the table, lets the plot mark the verdict
@@ -313,34 +349,40 @@ lowamp-plot](figures/growth-ssm-analysis-lowamp-plot-1.png)
 
 Uncertified waves are drawn as **hollow** points on the displacement
 panel. Read them as gaps in the argument, not as estimates with wide
-intervals: the amplitude panel shows why, with the interval collapsing
-toward zero as the group passes the origin. The displacement interval at
-such a wave can cover most of the circle, and the panel draws it at that
-full width rather than flattening it into something that looks precise.
+intervals. The amplitude panel shows why: its interval collapses toward
+zero as the group passes the origin. The displacement interval at such a
+wave can cover most of the circle. The panel draws it at that full width
+rather than flattening it into something that looks precise.
 
 The `certified` column is optional. A table without it plots the same
-way, minus the hollow marking and its legend — the figure then makes no
-claim about interpretability either way, which is the honest default
-when the verdict was never computed.
+way, minus the hollow marking and its legend. The figure then makes no
+claim about interpretability either way. That is the honest default when
+the verdict was never computed.
 
 ## 6. A caution about REML intervals at small samples
 
-The fixed-effect covariance matrix used for the draws conditions on the
-estimated variance components: it ignores their uncertainty. At small
-sample sizes this makes the resulting intervals anticonservative (too
-narrow). This is a property of the mixed-model machinery, not of the SSM
-transform, and the remedy is user-side: with modest N, prefer
-degrees-of-freedom-adjusted inference — the Kenward–Roger adjustment for
-`lme4` fits via **pbkrtest**, the approximate denominator degrees of
-freedom `nlme` supplies, or $`t`$-quantile-based intervals — or a
-parametric bootstrap of the fixed effects, over raw normal-approximation
-draws.
+The model is fit by REML (restricted maximum likelihood). Its variance
+components are the variances and covariances of the random effects and
+the residuals. The fixed-effect covariance matrix used for the draws
+conditions on the estimated variance components. That is, it ignores
+their uncertainty. At small sample sizes, this makes the resulting
+intervals anticonservative (too narrow). This is a property of the
+mixed-model machinery, not of the SSM transform, so the user must apply
+the remedy.
+
+With modest N, prefer degrees-of-freedom-adjusted inference or a
+parametric bootstrap of the fixed effects over raw normal-approximation
+draws. A parametric bootstrap refits the model to data simulated from
+the fitted model. Degrees-of-freedom-adjusted inference includes the
+Kenward–Roger adjustment for `lme4` fits via **pbkrtest**, the
+approximate denominator degrees of freedom `nlme` supplies, or
+$`t`$-quantile-based intervals.
 
 ## 7. The unwrap alternative: `angle_unwrap()`
 
-There is a second documented recipe: compute each person’s displacement
-at each wave, **unwrap** each person’s sequence onto a continuous
-branch, and fit an ordinary univariate growth model to the unwrapped
+There is a second documented recipe. Compute each person’s displacement
+at each wave. **Unwrap** each person’s sequence onto a continuous
+branch. Then fit an ordinary univariate growth model to the unwrapped
 angles.
 
 ``` r
@@ -352,38 +394,42 @@ angle_unwrap(d_person)
 ```
 
 [`angle_unwrap()`](http://circumplex.jmgirard.com/reference/angle_unwrap.md)
-wraps its input into \[0°, 360°), then accumulates the shortest signed
-rotation between successive waves (an exact 180° step ascends, by the
-package’s half-turn convention; an `NA` makes every later wave
-branch-ambiguous, so `NA` propagates onward). The unwrapped values live
-on an ordinary line, so any univariate mixed model applies — this
-framing models the *mean of the person-level directions*, which is a
-legitimate (and different) estimand from the direction of the mean
-trajectory in Section 4.
+wraps its input into \[0°, 360°). Then it accumulates the shortest
+signed rotation between successive waves: it adds up each wave-to-wave
+change, taking the shorter way around the circle. By the package’s
+half-turn convention, an exact 180° step ascends (it counts as +180°).
+An `NA` makes the branch of every later wave ambiguous, so `NA`
+propagates onward. The unwrapped values live on an ordinary line, so any
+univariate mixed model applies. This framing models the *mean of the
+person-level directions*. That is a legitimate (and different) estimand,
+or target of estimation, from the direction of the mean trajectory in
+Section 4.
 
 Its failure modes are sharp, though, and they are the reason the
 $`(x, y)`$ recipe is the reference:
 
 - **Fast movement between waves.** Unwrapping assumes successive waves
-  move less than a half-turn. A trajectory sampled too sparsely (or a
-  person who genuinely swings more than 180° between waves) is unwrapped
-  onto the wrong branch with no warning — near-180° jumps are resolved
-  by convention, not by information the data contain.
-- **No common branch across persons.** When persons occupy genuinely
+  move less than a half-turn. A trajectory sampled too sparsely is
+  unwrapped onto the wrong branch with no warning. So is a person who
+  genuinely swings more than 180° between waves. Near-180° jumps are
+  resolved by convention, not by information the data contain.
+- **No common branch across persons.** Suppose persons occupy genuinely
   heterogeneous locations around the circle (e.g., half the sample near
-  90°, half near 270°), their unwrapped branches are not comparable, and
-  the fixed-effect “mean trajectory” averages numbers that do not share
-  a scale. The $`(x, y)`$ framing has no such requirement.
-- **Low amplitude.** A person’s observed displacement at a wave where
-  their amplitude is near zero is mostly noise, and one noisy wave can
-  throw the rest of that person’s sequence onto a wrong branch (the same
-  reason the Section 5 certification exists).
+  90°, half near 270°). Then their unwrapped branches are not
+  comparable, and the fixed-effect “mean trajectory” averages numbers
+  that do not share a scale. The $`(x, y)`$ framing has no such
+  requirement.
+- **Low amplitude.** Suppose a person’s amplitude is near zero at some
+  wave. Their observed displacement at that wave is mostly noise. One
+  noisy wave can throw the rest of that person’s sequence onto a wrong
+  branch. This is the same reason that the Section 5 certification
+  exists.
 
-In the concentrated, common-branch regime — everyone well away from the
-origin, trajectories moving slowly, directions clustered — the two
-recipes agree closely (our validation simulations find mean trajectory
-differences well under a degree), so the choice matters exactly when the
-unwrap recipe’s assumptions are in doubt.
+The two recipes agree closely in the concentrated, common-branch regime:
+everyone well away from the origin, trajectories moving slowly,
+directions clustered. In that regime, our validation simulations find
+mean trajectory differences well under a degree. So the choice matters
+exactly when the unwrap recipe’s assumptions are in doubt.
 
 ## 8. Caveats and upgrades
 
@@ -392,21 +438,23 @@ statement:
 
 - **The derived $`d(t)`$ is the direction of the mean trajectory, not
   the mean of the person-level directions.** These differ whenever
-  persons disperse directionally; neither is wrong, but they answer
-  different questions, and Section 7’s unwrap recipe targets the latter.
+  persons disperse directionally. Neither is wrong, but they answer
+  different questions. Section 7’s unwrap recipe targets the latter.
 - **The derived $`a(t)`$ shrinks toward zero under directional
   dispersion.** The amplitude of an average profile is smaller than the
   average of individual amplitudes whenever persons point in different
-  directions — the standard SSM aggregation fact, inherited intact by
-  the growth setting.
+  directions. This is the standard SSM aggregation fact, and the growth
+  setting inherits it intact.
 
-Finally, the MVN-draw propagation used here is a large-sample
-approximation that is defensible in the concentrated regime and guarded
-by the Section 5 certification elsewhere. The fully model-based upgrade
-is **projected-normal regression** — e.g., the **bpnreg** package —
-which models circular outcomes directly with person-level structure and
-gives exact posterior inference for $`d(t)`$; circumplex does not wrap
-it, but
+Finally, the multivariate normal (MVN) draw propagation used here is a
+large-sample approximation. Draw propagation is the Section 4 method of
+carrying uncertainty through random draws. It is defensible in the
+concentrated regime (Section 7). Outside that regime, the Section 5
+certification guards it. The fully model-based upgrade is
+**projected-normal regression**, a regression model for angle outcomes.
+The **bpnreg** package is one implementation. The method models circular
+outcomes directly with person-level structure and gives exact posterior
+inference for $`d(t)`$. circumplex has no function that fits it. But
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
 will happily summarize posterior draws produced by any such model.
 
