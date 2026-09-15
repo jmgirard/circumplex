@@ -15,9 +15,9 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 
 ## Scope
 
-**In:** `summary.circumplex_ci_accuracy()` (`R/ssm_ci_oop.R:424`) gets a shorter layout. `print.circumplex_ssm_sem()` (`R/ssm_sem.R:1711`) wraps its ladder notes and verdict prose to the console width and trims them. Printed strings in `R/*.R` that use `--` as a dash get rewritten. D-056 records why these layout changes need no deprecation cycle under GP4. Snapshots and NEWS.md are updated.
+**In:** `summary.circumplex_ci_accuracy()` (`R/ssm_ci_oop.R:424`) gets a shorter layout. `print.circumplex_ssm_sem()` (`R/ssm_sem.R:1711`) wraps its ladder notes and verdict prose to the console width and trims them. Printed strings in `R/*.R` that use `--` as a dash get rewritten. D-056 records why these layout changes need no deprecation cycle under GP4. Snapshots and NEWS.md are updated. The precomputed vignettes whose printed output changes are re-knitted, so that the vignette staleness check passes on the PR.
 
-**Out:** re-knitting vignettes and the prose that reads this output → M128. Dashes in roxygen help text are out, because no one reported them. The `--` placeholder for a missing value in the axes-reliability component table (`R/axes_reliability_oop.R:33`) stays, because it is a table cell and not a dash. Removing a verdict or a caution from printed output is out. Removing a number is also out, except a table column that stays in the returned object (D-056 as corrected by D-057).
+**Out:** the vignette prose that reads this output → M129. Dashes in roxygen help text are out, because no one reported them. The `--` placeholder for a missing value in the axes-reliability component table (`R/axes_reliability_oop.R:33`) stays, because it is a table cell and not a dash. Removing a verdict or a caution from printed output is out. Removing a number is also out, except a table column that stays in the returned object (D-056 as corrected by D-057).
 
 ## Acceptance criteria
 
@@ -39,12 +39,13 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 - [ ] T2: Record the line count of the old summary at width 80 from commit `845fb5e7`. Write tests for AC1's five objects first: the seeded snapshot, CAUTION, near-zero regime, contrast and occasions. Then redesign the summary. Candidates are verdict blocks first and a compact coverage table with one row per profile and condition, with the MC_se, miss and width columns left to `acc$coverage`. The phrase tests at `test-ci_accuracy.R:743`, `:827` and `:863` pass with changes only to dashes and line wrapping.
 - [ ] T3: Wrap the prose in the ladder section with `strwrap()` at `getOption("width")`, and shorten the ΔCFI note (`sem_dcfi_note()`) and the verdict text without dropping a condition they name. Add the lavaan-gated tests from AC2. Skip them with `skip_if_not_installed("lavaan")` (lesson M65 family).
 - [ ] T4: Run AC3's search, list each hit in the work log with its disposition, and rewrite each printed dash as a period, a comma or a connecting word. Then update the phrase tests that match the old text (lesson M56 family: sweep both directions).
-- [ ] T5: Regenerate the changed `expect_snapshot()` files, review each diff line by line against AC1 and AC2, and add the NEWS.md entries. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [ ] T5: Regenerate the changed `expect_snapshot()` files, review each diff line by line against AC1 and AC2, and add the NEWS.md entries. After `devtools::install()`, re-knit the precomputed vignettes with `tools/precompute-vignettes.R` and run `tools/check-vignette-staleness.R`. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
 - 2026-09-14: created by /milestone-plan. The plan gate chose to change the package's printed layouts under a gated decision (D-056) over vignette-only workarounds, because the dashes and the long ladder lines come from the print methods themselves. Falsified by a user workflow that parses the old printed text.
 - 2026-09-14: criteria audit (full mode, fresh [O] reader) found 5 items on this file's draft. All were fixed before writing: the missing GP4 gate became D-056, AC1 got width 80 and the CAUTION, contrast and occasions probes, AC2 was scoped to package prose with three branch probes, AC3's pattern gained `) -- ` and U+2014 with the placeholder exempt, and AC4's snapshot promise moved to T5.
 - 2026-09-14: second fresh [O] audit of the written criteria found 5 items, all fixed. D-056 required every number to stay printed but allowed dropped columns, so D-057 corrects it. AC1 names its line sources and adds a near-zero probe. AC2 is scoped to the ladder block with more branch probes. AC3's pattern gains `--\n` and `—` and covers signaled conditions.
+- 2026-09-14: the M128 re-cut moved the vignette prose that reads this output to M129. The re-knit stays here, because the `vignette-precompute` job fails on a PR whose print changes leave a precomputed vignette stale.
 
 ## Decisions
