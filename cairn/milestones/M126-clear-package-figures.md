@@ -64,6 +64,8 @@
 - claim audit: 22 claims read, 1 corrected — tests/testthat/test-cpm_plot.R
 - 2026-09-14: the claim auditor noted that the `occasions-path` figure's spoke labels changed from degrees to PA to NO, which NEWS did not mention. The NEWS vignette entry now says so (figure viewed in T5).
 - 2026-09-14: all tasks checked, status set to review.
+- 2026-09-14: review gate: user accepted the proposed triage (6 fix now, 7 rejected). Fixes landed in c8878ded, re-verified clean.
+- step-7 approval: m126-clear-package-figures approved for merge
 
 ## Decisions
 
