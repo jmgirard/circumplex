@@ -2065,3 +2065,32 @@ object that the function returns. D-056's other conditions stand.
 accuracy coverage table out of `summary()`, because they stay in
 `acc$coverage`. Removing a verdict, a caution or a number that the returned
 object does not hold still needs its own gate under GP4.
+
+### D-058 (2026-09-14): simulated data that a vignette analyses ships as a documented package dataset built by a seeded data-raw script (M128 plan gate)
+
+**Context.** The maintainer does not want vignettes to show code that
+simulates data, and wants simulated data loaded by name. The
+advanced-visualization and growth vignettes simulate their data in chunks. The
+package already ships one simulated dataset, `simulated_items`, built by
+`data-raw/simulated_items.R`. Under GP4 an exported object is a commitment.
+
+**Decision.** Simulated data that a vignette analyses ships in `data/` as a
+documented dataset whose name starts with `simulated_`. A seeded `data-raw/`
+script writes it, and running the script again gives an identical object. Its
+help page says the data are simulated, states the generating parameters and
+links the script on GitHub, because `data-raw/` is not in the built package.
+The vignette loads the data with `data()`. Model output kept as a fixture,
+such as `vignettes/bayesian_ssm_draws.rds`, is not covered by this entry.
+
+**Rejected.** `.rds` files in `vignettes/` read by hidden chunks were rejected.
+They add no public object, but a reader cannot load the data by name or rerun
+an example outside the vignette. Keeping the simulation in hidden chunks was
+rejected for the same reason.
+
+**Consequences.** M128 adds `simulated_occasions`, `simulated_growth` and
+`simulated_growth_origin`. Removing one of these datasets or changing its
+structure later needs its own gate under GP4. The installed package grows, and
+R CMD check reports it if the data size draws a note.
+
+**Reopens.** A CRAN note or request about the size of `data/`, or a move of
+the teaching vignettes into an ebook that no longer needs the datasets.
