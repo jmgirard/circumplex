@@ -1,6 +1,6 @@
 # M130: The invariance-ladder verdict prints as labeled lines
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -40,12 +40,12 @@ Verdict:  metric invariance rejected
 
 ## Coverage
 
-- AC1 → T2, T3, T4, T8, T9, T13
+- AC1 → T2, T3, T4, T8, T9, T13, T15, T17
 - AC2 → T2, T4
-- AC3 → T1, T3, T5, T8, T11, T14
+- AC3 → T1, T3, T5, T8, T11, T14, T19
 - AC4 → T2, T4
-- AC5 → T6, T10
-- AC6 → T6, T7, T10, T14
+- AC5 → T6, T10, T18
+- AC6 → T6, T7, T10, T14, T16, T18, T19
 
 ## Tasks
 
@@ -63,6 +63,11 @@ Verdict:  metric invariance rejected
 - [x] T12: (finding O7) `print()` of an `invariance` element that lacks the fields the facts helper reads falls back to printing `inv$verdict`, with a test.
 - [x] T13: (finding O11) Start the `Verdict:` value in the same column as the labeled values, and stop repeating the rung name on a `Test:` line when only one rung was tested. Keep AC4 widths.
 - [x] T14: Re-run the T5 comparison over all cases (identical `res$invariance`, warnings, plot errors, stored verdicts), `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [ ] T15: (review 2, finding N6) When the groups are not comparable, print an `Also:` line that names any rung rejected above the required rung, marked as reported only. The stored verdict stays unchanged. Add a test that fails on the current code.
+- [ ] T16: (finding N3) Limit the NEWS.md width sentence to a UTF-8 locale.
+- [ ] T17: (findings N2, N5) The fallback print for an `invariance` element without `required` or `alpha` also prints the `Profiles:`, `Contrast:` and `Instead:` cautions from `comparable` and `contrast_requested`. Test it with a non-comparable case.
+- [ ] T18: (findings N1, N13, N14) Rewrap the 136-character `@details` line in `R/ssm_sem.R` and the long reworded `.orig` prose lines. Add "and a rung has a `dcfi` value" to the gating bullet. Re-document, re-knit, and run the AC5 width count and the staleness check.
+- [ ] T19: Re-run the 14-case comparison, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -90,6 +95,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: claim-audit re-read: all 7 corrected claims hold. A NEWS.md line over 80 characters in the source is rewrapped.
 - 2026-09-15: T14 done. `devtools::test()` at `b854388d` code gave FAIL 0, WARN 9, SKIP 1, PASS 9948 (later commits changed only comments, a test title, roxygen and NEWS wrapping). `devtools::check(args = "--no-manual")` at `d01ed148` gave Status OK, 0 errors, 0 warnings, 0 notes. After that, only NEWS.md line breaks changed. The staleness check passes at the head. Status is set to review.
 - 2026-09-15: review pass 2 checkpoint: AC1 to AC5 evidence recorded and ticked at `eb1b6f0d`. AC6, `document()`, and the [O] reviewer are still running.
+- 2026-09-15: review return 2 (defect): AC1 fails (N6, a rejection above a rejected required rung is not named) and AC6 fails (N3, the NEWS width sentence is false in a non-UTF-8 locale). The maintainer chose to fix the print for N6 rather than amend AC1, and to narrow the NEWS text for N3. T15 to T19 were added and one candidate row was filed. Status back to in-progress. This is the second defect return, and the thrash limit is the third.
 
 ## Decisions
 
@@ -150,3 +156,13 @@ Reviewers: [S] blame-history reported S1 to S3. [S] prior-review reported P1 and
 - N12 = O8: already a candidate row.
 - S3 = O9: already a candidate row.
 - S1: the O6 narrowing, fixed by T11 and tested.
+
+Gate dispositions, 2026-09-15, by the maintainer. The branch returns for fixes (defect return 2), not a merge.
+- N6: AC1 failure, fix the print, T15.
+- N3: AC6 failure. The NEWS sentence is limited to a UTF-8 locale (T16). The non-UTF-8 overflow is a follow-up in a candidate row.
+- N1 = P1, N13, N14: fix in this return, T18.
+- N2 with S2 and N5: fix in this return, T17.
+- N4 = P2: follow-up in the same candidate row as N3.
+- N7, N8, N9, N10, N11: rejected, because each matches master's behavior or is a repeated phrase, and none was chosen for this round.
+- N12 = O8 and S3 = O9: already in a candidate row.
+- S1: no action, already fixed and tested.
