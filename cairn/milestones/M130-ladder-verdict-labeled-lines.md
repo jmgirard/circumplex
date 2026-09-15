@@ -71,6 +71,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: T6 done, pending the staleness re-render. `options(width = 77)` sits in the vignette's hidden setup chunk, and a separate chunk would add blank lines to the render. The re-knitted ladder block spans lines 408 to 421, with a maximum width of 75 counted by `nchar(type = "width")`. The rest of the output is unchanged. The prose, the roxygen and NEWS.md are updated, and the M127 NEWS bullet is replaced.
 - 2026-09-15: claim audit: 31 claims read, 5 corrected — NEWS.md, R/ssm_sem.R, vignettes/sem-based-ssm-analysis.Rmd.orig (width claims held only at 77 and 80, the note is two lines only at 80, `Also:` prints only when comparable, and `dcfi_scope` records fields rather than one reason).
 - 2026-09-15: T7 tests: `devtools::test()` at `08cf7b8a` code gave FAIL 0, WARN 9, SKIP 1, PASS 9788. The 9 warnings match the count M129 recorded on master. Later commits changed only a comment, roxygen and prose.
+- 2026-09-15: T7 first check at `c86ff63d`: 0 errors, 2 warnings, 0 notes, tests OK. Both warnings came from this branch. `sem_verdict_facts()` held a literal `Δχ²` where master had `\u` escapes, because the Edit tool wrote the characters, so a byte-level replace restored the escapes. The test helper called `withr::`, which is not declared, and base `options()` replaces it.
 - 2026-09-15: T5 done. The branch head gives `identical()` invariance, warnings and plot errors in all 13 cases, and the printed-text ledger is in `## Decisions`.
 
 ## Decisions

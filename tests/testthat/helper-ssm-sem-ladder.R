@@ -175,9 +175,9 @@ ladder_case <- function(name) {
 # The ladder block as print() shows it, from the "Invariance ladder" line to
 # the line before the first "# Profile" line
 ladder_block_lines <- function(res, width = 80) {
-  out <- withr::with_options(
-    list(width = width), utils::capture.output(print(res))
-  )
+  old <- options(width = width)
+  on.exit(options(old), add = TRUE)
+  out <- utils::capture.output(print(res))
   start <- grep("^Invariance ladder", out)
   expect_length(start, 1)
   end <- grep("^# Profile", out)

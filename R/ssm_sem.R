@@ -848,7 +848,7 @@ sem_verdict_facts <- function(table, required, alpha,
   req_i <- match(required, rung_order)
   fmt_test <- function(row) {
     sprintf(
-      "%s(%g) = %s, p %s", "Δχ²", row$ddf,
+      "%s(%g) = %s, p %s", "\u0394\u03c7\u00b2", row$ddf,
       format(round(row$dchisq, 2)), sem_fmt_p(row$p, 4, prose = TRUE)
     )
   }
