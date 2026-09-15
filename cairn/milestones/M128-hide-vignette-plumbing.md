@@ -90,6 +90,7 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - 2026-09-15: status set to review.
 - 2026-09-15: /milestone-review started. No PR exists for the branch, and origin/master is still the branch cut 66f8c2ed, so no sync merge was needed.
 - 2026-09-15: review checkpoint, half done. AC1 to AC7 are ticked against recorded evidence. AC8 waits on both package checks, a reinstall and re-knit, and the PR's `vignette-precompute` job. The findings are logged, and their dispositions wait for the merge gate.
+- 2026-09-15: step-7 approval: m128-hide-vignette-plumbing approved for merge, with O5 and O7 fixed first and the other findings rejected.
 
 ## Decisions
 
@@ -131,3 +132,16 @@ Three fresh reviewers ran: [O] diff-bug, [S] blame-history and [S] prior-review.
 - S1 (blame): the Bayesian `atan2` argument-order `stopifnot()` checks, shown on purpose by an earlier plain-English pass, are now hidden behind a sentence. The check still runs.
 - S2 (blame): `waves <- 0:4` is now set in the hidden `trajectory` chunk and reused by the hidden `lowamp-trajectory` chunk.
 - P1-P3 (prior review): shown Bayesian chunks use `dat` (`data-head`, `brms-fit`) and `draws` (`draws-shape`), which hidden chunks define. This resembles M50 finding F2, but here the prose names each object.
+
+### Triage at the merge gate (2026-09-15)
+
+- O5: fix now. NEWS.md wording corrected on the branch.
+- O7: fix now. The help page states the group elevation of 0.
+- O1: rejected. No vignette has a `#|` line, so AC1's result stands.
+- O2: rejected. No vignette header carries a quoted `echo = FALSE`.
+- O3, O4: rejected. The sweep tool does not ship, and search mode, the mode AC1 relies on, is tested.
+- O6: rejected. The plan chose the plain fence, and AC5 allows it.
+- O8: rejected as a style nit.
+- S1: rejected. The plan called for hiding checks, and the check still runs.
+- S2: rejected. Both chunks are hidden, and a broken knit fails the build.
+- P1-P3: rejected. The plan hides these chunks, and AC7 requires the prose to name each object, which it does.

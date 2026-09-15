@@ -21,7 +21,8 @@ simulated_occasions
 A simulated dataset for demonstrating \code{\link[=ssm_analyze_long]{ssm_analyze_long()}} and
 \code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}}. The data are simulated, not collected from people.
 200 persons have scores on the eight octant scales at three waves. At each
-wave the group profile is a cosine curve with amplitude 0.6. Its displacement
+wave the group profile is a cosine curve with elevation 0 and amplitude 0.6.
+Its displacement
 is 330 degrees at \code{T1}, 355 degrees at \code{T2} and 20 degrees at \code{T3}, so the
 profile crosses the 0/360 degree boundary between \code{T2} and \code{T3}. Each person
 has one offset, added to all eight scales at every wave, drawn from a normal
