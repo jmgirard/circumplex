@@ -63,10 +63,10 @@ Verdict:  metric invariance rejected
 - [x] T12: (finding O7) `print()` of an `invariance` element that lacks the fields the facts helper reads falls back to printing `inv$verdict`, with a test.
 - [x] T13: (finding O11) Start the `Verdict:` value in the same column as the labeled values, and stop repeating the rung name on a `Test:` line when only one rung was tested. Keep AC4 widths.
 - [x] T14: Re-run the T5 comparison over all cases (identical `res$invariance`, warnings, plot errors, stored verdicts), `devtools::test()` and `devtools::check(args = "--no-manual")`.
-- [ ] T15: (review 2, finding N6) When the groups are not comparable, print an `Also:` line that names any rung rejected above the required rung, marked as reported only. The stored verdict stays unchanged. Add a test that fails on the current code.
-- [ ] T16: (finding N3) Limit the NEWS.md width sentence to a UTF-8 locale.
-- [ ] T17: (findings N2, N5) The fallback print for an `invariance` element without `required` or `alpha` also prints the `Profiles:`, `Contrast:` and `Instead:` cautions from `comparable` and `contrast_requested`. Test it with a non-comparable case.
-- [ ] T18: (findings N1, N13, N14) Rewrap the 136-character `@details` line in `R/ssm_sem.R` and the long reworded `.orig` prose lines. Add "and a rung has a `dcfi` value" to the gating bullet. Re-document, re-knit, and run the AC5 width count and the staleness check.
+- [x] T15: (review 2, finding N6) When the groups are not comparable, print an `Also:` line that names any rung rejected above the required rung, marked as reported only. The stored verdict stays unchanged. Add a test that fails on the current code.
+- [x] T16: (finding N3) Limit the NEWS.md width sentence to a UTF-8 locale.
+- [x] T17: (findings N2, N5) The fallback print for an `invariance` element without `required` or `alpha` also prints the `Profiles:`, `Contrast:` and `Instead:` cautions from `comparable` and `contrast_requested`. Test it with a non-comparable case.
+- [x] T18: (findings N1, N13, N14) Rewrap the 136-character `@details` line in `R/ssm_sem.R` and the long reworded `.orig` prose lines. Add "and a rung has a `dcfi` value" to the gating bullet. Re-document, re-knit, and run the AC5 width count and the staleness check.
 - [ ] T19: Re-run the 14-case comparison, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -101,6 +101,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: claim audit: 47 claims read, 2 corrected — NEWS.md, R/ssm_sem.R, man/ssm_sem.Rd, tests/testthat/helper-ssm-sem-ladder.R, tests/testthat/test-ssm_sem_groups.R, vignettes/sem-based-ssm-analysis.Rmd.orig (the setup comment claimed every printed line wraps, but `cat()` lavaan syntax does not; NEWS said `Instead:` prints when a contrast was requested, but it prints only when the groups are also not comparable).
 - 2026-09-15: claim-audit re-read: both corrected claims hold. The re-knit after the setup-comment fix changed no `#>` line.
 - 2026-09-15: checkpoint: the T15 to T18 code, docs and re-knit are committed with their boxes unticked. The full `devtools::test()` and `devtools::check(args = "--no-manual")` are still running, and the staleness check runs after this commit.
+- 2026-09-15: T15 to T18 ticked. At `402ada8c`, `tools/check-vignette-staleness.R` reports all 7 vignettes up to date. The full `devtools::test()` gave FAIL 0, WARN 9, SKIP 1, PASS 10030, on R and test code identical to `402ada8c`. `devtools::check(args = "--no-manual")` is still running for T19.
 
 ## Decisions
 
