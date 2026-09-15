@@ -81,5 +81,8 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - 2026-09-15: T7 growth: 42 changed `#>` lines. The trajectory table keeps its columns, `mid` keeps its note and intervals, and the verdicts match AC6. Two sentences were fixed to match the output.
 - 2026-09-15: T7 bayesian and using-instruments: pkgdown HTML output and `<img` counts match the branch cut, and the six counts read 23, 15 and so on as before.
 - 2026-09-15: T7 AC7 checks: every `--hidden-names` hit is named in prose before its use. A package-attach scan finds nothing at head, and it flags ggplot2 in the branch-cut advanced-visualization.
+- 2026-09-15: amendment gate: AC8 as written fails on `using-instruments.Rmd`, whose 38 prose-sweep findings were there at the branch cut. The user chose to narrow AC8 over rewriting that vignette's prose.
+- re-audit: AC8 (full) — three wording gaps: touched fixture `.Rmd` files, the `<stdin>` label, and repeated findings. Fixed wording proposed. The amended state holds at head.
+- re-audit: AC8 (full) — one gap: the head run's exit status is unbounded, and the cut run's input form is unstated. Replacement second sentence proposed. The other questions returned nothing.
 
 ## Decisions
