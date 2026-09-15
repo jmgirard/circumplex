@@ -205,3 +205,21 @@ test_that("plot.circumplex_cpm validates its arguments", {
   expect_error(plot(fit, angle_labels = c("A", "B")))  # wrong length
   expect_warning(plot(fit, bogus_arg = 1), "disregarded")
 })
+
+test_that("plot.circumplex_cpm puts the amplitude axis in a gap with no point", {
+  skip_on_cran()
+  fit <- clean_cpm_fit()
+  axis_angle <- function(fit) {
+    p <- suppressWarnings(plot(fit))
+    ggplot2::ggplot_build(p)$layout$coord$r_axis_inside
+  }
+  # With each estimate exactly on its own spoke, every gap holds a point and the
+  # default widest-gap rule applies. (The fitted estimates sit about 1e-7
+  # degrees off their spokes, which leaves a gap empty, so pin them.)
+  fit$results$Angle <- fit$results$Angle_theory
+  expect_equal(axis_angle(fit), 22.5)
+  # Moving two estimates off their spokes clears the 45-90 gap first.
+  fit$results$Angle[fit$results$Scale == "PA"] <- 100
+  fit$results$Angle[fit$results$Scale == "NO"] <- 30
+  expect_equal(axis_angle(fit), 67.5)
+})

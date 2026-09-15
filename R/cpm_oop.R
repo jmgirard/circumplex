@@ -329,7 +329,17 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
 #' [cpm_fit()], so the gap between a point and its spoke shows how far the
 #' estimated angle departed from the hypothesised one. Where the confidence
 #' intervals are estimable, a wedge spans each item's angle CI (angularly) and
-#' communality CI (radially).
+#' communality CI (radially). An interval of zero width has no area, so it is
+#' drawn as a line instead: along the radius for a zero-width angle CI, along
+#' the arc for a zero-width communality CI, and as a short fixed-length cap
+#' when both are zero. A scale whose communality CI is zero at both ends has no
+#' visible interval at the centre and is drawn as a point, with a warning.
+#'
+#' The communality axis and its labels are drawn along the midpoint of the
+#' widest gap between spokes that holds no estimated angle (ties go to the
+#' smallest midpoint; a point on a spoke counts as in both gaps next to it).
+#' When every gap holds a point, the axis goes in the widest gap, as
+#' [coord_circumplex()] places it by default.
 #'
 #' @param x A `circumplex_cpm` object from [cpm_fit()].
 #' @param amax A single positive number giving the communality represented by
@@ -447,6 +457,12 @@ plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
     ggplot2::theme(
       legend.position = if (legend) "right" else "none"
     )
+  # Keep the amplitude axis labels off the plotted points. The canvas coord is
+  # built fresh by ggcircumplex() above, so setting its field changes no other
+  # plot.
+  p$coordinates$r_axis_angle <- ssm_r_axis_angle_clear(
+    angles, df$Angle[pointable]
+  )
 
   if (any(wedge)) {
     p <- p +

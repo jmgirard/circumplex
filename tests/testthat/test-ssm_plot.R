@@ -281,3 +281,24 @@ test_that("ssm_plot_circle warns by name and omits an undefined-displacement pro
   expect_true(ggplot2::is_ggplot(p))
   expect_silent(invisible(ggplot2::ggplot_build(p)))
 })
+
+test_that("ssm_plot_circle() puts the amplitude axis in a gap with no point", {
+  skip_on_cran()
+  data("jz2017")
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = c("NARPD", "ASPD"),
+                     boots = 20)
+  axis_angle <- function(res) {
+    p <- suppressWarnings(ssm_plot_circle(res))
+    ggplot2::ggplot_build(p)$layout$coord$r_axis_inside
+  }
+  # A point in the 0-45 gap moves the axis off the default 22.5.
+  res$results$d_est <- c(17.8, 200)
+  res$results$d_lci <- res$results$d_est - 5
+  res$results$d_uci <- res$results$d_est + 5
+  expect_equal(axis_angle(res), 67.5)
+  # Points away from the 0-45 gap keep the default placement.
+  res$results$d_est <- c(100, 200)
+  res$results$d_lci <- res$results$d_est - 5
+  res$results$d_uci <- res$results$d_est + 5
+  expect_equal(axis_angle(res), 22.5)
+})

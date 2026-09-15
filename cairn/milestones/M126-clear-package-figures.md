@@ -38,7 +38,7 @@
 ## Tasks
 
 - [x] T1: Write failing tests in `tests/testthat/test-cpm_plot.R` for the zero-width cases and probes in AC1. Then change `plot.circumplex_cpm()` to draw a zero-width angle interval as a radial segment, a zero-width communality interval as an arc with a visible line weight, and a both-zero interval as a short cap of fixed drawn length. Render each case and look at it (lesson M33).
-- [ ] T2: Write a data-aware axis-angle helper beside `ssm_r_axis_angle()`, with tests for AC2's rule, ties, a point on a spoke and the all-gaps-full fallback. Call it from `ssm_plot_circle()` and `plot.circumplex_cpm()`. Update both help pages to state the rule.
+- [x] T2: Write a data-aware axis-angle helper beside `ssm_r_axis_angle()`, with tests for AC2's rule, ties, a point on a spoke and the all-gaps-full fallback. Call it from `ssm_plot_circle()` and `plot.circumplex_cpm()`. Update both help pages to state the rule.
 - [ ] T3: Make the `occasions-plot` panels at least as wide as tall. First try the chunk's figure size in `advanced-visualization.Rmd.orig:331` and in the growth vignette's `plot` chunks. If that is not enough, change the legend, caption or facet layout in `ssm_trajectory_ggplot()`. Keep `panel.spacing.x` (lesson M50).
 - [ ] T4: Fix the roxygen at `R/ssm_trajectory.R:412` against `ssm_interval_on_branch()` (`R/ssm_trajectory.R:58`), then run `devtools::document()`. Revert any `Config/roxygen2/version` change (lesson M85).
 - [ ] T5: In `advanced-visualization.Rmd.orig`, set `r_axis_angle` in the `occasions-path` chunk's canvas. After `devtools::install()`, re-knit with `tools/precompute-vignettes.R` every vignette the Scope's grep lists. View each AC3 figure's PNG, and record one verdict per figure as review evidence.
@@ -55,6 +55,7 @@
 - re-audit: AC1 (full) — 6 items: data-space vs canvas length, redundant reason clause, silent drop at upper bound 0 (GP2), no interior zero-width case, missing seam and negative-bound probes. All fixed in the rewrite.
 - re-audit: AC1 (full) — 9 items: seam storage forms, cap placement, point needs a location, warning names its reason, default `amax`, line width floor, assertions on every probe, "for that scale". All fixed; the user accepted the final wording at a gate (second-line stop).
 - 2026-09-14: T1 done. `plot.circumplex_cpm()` draws zero-width intervals with a `geom_segment()` layer and names each point-only scale with its reason. Six new tests failed before the change and pass after it. A render of radial, arc and cap cases looked right. CPM snapshots regenerated; `devtools::test()` 0 failures.
+- 2026-09-14: T2 done. `ssm_r_axis_angle_clear()` in `R/coord_circumplex.R` feeds both plot functions, and both help pages state the rule. The clean CPM fit's estimates sit about 1e-7 degrees off their spokes, so its axis moves to 157.5 and its snapshots changed, as did `cross-zero circle`. `devtools::test()` 0 failures.
 
 ## Decisions
 
