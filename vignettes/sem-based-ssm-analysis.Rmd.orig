@@ -184,14 +184,14 @@ ssm_plot_circle(latent)
 ```
 
 ```r
-ssm_table(latent)
+ssm_table(latent, drop_xy = TRUE)
 ```
 
 ```{r latent-table, echo = FALSE}
-knitr::kable(
-  ssm_table(latent, render = FALSE),
-  caption = "Latent SSM profile of NARPD"
-)
+# Non-breaking spaces keep each estimate and its interval on one line.
+latent_tab <- ssm_table(latent, drop_xy = TRUE, render = FALSE)
+latent_tab[] <- lapply(latent_tab, function(x) gsub(" ", " ", x))
+knitr::kable(latent_tab, caption = "Latent SSM profile of NARPD")
 ```
 
 By default `ssm_sem()` fits with a robust estimator (`estimator = "MLR"`,
@@ -428,9 +428,10 @@ documentation states them, and the vignette should too.
   approximations, not exact structure.
 - **Fixed angles are theoretical.** Departures from the theoretical geometry
   load into misfit, not into the angles. Use `cpm_fit()` to examine geometry.
-- **Latent-plane stationarity is assumed, not tested.** The plane factors are
-  fixed isotropic and orthogonal. Anisotropic latent dispersion surfaces only
-  as global misfit.
+- **The scaled tier assumes latent-plane stationarity and does not test it.**
+  That tier fixes the plane factors isotropic and orthogonal, so anisotropic
+  latent dispersion surfaces only as global misfit. The strict tier frees the
+  factor variances and covariances.
 - **The scaled tier assumes the general factor is orthogonal to the plane.**
   A true general-factor lean surfaces as misfit under the scaled tier. Use the
   strict tier to model it.
