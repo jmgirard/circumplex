@@ -106,6 +106,16 @@ ssm_plot_circle(
 
 A ggplot variable containing a completed circular plot.
 
+## Details
+
+The amplitude axis and its labels are drawn along the midpoint of the
+widest gap between displacement spokes that holds no plotted point
+estimate (ties go to the smallest midpoint; a point on a spoke counts as
+in both gaps next to it). When every gap holds a point, the axis goes in
+the widest gap, as
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+places it by default.
+
 ## See also
 
 Other visualization functions:

@@ -97,12 +97,16 @@ certification marking described below.
 The displacement panel is drawn on an *unwrapped* branch, so a profile
 whose displacement crosses the 0/360 boundary renders as one continuous
 path rather than jumping a full turn. Values on that panel may therefore
-fall outside \[0, 360); each confidence bound is placed at its signed
-angular distance from its own estimate. Unwrapping assumes the profile
-rotates less than a half-turn between consecutive time points at which
-its displacement is defined – no data can verify this, so time points
-that are far apart, or a series with a gap, should be read with that in
-mind.
+fall outside \[0, 360). The lower confidence bound is placed below the
+estimate by the counterclockwise angle from the lower bound to the
+estimate, and the upper bound is placed above the lower bound by the
+counterclockwise angle from the lower bound to the upper bound. An
+interval is therefore always drawn as the counterclockwise arc from its
+lower to its upper bound, even when that arc is wider than a half-turn.
+Unwrapping assumes the profile rotates less than a half-turn between
+consecutive time points at which its displacement is defined – no data
+can verify this, so time points that are far apart, or a series with a
+gap, should be read with that in mind.
 
 Occasions appear in the order they were supplied to
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)

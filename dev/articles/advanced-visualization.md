@@ -180,8 +180,12 @@ and say so in the caption.
 
 The amplitude (radial) axis and its tick labels are placed automatically
 in the widest gap between the displacement spokes. So they never collide
-with a spoke label. You can override that with `r_axis_angle`, given as
-a displacement in degrees:
+with a spoke label.
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+and [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a CPM
+fit go one step further and use the widest gap that holds no plotted
+point. You can override the placement with `r_axis_angle`, given as a
+displacement in degrees:
 
 ``` r
 
@@ -441,7 +445,11 @@ draws the same series as a path on the circular canvas, so a change in
 
 ``` r
 
-ggcircumplex(octants(), amax = 0.8) +
+ggplot() +
+  # The amplitude axis goes in the 45-90 gap, clear of the three occasions
+  coord_circumplex(amax = 0.8, r_axis_angle = 67.5) +
+  scale_x_continuous(breaks = octants(), labels = PANO()) +
+  theme_circumplex() +
   geom_ssm_point(
     data = results_long$results,
     mapping = aes(amplitude = a_est, displacement = d_est),
@@ -543,14 +551,18 @@ plus
 [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
 and
 [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
-and
+with the amplitude axis moved to a gap that holds no point.
 [`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md)
 uses
 [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
 for its angle axis. So you can always start from a built-in plot and add
 to it, or rebuild it from the pieces when you need finer control.
 Whichever route you take, the coordinates are computed the same way, so
-the results line up.
+the results line up. Only the amplitude axis can differ: to put it where
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+puts it, pass `r_axis_angle` to
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+as in the path figure above.
 
 ## References
 

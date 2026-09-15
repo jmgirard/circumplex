@@ -241,7 +241,9 @@ and say so in the caption.</p>
 </h3>
 <p>The amplitude (radial) axis and its tick labels are placed
 automatically in the widest gap between the displacement spokes. So they
-never collide with a spoke label. You can override that with
+never collide with a spoke label. <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> and
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a CPM fit go one step further and use the widest
+gap that holds no plotted point. You can override the placement with
 <code>r_axis_angle</code>, given as a displacement in degrees:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
@@ -462,7 +464,11 @@ the same series as a path on the circular canvas, so a change in
 (amplitude, displacement) reads as movement through circumplex
 space.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># The amplitude axis goes in the 45-90 gap, clear of the three occasions</span></span>
+<span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.8</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results_long</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
@@ -539,11 +545,15 @@ figure and a linear one label their scales identically.</p>
 <p>The built-in plotting functions are implemented on exactly these
 components: <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> is
 <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> plus <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> and
-<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code>, and <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> uses
+<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code>, with the amplitude axis moved to a gap
+that holds no point. <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> uses
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> for its angle axis. So you can always
 start from a built-in plot and add to it, or rebuild it from the pieces
 when you need finer control. Whichever route you take, the coordinates
-are computed the same way, so the results line up.</p>
+are computed the same way, so the results line up. Only the amplitude
+axis can differ: to put it where <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> puts it,
+pass <code>r_axis_angle</code> to <code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>, as in
+the path figure above.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

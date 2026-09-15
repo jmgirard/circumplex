@@ -14,7 +14,14 @@ supplied to
 so the gap between a point and its spoke shows how far the estimated
 angle departed from the hypothesised one. Where the confidence intervals
 are estimable, a wedge spans each item's angle CI (angularly) and
-communality CI (radially).
+communality CI (radially). An interval of zero width has no area, so it
+is drawn as a line instead: along the radius for a zero-width angle CI,
+along the arc for a zero-width communality CI, and as a short cap across
+the interval when both are zero. The cap has the same drawn length at
+every radius except near the centre, where it spans at most a quarter
+turn and so is shorter. A scale whose communality CI is zero at both
+ends has no visible interval at the centre and is drawn as a point, with
+a warning.
 
 ## Usage
 
@@ -53,6 +60,15 @@ plot(x, amax = 1, angle_labels = NULL, legend = TRUE, ...)
 ## Value
 
 A ggplot2 object.
+
+## Details
+
+The communality axis and its labels are drawn along the midpoint of the
+widest gap between spokes that holds no estimated angle (ties go to the
+smallest midpoint; a point on a spoke counts as in both gaps next to
+it). When every gap holds a point, the axis goes in the widest gap, as
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+places it by default.
 
 ## See also
 

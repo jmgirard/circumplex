@@ -167,6 +167,14 @@ through. See <code><a href="geom_ssm_path.html">geom_ssm_path()</a></code> for t
     <p>A ggplot variable containing a completed circular plot.</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The amplitude axis and its labels are drawn along the midpoint of the widest
+gap between displacement spokes that holds no plotted point estimate (ties go
+to the smallest midpoint; a point on a spoke counts as in both gaps next to
+it). When every gap holds a point, the axis goes in the widest gap, as
+<code><a href="coord_circumplex.html">coord_circumplex()</a></code> places it by default.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other visualization functions:
 <code><a href="plot.circumplex_ci_accuracy.html">plot.circumplex_ci_accuracy()</a></code>,
