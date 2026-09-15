@@ -35,7 +35,7 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 
 ## Tasks
 
-- [ ] T1: Confirm that D-056 and D-057 are in `cairn/DECISIONS.md`. They are the gate record for this milestone.
+- [x] T1: Confirm that D-056 and D-057 are in `cairn/DECISIONS.md`. They are the gate record for this milestone.
 - [ ] T2: Record the line count of the old summary at width 80 from commit `845fb5e7`. Write tests for AC1's five objects first: the seeded snapshot, CAUTION, near-zero regime, contrast and occasions. Then redesign the summary. Candidates are verdict blocks first and a compact coverage table with one row per profile and condition, with the MC_se, miss and width columns left to `acc$coverage`. The phrase tests at `test-ci_accuracy.R:743`, `:827` and `:863` pass with changes only to dashes and line wrapping.
 - [ ] T3: Wrap the prose in the ladder section with `strwrap()` at `getOption("width")`, and shorten the ΔCFI note (`sem_dcfi_note()`) and the verdict text without dropping a condition they name. Add the lavaan-gated tests from AC2. Skip them with `skip_if_not_installed("lavaan")` (lesson M65 family).
 - [ ] T4: Run AC3's search, list each hit in the work log with its disposition, and rewrite each printed dash as a period, a comma or a connecting word. Then update the phrase tests that match the old text (lesson M56 family: sweep both directions).
@@ -47,5 +47,10 @@ The printed accuracy summary and the printed invariance ladder show their verdic
 - 2026-09-14: criteria audit (full mode, fresh [O] reader) found 5 items on this file's draft. All were fixed before writing: the missing GP4 gate became D-056, AC1 got width 80 and the CAUTION, contrast and occasions probes, AC2 was scoped to package prose with three branch probes, AC3's pattern gained `) -- ` and U+2014 with the placeholder exempt, and AC4's snapshot promise moved to T5.
 - 2026-09-14: second fresh [O] audit of the written criteria found 5 items, all fixed. D-056 required every number to stay printed but allowed dropped columns, so D-057 corrects it. AC1 names its line sources and adds a near-zero probe. AC2 is scoped to the ladder block with more branch probes. AC3's pattern gains `--\n` and `—` and covers signaled conditions.
 - 2026-09-14: the M128 re-cut moved the vignette prose that reads this output to M129. The re-knit stays here, because the `vignette-precompute` job fails on a PR whose print changes leave a precomputed vignette stale.
+- 2026-09-14: implement started on branch `m127-shorter-printed-reports`. The old seeded summary prints 80 lines at width 80, so AC1's limit is 40. The AC3 search found 15 non-comment hits: 14 printed dashes and the exempt placeholder.
+- 2026-09-14: T1 done. D-056 and D-057 are in `cairn/DECISIONS.md`. The question gate chose one merged table, a three-line header and kept the x and y columns.
 
 ## Decisions
+
+- 2026-09-14 (question gate): `summary.circumplex_ci_accuracy()` prints one merged table with one row per profile and condition. Its columns are the coverage of e, x, y, a and d, the conditional displacement coverage, the certification rate and the Structural flag. All other coverage and guardrail columns stay only in the returned object (D-057).
+- 2026-09-14 (question gate): the nine tab-aligned setting lines become three prose lines that keep every number.
