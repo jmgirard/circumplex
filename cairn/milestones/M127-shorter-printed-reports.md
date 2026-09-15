@@ -1,13 +1,13 @@
 # M127: Printed reports are shorter and easier to scan
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — changes the printed output of exported print and summary methods
-- **Branch/PR:** —
+- **Branch/PR:** m127-shorter-printed-reports
 
 ## Goal
 
