@@ -26,9 +26,9 @@
   as a `Verdict:` line followed by short labeled lines: `Test:` and `Result:`,
   `Also:` for a rung rejected above the required one when the groups can be
   compared, and `Contrast:` and `Profiles:` when they cannot, plus `Instead:`
-  when a contrast was requested. The labeled values wrap to the console width, and at 77 and 80 columns every
-  line of the block fits. The stored verdict text, and the warning and error
-  that quote it, do not change.
+  when a contrast was requested. The labeled values wrap to the console
+  width, and at 77 and 80 columns every line of the block fits. The stored
+  verdict text, and the warning and error that quote it, do not change.
 
 * `print()` for a multi-group `ssm_sem()` result shows the `dcfi` and `cr`
   columns and a short ΔCFI note (two lines at 80 columns) only for a

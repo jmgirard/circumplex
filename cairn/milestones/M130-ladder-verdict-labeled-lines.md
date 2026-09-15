@@ -87,6 +87,7 @@ Verdict:  metric invariance rejected
 - 2026-09-15: T10 done. Roxygen, NEWS.md and the vignette bullet corrected, `document()` gives no link warnings, and the re-knitted ladder block (lines 408 to 421) has a maximum width of 75. The re-knit changed only the `Verdict:` column, the `Test:` line and the bullet.
 - 2026-09-15: T14 in progress (checkpoint): the 14-case comparison at `b854388d` gives `identical()` invariance, warnings, plot errors and stored verdicts, and every block line fits at 77 and 80. `devtools::test()`, `devtools::check()` and the claim audit are still running.
 - 2026-09-15: claim audit: 68 claims read, 7 corrected — NEWS.md, R/ssm_sem.R, man/ssm_sem.Rd, tests/testthat/helper-ssm-sem-ladder.R, tests/testthat/test-ssm_sem_groups.R (`Instead:` prints only with a requested contrast, `dcfi_scope$estimator` is lavaan's name and reads ML for MLR, no released object reaches the print fallback, the fallback verdict wraps, fixture and test comments name `sem_verdict_facts()` and what the note test calls). The same reader's re-read of the 7 is pending.
+- 2026-09-15: claim-audit re-read: all 7 corrected claims hold. A NEWS.md line over 80 characters in the source is rewrapped.
 
 ## Decisions
 
