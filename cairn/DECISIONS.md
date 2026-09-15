@@ -2012,3 +2012,37 @@ reports below the accuracy target — an under-report, which reopens D-051's
 mechanism rather than this test; a refusal there under any literal other than
 `"unidentified"`; or a machine-independent derivation of a `solve()` tolerance
 inside the measured band.
+
+### D-056 (2026-09-14): printed reports may change layout and wording without a deprecation cycle when every number, verdict and caution stays printed; this narrows GP4's printed-output clause and takes up D-039's "own gate" for format changes (M127 plan gate)
+
+**Context.** The maintainer reported that `summary()` of an `ssm_ci_accuracy()`
+result is too long to read in a vignette. The invariance ladder in `print()` of
+an `ssm_sem()` result is hard to parse, with verdict lines well over 80
+characters. Package messages also use ` -- ` as a dash, which the vignettes
+show as output. GP4 makes printed output a commitment. It allows a break only
+with statistical cause or a gated irreversible-api decision, and a break needs a
+deprecation cycle. D-039 read a factual correction as outside GP4. It also said
+that a format change or a dropped field "still needs its own gate". This entry
+is that gate.
+
+**Decision.** A printed report may change its layout, line wrapping, dash
+punctuation and wording without a deprecation cycle under three conditions.
+Every number, verdict and caution that it printed stays printed. The meaning
+of each caution stays the same. A table column that stops printing stays in
+the object that the function returns. Such a change is not a GP4 break. It
+ships with a NEWS.md entry and updated snapshots.
+
+**Rejected.** A deprecation cycle for the layout, such as an option that keeps
+the old format for a release, was rejected. Printed text is for reading, and
+the package documents no parsing of it. An option would keep two layouts under
+test for no user need. Vignette-only workarounds were also rejected, because
+the dashes and the long lines come from the print methods themselves.
+
+**Consequences.** M127 changes `summary.circumplex_ci_accuracy()`,
+`print.circumplex_ssm_sem()` and the package's printed dash clauses under this
+entry. A change that removes a printed number, verdict or caution, or changes
+a returned object's structure, does not inherit this entry. It still needs its
+own gate under GP4.
+
+**Reopens.** A user report of a script or tool that parses one of these printed
+reports and broke on the new layout.
