@@ -49,7 +49,7 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - [x] T4: advanced-visualization: load `simulated_occasions`, and hide the `subset()` table code, the `individuals` filter and the `curve-axis` data frame behind prose. Move `library(ggplot2)` into an echoed chunk if echoed code uses it.
 - [x] T5: growth Sections 2 to 5: load both datasets, show `ssm_parameters_id()` on the octant scores, hide the reshape and the draws loop, and show one `ssm_draws()` call for one wave. Describe each hidden step and every name it defines (lesson M50).
 - [x] T6: structure `variants` and `ipsatize`, SEM `latent-table`, the four Bayesian chunks and the using-instruments count chunk: keep the package calls shown, hide table assembly, checks and data building, and add the `ssm_table()` code blocks that AC5 needs.
-- [ ] T7: Re-knit every precomputed vignette with `tools/precompute-vignettes.R`, and build the two knit-at-build articles with pkgdown. Count figures, and check the named outputs and the certification verdicts. Read the prose of the sources AC7 names against the new output, fix what no longer matches, and record one work-log line per vignette.
+- [x] T7: Re-knit every precomputed vignette with `tools/precompute-vignettes.R`, and build the two knit-at-build articles with pkgdown. Count figures, and check the named outputs and the certification verdicts. Read the prose of the sources AC7 names against the new output, fix what no longer matches, and record one work-log line per vignette.
 - [ ] T8: Run `tools/prose-sweep.R`, `tools/check-vignette-staleness.R`, `devtools::test()`, `devtools::check(args = "--no-manual")` and `devtools::check(manual = TRUE)`. Add a NEWS.md documentation entry for the vignette changes.
 
 ## Work log
@@ -74,5 +74,12 @@ A vignette reader sees the circumplex calls and model-fitting calls being taught
 - 2026-09-15: T4 done. advanced-visualization loads `simulated_occasions`, and `library(ggplot2)` is in the shown setup chunk. The column selections, the `NA` filter and the `curve` data frame are hidden behind prose. The plot chunks keep their labels, so figure files keep their names. The path prose now gives the estimated angles (about 332, 355 and 21 degrees).
 - 2026-09-15: T5 done. growth loads both datasets and shows `ssm_parameters_id()` on them (750 rows each), one `ssm_draws()` call at wave 2, both `glmmTMB()` fits and `mid`. The reshapes, both draw steps and both trajectory loops are hidden, and prose names `long`, `B`, `trajectory`, `long2`, `B2` and `trajectory2`. Every wave of the first trajectory is certified, and wave 2 of the origin trajectory is not. The prose on displacement estimates now gives the printed values.
 - 2026-09-15: T6 done. The structure vignette shows three `cpm_fit()` calls and hides both table builds. SEM shows `ssm_table(latent)` in a plain fence. Bayesian hides the two `stopifnot()` checks, the data build, the `readRDS()` call and the prior simulation. using-instruments hides the count chunk. All nine kable sites pass the AC5 check. Printed output of the two knit-at-build articles is unchanged.
+- 2026-09-15: T7: all seven precomputed vignettes re-knit with no diff, and figure counts match the branch cut (3, 2, 13, 11, 10, 2, 0). The staleness check passes.
+- 2026-09-15: T7 structure: 2 changed `#>` lines, both the masked elapsed time. The `variants` and `ipsatize` tables are unchanged, and no prose change was needed.
+- 2026-09-15: T7 SEM: no `#>` change, and the latent table is unchanged.
+- 2026-09-15: T7 advanced-visualization: 6 changed `#>` lines, all in the occasions table, whose labels are unchanged. The path prose was fixed to the estimated angles.
+- 2026-09-15: T7 growth: 42 changed `#>` lines. The trajectory table keeps its columns, `mid` keeps its note and intervals, and the verdicts match AC6. Two sentences were fixed to match the output.
+- 2026-09-15: T7 bayesian and using-instruments: pkgdown HTML output and `<img` counts match the branch cut, and the six counts read 23, 15 and so on as before.
+- 2026-09-15: T7 AC7 checks: every `--hidden-names` hit is named in prose before its use. A package-attach scan finds nothing at head, and it flags ggplot2 in the branch-cut advanced-visualization.
 
 ## Decisions
