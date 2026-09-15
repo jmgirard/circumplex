@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-09-15 (M127 archived, M124 row pruned, O5 candidate added.)_
+_Last hygiene check: 2026-09-15 (M128 archived, M125 row pruned.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -9,11 +9,10 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M128 | Vignettes show the package calls they teach, not the plumbing around them | review | M126 | normal | milestones/M128-hide-vignette-plumbing.md |
 | M129 | Vignette prose matches the package's code and printed output | planned | M127, M128 | normal | milestones/M129-vignette-prose-matches-output.md |
+| M128 | Vignettes show the package calls they teach, not the plumbing around them | done | M126 | normal | milestones/archive/M128-hide-vignette-plumbing.md |
 | M127 | Printed reports are shorter and easier to scan | done | — | normal | milestones/archive/M127-shorter-printed-reports.md |
 | M126 | Package figures show every point, interval and axis label clearly | done | — | normal | milestones/archive/M126-clear-package-figures.md |
-| M125 | The circumplex-structure vignette reads as plain English | done | M123 | normal | milestones/archive/M125-plain-vignette-structure.md |
 
 ## Candidates
 
