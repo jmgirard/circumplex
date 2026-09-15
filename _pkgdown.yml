@@ -13,8 +13,10 @@ template:
     docsearch:
       api_key: ec4004481ba8d410e8e20c9e90fa5e60
       index_name: circumplex
+# One site at the root, rebuilt from master on every push, so the published
+# pages always match the current code (there is no separate /dev/ site).
 development:
-  mode: auto
+  mode: release
 reference:
 - title: Instrument Functions
   desc: Functions for importing and examining circumplex instruments
