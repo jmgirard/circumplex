@@ -183,7 +183,11 @@ moves.)
 ssm_plot_circle(latent)
 ```
 
-```{r latent-table}
+```r
+ssm_table(latent)
+```
+
+```{r latent-table, echo = FALSE}
 knitr::kable(
   ssm_table(latent, render = FALSE),
   caption = "Latent SSM profile of NARPD"

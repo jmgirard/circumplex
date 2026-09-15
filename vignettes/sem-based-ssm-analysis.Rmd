@@ -243,12 +243,8 @@ ssm_plot_circle(latent)
 
 <img src="figures/sem-based-ssm-analysis-latent-plot-1.png" alt="plot of chunk latent-plot" width="70%" />
 
-
-``` r
-knitr::kable(
-  ssm_table(latent, render = FALSE),
-  caption = "Latent SSM profile of NARPD"
-)
+```r
+ssm_table(latent)
 ```
 
 
