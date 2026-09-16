@@ -219,24 +219,15 @@ fit
 #> Sample size (N):   1166 
 #> Reference scale:   PA 
 #> 
-#>  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-#>     PA           90  90.000    90.000    90.000 0.767    0.679    0.888
-#>     BC          135 125.074   112.759   136.068 0.931    0.861    1.000
-#>     DE          180 170.353   156.422   183.533 0.780    0.738    0.836
-#>     FG          225 195.425   185.156   205.763 0.861    0.829    0.902
-#>     HI          270 250.721   243.600   257.894 0.956    0.940    0.977
-#>     JK          315 269.491   261.621   277.776 0.942    0.930    0.956
-#>     LM          360 294.230   285.726   302.375 0.806    0.757    0.854
-#>     NO           45  11.305     1.719    21.025 1.000    1.000    1.000
-#>  Communality
-#>        0.589
-#>        0.868
-#>        0.608
-#>        0.741
-#>        0.914
-#>        0.888
-#>        0.650
-#>        1.000
+#>  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality
+#>     PA     90  90.000  90.000  90.000 0.767 0.679 0.888       0.589
+#>     BC    135 125.074 112.759 136.068 0.931 0.861 1.000       0.868
+#>     DE    180 170.353 156.422 183.533 0.780 0.738 0.836       0.608
+#>     FG    225 195.425 185.156 205.763 0.861 0.829 0.902       0.741
+#>     HI    270 250.721 243.600 257.894 0.956 0.940 0.977       0.914
+#>     JK    315 269.491 261.621 277.776 0.942 0.930 0.956       0.888
+#>     LM    360 294.230 285.726 302.375 0.806 0.757 0.854       0.650
+#>     NO     45  11.305   1.719  21.025 1.000 1.000 1.000       1.000
 #> 
 #> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a
@@ -256,24 +247,15 @@ cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
 #> Sample size (N):   1166 
 #> Reference scale:   PA 
 #> 
-#>  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-#>     PA           90  90.000        NA        NA 0.767       NA       NA
-#>     BC          135 125.074        NA        NA 0.931       NA       NA
-#>     DE          180 170.353        NA        NA 0.780       NA       NA
-#>     FG          225 195.425        NA        NA 0.861       NA       NA
-#>     HI          270 250.721        NA        NA 0.956       NA       NA
-#>     JK          315 269.491        NA        NA 0.942       NA       NA
-#>     LM          360 294.230        NA        NA 0.806       NA       NA
-#>     NO           45  11.305        NA        NA 1.000       NA       NA
-#>  Communality
-#>        0.589
-#>        0.868
-#>        0.608
-#>        0.741
-#>        0.914
-#>        0.888
-#>        0.650
-#>        1.000
+#>  Scale Theory   Angle lci uci  Zeta lci uci Communality
+#>     PA     90  90.000  NA  NA 0.767  NA  NA       0.589
+#>     BC    135 125.074  NA  NA 0.931  NA  NA       0.868
+#>     DE    180 170.353  NA  NA 0.780  NA  NA       0.608
+#>     FG    225 195.425  NA  NA 0.861  NA  NA       0.741
+#>     HI    270 250.721  NA  NA 0.956  NA  NA       0.914
+#>     JK    315 269.491  NA  NA 0.942  NA  NA       0.888
+#>     LM    360 294.230  NA  NA 0.806  NA  NA       0.650
+#>     NO     45  11.305  NA  NA 1.000  NA  NA       1.000
 #> 
 #> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a

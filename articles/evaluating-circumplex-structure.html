@@ -148,6 +148,11 @@ covariance-structure fit indices.</p>
 the raw-data path, the default confidence intervals are bootstrapped. We
 lower <code>boots</code> from its default of 2000 to keep this vignette
 quick to build. In practice, use the default.</p>
+<p>This chunk prints two warnings: the CPM Hessian is ill-conditioned,
+and some bootstrap resamples were excluded. Both are expected for these
+data. The section <em>When a fit sits at a boundary</em>, below,
+explains the first. The second means that the intervals rest only on the
+resamples that were kept.</p>
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the reported condition number and the bootstrap
      acceptance counts move across BLAS implementations; the numbers this
@@ -174,24 +179,15 @@ quick to build. In practice, use the default.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Estimated angles and communality indices</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci</span></span>
-<span><span class="co">#&gt;     PA           90  90.000    90.000    90.000 0.767    0.684    0.860</span></span>
-<span><span class="co">#&gt;     BC          135 125.074   113.548   137.069 0.931    0.872    1.000</span></span>
-<span><span class="co">#&gt;     DE          180 170.353   156.943   185.174 0.780    0.733    0.826</span></span>
-<span><span class="co">#&gt;     FG          225 195.425   185.811   206.523 0.861    0.822    0.910</span></span>
-<span><span class="co">#&gt;     HI          270 250.721   244.660   258.758 0.956    0.935    0.977</span></span>
-<span><span class="co">#&gt;     JK          315 269.491   261.813   279.412 0.942    0.929    0.957</span></span>
-<span><span class="co">#&gt;     LM          360 294.230   286.626   303.019 0.806    0.761    0.850</span></span>
-<span><span class="co">#&gt;     NO           45  11.305     2.426    20.913 1.000    1.000    1.000</span></span>
-<span><span class="co">#&gt;  Communality</span></span>
-<span><span class="co">#&gt;        0.589</span></span>
-<span><span class="co">#&gt;        0.868</span></span>
-<span><span class="co">#&gt;        0.608</span></span>
-<span><span class="co">#&gt;        0.741</span></span>
-<span><span class="co">#&gt;        0.914</span></span>
-<span><span class="co">#&gt;        0.888</span></span>
-<span><span class="co">#&gt;        0.650</span></span>
-<span><span class="co">#&gt;        1.000</span></span>
+<span><span class="co">#&gt;  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality</span></span>
+<span><span class="co">#&gt;     PA     90  90.000  90.000  90.000 0.767 0.684 0.860       0.589</span></span>
+<span><span class="co">#&gt;     BC    135 125.074 113.548 137.069 0.931 0.872 1.000       0.868</span></span>
+<span><span class="co">#&gt;     DE    180 170.353 156.943 185.174 0.780 0.733 0.826       0.608</span></span>
+<span><span class="co">#&gt;     FG    225 195.425 185.811 206.523 0.861 0.822 0.910       0.741</span></span>
+<span><span class="co">#&gt;     HI    270 250.721 244.660 258.758 0.956 0.935 0.977       0.914</span></span>
+<span><span class="co">#&gt;     JK    315 269.491 261.813 279.412 0.942 0.929 0.957       0.888</span></span>
+<span><span class="co">#&gt;     LM    360 294.230 286.626 303.019 0.806 0.761 0.850       0.650</span></span>
+<span><span class="co">#&gt;     NO     45  11.305   2.426  20.913 1.000 1.000 1.000       1.000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Correlation-function weights</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -396,24 +392,15 @@ correlation-matrix path, where the intervals are analytic.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Estimated angles and communality indices</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci</span></span>
-<span><span class="co">#&gt;     PA           90  90.000    90.000    90.000 0.785    0.748    0.823</span></span>
-<span><span class="co">#&gt;     BC          135 125.057   120.571   129.542 0.881    0.852    0.911</span></span>
-<span><span class="co">#&gt;     DE          180 167.802   161.988   173.616 0.799    0.777    0.820</span></span>
-<span><span class="co">#&gt;     FG          225 193.344   187.711   198.976 0.878    0.854    0.901</span></span>
-<span><span class="co">#&gt;     HI          270 250.958   245.112   256.805 0.958    0.944    0.971</span></span>
-<span><span class="co">#&gt;     JK          315 269.528   263.351   275.706 0.948    0.938    0.958</span></span>
-<span><span class="co">#&gt;     LM          360 293.619   286.622   300.617 0.803    0.778    0.829</span></span>
-<span><span class="co">#&gt;     NO           45  12.673     7.017    18.329 0.929    0.836    1.023</span></span>
-<span><span class="co">#&gt;  Communality</span></span>
-<span><span class="co">#&gt;        0.617</span></span>
-<span><span class="co">#&gt;        0.777</span></span>
-<span><span class="co">#&gt;        0.638</span></span>
-<span><span class="co">#&gt;        0.770</span></span>
-<span><span class="co">#&gt;        0.917</span></span>
-<span><span class="co">#&gt;        0.899</span></span>
-<span><span class="co">#&gt;        0.645</span></span>
-<span><span class="co">#&gt;        0.863</span></span>
+<span><span class="co">#&gt;  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality</span></span>
+<span><span class="co">#&gt;     PA     90  90.000  90.000  90.000 0.785 0.748 0.823       0.617</span></span>
+<span><span class="co">#&gt;     BC    135 125.057 120.571 129.542 0.881 0.852 0.911       0.777</span></span>
+<span><span class="co">#&gt;     DE    180 167.802 161.988 173.616 0.799 0.777 0.820       0.638</span></span>
+<span><span class="co">#&gt;     FG    225 193.344 187.711 198.976 0.878 0.854 0.901       0.770</span></span>
+<span><span class="co">#&gt;     HI    270 250.958 245.112 256.805 0.958 0.944 0.971       0.917</span></span>
+<span><span class="co">#&gt;     JK    315 269.528 263.351 275.706 0.948 0.938 0.958       0.899</span></span>
+<span><span class="co">#&gt;     LM    360 293.619 286.622 300.617 0.803 0.778 0.829       0.645</span></span>
+<span><span class="co">#&gt;     NO     45  12.673   7.017  18.329 0.929 0.836 1.023       0.863</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Correlation-function weights</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -553,7 +540,10 @@ the structure it was simulated from.)</li>
 instrument consistent with <em>equally spaced</em> scales? Is it
 consistent with <em>equal</em> communalities? The correlation-matrix
 path is convenient for this comparison, because its point estimates and
-fit indices are deterministic. So no bootstrap is needed:</p>
+fit indices are deterministic. So no bootstrap is needed. The first of
+these refits (<code>quasi-circumplex</code>) prints the same
+ill-conditioned Hessian warning that <em>When a fit sits at a
+boundary</em> explains.</p>
 <!-- precompute:volatile-numbers start -- these three model variants
      refit the same ill-conditioned correlation matrix, so the reported
      condition number and the fit indices derived from that solution move
@@ -813,7 +803,11 @@ object built with the default <code>boots = 2000</code>. They give a
 Monte Carlo standard error under one percentage point for coverage near
 the nominal level, and they are recommended in practice. The
 <code>parallel</code>/<code>ncpus</code> arguments speed up real runs
-without changing results for a given seed.</p>
+without changing results for a given seed. The CPM fit inside the
+diagnostic prints the same ill-conditioned Hessian warning that <em>When
+a fit sits at a boundary</em> explains.</p>
+<p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows the short report: one block of verdicts
+per profile.</p>
 <!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
      ill-conditioned CPM, whose solution moves in the third digit across
      BLAS implementations; every simulated replication moves with it, so
@@ -823,11 +817,109 @@ without changing results for a given seed.</p>
 <span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy</a></span><span class="op">(</span><span class="va">res</span>, reps <span class="op">=</span> <span class="fl">200</span>, amplitude_factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles</span></span>
 <span><span class="co">#&gt; may be clustered or parameters weakly determined.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; SSM CI accuracy, simulated at your n and settings (200 replications per</span></span>
+<span><span class="co">#&gt; condition; bootstrap intervals with 500 replicates at level 0.95)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
+<span><span class="co">#&gt;     Elevation      coverage 93.0%: borderline</span></span>
+<span><span class="co">#&gt;     Amplitude      coverage 94.5%: borderline</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 89.1% when certified: borderline</span></span>
+<span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
+<span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
+<span><span class="co">#&gt;                    2.5%)</span></span>
+<span><span class="co">#&gt;   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement</span></span>
+<span><span class="co">#&gt;   coverage rates are borderline at this number of replications; a larger</span></span>
+<span><span class="co">#&gt;   `reps` would sharpen the verdict.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
+<span><span class="co">#&gt;     Elevation      coverage 95.0%: borderline</span></span>
+<span><span class="co">#&gt;     Amplitude      coverage 83.0%: INADEQUATE (under-coverage; misses are</span></span>
+<span><span class="co">#&gt;                    almost all below the interval: the amplitude CI tends to</span></span>
+<span><span class="co">#&gt;                    sit above the truth)</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 50.0% when certified: INADEQUATE (under-coverage)</span></span>
+<span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
+<span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
+<span><span class="co">#&gt;                    2.5%)</span></span>
+<span><span class="co">#&gt;   Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this</span></span>
+<span><span class="co">#&gt;   sample size and displacement CIs mis-cover even when certified. Elevation</span></span>
+<span><span class="co">#&gt;   coverage is borderline at this number of replications; a larger `reps`</span></span>
+<span><span class="co">#&gt;   would sharpen the verdict. Consider a larger sample or treat near-zero</span></span>
+<span><span class="co">#&gt;   amplitudes as inconclusive rather than absent.</span></span></code></pre></div>
+<!-- precompute:volatile-numbers end -->
+<p>How to read this output. Each profile’s lines classify its coverage
+at the amplitude it was estimated to have. Coverage is how often your CI
+procedure covered the truth in the simulated replications. The
+diagnostic compares it with the nominal level, using the Wilson interval
+(an interval around the estimated coverage) and the Bradley band.</p>
+<ul>
+<li>
+<strong>Elevation, Amplitude and Displacement</strong> give the
+coverage of each parameter and its class. Displacement coverage counts
+only the replications in which the profile was <em>certified</em>. A
+certified profile has its amplitude CI lower bound at least 0.35
+CI-widths above zero.</li>
+<li>
+<strong>Guardrail</strong> gives the rate at which a profile whose
+true amplitude is zero would still be certified. Any such certification
+is a false certification. The line prints a caution when that rate is
+materially above the rate that a user would expect from the interval
+level. This is a measured property of the shipped display rule, not a
+hypothesis test.</li>
+<li>
+<strong>Verdict</strong> states the overall conclusion for the
+profile.</li>
+</ul>
+<p>The two profiles tell usefully different stories. Paranoid PD is
+certified. Its amplitude CI lower bound clears the 0.35-CI-width margin,
+so the printed output adds no displacement note. None of its coverage
+rates clearly leaves the Bradley band at the as-estimated amplitude.
+Obsessive–compulsive PD is <em>not</em> certified. Its amplitude (about
+.02 here) is far too close to zero relative to its CI width. So the
+printed output still shows its displacement and interval, but with a
+note that the displacement is not interpretable. The
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> result flags this on its own, before any
+coverage question is asked. On top of that, the diagnostic shows that
+its amplitude and displacement CIs under-cover badly at this sample
+size. Almost all amplitude misses fall below the interval, so the
+amplitude CI tends to sit above the truth. So its verdict is a caution
+for a genuine reason. The intervals themselves are unreliable, not
+merely the point on the circle.</p>
+<p>The guardrail line confirms that the rule is doing its job. At this
+configuration
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>250</mn></mrow><annotation encoding="application/x-tex">n = 250</annotation></semantics></math>,
+eight octant correlations), take a profile whose true amplitude is
+exactly zero. Its estimated certification rate does not clearly exceed
+the benchmark rate. That rate is roughly the one-sided error that a user
+reading the guardrail would expect. So no caution fires from the
+guardrail itself. This is the payoff of the scale-free rule. Unlike a
+fixed amplitude-unit cutoff, it keeps false-certification from clearly
+exceeding the benchmark, even in the near-zero regime that Zimmermann
+and Wright flagged. In that regime, a sample amplitude large enough to
+look non-zero is otherwise the <em>expected</em> outcome from a flat
+population.</p>
+<p>One reading note: at reduced <code>reps</code>, classes tend to print
+as <code>borderline</code>. This is because the Wilson interval around
+the estimated coverage is too wide to place it clearly inside or outside
+the Bradley band. That is the diagnostic being honest about its own
+Monte Carlo error. The default <code>reps = 1000</code> sharpens such
+classifications into <code>adequate</code> or
+<code>INADEQUATE</code>.</p>
+<div class="section level4">
+<h4 id="the-full-report">The full report<a class="anchor" aria-label="anchor" href="#the-full-report"></a>
+</h4>
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> adds the settings, a note on the simulated
+population, and a table of coverage at every rung of the amplitude
+ladder:</p>
+<!-- precompute:volatile-numbers start -- the summary of the diagnostic run
+     above; its numbers move with that run across BLAS implementations. -->
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per</span></span>
 <span><span class="co">#&gt; condition.</span></span>
-<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 5.2s.</span></span>
+<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 6.2s.</span></span>
 <span><span class="co">#&gt; Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) &gt;= 0.35.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
@@ -885,86 +977,45 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;   contain a zero truth). This is a theorem, not a measurement; the</span></span>
 <span><span class="co">#&gt;   informative near-zero rungs are the small c &gt; 0 ones.</span></span></code></pre></div>
 <!-- precompute:volatile-numbers end -->
-<p>How to read this output:</p>
+<p>How to read the additions:</p>
 <ul>
 <li>
-<strong>The coverage table</strong> reports how often your CI
-procedure covered the truth in the simulated replications, for each
-parameter. It does so at the amplitude that the profile was estimated to
-have (<code>Condition = 1</code>) and at fractions of it. Compare
-coverage against the nominal level using the Wilson interval (an
-interval around the estimated coverage) and the Bradley band. The
-verdict does this for you.</li>
+<strong>The structure note</strong> describes the population the
+replications were drawn from, with its fit indices and any boundary
+markers from the CPM fit.</li>
+<li>
+<strong>The coverage table</strong> reports coverage for each
+parameter at each rung of the ladder (<code>Condition = 1</code> is the
+amplitude as estimated). The <code>d_cert</code> column is displacement
+coverage when certified.</li>
 <li>
 <strong>The amplitude ladder</strong> (<code>Condition</code>
 column) matters because your estimated amplitude is biased upward. The
 population that generated your data plausibly has <em>less</em>
 differentiation than your estimate. The rungs below 1 show what happens
-to coverage in that direction. The 0 rung shows the degenerate
-flat-profile case. There, displacement has no true value at all, and the
-amplitude interval cannot cover the boundary truth. (Its printed zero
-coverage is structural, and the table flags it.) When a profile’s
-estimated amplitude is smaller than half its own CI width, the
-diagnostic adds one more rung at a scaling factor above 1. This is the
-case for obsessive–compulsive PD here. That rung is the amplitude at
-which the population would sit exactly at the observed CI
-half-width.</li>
+to coverage in that direction. For paranoid PD, no coverage rate clearly
+leaves the Bradley band with the population amplitude halved either. The
+0 rung shows the degenerate flat-profile case. There, displacement has
+no true value at all, and the amplitude interval cannot cover the
+boundary truth. (Its printed zero coverage is structural, and the table
+flags it.) When a profile’s estimated amplitude is smaller than half its
+own CI width, the diagnostic adds one more rung at a scaling factor
+above 1. This is the case for obsessive–compulsive PD here. That rung is
+the amplitude at which the population would sit exactly at the observed
+CI half-width.</li>
 <li>
-<strong>The <code>cert</code> column</strong> of the coverage table
-reports how often profiles were <em>certified</em> at each rung. Each
-profile’s <code>Guardrail</code> line gives the rate at the 0 rung. A
-certified profile has its amplitude CI lower bound at least 0.35
-CI-widths above zero. At the 0 rung, any certification is a false
-certification. The summary prints a caution when the false-certification
-rate is materially above the rate that a user would expect from the
-interval level. This is a measured property of the shipped display rule,
-not a hypothesis test.</li>
+<strong>The <code>cert</code> column</strong> reports how often
+profiles were certified at each rung. The <code>Guardrail</code> line of
+the short report is this rate at the 0 rung.</li>
 <li>
 <strong>The lines under
-<code>Verdicts (c = 1, as estimated)</code></strong> classify elevation,
-amplitude, and certification-conditional displacement coverage at your
-as-estimated amplitude. Each profile’s <code>Verdict:</code> paragraph
-states the overall conclusion.</li>
+<code>Verdicts (c = 1, as estimated)</code></strong> are the verdict
+blocks that <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows.</li>
 </ul>
 <p>For a visual summary across the ladder:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%"></p>
-<p>The two profiles tell usefully different stories. Paranoid PD is
-certified. Its amplitude CI lower bound clears the 0.35-CI-width margin,
-so the printed output adds no displacement note. Nothing in its coverage
-table clearly leaves the Bradley band, at the as-estimated amplitude or
-with the population amplitude halved. Obsessive–compulsive PD is
-<em>not</em> certified. Its amplitude (about .02 here) is far too close
-to zero relative to its CI width. So the printed output still shows its
-displacement and interval, but with a note that the displacement is not
-interpretable. The <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> result flags this on its
-own, before any coverage question is asked. On top of that, the
-diagnostic shows that its amplitude and displacement CIs under-cover
-badly at this sample size. Almost all amplitude misses fall below the
-interval, so the amplitude CI tends to sit above the truth. So its
-verdict is a caution for a genuine reason. The intervals themselves are
-unreliable, not merely the point on the circle.</p>
-<p>The guardrail line confirms that the rule is doing its job. At this
-configuration
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>250</mn></mrow><annotation encoding="application/x-tex">n = 250</annotation></semantics></math>,
-eight octant correlations), take a profile whose true amplitude is
-exactly zero. Its estimated certification rate does not clearly exceed
-the benchmark rate. That rate is roughly the one-sided error that a user
-reading the guardrail would expect. So no caution fires from the
-guardrail itself. This is the payoff of the scale-free rule. Unlike a
-fixed amplitude-unit cutoff, it keeps false-certification from clearly
-exceeding the benchmark, even in the near-zero regime that Zimmermann
-and Wright flagged. In that regime, a sample amplitude large enough to
-look non-zero is otherwise the <em>expected</em> outcome from a flat
-population.</p>
-<p>One reading note: at reduced <code>reps</code>, classes tend to print
-as <code>borderline</code>. This is because the Wilson interval around
-the estimated coverage is too wide to place it clearly inside or outside
-the Bradley band. That is the diagnostic being honest about its own
-Monte Carlo error. The default <code>reps = 1000</code> sharpens such
-classifications into <code>adequate</code> or
-<code>INADEQUATE</code>.</p>
 <p>Two settings are worth knowing. First,
 <code>structure = "observed"</code> rebuilds the population from the
 pooled observed correlations instead of the CPM. If the two structures
@@ -978,6 +1029,7 @@ conditions, it reproduces their accuracy classifications. It gives
 coverage inside the Bradley band at conditions they found accurate. It
 gives the same one-sided under-coverage at conditions they found
 inaccurate.</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="when-to-trust-ssm-parameters">When to trust SSM parameters<a class="anchor" aria-label="anchor" href="#when-to-trust-ssm-parameters"></a>
@@ -1000,8 +1052,8 @@ elevation is also the parameter that ipsatizing destroys. See Section
 zero, so it overshoots when true differentiation is weak. Before
 interpreting a “marked” amplitude at modest
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
-run <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> and look at the sub-1 ladder
-rungs.</li>
+run <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> and look at the sub-1 ladder rungs in
+its <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> or <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
 <li>
 <strong>Only interpret displacement when amplitude is
 credible.</strong> When the amplitude CI lower bound sits less than 0.35
@@ -1095,7 +1147,7 @@ removing that general factor (Acton &amp; Revelle, 2004, p. 9), so it is
 <code>scoring = "raw"</code> to analyze the scores as given. Each of the
 two scorings carries its own set of cutoffs (next subsection), matched
 automatically.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_structure.html">fit_structure</a></span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">res</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1122,7 +1174,7 @@ automatically.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Interpretations are heuristic likelihood classifications from simulation,</span></span>
 <span><span class="co">#&gt;   not significance tests (Acton &amp; Revelle, 2004). RANDALL's p-value is exact.</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Circumplex Structure Tests (Acton &amp; Revelle, 2004)</span></span>
@@ -1164,7 +1216,7 @@ octant spacing, with broadly similar communalities. <code>Fisher</code>
 measures departures in communality, and <code>Gap</code> measures
 departures in even angular spacing. <code>Variance</code> (VT2) and
 <code>Rotation</code> test interstitiality.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%"></p>
 <p>For the IIP-SC octants, the picture agrees with Section 2’s CPM fit.
@@ -1285,7 +1337,7 @@ between the ipsatized scales and any external measure sum to exactly
 zero. This forces the mean correlation toward zero, regardless of how
 strongly the construct relates to the instrument’s general factor
 (Zimmermann &amp; Wright, 2017, p. 4).</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">45678</span><span class="op">)</span></span>
 <span><span class="va">res_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span>,</span>

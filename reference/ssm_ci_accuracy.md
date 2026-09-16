@@ -274,7 +274,8 @@ acc <- ssm_ci_accuracy(res, reps = 25, amplitude_factors = c(1, 0.25))
 #> Warning: CPM Hessian is ill-conditioned (condition number 3.53e+17): angles may be clustered or parameters weakly determined.
 acc
 #> 
-#> SSM CI accuracy, simulated at your n and settings (25 replications per condition; bootstrap intervals with 100 replicates at level 0.95)
+#> SSM CI accuracy, simulated at your n and settings (25 replications per
+#> condition; bootstrap intervals with 100 replicates at level 0.95)
 #> 
 #>   # Profile [All] (n = 200; 95% bootstrap CIs, 100 replicates):
 #>     Elevation      coverage 92.0%: borderline
@@ -286,7 +287,7 @@ acc
 summary(acc)
 #> 
 #> Mean scores; bootstrap, 100 replicates, level 0.95; 25 reps per condition.
-#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.3s.
+#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.2s.
 #> Ladder c = 1, 0.25; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
