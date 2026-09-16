@@ -29,7 +29,7 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 - [x] AC4: `_pkgdown.yml` has an `articles:` section with one group per level, every vignette in `vignettes/` listed exactly once across the groups in the map's order, and a navbar Vignettes menu with the same entries in the same order. Procedure: a script reads the two lists from the YAML and the vignette titles from `vignettes/` and diffs them. `pkgdown::check_pkgdown()` runs clean as a second check.
 - [x] AC5: For each of the seven pre-computed vignettes, the `tools/prose-sweep.R --chunks` output at the branch head is identical to the output at the merge base, and `tools/check-vignette-staleness.R` passes at the branch head.
 - [x] AC6: For each of the nine source files, the finding list of `tools/prose-sweep.R` at the branch head is a subset of its finding list at the merge base. The SEM page and the three older pages have findings at master, so the frame adds none and removes any it touches.
-- [ ] AC7: `Rscript -e 'devtools::test()'` reports 0 failures, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and no note that the merge base does not report.
+- [x] AC7: `Rscript -e 'devtools::test()'` reports 0 failures, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and no note that the merge base does not report.
 
 ## Coverage
 
@@ -77,3 +77,20 @@ Reviewed 2026-09-16 on branch m135-vignette-levels-and-frame at 9eb175e0. Master
 - AC4: `tools/check-pkgdown-vignettes.R` reports that the articles index, the navbar menu and `vignettes/` agree on 9 pages. `pkgdown::check_pkgdown()` finds no problems.
 - AC5: `tools/prose-sweep.R --chunks` output is byte-identical to the merge base for all 16 touched `.Rmd` and `.Rmd.orig` files. `tools/check-vignette-staleness.R` reports all 7 pre-computed vignettes up to date.
 - AC6: with line numbers stripped, no source gains a sweep finding. The instruments and intermediate pages each lose one finding, and the other seven are unchanged (SEM keeps its 2, the rest 0).
+- AC7: `devtools::test()` reports 0 failures, 11217 passes, 1 skip and 11 warnings, all in test files the branch does not touch. `devtools::check(args = "--no-manual")` reports Status OK with 0 errors, 0 warnings and 0 notes, so no note is new.
+
+Consistency gate: `cairn_validate.py` passes every check. `document()` makes no diff and prints no link warning. README.md is in sync. NEWS.md has the entry. `tools/` is in `.Rbuildignore`. The newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master are both green (4ac54be8). The master-red-alert audits and the branch-protection check exit clean. No principle changed, so `cairn_impact.py` was skipped.
+
+Independent review, three lenses ([O] diff-bug, [S] blame-history, [S] prior-review). Findings merged across lenses, ranked, with disposition:
+
+- F1 `vignettes/growth-ssm-analysis.Rmd.orig:500` (all three lenses): the Wrap-up says the next page to read is "Advanced Circumplex Visualization", but Scope lists Growth as terminal and the NEWS entry says a terminal page names a related page. Disposition: pending gate.
+- F2 `vignettes/advanced-visualization.Rmd.orig:29` (two lenses): the Level line names "Intermediate SSM Analysis" as the page to read first, but the reading map puts "Evaluating Circumplex Structure" before Visualization. The AC1 procedure only checks that the title exists, so the criterion passes as written. Disposition: pending gate.
+- F3 `tests/testthat/test-vignette-frame.R:118`: the Level check never compares the named page with the reading map, which is why F2 passes. Disposition: pending gate.
+- F4 `vignettes/sem-based-ssm-analysis.Rmd.orig:508` and `vignettes/evaluating-circumplex-structure.Rmd.orig:878`: "corrects a measure's profile for the unequal reliability of the scales" names only heterogeneity, but the latent SSM also corrects the amplitude for average unreliability. Disposition: pending gate.
+- F5 `vignettes/bayesian-ssm-analysis.Rmd:263`: "summarizes the fit with `ssm_draws()`" collides with the SSM fit statistic; the growth page summarizes fixed-effect draws. Disposition: pending gate.
+- F6 `vignettes/evaluating-circumplex-structure.Rmd.orig:25`: "the two assumptions that an SSM analysis rests on" undercounts the page and calls interpretation preconditions assumptions. Disposition: pending gate.
+- F7 `vignettes/evaluating-circumplex-structure.Rmd:236`: the rendered elapsed time changed from 6.2s to 5.3s. It sits inside a declared volatile region and the `--chunks` output is unchanged. Disposition: rejected, the line is masked volatile output.
+- F8 to F15, test and script robustness: the Overview check ignores the section numbers (F8); a wrapped Level line finds no title (F9); only straight quotes with a capital match (F10); the level map is duplicated in the test and the script (F11); nothing runs `tools/check-pkgdown-vignettes.R` (F12); the script skips a group with an unknown title (F13); a missing yaml package exits 2 (F14); References is only recognized last (F15). Disposition: pending gate.
+- F16 `vignettes/axes-reliability.Rmd.orig:335`: "(the Wrap-up)" is a vaguer pointer than the numbered one it replaced. Disposition: pending gate.
+- F17 `vignettes/advanced-visualization.Rmd.orig:65`: a hard line break in the Overview paragraph, cosmetic. Disposition: rejected, renders identically.
+- The blame lens noted the navbar reorder as deliberate and found no undone past fix or contradicted decision. The prior-review lens found no PR review threads and one archived precedent (M77) for F1.
