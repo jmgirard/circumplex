@@ -13,6 +13,9 @@ set.seed(12345)
 library(kableExtra)
 library(ggplot2)
 library(knitr)
+# Output that follows the console width wraps at 77 columns, so with its "#> "
+# prefix it fits in 80. Text printed with cat() does not wrap.
+options(width = 77)
 ```
 
 ```{r setup}
@@ -61,7 +64,7 @@ ggplot2::ggplot() +
     ),
     size = 5,
     color = "black",
-    label.size = NA,
+    linewidth = NA,
     hjust = "center",
     vjust = "center"
   ) +
@@ -81,7 +84,7 @@ ggplot2::ggplot() +
     ),
     size = 5,
     color = "black",
-    label.size = NA,
+    linewidth = NA,
     hjust = "outward",
     vjust = "outward"
   )
@@ -299,7 +302,7 @@ ggplot2::ggplot() +
     ),
     size = 5,
     color = "gray40",
-    label.size = NA,
+    linewidth = NA,
     hjust = "center",
     vjust = "center"
   ) +
@@ -312,7 +315,7 @@ ggplot2::ggplot() +
     ),
     size = 4,
     color = "gray50",
-    label.size = NA,
+    linewidth = NA,
     hjust = "center",
     vjust = "center"
   ) +
@@ -333,7 +336,7 @@ ggplot2::ggplot() +
     ),
     size = 5,
     color = "black",
-    label.size = NA,
+    linewidth = NA,
     hjust = "outward",
     vjust = "outward"
   )

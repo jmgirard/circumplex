@@ -71,14 +71,14 @@ coord <- ssm_parameters_id(simulated_growth, scales = PANO())
 coord$person <- simulated_growth$person
 coord$wave <- simulated_growth$wave
 head(coord, 3)
-#>   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp       Fit
-#> 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608 0.5912013
-#> 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459 0.7171530
-#> 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495 0.8516460
-#>   person wave
-#> 1      1    0
-#> 2      2    0
-#> 3      3    0
+#>   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp
+#> 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608
+#> 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459
+#> 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495
+#>         Fit person wave
+#> 1 0.5912013      1    0
+#> 2 0.7171530      2    0
+#> 3 0.8516460      3    0
 ```
 
 With no `id` argument, `ssm_parameters_id()` treats each row as its own
@@ -303,8 +303,8 @@ mid
 #> Amplitude         0.023       0.005       0.049
 #> Displacement     80.714     322.335     214.098
 #> Model Fit                                      
-#>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the
-#>   displacement is not interpretable.
+#>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero;
+#>   the displacement is not interpretable.
 ```
 
 The printed note is the certification rule firing. At this wave, the

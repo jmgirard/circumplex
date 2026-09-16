@@ -34,7 +34,7 @@
         Boundary markers: Heywood communality; small correlation-function weight;
         ill-conditioned Hessian.
       
-      Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:
+      Verdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:
       
         # Profile [All] (n = 120; 95% bootstrap CIs, 60 replicates):
           Elevation      coverage 100.0%: borderline

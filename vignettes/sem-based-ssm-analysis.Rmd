@@ -77,6 +77,7 @@ below:
 worth seeing the model it generates. `ssm_sem_syntax()` returns that model as
 a string:
 
+<!-- vignette-width:exempt start -- the loading lines list every scale name, so their length follows from the scale names and no width setting reaches cat() output -->
 
 ``` r
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
@@ -125,6 +126,7 @@ cat(syntax)
 #> # built in-package through circular quantiles, never via lavaan := or
 #> # delta-method CIs (which ignore the angular branch cut).
 ```
+<!-- vignette-width:exempt end -->
 
 Three latent factors carry the structure: a general factor `g` and the two
 plane axes `cx` and `cy`. Each scale loads on (has a weight on) all three. But

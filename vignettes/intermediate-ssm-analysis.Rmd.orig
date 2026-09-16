@@ -12,6 +12,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ggplot2)
 library(kableExtra)
 set.seed(12345)
+# Output that follows the console width wraps at 77 columns, so with its "#> "
+# prefix it fits in 80. Text printed with cat() does not wrap.
+options(width = 77)
 ```
 
 ```{r setup}
