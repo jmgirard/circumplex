@@ -18,13 +18,14 @@ options(width = 77)
 library(circumplex)
 ```
 
+**Level:** Introductory. No earlier page is needed, because this is the first page to read.
 
-## 1. Overview of Instrument-related Functions
+## 1. Overview
 Although the circumplex package is capable of analyzing and visualizing data in a "source-agnostic" manner (i.e., without knowing what the numbers correspond to), it can be helpful to both the user and the package to have more contextual information about which instrument/questionnaire the data come from. For example, knowing the specific instrument used can enable the package to automatically score item-level responses and standardize these scores using normative data. Furthermore, a centralized repository of information about circumplex instruments would provide a convenient and accessible way for users to discover and begin using new instruments. To address these needs, a suite of new instrument-related functions (and underlying data to power them) was added to the circumplex package in version 0.2.0.
 
-The first part of this vignette will discuss how to preview the instruments currently available in the circumplex package, how to load information about a specific instrument for use in analysis, and how to extract general and specific information about that instrument. The following functions will be discussed: `instruments()`, `print()`, `summary()`, `scales()`, `items()`, `anchors()`, `norms()`, and `View()`.
+Section 2, "Loading and Examining Instrument Objects", shows how to preview the instruments in the circumplex package. It shows how to load the information about one instrument for use in analysis. It also shows how to extract general and specific information about that instrument. The following functions will be discussed: `instruments()`, `print()`, `summary()`, `scales()`, `items()`, `anchors()`, `norms()`, and `View()`.
 
-The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply deviation scoring across variables), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: `ipsatize()`, `score()`, and `norm_standardize()`.
+Section 3, "Instrument-related Tidying Functions", shows how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply deviation scoring across variables), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: `ipsatize()`, `score()`, and `norm_standardize()`. The Wrap-up lists what the page covered and names the next page to read.
 
 ## 2. Loading and Examining Instrument Objects
 
@@ -174,7 +175,7 @@ print(z_scales)
 
 Again, because we set `append` to FALSE, the output contains only the norm standardized scale-level variables. The new variables are named the same as the scale score variables except with a configurable `prefix` and `suffix` (by default, they are given only a suffix of `_z`). These variables are the ones we are most likely to use in subsequent analyses (e.g., the structural summary method).
 
-## 4. Wrap-up
-In this vignette, we learned how to preview the instruments available in the circumplex package, load and examine the information contained in one of these instrument objects, ipsatize item-level data, calculate scale scores from item-level data, and standardize those scale scores using normative data included in the package. We are now in an excellent position to discover and implement new circumplex instruments. Later vignettes describe analyses and visualizations that make use of the data collected using these tools.
+## Wrap-up
+In this vignette, we learned how to preview the instruments available in the circumplex package, load and examine the information contained in one of these instrument objects, ipsatize item-level data, calculate scale scores from item-level data, and standardize those scale scores using normative data included in the package. We are now in an excellent position to discover and implement new circumplex instruments. The next page to read is "Introduction to SSM Analysis", which analyzes scores like the ones these tools produce.
 
 Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Chloe Bliton, Michael Boudreaux, Robert Hatcher, Christopher Hopwood, Leonard Horowitz, Kenneth Locke, Patrick Markey, Aaron Pincus, Elisa Trucco, and MindGarden Inc.

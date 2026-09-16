@@ -105,6 +105,28 @@ reference:
   - simulated_occasions
   - simulated_growth
   - simulated_growth_origin
+# The vignette index and the Vignettes navbar menu below list the same pages in
+# the same order, grouped by level and in reading order within a level.
+# tools/check-pkgdown-vignettes.R diffs the two lists against vignettes/.
+articles:
+- title: Introductory
+  desc: Start here. Load an instrument, score its items, and run a first SSM analysis.
+  contents:
+  - using-instruments
+  - introduction-to-ssm-analysis
+- title: Intermediate
+  desc: Groups, measures, contrasts, and the checks an SSM analysis rests on.
+  contents:
+  - intermediate-ssm-analysis
+  - evaluating-circumplex-structure
+- title: Advanced
+  desc: Custom figures, latent-variable models, Bayesian estimation, and growth models.
+  contents:
+  - advanced-visualization
+  - sem-based-ssm-analysis
+  - axes-reliability
+  - bayesian-ssm-analysis
+  - growth-ssm-analysis
 navbar:
   title: circumplex
   left:
@@ -152,12 +174,14 @@ navbar:
       href: articles/introduction-to-ssm-analysis.html
     - text: Intermediate SSM Analysis
       href: articles/intermediate-ssm-analysis.html
-    - text: Advanced Circumplex Visualization
-      href: articles/advanced-visualization.html
     - text: Evaluating Circumplex Structure
       href: articles/evaluating-circumplex-structure.html
+    - text: Advanced Circumplex Visualization
+      href: articles/advanced-visualization.html
     - text: SEM-Based SSM Analysis
       href: articles/sem-based-ssm-analysis.html
+    - text: Axes Reliability
+      href: articles/axes-reliability.html
     - text: Bayesian SSM Analysis
       href: articles/bayesian-ssm-analysis.html
     - text: Growth Models on SSM Parameters
