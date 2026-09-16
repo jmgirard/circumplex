@@ -161,7 +161,6 @@ circumplex model. Examining geometry is a different question, and
 <p><code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> builds and fits a lavaan measurement model for
 you, but it is worth seeing the model it generates.
 <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code> returns that model as a string:</p>
-<!-- vignette-width:exempt start -- the loading lines list every scale name, so their length follows from the scale names and no width setting reaches cat() output -->
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scales</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span></span>
 <span><span class="va">syntax</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax</a></span><span class="op">(</span>scales <span class="op">=</span> <span class="va">scales</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="st">"NARPD"</span><span class="op">)</span></span>
@@ -208,7 +207,6 @@ you, but it is worth seeing the model it generates.
 <span><span class="co">#&gt; # here. They are nonlinear (sqrt / atan2) and their intervals must be</span></span>
 <span><span class="co">#&gt; # built in-package through circular quantiles, never via lavaan := or</span></span>
 <span><span class="co">#&gt; # delta-method CIs (which ignore the angular branch cut).</span></span></code></pre></div>
-<!-- vignette-width:exempt end -->
 <p>Three latent factors carry the structure: a general factor
 <code>g</code> and the two plane axes <code>cx</code> and
 <code>cy</code>. Each scale loads on (has a weight on) all three. But
