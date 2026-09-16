@@ -131,6 +131,8 @@ package's own cautions is M131.
 - 2026-09-16: re-audit: AC1 (full) — nothing.
 - 2026-09-16: re-audit: AC6 (full) — nothing. It noted that the Goal ("no output line") does not qualify the two exempted lines, which the plan already exempted. Goal is plan-owned, so this goes to the review gate.
 - 2026-09-16: T4 box ticked. The T4 work-log lines above record the render and both guards green.
+- 2026-09-16: review pass 2 gate fixes O1 (marker reason pattern) and O2 (NEWS heading reason) committed. Guard green, plants 42 of 42.
+- 2026-09-16: step-7 approval: m132-vignette-output-fits-code-box approved for merge
 
 ## Decisions
 
@@ -172,3 +174,7 @@ Review pass 2, 2026-09-16, at e45fc34f. The branch contains origin/master (68c5b
   - O10: six files' outside/inside plants use a region the plant script writes, and no plant covers marker misuse. Recommended: follow-up.
   - O11: the rerender plant does not show that the width setting takes effect. Recommended: reject, because AC1 on the real render at width 77 shows it.
   - O12: the T5 work-log line says unicode80 is 157 bytes. The script and the reviewer measure 156. Recommended: noted here as the correction, since the work log is history.
+- Gate dispositions (maintainer accepted the recommendations): O1 and O2 fixed now. P1, O3, O5, O6, O9 and O10 go to the code-box-width candidate row. O4, O7, O8 and O11 rejected for the reasons above. O12 noted.
+- O1 fix: the reason pattern is now `start\s+--\s*[^->[:space:]].*-->`. A temporary copy with `start -->` and with `start -- -->` each exits 1 with the "states no reason" error. The real marker still passes. After the fix the guard exits 0 and the plant script reports 42 of 42.
+- O2 fix: NEWS now says the old heading took 81 columns in a vignette and the new one 79, measured as `nchar()` of each heading with `#> `.
+- Goal gap: the maintainer accepted, as the plan chose, that the two exempted loading lines still exceed the code box. The Goal text is unchanged.

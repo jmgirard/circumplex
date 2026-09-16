@@ -50,7 +50,7 @@ scan_widths <- function(lines, what) {
     ln <- lines[[i]]
     if (grepl(START, ln)) {
       if (open) stop(what, ": nested vignette-width:exempt start at line ", i, call. = FALSE)
-      if (!grepl("start\\s+--\\s*[^-[:space:]]", ln))
+      if (!grepl("start\\s+--\\s*[^->[:space:]].*-->", ln))
         stop(what, ": the exempt region at line ", i, " states no reason; write ",
              "`start -- <why no width setting reaches this output>`.", call. = FALSE)
       open <- TRUE
