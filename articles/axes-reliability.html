@@ -165,16 +165,16 @@ angles you pass:</p>
 <span><span class="co">#&gt;  X    16     0.773       0.476 0.822         </span></span>
 <span><span class="co">#&gt;  Y    16     0.773       0.476 0.823         </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Note: the two axes share one axes-variance estimate and, with equal items per</span></span>
-<span><span class="co">#&gt;   axis, carry the same reliability. This is expected, not an error.</span></span>
+<span><span class="co">#&gt;   Note: the two axes share one axes-variance estimate and, with equal items</span></span>
+<span><span class="co">#&gt;   per axis, carry the same reliability. This is expected, not an error.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Note: the model is fit to the item correlation matrix as if it were a</span></span>
 <span><span class="co">#&gt;   covariance matrix (Cudeck, 1989), and both sides of that mismatch are</span></span>
 <span><span class="co">#&gt;   corrected, so these numbers differ from LISREL's, and from lavaan's own, by</span></span>
 <span><span class="co">#&gt;   design.</span></span>
-<span><span class="co">#&gt;   The component standard errors are adjusted to the correlation metric and are</span></span>
-<span><span class="co">#&gt;   calibrated; they are typically smaller than the values printed by Strack et</span></span>
-<span><span class="co">#&gt;   al. (2013), whose LISREL output carries no correction.</span></span></code></pre></div>
+<span><span class="co">#&gt;   The component standard errors are adjusted to the correlation metric and</span></span>
+<span><span class="co">#&gt;   are calibrated; they are typically smaller than the values printed by</span></span>
+<span><span class="co">#&gt;   Strack et al. (2013), whose LISREL output carries no correction.</span></span></code></pre></div>
 <p>If your items belong to one of the package’s built-in instruments,
 you can pass the <code>instrument</code> object instead of
 <code>items</code> and <code>angles</code>. It supplies both the scale
@@ -214,16 +214,16 @@ model’s global fit:</p>
 <span><span class="co">#&gt;  X    16     0.773       0.476 0.822         </span></span>
 <span><span class="co">#&gt;  Y    16     0.773       0.476 0.823         </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Note: the two axes share one axes-variance estimate and, with equal items per</span></span>
-<span><span class="co">#&gt;   axis, carry the same reliability. This is expected, not an error.</span></span>
+<span><span class="co">#&gt;   Note: the two axes share one axes-variance estimate and, with equal items</span></span>
+<span><span class="co">#&gt;   per axis, carry the same reliability. This is expected, not an error.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Note: the model is fit to the item correlation matrix as if it were a</span></span>
 <span><span class="co">#&gt;   covariance matrix (Cudeck, 1989), and both sides of that mismatch are</span></span>
 <span><span class="co">#&gt;   corrected, so these numbers differ from LISREL's, and from lavaan's own, by</span></span>
 <span><span class="co">#&gt;   design.</span></span>
-<span><span class="co">#&gt;   The component standard errors are adjusted to the correlation metric and are</span></span>
-<span><span class="co">#&gt;   calibrated; they are typically smaller than the values printed by Strack et</span></span>
-<span><span class="co">#&gt;   al. (2013), whose LISREL output carries no correction.</span></span>
+<span><span class="co">#&gt;   The component standard errors are adjusted to the correlation metric and</span></span>
+<span><span class="co">#&gt;   are calibrated; they are typically smaller than the values printed by</span></span>
+<span><span class="co">#&gt;   Strack et al. (2013), whose LISREL output carries no correction.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Variance components</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -242,8 +242,8 @@ model’s global fit:</p>
 <span><span class="co">#&gt;   fit; df and srmr are unchanged. The scaled test can modestly over-reject at</span></span>
 <span><span class="co">#&gt;   typical sample sizes: it over-flags misfit rather than flattering it; see</span></span>
 <span><span class="co">#&gt;   ?axes_reliability for the measured rates. They follow lavaan's *.scaled</span></span>
-<span><span class="co">#&gt;   definitions, not its *.robust ones, and differ from what fitMeasures() reports</span></span>
-<span><span class="co">#&gt;   for an equivalent ML fit.</span></span></code></pre></div>
+<span><span class="co">#&gt;   definitions, not its *.robust ones, and differ from what fitMeasures()</span></span>
+<span><span class="co">#&gt;   reports for an equivalent ML fit.</span></span></code></pre></div>
 <p>The <strong>variance components</strong> show the decomposition that
 the reliability rests on. The <code>axes</code> component is the only
 one that feeds reliability. The <code>general</code>,
@@ -282,20 +282,20 @@ place of <code>data</code>.</p>
 <span><span class="co">#&gt;  X    16     0.773       0.476 --            </span></span>
 <span><span class="co">#&gt;  Y    16     0.773       0.476 --            </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Note: the two axes share one axes-variance estimate and, with equal items per</span></span>
-<span><span class="co">#&gt;   axis, carry the same reliability. This is expected, not an error.</span></span>
+<span><span class="co">#&gt;   Note: the two axes share one axes-variance estimate and, with equal items</span></span>
+<span><span class="co">#&gt;   per axis, carry the same reliability. This is expected, not an error.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Note: the Nunnally-Bernstein comparison needs the raw item scores (scale</span></span>
-<span><span class="co">#&gt;   alphas and the axis-composite variance), so it is NA on the correlation-matrix</span></span>
-<span><span class="co">#&gt;   path.</span></span>
+<span><span class="co">#&gt;   alphas and the axis-composite variance), so it is NA on the</span></span>
+<span><span class="co">#&gt;   correlation-matrix path.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Note: the model is fit to the item correlation matrix as if it were a</span></span>
 <span><span class="co">#&gt;   covariance matrix (Cudeck, 1989), and both sides of that mismatch are</span></span>
 <span><span class="co">#&gt;   corrected, so these numbers differ from LISREL's, and from lavaan's own, by</span></span>
 <span><span class="co">#&gt;   design.</span></span>
-<span><span class="co">#&gt;   The component standard errors are adjusted to the correlation metric and are</span></span>
-<span><span class="co">#&gt;   calibrated; they are typically smaller than the values printed by Strack et</span></span>
-<span><span class="co">#&gt;   al. (2013), whose LISREL output carries no correction.</span></span></code></pre></div>
+<span><span class="co">#&gt;   The component standard errors are adjusted to the correlation metric and</span></span>
+<span><span class="co">#&gt;   are calibrated; they are typically smaller than the values printed by</span></span>
+<span><span class="co">#&gt;   Strack et al. (2013), whose LISREL output carries no correction.</span></span></code></pre></div>
 <p>The estimates are identical to the raw-data run above. The raw-data
 path builds exactly this matrix internally and fits it the same way.
 <code>items</code> selects and orders the matrix’s rows by name, so the

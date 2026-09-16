@@ -46,12 +46,6 @@ personality psychologist might want to understand what kind of
 interpersonal behaviors are associated with a trait (e.g.,
 extraversion).
 
-    #> Warning: The `label.size` argument of `geom_label()` is deprecated as of ggplot2 3.5.0.
-    #> ℹ Please use the `linewidth` argument instead.
-    #> This warning is displayed once per session.
-    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    #> generated.
-
 ![plot of chunk model](figures/introduction-to-ssm-analysis-model-1.png)
 
 ### The Structural Summary Method
@@ -160,20 +154,20 @@ in R.
 
 data("jz2017")
 head(jz2017)
-#>   Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD BORPD
-#> 1 Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7     8
-#> 2 Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0     1
-#> 3 Female 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00     0     1     0    4     1
-#> 4   Male 2.00 1.75 1.75 2.50 2.00 1.75 2.00 2.50     1     0     0    0     1
-#> 5 Female 0.25 0.50 0.25 0.00 0.00 0.00 0.00 0.00     0     0     0    0     1
-#> 6   Male 1.50 1.75 2.25 1.75 2.00 1.25 2.25 2.50     5     5     7    5     4
-#>   HISPD NARPD AVPD DPNPD OCPD
-#> 1     4     6    3     4    6
-#> 2     2     3    0     1    0
-#> 3     5     4    0     0    1
-#> 4     0     0    0     0    0
-#> 5     0     0    1     0    0
-#> 6     4     7    2     0    3
+#>   Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD
+#> 1 Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7
+#> 2 Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0
+#> 3 Female 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00     0     1     0    4
+#> 4   Male 2.00 1.75 1.75 2.50 2.00 1.75 2.00 2.50     1     0     0    0
+#> 5 Female 0.25 0.50 0.25 0.00 0.00 0.00 0.00 0.00     0     0     0    0
+#> 6   Male 1.50 1.75 2.25 1.75 2.00 1.25 2.25 2.50     5     5     7    5
+#>   BORPD HISPD NARPD AVPD DPNPD OCPD
+#> 1     8     4     6    3     4    6
+#> 2     1     2     3    0     1    0
+#> 3     1     5     4    0     0    1
+#> 4     1     0     0    0     0    0
+#> 5     1     0     0    1     0    0
+#> 6     4     4     7    2     0    3
 ```
 
 The circumplex scales in `jz2017` come from the Inventory of

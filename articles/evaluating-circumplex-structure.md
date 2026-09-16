@@ -62,12 +62,12 @@ the default.
 data("jz2017")
 set.seed(12345)
 cpm <- cpm_fit(jz2017, scales = PANO(), angles = octants(), boots = 500)
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may
-#> be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles
+#> may be clustered or parameters weakly determined.
 #> Warning: 11 of 500 bootstrap resamples were excluded (0 with a degenerate or
-#> non-positive-definite correlation matrix, 11 failing the convergence acceptance
-#> criterion); the confidence intervals are based on the remaining 489 replicates
-#> and are conditional on estimability.
+#> non-positive-definite correlation matrix, 11 failing the convergence
+#> acceptance criterion); the confidence intervals are based on the remaining
+#> 489 replicates and are conditional on estimability.
 summary(cpm)
 #> 
 #> Circular Process Model (Browne, 1992) 
@@ -124,15 +124,15 @@ summary(cpm)
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a
 #>   Heywood-type solution).
 #>   Note: 11 of 500 bootstrap resamples were excluded (0 degenerate, 11
-#>   non-convergent); the intervals are based on 489 replicates and are conditional
-#>   on estimability.
+#>   non-convergent); the intervals are based on 489 replicates and are
+#>   conditional on estimability.
 #> 
 #>   Note: boundary/weak-identification markers fired: Heywood communality;
 #>   small correlation-function weight; ill-conditioned Hessian.
-#>   What has been measured about these markers covers analytic intervals only, and
-#>   not every marker was measured; they are not validated as predictors of the
-#>   bootstrap intervals shown here (see the vignette section 'When a fit sits at a
-#>   boundary').
+#>   What has been measured about these markers covers analytic intervals only,
+#>   and not every marker was measured; they are not validated as predictors of
+#>   the bootstrap intervals shown here (see the vignette section 'When a fit
+#>   sits at a boundary').
 ```
 
 Two parts of this output matter most for evaluating structure:
@@ -332,8 +332,8 @@ summary(demo)
 #>   Note: this solution is near a parameter boundary or weakly identified
 #>   (small correlation-function weight); analytic (Wald) confidence intervals
 #>   mis-covered for such fits in validation even at N in the tens of thousands.
-#>   Interpret them with caution and prefer the bootstrap on the raw-data path when
-#>   available.
+#>   Interpret them with caution and prefer the bootstrap on the raw-data path
+#>   when available.
 ```
 
 One marker fires here, a **small correlation-function weight**, and
@@ -443,8 +443,8 @@ fit_quasi <- cpm_fit(
   cormat = R, scales = PANO(), angles = octants(),
   n = nrow(jz2017), model = "quasi-circumplex"
 )
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may
-#> be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles
+#> may be clustered or parameters weakly determined.
 fit_equal <- cpm_fit(
   cormat = R, scales = PANO(), angles = octants(),
   n = nrow(jz2017), model = "equal-communality"
@@ -637,52 +637,54 @@ results for a given seed.
 
 set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
-#> Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles may
-#> be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles
+#> may be clustered or parameters weakly determined.
 summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 5.6s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 5.2s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
-#>   The structure fits adequately (RMSEA <= 0.08, Browne & Cudeck, 1993; SRMR <=
-#>   0.08, Hu & Bentler, 1999), so the simulated population is a reasonable
+#>   The structure fits adequately (RMSEA <= 0.08, Browne & Cudeck, 1993; SRMR
+#>   <= 0.08, Hu & Bentler, 1999), so the simulated population is a reasonable
 #>   stand-in for yours.
 #>   Boundary markers: Heywood communality; small correlation-function weight;
 #>   ill-conditioned Hessian.
-#> Near-zero regime: the amplitude estimate of profile [OCPD] is below half its own
-#> CI width, so your analysis already sits in the amplitude-near-zero regime; an
-#> absolute rung at the certification margin (c = 2.08, population amplitude = the
-#> observed CI half-width) was added to the ladder.
+#> Near-zero regime: the amplitude estimate of profile [OCPD] is below half its
+#> own CI width, so your analysis already sits in the amplitude-near-zero
+#> regime; an absolute rung at the certification margin (c = 2.08, population
+#> amplitude = the observed CI half-width) was added to the ladder.
 #> 
-#> Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:
+#> Verdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:
 #> 
 #>   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):
 #>     Elevation      coverage 93.0%: borderline
 #>     Amplitude      coverage 94.5%: borderline
 #>     Displacement   coverage 89.1% when certified: borderline
-#>     Guardrail      under a truly zero amplitude, displacement would be certified
-#>                    1.0% of the time (user-expectation benchmark 2.5%)
-#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement coverage
-#>   rates are borderline at this number of replications; a larger `reps` would
-#>   sharpen the verdict.
+#>     Guardrail      under a truly zero amplitude, displacement would be
+#>                    certified 1.0% of the time (user-expectation benchmark
+#>                    2.5%)
+#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
+#>   coverage rates are borderline at this number of replications; a larger
+#>   `reps` would sharpen the verdict.
 #> 
 #>   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):
 #>     Elevation      coverage 95.0%: borderline
-#>     Amplitude      coverage 83.0%: INADEQUATE (under-coverage; misses are almost
-#>                    all below the interval: the amplitude CI tends to sit above
-#>                    the truth)
+#>     Amplitude      coverage 83.0%: INADEQUATE (under-coverage; misses are
+#>                    almost all below the interval: the amplitude CI tends to
+#>                    sit above the truth)
 #>     Displacement   coverage 50.0% when certified: INADEQUATE (under-coverage)
-#>     Guardrail      under a truly zero amplitude, displacement would be certified
-#>                    1.0% of the time (user-expectation benchmark 2.5%)
-#>   Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this sample
-#>   size and displacement CIs mis-cover even when certified. Elevation coverage is
-#>   borderline at this number of replications; a larger `reps` would sharpen the
-#>   verdict. Consider a larger sample or treat near-zero amplitudes as
-#>   inconclusive rather than absent.
+#>     Guardrail      under a truly zero amplitude, displacement would be
+#>                    certified 1.0% of the time (user-expectation benchmark
+#>                    2.5%)
+#>   Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this
+#>   sample size and displacement CIs mis-cover even when certified. Elevation
+#>   coverage is borderline at this number of replications; a larger `reps`
+#>   would sharpen the verdict. Consider a larger sample or treat near-zero
+#>   amplitudes as inconclusive rather than absent.
 #> 
 #> Coverage by condition (d_cert: d when certified; cert: certification rate):
 #>  Profile Condition     e     x     y     a     d d_cert  cert Structural
@@ -695,9 +697,9 @@ summary(acc)
 #>     OCPD     0.000 0.920 0.955 0.945 0.000    NA     NA 0.010       TRUE
 #>     OCPD     2.077 0.930 0.915 0.945 0.930 0.885  0.833 0.090      FALSE
 #>   Note: amplitude coverage on rows flagged Structural is structurally 0 (a
-#>   percentile interval of strictly positive amplitude replicates cannot contain a
-#>   zero truth). This is a theorem, not a measurement; the informative near-zero
-#>   rungs are the small c > 0 ones.
+#>   percentile interval of strictly positive amplitude replicates cannot
+#>   contain a zero truth). This is a theorem, not a measurement; the
+#>   informative near-zero rungs are the small c > 0 ones.
 ```
 
 How to read this output:
@@ -728,10 +730,10 @@ How to read this output:
   when the false-certification rate is materially above the rate that a
   user would expect from the interval level. This is a measured property
   of the shipped display rule, not a hypothesis test.
-- **The lines under `Verdicts at c = 1`** classify elevation, amplitude,
-  and certification-conditional displacement coverage at your
-  as-estimated amplitude. Each profile’s `Verdict:` paragraph states the
-  overall conclusion.
+- **The lines under `Verdicts (c = 1, as estimated)`** classify
+  elevation, amplitude, and certification-conditional displacement
+  coverage at your as-estimated amplitude. Each profile’s `Verdict:`
+  paragraph states the overall conclusion.
 
 For a visual summary across the ladder:
 
@@ -904,18 +906,23 @@ res
 #> 
 #> # Exploratory criteria
 #> 
-#>  Test     Statistic Interpretation                                           
-#>  Fisher   0.102     equal axes: at least 3x as likely as the alternative     
-#>  Gap      0.152     equal spacing: at least 3x as likely as the alternative  
-#>  Variance 0.180     interstitiality: almost certain                          
-#>  Rotation 0.325     interstitiality: at least 3x as likely as the alternative
+#>  Test     Statistic
+#>  Fisher   0.102    
+#>  Gap      0.152    
+#>  Variance 0.180    
+#>  Rotation 0.325    
+#>  Interpretation                                           
+#>  equal axes: at least 3x as likely as the alternative     
+#>  equal spacing: at least 3x as likely as the alternative  
+#>  interstitiality: almost certain                          
+#>  interstitiality: at least 3x as likely as the alternative
 #> 
 #> # Order hypothesis (RANDALL)
 #> 
 #>   Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)
 #> 
-#>   Interpretations are heuristic likelihood classifications from simulation, not
-#>   significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
+#>   Interpretations are heuristic likelihood classifications from simulation,
+#>   not significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
 ```
 
 ``` r
@@ -951,8 +958,8 @@ summary(res)
 #> 
 #>   Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)
 #> 
-#>   Interpretations are heuristic likelihood classifications from simulation, not
-#>   significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
+#>   Interpretations are heuristic likelihood classifications from simulation,
+#>   not significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
 ```
 
 [`summary()`](https://rdrr.io/r/base/summary.html) adds the numeric

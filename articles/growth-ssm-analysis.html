@@ -167,14 +167,14 @@ states how the data were simulated.</p>
 <span><span class="va">coord</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="va">simulated_growth</span><span class="op">$</span><span class="va">person</span></span>
 <span><span class="va">coord</span><span class="op">$</span><span class="va">wave</span> <span class="op">&lt;-</span> <span class="va">simulated_growth</span><span class="op">$</span><span class="va">wave</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">coord</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp       Fit</span></span>
-<span><span class="co">#&gt; 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608 0.5912013</span></span>
-<span><span class="co">#&gt; 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459 0.7171530</span></span>
-<span><span class="co">#&gt; 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495 0.8516460</span></span>
-<span><span class="co">#&gt;   person wave</span></span>
-<span><span class="co">#&gt; 1      1    0</span></span>
-<span><span class="co">#&gt; 2      2    0</span></span>
-<span><span class="co">#&gt; 3      3    0</span></span></code></pre></div>
+<span><span class="co">#&gt;   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp</span></span>
+<span><span class="co">#&gt; 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608</span></span>
+<span><span class="co">#&gt; 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459</span></span>
+<span><span class="co">#&gt; 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495</span></span>
+<span><span class="co">#&gt;         Fit person wave</span></span>
+<span><span class="co">#&gt; 1 0.5912013      1    0</span></span>
+<span><span class="co">#&gt; 2 0.7171530      2    0</span></span>
+<span><span class="co">#&gt; 3 0.8516460      3    0</span></span></code></pre></div>
 <p>With no <code>id</code> argument, <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>
 treats each row as its own profile. So <code>coord</code> has one row
 per person per wave, and its <code>id</code> column is the row number.
@@ -412,8 +412,8 @@ same way as <code>B</code>. (That code is omitted.) The summary at wave
 <span><span class="co">#&gt; Amplitude         0.023       0.005       0.049</span></span>
 <span><span class="co">#&gt; Displacement     80.714     322.335     214.098</span></span>
 <span><span class="co">#&gt; Model Fit                                      </span></span>
-<span><span class="co">#&gt;   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the</span></span>
-<span><span class="co">#&gt;   displacement is not interpretable.</span></span></code></pre></div>
+<span><span class="co">#&gt;   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero;</span></span>
+<span><span class="co">#&gt;   the displacement is not interpretable.</span></span></code></pre></div>
 <p>The printed note is the certification rule firing. At this wave, the
 amplitude interval sits too close to zero. The displacement interval,
 which here spans more than half the circle, is not a statement about
