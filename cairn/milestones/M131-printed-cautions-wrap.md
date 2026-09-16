@@ -155,6 +155,8 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-16: claim audit re-read, the one the step allows. Six of the seven corrections cleared. One did not: the ledger's kinds comment called a top-level heading and a test-statistic line "column-structured", and neither is. The heading is a running title and the statistic line is a labeled sentence. Corrected to say what actually puts them in the ledger, which is that their layout is written into the line rather than flowed. No further reader spawned; the step allows one re-read.
 - 2026-09-16: all tasks done, status to review. `devtools::test()`: 0 failures, 10743 passing, 1 skip. `devtools::check(args = "--no-manual")` on the finished tree: Status OK, 0 errors, 0 warnings, 0 notes. `devtools::document()` produces no diff and no unresolved-link warning.
 - 2026-09-16: second review pass: AC1 to AC5 pass on fresh evidence at `8360f269`, both AC4 probes now go red, consistency gate clean, three-lens review returned 13 findings (0 from the two history lenses), none meeting the return floor. Dispositions go to the gate.
+- 2026-09-16: gate accepted the proposed triage. P4 (misplaced comment) and P11 (NEWS.md overstatement) fixed on the branch, six findings to the printed-width candidate row, four rejected.
+- 2026-09-16: step-7 approval: m131-printed-cautions-wrap approved for merge
 
 ## Decisions
 
@@ -309,6 +311,14 @@ so none meets the return floor. Proposed dispositions, decided at the gate:
 | P11 | NEWS.md says every caution broke "at a column written into the package", but census rows marked U were not wrapped at all. | fix now |
 | P12 | AC4 box unticked. | resolved by this pass's tick |
 | P13 | One ~120-character comment line at `test-cpm_summary_markers.R:139`. | reject: style nit |
+
+**Gate triage (2026-09-16).** The maintainer accepted every proposed
+disposition. P4 and P11 were fixed on the branch before the push: the
+`norm_kind_phrase()` comment moved back above its function, and the NEWS.md
+entry now says some cautions broke at a fixed column and some printed as one
+long line. P2, P3, P5, P8, P9 and P10 go to the printed-width candidate row at
+the hygiene pass. P1, P6, P7 and P13 are rejected for the reasons in the table.
+P12 was resolved by this pass's AC4 tick.
 
 ### First pass (2026-09-15)
 

@@ -12,10 +12,10 @@
 ## Minor improvements and fixes
 
 * Every prose caution and note that `print()` and `summary()` show now wraps
-  to the console width you set with `options(width = )`. Before this, each
-  one broke its lines at a column written into the package, so the text
-  ignored the width you set: it ran past a narrow console and stopped short
-  of a wide one, leaving a ragged column. The
+  to the console width you set with `options(width = )`. Before this, the
+  text ignored the width you set. Some cautions broke their lines at a column
+  written into the package and some printed as one long line, so they ran
+  past a narrow console or stopped short of a wide one. The
   words and their order do not change. Only the line breaks move. A
   fired marker label, such as `Heywood communality`, still stays on one line.
   Tables, column headers, fit lines and section headings are unchanged,
