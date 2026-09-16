@@ -28,8 +28,8 @@
 
 * The vignettes set `options(width = 77)`, so output that follows the console
   width fits, with its `#> ` prefix, in 80 columns. The package website's
-  code box shows 80 columns without scrolling. The generated lavaan syntax in the SEM vignette is
-  printed with `cat()` and stays wider.
+  code box shows 81 monospace columns without scrolling. The generated lavaan
+  syntax in the SEM vignette is printed with `cat()` and stays wider.
 
 * `summary()` for an `ssm_ci_accuracy()` result is about half as long. The
   settings print as three short sentences, usually on three lines. The

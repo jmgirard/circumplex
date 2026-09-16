@@ -14,7 +14,7 @@
 #   rerender a chunk added to the .Rmd.orig source that prints a 93-column
 #            line, then the vignette is re-rendered
 # Controls (each must stay green):
-#   unicode80  an 80-column line of "ζ" and "²" (157 bytes): a guard that
+#   unicode80  an 80-column line of "ζ" and "²" (156 bytes): a guard that
 #              counted bytes rather than display columns would go red here
 #   inside     a long line just before the end marker of an exemption region
 #

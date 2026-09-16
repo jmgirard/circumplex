@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
   fig.height = 5,
   out.width = "100%"
 )
-# Output wraps to 77 columns, so with its "#> " prefix it fits the site's code box.
+# Output that follows the console width wraps at 77 columns, so with its "#> "
+# prefix it fits in 80. Text printed with cat() does not wrap.
 options(width = 77)
 set.seed(12345)
 ```
