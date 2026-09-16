@@ -154,8 +154,8 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-16: candidate rows filed for the two findings the gate deferred, both onto the existing printed-width row: O7 (`R/ssm_sem.R` wraps by a character count at `< width`, against this helper's display columns at `<= width`) and O11 (spliced failure reasons can break mid-phrase).
 - 2026-09-16: claim audit re-read, the one the step allows. Six of the seven corrections cleared. One did not: the ledger's kinds comment called a top-level heading and a test-statistic line "column-structured", and neither is. The heading is a running title and the statistic line is a labeled sentence. Corrected to say what actually puts them in the ledger, which is that their layout is written into the line rather than flowed. No further reader spawned; the step allows one re-read.
 - 2026-09-16: all tasks done, status to review. `devtools::test()`: 0 failures, 10743 passing, 1 skip. `devtools::check(args = "--no-manual")` on the finished tree: Status OK, 0 errors, 0 warnings, 0 notes. `devtools::document()` produces no diff and no unresolved-link warning.
-
 - 2026-09-16: second review pass: AC1 to AC5 pass on fresh evidence at `8360f269`, both AC4 probes now go red, consistency gate clean, three-lens review returned 13 findings (0 from the two history lenses), none meeting the return floor. Dispositions go to the gate.
+
 ## Decisions
 
 ### T1 census: the prose caution and note emitters (2026-09-15)
