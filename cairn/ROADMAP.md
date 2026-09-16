@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-09-16 (M132 archived, its six guard findings in a new width-guard row, M129 row pruned.)_
+_Last hygiene check: 2026-09-16 (M132 archived, six guard findings in a new row, M129 row pruned.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
