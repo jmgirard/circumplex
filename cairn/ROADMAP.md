@@ -9,7 +9,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M134 | Simplify the vignette width guard | in-progress | — | normal | milestones/M134-simplify-vignette-width-guard.md |
+| M134 | Simplify the vignette width guard | review | — | normal | milestones/M134-simplify-vignette-width-guard.md |
 | M133 | Fit vignette output reads cleanly | done | M132 | normal | milestones/archive/M133-fit-vignette-output-reads-cleanly.md |
 | M132 | Rendered vignette output fits the website's code box | done | M131 | normal | milestones/archive/M132-vignette-output-fits-code-box.md |
 | M131 | Printed cautions and notes wrap to the reader's width | done | — | normal | milestones/archive/M131-printed-cautions-wrap.md |

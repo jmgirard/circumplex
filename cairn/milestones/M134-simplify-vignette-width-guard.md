@@ -1,6 +1,6 @@
 # M134: Simplify the vignette width guard
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -83,7 +83,7 @@ records them (plan gate).
       `.github/workflows/vignette-precompute.yaml` header comment (lines
       15-17). Delete `tools/m132-planted-defects.R`. Run the width checker, the
       AC2 grep and the AC5 diff.
-- [ ] T3: In temporary copies of `vignettes/`, plant each defect and record
+- [x] T3: In temporary copies of `vignettes/`, plant each defect and record
       the checker's exit status and message in the work log. (a) An 81-column
       line directly after the `cy =~` line: red, line named. (b) The `cx =~`
       line shortened to 80 columns: red, entry named. (c) A tab line of 80 or
@@ -102,6 +102,12 @@ records them (plan gate).
 - 2026-09-16: AC5 and plant (e) were added after the gate. A second [O] re-audit of AC3 and AC5 returned two findings, both fixed. AC3 now limits a stale entry to `#>` lines measured after tab expansion. AC5 was a staleness check, which fails before the render is committed and proves nothing after. It is now a diff that shows only the two marker lines removed.
 - 2026-09-16: T1 done. The checker holds a two-entry EXEMPT list and expands tabs before it measures. On the committed vignettes it exits 0 and exempts `sem-based-ssm-analysis` lines 94 and 95, 86 columns each, while the old markers are still in place. Test suite: 0 failed, 0 errors.
 - 2026-09-16: T2 done. Markers removed and `sem-based-ssm-analysis` re-rendered with the current package installed. The diff against master removes only the two marker lines. The checker exits 0 and exempts lines 93 and 94. The AC2 grep prints nothing, and the plant script is deleted. No package code changed, so the test suite was not re-run.
+- 2026-09-16: T3 plant (a), an 81-column line after `cy =~` in `sem-based-ssm-analysis`: exit 1, "line 95 (81 columns)", the two exempt lines still exempted.
+- 2026-09-16: T3 plant (b), the `cx =~` line cut to 80 columns: exit 1, "the exemption `^#> cx =~ ` matches no output line wider than 80 columns".
+- 2026-09-16: T3 plant (c), `#>`, a tab and 77 x in `introduction-to-ssm-analysis` (79 columns unexpanded): exit 1, "line 73 (85 columns)".
+- 2026-09-16: T3 plant (d), `#>`, a tab and 72 x (80 columns expanded): exit 0, and the report reads 66 output lines, so the planted line was read.
+- 2026-09-16: T3 plant (e), an 86-column `#> cx =~` line in `axes-reliability`: exit 1, "line 68 (86 columns)", 0 exempted in that file.
+- 2026-09-16: claim audit: not owed — internal tier.
 
 ## Decisions
 
