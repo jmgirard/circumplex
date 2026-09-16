@@ -1,6 +1,6 @@
 # M131: Printed cautions and notes wrap to the reader's width
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -35,17 +35,17 @@ The vignette width setting, the re-render and the width guard go to M132.
 
 ## Acceptance criteria
 
-- [ ] AC1: No caution or note line printed by `print()` or `summary()`
+- [x] AC1: No caution or note line printed by `print()` or `summary()`
       exceeds the set width, measured as display columns. This holds at
       `options(width = 60)` and at `options(width = 120)`. It holds for each
       fixture in `tests/testthat/test-print-width.R`. That file holds one
       fixture per caution in the T1 census, including the three cautions
       that the census records as assembled at run time.
-- [ ] AC2: Every caution and note that master `26bd64ac` printed still
+- [x] AC2: Every caution and note that master `26bd64ac` printed still
       prints. The words and their order stay the same after line breaks
       collapse to single spaces. A script compares output from a
       `git archive` of `26bd64ac` against the branch over the AC1 fixtures.
-- [ ] AC3: The AC1 test goes red against each of four planted defect forms,
+- [x] AC3: The AC1 test goes red against each of four planted defect forms,
       applied one at a time. Form one is an unwrapped emitter. Form two is
       an emitter wrapped at a hardcoded width. Form three is an emitter
       wrapped at `width + 1`. Form four is an emitter whose indent is not
@@ -61,7 +61,7 @@ The vignette width setting, the re-render and the width guard go to M132.
       records. The check goes red against a planted defect that changes a
       table's column widths without changing its words. It goes red against
       a second defect that drops a blank line before a note.
-- [ ] AC5: `Rscript -e 'devtools::test()'` is clean. Running
+- [x] AC5: `Rscript -e 'devtools::test()'` is clean. Running
       `Rscript -e 'devtools::check(args = "--no-manual")'` reports no error,
       warning or note that master `26bd64ac` does not also report. NEWS.md
       records the wrapping change.
@@ -119,6 +119,7 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-15: re-audit: AC4 (full) — five findings: a caution-based partition the scope makes unreachable, 29 graphics snapshots pulled into the promise, a "six classes" count no procedure produced, a table-and-heading claim no procedure enumerates, and a diff-reading act bound as a promise.
 - 2026-09-15: re-audit: AC4 (full) — six findings: an undecidable "fit line" category, no named baseline for "changes", a fourth sentence AC1 already entails, a word-collapse check blind to column structure, no probe of AC4's own instrument, and eleven axes-reliability emitters that no snapshot records.
 - 2026-09-15: criteria audit ran in full mode and returned ten findings. Five were fixed before writing. A grep clause passed only by changing `fit_est < 0.70` or a preserved caution. An "only wrapping mechanism" claim was already false at `ssm_sem.R:796`. The nchar type was unstated against multibyte cautions. The probe family varied only location. Five clauses bound an instrument. A `0 notes` clause reddens for unrelated reasons, and a width-40 case was unsatisfiable against a 15-column leader.
+- 2026-09-15: review gate, AC4 FAILED, status back to in-progress. Two counts, both inside the domain AC4's own procedure names. (1) `tools/m131-line-identity.R` does not go red against a dropped blank line before a note: removing the `cat("\n")` at `R/axes_reliability_oop.R:213` drops the blank line in the printed output and the tool still exits 0. Its `attributable()` marker exit puts the dropped line in the note's own changed group and excuses it. (2) AC4's byte-identity promise is violated in `_snaps/ci_accuracy.md`: the three settings sentences emitted at `R/ssm_ci_oop.R:472` belong to no census row, so they had to stay byte-identical, and `wrap_prose()` merged them into one flowed paragraph because it collapses a multi-element `x`. The same instrument excused that as a re-wrap. NEWS.md:25 now carries a false claim about those three sentences. AC1, AC2, AC3 and AC5 pass with evidence recorded in the Review section. Defect-return count: 1.
 
 ## Decisions
 
@@ -209,3 +210,155 @@ The property is tested with a double-width character, which is the only input
 that can tell the two counts apart.
 
 ## Review
+
+_Fresh evidence, gathered 2026-09-15 on branch `m131-printed-cautions-wrap` at
+`d1efbd5e`, synced with `origin/master` (10 ahead, 0 behind)._
+
+**AC1 — width compliance.** `testthat::test_file("tests/testthat/test-print-width.R")`
+on the branch: 43 blocks, 628 assertions, 0 failures, 0 errors. 41 of those
+blocks are the census fixtures, one per census row 1 to 41, each asserting at
+`width = 60` and `width = 120` that the caution's marker fired and that no
+printed line exceeds the width in display columns. Two warnings surfaced
+(row01 and row32 emit an ill-conditioned-Hessian warning by design); neither
+is a failure. The remaining two blocks are the ledger guards.
+
+**AC2 — word parity against master `26bd64ac`.** `Rscript
+tools/m131-caution-word-parity.R`: 41 of 41 fixtures print the same words in
+the same order as a `git archive` build of `26bd64ac`; 0 differ. The oracle
+discriminates: changing `Heywood-type` to `Heywood` in one caution
+(`R/cpm_oop.R:70`) turned 10 rows to `WORDS DIFFER` and named the word and its
+position. The plant was reverted and the tree verified clean.
+
+**AC3 — four planted defect forms, one at a time, fresh runs.** Each plant was
+applied alone, `test-print-width.R` run, and the plant reverted.
+
+| Form | Plant | Result |
+|---|---|---|
+| 1. unwrapped emitter | `R/ssm_oop.R` low-model-fit caution emitted with plain `cat()` at a hand-placed indent | 1 block red, named `row11_low_model_fit` |
+| 2. hardcoded width | `width = 78` passed to the `R/cpm_oop.R` analytic-CI caution | 1 block red, named `row08_analytic_ci_n` |
+| 3. `width + 1` | `room <- max(width - disp_width(lead), 1) + 1` in `wrap_prose()` | 34 blocks red, each named |
+| 4. uncounted indent | `room <- max(width, 1)` in `wrap_prose()`, so the prefix is printed but not charged | 34 blocks red, each named |
+
+All four forms go red and name the emitter, so AC3 holds as written.
+
+**A sensitivity limit found while planting form 4, carried to the gate.** A
+weaker, emitter-local version of the same defect did not go red. Setting
+`prefix = ""` on the `row16` boundary-solution caution while printing the two
+indent columns with a separate `cat("  ")` left the widest line at 57 columns
+at `width = 60`, because that caution's greedy fill happened to leave three
+columns of slack. The test's promise is only that no line exceeds the width,
+so a defect that overflows by fewer columns than the slack on the widest line
+passes. This is a property of the criterion, not a failure of it, and the
+helper-level plant above catches the same defect class. Recorded as a finding
+at the gate rather than silently.
+
+**AC4 — line identity against master `26bd64ac`. FAILS on its own second
+instrument probe.**
+
+The comparison itself passes. `Rscript tools/m131-line-identity.R` exits 0:
+`ci_accuracy.md` 10 changed groups (6 attributed by marker, 4 pure re-wraps),
+`cpm_api.md` 4 groups (3 by marker, 1 re-wrap), `cpm_summary_markers.md` 4
+groups (3 by marker, 1 re-wrap), `fit_structure_api.md` identical. The
+axes-reliability surface at `width = 80`, which no snapshot records, reports
+every changed group attributed across rows 16 to 26. Nothing is unattributed.
+
+The first instrument probe passes. Changing `right = FALSE` to `right = TRUE`
+in the per-axis reliability table at `R/axes_reliability_oop.R:211` re-aligns
+the table's columns without changing a word. The tool reports `1 NOT
+attributed` on eleven fixtures and exits 1.
+
+**The second instrument probe fails.** AC4's last sentence requires the check
+to go red against a defect that drops a blank line before a note. Removing the
+`cat("\n")` that precedes the boundary-solution note at
+`R/axes_reliability_oop.R:213` does drop the blank line. Verified in the
+printed output: at `width = 80` the note's first line follows the last table
+row with no blank line between them. `tools/m131-line-identity.R` nonetheless
+exits 0 and reports `0 NOT attributed` on every fixture.
+
+The cause is in the instrument, not the criterion. `changed_groups()` puts the
+dropped blank line in the same changed group as the note's own text, because
+they are adjacent. That group then takes the marker exit in `attributable()`,
+which asks only whether the group's joined text carries a known caution
+marker. It does, so the group is excused, blank line and all. The tool's own
+comment above `is_rewrap()` anticipates this case for the re-wrap exit
+("adding or dropping a blank line leaves no words on either side, which would
+otherwise compare equal and be excused") but the marker exit has no equivalent
+guard.
+
+The criterion is satisfiable as written: the marker exit can require that a
+group preserve its blank-line count, or blank-line changes can be held out of
+the marker exit altogether. The promise is sound; the instrument does not meet
+it. AC4 stays unticked.
+
+**AC5 — suite and package check.** `Rscript -e 'devtools::check(args =
+"--no-manual")'` on the branch at `d1efbd5e`, run on a clean tree: `Status:
+OK`, duration 7m 2.4s, 0 errors, 0 warnings, 0 notes. The test suite ran
+inside that check and passed. Master `26bd64ac` reports no error, warning or
+note that this does not, because this reports none at all. NEWS.md records the
+wrapping change. AC5 holds. (A separate NEWS.md defect is recorded as finding
+O1 below; it is not an AC5 failure, because AC5 asks only that the change be
+recorded.)
+
+### Consistency gate
+
+`python3 cairn_validate.py`: exit 0, all checks passed, no advisory fired.
+`devtools::check(args = "--no-manual")`: Status OK, as above. The remaining
+toolchain-slot checks were not reached, because AC4 had already failed.
+
+### Independent review — three lenses
+
+Full three-lens fan-out, as the diff touches executable surface at a
+user-facing tier.
+
+**[S] blame-history: no findings.** The hardcoded 70 and 78 carry no
+documented rationale in history and are named as defects by the plan. D-056
+and D-059 are not contradicted. Every deliberate comment citing a past
+milestone (M62 F2, RR09, M61-D1, D-009, D-010) survives verbatim. The
+relaxed assertions in the three pre-existing test files lose no guard.
+
+**[S] prior-review record: no findings.** The GitHub probe returned `[]`, so
+the thread walk was skipped. Archived `## Review` sections for M94, M127,
+M129, M110, M78, M48, M40 and M10 were read against the diff. M94's two
+corrections and M129's wording pins survive; M127's own wrap-to-width work is
+completed rather than contradicted.
+
+**[O] diff-bug: eleven findings.** Ranked as reported, with disposition. Four
+were verified here; the rest are recorded as reported and go back unverified.
+
+| # | Finding | Verified | Disposition |
+|---|---|---|---|
+| O1 | `summary.circumplex_ci_accuracy()` passes a 3-element vector to `ssm_ci_cat_para()`. `strwrap()` treated each element as its own paragraph; `wrap_prose()` collapses them, so three settings sentences now flow as one. NEWS.md:25 still claims "settings print as three short sentences, usually on three lines", which is now false, and the comment at `R/ssm_ci_oop.R:487` is stale. | confirmed | fix now |
+| O2 | `wrap_prose()` collapses a multi-element `x` into one paragraph. Undocumented in its header, and `test-wrap-prose.R` has no multi-element non-atomic case. Root cause of O1. | confirmed | fix now |
+| O3 | The AC4 oracle counts a destroyed paragraph boundary as a pure re-wrap, so it scored O1 as one of `ci_accuracy.md`'s four re-wraps. | confirmed | fix now |
+| O4 | `attributable()` excuses a whole changed group when any caution marker appears anywhere in it, with no check on the words outside the caution. Same root cause as the AC4 probe failure above. | confirmed | fix now |
+| O5 | The ledger's first guard checks entries only against registered fixtures' markers, so a caution with no census row can be parked in the ledger and both guards pass. | reported | fix now |
+| O6 | Ledger guard two reads an environment the 41 fixture blocks fill, so it depends on within-file ordering and on earlier blocks' side effects. An isolation run here was inconclusive. | reported | fix now |
+| O7 | `R/ssm_sem.R` still wraps prose with `strwrap()`, which breaks at `< width` and counts characters, while `wrap_prose()` admits exactly `width` and counts columns. The package prints prose two ways, one column apart. | reported | candidate row (scope leaves `ssm_sem.R` out) |
+| O8 | `wrap_prose()` silently repairs a bad `width` to 80 while `stopifnot()`-validating its other arguments, and `is_flag()` admits `atomic = NA`. | reported | fix now |
+| O9 | `test-cpm_summary_markers.R` lost its only direct pin on the caveat's continuation indent; it survives only in snapshots. | reported | fix now |
+| O10 | AC4 and T3 unchecked while the log reads "all tasks done". | confirmed | bookkeeping, back with the return |
+| O11 | Interpolated failure reasons at `axes_reliability_oop.R:307` and `:338` can now break mid-phrase, unlike the marker labels, which are atomic. | reported | maintainer's call at the next gate |
+
+The reviewer also verified, and this review accepts: no snapshot lost content
+(word-level diffs empty, blank-line counts unchanged at 17/40/58/19), marker
+labels are atomic at both `cpm_oop.R` sites, no hand-placed `\n` prose remains
+in the six scope files, and `tools/` is Rbuildignored.
+
+### Gate outcome: returned to `in-progress`
+
+AC4 fails on two independent counts, both inside the domain of the procedure
+AC4 names, and both repairable without changing what AC4 promises.
+
+1. The instrument does not go red against a dropped blank line before a note,
+   which AC4's last sentence requires (evidence above).
+2. AC4's byte-identity promise is violated in `ci_accuracy.md`. The three
+   settings sentences at `R/ssm_ci_oop.R:472` are emitted by no census row, so
+   AC4 requires them to stay byte-identical. They did not (finding O1). The
+   instrument excused the change as a re-wrap (finding O3).
+
+This is a defect return, not an amendment return: AC4's promise is sound and
+satisfiable as written, and the repair is to the instrument and to the
+emitter, not to the criterion. Defect-return count for this milestone: 1. The
+AC4 amendment of 2026-09-15 stays on the separate amendment track and is not
+counted here.
+
