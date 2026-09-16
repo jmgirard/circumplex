@@ -9,7 +9,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M131 | Printed cautions and notes wrap to the reader's width | planned | — | normal | milestones/M131-printed-cautions-wrap.md |
+| M131 | Printed cautions and notes wrap to the reader's width | in-progress | — | normal | milestones/M131-printed-cautions-wrap.md |
 | M132 | Rendered vignette output fits the website's code box | planned | M131 | normal | milestones/M132-vignette-output-fits-code-box.md |
 | M130 | The invariance-ladder verdict prints as labeled lines | done | — | normal | milestones/archive/M130-ladder-verdict-labeled-lines.md |
 | M129 | Vignette prose matches the package's code and printed output | done | M127, M128 | normal | milestones/archive/M129-vignette-prose-matches-output.md |

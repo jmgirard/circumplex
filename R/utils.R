@@ -227,6 +227,88 @@ is_null_or_num <- function(x, n = NULL) {
 # phrase: the controlled vocabulary is pinned by the test suite, so reaching
 # this branch means the data went somewhere the vocabulary does not cover, and
 # printing a guess there would hide it.
+# Display columns, not characters or bytes. The printed cautions carry "²",
+# "ζ" and "ℹ", whose column count is what a console line budget is
+# spent in, so every width comparison below goes through this one function.
+disp_width <- function(x) {
+  nchar(x, type = "width")
+}
+
+# Wrap prose to the reader's console width and return the finished lines.
+#
+# The caller cats what this returns, so one wrapping rule serves every caution
+# and note the package prints, and the rule can be tested without capturing
+# console output. Width defaults to getOption("width"), which is what a reader
+# sets to tell R how wide their console is.
+#
+# `prefix` is placed before the first line and `continuation` before every
+# later line. Both are counted AGAINST the width, never added on top of it, so
+# an indented or labeled block stays inside the budget. A fixed-width label
+# field is expressed as a `prefix` of that width with a `continuation` of the
+# same width in spaces.
+#
+# With `atomic = FALSE`, `x` is prose and a break may fall between any two
+# words. With `atomic = TRUE`, each element of `x` is a unit that must not
+# split: a break falls only between elements. The bootstrap marker note uses
+# the atomic form, because a marker label is taught as a unit and reads as one
+# name only while it stays on one line.
+#
+# A single word wider than the room left on a line is placed on its own line
+# rather than split, so that line can exceed the width. Breaking a word would
+# change the words the reader sees, which matters more than the column.
+wrap_prose <- function(x, prefix = "", continuation = prefix,
+                       width = getOption("width"), atomic = FALSE) {
+  stopifnot(
+    is_char(x),
+    is_char(prefix, n = 1),
+    is_char(continuation, n = 1),
+    is_flag(atomic)
+  )
+  if (!is_scalar_count(width)) width <- 80L
+
+  pieces <- if (atomic) {
+    x
+  } else {
+    unlist(strsplit(paste(x, collapse = " "), "[ \t\r\n]+"))
+  }
+  pieces <- pieces[nzchar(pieces)]
+  if (length(pieces) == 0) return(character(0))
+
+  bodies <- character(0)
+  current <- pieces[[1]]
+  for (piece in pieces[-1]) {
+    lead <- if (length(bodies) == 0) prefix else continuation
+    room <- max(width - disp_width(lead), 1)
+    candidate <- paste(current, piece)
+    if (disp_width(candidate) <= room) {
+      current <- candidate
+    } else {
+      bodies <- c(bodies, current)
+      current <- piece
+    }
+  }
+  bodies <- c(bodies, current)
+
+  leads <- c(prefix, rep(continuation, length(bodies) - 1))
+  paste0(leads[seq_along(bodies)], bodies)
+}
+
+# The same wrapping, printed. Every caution site that has nothing to add
+# between the lines uses this, so the newline handling is written once.
+cat_prose <- function(x, prefix = "", continuation = prefix,
+                      width = getOption("width"), atomic = FALSE) {
+  lines <- wrap_prose(
+    x,
+    prefix = prefix,
+    continuation = continuation,
+    width = width,
+    atomic = atomic
+  )
+  if (length(lines) > 0) cat(lines, sep = "\n")
+  if (length(lines) > 0) cat("\n")
+  invisible(lines)
+}
+
 norm_kind_phrase <- function(kind) {
   phrases <- c(
     standardization = "standardization sample",
