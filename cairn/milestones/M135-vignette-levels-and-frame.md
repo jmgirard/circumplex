@@ -1,13 +1,13 @@
 # M135: Vignettes are labeled by level and framed like the older ones
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the vignettes and the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** m135-vignette-levels-and-frame
 
 ## Goal
 
@@ -43,7 +43,7 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 
 ## Tasks
 
-- [ ] T1: Add the `articles:` index and regroup the navbar menu in `_pkgdown.yml` by the level map, adding `axes-reliability`. Write the AC4 diff script under `tools/` or as a testthat test that skips where `vignettes/` is absent (see `tests/testthat/test-cpm_boundary_vignette.R` for the installed-tree fallback).
+- [x] T1: Add the `articles:` index and regroup the navbar menu in `_pkgdown.yml` by the level map, adding `axes-reliability`. Write the AC4 diff script under `tools/` or as a testthat test that skips where `vignettes/` is absent (see `tests/testthat/test-cpm_boundary_vignette.R` for the installed-tree fallback).
 - [ ] T2: Frame the three older vignettes: `using-instruments.Rmd`, `introduction-to-ssm-analysis.Rmd.orig`, `intermediate-ssm-analysis.Rmd.orig`. Their sections are already numbered. Add the Level line, rename the first section to `## 1. Overview` where the content fits or add one, and name the next page in each Wrap-up.
 - [ ] T3: Frame `evaluating-circumplex-structure`, `sem-based-ssm-analysis`, `growth-ssm-analysis`, `axes-reliability` (numbered already, no Overview). Add the Level line and the Overview, renumber, and add the Wrap-up where missing (growth has none).
 - [ ] T4: Frame `advanced-visualization.Rmd.orig` (unnumbered headings) and `bayesian-ssm-analysis.Rmd` (its section 6 "Where to go next" becomes the Wrap-up). Write the AC1 to AC3 check script in the same place as T1's and run it over all nine.
@@ -55,6 +55,8 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 
 - 2026-09-16: created by /milestone-plan. Plan gate chose three levels with a Level line, Overview and Wrap-up on every page over labels in the site index only, because the older vignettes carry their frame in the page and the maintainer asked to emulate them; falsified by readers who report the frame as noise.
 - 2026-09-16: criteria audit ran in full mode on a fresh Opus reader; 16 findings. Fixed at the gate: the sweep already fails on the SEM page (AC6 now a subset rule), `check_pkgdown()` validates no navbar (AC4 names a diff script), the Level, Overview and Wrap-up checks are scripted (AC1 to AC3), the reading map moved from a Decisions list into Scope, and "0 notes" became "no new notes".
+- 2026-09-16: implement started on branch m135-vignette-levels-and-frame. Question gate chose a testthat test for the Level, heading and Wrap-up checks and a tools/ script for the pkgdown index diff, because the diff needs the yaml package and the package does not list it. Baseline: the seven pre-computed pages re-render up to date on this machine before any edit.
+- 2026-09-16: T1 done. `_pkgdown.yml` gains the three-level `articles:` index and the navbar menu follows the same order with `axes-reliability` added. `tools/check-pkgdown-vignettes.R` diffs both lists against `vignettes/` and passes, and `pkgdown::check_pkgdown()` finds no problems.
 
 ## Decisions
 
