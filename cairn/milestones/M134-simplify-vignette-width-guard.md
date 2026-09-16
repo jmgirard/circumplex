@@ -1,13 +1,13 @@
 # M134: Simplify the vignette width guard
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
 - **Resolves:** —
 - **Surface tier:** internal — a CI checker over the rendered vignettes that no package user runs
-- **Branch/PR:** —
+- **Branch/PR:** m134-simplify-vignette-width-guard
 
 ## Goal
 
@@ -71,7 +71,7 @@ records them (plan gate).
 
 ## Tasks
 
-- [ ] T1: Rewrite `tools/check-vignette-width.R`. Replace `START`, `END` and
+- [x] T1: Rewrite `tools/check-vignette-width.R`. Replace `START`, `END` and
       the region logic in `scan_widths()` with an exemption list of
       (vignette, anchored pattern, reason). Error on an entry that matches no
       over-wide line. Expand tabs to 8-column stops before
@@ -100,6 +100,7 @@ records them (plan gate).
 - 2026-09-16: plan gate chose simplifying over deleting the guard, because the print-width tests do not read whole vignettes; falsified by the guard catching nothing those tests miss.
 - 2026-09-16: plan gate chose a one-off plant run over a committed plant script, because CI never ran the M132 script; falsified by a checker regression that a rerun of the plants catches.
 - 2026-09-16: AC5 and plant (e) were added after the gate. A second [O] re-audit of AC3 and AC5 returned two findings, both fixed. AC3 now limits a stale entry to `#>` lines measured after tab expansion. AC5 was a staleness check, which fails before the render is committed and proves nothing after. It is now a diff that shows only the two marker lines removed.
+- 2026-09-16: T1 done. The checker holds a two-entry EXEMPT list and expands tabs before it measures. On the committed vignettes it exits 0 and exempts `sem-based-ssm-analysis` lines 94 and 95, 86 columns each, while the old markers are still in place. Test suite: 0 failed, 0 errors.
 
 ## Decisions
 
