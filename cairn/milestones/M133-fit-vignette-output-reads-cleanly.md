@@ -22,7 +22,7 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 ## Acceptance criteria
 
 - [x] AC1: `names(cpm_fit(...)$results)` is unchanged from master, shown by an existing or new test asserting the name vector.
-- [ ] AC2: At `options(width = 77)`, `print()` and `summary()` of each CPM fixture in `test-cpm_api.R` and `test-cpm_summary_markers.R` show the estimated-angles table as one header row plus one row per scale. A test asserts this. The tests titled "byte-identical to merge-base" are renamed to say what they now pin.
+- [x] AC2: At `options(width = 77)`, `print()` and `summary()` of each CPM fixture in `test-cpm_api.R` and `test-cpm_summary_markers.R` show the estimated-angles table as one header row plus one row per scale. A test asserts this. The tests titled "byte-identical to merge-base" are renamed to say what they now pin.
 - [x] AC3: A test shows that the values in the printed CPM table equal `cpm_round_df(results)` column by column, in the same order. The test states the one-to-one map from old to new header names (for example `Angle_theory` to `Theory`).
 - [x] AC4: At `options(width = 77)`, every line of `print()` for `cache$ci`, `ci_guard`, `ci_cpm` and `ci_contrast` (from `helper-caution-fixtures.R`) is at most 77 display columns. A test measures this with `nchar(type = "width")`. The vignette's rendered `print(acc)` output passes `tools/check-vignette-width.R`.
 - [x] AC5: The committed rendered `.Rmd` has three chunks whose output contains "CPM Hessian is ill-conditioned" (the jz2017 fit, the model variants and `acc`). The prose before each such chunk has a sentence that says the warning will appear and names the section *When a fit sits at a boundary*.
@@ -98,3 +98,33 @@ Independent review (three reviewers). Dispositions are pending, because the AC2 
 - [O] 11: nits. NEWS says "first line", but print() starts with a blank line. A code comment cites "(M133)".
 - [S] blame-history: no findings. One nit: two sentences are joined on one source line at .Rmd.orig:513.
 - [S] prior-review: no reintroduction. The wrap_prose() use on a heading is a planned extension of M131's scope. The change resolves ROADMAP candidate item (vii), the ledgered accuracy heading.
+
+Pass 2 (2026-09-16), branch in sync with origin/master (merge-base 26fc9288, 0 behind). Resume route (d): no PR exists.
+
+- AC1: pass. test-cpm_api.R:70-72 asserts the nine `results` names, the file has no diff in that block, and devtools::test() passed.
+- AC2: pass. test-cpm_summary_markers.R:315-340 runs `expect_cpm_table_one_block()` with print() and summary() on all seven fixtures. The fixtures are clean, hey, small, free, boot_jz, boot_big and boot_clean. At width 77 the helper requires one `Scale` header row, one row per scale and a blank line after. It carries skip_on_cran() only. test-cpm_api.R:552-553 and :661-662 cover both methods for the analytic and bootstrap fits there. T5's work-log line records the planted defect turning it red. The tests formerly titled "byte-identical to merge-base" now read "matches its snapshot" (:75, :301).
+- AC3: pass. helper-cpm-table.R:7-11 states the header map as its own constant: Angle_theory to Theory, the two `_lci` names to lci, the two `_uci` names to uci. The helper compares each printed column with `cpm_round_df(results)` in order, tolerance 0.
+- AC4: pass. test-ci_accuracy_print_width.R passed in the suite. tools/check-vignette-width.R: evaluating-circumplex-structure 295 output lines, all fit. All 7 vignettes fit in 80 columns.
+- AC5: pass. Rendered .Rmd warning lines 77, 432, 630. Prose naming *When a fit sits at a boundary* at lines 65 and 617, and the variants notice before line 432 (pass 1 line 427-429, file unchanged since).
+- AC6: pass. `print(acc)` at line 632, `summary(acc)` at line 724. The five grep terms match only lines 731, 743, 792, 793, 808, 810.
+- AC7: pass. devtools::test(): FAIL 0, WARN 11, SKIP 1, PASS 11034. devtools::check(args = "--no-manual"): 0 errors, 0 warnings, 0 notes. Width guard and staleness guard: all 7 vignettes pass. NEWS.md has the CPM-header entry and the accuracy-heading entry.
+
+Consistency gate: cairn_validate exit 0 (all checks passed). document() made no diff, 0 `resolve link` lines. check_pkgdown(): no problems. README not touched. New files are both under tests/testthat. Master push runs, newest verdict: R-CMD-check success and test-coverage success (7127001b). check-master-red-alert.R, master-red-alert-dryrun.R and check-branch-protection.R exit 0.
+
+Independent review, pass 2 (three fresh reviewers). Pass-1 findings [O] 1 and [O] 3 are fixed by T5 and T6. Candidate findings, ranked:
+- [O] a: NEWS.md:21 (M131 entry) says column headers are unchanged, and the new entry changes the CPM table's column headers.
+- [O] b: the one-block claim has little headroom. A probe at width 77 used `scaling = "free"` and IIP-length names (longest 16 characters). VarRatio printed in a second block. The same names with unit scaling fit (75 columns), and free scaling with 7-character names fits (75 columns). No fixture uses long names.
+- [O] c / [S] prior-review 1: the one-block property is tested only at digits = 3 (pass-1 [O] 6, still open).
+- [O] d / [S] prior-review 3: the vignette says `summary()` "adds the settings", but it prints a different settings paragraph and a Near-zero regime note that the text never mentions (pass-1 [O] 5).
+- [S] prior-review 2: pass-1 [O] 4 (Guardrail line reports the 0 rung) has no recorded fix. The [O] reviewer checked the prose against the rendered output and found it consistent.
+- [O] e: test-cpm_summary_markers.R:7 says the helper checks that values are "unchanged", but it compares with the same object, not with master.
+- [O] f: test-ci_accuracy_print_width.R:7 reaches builders through `environment(fx[[1]]$build)` (pass-1 [O] 9).
+- [O] g: .Rmd.orig:513 is a 112-character prose line (pass-1 [S] nit).
+- [O] h: "This chunk prints two warnings" rests on a bootstrap-exclusion count that can change across BLAS builds (pass-1 [O] 10).
+- [O] i: AC3's "one-to-one" wording is loose, because two old names map to `lci` and two to `uci`.
+- [O] j: the skip_on_ci() blocks at test-cpm_summary_markers.R:91-108, :309 repeat checks the new CI block already runs.
+- [O] k: the vignette does not say why only `fit_quasi` of the three variants warns (outside scope).
+- Carried from pass 1, not re-raised: [O] 7 (no help page says which lci/uci pair belongs to which estimate), [O] 8 (helper splits on whitespace), [O] 11 (NEWS "first line" nit, "(M133)" code comment).
+- [S] blame-history: no finding contradicts a past change or decision. D-056 and D-057 cover the header change. Removing the accuracy heading from the width ledger is correct.
+
+No finding shows an acceptance criterion failing. Dispositions are recorded at the approval gate.
