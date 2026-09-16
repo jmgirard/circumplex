@@ -64,6 +64,10 @@ the default confidence intervals are bootstrapped. We
 lower `boots` from its default of 2000 to keep this vignette quick to
 build. In practice, use the default.
 
+This chunk prints a warning that the CPM Hessian is ill-conditioned. That
+warning is expected for these data. The section *When a fit sits at a
+boundary*, below, explains what it means.
+
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the reported condition number and the bootstrap
      acceptance counts move across BLAS implementations; the numbers this
@@ -301,7 +305,9 @@ Constrained variants make the structural question sharp. Is the instrument
 consistent with *equally spaced* scales? Is it consistent with *equal*
 communalities? The correlation-matrix path is convenient for this
 comparison, because its point estimates and fit indices are deterministic.
-So no bootstrap is needed:
+So no bootstrap is needed. These refits of the same data print the same
+ill-conditioned Hessian warning that *When a fit sits at a boundary*
+explains.
 
 <!-- precompute:volatile-numbers start -- these three model variants
      refit the same ill-conditioned correlation matrix, so the reported
@@ -466,7 +472,11 @@ explained below. The defaults are
 `boots = 2000`. They give a Monte Carlo standard error under one percentage
 point for coverage near the nominal level, and they are recommended in
 practice. The `parallel`/`ncpus` arguments speed up real runs without
-changing results for a given seed.
+changing results for a given seed. The CPM fit inside the diagnostic prints
+the same ill-conditioned Hessian warning that *When a fit sits at a boundary*
+explains.
+
+`print()` shows the short report: one block of verdicts per profile.
 
 <!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
      ill-conditioned CPM, whose solution moves in the third digit across
@@ -475,53 +485,31 @@ changing results for a given seed.
 ```{r accuracy_run}
 set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
-summary(acc)
+print(acc)
 ```
 <!-- precompute:volatile-numbers end -->
 
-How to read this output:
+How to read this output. Each profile's lines classify its coverage at the
+amplitude it was estimated to have. Coverage is how often your CI procedure
+covered the truth in the simulated replications. The diagnostic compares
+it with the nominal level, using the Wilson interval (an interval around the
+estimated coverage) and the Bradley band.
 
-- **The coverage table** reports how often your CI procedure covered the
-  truth in the simulated replications, for each parameter. It does so at the
-  amplitude that the profile was estimated to have (`Condition = 1`) and at
-  fractions of it. Compare coverage against the nominal level using the
-  Wilson interval (an interval around the estimated coverage) and the
-  Bradley band. The verdict does this for you.
-- **The amplitude ladder** (`Condition` column) matters because your
-  estimated amplitude is biased upward. The population that generated your
-  data plausibly has *less* differentiation than your estimate. The rungs
-  below 1 show what happens to coverage in that direction. The 0 rung shows
-  the degenerate flat-profile case. There, displacement has no true value at
-  all, and the amplitude interval cannot cover the boundary truth. (Its
-  printed zero coverage is structural, and the table flags it.) When a
-  profile's estimated amplitude is smaller than half its own CI width, the
-  diagnostic adds one more rung at a scaling factor above 1. This is the
-  case for obsessive–compulsive PD here. That rung is the amplitude at which
-  the population would sit exactly at the observed CI half-width.
-- **The `cert` column** of the coverage table reports how often profiles were
-  *certified* at each rung. Each profile's `Guardrail` line gives the rate at
-  the 0 rung. A certified profile has its amplitude CI lower bound at least
-  0.35 CI-widths above zero. At the 0 rung, any certification is a false
-  certification. The summary prints a caution when the false-certification
-  rate is materially above the rate that a user would expect from the
-  interval level. This is a measured property of the shipped display rule,
-  not a hypothesis test.
-- **The lines under `Verdicts (c = 1, as estimated)`** classify elevation, amplitude, and
-  certification-conditional displacement coverage at your as-estimated
-  amplitude. Each profile's `Verdict:` paragraph states the overall
-  conclusion.
-
-For a visual summary across the ladder:
-
-```{r accuracy_plot, fig.width = 7.5, fig.height = 5, out.width = "100%"}
-plot(acc)
-```
+- **Elevation, Amplitude and Displacement** give the coverage of each
+  parameter and its class. Displacement coverage counts only the replications
+  in which the profile was *certified*. A certified profile has its amplitude
+  CI lower bound at least 0.35 CI-widths above zero.
+- **Guardrail** gives the rate at which a profile whose true amplitude is
+  zero would still be certified. Any such certification is a false
+  certification. The line prints a caution when that rate is materially above
+  the rate that a user would expect from the interval level. This is a
+  measured property of the shipped display rule, not a hypothesis test.
+- **Verdict** states the overall conclusion for the profile.
 
 The two profiles tell usefully different stories. Paranoid PD is
 certified. Its amplitude CI lower bound clears the 0.35-CI-width margin, so
-the printed output adds no displacement note. Nothing in its coverage table
-clearly leaves the Bradley band, at the as-estimated amplitude or with the
-population amplitude halved. Obsessive–compulsive PD is *not* certified. Its
+the printed output adds no displacement note. None of its coverage rates
+clearly leaves the Bradley band at the as-estimated amplitude. Obsessive–compulsive PD is *not* certified. Its
 amplitude (about .02 here) is far too close to zero relative to its CI
 width. So the printed output still shows its displacement and interval, but
 with a note that the displacement is not interpretable. The `ssm_analyze()`
@@ -551,6 +539,49 @@ That is the diagnostic being honest about its own Monte Carlo error. The
 default `reps = 1000` sharpens such classifications into `adequate` or
 `INADEQUATE`.
 
+#### The full report
+
+`summary()` adds the settings, a note on the simulated population, and a
+table of coverage at every rung of the amplitude ladder:
+
+<!-- precompute:volatile-numbers start -- the summary of the diagnostic run
+     above; its numbers move with that run across BLAS implementations. -->
+```{r accuracy_summary}
+summary(acc)
+```
+<!-- precompute:volatile-numbers end -->
+
+How to read the additions:
+
+- **The structure note** describes the population the replications were
+  drawn from, with its fit indices and any boundary markers from the CPM fit.
+- **The coverage table** reports coverage for each parameter at each rung of
+  the ladder (`Condition = 1` is the amplitude as estimated). The `d_cert`
+  column is displacement coverage when certified.
+- **The amplitude ladder** (`Condition` column) matters because your
+  estimated amplitude is biased upward. The population that generated your
+  data plausibly has *less* differentiation than your estimate. The rungs
+  below 1 show what happens to coverage in that direction. For paranoid PD,
+  no coverage rate clearly leaves the Bradley band with the population
+  amplitude halved either. The 0 rung shows the degenerate flat-profile
+  case. There, displacement has no true value at all, and the amplitude
+  interval cannot cover the boundary truth. (Its printed zero coverage is
+  structural, and the table flags it.) When a profile's estimated amplitude
+  is smaller than half its own CI width, the diagnostic adds one more rung at
+  a scaling factor above 1. This is the case for obsessive–compulsive PD
+  here. That rung is the amplitude at which the population would sit exactly
+  at the observed CI half-width.
+- **The `cert` column** reports how often profiles were certified at each
+  rung. The `Guardrail` line of the short report is this rate at the 0 rung.
+- **The lines under `Verdicts (c = 1, as estimated)`** are the verdict blocks
+  that `print()` shows.
+
+For a visual summary across the ladder:
+
+```{r accuracy_plot, fig.width = 7.5, fig.height = 5, out.width = "100%"}
+plot(acc)
+```
+
 Two settings are worth knowing. First, `structure = "observed"` rebuilds the
 population from the pooled observed correlations instead of the CPM. If
 the two structures yield different verdicts, that disagreement is itself
@@ -578,7 +609,7 @@ Putting Sections 2 and 3 together into a checklist:
 3. **Treat amplitude as optimistic.** It cannot go below zero, so it
    overshoots when true differentiation is weak. Before interpreting a
    "marked" amplitude at modest $n$, run `ssm_ci_accuracy()` and look at
-   the sub-1 ladder rungs.
+   the sub-1 ladder rungs in its `summary()` or `plot()`.
 4. **Only interpret displacement when amplitude is credible.** When the
    amplitude CI lower bound sits less than 0.35 CI-widths above zero, the
    printed output notes that the displacement is not interpretable. The

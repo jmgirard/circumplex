@@ -43,7 +43,7 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 
 - [x] T1: Write tests first that pin `names(results)` and the one-block CPM table. In R/cpm_oop.R, print a display copy of `results` with shorter headers (for example `Theory`, `lci`, `uci`) in both methods. Rename the "byte-identical to merge-base" tests in `test-cpm_summary_markers.R` and update the two snapshot files. Add the value-equality test for AC3. Sweep `git grep` hits for the old header names in docs and prose.
 - [x] T2: Write a width test first for `print.circumplex_ci_accuracy()` over the four named fixtures. Wrap its header line with `wrap_prose()` (R/utils.R:267). Update snapshots.
-- [ ] T3: Edit `vignettes/evaluating-circumplex-structure.Rmd.orig`. Add the warning sentences before the three chunks that emit the Hessian warning (jz2017 fit, model variants, accuracy). Use `print(acc)` in the main chunk. Add a `summary(acc)` chunk after the verdict discussion, and move the text about the ladder, the `cert` column and the table after it.
+- [x] T3: Edit `vignettes/evaluating-circumplex-structure.Rmd.orig`. Add the warning sentences before the three chunks that emit the Hessian warning (jz2017 fit, model variants, accuracy). Use `print(acc)` in the main chunk. Add a `summary(acc)` chunk after the verdict discussion, and move the text about the ladder, the `cert` column and the table after it.
 - [ ] T4: Re-render with `tools/precompute-vignettes.R`. Run the width guard over the rendered `print(acc)`, then run both vignette guards, the tests and the check. Add the NEWS.md entry.
 
 ## Work log
@@ -56,6 +56,7 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - 2026-09-16: implement gate chose headers Scale, Theory, Angle, lci, uci, Zeta, lci, uci, Communality (66 columns on jz2017) over keeping Angle_lci/Zeta_lci with Comm (76 columns), because it leaves room for longer scale names and VarRatio. Falsified by readers confusing the two lci/uci pairs.
 - 2026-09-16: T1 done. `cpm_display_results()` in R/cpm_oop.R, `expect_cpm_table_one_block()` helper added to both snapshot test files (7 fixtures), snapshots re-captured, M94 byte-identical tests renamed. devtools::test() 0 failures.
 - 2026-09-16: T2 done. `print.circumplex_ci_accuracy()` wraps its header with `wrap_prose()`. New test-ci_accuracy_print_width.R covers the four fixtures. Its now-unprinted header entry left the M131 width ledger in test-print-width.R. devtools::test() 0 failures.
+- 2026-09-16: T3 done. Warning notices before the cpm, variants and accuracy_run chunks. accuracy_run prints `print(acc)` with a short reading guide. New `#### The full report` subsection holds `summary(acc)`, the table/ladder/cert guide and the plot. Wrap-up checklist item 3 now points at `summary()` or `plot()` for the ladder.
 
 ## Decisions
 
