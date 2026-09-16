@@ -280,9 +280,9 @@ acc
 #>     Elevation      coverage 92.0%: borderline
 #>     Amplitude      coverage 88.0%: borderline
 #>     Displacement   coverage 92.0% when certified: borderline
-#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
-#>   coverage rates are borderline at this number of replications; a larger
-#>   `reps` would sharpen the verdict.
+#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement coverage
+#>   rates are borderline at this number of replications; a larger `reps` would
+#>   sharpen the verdict.
 summary(acc)
 #> 
 #> Mean scores; bootstrap, 100 replicates, level 0.95; 25 reps per condition.
@@ -291,8 +291,8 @@ summary(acc)
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.049, SRMR = 0.035).
-#>   The structure fits adequately (RMSEA <= 0.08, Browne & Cudeck, 1993; SRMR
-#>   <= 0.08, Hu & Bentler, 1999), so the simulated population is a reasonable
+#>   The structure fits adequately (RMSEA <= 0.08, Browne & Cudeck, 1993; SRMR <=
+#>   0.08, Hu & Bentler, 1999), so the simulated population is a reasonable
 #>   stand-in for yours.
 #>   Boundary markers: Heywood communality; small correlation-function weight;
 #>   ill-conditioned Hessian.
@@ -303,9 +303,9 @@ summary(acc)
 #>     Elevation      coverage 92.0%: borderline
 #>     Amplitude      coverage 88.0%: borderline
 #>     Displacement   coverage 92.0% when certified: borderline
-#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
-#>   coverage rates are borderline at this number of replications; a larger
-#>   `reps` would sharpen the verdict.
+#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement coverage
+#>   rates are borderline at this number of replications; a larger `reps` would
+#>   sharpen the verdict.
 #> 
 #> Coverage by condition (d_cert: d when certified; cert: certification rate):
 #>  Profile Condition    e    x    y    a    d d_cert cert Structural

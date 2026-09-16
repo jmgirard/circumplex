@@ -239,8 +239,11 @@ fit
 #>        1.000
 #> 
 #> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
-#>   Note: a communality index reached its upper boundary (ζ > 0.995, a Heywood-type solution).
-#>   Note: 2 of 100 bootstrap resamples were excluded (0 degenerate, 2 non-convergent); the intervals are based on 98 replicates and are conditional on estimability.
+#>   Note: a communality index reached its upper boundary (ζ > 0.995, a
+#>   Heywood-type solution).
+#>   Note: 2 of 100 bootstrap resamples were excluded (0 degenerate, 2
+#>   non-convergent); the intervals are based on 98 replicates and are conditional
+#>   on estimability.
 
 # Matrix-input path (supply the sample size; analytic CIs)
 R <- cor(jz2017[scales])
@@ -273,5 +276,6 @@ cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
 #>        1.000
 #> 
 #> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
-#>   Note: a communality index reached its upper boundary (ζ > 0.995, a Heywood-type solution).
+#>   Note: a communality index reached its upper boundary (ζ > 0.995, a
+#>   Heywood-type solution).
 ```

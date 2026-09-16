@@ -14,6 +14,18 @@
 
 ### Minor improvements and fixes
 
+- Every prose caution and note that
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) show now wraps to
+  the console width you set with `options(width = )`. Before this, the
+  text ignored the width you set. Some cautions broke their lines at a
+  column written into the package and some printed as one long line, so
+  they ran past a narrow console or stopped short of a wide one. The
+  words and their order do not change. Only the line breaks move. A
+  fired marker label, such as `Heywood communality`, still stays on one
+  line. Tables, column headers, fit lines and section headings are
+  unchanged, because wrapping them would destroy their columns.
+
 - [`summary()`](https://rdrr.io/r/base/summary.html) for an
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
   result is about half as long. The settings print as three short

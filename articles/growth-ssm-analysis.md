@@ -307,7 +307,8 @@ mid
 #> Amplitude         0.023       0.005       0.049
 #> Displacement     80.714     322.335     214.098
 #> Model Fit                                      
-#>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the displacement is not interpretable.
+#>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero; the
+#>   displacement is not interpretable.
 ```
 
 The printed note is the certification rule firing. At this wave, the
