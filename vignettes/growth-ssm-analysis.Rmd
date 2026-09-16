@@ -459,8 +459,8 @@ input, and one joint mixed model fits the three coordinates. `ssm_draws()`
 turns the fixed effects into $a(t)$ and $d(t)$ with intervals. The
 certification step says when a direction interval is not interpretable.
 `angle_unwrap()` is the alternative when person-level directions are the
-target. The next page to read is "Advanced Circumplex Visualization", which
-draws trajectories across occasions on the circumplex canvas.
+target. No page follows this one. To draw the fitted trajectories across
+occasions on the circumplex canvas, read "Advanced Circumplex Visualization".
 
 ## References
 

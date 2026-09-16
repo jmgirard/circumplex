@@ -332,7 +332,8 @@ does not already know. Blocks that coincide with the scales, a single block
 holding every item, or one block per item all leave `zeta2` unidentified. That
 is, the data cannot pin down its value. It is then dropped with
 `details$zeta2_fitted` set to `FALSE`. This is the same treatment that scale
-specificity gets on a single-item instrument (the Wrap-up).
+specificity gets on a single-item instrument (the single-item paragraph of
+the Wrap-up).
 
 What it costs to *ignore* real blocks depends on their geometry. The general
 factor can take up ignored block variance, but it never gives any back. So

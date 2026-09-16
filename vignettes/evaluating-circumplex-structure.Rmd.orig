@@ -22,7 +22,8 @@ library(circumplex)
 
 ## 1. Overview
 
-This vignette checks the two assumptions that an SSM analysis rests on.
+This vignette checks the two conditions, circumplex fit and interval
+accuracy, that an SSM interpretation rests on.
 Section 2, "Two questions to ask before interpreting an SSM analysis", states
 them. Section 3, "Does the instrument fit a circumplex?", fits the circular
 process model with `cpm_fit()`. Section 4, "Can you trust your confidence
@@ -877,8 +878,8 @@ your sample size affords.
 
 Two pages follow this one. "Advanced Circumplex Visualization" builds
 circumplex figures from `ggplot2` components. "SEM-Based SSM Analysis" fits a
-latent version of the SSM that corrects a measure's profile for the unequal
-reliability of the scales.
+latent version of the SSM. It corrects a measure's profile for scale
+unreliability, both its average level and its differences across scales.
 
 ## References
 

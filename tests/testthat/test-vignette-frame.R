@@ -112,6 +112,12 @@ test_that("every vignette opens with a Level line naming its level and prerequis
     } else {
       expect_true(all(named %in% titles), info = paste(name, "names", toString(named)))
     }
+    # The page to read first is the one the reading map puts before this one.
+    before <- frame_next[frame_next[, 2] == name, 1]
+    for (prev in before) {
+      expect_true(titles[[prev]] %in% named,
+                  info = paste(name, "Level line does not name", titles[[prev]]))
+    }
   }
 })
 
@@ -146,6 +152,11 @@ test_that("every Wrap-up names the next page, and the reading order is followed"
     for (nxt in following) {
       expect_true(titles[[nxt]] %in% named,
                   info = paste(name, "Wrap-up does not name", titles[[nxt]]))
+    }
+    # A page nothing follows says so, and never announces a next page.
+    if (length(following) == 0L) {
+      expect_match(wrap, "No page follows this one", fixed = TRUE, info = name)
+      expect_false(grepl("next page", wrap, fixed = TRUE), info = name)
     }
   }
 })

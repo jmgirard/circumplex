@@ -15,8 +15,7 @@ library(circumplex)
 library(ggplot2)
 ```
 
-**Level:** Advanced. Read "Intermediate SSM Analysis" first, because the
-figures start from its results.
+**Level:** Advanced. Read "Evaluating Circumplex Structure" first.
 
 ## 1. Overview
 

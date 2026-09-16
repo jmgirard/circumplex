@@ -261,5 +261,5 @@ draws.
 * Frequentist inference on group profiles and contrasts: `ssm_analyze()`.
 
 The next page to read is "Growth Models on SSM Parameters". It fits a growth
-model to SSM parameters measured at several waves and summarizes the fit
-with `ssm_draws()`.
+model to SSM parameters measured at several waves and turns its fixed
+effects into amplitude and displacement curves with `ssm_draws()`.

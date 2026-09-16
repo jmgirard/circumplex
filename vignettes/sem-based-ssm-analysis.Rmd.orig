@@ -506,8 +506,8 @@ boundary. To cross to freely estimated angles, use `cpm_fit()`.
 
 ## Wrap-up
 
-The latent SSM corrects a measure's circumplex profile for the unequal
-reliability of the scales. `ssm_sem()` fits the measurement model, propagates
+The latent SSM corrects a measure's circumplex profile for scale
+unreliability, both its average level and its differences across scales. `ssm_sem()` fits the measurement model, propagates
 its full covariance into circular-aware intervals, and gates the latent group
 contrast on measurement invariance. Every latent quantity is conditional on
 the fixed-angle model, so read the global fit first. The next page to read is
