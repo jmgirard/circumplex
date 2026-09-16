@@ -131,11 +131,14 @@ test_that("an analytic marker-firing fit names each fired label exactly once", {
 # banned phrase broken across two lines is now found, where a raw search
 # would have missed it.
 #
-# Some assertions still read the raw output, because what they check is a
-# property of the layout rather than of the words: the note sits in the
+# Some assertions still read the raw output. Four of them check a property of
+# the layout, which collapsing whitespace would erase: the note sits in the
 # Diagnostics section, no blank line is doubled, the header and the note are
 # separated by exactly one blank line, and no fired marker label is split
-# across a line break. Collapsing whitespace would erase what those look at.
+# across a line break. Two others read raw output for a different reason. The
+# snapshot records the whole rendering, and the no-note check looks for the
+# absence of the note's opening clause, which never splits because it is
+# handed to wrap_prose() as one atomic unit.
 m94_marker_block <- function(out) {
   flat <- gsub("\\s+", " ", out)
   start_pat <- "Note: boundary/weak-identification markers fired:"

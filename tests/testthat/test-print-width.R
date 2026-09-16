@@ -25,9 +25,15 @@
 # else does. Comparing against the pre-change output would not: a caution
 # nobody wrapped is byte-identical to how it printed before, so a line-by-line
 # comparison reports no change at all and has nothing to object to. The
-# guards are that no ledger entry carries a known caution's text, and that
-# every entry is one some fixture really produces, so a dead entry cannot sit
-# here widening what is excused.
+# guards are that no ledger entry carries a known caution's marker text, and
+# that every entry is one some fixture really produces, so a dead entry
+# cannot sit here widening what is excused.
+#
+# The first guard catches a whole caution parked here, which is the case that
+# matters, because an emitter nobody wrapped prints its caution on one line.
+# It does not catch a single continuation line of a caution, which carries no
+# marker. Nothing here does. Adding an entry is a deliberate act, and the
+# entry has to be classified above.
 
 caution_width_ledger <- c(
   # fit line (R/cpm_oop.R, cpm_fit_line())

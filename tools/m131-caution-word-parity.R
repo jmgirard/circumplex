@@ -9,9 +9,10 @@
 # Usage, from the repo root:
 #   Rscript tools/m131-caution-word-parity.R [<base-commit>]
 #
-# The base commit defaults to 26bd64ac, the last commit before this work that
-# changed any R code. The branch was cut from cf75fd04, whose only content is
-# tracking files, so the two print the same output.
+# The base commit defaults to 26bd64ac, the last commit before this work. It
+# changed only tracking files; the R code in its tree is unchanged since
+# dba3f96e. The branch was cut from cf75fd04, which also changed only
+# tracking files, so the two trees print the same output.
 #
 # Both runs evaluate the SAME fixtures, the ones in
 # tests/testthat/helper-caution-fixtures.R in the working tree, so a fixture
