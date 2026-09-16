@@ -123,18 +123,25 @@ ssm_sem(
   gates: `comparable`, the verdict, and the fit the estimation layer
   consumes are decided by the nested test alone, and the two criteria
   can legitimately disagree (a change in CFI is insensitive to sample
-  size where the nested test is not). The retain/reject label prints
+  size where the nested test is not). The retain/reject label is set
   **only inside the envelope that simulation covers**: exactly two
-  groups, ML estimation, and a plain (non-robust) CFI. Three separate
-  things put a fit outside it, and the printed note names which one
-  applies. A robust estimator – the default `"MLR"`, or `"MLM"` – makes
-  lavaan report a robust CFI; so does `missing = "fiml"`, even under
-  `estimator = "ML"`, so plain ML is necessary for the label but not
-  sufficient. `"GLS"`, `"WLS"`, `"ULS"` and `"DWLS"` are not ML
-  estimation at all, though their CFI is plain-named. And more than two
-  groups is outside the simulation whatever the estimator. In each case
-  the `dcfi` value still prints, marked as not validated for that
-  configuration and with no verdict attached.
+  groups, ML estimation, and a plain (non-robust) CFI.
+  [`print()`](https://rdrr.io/r/base/print.html) shows the `dcfi` and
+  `cr` columns and a short note only inside it, and only when a rung has
+  a `dcfi` value. Three separate things put a fit outside it.
+  `dcfi_scope` in the returned `invariance` element records the number
+  of groups, the estimator as lavaan reports it (`"ML"` for `"MLR"` and
+  `"MLM"`), whether it is ML estimation and whether the CFI is plain,
+  and the conditions that apply follow from those fields. A robust
+  estimator – the default `"MLR"`, or `"MLM"` – makes lavaan report a
+  robust CFI; so does `missing = "fiml"`, even under `estimator = "ML"`,
+  so plain ML is necessary for the label but not sufficient. `"GLS"`,
+  `"WLS"`, `"ULS"` and `"DWLS"` are not ML estimation at all, though
+  their CFI is plain-named. And more than two groups is outside the
+  simulation whatever the estimator. In each case the `dcfi` value stays
+  in the returned ladder table with no label attached, and
+  [`print()`](https://rdrr.io/r/base/print.html) shows neither the value
+  nor a note.
 
   Cheung and Rensvold simulated two groups, ML estimation, multivariate
   normal data, and Type I error only; robust CFI variants were not in
