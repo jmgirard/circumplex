@@ -48,7 +48,7 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 - [x] T3: Frame `evaluating-circumplex-structure`, `sem-based-ssm-analysis`, `growth-ssm-analysis`, `axes-reliability` (numbered already, no Overview). Add the Level line and the Overview, renumber, and add the Wrap-up where missing (growth has none).
 - [x] T4: Frame `advanced-visualization.Rmd.orig` (unnumbered headings) and `bayesian-ssm-analysis.Rmd` (its section 6 "Where to go next" becomes the Wrap-up). Write the AC1 to AC3 check script in the same place as T1's and run it over all nine.
 - [x] T5: Re-render the seven pre-computed pages with `tools/precompute-vignettes.R` (the package must be installed first), and run the staleness and width guards.
-- [ ] T6: Run the AC1 to AC4 scripts, the `--chunks` comparison and the sweep-subset comparison against the merge base, and record the results in the work log. Add the NEWS.md entry.
+- [x] T6: Run the AC1 to AC4 scripts, the `--chunks` comparison and the sweep-subset comparison against the merge base, and record the results in the work log. Add the NEWS.md entry.
 - [ ] T7: Run tests and the check, and compare the notes with the merge base.
 
 ## Work log
@@ -61,6 +61,7 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 - 2026-09-16: T3 done. The four numbered pages gain the Level line, an Overview as section 1, and a Wrap-up (new on the SEM and growth pages). Every in-text "Section N" reference was renumbered, and the axes page's reference to its own Wrap-up now says so. The sweep adds no finding on any of the four. The frame test now collapses whitespace so a wrapped heading matches.
 - 2026-09-16: T4 done. The visualization page's first section became the Overview and its headings are numbered 2 to 9. The Bayesian page's "Where to go next" became the Wrap-up. Three planted defects each failed the frame test: a wrong level, a skipped section number, a misspelled next-page title. The pkgdown script failed on a missing navbar entry, a swapped index order and an unlisted tenth page. The test reads a quoted string as a title only if it starts with a capital letter.
 - 2026-09-16: T5 done. The seven pages re-rendered from the framed sources. The diff to the committed renders is prose plus one elapsed-time line inside a masked volatile region. No figure changed, and the width guard passes on all seven.
+- 2026-09-16: T6 done. AC1 to AC3: the frame test passes on all nine sources. AC4: the index script and `pkgdown::check_pkgdown()` both pass. AC5: the `--chunks` output of each `.Rmd` and `.Rmd.orig` is byte-identical to the merge base, and the staleness guard passes at the head. AC6: with line numbers stripped, no source gains a sweep finding, and two findings went away (a Wrap-up sentence on each of the instruments and intermediate pages). NEWS.md has the entry.
 
 ## Decisions
 
