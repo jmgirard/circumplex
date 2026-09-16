@@ -1,6 +1,6 @@
 # M133: Fit vignette output reads cleanly
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M132
 - **Driving RR:** —
@@ -21,13 +21,13 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 
 ## Acceptance criteria
 
-- [ ] AC1: `names(cpm_fit(...)$results)` is unchanged from master, shown by an existing or new test asserting the name vector.
+- [x] AC1: `names(cpm_fit(...)$results)` is unchanged from master, shown by an existing or new test asserting the name vector.
 - [ ] AC2: At `options(width = 77)`, `print()` and `summary()` of each CPM fixture in `test-cpm_api.R` and `test-cpm_summary_markers.R` show the estimated-angles table as one header row plus one row per scale. A test asserts this. The tests titled "byte-identical to merge-base" are renamed to say what they now pin.
-- [ ] AC3: A test shows that the values in the printed CPM table equal `cpm_round_df(results)` column by column, in the same order. The test states the one-to-one map from old to new header names (for example `Angle_theory` to `Theory`).
-- [ ] AC4: At `options(width = 77)`, every line of `print()` for `cache$ci`, `ci_guard`, `ci_cpm` and `ci_contrast` (from `helper-caution-fixtures.R`) is at most 77 display columns. A test measures this with `nchar(type = "width")`. The vignette's rendered `print(acc)` output passes `tools/check-vignette-width.R`.
-- [ ] AC5: The committed rendered `.Rmd` has three chunks whose output contains "CPM Hessian is ill-conditioned" (the jz2017 fit, the model variants and `acc`). The prose before each such chunk has a sentence that says the warning will appear and names the section *When a fit sits at a boundary*.
-- [ ] AC6: In the rendered vignette, the first chunk that prints `acc` calls `print(acc)`, and a later chunk calls `summary(acc)`. The bullet list that explains the coverage table, the `Condition` ladder, the `` `cert` `` column and `Verdicts (c = 1` comes after the `summary(acc)` chunk. A grep for `` `cert` ``, `Condition = `, `coverage table`, `Structure note` and `Verdicts (c = 1` finds no line before that chunk.
-- [ ] AC7: `devtools::test()` reports 0 failures. `devtools::check(args = "--no-manual")` reports 0 errors and 0 warnings. `tools/check-vignette-width.R` and `tools/check-vignette-staleness.R` pass. NEWS.md has an entry for both layout changes.
+- [x] AC3: A test shows that the values in the printed CPM table equal `cpm_round_df(results)` column by column, in the same order. The test states the one-to-one map from old to new header names (for example `Angle_theory` to `Theory`).
+- [x] AC4: At `options(width = 77)`, every line of `print()` for `cache$ci`, `ci_guard`, `ci_cpm` and `ci_contrast` (from `helper-caution-fixtures.R`) is at most 77 display columns. A test measures this with `nchar(type = "width")`. The vignette's rendered `print(acc)` output passes `tools/check-vignette-width.R`.
+- [x] AC5: The committed rendered `.Rmd` has three chunks whose output contains "CPM Hessian is ill-conditioned" (the jz2017 fit, the model variants and `acc`). The prose before each such chunk has a sentence that says the warning will appear and names the section *When a fit sits at a boundary*.
+- [x] AC6: In the rendered vignette, the first chunk that prints `acc` calls `print(acc)`, and a later chunk calls `summary(acc)`. The bullet list that explains the coverage table, the `Condition` ladder, the `` `cert` `` column and `Verdicts (c = 1` comes after the `summary(acc)` chunk. A grep for `` `cert` ``, `Condition = `, `coverage table`, `Structure note` and `Verdicts (c = 1` finds no line before that chunk.
+- [x] AC7: `devtools::test()` reports 0 failures. `devtools::check(args = "--no-manual")` reports 0 errors and 0 warnings. `tools/check-vignette-width.R` and `tools/check-vignette-staleness.R` pass. NEWS.md has an entry for both layout changes.
 
 ## Coverage
 
@@ -59,7 +59,35 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - 2026-09-16: T3 done. Warning notices before the cpm, variants and accuracy_run chunks. accuracy_run prints `print(acc)` with a short reading guide. New `#### The full report` subsection holds `summary(acc)`, the table/ladder/cert guide and the plot. Wrap-up checklist item 3 now points at `summary()` or `plot()` for the ladder.
 - 2026-09-16: T4 done. Rendered after `R CMD INSTALL` (the first render read the old installed package and was discarded). Width guard: all 7 vignettes within 80 columns. Staleness guard: up to date. devtools::test() 0 failures. devtools::check(--no-manual) 0 errors, 0 warnings, 0 notes. NEWS.md has three entries.
 - 2026-09-16: claim audit: 30 claims read, 2 corrected — vignettes/evaluating-circumplex-structure.Rmd.orig, vignettes/evaluating-circumplex-structure.Rmd (only fit_quasi of the variants warns; the cpm chunk prints two warnings). Prose fixed identically in source and render.
+- 2026-09-16: review return 1 (defect): AC2 failed. No test asserts the one-block table for print() of the four analytic fits in test-cpm_summary_markers.R, for summary() of m94_boot_jz, or for m94_boot_big and m94_boot_clean with either method. Status back to in-progress. Reviewer findings [O] 2-11 await triage at the next review gate.
 
 ## Decisions
 
 ## Review
+
+Pass 1 (2026-09-16), branch in sync with origin/master (0 behind, 0 ahead).
+
+- AC1: pass. The existing name-vector assertion at tests/testthat/test-cpm_api.R:70-72 is unchanged from master, and devtools::test() passed.
+- AC2: FAIL. The behavior holds: an ad-hoc probe ran `expect_cpm_table_one_block()` for print() and summary() on m94_boot_jz, m94_boot_big, m94_boot_clean, the Heywood VOC fit and the cpm_api misfit fit, and all 10 passed. The test does not assert it for every fixture. test-cpm_summary_markers.R checks clean, hey, small and free with summary() only, jz with print() only, and never checks m94_boot_big or m94_boot_clean. The rename of the byte-identical tests is done.
+- AC3: pass. helper-cpm-table.R states `cpm_table_header_map` as its own constant and compares every printed column with `cpm_round_df(results)` in order, with tolerance 0. It runs on all 7 asserted fixture/method pairs.
+- AC4: pass. test-ci_accuracy_print_width.R checks every print() line of ci, ci_guard, ci_cpm and ci_contrast at width 77 with `nchar(type = "width")` and passed. tools/check-vignette-width.R: evaluating-circumplex-structure, 295 output lines, all fit.
+- AC5: pass. The rendered .Rmd has the warning in three chunk outputs (lines 77, 432, 630: cpm, fit_quasi, acc). The prose before each names *When a fit sits at a boundary* (lines 63-65, 427-429, 616-618).
+- AC6: pass. The first chunk that prints acc calls `print(acc)` (line 632), `summary(acc)` follows at line 724, and the bullet list is at lines 792-810. The five grep terms match only lines 731, 743, 792, 793, 808 and 810, all after line 724.
+- AC7: pass. devtools::test(): 0 failed, 0 errors, 1 skipped, 10836 passed. devtools::check(args = "--no-manual"): 0 errors, 0 warnings, 0 notes. Width and staleness guards: all 7 vignettes pass. NEWS.md has entries for the CPM headers and the accuracy header.
+
+Consistency gate: cairn_validate exit 0. document() made no diff and 0 `resolve link` lines. check_pkgdown() found no problems. README not touched. No new top-level files. Master R-CMD-check and test-coverage push runs: newest verdict success (7127001b). Master-red-alert audit and dry run exit 0. Branch protection matches.
+
+Independent review (three reviewers). Dispositions are pending, because the AC2 failure returned the milestone before the approval gate:
+- [O] 1: AC2 only partly asserted (same as the AC2 evidence above). Returned.
+- [O] 2: most one-block checks carry skip_on_ci(). On CI, only the analytic cpm_api fit runs, which has no VarRatio column.
+- [O] 3: NEWS.md contradicts itself: the wrap entry says headings stay unwrapped "because wrapping them would destroy their columns", and the new entry wraps the accuracy print() heading. Confirmed by reading NEWS.md:14-21.
+- [O] 4: the new "How to read this output" paragraph says the lines classify coverage at the estimated amplitude, but the Guardrail line reports the 0 rung.
+- [O] 5: the "The full report" intro omits the Near-zero regime note and the structural-zero note that summary() prints.
+- [O] 6: the one-block property is tested only at digits = 3; larger digits can widen a free-scaling table past 77 columns.
+- [O] 7: no help page says which lci/uci pair belongs to Angle and which to Zeta.
+- [O] 8: helper-cpm-table.R splits on whitespace. A scale name with a space makes the helper fail when the table is correct.
+- [O] 9: test-ci_accuracy_print_width.R reaches its builders through `environment(fx[[1]]$build)`.
+- [O] 10: "This chunk prints two warnings" depends on bootstrap exclusions that can vary across BLAS on a re-render.
+- [O] 11: nits. NEWS says "first line", but print() starts with a blank line. A code comment cites "(M133)".
+- [S] blame-history: no findings. One nit: two sentences are joined on one source line at .Rmd.orig:513.
+- [S] prior-review: no reintroduction. The wrap_prose() use on a heading is a planned extension of M131's scope. The change resolves ROADMAP candidate item (vii), the ledgered accuracy heading.
