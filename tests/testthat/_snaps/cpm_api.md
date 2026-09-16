@@ -91,8 +91,9 @@
       
         Note: harmonic(s) 3 were on the zero boundary and removed (df adjusted).
       
-        Note: analytic (Wald) confidence intervals may materially mis-cover at this sample size
-        (N < 2000); prefer the bootstrap on the raw-data path when available.
+        Note: analytic (Wald) confidence intervals may materially mis-cover at this
+        sample size (N < 2000); prefer the bootstrap on the raw-data path when
+        available.
       
 
 # print and summary render a bootstrap fit as expected
@@ -127,7 +128,9 @@
              0.369
       
       Fit: χ²(10) = 2.462, p = 0.991; RMSEA = 0 [0, 0]; SRMR = 0.015; CFI = 1
-        Note: 1 of 100 bootstrap resamples were excluded (0 degenerate, 1 non-convergent); the intervals are based on 99 replicates and are conditional on estimability.
+        Note: 1 of 100 bootstrap resamples were excluded (0 degenerate, 1
+        non-convergent); the intervals are based on 99 replicates and are conditional
+        on estimability.
 
 ---
 
@@ -186,13 +189,15 @@
       
       # Diagnostics
       
-        Note: 1 of 100 bootstrap resamples were excluded (0 degenerate, 1 non-convergent); the intervals are based on 99 replicates and are conditional on estimability.
+        Note: 1 of 100 bootstrap resamples were excluded (0 degenerate, 1
+        non-convergent); the intervals are based on 99 replicates and are conditional
+        on estimability.
       
         Note: boundary/weak-identification markers fired:
         small correlation-function weight.
-        What has been measured about these markers covers analytic intervals
-        only, and not every marker was measured; they are not validated as
-        predictors of the bootstrap intervals shown here (see the vignette
-        section 'When a fit sits at a boundary').
+        What has been measured about these markers covers analytic intervals only, and
+        not every marker was measured; they are not validated as predictors of the
+        bootstrap intervals shown here (see the vignette section 'When a fit sits at a
+        boundary').
       
 

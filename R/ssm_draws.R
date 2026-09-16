@@ -287,10 +287,12 @@ print.circumplex_ssm_draws <- function(x, digits = 3, ...) {
   # credible interval (recomputed here from the results columns, exactly as
   # print.circumplex_ssm does, so the note can never disagree with the rule)
   if (!ssm_certified(dat$a_lci, dat$a_uci)) {
-    cat(
-      "  Note: the amplitude CrI lower bound is under 0.35 CrI-widths ",
-      "above zero; the displacement is not interpretable.\n",
-      sep = ""
+    cat_prose(
+      paste0(
+        "Note: the amplitude CrI lower bound is under 0.35 CrI-widths ",
+        "above zero; the displacement is not interpretable."
+      ),
+      prefix = "  "
     )
   }
   cat("\n")

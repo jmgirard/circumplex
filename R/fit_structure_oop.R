@@ -102,10 +102,12 @@ structure_randall_line <- function(randall, digits = 3) {
 # The heuristic-cutoff caveat, printed once wherever interpretations appear so
 # the vignette-precision rule (CLAUDE.md) is never silently dropped: these are
 # likelihood classifications read off simulated distributions, not tests.
+# Held unwrapped: the constant is built when the package loads, and the width
+# that matters is the reader's at print time, so each caller wraps it there.
 structure_caveat <- paste0(
-  "  Interpretations are heuristic likelihood classifications from ",
-  "simulation, not\n  significance tests (Acton & Revelle, 2004). RANDALL's ",
-  "p-value is exact.\n"
+  "Interpretations are heuristic likelihood classifications from ",
+  "simulation, not significance tests (Acton & Revelle, 2004). RANDALL's ",
+  "p-value is exact."
 )
 
 # ---- print ------------------------------------------------------------------
@@ -149,14 +151,18 @@ print.circumplex_structure <- function(x, digits = 3, ...) {
   )
 
   if (!d$calibrated) {
-    cat(
-      "\n  Note: no interpretive cutoffs are calibrated for ", d$nv,
-      " scales; only\n  eight (octant) scales are. The criterion statistics ",
-      "are reported without\n  an interpretation.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: no interpretive cutoffs are calibrated for ", d$nv,
+        " scales; only eight (octant) scales are. The criterion statistics ",
+        "are reported without an interpretation."
+      ),
+      prefix = "  "
     )
   } else {
-    cat("\n", structure_caveat, sep = "")
+    cat("\n")
+    cat_prose(structure_caveat, prefix = "  ")
   }
   invisible(x)
 }
@@ -216,14 +222,18 @@ summary.circumplex_structure <- function(object, digits = 3, ...) {
   )
 
   if (!d$calibrated) {
-    cat(
-      "\n  Note: no interpretive cutoffs are calibrated for ", d$nv,
-      " scales; only\n  eight (octant) scales are. The criterion statistics ",
-      "are reported without\n  an interpretation.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: no interpretive cutoffs are calibrated for ", d$nv,
+        " scales; only eight (octant) scales are. The criterion statistics ",
+        "are reported without an interpretation."
+      ),
+      prefix = "  "
     )
   } else {
-    cat("\n", structure_caveat, sep = "")
+    cat("\n")
+    cat_prose(structure_caveat, prefix = "  ")
   }
   cat("\n")
   invisible(object)

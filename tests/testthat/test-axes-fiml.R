@@ -1007,7 +1007,9 @@ test_that("BC9: the FIML reason accumulates with the others", {
                      missing = "fiml")
   )
   expect_setequal(res$details$nb_reason, c("fiml", "single_item"))
-  out <- paste(capture.output(print(res)), collapse = "\n")
+  # Whitespace is collapsed: the note wraps to the reader's width, so a
+  # phrase falls across a line break at one width and not at another.
+  out <- gsub("\\s+", " ", paste(capture.output(print(res)), collapse = "\n"))
   expect_match(out, "only one item")
   expect_match(out, "every respondent")
 })
@@ -1132,7 +1134,8 @@ test_that("AC16: the FIML SE caveat prints beside the SEs, and only there", {
   skip_if_not_installed("lavaan")
   fx <- fiml_refuse_fixture()
   fi <- fiml_call(fiml_holes(fx$mat), fx$items)
-  out <- paste(capture.output(print(fi)), collapse = " ")
+  # Whitespace is collapsed: see the note in BC9 above.
+  out <- gsub("\\s+", " ", paste(capture.output(print(fi)), collapse = " "))
   expect_match(out, "observed-information SEs on the standardized metric")
   expect_match(out, "conditional on the")
   expect_match(out, "missing at\\s+random and multivariate normal")

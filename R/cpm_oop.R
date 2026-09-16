@@ -48,49 +48,57 @@ cpm_fit_line <- function(fit, digits = 3) {
 # Diagnostic/boundary lines, gathered so print() and summary() agree (design
 # sec. 2.5 / sec. 3.5). Returns a character vector (possibly empty).
 cpm_diagnostic_lines <- function(details) {
+  # Each entry is wrapped here rather than by the caller, so the returned
+  # character vector stays the finished text the callers cat() unchanged.
+  note <- function(...) {
+    paste0(
+      paste(wrap_prose(paste0(...), prefix = "  "), collapse = "\n"),
+      "\n"
+    )
+  }
   msg <- character(0)
   if (!isTRUE(details$accepted)) {
-    msg <- c(msg, paste0(
-      "  Note: the fit did not meet the convergence acceptance criterion ",
+    msg <- c(msg, note(
+      "Note: the fit did not meet the convergence acceptance criterion ",
       "(gradient norm ", format(details$gradient_norm, digits = 2),
-      "); interpret with caution.\n"
+      "); interpret with caution."
     ))
   }
   if (isTRUE(details$heywood)) {
-    msg <- c(msg, paste0(
-      "  Note: a communality index reached its upper boundary ",
-      "(\u03b6 > 0.995, a Heywood-type solution).\n"
+    msg <- c(msg, note(
+      "Note: a communality index reached its upper boundary ",
+      "(\u03b6 > 0.995, a Heywood-type solution)."
     ))
   }
   if (isTRUE(details$sigma_pathology)) {
-    msg <- c(msg, paste0(
-      "  Note: a fitted variance ratio (\u03c3\u00b2) departs materially from 1 ",
-      "(outside [0.5, 2]);\n  the scaling or model may be misspecified.\n"
+    msg <- c(msg, note(
+      "Note: a fitted variance ratio (\u03c3\u00b2) departs materially from 1 ",
+      "(outside [0.5, 2]); the scaling or model may be misspecified."
     ))
   }
   if (length(details$removed_harmonics) > 0) {
-    msg <- c(msg, paste0(
-      "  Note: harmonic(s) ",
+    msg <- c(msg, note(
+      "Note: harmonic(s) ",
       paste(details$removed_harmonics, collapse = ", "),
-      " were on the zero boundary and removed (df adjusted).\n"
+      " were on the zero boundary and removed (df adjusted)."
     ))
   }
   if (isTRUE(details$multimodal)) {
-    msg <- c(msg, paste0(
-      "  Note: competing near-tied optima were found; the solution may be ",
-      "weakly identified.\n"
+    msg <- c(msg, note(
+      "Note: competing near-tied optima were found; the solution may be ",
+      "weakly identified."
     ))
   }
   # Bootstrap replicate accounting (design sec. 5.2): surface exclusions.
   if (identical(details$ci_method, "bootstrap") &&
       isTRUE(details$boots_used < details$boots)) {
     n_bad <- details$boots - details$boots_used
-    msg <- c(msg, paste0(
-      "  Note: ", n_bad, " of ", details$boots, " bootstrap resamples were ",
+    msg <- c(msg, note(
+      "Note: ", n_bad, " of ", details$boots, " bootstrap resamples were ",
       "excluded (", details$boots_degenerate, " degenerate, ",
       details$boots_nonconvergent, " non-convergent); the intervals are ",
       "based on ", details$boots_used, " replicates and are conditional on ",
-      "estimability.\n"
+      "estimability."
     ))
   }
   msg
@@ -241,29 +249,29 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
 
   if (length(boot_markers) > 0) {
     # Wrap the label sentence at whole-label boundaries only: a marker label
-    # is taught as a unit, so it must never break across lines.
+    # is taught as a unit, so it must never break across lines. The opening
+    # clause and each label are handed to wrap_prose() as atomic units, so a
+    # break can only ever fall between them.
     items <- paste0(boot_markers, ";")
     items[length(items)] <- sub(";$", ".", items[length(items)])
-    lines <- "Note: boundary/weak-identification markers fired:"
-    for (item in items) {
-      cand <- paste(lines[length(lines)], item)
-      if (nchar(cand) <= 70) {
-        lines[length(lines)] <- cand
-      } else {
-        lines <- c(lines, item)
-      }
-    }
-    cat(
-      # The blank separator line is owed only after printed diagnostic lines;
-      # when the note opens the section itself, the header's own "\n\n"
-      # already provides the single blank line every other render shows.
-      if (length(diag_lines) > 0) "\n" else "",
-      paste0("  ", lines, collapse = "\n"), "\n",
-      "  What has been measured about these markers covers analytic ",
-      "intervals\n  only, and not every marker was measured; they are not ",
-      "validated as\n  predictors of the bootstrap intervals shown here ",
-      "(see the vignette\n  section 'When a fit sits at a boundary').\n",
-      sep = ""
+    # The blank separator line is owed only after printed diagnostic lines;
+    # when the note opens the section itself, the header's own "\n\n"
+    # already provides the single blank line every other render shows.
+    if (length(diag_lines) > 0) cat("\n")
+    cat_prose(
+      c("Note: boundary/weak-identification markers fired:", items),
+      prefix = "  ",
+      atomic = TRUE
+    )
+    # The trailing caveat is ordinary prose and wraps at word boundaries.
+    cat_prose(
+      paste0(
+        "What has been measured about these markers covers analytic ",
+        "intervals only, and not every marker was measured; they are not ",
+        "validated as predictors of the bootstrap intervals shown here ",
+        "(see the vignette section 'When a fit sits at a boundary')."
+      ),
+      prefix = "  "
     )
   }
 
@@ -279,23 +287,43 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   # variance ratios carry no interval, so that note is appended for it below.
   if (identical(d$ci_method, "analytic")) {
     if (d$N < cpm_analytic_ci_n_caution) {
-      cat(
-        "\n  Note: analytic (Wald) confidence intervals may materially mis-cover ",
-        "at this sample size\n  (N < ", cpm_analytic_ci_n_caution,
-        "); prefer the bootstrap on the raw-data path when available.\n",
-        sep = ""
+      cat("\n")
+      cat_prose(
+        paste0(
+          "Note: analytic (Wald) confidence intervals may materially ",
+          "mis-cover at this sample size (N < ", cpm_analytic_ci_n_caution,
+          "); prefer the bootstrap on the raw-data path when available."
+        ),
+        prefix = "  "
       )
     } else if (d$N < cpm_analytic_ci_n_boundary_caution) {
       markers <- cpm_boundary_markers(object)
       if (length(markers) > 0) {
-        cat(
-          "\n  Note: this solution is near a parameter boundary or weakly ",
-          "identified\n  (", paste(markers, collapse = "; "), ");\n  ",
-          "analytic (Wald) confidence intervals mis-covered for such fits ",
-          "in validation\n  even at N in the tens of thousands. Interpret ",
-          "them with caution and prefer\n  the bootstrap on the raw-data ",
-          "path when available.\n",
-          sep = ""
+        # A marker label is taught as a unit here too, so it must not break
+        # across lines: the surrounding prose is split into words and each
+        # label (with the punctuation that joins it to its neighbours) is
+        # handed to wrap_prose() whole, as atomic units.
+        labels <- paste0(markers, ";")
+        labels[[length(labels)]] <- paste0(markers[[length(markers)]], ");")
+        labels[[1]] <- paste0("(", labels[[1]])
+        words <- function(s) unlist(strsplit(s, " ", fixed = TRUE))
+        cat("\n")
+        cat_prose(
+          c(
+            words(paste0(
+              "Note: this solution is near a parameter boundary or weakly ",
+              "identified"
+            )),
+            labels,
+            words(paste0(
+              "analytic (Wald) confidence intervals mis-covered for such fits ",
+              "in validation even at N in the tens of thousands. Interpret ",
+              "them with caution and prefer the bootstrap on the raw-data ",
+              "path when available."
+            ))
+          ),
+          prefix = "  ",
+          atomic = TRUE
         )
       }
     }
@@ -304,10 +332,13 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
       # diagnostic (D-009); no analytic interval is offered for it, ever. (Its
       # bordered information is also singular below N ~ 2000, so those CIs are
       # often NA -- an independent reason the N < ...n_caution note above holds.)
-      cat(
-        "\n  Note: the free-scaling variance ratios (\u03c3\u00b2) carry no ",
-        "confidence interval.\n",
-        sep = ""
+      cat("\n")
+      cat_prose(
+        paste0(
+          "Note: the free-scaling variance ratios (\u03c3\u00b2) carry no ",
+          "confidence interval."
+        ),
+        prefix = "  "
       )
     }
   }

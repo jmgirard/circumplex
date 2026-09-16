@@ -2175,7 +2175,11 @@ test_that("M61 review F4: nb_reason carries every reason that applies", {
   expect_setequal(res$details$nb_reason, c("cormat", "single_item"))
   expect_true(all(is.na(res$results$nb_reliability)))
   expect_false(any(is.nan(res$results$nb_reliability)))
-  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  # Whitespace is collapsed: the note wraps to the reader's width, so a
+  # phrase falls across a line break at one width and not at another.
+  out <- gsub(
+    "\\s+", " ", paste(utils::capture.output(print(res)), collapse = "\n")
+  )
   expect_match(out, "correlation-matrix path")
   expect_match(out, "undefined for a scale carrying only one item")
 

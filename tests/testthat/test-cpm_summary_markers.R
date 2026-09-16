@@ -123,23 +123,71 @@ test_that("an analytic marker-firing fit names each fired label exactly once", {
 
 # ---- AC1/AC2: the bootstrap fired-marker note -------------------------------
 
-# The note's variable sentence is wrapped at emission time, so label and
-# prefix assertions run on the whitespace-normalized block; the fixed caveat
-# lines are additionally pinned raw (they are literals in the code).
+# The whole note now wraps to the reader's console width, so where its line
+# breaks fall depends on that width and no assertion may depend on them. The
+# block is located and returned with its whitespace collapsed, and every
+# assertion below runs on that. This pins the words and their order, which is
+# what the note promises, and it makes the negative assertions stronger: a
+# banned phrase broken across two lines is now found, where a raw search
+# would have missed it.
+#
+# Some assertions still read the raw output. Five of them check a property of
+# the layout, which collapsing whitespace would erase: the note sits in the
+# Diagnostics section, no blank line is doubled, the header and the note are
+# separated by exactly one blank line, no fired marker label is split across a
+# line break, and every line of the trailing caveat keeps its two-space
+# continuation leader (m94_expect_caveat_indent(), added by M131). Two others read raw output for a different reason. The
+# snapshot records the whole rendering, and the no-note check looks for the
+# absence of the note's opening clause, which never splits because it is
+# handed to wrap_prose() as one atomic unit.
 m94_marker_block <- function(out) {
+  flat <- gsub("\\s+", " ", out)
   start_pat <- "Note: boundary/weak-identification markers fired:"
   end_pat <- "'When a fit sits at a boundary')."
-  start <- regexpr(start_pat, out, fixed = TRUE)
-  end <- regexpr(end_pat, out, fixed = TRUE)
+  start <- regexpr(start_pat, flat, fixed = TRUE)
+  end <- regexpr(end_pat, flat, fixed = TRUE)
   if (start < 0 || end < 0) return(NA_character_)
-  substr(out, start, end + nchar(end_pat) - 1L)
+  substr(flat, start, end + nchar(end_pat) - 1L)
 }
 
-m94_caveat_raw <- paste0(
-  "  What has been measured about these markers covers analytic intervals\n",
-  "  only, and not every marker was measured; they are not validated as\n",
-  "  predictors of the bootstrap intervals shown here (see the vignette\n",
-  "  section 'When a fit sits at a boundary')."
+# Raw-output check: every line of the caveat carries the two-space continuation
+# leader. Collapsing whitespace erases indentation, so m94_caveat_words cannot
+# see this and nothing outside the snapshots pinned it (M131 review, O9). The
+# leader is what keeps the caveat inside the note it belongs to, and
+# wrap_prose() counts it against the width rather than adding it on top, so a
+# lost leader is a real layout change, not a cosmetic one.
+m94_expect_caveat_indent <- function(out) {
+  lines <- unlist(strsplit(out, "\n", fixed = TRUE))
+  first <- grep("What has been measured about these markers", lines, fixed = TRUE)
+  expect_length(first, 1L)
+  # The caveat's end is found by consuming lines until they carry all of its
+  # words, because its closing phrase straddles a line break at most widths
+  # and matching it raw would find nothing.
+  squash <- function(x) paste(unlist(strsplit(x, "[ \t]+")), collapse = " ")
+  caveat <- character(0)
+  for (i in seq(first[[1]], length(lines))) {
+    caveat <- c(caveat, lines[[i]])
+    if (grepl(m94_caveat_words, squash(paste(caveat, collapse = " ")),
+              fixed = TRUE)) {
+      break
+    }
+  }
+  expect_match(squash(paste(caveat, collapse = " ")), m94_caveat_words,
+               fixed = TRUE)
+  expect_gte(length(caveat), 2L)
+  for (line in caveat) {
+    expect_match(
+      line, "^  [^ ]",
+      info = paste0("caveat line lost its leader: ", line)
+    )
+  }
+}
+
+m94_caveat_words <- paste(
+  "What has been measured about these markers covers analytic intervals",
+  "only, and not every marker was measured; they are not validated as",
+  "predictors of the bootstrap intervals shown here (see the vignette",
+  "section 'When a fit sits at a boundary')."
 )
 
 # The note must sit inside the `# Diagnostics` section — including on fits
@@ -186,7 +234,8 @@ test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2
   for (lab in fired) {
     expect_match(out, lab, fixed = TRUE)
   }
-  expect_match(out, m94_caveat_raw, fixed = TRUE)
+  expect_match(block, m94_caveat_words, fixed = TRUE)
+  m94_expect_caveat_indent(out)
 })
 
 test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N >= 2000", {
@@ -218,7 +267,8 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
   for (lab in fired) {
     expect_match(out, lab, fixed = TRUE)
   }
-  expect_match(out, m94_caveat_raw, fixed = TRUE)
+  expect_match(block, m94_caveat_words, fixed = TRUE)
+  m94_expect_caveat_indent(out)
 })
 
 test_that("the marker note claims no interval consequence (banned phrases absent)", {

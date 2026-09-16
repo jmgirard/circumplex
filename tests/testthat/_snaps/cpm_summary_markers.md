@@ -108,13 +108,14 @@
       
       # Diagnostics
       
-        Note: a communality index reached its upper boundary (ζ > 0.995, a Heywood-type solution).
+        Note: a communality index reached its upper boundary (ζ > 0.995, a
+        Heywood-type solution).
       
         Note: this solution is near a parameter boundary or weakly identified
-        (Heywood communality; small correlation-function weight; ill-conditioned Hessian);
-        analytic (Wald) confidence intervals mis-covered for such fits in validation
-        even at N in the tens of thousands. Interpret them with caution and prefer
-        the bootstrap on the raw-data path when available.
+        (Heywood communality; small correlation-function weight;
+        ill-conditioned Hessian); analytic (Wald) confidence intervals mis-covered for
+        such fits in validation even at N in the tens of thousands. Interpret them
+        with caution and prefer the bootstrap on the raw-data path when available.
       
 
 ---
@@ -172,8 +173,9 @@
       
         Largest absolute residual: 0 (V1 – V2)
       
-        Note: analytic (Wald) confidence intervals may materially mis-cover at this sample size
-        (N < 2000); prefer the bootstrap on the raw-data path when available.
+        Note: analytic (Wald) confidence intervals may materially mis-cover at this
+        sample size (N < 2000); prefer the bootstrap on the raw-data path when
+        available.
       
 
 ---
@@ -266,5 +268,6 @@
              1.000
       
       Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
-        Note: a communality index reached its upper boundary (ζ > 0.995, a Heywood-type solution).
+        Note: a communality index reached its upper boundary (ζ > 0.995, a
+        Heywood-type solution).
 

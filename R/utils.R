@@ -220,6 +220,120 @@ is_null_or_num <- function(x, n = NULL) {
   is.null(x) || is_num(x, n)
 }
 
+# Display columns, which is what a console line budget is spent in. Every
+# width comparison below goes through this one function.
+#
+# The cautions carry "²", "ζ" and "ℹ", which take more bytes
+# than characters but occupy one column each, so for the package's own text a
+# character count would give the same answer. Columns are counted because
+# that is the right question to ask of a console, not because these glyphs
+# force it. A double-width character is what tells the two counts apart, and
+# that is what test-wrap-prose.R uses.
+disp_width <- function(x) {
+  nchar(x, type = "width")
+}
+
+# Wrap prose to the reader's console width and return the finished lines.
+#
+# The caller cats what this returns, so one wrapping rule serves every caution
+# and note the package prints, and the rule can be tested without capturing
+# console output. Width defaults to getOption("width"), which is what a reader
+# sets to tell R how wide their console is.
+#
+# `prefix` is placed before the first line and `continuation` before every
+# later line. Both are counted AGAINST the width, never added on top of it, so
+# an indented or labeled block stays inside the budget. A fixed-width label
+# field is expressed as a `prefix` of that width with a `continuation` of the
+# same width in spaces.
+#
+# With `atomic = FALSE`, `x` is prose and a break may fall between any two
+# words. Each ELEMENT of `x` is then a paragraph of its own: elements are never
+# flowed into one another, which is the one property of the strwrap() this
+# replaced that the cautions depend on. Two details differ from strwrap() and
+# are this function's own. `prefix` opens EVERY paragraph, where strwrap()'s
+# `initial` opens only the first line of the whole output. And an empty or
+# whitespace-only element contributes nothing, where strwrap() emits an empty
+# line for it.
+#
+# With `atomic = TRUE`, each element of `x` is instead a unit that must not
+# split: a break falls only between elements, and the whole vector is one
+# paragraph. The bootstrap marker note uses the atomic form, because a marker
+# label is taught as a unit and reads as one name only while it stays on one
+# line.
+#
+# A single word wider than the room left on a line is placed on its own line
+# rather than split, so that line can exceed the width. Breaking a word would
+# change the words the reader sees, which matters more than the column.
+wrap_prose <- function(x, prefix = "", continuation = prefix,
+                       width = NULL, atomic = FALSE) {
+  stopifnot(
+    is_char(x),
+    is_char(prefix, n = 1),
+    is_char(continuation, n = 1),
+    is_flag(atomic), !is.na(atomic)
+  )
+  # `width = NULL` means "ask the reader's console". No fallback is needed for
+  # that answer: R refuses to delete the width option or to set it outside
+  # 10...10000, so getOption("width") is always a usable integer. A width the
+  # caller states is validated like every other argument, because a caller
+  # passing 0, -5 or "80" has made a mistake, and silently printing at 80
+  # would hide it (M131 review, O8).
+  if (is.null(width)) width <- getOption("width")
+  stopifnot(is_scalar_count(width))
+
+  # Each element of `x` is a paragraph of its own, as in the strwrap() this
+  # replaced, so a caller that hands over several sentences gets several
+  # paragraphs rather than one flowed block (M131 review, O1). In atomic mode
+  # an element is a unit that must not split, not a paragraph, so the whole
+  # vector is one paragraph there.
+  paragraphs <- if (atomic) list(x) else lapply(x, function(p) {
+    unlist(strsplit(p, "[ \t\r\n]+"))
+  })
+
+  out <- character(0)
+  for (pieces in paragraphs) {
+    pieces <- pieces[nzchar(pieces)]
+    if (length(pieces) == 0) next
+
+    bodies <- character(0)
+    current <- pieces[[1]]
+    for (piece in pieces[-1]) {
+      lead <- if (length(bodies) == 0) prefix else continuation
+      room <- max(width - disp_width(lead), 1)
+      candidate <- paste(current, piece)
+      if (disp_width(candidate) <= room) {
+        current <- candidate
+      } else {
+        bodies <- c(bodies, current)
+        current <- piece
+      }
+    }
+    bodies <- c(bodies, current)
+
+    leads <- c(prefix, rep(continuation, length(bodies) - 1))
+    out <- c(out, paste0(leads[seq_along(bodies)], bodies))
+  }
+  out
+}
+
+# The same wrapping, printed. Every caution site that has nothing to add
+# between the lines uses this, so the newline handling is written once.
+cat_prose <- function(x, prefix = "", continuation = prefix,
+                      width = NULL, atomic = FALSE) {
+  lines <- wrap_prose(
+    x,
+    prefix = prefix,
+    continuation = continuation,
+    width = width,
+    atomic = atomic
+  )
+  # cat() appends `sep` after the LAST element too, so this already ends the
+  # final line. A further cat("\n") here would add a blank line after every
+  # caution and change the layout this milestone is meant to preserve.
+  if (length(lines) > 0) cat(lines, sep = "\n")
+  invisible(lines)
+}
+
 # The reader-facing phrase for a stored reference-kind token. One mapping for
 # both surfaces that report a kind -- norms() and norm_standardize()'s
 # disclosure -- so the two cannot drift into describing the same sample
