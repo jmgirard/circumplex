@@ -157,6 +157,7 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-16: second review pass: AC1 to AC5 pass on fresh evidence at `8360f269`, both AC4 probes now go red, consistency gate clean, three-lens review returned 13 findings (0 from the two history lenses), none meeting the return floor. Dispositions go to the gate.
 - 2026-09-16: gate accepted the proposed triage. P4 (misplaced comment) and P11 (NEWS.md overstatement) fixed on the branch, six findings to the printed-width candidate row, four rejected.
 - 2026-09-16: step-7 approval: m131-printed-cautions-wrap approved for merge
+- 2026-09-16: PR #164 CI red on `vignette-precompute`: four pre-rendered vignettes held the old caution line breaks. Re-rendered them with `tools/precompute-vignettes.R`. With `#>` stripped, the words match the committed copies except one elapsed time (8.3s to 5.6s). Figure PNGs the render also rewrote were reverted, because the staleness check reads text only.
 
 ## Decisions
 
