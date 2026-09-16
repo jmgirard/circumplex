@@ -50,10 +50,17 @@ The vignette width setting, the re-render and the width guard go to M132.
       an emitter wrapped at a hardcoded width. Form three is an emitter
       wrapped at `width + 1`. Form four is an emitter whose indent is not
       counted against the width. Each red run names the emitter.
-- [ ] AC4: No table row, column header, fit line or heading changes. Every
-      existing snapshot passes with no update. Each of the six classes in
-      the T1 census has at least one snapshot or printed-output test that
-      runs.
+- [ ] AC4: The pre-image for every comparison below is master `26bd64ac`.
+      In each of the four snapshot files the T1 census names, every line
+      that no census row emits stays byte-identical and in order. Blank
+      lines count as lines. Each line that does change is attributed to a
+      census row number in the work log. Outside those four files, every
+      existing `_snaps/*.md` snapshot passes with no update. The same
+      byte-identity check covers the full `print()` and `summary()` output
+      of the axes-reliability fixtures at `width = 80`, which no snapshot
+      records. The check goes red against a planted defect that changes a
+      table's column widths without changing its words. It goes red against
+      a second defect that drops a blank line before a note.
 - [ ] AC5: `Rscript -e 'devtools::test()'` is clean. Running
       `Rscript -e 'devtools::check(args = "--no-manual")'` reports no error,
       warning or note that master `26bd64ac` does not also report. NEWS.md
@@ -64,7 +71,7 @@ The vignette width setting, the re-render and the width guard go to M132.
 - AC1 → T1, T2, T3
 - AC2 → T4
 - AC3 → T3
-- AC4 → T2, T5
+- AC4 → T4, T5
 - AC5 → T5, T6
 
 ## Tasks
@@ -94,6 +101,9 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-15: plan gate chose a shared helper over per-site strwrap calls, because the T1 census found four wrapping mechanisms across six files. Falsified by a caution whose layout the shared helper cannot express.
 - 2026-09-15: T1 census done: 41 emitters, 4 layout classes, not the 6 the plan assumed. Delegated to a Sonnet reader, spot-verified against the source. Table in Decisions.
 - 2026-09-15: T2 done: `wrap_prose()` and `cat_prose()` added to `R/utils.R`, with direct tests in `tests/testthat/test-wrap-prose.R` (33 pass). Four planted defects each turn the tests red: an uncounted prefix, an off-by-one width, a character count in place of a column count, and a split atomic unit.
+- 2026-09-15: amendment, AC4. The plan's AC4 promised that every existing snapshot passes with no update. That state is unreachable. The two `ssm_ci_oop.R` helpers also wrap output carrying no caution, so re-wrapping them moves line breaks in snapshots the old wording protected. The gate chose to amend rather than hold the wording, because holding it defeats the goal. AC4 now compares against master `26bd64ac` by byte identity outside the census rows. It also covers the axes-reliability printers, which no snapshot records. Coverage moves from AC4 → T2, T5 to AC4 → T4, T5.
+- 2026-09-15: re-audit: AC4 (full) — five findings: a caution-based partition the scope makes unreachable, 29 graphics snapshots pulled into the promise, a "six classes" count no procedure produced, a table-and-heading claim no procedure enumerates, and a diff-reading act bound as a promise.
+- 2026-09-15: re-audit: AC4 (full) — six findings: an undecidable "fit line" category, no named baseline for "changes", a fourth sentence AC1 already entails, a word-collapse check blind to column structure, no probe of AC4's own instrument, and eleven axes-reliability emitters that no snapshot records.
 - 2026-09-15: criteria audit ran in full mode and returned ten findings. Five were fixed before writing. A grep clause passed only by changing `fit_est < 0.70` or a preserved caution. An "only wrapping mechanism" claim was already false at `ssm_sem.R:796`. The nchar type was unstated against multibyte cautions. The probe family varied only location. Five clauses bound an instrument. A `0 notes` clause reddens for unrelated reasons, and a width-40 case was unsatisfiable against a 15-column leader.
 
 ## Decisions
