@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-09-16 (M134 archived, width-guard row promoted for planning, M131 row pruned.)_
+_Last hygiene check: 2026-09-16 (M135 to M137 planned, M132 row pruned to stay under the line cap.)_
 
 Pre-migration history: `cairn/legacy/` and git log.
 
@@ -9,9 +9,11 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
+| M135 | Vignettes are labeled by level and framed like the older ones | planned | — | high | milestones/M135-vignette-levels-and-frame.md |
+| M136 | The structure vignette becomes four shorter vignettes | planned | M135 | high | milestones/M136-split-structure-vignette.md |
+| M137 | The axes-reliability and SEM vignettes each split into a core page and an advanced page | planned | M135 | normal | milestones/M137-split-axes-and-sem-vignettes.md |
 | M134 | Simplify the vignette width guard | done | — | normal | milestones/archive/M134-simplify-vignette-width-guard.md |
 | M133 | Fit vignette output reads cleanly | done | M132 | normal | milestones/archive/M133-fit-vignette-output-reads-cleanly.md |
-| M132 | Rendered vignette output fits the website's code box | done | M131 | normal | milestones/archive/M132-vignette-output-fits-code-box.md |
 
 ## Candidates
 
