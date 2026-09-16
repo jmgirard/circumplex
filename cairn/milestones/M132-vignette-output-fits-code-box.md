@@ -1,6 +1,6 @@
 # M132: Rendered vignette output fits the website's code box
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M131
 - **Driving RR:** —
@@ -122,7 +122,21 @@ package's own cautions is M131.
 - 2026-09-16: T7 in progress: NEWS.md gained entries for the reworded heading and the vignette width. Full `devtools::test()` passed (FAIL 0, WARN 11, SKIP 1, PASS 10743). Prose sweep of the nine vignette sources, README.Rmd and NEWS.md found no claim about the old output width.
 - 2026-09-16: claim audit: 31 claims read, 4 corrected — tools/m132-planted-defects.R, .github/workflows/vignette-precompute.yaml, the eight vignette setup comments, NEWS.md. Re-read once by the same reader, all four correct.
 - 2026-09-16: T7 done. `devtools::check(args = "--no-manual")` at 756d7167: 0 errors, 0 warnings, 0 notes. The branch workflow run of AC7 happens when review opens the PR. Status set to review.
+- 2026-09-16: amendment return: AC1 — "The 23 lines over 81 columns that this plan measured at `26bd64ac` are gone." 2 of the 23 are the exempted sem-based loading lines, still present by design.
+- 2026-09-16: amendment return: AC6 — "Exactly one exemption exists, at `sem-based-ssm-analysis.Rmd:93-94`." The exempted lines are the same content, now at 94-95 after the start marker. Status back to in-progress for these two amendments only. This is not a defect return.
 
 ## Decisions
 
 ## Review
+
+Review pass 1, 2026-09-16, at da8139cd. The branch contains origin/master. No PR exists.
+
+- AC1 (not ticked, criterion wrong as written): `Rscript tools/check-vignette-width.R` exits 0 and every output line outside the exemption is 80 columns or fewer. But re-measuring at 26bd64ac finds the 23 lines over 81 columns (evaluating 10, growth 5, intermediate 5, introduction 1, sem-based 2). The 2 sem-based lines, the `cx =~` and `cy =~` loading lines, are still in the render verbatim, inside the exemption that Scope and AC6 require. "The 23 lines ... are gone" therefore cannot hold alongside AC6. 21 of the 23 are gone.
+- AC3 (partial evidence, not ticked): the guard's per-file counts are 284, 147, 9, 255, 65, 41, 94 output lines, and exemptions 0, 1, 0, 0, 0, 0, 0. Not ticked because the review stopped at the AC1/AC6 return.
+- AC5 (evidence, not ticked): no `deprecated` line in the rendered introduction vignette, and `grep -rn "label.size" vignettes/` exits 1 with no hit.
+- AC6 (not ticked, criterion wrong as written): exactly one exemption exists, and its marker states that the line length follows from the scale names. The exempted lines are the same two loading lines that were `sem-based-ssm-analysis.Rmd:93-94`, but they now sit at lines 94-95 because the start marker adds a line. The criterion names :93-94.
+- AC7 (partial): `devtools::test()` FAIL 0, WARN 11, SKIP 1, PASS 10743. Check and the workflow run not rerun at this pass.
+- AC2, AC4: not run at this pass.
+- Consistency gate: `cairn_validate.py` all checks passed. Toolchain checks not run at this pass.
+- Observation for the amendment round, not a triaged finding: the exempt region spans the whole `syntax` chunk (rendered lines 80-129, 37 output lines), so a new over-wide line anywhere in that output would pass unseen. T4's task box is unticked although the work log records T4 done.
+- Outcome: review stopped before the reviewer fan-out. AC1 and AC6 go back for a gated criterion amendment.
