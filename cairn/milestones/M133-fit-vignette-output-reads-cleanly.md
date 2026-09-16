@@ -1,13 +1,13 @@
 # M133: Fit vignette output reads cleanly
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M132
 - **Driving RR:** —
 - **Principles touched:** GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — changes `print()`/`summary()` output of `cpm_fit()` and `ssm_ci_accuracy()` objects and a vignette
-- **Branch/PR:** —
+- **Branch/PR:** m133-fit-vignette-output
 
 ## Goal
 
