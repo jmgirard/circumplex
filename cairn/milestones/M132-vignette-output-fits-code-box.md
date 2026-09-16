@@ -1,13 +1,13 @@
 # M132: Rendered vignette output fits the website's code box
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M131
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the vignettes are the package's teaching material on the website
-- **Branch/PR:** —
+- **Branch/PR:** m132-vignette-output-fits-code-box
 
 ## Goal
 
@@ -80,7 +80,7 @@ package's own cautions is M131.
 
 ## Tasks
 
-- [ ] T1: Write `tools/check-vignette-width.R`. Read every `#> ` line, count
+- [x] T1: Write `tools/check-vignette-width.R`. Read every `#> ` line, count
       display columns, honor an exemption marker, and report per-file line
       and exemption counts. Add the exemption marker to
       `sem-based-ssm-analysis.Rmd.orig`.
@@ -103,6 +103,8 @@ package's own cautions is M131.
 - 2026-09-15: plan gate chose an exemption marker for the generated lavaan lines over wrapping them or raising the guard's limit to 86. Wrapping changes code readers copy, and a global limit of 86 stops the guard catching real regressions. Falsified by a second exemption becoming necessary.
 - 2026-09-15: plan gate chose the width setting without a guard for the two live vignettes, over adding them to the pre-render set. One of them needs brms, which makes the render job slow and fragile. Falsified by an over-long line reaching the site from either vignette.
 - 2026-09-15: criteria audit ran in full mode. Its most serious finding concerned the guard's domain. The guard reads committed file text. That text is disjoint from the rendered output of the two live vignettes. A promise over all nine files therefore passes without checking two of them. The scope now names seven. The audit also replaced a single plant form with four, split an unsatisfiable CI promise, and dropped a mandated marker wording from a criterion.
+- 2026-09-16: implement gate chose a start/end region marker for the exemption (fails when it covers no over-wide line) and a committed tools/m132-planted-defects.R for the AC2 plants. The region's markers add rendered lines, so the exempted lines move from :93-94.
+- 2026-09-16: T1 done. tools/check-vignette-width.R reads `#>` lines of the seven renders, measures display columns against 80, honors vignette-width:exempt regions, and errors on an empty domain. Before the re-render it reports 41 over-wide lines; the plan's 23 was measured at 26bd64ac, before M131's wrapped cautions reached 81-83 columns.
 
 ## Decisions
 
