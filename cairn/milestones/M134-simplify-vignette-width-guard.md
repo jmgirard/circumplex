@@ -41,22 +41,22 @@ records them (plan gate).
 
 ## Acceptance criteria
 
-- [ ] AC1: `Rscript tools/check-vignette-width.R` exits 0 on the committed
+- [x] AC1: `Rscript tools/check-vignette-width.R` exits 0 on the committed
       vignettes. Its report shows two exempted lines, both in
       `sem-based-ssm-analysis`: the lavaan `cx =~` and `cy =~` loading lines.
-- [ ] AC2: `grep -rn "vignette-width:exempt" vignettes tools .github` prints
+- [x] AC2: `grep -rn "vignette-width:exempt" vignettes tools .github` prints
       nothing, and `tools/m132-planted-defects.R` no longer exists.
-- [ ] AC3: The checker holds its exemptions as a list. Each entry names a
+- [x] AC3: The checker holds its exemptions as a list. Each entry names a
       vignette and a pattern anchored at the start of the line. An exemption
       covers only the lines its pattern matches in its vignette. An entry that
       matches no `#>` line wider than 80 columns after tab expansion stops the
       checker with an error that names the entry. The checker measures each line after it expands tabs to
       8-column stops.
-- [ ] AC4: The first sentence of the checker's header claims a width limit
+- [x] AC4: The first sentence of the checker's header claims a width limit
       for `#>` output lines only. The header names three kinds of output the
       checker does not read: output under another knitr `comment` prefix,
       `results = "asis"` output, and indented output.
-- [ ] AC5: After `sem-based-ssm-analysis` is re-rendered with
+- [x] AC5: After `sem-based-ssm-analysis` is re-rendered with
       `tools/precompute-vignettes.R`,
       `git diff master -- vignettes/sem-based-ssm-analysis.Rmd` shows only the
       two marker lines removed.
@@ -112,3 +112,11 @@ records them (plan gate).
 ## Decisions
 
 ## Review
+
+Branch synced: `origin/master` is an ancestor of HEAD, no merge needed (2026-09-16).
+
+- AC1: `Rscript tools/check-vignette-width.R` exit 0. Report: `sem-based-ssm-analysis` 147 output lines, 2 exempted (lines 93, 94), the `#> cx =~` and `#> cy =~` loading lines at 86 columns. The other six vignettes show 0 exempted, all fit.
+- AC2: `grep -rn "vignette-width:exempt" vignettes tools .github` printed nothing (exit 1). `ls tools/m132-planted-defects.R` reports no such file.
+- AC3: source read. `EXEMPT` is a list of two entries (vignette, pattern, reason), and a pattern not starting with `^` stops the checker. `scan_widths()` receives only the entries for its vignette and matches them against over-wide `#>` lines, measured by `display_width()` after `expand_tabs()` to 8-column stops. The five plants re-ran on scratch copies. Plant (a), an 81-column line after `cy =~`: exit 1, "line 95 (81 columns)". Plant (b), `cx =~` cut to 80 columns: exit 1, "the exemption `^#> cx =~ ` matches no output line wider than 80 columns". Plant (c), a tab line of 80 unexpanded columns: exit 1, "line 73 (85 columns)". Plant (d), a tab line of 80 expanded columns: exit 0, 66 output lines read in that file. Plant (e), the `cx =~` line in `axes-reliability`: exit 1, "line 68 (86 columns)", 0 exempted there.
+- AC4: header read. Its first sentence reads: no "#>" output line in a pre-computed vignette is wider than the website's code box. A later paragraph names output under another knitr `comment` prefix, output of a chunk with `results = "asis"`, and indented output as not read.
+- AC5: `Rscript tools/precompute-vignettes.R sem-based-ssm-analysis` re-rendered the file (exit 0, installed circumplex 2.0.1.9000) and left the working tree clean. `git diff master -- vignettes/sem-based-ssm-analysis.Rmd` shows two deletions, the `vignette-width:exempt start` and `end` comment lines, and nothing else.
