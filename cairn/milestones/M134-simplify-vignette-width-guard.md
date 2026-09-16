@@ -108,6 +108,7 @@ records them (plan gate).
 - 2026-09-16: T3 plant (d), `#>`, a tab and 72 x (80 columns expanded): exit 0, and the report reads 66 output lines, so the planted line was read.
 - 2026-09-16: T3 plant (e), an 86-column `#> cx =~` line in `axes-reliability`: exit 1, "line 68 (86 columns)", 0 exempted in that file.
 - 2026-09-16: claim audit: not owed — internal tier.
+- 2026-09-16: step-7 approval: m134-simplify-vignette-width-guard approved for merge
 
 ## Decisions
 
@@ -140,3 +141,5 @@ Reviewers: [O] diff-bug, [S] blame-history, [S] prior-review. The prior-review p
 - S2: a regex metacharacter typo in a pattern changes which lines it matches. No such typo exists today.
 - P1: the M132 O9 byte-versus-display-width plant left with the plant script. Fresh plant on a scratch copy: a line of `αβ²` repeats at 80 display columns and more than 80 bytes exits 0, and the same line at 81 columns exits 1, "line 68 (81 columns)".
 - The [S] blame-history report also claims `vignette-width:exempt` still appears in the checker's error text. The AC2 grep refutes this.
+
+Triage at the merge gate (2026-09-16, maintainer chose the recommended option). Follow-up to the width-guard candidate row: O1 and O2. Rejected as already true on master: O4, O7. Rejected as planned by the plan gate: S1. Rejected as fixed or refuted: O11 (checkpoint e17ed798), P1 (fresh Unicode plant). Rejected as report-only or cosmetic with pass or fail unaffected: O5, O6, O9, O10. Rejected as latent with no instance today: O3, O8, S2.
