@@ -1,6 +1,6 @@
 # M135: Vignettes are labeled by level and framed like the older ones
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -49,7 +49,7 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 - [x] T4: Frame `advanced-visualization.Rmd.orig` (unnumbered headings) and `bayesian-ssm-analysis.Rmd` (its section 6 "Where to go next" becomes the Wrap-up). Write the AC1 to AC3 check script in the same place as T1's and run it over all nine.
 - [x] T5: Re-render the seven pre-computed pages with `tools/precompute-vignettes.R` (the package must be installed first), and run the staleness and width guards.
 - [x] T6: Run the AC1 to AC4 scripts, the `--chunks` comparison and the sweep-subset comparison against the merge base, and record the results in the work log. Add the NEWS.md entry.
-- [ ] T7: Run tests and the check, and compare the notes with the merge base.
+- [x] T7: Run tests and the check, and compare the notes with the merge base.
 
 ## Work log
 
@@ -63,6 +63,7 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 - 2026-09-16: T5 done. The seven pages re-rendered from the framed sources. The diff to the committed renders is prose plus one elapsed-time line inside a masked volatile region. No figure changed, and the width guard passes on all seven.
 - 2026-09-16: T6 done. AC1 to AC3: the frame test passes on all nine sources. AC4: the index script and `pkgdown::check_pkgdown()` both pass. AC5: the `--chunks` output of each `.Rmd` and `.Rmd.orig` is byte-identical to the merge base, and the staleness guard passes at the head. AC6: with line numbers stripped, no source gains a sweep finding, and two findings went away (a Wrap-up sentence on each of the instruments and intermediate pages). NEWS.md has the entry.
 - 2026-09-16: claim audit: 71 claims read, 3 corrected — vignettes/sem-based-ssm-analysis.Rmd.orig, vignettes/advanced-visualization.Rmd.orig, NEWS.md. The SEM Overview no longer credits Section 4 with `ssm_sem_parameters()`, the visualization Overview says Section 3 builds a figure from scratch, and the NEWS entry says a terminal page names a related page. The two pages re-rendered with no output change, and the guards pass again.
+- 2026-09-16: T7 done. `devtools::test()` at the head: 0 failures, 11217 passes, 1 skip. `devtools::check(args = "--no-manual")`: Status OK with 0 errors, 0 warnings and 0 notes, so no note is new. Status set to review.
 
 ## Decisions
 
