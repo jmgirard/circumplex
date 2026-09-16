@@ -23,10 +23,12 @@
 # elements, flowed onto one line -- carries the same words in a different line
 # partition, which is the definition of a legitimate re-wrap. Nothing in the
 # printed text tells the two apart, because the paragraph structure lives in
-# the emitter, not in its output. That defect is caught instead by the
-# committed snapshot in tests/testthat/_snaps/ci_accuracy.md, which pins the
-# three settings sentences on three lines, and by the element-boundary tests
-# in tests/testthat/test-wrap-prose.R.
+# the emitter, not in its output. What catches that defect instead is the
+# element-boundary tests in tests/testthat/test-wrap-prose.R, which run
+# everywhere. The committed snapshot in tests/testthat/_snaps/ci_accuracy.md
+# pins the three settings sentences on three lines as well, but its test
+# carries skip_on_ci() and skip_on_cran(), so that pin holds on a local run
+# only and is a second line of defence rather than the first.
 #
 # Usage, from the repo root:
 #   Rscript tools/m131-line-identity.R [<base-commit>]

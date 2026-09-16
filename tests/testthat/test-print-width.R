@@ -76,8 +76,13 @@ caution_width_ledger <- c(
     "  # Contrast [Male - Female] (95% bootstrap CIs, 40 replicates):"
 )
 
-# The kinds this milestone deliberately leaves unwrapped, per its Scope.
-# Nothing else may be excused, and no caution is any of these.
+# The kinds of line this ledger may excuse. The milestone's Scope names the
+# families it leaves unwrapped -- tables, column headers, fit lines and
+# section headings -- and these four are the kinds that the fixtures below
+# actually print over-long, at a finer grain than the Scope's wording: a
+# test-statistic line and a top-level heading are both column-structured
+# output of the kind the Scope leaves alone. Nothing else may be excused, and
+# no caution is any of these.
 caution_ledger_kinds <- c(
   "fit line", "test-statistic line", "heading", "section heading"
 )
@@ -144,12 +149,13 @@ test_that("every ledger entry is a line some fixture really prints", {
   # A ledger whose entries no longer occur has stopped being a record of what
   # is excused and become room to grow.
   #
-  # The domain is normally what the blocks above gathered as they ran. When
-  # this block runs on its own -- a filtered run, or a runner that does not
-  # keep file order -- that environment is empty, and reading it anyway would
-  # fail for a reason that has nothing to do with the ledger, or pass on
-  # whatever a previous run left behind (M131 review, O6). So the guard
-  # rebuilds the domain itself in that case, and says which it used.
+  # The domain is normally what the blocks above gathered as they ran, which
+  # under testthat they always have: it filters at file granularity and a
+  # sourced file runs its blocks in order. The case that reaches an empty
+  # environment is this block re-run by hand in an interactive session, where
+  # reading it anyway fails for a reason that has nothing to do with the
+  # ledger (M131 review, O6). So the guard rebuilds the domain itself in that
+  # case, and says which one it used.
   seen <- caution_seen_overlong$lines
   rebuilt <- length(seen) == 0
   if (rebuilt) {

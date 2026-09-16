@@ -175,7 +175,9 @@ test_that("prefix opens every paragraph and continuation carries its rest", {
   expect_true(all(nchar(lines, type = "width") <= 20L))
 })
 
-test_that("empty and whitespace-only elements drop out, as strwrap drops them", {
+test_that("empty and whitespace-only elements drop out", {
+  # Not strwrap()'s behavior: it emits an empty line for such an element.
+  # These cautions never want a blank line they did not ask for.
   expect_identical(
     wrap_prose(c("Kept.", "", "   ", "Also kept."), width = 80),
     c("Kept.", "Also kept.")

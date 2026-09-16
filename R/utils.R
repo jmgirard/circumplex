@@ -254,10 +254,13 @@ disp_width <- function(x) {
 # same width in spaces.
 #
 # With `atomic = FALSE`, `x` is prose and a break may fall between any two
-# words. Each ELEMENT of `x` is then a paragraph of its own, as it is for the
-# strwrap() this replaced: elements are never flowed into one another, and
-# `prefix` opens each of them. An empty or whitespace-only element
-# contributes nothing, again as strwrap drops it.
+# words. Each ELEMENT of `x` is then a paragraph of its own: elements are never
+# flowed into one another, which is the one property of the strwrap() this
+# replaced that the cautions depend on. Two details differ from strwrap() and
+# are this function's own. `prefix` opens EVERY paragraph, where strwrap()'s
+# `initial` opens only the first line of the whole output. And an empty or
+# whitespace-only element contributes nothing, where strwrap() emits an empty
+# line for it.
 #
 # With `atomic = TRUE`, each element of `x` is instead a unit that must not
 # split: a break falls only between elements, and the whole vector is one

@@ -131,11 +131,12 @@ test_that("an analytic marker-firing fit names each fired label exactly once", {
 # banned phrase broken across two lines is now found, where a raw search
 # would have missed it.
 #
-# Some assertions still read the raw output. Four of them check a property of
+# Some assertions still read the raw output. Five of them check a property of
 # the layout, which collapsing whitespace would erase: the note sits in the
 # Diagnostics section, no blank line is doubled, the header and the note are
-# separated by exactly one blank line, and no fired marker label is split
-# across a line break. Two others read raw output for a different reason. The
+# separated by exactly one blank line, no fired marker label is split across a
+# line break, and every line of the trailing caveat keeps its two-space
+# continuation leader (m94_expect_caveat_indent(), added by M131). Two others read raw output for a different reason. The
 # snapshot records the whole rendering, and the no-note check looks for the
 # absence of the note's opening clause, which never splits because it is
 # handed to wrap_prose() as one atomic unit.
