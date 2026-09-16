@@ -21,6 +21,16 @@
   Tables, column headers, fit lines and section headings are unchanged,
   because wrapping them would destroy their columns.
 
+* In `summary()` for an `ssm_ci_accuracy()` result, the heading above the
+  verdicts now reads `Verdicts (c = 1, as estimated), Bradley (1978) liberal
+  band, 95% Wilson CIs:`. It was two characters longer. The heading is not
+  wrapped, and at its new length it fits in an 80-column console.
+
+* The vignettes set `options(width = 77)`, so output that follows the console
+  width fits, with its `#> ` prefix, in 80 columns. The package website's
+  code box shows 80 columns without scrolling. The generated lavaan syntax in the SEM vignette is
+  printed with `cat()` and stays wider.
+
 * `summary()` for an `ssm_ci_accuracy()` result is about half as long. The
   settings print as three short sentences, usually on three lines. The
   coverage and guardrail tables are replaced
