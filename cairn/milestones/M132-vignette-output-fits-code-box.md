@@ -1,6 +1,6 @@
 # M132: Rendered vignette output fits the website's code box
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M131
 - **Driving RR:** —
@@ -37,17 +37,17 @@ and its width-ledger entry in `tests/testthat/test-print-width.R` follow.
 `bayesian-ssm-analysis.Rmd` and `using-instruments.Rmd` are not pre-rendered,
 so their shipped file holds no output line for a guard to read. They get the
 width setting and a candidate row, not a criterion. The generated lavaan
-syntax at `sem-based-ssm-analysis.Rmd:93-94` stays long behind a declared
-exemption. Its length follows from the scale names, so no width setting
-reaches it, and its emitter is pinned by stored snapshots. Wrapping the
+loading lines (`cx =~`, `cy =~`) in `sem-based-ssm-analysis.Rmd` stay long
+behind a declared exemption. Their length follows from the scale names, so no
+width setting reaches them, and their emitter is pinned by stored snapshots. Wrapping the
 package's own cautions is M131.
 
 ## Acceptance criteria
 
 - [ ] AC1: `Rscript tools/check-vignette-width.R` exits 0. Every line in the
       seven pre-rendered `vignettes/*.Rmd` files that begins `#> ` and sits
-      outside a declared exemption is 80 display columns or fewer. The 23
-      lines over 81 columns that this plan measured at `26bd64ac` are gone.
+      outside a `vignette-width:exempt` region is 80 display columns or
+      fewer, as the guard measures them.
 - [ ] AC2: The guard goes red against each of four planted defect forms,
       applied one file at a time across all seven. Form one is an
       81-column ASCII line. Form two is an 81-column line built from `ζ`
@@ -63,10 +63,11 @@ package's own cautions is M131.
       against the committed render.
 - [ ] AC5: The rendered introduction vignette contains no line matching
       `deprecated`, and `grep -n "label.size" vignettes/` returns no hit.
-- [ ] AC6: Exactly one exemption exists, at
-      `sem-based-ssm-analysis.Rmd:93-94`. Its marker records that the line
-      length follows from the scale names. The guard's exemption count of
-      AC3 is 1.
+- [ ] AC6: Exactly one `vignette-width:exempt` region exists in the seven
+      pre-rendered vignettes. The guard's AC3 count is 1 for
+      `sem-based-ssm-analysis.Rmd` and 0 for the other six. The region holds
+      the `cx =~` and `cy =~` loading lines. Its marker records that the line
+      length follows from the scale names.
 - [ ] AC7: `Rscript -e 'devtools::test()'` is clean. Running
       `Rscript -e 'devtools::check(args = "--no-manual")'` reports no error,
       warning or note that master does not also report. The workflow run on
@@ -93,7 +94,7 @@ package's own cautions is M131.
       64, 84, 302, 315 and 336 with the current ggplot2 argument.
 - [x] T3: Reword the verdict heading at `R/ssm_ci_oop.R:522`. Update the
       vignette prose that quotes it, its snapshot, and its width-ledger entry.
-- [ ] T4: Re-render the seven vignettes, commit the render, then run the
+- [x] T4: Re-render the seven vignettes, commit the render, then run the
       width guard and the staleness guard.
 - [x] T5: Run the four planted defect forms of AC2 and the inside-exemption
       control. Record each result.
@@ -124,6 +125,12 @@ package's own cautions is M131.
 - 2026-09-16: T7 done. `devtools::check(args = "--no-manual")` at 756d7167: 0 errors, 0 warnings, 0 notes. The branch workflow run of AC7 happens when review opens the PR. Status set to review.
 - 2026-09-16: amendment return: AC1 — "The 23 lines over 81 columns that this plan measured at `26bd64ac` are gone." 2 of the 23 are the exempted sem-based loading lines, still present by design.
 - 2026-09-16: amendment return: AC6 — "Exactly one exemption exists, at `sem-based-ssm-analysis.Rmd:93-94`." The exempted lines are the same content, now at 94-95 after the start marker. Status back to in-progress for these two amendments only. This is not a defect return.
+- 2026-09-16: re-audit: AC1 (full) — the "23 lines are gone" sentence restated a search result the all-lines check already implies, and "declared exemption" named no marker. Both fixed before the gate.
+- 2026-09-16: re-audit: AC6 (full) — "exemption count of AC3 is 1" was ambiguous against per-file counts, and Scope Out still cited :93-94. Both fixed before the gate. It also found the region spans the whole 37-line chunk output.
+- 2026-09-16: amendment (AC1, AC6, Scope Out), mini gate approved: AC1 drops the 23-line clause and names the `vignette-width:exempt` region. AC6 names the loading lines by content and states per-file counts. Scope Out drops the :93-94 line numbers. The region-breadth gap goes to the code-box-width candidate row at archive.
+- 2026-09-16: re-audit: AC1 (full) — nothing.
+- 2026-09-16: re-audit: AC6 (full) — nothing. It noted that the Goal ("no output line") does not qualify the two exempted lines, which the plan already exempted. Goal is plan-owned, so this goes to the review gate.
+- 2026-09-16: T4 box ticked. The T4 work-log lines above record the render and both guards green.
 
 ## Decisions
 
