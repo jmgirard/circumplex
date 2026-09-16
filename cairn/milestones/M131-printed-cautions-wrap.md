@@ -1,6 +1,6 @@
 # M131: Printed cautions and notes wrap to the reader's width
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -102,6 +102,7 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-15: T1 census done: 41 emitters, 4 layout classes, not the 6 the plan assumed. Delegated to a Sonnet reader, spot-verified against the source. Table in Decisions.
 - 2026-09-15: T2 done: `wrap_prose()` and `cat_prose()` added to `R/utils.R`, with direct tests in `tests/testthat/test-wrap-prose.R` (33 pass). Four planted defects each turn the tests red: an uncounted prefix, an off-by-one width, a character count in place of a column count, and a split atomic unit.
 - 2026-09-15: claim audit: 39 claims read, 7 corrected — NEWS.md, R/utils.R, tests/testthat/test-print-width.R, tests/testthat/test-cpm_summary_markers.R, tests/testthat/helper-caution-fixtures.R, tools/m131-caution-word-parity.R
+- 2026-09-15: all tasks done, status to review. Final `devtools::check(args = "--no-manual")` on the finished tree: Status OK, 0 errors, 0 warnings, 0 notes, test suite OK.
 - 2026-09-15: claim audit re-read, the one the step allows. Four of the seven corrections cleared. Three needed a further pass, all of them prose. The ledger guard checks a caution's marker text, not its full text, so a lone continuation line sits outside it. The list of raw-output assertions omitted two. And `26bd64ac` changed no R code itself. Its tree is unchanged since `dba3f96e`, which was verified as the last commit touching `R/` or `src/`. All three are corrected.
 - 2026-09-15: claim audit finding, acted on. The header of `test-print-width.R` claimed the ledger cannot hide an unwrapped caution, on the grounds that the line comparison catches it. That is false. An unwrapped caution prints exactly as it did before, so the comparison reports no change. Two tests now guard the ledger directly: no entry carries a known caution's text, and every entry is a line some fixture really prints. Both go red when a caution is parked in the ledger, and the second also goes red on a dead entry.
 - 2026-09-15: T5 done. `devtools::check(args = "--no-manual")` reports Status OK, 0 errors, 0 warnings, 0 notes, so nothing is reported that master `26bd64ac` does not also report. `devtools::document()` produces no diff.
