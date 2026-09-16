@@ -18,6 +18,16 @@
 #   2. the full print() and summary() output of the axes-reliability
 #      fixtures at width 80, which no snapshot file records at all.
 #
+# What it cannot decide, and what covers that instead (M131 review, O3). A
+# destroyed PARAGRAPH boundary -- two sentences the emitter passed as separate
+# elements, flowed onto one line -- carries the same words in a different line
+# partition, which is the definition of a legitimate re-wrap. Nothing in the
+# printed text tells the two apart, because the paragraph structure lives in
+# the emitter, not in its output. That defect is caught instead by the
+# committed snapshot in tests/testthat/_snaps/ci_accuracy.md, which pins the
+# three settings sentences on three lines, and by the element-boundary tests
+# in tests/testthat/test-wrap-prose.R.
+#
 # Usage, from the repo root:
 #   Rscript tools/m131-line-identity.R [<base-commit>]
 
@@ -114,22 +124,43 @@ changed_groups <- function(before, after) {
 #
 # Non-empty matters too: adding or dropping a blank line leaves no words on
 # either side, which would otherwise compare equal and be excused.
-is_rewrap <- function(before, after) {
-  words <- function(x) {
-    w <- unlist(strsplit(paste(x, collapse = " "), "[ \t\r\n]+"))
+group_words <- function(x) {
+  w <- unlist(strsplit(paste(x, collapse = " "), "[ \t\r\n]+"))
+  w[nzchar(w)]
+}
+
+group_partition <- function(x) {
+  lapply(x, function(l) {
+    w <- unlist(strsplit(l, "[ \t\r\n]+"))
     w[nzchar(w)]
-  }
-  partition <- function(x) {
-    lapply(x, function(l) {
-      w <- unlist(strsplit(l, "[ \t\r\n]+"))
-      w[nzchar(w)]
-    })
-  }
-  wb <- words(before)
-  wa <- words(after)
+  })
+}
+
+group_blanks <- function(x) sum(!nzchar(trimws(x)))
+
+is_rewrap <- function(before, after) {
+  wb <- group_words(before)
+  wa <- group_words(after)
   length(wb) > 0 &&
     identical(wb, wa) &&
-    !identical(partition(before), partition(after))
+    !identical(group_partition(before), group_partition(after))
+}
+
+# What a group carrying a caution marker is still required to prove.
+#
+# Carrying a marker is not on its own a licence (M131 review, O4). This
+# milestone moves line breaks inside a caution and nothing else, so a group
+# the marker excuses must show exactly that: the same words in the same order,
+# and the same number of blank lines. Either half alone lets a real defect
+# through. Without the word check, a group that holds a caution plus an
+# altered neighbouring line is excused wholesale. Without the blank-line
+# check, dropping the blank line that precedes a note is excused, because the
+# dropped line lands in the note's own group and carries its marker with it --
+# the defect AC4's second instrument probe plants, and the one this check was
+# written for.
+marker_is_safe <- function(before, after) {
+  identical(group_words(before), group_words(after)) &&
+    identical(group_blanks(before), group_blanks(after))
 }
 
 report <- function(label, before, after) {
@@ -143,8 +174,11 @@ report <- function(label, before, after) {
   rewraps <- 0L
   for (g in groups) {
     rows_hit <- attributable(c(g$before, g$after))
-    if (length(rows_hit) > 0) {
+    if (length(rows_hit) > 0 && marker_is_safe(g$before, g$after)) {
       rows <- union(rows, rows_hit)
+    } else if (length(rows_hit) > 0) {
+      g$why <- "carries a caution marker, but its words or blank lines moved"
+      unattributed[[length(unattributed) + 1L]] <- g
     } else if (is_rewrap(g$before, g$after)) {
       rewraps <- rewraps + 1L
     } else {
@@ -162,7 +196,8 @@ report <- function(label, before, after) {
         sep = "")
   }
   for (g in unattributed) {
-    cat("    UNATTRIBUTED near line ", g$at, ":\n", sep = "")
+    cat("    UNATTRIBUTED near line ", g$at,
+        if (!is.null(g$why)) paste0(" (", g$why, ")") else "", ":\n", sep = "")
     for (l in g$before) cat("      base   |", l, "\n")
     for (l in g$after) cat("      branch |", l, "\n")
   }

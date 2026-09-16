@@ -99,7 +99,7 @@ The vignette width setting, the re-render and the width guard go to M132.
       correct the NEWS.md claim about them and the stale comment at
       `R/ssm_ci_oop.R:487`, and add multi-element tests to
       `test-wrap-prose.R`. (Review findings O1, O2.)
-- [ ] T8: Strengthen `tools/m131-line-identity.R` so its marker exit cannot
+- [x] T8: Strengthen `tools/m131-line-identity.R` so its marker exit cannot
       excuse a dropped blank line, or a changed line outside the caution's
       own text, inside an attributed group. Re-run both of AC4's instrument
       probes. (Review findings O3, O4.)
@@ -142,6 +142,8 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-15: question gate chose a paragraph-aware `wrap_prose()` over a loop at the one multi-element call site, because the collapse is a silent divergence from the `strwrap()` it replaced and the next caller would hit it again. Falsified by a caution that needs several elements flowed into one paragraph.
 - 2026-09-15: question gate chose to take findings O5, O6, O8 and O9 in this milestone, because all four sit in files already open here and O5 and O6 bear on whether the AC1 width test means what it claims. O7 (`ssm_sem.R` wraps one column differently, by a character count) and O11 (spliced failure reasons can break mid-phrase) go to candidate rows.
 - 2026-09-15: T7 done (review findings O1, O2). `wrap_prose()` now treats each element of `x` as its own paragraph in non-atomic mode, as `strwrap()` did; atomic mode keeps element-as-unit semantics. Five tests written first in `test-wrap-prose.R`, four of them red before the change. The three settings sentences at `R/ssm_ci_oop.R:472` print on their own lines again and `_snaps/ci_accuracy.md` is byte-identical to master `26bd64ac` on those lines. AC2 word parity: still 41 of 41. AC4 line identity: `ci_accuracy.md` falls from 10 changed groups to 9, and from 4 re-wraps to 3, the merged-paragraph group being gone. NEWS.md needed no edit: its claim that the settings "print as three short sentences, usually on three lines" is true again once the behavior is restored. The stale comment at `:487` was corrected. `devtools::test()`: 0 failures, 10714 passing.
+- 2026-09-15: T8 done (review findings O3, O4). The marker exit in `tools/m131-line-identity.R` no longer excuses a group on the marker alone: the group must also carry the same words in the same order and the same number of blank lines. AC4's two instrument probes now both go red. The dropped blank line before the boundary-solution note reports `UNATTRIBUTED ... carries a caution marker, but its words or blank lines moved` and exits 1; the re-aligned table columns report 11 unattributed groups and exit 1. On the real tree the tool still exits 0.
+- 2026-09-15: T8, O3 answered by measurement rather than by strengthening the tool. A destroyed paragraph boundary carries the same words in a different line partition, which is exactly the definition of a legitimate re-wrap, so the printed text cannot tell the two apart; the paragraph structure lives in the emitter. Planting the O1 defect again and running the suite reddens `test-ci_accuracy.R` "print and summary snapshots (seeded)" through the committed snapshot, which pins the three settings sentences on three lines. The tool's header now records the limit and names the snapshot and `test-wrap-prose.R` as what covers it.
 
 ## Decisions
 
