@@ -23,12 +23,12 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 
 ## Acceptance criteria
 
-- [ ] AC1: In each of the nine vignette source files (the `.Rmd.orig` where one exists, else the `.Rmd`), the first prose line after the setup chunk has the form `**Level:** <Introductory|Intermediate|Advanced>. <sentence>`. The sentence names each page to read first by its title, or says that none is needed. Procedure: a script greps `^\*\*Level:\*\*` in the nine files, requires one hit per file, checks the level word against the map in Scope, and checks each quoted title against the `VignetteIndexEntry` titles in `vignettes/`.
-- [ ] AC2: In each of the nine source files, `grep '^## '` prints, in order, `## 1. Overview`, then `## 2.` to `## N.` with consecutive numbers, then `## Wrap-up`, then `## References` where the page has one. Procedure: the same script checks the heading sequence and checks that the text of every heading after Overview appears in the Overview section's body.
-- [ ] AC3: Each Wrap-up section names at least one page to read next by its title, and each named title is a `VignetteIndexEntry` title. Each page in the reading order in Scope is named by the Wrap-up of the page before it. Procedure: the script reads the Wrap-up sections and checks both directions against the reading order.
-- [ ] AC4: `_pkgdown.yml` has an `articles:` section with one group per level, every vignette in `vignettes/` listed exactly once across the groups in the map's order, and a navbar Vignettes menu with the same entries in the same order. Procedure: a script reads the two lists from the YAML and the vignette titles from `vignettes/` and diffs them. `pkgdown::check_pkgdown()` runs clean as a second check.
-- [ ] AC5: For each of the seven pre-computed vignettes, the `tools/prose-sweep.R --chunks` output at the branch head is identical to the output at the merge base, and `tools/check-vignette-staleness.R` passes at the branch head.
-- [ ] AC6: For each of the nine source files, the finding list of `tools/prose-sweep.R` at the branch head is a subset of its finding list at the merge base. The SEM page and the three older pages have findings at master, so the frame adds none and removes any it touches.
+- [x] AC1: In each of the nine vignette source files (the `.Rmd.orig` where one exists, else the `.Rmd`), the first prose line after the setup chunk has the form `**Level:** <Introductory|Intermediate|Advanced>. <sentence>`. The sentence names each page to read first by its title, or says that none is needed. Procedure: a script greps `^\*\*Level:\*\*` in the nine files, requires one hit per file, checks the level word against the map in Scope, and checks each quoted title against the `VignetteIndexEntry` titles in `vignettes/`.
+- [x] AC2: In each of the nine source files, `grep '^## '` prints, in order, `## 1. Overview`, then `## 2.` to `## N.` with consecutive numbers, then `## Wrap-up`, then `## References` where the page has one. Procedure: the same script checks the heading sequence and checks that the text of every heading after Overview appears in the Overview section's body.
+- [x] AC3: Each Wrap-up section names at least one page to read next by its title, and each named title is a `VignetteIndexEntry` title. Each page in the reading order in Scope is named by the Wrap-up of the page before it. Procedure: the script reads the Wrap-up sections and checks both directions against the reading order.
+- [x] AC4: `_pkgdown.yml` has an `articles:` section with one group per level, every vignette in `vignettes/` listed exactly once across the groups in the map's order, and a navbar Vignettes menu with the same entries in the same order. Procedure: a script reads the two lists from the YAML and the vignette titles from `vignettes/` and diffs them. `pkgdown::check_pkgdown()` runs clean as a second check.
+- [x] AC5: For each of the seven pre-computed vignettes, the `tools/prose-sweep.R --chunks` output at the branch head is identical to the output at the merge base, and `tools/check-vignette-staleness.R` passes at the branch head.
+- [x] AC6: For each of the nine source files, the finding list of `tools/prose-sweep.R` at the branch head is a subset of its finding list at the merge base. The SEM page and the three older pages have findings at master, so the frame adds none and removes any it touches.
 - [ ] AC7: `Rscript -e 'devtools::test()'` reports 0 failures, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and no note that the merge base does not report.
 
 ## Coverage
@@ -68,3 +68,12 @@ The level map. Introductory: Using Circumplex Instruments (start), Introduction 
 ## Decisions
 
 ## Review
+
+Reviewed 2026-09-16 on branch m135-vignette-levels-and-frame at 9eb175e0. Master did not move after the branch was cut (merge base 8d87bb61).
+
+- AC1: `tests/testthat/test-vignette-frame.R` ran fresh with 183 passes and 0 failures. Its Level checks cover the nine sources against the Scope map and the index titles.
+- AC2: the same run passed the heading-sequence and Overview-mentions checks on all nine.
+- AC3: the same run passed the Wrap-up next-page checks in both directions of the reading order.
+- AC4: `tools/check-pkgdown-vignettes.R` reports that the articles index, the navbar menu and `vignettes/` agree on 9 pages. `pkgdown::check_pkgdown()` finds no problems.
+- AC5: `tools/prose-sweep.R --chunks` output is byte-identical to the merge base for all 16 touched `.Rmd` and `.Rmd.orig` files. `tools/check-vignette-staleness.R` reports all 7 pre-computed vignettes up to date.
+- AC6: with line numbers stripped, no source gains a sweep finding. The instruments and intermediate pages each lose one finding, and the other seven are unchanged (SEM keeps its 2, the rest 0).
