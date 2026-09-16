@@ -99,16 +99,14 @@ test_that("wrap_prose() handles the degenerate inputs", {
   )
 })
 
-test_that("wrap_prose() falls back to 80 columns when the width option is unusable", {
+test_that("width = NULL reads the reader's console width", {
   text <- paste(rep("word", 40), collapse = " ")
-  expect_identical(
-    wrap_prose(text, width = NULL),
-    wrap_prose(text, width = 80)
-  )
-  expect_identical(
-    wrap_prose(text, width = NA_integer_),
-    wrap_prose(text, width = 80)
-  )
+  old <- options(width = 55L)
+  on.exit(options(old), add = TRUE)
+  expect_identical(wrap_prose(text, width = NULL), wrap_prose(text, width = 55))
+  expect_false(identical(
+    wrap_prose(text, width = NULL), wrap_prose(text, width = 80)
+  ))
 })
 
 test_that("wrap_prose() rejects arguments of the wrong type", {
@@ -191,4 +189,33 @@ test_that("atomic mode keeps element-as-unit semantics, not paragraphs", {
   # one paragraph per marker.
   lines <- wrap_prose(c("aa", "bb", "cc"), width = 80, atomic = TRUE)
   expect_identical(lines, "aa bb cc")
+})
+
+# ---- M131 T10: argument validation ------------------------------------------
+
+test_that("a width the caller states is validated, not silently repaired", {
+  expect_error(wrap_prose("word", width = 0))
+  expect_error(wrap_prose("word", width = -5))
+  expect_error(wrap_prose("word", width = "80"))
+  expect_error(wrap_prose("word", width = c(40, 80)))
+  expect_error(wrap_prose("word", width = NA_integer_))
+  expect_error(wrap_prose("word", width = NA))
+  expect_error(cat_prose("word", width = 0))
+})
+
+test_that("the console width needs no fallback, because R guarantees it", {
+  # Why wrap_prose() validates the width it is given but never repairs the
+  # one it reads: R refuses both ways of making getOption("width") unusable,
+  # so there is no unusable option to defend against and a fallback here
+  # would be a branch no test could reach.
+  old <- options(width = 80L)
+  on.exit(options(old), add = TRUE)
+  expect_error(options(width = NULL))
+  expect_error(options(width = -1))
+  expect_true(is_scalar_count(getOption("width")))
+})
+
+test_that("atomic must be TRUE or FALSE, never NA", {
+  expect_error(wrap_prose("word", atomic = NA))
+  expect_error(wrap_prose("word", atomic = c(TRUE, FALSE)))
 })

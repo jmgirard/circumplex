@@ -149,6 +149,39 @@ m94_marker_block <- function(out) {
   substr(flat, start, end + nchar(end_pat) - 1L)
 }
 
+# Raw-output check: every line of the caveat carries the two-space continuation
+# leader. Collapsing whitespace erases indentation, so m94_caveat_words cannot
+# see this and nothing outside the snapshots pinned it (M131 review, O9). The
+# leader is what keeps the caveat inside the note it belongs to, and
+# wrap_prose() counts it against the width rather than adding it on top, so a
+# lost leader is a real layout change, not a cosmetic one.
+m94_expect_caveat_indent <- function(out) {
+  lines <- unlist(strsplit(out, "\n", fixed = TRUE))
+  first <- grep("What has been measured about these markers", lines, fixed = TRUE)
+  expect_length(first, 1L)
+  # The caveat's end is found by consuming lines until they carry all of its
+  # words, because its closing phrase straddles a line break at most widths
+  # and matching it raw would find nothing.
+  squash <- function(x) paste(unlist(strsplit(x, "[ \t]+")), collapse = " ")
+  caveat <- character(0)
+  for (i in seq(first[[1]], length(lines))) {
+    caveat <- c(caveat, lines[[i]])
+    if (grepl(m94_caveat_words, squash(paste(caveat, collapse = " ")),
+              fixed = TRUE)) {
+      break
+    }
+  }
+  expect_match(squash(paste(caveat, collapse = " ")), m94_caveat_words,
+               fixed = TRUE)
+  expect_gte(length(caveat), 2L)
+  for (line in caveat) {
+    expect_match(
+      line, "^  [^ ]",
+      info = paste0("caveat line lost its leader: ", line)
+    )
+  }
+}
+
 m94_caveat_words <- paste(
   "What has been measured about these markers covers analytic intervals",
   "only, and not every marker was measured; they are not validated as",
@@ -201,6 +234,7 @@ test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2
     expect_match(out, lab, fixed = TRUE)
   }
   expect_match(block, m94_caveat_words, fixed = TRUE)
+  m94_expect_caveat_indent(out)
 })
 
 test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N >= 2000", {
@@ -233,6 +267,7 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
     expect_match(out, lab, fixed = TRUE)
   }
   expect_match(block, m94_caveat_words, fixed = TRUE)
+  m94_expect_caveat_indent(out)
 })
 
 test_that("the marker note claims no interval consequence (banned phrases absent)", {

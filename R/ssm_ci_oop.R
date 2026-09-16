@@ -30,7 +30,7 @@ ssm_ci_pct <- function(p, digits = 1) {
 # so the block stays inside the reader's console rather than inside a column
 # this file picked.
 ssm_ci_cat_line <- function(leader, text, indent = 4,
-                            width = getOption("width")) {
+                            width = NULL) {
   cat_prose(
     text,
     prefix = paste0(strrep(" ", indent), format(leader, width = 15)),
@@ -40,7 +40,7 @@ ssm_ci_cat_line <- function(leader, text, indent = 4,
 }
 
 # A wrapped paragraph at a fixed indent (verdict paragraph, notes)
-ssm_ci_cat_para <- function(text, indent = 2, width = getOption("width")) {
+ssm_ci_cat_para <- function(text, indent = 2, width = NULL) {
   cat_prose(text, prefix = strrep(" ", indent), width = width)
 }
 

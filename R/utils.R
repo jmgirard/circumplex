@@ -269,14 +269,21 @@ disp_width <- function(x) {
 # rather than split, so that line can exceed the width. Breaking a word would
 # change the words the reader sees, which matters more than the column.
 wrap_prose <- function(x, prefix = "", continuation = prefix,
-                       width = getOption("width"), atomic = FALSE) {
+                       width = NULL, atomic = FALSE) {
   stopifnot(
     is_char(x),
     is_char(prefix, n = 1),
     is_char(continuation, n = 1),
-    is_flag(atomic)
+    is_flag(atomic), !is.na(atomic)
   )
-  if (!is_scalar_count(width)) width <- 80L
+  # `width = NULL` means "ask the reader's console". No fallback is needed for
+  # that answer: R refuses to delete the width option or to set it outside
+  # 10...10000, so getOption("width") is always a usable integer. A width the
+  # caller states is validated like every other argument, because a caller
+  # passing 0, -5 or "80" has made a mistake, and silently printing at 80
+  # would hide it (M131 review, O8).
+  if (is.null(width)) width <- getOption("width")
+  stopifnot(is_scalar_count(width))
 
   # Each element of `x` is a paragraph of its own, as in the strwrap() this
   # replaced, so a caller that hands over several sentences gets several
@@ -316,7 +323,7 @@ wrap_prose <- function(x, prefix = "", continuation = prefix,
 # The same wrapping, printed. Every caution site that has nothing to add
 # between the lines uses this, so the newline handling is written once.
 cat_prose <- function(x, prefix = "", continuation = prefix,
-                      width = getOption("width"), atomic = FALSE) {
+                      width = NULL, atomic = FALSE) {
   lines <- wrap_prose(
     x,
     prefix = prefix,
