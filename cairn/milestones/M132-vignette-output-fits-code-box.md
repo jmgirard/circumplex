@@ -95,7 +95,7 @@ package's own cautions is M131.
       vignette prose that quotes it, its snapshot, and its width-ledger entry.
 - [ ] T4: Re-render the seven vignettes, commit the render, then run the
       width guard and the staleness guard.
-- [ ] T5: Run the four planted defect forms of AC2 and the inside-exemption
+- [x] T5: Run the four planted defect forms of AC2 and the inside-exemption
       control. Record each result.
 - [x] T6: Wire the guard into `.github/workflows/vignette-precompute.yaml`
       after the re-render step. Add `tools/check-vignette-width.R` to
@@ -117,6 +117,8 @@ package's own cautions is M131.
 - 2026-09-16: T3 done. Heading reworded in `R/ssm_ci_oop.R`, `_snaps/ci_accuracy.md`, the `test-print-width.R` ledger and the vignette source prose. The ci_accuracy and print-width tests pass (876).
 - 2026-09-16: T4 render committed. Width guard exits 0: output lines per file 284, 147, 9, 255, 65, 41, 94, one exemption (sem-based lines 94-95). Output words match the previous render apart from the heading, a timing, the removed deprecation warning, and table columns that moved when tables wrapped at 77.
 - 2026-09-16: T6 done. The workflow runs the width guard after the staleness step, with `if: !cancelled()` so both report. No `.Rbuildignore` edit was needed, because `^tools$` already excludes the guard.
+- 2026-09-16: AC4 run: a second full re-render then check-vignette-staleness.R reported all 7 up to date, and the width guard stayed green.
+- 2026-09-16: T5 done. tools/m132-planted-defects.R: 42 of 42 plants as expected. Forms ascii (81 col), unicode (81 col, 159 bytes), outside (89), rerender (93) went red naming the planted line in each of the 7 files. Controls unicode80 (80 col, 157 bytes) and inside stayed green in each.
 
 ## Decisions
 
