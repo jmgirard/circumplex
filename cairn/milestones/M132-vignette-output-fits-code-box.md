@@ -97,7 +97,7 @@ package's own cautions is M131.
       width guard and the staleness guard.
 - [ ] T5: Run the four planted defect forms of AC2 and the inside-exemption
       control. Record each result.
-- [ ] T6: Wire the guard into `.github/workflows/vignette-precompute.yaml`
+- [x] T6: Wire the guard into `.github/workflows/vignette-precompute.yaml`
       after the re-render step. Add `tools/check-vignette-width.R` to
       `.Rbuildignore`.
 - [ ] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
@@ -116,6 +116,7 @@ package's own cautions is M131.
 - 2026-09-16: minor amendment: new T3 (reword the heading) inserted, render moved before the plants (plants read a green render). Old T3-T6 are now T5, T4, T6, T7. Coverage renumbered.
 - 2026-09-16: T3 done. Heading reworded in `R/ssm_ci_oop.R`, `_snaps/ci_accuracy.md`, the `test-print-width.R` ledger and the vignette source prose. The ci_accuracy and print-width tests pass (876).
 - 2026-09-16: T4 render committed. Width guard exits 0: output lines per file 284, 147, 9, 255, 65, 41, 94, one exemption (sem-based lines 94-95). Output words match the previous render apart from the heading, a timing, the removed deprecation warning, and table columns that moved when tables wrapped at 77.
+- 2026-09-16: T6 done. The workflow runs the width guard after the staleness step, with `if: !cancelled()` so both report. No `.Rbuildignore` edit was needed, because `^tools$` already excludes the guard.
 
 ## Decisions
 
