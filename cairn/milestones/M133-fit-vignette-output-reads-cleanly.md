@@ -1,6 +1,6 @@
 # M133: Fit vignette output reads cleanly
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M132
 - **Driving RR:** —
@@ -66,6 +66,7 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - 2026-09-16: T5 done. New test runs the one-block check on 7 fixtures with print() and summary() (198 expectations, skip_on_cran only). Planted defect (cpm_display_results() with the old headers) turned it red.
 - 2026-09-16: T6 done. The NEWS entry now says the accuracy heading wraps because it has no columns under it, and points at the first entry.
 - 2026-09-16: claim audit: 7 claims read, 0 corrected — NEWS.md, tests/testthat/test-cpm_summary_markers.R (one NEWS line rewrapped to 80 columns).
+- 2026-09-16: implement complete after return 1. devtools::test(): 0 failed, 0 errors, 1 skipped, 11034 passed. Status review.
 
 ## Decisions
 
