@@ -22,8 +22,15 @@ caution_fixture_output <- function(expr, width, env = parent.frame()) {
 }
 
 # The marker text that proves a fixture fired its caution, not merely printed.
+#
+# Whitespace is collapsed on both sides before the match. A caution now wraps
+# to the reader's width, so a marker phrase falls across a line break at one
+# width and not at another, and the continuation indent would otherwise sit
+# in the middle of the phrase. Without this, a marker could pass at width 120
+# and fail at width 60 while the caution printed correctly at both.
 caution_fixture_fires <- function(lines, marker) {
-  any(grepl(marker, paste(lines, collapse = " "), fixed = TRUE))
+  squash <- function(x) paste(unlist(strsplit(x, "[ \t\r\n]+")), collapse = " ")
+  grepl(squash(marker), squash(paste(lines, collapse = " ")), fixed = TRUE)
 }
 
 # Lines of printed output wider than `width` display columns.

@@ -125,8 +125,15 @@ verdicts <- lapply(rows, function(nm) {
   }
   wb <- words_of(b$lines)
   wa <- words_of(a$lines)
-  fired_b <- any(grepl(b$marker, paste(b$lines, collapse = " "), fixed = TRUE))
-  fired_a <- any(grepl(a$marker, paste(a$lines, collapse = " "), fixed = TRUE))
+  # Whitespace is collapsed on both sides: a marker phrase can fall across a
+  # line break at the comparison width, putting the continuation indent inside
+  # the phrase. Matching raw text would report a caution as gone when it is
+  # merely wrapped differently.
+  squash <- function(x) paste(unlist(strsplit(x, "[ \t\r\n]+")), collapse = " ")
+  fired_b <- grepl(squash(b$marker), squash(paste(b$lines, collapse = " ")),
+                   fixed = TRUE)
+  fired_a <- grepl(squash(a$marker), squash(paste(a$lines, collapse = " ")),
+                   fixed = TRUE)
   if (!fired_b) {
     # The caution did not print at the base commit, so this fixture is not
     # evidence about what M131 preserved. Reported, never silently passed.

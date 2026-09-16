@@ -123,23 +123,32 @@ test_that("an analytic marker-firing fit names each fired label exactly once", {
 
 # ---- AC1/AC2: the bootstrap fired-marker note -------------------------------
 
-# The note's variable sentence is wrapped at emission time, so label and
-# prefix assertions run on the whitespace-normalized block; the fixed caveat
-# lines are additionally pinned raw (they are literals in the code).
+# The whole note now wraps to the reader's console width, so where its line
+# breaks fall depends on that width and no assertion may depend on them. The
+# block is located and returned with its whitespace collapsed, and every
+# assertion below runs on that. This pins the words and their order, which is
+# what the note promises, and it makes the negative assertions stronger: a
+# banned phrase broken across two lines is now found, where a raw search
+# would have missed it.
+#
+# The one assertion that still reads the raw output is the check that no
+# fired marker label is split across a line break. That is a property of the
+# wrapping itself, so it has to be read there.
 m94_marker_block <- function(out) {
+  flat <- gsub("\\s+", " ", out)
   start_pat <- "Note: boundary/weak-identification markers fired:"
   end_pat <- "'When a fit sits at a boundary')."
-  start <- regexpr(start_pat, out, fixed = TRUE)
-  end <- regexpr(end_pat, out, fixed = TRUE)
+  start <- regexpr(start_pat, flat, fixed = TRUE)
+  end <- regexpr(end_pat, flat, fixed = TRUE)
   if (start < 0 || end < 0) return(NA_character_)
-  substr(out, start, end + nchar(end_pat) - 1L)
+  substr(flat, start, end + nchar(end_pat) - 1L)
 }
 
-m94_caveat_raw <- paste0(
-  "  What has been measured about these markers covers analytic intervals\n",
-  "  only, and not every marker was measured; they are not validated as\n",
-  "  predictors of the bootstrap intervals shown here (see the vignette\n",
-  "  section 'When a fit sits at a boundary')."
+m94_caveat_words <- paste(
+  "What has been measured about these markers covers analytic intervals",
+  "only, and not every marker was measured; they are not validated as",
+  "predictors of the bootstrap intervals shown here (see the vignette",
+  "section 'When a fit sits at a boundary')."
 )
 
 # The note must sit inside the `# Diagnostics` section — including on fits
@@ -186,7 +195,7 @@ test_that("bootstrap summary() prints the fired-marker note: >= 2 markers, N < 2
   for (lab in fired) {
     expect_match(out, lab, fixed = TRUE)
   }
-  expect_match(out, m94_caveat_raw, fixed = TRUE)
+  expect_match(block, m94_caveat_words, fixed = TRUE)
 })
 
 test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N >= 2000", {
@@ -218,7 +227,7 @@ test_that("bootstrap summary() prints the fired-marker note: exactly 1 marker, N
   for (lab in fired) {
     expect_match(out, lab, fixed = TRUE)
   }
-  expect_match(out, m94_caveat_raw, fixed = TRUE)
+  expect_match(block, m94_caveat_words, fixed = TRUE)
 })
 
 test_that("the marker note claims no interval consequence (banned phrases absent)", {

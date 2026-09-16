@@ -304,8 +304,10 @@ cat_prose <- function(x, prefix = "", continuation = prefix,
     width = width,
     atomic = atomic
   )
+  # cat() appends `sep` after the LAST element too, so this already ends the
+  # final line. A further cat("\n") here would add a blank line after every
+  # caution and change the layout this milestone is meant to preserve.
   if (length(lines) > 0) cat(lines, sep = "\n")
-  if (length(lines) > 0) cat("\n")
   invisible(lines)
 }
 

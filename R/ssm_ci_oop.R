@@ -25,20 +25,23 @@ ssm_ci_pct <- function(p, digits = 1) {
   paste0(format(round(p * 100, digits), nsmall = digits, trim = TRUE), "%")
 }
 
-# One wrapped output line with a fixed-width leader (verdict-block layout)
-ssm_ci_cat_line <- function(leader, text, indent = 4, width = 78) {
-  lead <- paste0(strrep(" ", indent), format(leader, width = 15))
-  body <- strwrap(text, width = width - indent - 15)
-  cat(lead, body[1], "\n", sep = "")
-  for (b in body[-1]) {
-    cat(strrep(" ", indent + 15), b, "\n", sep = "")
-  }
+# One wrapped output line with a fixed-width leader (verdict-block layout).
+# The label field and the indent are counted against the width by wrap_prose(),
+# so the block stays inside the reader's console rather than inside a column
+# this file picked.
+ssm_ci_cat_line <- function(leader, text, indent = 4,
+                            width = getOption("width")) {
+  cat_prose(
+    text,
+    prefix = paste0(strrep(" ", indent), format(leader, width = 15)),
+    continuation = strrep(" ", indent + 15),
+    width = width
+  )
 }
 
 # A wrapped paragraph at a fixed indent (verdict paragraph, notes)
-ssm_ci_cat_para <- function(text, indent = 2, width = 78) {
-  cat(strwrap(text, width = width, indent = indent, exdent = indent),
-      sep = "\n")
+ssm_ci_cat_para <- function(text, indent = 2, width = getOption("width")) {
+  cat_prose(text, prefix = strrep(" ", indent), width = width)
 }
 
 # The guardrail false-certification caution decision (spec sec. 4.3/5.1):

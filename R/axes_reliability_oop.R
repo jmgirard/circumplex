@@ -68,30 +68,33 @@ axes_fmt <- function(x, digits = 3) {
 # variants say only what is true of the object in hand; where neither half is
 # live, print() emits no opening at all.
 axes_metric_note <- function(se_live, fit_live) {
-  # Each variant carries its own line breaks: the clause lengths differ, and a
-  # shared tail wraps one of the three badly.
+  # Each variant is returned unwrapped: the clause lengths differ, so the three
+  # tails stay separate, but print() wraps whichever one is live to the
+  # reader's console width.
   tail <- if (se_live && fit_live) {
-    paste0("both sides of that mismatch are\n",
-           "  corrected, so these numbers differ from LISREL's, and from",
-           " lavaan's\n  own, by design.")
+    paste0("both sides of that mismatch are",
+           " corrected, so these numbers differ from LISREL's, and from",
+           " lavaan's own, by design.")
   } else if (se_live) {
-    paste0("the standard-error side of that\n",
-           "  mismatch is corrected, so those numbers differ from LISREL's,",
-           " and\n  from lavaan's own, by design.")
+    paste0("the standard-error side of that",
+           " mismatch is corrected, so those numbers differ from LISREL's,",
+           " and from lavaan's own, by design.")
   } else {
-    paste0("the global-fit side of that\n",
-           "  mismatch is corrected, so those numbers differ from LISREL's,",
-           " and\n  from lavaan's own, by design.")
+    paste0("the global-fit side of that",
+           " mismatch is corrected, so those numbers differ from LISREL's,",
+           " and from lavaan's own, by design.")
   }
   paste0(
-    "  Note: the model is fit to the item correlation matrix as if it were a\n",
-    "  covariance matrix (Cudeck, 1989), and ", tail
+    "Note: the model is fit to the item correlation matrix as if it were a",
+    " covariance matrix (Cudeck, 1989), and ", tail
   )
 }
+# Unwrapped, like the note above: a constant built at load time cannot know the
+# width its reader will print at, so print() wraps it at the point of use.
 axes_se_corrected_note <- paste0(
-  "  The component standard errors are adjusted to the correlation metric\n",
-  "  and are calibrated; they are typically smaller than the values printed\n",
-  "  by Strack et al. (2013), whose LISREL output carries no correction."
+  "The component standard errors are adjusted to the correlation metric ",
+  "and are calibrated; they are typically smaller than the values printed ",
+  "by Strack et al. (2013), whose LISREL output carries no correction."
 )
 # The third surface RR14 required (BC5). It carries the DIRECTION of the
 # small-sample error and a pointer, deliberately no rates: the measured numbers
@@ -108,16 +111,16 @@ axes_se_corrected_note <- paste0(
 # scaling-failure note travels with it for the same reason: it explains four NAs
 # that only summary() displays.
 axes_fit_scaled_note <- paste0(
-  "  The global fit statistics chisq, pvalue, rmsea and cfi are scaled to\n",
-  "  that metric (Satorra & Bentler, 1994), which removes a distortion that\n",
-  "  flatters fit; df and srmr are unchanged. The scaled test can modestly\n",
-  "  over-reject at typical sample sizes: it over-flags misfit rather than\n",
-  "  flattering it; see ?axes_reliability for the measured rates.\n",
+  "The global fit statistics chisq, pvalue, rmsea and cfi are scaled to ",
+  "that metric (Satorra & Bentler, 1994), which removes a distortion that ",
+  "flatters fit; df and srmr are unchanged. The scaled test can modestly ",
+  "over-reject at typical sample sizes: it over-flags misfit rather than ",
+  "flattering it; see ?axes_reliability for the measured rates. ",
   # Named here and not only in the help page because the cross-check a reader
   # runs is prompted by seeing these four numbers, and both of the obvious
   # comparisons -- lavaan's bare cfi and its cfi.robust -- disagree with them.
-  "  They follow lavaan's *.scaled definitions, not its *.robust ones, and\n",
-  "  differ from what fitMeasures() reports for an equivalent ML fit."
+  "They follow lavaan's *.scaled definitions, not its *.robust ones, and ",
+  "differ from what fitMeasures() reports for an equivalent ML fit."
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs
@@ -133,10 +136,10 @@ axes_fit_scaled_note <- paste0(
 # shown rather than only in the help page, because that is where a reader is
 # about to use them.
 axes_fiml_se_caveat <- paste0(
-  "  Note: under missing = \"fiml\" the standard errors are\n",
-  "  observed-information SEs on the standardized metric, conditional on the\n",
-  "  FIML standardization constants; FIML assumes the data are missing at\n",
-  "  random and multivariate normal."
+  "Note: under missing = \"fiml\" the standard errors are ",
+  "observed-information SEs on the standardized metric, conditional on the ",
+  "FIML standardization constants; FIML assumes the data are missing at ",
+  "random and multivariate normal."
 )
 
 # ---- methods ----------------------------------------------------------------
@@ -206,15 +209,18 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   )
   print(disp, row.names = FALSE, right = FALSE)
   if (isTRUE(d$boundary)) {
-    cat(
-      # Names the CLASS of solution, not one disjunct: the flag is raised by an
-      # axes variance outside (0, 1) OR any negative variance component, and
-      # naming only the first told a user the wrong cause for the others
-      # (M62 review, F2). The components table below already shows which.
-      "\n  Note: a boundary solution was reached (an axes variance outside",
-      "\n  (0, 1), or a negative variance component); reliability and SEm are",
-      "\n  NA rather than a clipped value. See the components table above.\n",
-      sep = ""
+    cat("\n")
+    # Names the CLASS of solution, not one disjunct: the flag is raised by an
+    # axes variance outside (0, 1) OR any negative variance component, and
+    # naming only the first told a user the wrong cause for the others
+    # (M62 review, F2). The components table below already shows which.
+    cat_prose(
+      paste0(
+        "Note: a boundary solution was reached (an axes variance outside",
+        " (0, 1), or a negative variance component); reliability and SEm are",
+        " NA rather than a clipped value. See the components table above."
+      ),
+      prefix = "  "
     )
   } else if (isTRUE(all.equal(
     x$results$reliability[[1]], x$results$reliability[[2]]
@@ -222,10 +228,14 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
     # The two axes share one (equal-constrained) axes-variance estimate, so a
     # balanced instrument's rows match by construction (RR09) -- flag it so a
     # user does not read the identical rows as a bug.
-    cat(
-      "\n  Note: the two axes share one axes-variance estimate and, with equal",
-      "\n  items per axis, carry the same reliability. This is expected, not an error.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: the two axes share one axes-variance estimate and, with equal",
+        " items per axis, carry the same reliability. This is expected, not",
+        " an error."
+      ),
+      prefix = "  "
     )
   }
   # RR09 sec. 7.4 and M61-D1: NA-with-reason, never silently dropped. `d$nb_reason`
@@ -236,29 +246,38 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   nb_reason <- d$nb_reason
   if (is.null(nb_reason) && from_cormat) nb_reason <- "cormat"
   if ("cormat" %in% nb_reason) {
-    cat(
-      "\n  Note: the Nunnally-Bernstein comparison needs the raw item scores",
-      "\n  (scale alphas and the axis-composite variance), so it is NA on the",
-      "\n  correlation-matrix path.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: the Nunnally-Bernstein comparison needs the raw item scores",
+        " (scale alphas and the axis-composite variance), so it is NA on the",
+        " correlation-matrix path."
+      ),
+      prefix = "  "
     )
   }
   if ("fiml" %in% nb_reason) {
-    cat(
-      "\n  Note: the Nunnally-Bernstein comparison needs each scale's alpha and",
-      "\n  the axis-composite variance, both of which need items observed by",
-      "\n  every respondent, so it is NA under missing = \"fiml\" rather than",
-      "\n  computed from whatever cells happened to be answered.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: the Nunnally-Bernstein comparison needs each scale's alpha and",
+        " the axis-composite variance, both of which need items observed by",
+        " every respondent, so it is NA under missing = \"fiml\" rather than",
+        " computed from whatever cells happened to be answered."
+      ),
+      prefix = "  "
     )
   }
   if ("single_item" %in% nb_reason) {
-    cat(
-      "\n  Note: the Nunnally-Bernstein comparison needs each scale's alpha,",
-      "\n  which is undefined for a scale carrying only one item, so it is NA",
-      "\n  here. Strack et al. (2013) likewise leave it blank for such",
-      "\n  instruments.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: the Nunnally-Bernstein comparison needs each scale's alpha,",
+        " which is undefined for a scale carrying only one item, so it is NA",
+        " here. Strack et al. (2013) likewise leave it blank for such",
+        " instruments."
+      ),
+      prefix = "  "
     )
   }
   # The correction-failure state gets its own note, like every other
@@ -281,22 +300,24 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   se_live <- is.null(x$details$se_correction_failed)
   fit_live <- is.null(x$details$fit_scaling_failed)
   if (!se_live) {
-    cat(
-      "\n  Note: the component standard errors could not be computed (",
-      x$details$se_correction_failed,
-      ") and are\n  NA. The point estimates, reliability, and SEm ",
-      "are unaffected.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: the component standard errors could not be computed (",
+        x$details$se_correction_failed,
+        ") and are NA. The point estimates, reliability, and SEm ",
+        "are unaffected."
+      ),
+      prefix = "  "
     )
   }
   if (se_live || fit_live) {
-    cat("\n",
-        paste(c(axes_metric_note(se_live, fit_live),
-                if (se_live) axes_se_corrected_note),
-              collapse = "\n"),
-        "\n", sep = "")
+    cat("\n")
+    cat_prose(axes_metric_note(se_live, fit_live), prefix = "  ")
+    if (se_live) cat_prose(axes_se_corrected_note, prefix = "  ")
     if (se_live && is_fiml) {
-      cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+      cat("\n")
+      cat_prose(axes_fiml_se_caveat, prefix = "  ")
     }
   }
   invisible(x)
@@ -309,14 +330,18 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
 axes_cat_fit_note <- function(x) {
   fit_failed <- x$details$fit_scaling_failed
   if (is.null(fit_failed)) {
-    cat("\n", axes_fit_scaled_note, "\n", sep = "")
+    cat("\n")
+    cat_prose(axes_fit_scaled_note, prefix = "  ")
   } else {
-    cat(
-      "\n  Note: the global fit statistics could not be scaled to the ",
-      "correlation\n  metric (", fit_failed, "), so chisq, pvalue, rmsea and ",
-      "cfi are NA. What\n  lavaan reported unscaled is in ",
-      "details$fit_uncorrected; df and srmr are\n  unaffected.\n",
-      sep = ""
+    cat("\n")
+    cat_prose(
+      paste0(
+        "Note: the global fit statistics could not be scaled to the ",
+        "correlation metric (", fit_failed, "), so chisq, pvalue, rmsea and ",
+        "cfi are NA. What lavaan reported unscaled is in ",
+        "details$fit_uncorrected; df and srmr are unaffected."
+      ),
+      prefix = "  "
     )
   }
   invisible(NULL)

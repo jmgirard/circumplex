@@ -127,3 +127,20 @@ test_that("cat_prose() prints what wrap_prose() returns, one line each", {
   )
   expect_silent(cat_prose(character(0)))
 })
+
+test_that("cat_prose() adds no blank line of its own", {
+  # cat() appends its separator after the last element, so an extra newline
+  # here would put a blank line after every caution and silently change the
+  # layout. The next thing printed must land on the very next line.
+  text <- paste(rep("word", 20), collapse = " ")
+  printed <- utils::capture.output({
+    cat_prose(text, prefix = "  ", width = 40)
+    cat("NEXT\n")
+  })
+  expect_identical(printed[[length(printed)]], "NEXT")
+  expect_false(any(printed == ""))
+  expect_identical(
+    length(printed),
+    length(wrap_prose(text, prefix = "  ", width = 40)) + 1L
+  )
+})

@@ -105,6 +105,33 @@ changed_groups <- function(before, after) {
   groups
 }
 
+# A changed group is a re-wrap when it carries exactly the same words in the
+# same order and those words sit on the lines differently. Both halves matter.
+#
+# Same words alone is not enough: re-aligning a table's columns leaves the
+# words untouched and only the spacing inside each line changes, so the line
+# partition is unchanged and the group is NOT a re-wrap.
+#
+# Non-empty matters too: adding or dropping a blank line leaves no words on
+# either side, which would otherwise compare equal and be excused.
+is_rewrap <- function(before, after) {
+  words <- function(x) {
+    w <- unlist(strsplit(paste(x, collapse = " "), "[ \t\r\n]+"))
+    w[nzchar(w)]
+  }
+  partition <- function(x) {
+    lapply(x, function(l) {
+      w <- unlist(strsplit(l, "[ \t\r\n]+"))
+      w[nzchar(w)]
+    })
+  }
+  wb <- words(before)
+  wa <- words(after)
+  length(wb) > 0 &&
+    identical(wb, wa) &&
+    !identical(partition(before), partition(after))
+}
+
 report <- function(label, before, after) {
   groups <- changed_groups(before, after)
   if (length(groups) == 0) {
@@ -113,17 +140,21 @@ report <- function(label, before, after) {
   }
   unattributed <- list()
   rows <- character(0)
+  rewraps <- 0L
   for (g in groups) {
     rows_hit <- attributable(c(g$before, g$after))
     if (length(rows_hit) > 0) {
       rows <- union(rows, rows_hit)
+    } else if (is_rewrap(g$before, g$after)) {
+      rewraps <- rewraps + 1L
     } else {
       unattributed[[length(unattributed) + 1L]] <- g
     }
   }
   cat(sprintf(
-    "%-46s %d changed group(s), %d attributed, %d NOT attributed\n",
-    label, length(groups), length(groups) - length(unattributed),
+    "%-46s %d group(s): %d by marker, %d re-wrap, %d NOT attributed\n",
+    label, length(groups),
+    length(groups) - rewraps - length(unattributed), rewraps,
     length(unattributed)
   ))
   if (length(rows) > 0) {

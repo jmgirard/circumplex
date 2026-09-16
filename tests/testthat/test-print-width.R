@@ -27,9 +27,26 @@
 # which is what the ledger entries are and a wrapped caution is not.
 
 caution_width_ledger <- c(
-  # Filled in at T4, once the migration is done and the remaining over-long
-  # lines are the out-of-scope ones. Each entry carries its class in a
-  # comment: heading, fit line, table row, or column header.
+  # fit lines
+  paste0(
+    "Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 ",
+    "[0.063, 0.094]; SRMR = 0.042; CFI = 0.984"
+  ),
+  "  Correspondence index = 0.694, p = 0.0167 (exact, 120 relabelings)",
+  "  Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)",
+  # headings
+  "Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)",
+  paste0(
+    "SSM CI accuracy, simulated at your n and settings (3 replications per ",
+    "condition; bootstrap intervals with 40 replicates at level 0.95)"
+  ),
+  "Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:",
+  "Coverage by condition (d_cert: d when certified; cert: certification rate):",
+  # section headings inside the accuracy report
+  "  # Profile [All] (n = 150; 95% bootstrap CIs, 40 replicates):",
+  "  # Profile [Female] (n = 71; 95% bootstrap CIs, 40 replicates):",
+  "  # Profile [Male] (n = 79; 95% bootstrap CIs, 40 replicates):",
+  "  # Contrast [Male - Female] (95% bootstrap CIs, 40 replicates):"
 )
 
 # Lines over the width that the ledger does not account for.

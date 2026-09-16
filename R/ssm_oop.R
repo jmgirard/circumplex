@@ -186,17 +186,21 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
     is_contrast_row <- x$details$contrast && i == nrow(x$results)
     if (!is_contrast_row) {
       if (is.na(dat$fit_est) || dat$fit_est < 0.70) {
-        cat(
-          "  Note: model fit is inadequate (R\u00b2 < .70); ",
-          "interpret only the elevation parameter.\n",
-          sep = ""
+        cat_prose(
+          paste0(
+            "Note: model fit is inadequate (R\u00b2 < .70); ",
+            "interpret only the elevation parameter."
+          ),
+          prefix = "  "
         )
       }
       if (!ssm_certified(dat$a_lci, dat$a_uci)) {
-        cat(
-          "  Note: the amplitude CI lower bound is under 0.35 CI-widths ",
-          "above zero; the displacement is not interpretable.\n",
-          sep = ""
+        cat_prose(
+          paste0(
+            "Note: the amplitude CI lower bound is under 0.35 CI-widths ",
+            "above zero; the displacement is not interpretable."
+          ),
+          prefix = "  "
         )
       }
     }
