@@ -91,7 +91,9 @@ section_body <- function(lines, heading_re) {
   expect_length(start, 1L)
   after <- heads[heads > start]
   end <- if (length(after)) after[[1]] - 1L else length(lines)
-  paste(lines[seq(start + 1L, end)], collapse = "\n")
+  # Runs of whitespace collapse to one space, so a heading or a title that
+  # wraps across source lines still matches.
+  gsub("\\s+", " ", paste(lines[seq(start + 1L, end)], collapse = " "))
 }
 
 test_that("every vignette opens with a Level line naming its level and prerequisites", {
