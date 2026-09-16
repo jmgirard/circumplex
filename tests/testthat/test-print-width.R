@@ -78,11 +78,13 @@ caution_width_ledger <- c(
 
 # The kinds of line this ledger may excuse. The milestone's Scope names the
 # families it leaves unwrapped -- tables, column headers, fit lines and
-# section headings -- and these four are the kinds that the fixtures below
-# actually print over-long, at a finer grain than the Scope's wording: a
-# test-statistic line and a top-level heading are both column-structured
-# output of the kind the Scope leaves alone. Nothing else may be excused, and
-# no caution is any of these.
+# section headings -- and these four are the kinds the fixtures below actually
+# print over-long. Two of them are not the Scope's own words: a top-level
+# heading, and a test-statistic line. Neither is column-structured, so neither
+# is a table or a column header; what puts them here is what puts the Scope's
+# four here, that their layout is written into the line rather than flowed,
+# and re-flowing them would change what they are rather than where they break.
+# Nothing else may be excused, and no caution is any of these.
 caution_ledger_kinds <- c(
   "fit line", "test-statistic line", "heading", "section heading"
 )

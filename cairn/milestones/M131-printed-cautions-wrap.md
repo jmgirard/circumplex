@@ -1,6 +1,6 @@
 # M131: Printed cautions and notes wrap to the reader's width
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -152,6 +152,8 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-16: what the claim audit caught, all of it prose about the code rather than the code. The `strwrap()` analogy was wrong twice in the same way: `strwrap()` emits an empty line for an empty element rather than dropping it, and its `initial` opens only the first line of the whole output, not each paragraph. Both verified by running `strwrap()`. The comment now names those two as differences rather than likenesses. The ledger's kinds were cited to the Scope, whose four families are not the vector's four kinds. Guard two's justification named two scenarios that cannot happen, because testthat filters at file granularity and a sourced file runs its blocks in order; the reachable case is an interactive re-run. The raw-assertion census in `test-cpm_summary_markers.R` said four where the new indent pin makes five. And the line-identity tool credited the `ci_accuracy` snapshot as what covers the merged-paragraph defect, when that test carries `skip_on_ci()` and `skip_on_cran()` and so pins it locally only; `test-wrap-prose.R` is what runs everywhere. Verified by reading the skips at `test-ci_accuracy.R:877-878`.
 - 2026-09-16: the audit's one allowed re-read of the seven corrections was still running when this checkpoint was committed. Its result lands before the milestone goes back to review.
 - 2026-09-16: candidate rows filed for the two findings the gate deferred, both onto the existing printed-width row: O7 (`R/ssm_sem.R` wraps by a character count at `< width`, against this helper's display columns at `<= width`) and O11 (spliced failure reasons can break mid-phrase).
+- 2026-09-16: claim audit re-read, the one the step allows. Six of the seven corrections cleared. One did not: the ledger's kinds comment called a top-level heading and a test-statistic line "column-structured", and neither is. The heading is a running title and the statistic line is a labeled sentence. Corrected to say what actually puts them in the ledger, which is that their layout is written into the line rather than flowed. No further reader spawned; the step allows one re-read.
+- 2026-09-16: all tasks done, status to review. `devtools::test()`: 0 failures, 10743 passing, 1 skip. `devtools::check(args = "--no-manual")` on the finished tree: Status OK, 0 errors, 0 warnings, 0 notes. `devtools::document()` produces no diff and no unresolved-link warning.
 
 ## Decisions
 
