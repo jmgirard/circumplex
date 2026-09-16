@@ -22,7 +22,12 @@ options(width = 77)
 library(circumplex)
 ```
 
-## 1. Background and Motivation
+**Level:** Introductory. Read "Using Circumplex Instruments" first if your data are item-level responses that still need scoring.
+
+## 1. Overview
+This vignette introduces the Structural Summary Method (SSM) and the functions that run it. Section 2, "Background and Motivation", explains circumplex models, circumplex scales, and the SSM parameters. Section 3, "Example data: jz2017", loads the dataset that the examples use. Section 4, "Mean-based SSM Analysis", runs the SSM on a group's mean scores with `ssm_analyze()`, `ssm_table()`, `ssm_plot_circle()`, and `ssm_plot_curve()`. Section 5, "Correlation-based SSM Analysis", runs it on the correlations between the scales and an external measure. The Wrap-up lists what the page covered and names the next page, and the References list the sources cited.
+
+## 2. Background and Motivation
 
 ### Circumplex models, scales, and data
 Circumplex models are popular within many areas of psychology because they offer a parsimonious account of complex psychological domains, such as emotion and interpersonal functioning. This parsimony is achieved by understanding phenomena in a domain as being a "blend" of two primary dimensions. For instance, circumplex models of emotion typically represent affective phenomena as a blend of *valence* (pleasantness versus unpleasantness) and *arousal* (activity versus passivity), whereas circumplex models of interpersonal functioning typically represent interpersonal phenomena as a blend of *communion* (affiliation versus separation) and *agency* (dominance versus submissiveness). These models are often depicted as circles around the intersection of the two dimensions (see figure). Any given phenomenon can be located within this circular space through reference to the two underlying dimensions (e.g., anger is a blend of unpleasantness and activity).
@@ -249,7 +254,7 @@ knitr::include_graphics("VIG1-d.gif")
 
 By interpreting these three parameters, we can understand a profile much more parsimoniously than by trying to interpret all eight subscales individually. This approach also leverages the circumplex relationship (i.e., dependency) among subscales. It is also possible to transform the amplitude and displacement parameters into estimates of distance from the x-axis and y-axis, which will be shown in the output discussed below.
 
-## 2. Example data: jz2017
+## 3. Example data: jz2017
 To illustrate the SSM functions, we will use the example dataset `jz2017`, which was provided by Zimmermann & Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the `?jz2017` command in R.
 
 ```{r jz2017}
@@ -342,7 +347,7 @@ ggplot2::ggplot() +
   )
 ```
 
-## 3. Mean-based SSM Analysis
+## 4. Mean-based SSM Analysis
 
 ### Conducting SSM for a group's mean scores
 To begin, let's say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. We will use the raw scores contained in `jz2017`, although note that the results may be more interpretable if we standardized the scores first (e.g., using the `norm_standardize()` function as described in the "Using Circumplex Instruments" vignette). 
@@ -393,7 +398,7 @@ ssm_plot_circle(results2)
 ssm_plot_curve(results2)
 ```
 
-## 4. Correlation-based SSM Analysis
+## 5. Correlation-based SSM Analysis
 
 ### Conducting SSM for a group's correlations with an external measure
 Next, let's say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as "projecting" that external measure into the circumplex space. As an example, let's project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.
@@ -437,7 +442,7 @@ From this figure, it is very easy to see that, consistent with our hypotheses, t
 ssm_plot_curve(results3)
 ```
 
-## 5. Wrap-up
+## Wrap-up
 In this vignette, we learned about circumplex models, scales, and data as well as the Structural Summary Method (SSM) for analyzing such data. We learned about the `circumplex` package and how to use the `ssm_analyze()` function to generate SSM results for a single group's mean scores and for correlations with a single external measure. We learned several shortcuts for making calls to this function easier and then explored the basics of SSM visualization by creating simple tables and circular plots. In the next vignette, "Intermediate SSM Analysis", we will build upon this knowledge to learn how to (1) generalize our analyses to multiple groups and multiple measures, (2) perform contrast analyses to compare groups or measures, and (3) export and make basic changes to tables and figures.
 
 ## References

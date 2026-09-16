@@ -21,7 +21,12 @@ options(width = 77)
 library(circumplex)
 ```
 
-## 1. Generalizing the basic analyses
+**Level:** Intermediate. Read "Introduction to SSM Analysis" first.
+
+## 1. Overview
+This vignette extends the basic SSM analyses to more than one group or measure. Section 2, "Generalizing the basic analyses", adds the `grouping` and `measures` arguments of `ssm_analyze()`. Section 3, "Contrast analyses", adds the `contrast` argument and `ssm_plot_contrast()`. Section 4, "Taxonomy of analysis types", lists every analysis type and the arguments that select it. Section 5, "Working with SSM tables", customizes the output of `ssm_table()`. Section 6, "Working with SSM figures", exports figures with `ggsave()`. The Wrap-up lists what the page covered and names the next pages, and the References list the sources cited.
+
+## 2. Generalizing the basic analyses
 
 ### Generalizing to multiple means
 We've already seen how adding the `measures` argument can change `ssm_analyze()` from analyzing means to analyzing correlations. Similarly, we can change it from analyzing all observations as a single group to analyzing subgroups separately. This is done using the `grouping` argument. This argument needs to contain a single variable (name or column number) that specifies each observation's group. For instance, the `Gender` variable in the `jz2017` dataset is a factor with two levels: Female and Male. To analyze each gender separately, we need to add the `grouping = "Gender"` argument to the function call.
@@ -131,7 +136,7 @@ ssm_plot_curve(results3)
 ssm_plot_curve(results3, drop_lowfit = TRUE)
 ```
 
-## 2. Contrast analyses
+## 3. Contrast analyses
 The final argument to master in this vignette is `contrast`, which allows us to compare two groups or measures. Setting this argument to TRUE will first generate scores for each group (or measure), then estimate SSM parameters for these scores, and finally calculate the difference between the parameters. To keep the code simpler and to discourage "fishing expeditions," only two groups or measures can be compared at a time.
 
 ### Contrasts between groups' means
@@ -223,7 +228,7 @@ ssm_table(results6, render = FALSE) %>%
 ssm_plot_contrast(results6)
 ```
 
-## 3. Taxonomy of analysis types
+## 4. Taxonomy of analysis types
 Although all SSM analyses are based on the idea of decomposing circumplex scores into the parameters of a cosine curve, there are actually many different ways to implement it. Each of these implementations allows different questions to be explored. In the table below, a list of the SSM analysis types that are currently implemented in the `circumplex` package is provided. This table also provides the specific combination of arguments needed to implement each analysis using the `ssm_analyze()` function. Specifying which analysis to run is simply a matter of providing the correct arguments to the function; this allows a single function to essentially do the work of seven and makes for a more intuitive user experience.
 
 ```{r taxonomy, echo = FALSE}
@@ -259,12 +264,12 @@ If yes, we must specify a `grouping` variable, and the output will contain resul
 
 1. **Do we want to contrast/compare two sets of results?** If yes, we must specify `contrast` as TRUE and ensure that we are only requesting two sets of results (i.e., two groups or two measures). If no, we must omit the `contrast` argument or set it to FALSE, and the results themselves will be output, rather than their contrast.
 
-## 4. Working with SSM tables
+## 5. Working with SSM tables
 
 ### Basic customizations of tables
 Additional arguments to the `ssm_table()` function can be explored using the `?ssm_table` command. Two useful options are the `drop_xy` argument, which shows or hides the x-value and y-value columns, and the `caption` argument which allows a custom string to be printed above the table. Note as well that the return object of this function is just a data frame, which can be easily edited to add, change, or remove text. To change the formatting of the table, see the `htmlTable` or `kableExtra` packages.
 
-## 5. Working with SSM figures
+## 6. Working with SSM figures
 
 ### Exporting figures as files
 All SSM plots are created using the `ggplot2` package, which is incredibly flexible and powerful. It also offers the `ggsave()` function to export figures to external files of various types. See the documentation for this function (`?ggsave`) to learn more, but some useful arguments are `filename`, `plot`, `width`, `height`, and `units`. We can save the figure as a raster image file (e.g., "png", "jpeg", "tiff"), a vector image file (e.g., "svg"), or a portable document (e.g., "pdf" or "tex"). We can also control the exact width and height of the image in different units (i.e., "in", "cm", or "mm"). Because the underlying graphics are vectorized in R, they can be easily scaled to any size without loss of quality and used in manuscripts, presentations, or posters.
@@ -275,7 +280,7 @@ ggsave("bordpd_gender.png", width = 7.5, height = 4, units = "in")
 ```
 
 ## Wrap-up
-In this vignette, we learned how to generalize the SSM analyses to multiple groups and measures, how to conduct contrast analyses, how to make basic customizations to tables and figures, and how to export tables and figures to external files. In the next vignette, "Advanced Circumplex Visualization," we learn how to build circumplex figures from scratch by composing the `ggcircumplex()` canvas, the `geom_ssm_point()` and `geom_ssm_arc()` layers, and the `scale_x_circumplex()` axis scale with any other `ggplot2` components.
+In this vignette, we learned how to generalize the SSM analyses to multiple groups and measures, how to conduct contrast analyses, how to make basic customizations to tables and figures, and how to export tables and figures to external files. Two pages follow this one. "Evaluating Circumplex Structure" asks whether an instrument fits a circumplex and whether its confidence intervals can be trusted. "Bayesian SSM Analysis" estimates the same parameters with a Bayesian model.
 
 ## References
 * Gurtman, M. B. (1992). Construct validity of interpersonal personality measures: The interpersonal circumplex as a nomological net. _Journal of Personality and Social Psychology, 63_(1), 105–118.
