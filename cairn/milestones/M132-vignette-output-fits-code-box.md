@@ -44,26 +44,26 @@ package's own cautions is M131.
 
 ## Acceptance criteria
 
-- [ ] AC1: `Rscript tools/check-vignette-width.R` exits 0. Every line in the
+- [x] AC1: `Rscript tools/check-vignette-width.R` exits 0. Every line in the
       seven pre-rendered `vignettes/*.Rmd` files that begins `#> ` and sits
       outside a `vignette-width:exempt` region is 80 display columns or
       fewer, as the guard measures them.
-- [ ] AC2: The guard goes red against each of four planted defect forms,
+- [x] AC2: The guard goes red against each of four planted defect forms,
       applied one file at a time across all seven. Form one is an
       81-column ASCII line. Form two is an 81-column line built from `ζ`
       and `²`. Form three is a long line just outside an exemption marker.
       Form four is a long line that arrives from a re-render rather than
       from an edit. A long line just inside an exemption stays green.
-- [ ] AC3: The guard's domain is not empty. It reports, for each file, how
+- [x] AC3: The guard's domain is not empty. It reports, for each file, how
       many `#> ` lines it read and how many exemptions it honored. Both
       counts appear in the milestone's review evidence, and the line count
       is above zero for all seven files.
-- [ ] AC4: Re-running `Rscript tools/precompute-vignettes.R` and then
+- [x] AC4: Re-running `Rscript tools/precompute-vignettes.R` and then
       `Rscript tools/check-vignette-staleness.R` reports no difference
       against the committed render.
-- [ ] AC5: The rendered introduction vignette contains no line matching
+- [x] AC5: The rendered introduction vignette contains no line matching
       `deprecated`, and `grep -n "label.size" vignettes/` returns no hit.
-- [ ] AC6: Exactly one `vignette-width:exempt` region exists in the seven
+- [x] AC6: Exactly one `vignette-width:exempt` region exists in the seven
       pre-rendered vignettes. The guard's AC3 count is 1 for
       `sem-based-ssm-analysis.Rmd` and 0 for the other six. The region holds
       the `cx =~` and `cy =~` loading lines. Its marker records that the line
@@ -147,3 +147,28 @@ Review pass 1, 2026-09-16, at da8139cd. The branch contains origin/master. No PR
 - Consistency gate: `cairn_validate.py` all checks passed. Toolchain checks not run at this pass.
 - Observation for the amendment round, not a triaged finding: the exempt region spans the whole `syntax` chunk (rendered lines 80-129, 37 output lines), so a new over-wide line anywhere in that output would pass unseen. T4's task box is unticked although the work log records T4 done.
 - Outcome: review stopped before the reviewer fan-out. AC1 and AC6 go back for a gated criterion amendment.
+
+Review pass 2, 2026-09-16, at e45fc34f. The branch contains origin/master (68c5b755). No PR exists.
+
+- AC1: `Rscript tools/check-vignette-width.R` exits 0 on the committed render and again after the AC4 re-render. All seven files report "all fit". The only lines over 80 columns sit inside the sem-based region.
+- AC2: `Rscript tools/m132-planted-defects.R` exits 0, with 42 of 42 plants as expected. In each of the 7 files, the ascii (81 columns), unicode (81), outside (89) and rerender (93) plants went red. Each red named the planted line. The inside (89) and unicode80 (80) controls stayed green.
+- AC3: the guard reports output lines per file of 284, 147, 9, 255, 65, 41 and 94 (evaluating, sem-based, advanced, intermediate, introduction, growth, axes). Every count is above zero. It reports exemptions of 0, 1, 0, 0, 0, 0 and 0 in the same order.
+- AC4: `Rscript tools/precompute-vignettes.R` exits 0, and then `Rscript tools/check-vignette-staleness.R` exits 0 and reports all 7 up to date. The only text change the re-render left is one elapsed time inside a masked region (5.2s to 5.5s). No figure changed. The working tree was restored afterward.
+- AC5: `grep -c deprecated vignettes/introduction-to-ssm-analysis.Rmd` gives 0. `grep -rn "label.size" vignettes/` exits 1 with no hit.
+- AC6: a search of the seven `vignettes/*.Rmd` renders finds one `vignette-width:exempt start` marker, in `sem-based-ssm-analysis.Rmd`. The guard's AC3 exemption count is 1 for sem-based and 0 for the other six. The region holds the `cx =~` and `cy =~` loading lines at 94-95. The marker's reason says the loading lines list every scale name, so their length follows from the scale names.
+- AC7 (not ticked yet): `devtools::test()` gives FAIL 0, WARN 11, SKIP 1, PASS 10743. `devtools::check(args = "--no-manual")` gives 0 errors, 0 warnings, 0 notes, so nothing master lacks. The workflow run on the branch waits for the PR at merge time. The box is ticked only when that run is green.
+- Consistency gate: `cairn_validate.py` all checks passed. No DESIGN.md principle changed, so `cairn_impact` was skipped. `devtools::document()` exits 0 with 0 `resolve link` lines and no diff. `pkgdown::check_pkgdown()` found no problems. README.md is newer than README.Rmd, and the branch touches neither. NEWS.md has entries for the heading and the vignette width. The `.Rbuildignore` entry `^tools$` covers the new tools. The master watches pass: the newest push runs of R-CMD-check and test-coverage on master (58269c58) succeeded, and the later 68c5b755 changed only `cairn/`. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all ran clean.
+- Reviewers: [O] diff-bug, [S] blame-history, [S] prior-review record. Blame-history found nothing. Prior-review record found no GitHub review threads. Findings, most severe first, with the recommended disposition (final disposition at the gate):
+  - O1: the guard accepts `<!-- vignette-width:exempt start -->` with no reason, because the reason pattern matches the closing `>` (`tools/check-vignette-width.R:53`). Confirmed by running the pattern. Recommended: fix now.
+  - O2: NEWS says the new heading fits an 80-column console, which suggests the old one did not. The old heading was 78 columns and fit. It overflowed only as vignette output, at 81 with `#> ` (`NEWS.md:24-27`). Confirmed. Recommended: fix now.
+  - P1: the exempt region wraps the whole `syntax` chunk, which repeats the M120 lesson that regions are chunk-granular. Recommended: follow-up, as decided at the amendment gate.
+  - O3: a tab counts as 0 columns, and tab-bearing output lines exist. All fit when tabs are expanded. Recommended: follow-up.
+  - O4: echoed code line `sem-based-ssm-analysis.Rmd:84` is 81 columns. Recommended: reject, because the box fits 81 columns and the Goal covers output only.
+  - O5: output under another `comment` prefix, `results = "asis"`, or indented output is not read. None exists now. Recommended: follow-up.
+  - O6: marker regexes are unanchored, so an output line with marker text would open a region. Recommended: follow-up, with O5.
+  - O7: the guard runs only from the repo root. Recommended: reject, because its usage lines and CI run it from the root.
+  - O8: `if: !cancelled()` runs the width step after a failed re-render. Recommended: reject, because the job is already red then and the step adds a report, not a false green.
+  - O9: the plants cannot tell a character-count guard from a display-width guard. Recommended: follow-up.
+  - O10: six files' outside/inside plants use a region the plant script writes, and no plant covers marker misuse. Recommended: follow-up.
+  - O11: the rerender plant does not show that the width setting takes effect. Recommended: reject, because AC1 on the real render at width 77 shows it.
+  - O12: the T5 work-log line says unicode80 is 157 bytes. The script and the reviewer measure 156. Recommended: noted here as the correction, since the work log is history.
