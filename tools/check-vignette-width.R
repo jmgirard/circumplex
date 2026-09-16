@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Guard: no printed output line in a pre-computed vignette is wider than the
+# Guard: no "#>" output line in a pre-computed vignette is wider than the
 # website's code box. The pkgdown code box scrolls sideways (overflow-x: auto)
 # past its width, measured on the live site on 2026-09-15 at 81 monospace
 # characters. The limit here is 80 display columns, counting knitr's "#> "
@@ -13,69 +13,66 @@
 # tools/precompute-vignettes.R renders. The two live vignettes ship without
 # output, so there is nothing here for this guard to read.
 #
+# Only lines that start with "#>" are read. The guard does not read output
+# printed under another knitr `comment` prefix, output of a chunk with
+# results = "asis", or indented output (a "#>" line that does not start at
+# column 1).
+#
 # Width is display columns (nchar(type = "width")), not bytes or characters,
-# so a line of Greek letters and superscripts is measured as it looks.
+# so a line of Greek letters and superscripts is measured as it looks. Tabs
+# are expanded to 8-column stops before the line is measured.
 #
-# Output that no width setting reaches, such as text printed with cat(), may be
-# exempted by a marked region in the vignette source:
-#
-#   <!-- vignette-width:exempt start -- <reason> -->
-#   ...
-#   <!-- vignette-width:exempt end -->
-#
-# A region that states no reason, is never closed, or exempts no over-wide line
-# is an error, so a marker cannot outlive the output it was written for.
+# Output that no width setting reaches, such as text printed with cat(), is
+# exempted by an entry in EXEMPT below: a vignette name, a regular expression
+# anchored at the start of the line, and the reason. An entry exempts only the
+# lines its pattern matches in its own vignette. An entry that matches no
+# over-wide "#>" line is an error, so an entry cannot outlive the output it was
+# written for.
 #
 # Run by .github/workflows/vignette-precompute.yaml after the re-render.
 # Base R only.
 
 LIMIT <- 80L
 
+EXEMPT <- list(
+  list(vignette = "sem-based-ssm-analysis", pattern = "^#> cx =~ ",
+       reason = "the loading line lists every scale name; no width setting reaches cat() output"),
+  list(vignette = "sem-based-ssm-analysis", pattern = "^#> cy =~ ",
+       reason = "the loading line lists every scale name; no width setting reaches cat() output")
+)
+
 env <- new.env()
 sys.source("tools/precompute-vignettes.R", env)
 VIGNETTES <- env$VIGNETTES
 
-START <- "<!--\\s*vignette-width:exempt start\\b"
-END <- "<!--\\s*vignette-width:exempt end\\s*-->"
+for (e in EXEMPT) {
+  if (!startsWith(e$pattern, "^"))
+    stop("exemption pattern `", e$pattern, "` is not anchored at the start of the line.", call. = FALSE)
+  if (!e$vignette %in% VIGNETTES)
+    stop("exemption `", e$pattern, "` names `", e$vignette,
+         "`, which tools/precompute-vignettes.R does not render.", call. = FALSE)
+}
+
+# Replaces each tab with the spaces that reach the next 8-column stop.
+expand_tabs <- function(ln) {
+  if (!grepl("\t", ln, fixed = TRUE)) return(ln)
+  pieces <- regmatches(ln, gregexpr("\t", ln, fixed = TRUE), invert = TRUE)[[1]]
+  out <- pieces[[1]]
+  for (piece in pieces[-1]) {
+    out <- paste0(out, strrep(" ", 8L - nchar(out, type = "width") %% 8L), piece)
+  }
+  out
+}
+
+display_width <- function(ln) nchar(expand_tabs(ln), type = "width")
 
 # Returns, for one rendered vignette, the number of output lines read, the
-# over-wide lines outside any region, and the over-wide lines each region
-# exempted. Marker misuse stops with an error naming the file and line.
-scan_widths <- function(lines, what) {
-  out_lines <- 0L
-  wide <- integer(0)
-  regions <- list()
-  open <- FALSE
-  for (i in seq_along(lines)) {
-    ln <- lines[[i]]
-    if (grepl(START, ln)) {
-      if (open) stop(what, ": nested vignette-width:exempt start at line ", i, call. = FALSE)
-      if (!grepl("start\\s+--\\s*[^->[:space:]].*-->", ln))
-        stop(what, ": the exempt region at line ", i, " states no reason; write ",
-             "`start -- <why no width setting reaches this output>`.", call. = FALSE)
-      open <- TRUE
-      regions[[length(regions) + 1L]] <- integer(0)
-      next
-    }
-    if (grepl(END, ln)) {
-      if (!open) stop(what, ": vignette-width:exempt end without a start at line ", i, call. = FALSE)
-      open <- FALSE
-      next
-    }
-    if (!startsWith(ln, "#>")) next
-    out_lines <- out_lines + 1L
-    if (nchar(ln, type = "width") <= LIMIT) next
-    if (open) {
-      regions[[length(regions)]] <- c(regions[[length(regions)]], i)
-    } else {
-      wide <- c(wide, i)
-    }
-  }
-  if (open) stop(what, ": a vignette-width:exempt region is never closed.", call. = FALSE)
-  if (any(lengths(regions) == 0L))
-    stop(what, ": a vignette-width:exempt region exempts no line wider than ", LIMIT,
-         " columns; delete the marker.", call. = FALSE)
-  list(out_lines = out_lines, wide = wide, regions = regions)
+# over-wide lines no entry exempts, and the over-wide lines each entry exempts.
+scan_widths <- function(lines, entries) {
+  out <- which(startsWith(lines, "#>"))
+  wide <- out[vapply(lines[out], display_width, 0L) > LIMIT]
+  hits <- lapply(entries, function(e) wide[grepl(e$pattern, lines[wide], perl = TRUE)])
+  list(out_lines = length(out), wide = setdiff(wide, unlist(hits)), hits = hits)
 }
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -87,24 +84,32 @@ for (name in VIGNETTES) {
   path <- file.path(dir, paste0(name, ".Rmd"))
   if (!file.exists(path)) stop("missing ", path, " -- run tools/precompute-vignettes.R first", call. = FALSE)
   lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
-  res <- scan_widths(lines, path)
+  entries <- Filter(function(e) identical(e$vignette, name), EXEMPT)
+  res <- scan_widths(lines, entries)
   if (res$out_lines == 0L)
     stop(path, ": no output line read; the guard has nothing to check.", call. = FALSE)
-  exempted <- if (length(res$regions)) {
-    paste0(" (lines ", paste(vapply(res$regions, paste, "", collapse = ", "), collapse = "; "), ")")
-  } else ""
-  cat(sprintf("%-36s %4d output lines, %d exemption(s)%s, %s\n",
-              name, res$out_lines, length(res$regions), exempted,
+  for (k in seq_along(entries)) {
+    if (!length(res$hits[[k]]))
+      stop(path, ": the exemption `", entries[[k]]$pattern, "` matches no output line wider than ",
+           LIMIT, " columns; delete the entry from EXEMPT.", call. = FALSE)
+  }
+  exempted <- sort(unlist(res$hits))
+  cat(sprintf("%-36s %4d output lines, %d exempted%s, %s\n",
+              name, res$out_lines, length(exempted),
+              if (length(exempted)) paste0(" (lines ", paste(exempted, collapse = ", "), ")") else "",
               if (length(res$wide)) paste(length(res$wide), "TOO WIDE") else "all fit"))
+  for (i in exempted) {
+    cat(sprintf("    exempt line %d (%d columns): %s\n", i, display_width(lines[[i]]), lines[[i]]))
+  }
   for (i in res$wide) {
-    cat(sprintf("    line %d (%d columns): %s\n", i, nchar(lines[[i]], type = "width"), lines[[i]]))
+    cat(sprintf("    line %d (%d columns): %s\n", i, display_width(lines[[i]]), lines[[i]]))
   }
   if (length(res$wide)) failed <- c(failed, name)
 }
 
 if (length(failed)) {
   stop("vignette output wider than ", LIMIT, " columns in: ", paste(failed, collapse = ", "),
-       "\nSet options(width = 77) in the vignette's setup chunk, or mark output no ",
-       "width setting reaches with a vignette-width:exempt region.", call. = FALSE)
+       "\nSet options(width = 77) in the vignette's setup chunk, or add an entry to ",
+       "EXEMPT in tools/check-vignette-width.R for output no width setting reaches.", call. = FALSE)
 }
 cat("all", length(VIGNETTES), "pre-computed vignettes print within", LIMIT, "columns\n")

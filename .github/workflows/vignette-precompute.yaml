@@ -13,8 +13,8 @@
 # rather than a byte-exact `git diff`: one chunk's printed numbers are not
 # reproducible across machines and the guard's header explains what that script
 # masks and what it still holds byte-exact. tools/check-vignette-width.R then
-# fails if any output line of the fresh render is wider than 80 columns,
-# outside a marked vignette-width:exempt region. The figures under vignettes/figures/
+# fails if any "#>" output line of the fresh render is wider than 80 columns,
+# other than the lines its EXEMPT list names. The figures under vignettes/figures/
 # are PNGs whose bytes depend on the graphics device, so they are not
 # reproducible across machines either and are not compared at all.
 #
