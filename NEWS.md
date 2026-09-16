@@ -34,8 +34,10 @@
   second block below the table. The values do not change, and the `results`
   data frame keeps its column names.
 
-* The first line of `print()` for an `ssm_ci_accuracy()` result now wraps to
-  the console width. Before this, it printed as one line of any
+* The heading of `print()` for an `ssm_ci_accuracy()` result now wraps to the
+  console width. The first entry in this section keeps headings unwrapped to protect their
+  columns. This heading is a sentence about the simulation settings with no
+  columns under it, so it wraps. Before this, it printed as one line of any
   length.
 
 * The "Evaluating Circumplex Structure" vignette now shows the short

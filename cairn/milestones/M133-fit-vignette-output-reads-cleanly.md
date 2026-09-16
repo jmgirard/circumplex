@@ -32,12 +32,12 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 ## Coverage
 
 - AC1 → T1
-- AC2 → T1, T4
+- AC2 → T1, T4, T5
 - AC3 → T1
 - AC4 → T2, T4
 - AC5 → T3, T4
 - AC6 → T3, T4
-- AC7 → T4
+- AC7 → T4, T6
 
 ## Tasks
 
@@ -45,6 +45,8 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - [x] T2: Write a width test first for `print.circumplex_ci_accuracy()` over the four named fixtures. Wrap its header line with `wrap_prose()` (R/utils.R:267). Update snapshots.
 - [x] T3: Edit `vignettes/evaluating-circumplex-structure.Rmd.orig`. Add the warning sentences before the three chunks that emit the Hessian warning (jz2017 fit, model variants, accuracy). Use `print(acc)` in the main chunk. Add a `summary(acc)` chunk after the verdict discussion, and move the text about the ladder, the `cert` column and the table after it.
 - [x] T4: Re-render with `tools/precompute-vignettes.R`. Run the width guard over the rendered `print(acc)`, then run both vignette guards, the tests and the check. Add the NEWS.md entry.
+- [x] T5: In `test-cpm_summary_markers.R`, add one test that runs `expect_cpm_table_one_block()` with both `print()` and `summary()` on all seven fixtures of the file (clean, hey, small, free, m94_boot_jz, m94_boot_big, m94_boot_clean).
+- [x] T6: Reword the NEWS.md entry for the accuracy heading so that it does not contradict the first entry, which says headings stay unwrapped.
 
 ## Work log
 
@@ -60,6 +62,9 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - 2026-09-16: T4 done. Rendered after `R CMD INSTALL` (the first render read the old installed package and was discarded). Width guard: all 7 vignettes within 80 columns. Staleness guard: up to date. devtools::test() 0 failures. devtools::check(--no-manual) 0 errors, 0 warnings, 0 notes. NEWS.md has three entries.
 - 2026-09-16: claim audit: 30 claims read, 2 corrected — vignettes/evaluating-circumplex-structure.Rmd.orig, vignettes/evaluating-circumplex-structure.Rmd (only fit_quasi of the variants warns; the cpm chunk prints two warnings). Prose fixed identically in source and render.
 - 2026-09-16: review return 1 (defect): AC2 failed. No test asserts the one-block table for print() of the four analytic fits in test-cpm_summary_markers.R, for summary() of m94_boot_jz, or for m94_boot_big and m94_boot_clean with either method. Status back to in-progress. Reviewer findings [O] 2-11 await triage at the next review gate.
+- 2026-09-16: minor amendment after review return 1: added T5 (AC2 assertions for all seven fixtures in test-cpm_summary_markers.R) and T6 (review finding [O] 3, NEWS contradiction). Coverage now maps AC2 to T5 and AC7 to T6.
+- 2026-09-16: T5 done. New test runs the one-block check on 7 fixtures with print() and summary() (198 expectations, skip_on_cran only). Planted defect (cpm_display_results() with the old headers) turned it red.
+- 2026-09-16: T6 done. The NEWS entry now says the accuracy heading wraps because it has no columns under it, and points at the first entry.
 
 ## Decisions
 

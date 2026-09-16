@@ -309,3 +309,32 @@ test_that("print() on a bootstrap marker-firing fit matches its snapshot", {
   expect_cpm_table_one_block(jz, print)
   expect_snapshot(print(jz))
 })
+
+# ---- M133: one-block results table for every fixture in this file -----------
+
+test_that("print() and summary() show the results table as one block for every fixture", {
+  # The check compares the printed table with the same object's rounded
+  # results, so it does not depend on platform numerics and runs on CI.
+  skip_on_cran()
+  tr <- cpm_clean_truth()
+  P0 <- m94_clean_P0()
+  voc <- cpm_oracle_voc()
+  fits <- list(
+    clean = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
+                    angles = tr$angles, n = 5000, m = 3),
+    hey = suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
+                                   angles = voc$th_start, n = 5000, m = 2)),
+    small = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
+                    angles = tr$angles, n = 300, m = 3),
+    free = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
+                   angles = tr$angles, n = 5000, m = 3, scaling = "free"),
+    boot_jz = m94_boot_jz(),
+    boot_big = m94_boot_big(),
+    boot_clean = m94_boot_clean()
+  )
+  for (nm in names(fits)) {
+    for (printer in list(print = print, summary = summary)) {
+      expect_cpm_table_one_block(fits[[nm]], printer)
+    }
+  }
+})
