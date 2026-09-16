@@ -120,3 +120,23 @@ Branch synced: `origin/master` is an ancestor of HEAD, no merge needed (2026-09-
 - AC3: source read. `EXEMPT` is a list of two entries (vignette, pattern, reason), and a pattern not starting with `^` stops the checker. `scan_widths()` receives only the entries for its vignette and matches them against over-wide `#>` lines, measured by `display_width()` after `expand_tabs()` to 8-column stops. The five plants re-ran on scratch copies. Plant (a), an 81-column line after `cy =~`: exit 1, "line 95 (81 columns)". Plant (b), `cx =~` cut to 80 columns: exit 1, "the exemption `^#> cx =~ ` matches no output line wider than 80 columns". Plant (c), a tab line of 80 unexpanded columns: exit 1, "line 73 (85 columns)". Plant (d), a tab line of 80 expanded columns: exit 0, 66 output lines read in that file. Plant (e), the `cx =~` line in `axes-reliability`: exit 1, "line 68 (86 columns)", 0 exempted there.
 - AC4: header read. Its first sentence reads: no "#>" output line in a pre-computed vignette is wider than the website's code box. A later paragraph names output under another knitr `comment` prefix, output of a chunk with `results = "asis"`, and indented output as not read.
 - AC5: `Rscript tools/precompute-vignettes.R sem-based-ssm-analysis` re-rendered the file (exit 0, installed circumplex 2.0.1.9000) and left the working tree clean. `git diff master -- vignettes/sem-based-ssm-analysis.Rmd` shows two deletions, the `vignette-width:exempt start` and `end` comment lines, and nothing else.
+
+Consistency gate (2026-09-16): `cairn_validate.py` exit 0, all checks passed. `devtools::document()` left no diff and printed 0 `resolve link` lines. `pkgdown::check_pkgdown()` found no problems. README.Rmd is not newer than README.md. No NEWS entry is owed, because the diff changes no user-visible behavior, and it adds no top-level file. On master, the newest R-CMD-check push run with a verdict is `success` (7127001b). The newest test-coverage push run is `success` (58c56f3b). `check-master-red-alert.R`, `master-red-alert-dryrun.R` and `check-branch-protection.R` all exit 0.
+
+Reviewers: [O] diff-bug, [S] blame-history, [S] prior-review. The prior-review probe found no PR review comments, so that lens read the archived M132 and M133 Review sections only. No finding shows an acceptance criterion failing.
+
+- O1 (ranked first): an exempt line has no width cap, so a `cx =~` line of 200 columns still exits 0.
+- O2: an entry covers every matching line in the whole vignette, not only the `syntax` chunk.
+- O3: the anchoring check reads only the first character, so `^#> cx|foo` passes with an unanchored second branch.
+- O4: the script runs only from the repo root. This was already true on master.
+- O5: a stale-entry error stops the run before the other vignettes are scanned.
+- O6: two entries that match one line list that line twice in the report. Pass or fail is unaffected.
+- O7: an empty `VIGNETTES` list exits 0. This was already true on master.
+- O8: ANSI color codes add to the measured width, so the error is a false failure, not a missed one.
+- O9: the header says the files read are under `vignettes/`, but with a directory argument they are under that directory.
+- O10: the render now has two blank lines in a row where the start marker was. Markdown output is the same.
+- O11: the ticked boxes were uncommitted when the reviewer read HEAD. Checkpoint e17ed798 committed them.
+- S1: deleting the plant script leaves no committed trip-wire for the guard. The plan chose this.
+- S2: a regex metacharacter typo in a pattern changes which lines it matches. No such typo exists today.
+- P1: the M132 O9 byte-versus-display-width plant left with the plant script. Fresh plant on a scratch copy: a line of `αβ²` repeats at 80 display columns and more than 80 bytes exits 0, and the same line at 81 columns exits 1, "line 68 (81 columns)".
+- The [S] blame-history report also claims `vignette-width:exempt` still appears in the checker's error text. The AC2 grep refutes this.
