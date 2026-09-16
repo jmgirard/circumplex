@@ -56,15 +56,16 @@
     <li><a class="dropdown-item" href="../reference/isc.html">Interpersonal Sensitivities Circumplex</a></li>
   </ul>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-vignettes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Vignettes</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes">
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,8 +97,25 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Advanced. Read “SEM-Based SSM Analysis”
+first.</p>
 <div class="section level2">
-<h2 id="what-is-axis-reliability">1. What is axis reliability?<a class="anchor" aria-label="anchor" href="#what-is-axis-reliability"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>This vignette estimates how reliably a circumplex instrument measures
+its two axes. Section 2, “What is axis reliability?”, defines the
+quantity and the variance components behind it. Section 3, “A worked
+example”, runs <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> on the
+<code>simulated_items</code> data. Section 4, “Reading the components”,
+reads the components and the global fit from <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.
+Section 5, “Starting from a published correlation matrix”, fits the
+model from a correlation matrix and a sample size. Section 6, “Caveats
+to keep in mind”, states four properties that shape how the output
+should be read. The Wrap-up lists what the page covered and names the
+next page, and the References list the sources cited.</p>
+</div>
+<div class="section level2">
+<h2 id="what-is-axis-reliability">2. What is axis reliability?<a class="anchor" aria-label="anchor" href="#what-is-axis-reliability"></a>
 </h2>
 <p>A circumplex instrument places its scales around a circle. It
 summarizes a person (or a profile of correlations) by a position on two
@@ -114,7 +132,7 @@ item-level measurement model. The model splits each item’s variance into
 orthogonal pieces: a general factor shared by all items, the two
 circumplex <strong>axes</strong>, scale specificity, and item error. For
 an instrument administered in blocks, it adds a block-specificity
-component (Section 5 explains blocks). The function reads axis
+component (Section 6 explains blocks). The function reads axis
 reliability off the <strong>axes</strong> component alone. Reliability
 is then the Spearman–Brown “list-length” reliability of a composite with
 the axis’s effective test length, built from items that share only their
@@ -128,7 +146,7 @@ instead reports a single, interpretable number per axis: how well the
 instrument measures communion and agency.</p>
 </div>
 <div class="section level2">
-<h2 id="a-worked-example">2. A worked example<a class="anchor" aria-label="anchor" href="#a-worked-example"></a>
+<h2 id="a-worked-example">3. A worked example<a class="anchor" aria-label="anchor" href="#a-worked-example"></a>
 </h2>
 <p>The package ships <code>simulated_items</code>, a synthetic dataset
 of 1–7 Likert responses from 500 respondents on 32 items. There are four
@@ -186,7 +204,7 @@ the per-axis table reports the effective test length
 (<code>item_n</code>), the Strack axis <code>Reliability</code> and its
 standard error of measurement (<code>SEm</code>). It also reports the
 Nunnally–Bernstein reliability (<code>NB_Reliability</code>), a simpler
-formula that Section 3 compares. For a balanced instrument (the same
+formula that Section 4 compares. For a balanced instrument (the same
 number of items on every scale), the two axes share one axes-variance
 estimate and carry equal <code>item_n</code>. So they report the same
 reliability, which is expected, not an error.</p>
@@ -195,7 +213,7 @@ into the simulated population. The axes-variance estimate (below)
 recovers the population value of .18.</p>
 </div>
 <div class="section level2">
-<h2 id="reading-the-components">3. Reading the components<a class="anchor" aria-label="anchor" href="#reading-the-components"></a>
+<h2 id="reading-the-components">4. Reading the components<a class="anchor" aria-label="anchor" href="#reading-the-components"></a>
 </h2>
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> adds the estimated variance components and the
 model’s global fit:</p>
@@ -258,7 +276,7 @@ between the two numbers shows how much scale-specific variance the
 simpler formula would have credited to the axes in error.</p>
 </div>
 <div class="section level2">
-<h2 id="starting-from-a-published-correlation-matrix">4. Starting from a published correlation matrix<a class="anchor" aria-label="anchor" href="#starting-from-a-published-correlation-matrix"></a>
+<h2 id="starting-from-a-published-correlation-matrix">5. Starting from a published correlation matrix<a class="anchor" aria-label="anchor" href="#starting-from-a-published-correlation-matrix"></a>
 </h2>
 <p>You do not always have the raw data. A paper may print an item
 correlation matrix and nothing else, and that matrix is enough. Pass it
@@ -314,7 +332,7 @@ omitted, so a matrix-based result cannot be mistaken for a raw-data
 one.</p>
 </div>
 <div class="section level2">
-<h2 id="caveats-to-keep-in-mind">5. Caveats to keep in mind<a class="anchor" aria-label="anchor" href="#caveats-to-keep-in-mind"></a>
+<h2 id="caveats-to-keep-in-mind">6. Caveats to keep in mind<a class="anchor" aria-label="anchor" href="#caveats-to-keep-in-mind"></a>
 </h2>
 <p>Four properties of the method shape how its output should be
 read.</p>
@@ -509,7 +527,8 @@ single block holding every item, or one block per item all leave
 <code>zeta2</code> unidentified. That is, the data cannot pin down its
 value. It is then dropped with <code>details$zeta2_fitted</code> set to
 <code>FALSE</code>. This is the same treatment that scale specificity
-gets on a single-item instrument (Section 6).</p>
+gets on a single-item instrument (the single-item paragraph of the
+Wrap-up).</p>
 <p>What it costs to <em>ignore</em> real blocks depends on their
 geometry. The general factor can take up ignored block variance, but it
 never gives any back. So <code>xi2</code>, the general-factor variance,
@@ -544,7 +563,7 @@ of one profile’s axis position. It is not a significance test of that
 position against any particular value.</p>
 </div>
 <div class="section level2">
-<h2 id="wrap-up">6. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+<h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
 <p><code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> gives a compact, per-axis answer to
 “how reliably does this instrument measure communion and agency?” It
@@ -588,6 +607,9 @@ crosses it and this function does not. The model implemented here is
 dimensions. The figures they publish for it come from that three-axis
 model, and no configuration that <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> accepts
 will reproduce them.</p>
+<p>No page follows this one. The observed-score checks of the same
+instrument, the circumplex fit and the interval accuracy, are on
+“Evaluating Circumplex Structure”.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

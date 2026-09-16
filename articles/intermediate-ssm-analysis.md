@@ -5,7 +5,26 @@
 library(circumplex)
 ```
 
-## 1. Generalizing the basic analyses
+**Level:** Intermediate. Read “Introduction to SSM Analysis” first.
+
+## 1. Overview
+
+This vignette extends the basic SSM analyses to more than one group or
+measure. Section 2, “Generalizing the basic analyses”, adds the
+`grouping` and `measures` arguments of
+[`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md).
+Section 3, “Contrast analyses”, adds the `contrast` argument and
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/reference/ssm_plot_contrast.md).
+Section 4, “Taxonomy of analysis types”, lists every analysis type and
+the arguments that select it. Section 5, “Working with SSM tables”,
+customizes the output of
+[`ssm_table()`](http://circumplex.jmgirard.com/reference/ssm_table.md).
+Section 6, “Working with SSM figures”, exports figures with
+[`ggsave()`](http://circumplex.jmgirard.com/reference/ggsave.md). The
+Wrap-up lists what the page covered and names the next pages, and the
+References list the sources cited.
+
+## 2. Generalizing the basic analyses
 
 ### Generalizing to multiple means
 
@@ -333,7 +352,7 @@ ssm_plot_curve(results3, drop_lowfit = TRUE)
 ![plot of chunk
 general_plot4](figures/intermediate-ssm-analysis-general_plot4-1.png)
 
-## 2. Contrast analyses
+## 3. Contrast analyses
 
 The final argument to master in this vignette is `contrast`, which
 allows us to compare two groups or measures. Setting this argument to
@@ -603,7 +622,7 @@ ssm_plot_contrast(results6)
 ![plot of chunk
 group_contrast_plot](figures/intermediate-ssm-analysis-group_contrast_plot-1.png)
 
-## 3. Taxonomy of analysis types
+## 4. Taxonomy of analysis types
 
 Although all SSM analyses are based on the idea of decomposing
 circumplex scores into the parameters of a cosine curve, there are
@@ -642,7 +661,7 @@ The three main questions to ask when conducting a new SSM analysis are:
     If no, we must omit the `contrast` argument or set it to FALSE, and
     the results themselves will be output, rather than their contrast.
 
-## 4. Working with SSM tables
+## 5. Working with SSM tables
 
 ### Basic customizations of tables
 
@@ -657,7 +676,7 @@ the return object of this function is just a data frame, which can be
 easily edited to add, change, or remove text. To change the formatting
 of the table, see the `htmlTable` or `kableExtra` packages.
 
-## 5. Working with SSM figures
+## 6. Working with SSM figures
 
 ### Exporting figures as files
 
@@ -687,17 +706,11 @@ ggsave("bordpd_gender.png", width = 7.5, height = 4, units = "in")
 In this vignette, we learned how to generalize the SSM analyses to
 multiple groups and measures, how to conduct contrast analyses, how to
 make basic customizations to tables and figures, and how to export
-tables and figures to external files. In the next vignette, “Advanced
-Circumplex Visualization,” we learn how to build circumplex figures from
-scratch by composing the
-[`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
-canvas, the
-[`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md)
-and
-[`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md)
-layers, and the
-[`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md)
-axis scale with any other `ggplot2` components.
+tables and figures to external files. Two pages follow this one.
+“Evaluating Circumplex Structure” asks whether an instrument fits a
+circumplex and whether its confidence intervals can be trusted.
+“Bayesian SSM Analysis” estimates the same parameters with a Bayesian
+model.
 
 ## References
 

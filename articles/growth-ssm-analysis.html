@@ -62,9 +62,10 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,8 +97,30 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Advanced. Read “Bayesian SSM Analysis” first,
+because this page summarizes draws with the same tools.</p>
 <div class="section level2">
-<h2 id="the-question-growth-modeling-answers">1. The question growth modeling answers<a class="anchor" aria-label="anchor" href="#the-question-growth-modeling-answers"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>This vignette fits a growth model to SSM parameters measured at
+several waves. Section 2, “The question growth modeling answers”, states
+the question. Section 3, “From repeated measures to a coordinate table”,
+builds the input with <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>. Section 4, “One
+joint model, not three separate ones”, fits the joint mixed model.
+Section 5, “From fixed effects to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a(t), d(t))</annotation></semantics></math>
+with intervals”, carries the uncertainty through
+<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>. Section 6, “Certification: when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
+intervals are not interpretable”, and Section 7, “A caution about REML
+intervals at small samples”, state the limits. Section 8, “The unwrap
+alternative: <code><a href="../reference/angle_unwrap.html">angle_unwrap()</a></code>”, fits a second recipe. Section
+9, “Caveats and upgrades”, closes. The Wrap-up lists what the page
+covered and names the next page, and the References list the sources
+cited.</p>
+</div>
+<div class="section level2">
+<h2 id="the-question-growth-modeling-answers">2. The question growth modeling answers<a class="anchor" aria-label="anchor" href="#the-question-growth-modeling-answers"></a>
 </h2>
 <p>A single Structural Summary Method (SSM) analysis describes one
 profile: an elevation
@@ -141,7 +164,7 @@ be fit with <code>nlme</code> (shipped with base R), using its
 <code>varIdent</code> and <code>corSymm</code> machinery.</p>
 </div>
 <div class="section level2">
-<h2 id="from-repeated-measures-to-a-coordinate-table">2. From repeated measures to a coordinate table<a class="anchor" aria-label="anchor" href="#from-repeated-measures-to-a-coordinate-table"></a>
+<h2 id="from-repeated-measures-to-a-coordinate-table">3. From repeated measures to a coordinate table<a class="anchor" aria-label="anchor" href="#from-repeated-measures-to-a-coordinate-table"></a>
 </h2>
 <p>The input to the growth model is a person-by-wave table of SSM
 coordinates. <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code> computes
@@ -183,7 +206,7 @@ The two assignments copy each row’s person and wave onto it. (Passing
 into one profile, which is not what a growth model needs.)</p>
 </div>
 <div class="section level2">
-<h2 id="one-joint-model-not-three-separate-ones">3. One joint model, not three separate ones<a class="anchor" aria-label="anchor" href="#one-joint-model-not-three-separate-ones"></a>
+<h2 id="one-joint-model-not-three-separate-ones">4. One joint model, not three separate ones<a class="anchor" aria-label="anchor" href="#one-joint-model-not-three-separate-ones"></a>
 </h2>
 <p>The growth model treats the three coordinates as a
 <em>multivariate</em> outcome. Stack them into long format with an
@@ -251,7 +274,7 @@ realistic, because profile tilts are rarely aligned with an axis. Do not
 fit the coordinates separately.</p>
 </div>
 <div class="section level2">
-<h2 id="from-fixed-effects-to-at-dt-with-intervals">4. From fixed effects to
+<h2 id="from-fixed-effects-to-at-dt-with-intervals">5. From fixed effects to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a(t), d(t))</annotation></semantics></math>
 with intervals<a class="anchor" aria-label="anchor" href="#from-fixed-effects-to-at-dt-with-intervals"></a>
 </h2>
@@ -340,12 +363,12 @@ own.</p>
 natural recipe is to “shift each bound by its signed distance from the
 estimate.” That recipe silently cannot represent an interval wider than
 a half-turn. Such an interval is exactly the near-origin case that
-Section 5 is about. <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> handles both
+Section 6 is about. <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> handles both
 cases: the interval that straddles the boundary and the interval wider
 than a half-turn.</p>
 </div>
 <div class="section level2">
-<h2 id="certification-when-dt-intervals-are-not-interpretable">5. Certification: when
+<h2 id="certification-when-dt-intervals-are-not-interpretable">6. Certification: when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 intervals are not interpretable<a class="anchor" aria-label="anchor" href="#certification-when-dt-intervals-are-not-interpretable"></a>
 </h2>
@@ -441,7 +464,7 @@ then makes no claim about interpretability either way. That is the
 honest default when the verdict was never computed.</p>
 </div>
 <div class="section level2">
-<h2 id="a-caution-about-reml-intervals-at-small-samples">6. A caution about REML intervals at small samples<a class="anchor" aria-label="anchor" href="#a-caution-about-reml-intervals-at-small-samples"></a>
+<h2 id="a-caution-about-reml-intervals-at-small-samples">7. A caution about REML intervals at small samples<a class="anchor" aria-label="anchor" href="#a-caution-about-reml-intervals-at-small-samples"></a>
 </h2>
 <p>The model is fit by REML (restricted maximum likelihood). Its
 variance components are the variances and covariances of the random
@@ -462,7 +485,7 @@ freedom <code>nlme</code> supplies, or
 intervals.</p>
 </div>
 <div class="section level2">
-<h2 id="the-unwrap-alternative-angle_unwrap">7. The unwrap alternative: <code>angle_unwrap()</code><a class="anchor" aria-label="anchor" href="#the-unwrap-alternative-angle_unwrap"></a>
+<h2 id="the-unwrap-alternative-angle_unwrap">8. The unwrap alternative: <code>angle_unwrap()</code><a class="anchor" aria-label="anchor" href="#the-unwrap-alternative-angle_unwrap"></a>
 </h2>
 <p>There is a second documented recipe. Compute each person’s
 displacement at each wave. <strong>Unwrap</strong> each person’s
@@ -483,7 +506,7 @@ unwrapped values live on an ordinary line, so any univariate mixed model
 applies. This framing models the <em>mean of the person-level
 directions</em>. That is a legitimate (and different) estimand, or
 target of estimation, from the direction of the mean trajectory in
-Section 4.</p>
+Section 5.</p>
 <p>Its failure modes are sharp, though, and they are the reason the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(x, y)</annotation></semantics></math>
 recipe is the reference:</p>
@@ -507,7 +530,7 @@ framing has no such requirement.</li>
 <strong>Low amplitude.</strong> Suppose a person’s amplitude is near
 zero at some wave. Their observed displacement at that wave is mostly
 noise. One noisy wave can throw the rest of that person’s sequence onto
-a wrong branch. This is the same reason that the Section 5 certification
+a wrong branch. This is the same reason that the Section 6 certification
 exists.</li>
 </ul>
 <p>The two recipes agree closely in the concentrated, common-branch
@@ -517,7 +540,7 @@ mean trajectory differences well under a degree. So the choice matters
 exactly when the unwrap recipe’s assumptions are in doubt.</p>
 </div>
 <div class="section level2">
-<h2 id="caveats-and-upgrades">8. Caveats and upgrades<a class="anchor" aria-label="anchor" href="#caveats-and-upgrades"></a>
+<h2 id="caveats-and-upgrades">9. Caveats and upgrades<a class="anchor" aria-label="anchor" href="#caveats-and-upgrades"></a>
 </h2>
 <p>Two statistical facts about the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(x, y)</annotation></semantics></math>
@@ -529,7 +552,7 @@ recipe deserve explicit statement:</p>
 is the direction of the mean trajectory, not the mean of the
 person-level directions.</strong> These differ whenever persons disperse
 directionally. Neither is wrong, but they answer different questions.
-Section 7’s unwrap recipe targets the latter.</li>
+Section 8’s unwrap recipe targets the latter.</li>
 <li>
 <strong>The derived
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">a(t)</annotation></semantics></math>
@@ -540,9 +563,9 @@ standard SSM aggregation fact, and the growth setting inherits it
 intact.</li>
 </ul>
 <p>Finally, the multivariate normal (MVN) draw propagation used here is
-a large-sample approximation. Draw propagation is the Section 4 method
+a large-sample approximation. Draw propagation is the Section 5 method
 of carrying uncertainty through random draws. It is defensible in the
-concentrated regime (Section 7). Outside that regime, the Section 5
+concentrated regime (Section 8). Outside that regime, the Section 6
 certification guards it. The fully model-based upgrade is
 <strong>projected-normal regression</strong>, a regression model for
 angle outcomes. The <strong>bpnreg</strong> package is one
@@ -551,6 +574,24 @@ person-level structure and gives exact posterior inference for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>.
 circumplex has no function that fits it. But <code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>
 will happily summarize posterior draws produced by any such model.</p>
+</div>
+<div class="section level2">
+<h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+</h2>
+<p>A growth model on the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>e</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(e, x, y)</annotation></semantics></math>
+coordinates describes how a group’s mean profile moves over time.
+<code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code> builds the person-by-wave input, and
+one joint mixed model fits the three coordinates.
+<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> turns the fixed effects into
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">a(t)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
+with intervals. The certification step says when a direction interval is
+not interpretable. <code><a href="../reference/angle_unwrap.html">angle_unwrap()</a></code> is the alternative when
+person-level directions are the target. No page follows this one. To
+draw the fitted trajectories across occasions on the circumplex canvas,
+read “Advanced Circumplex Visualization”.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

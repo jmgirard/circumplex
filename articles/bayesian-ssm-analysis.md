@@ -5,7 +5,23 @@
 library(circumplex)
 ```
 
-## 1. Why a Bayesian SSM?
+**Level:** Advanced. Read “Intermediate SSM Analysis” first.
+
+## 1. Overview
+
+This vignette estimates the SSM parameters with a Bayesian model and
+summarizes its posterior draws. Section 2, “Why a Bayesian SSM?”,
+motivates the approach. Section 3, “The cosine model as a linear
+regression”, rewrites the cosine model so that a regression can fit it.
+Section 4, “Fitting the model with brms”, fits it to the `jz2017` octant
+scores. Section 5, “From posterior draws to SSM summaries”, turns the
+draws into SSM summaries with
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
+Section 6, “The induced prior on amplitude”, shows what the priors on
+$`x`$ and $`y`$ imply for the amplitude. The Wrap-up names related
+functions and the next page to read.
+
+## 2. Why a Bayesian SSM?
 
 The Structural Summary Method (SSM) describes a circumplex profile with
 an elevation $`e`$, an amplitude $`a`$, and a displacement $`d`$.
@@ -38,7 +54,7 @@ An inverted interval runs the long way around the circle.
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
 handles that by construction.
 
-## 2. The cosine model as a linear regression
+## 3. The cosine model as a linear regression
 
 The SSM’s cosine model for a profile of scores $`S_j`$ observed at scale
 angles $`\theta_j`$ is
@@ -89,7 +105,7 @@ The printed `d` is 90. A hidden check stops the vignette build unless
 `atan2(y_hat, x_hat)` gives 90° and the swapped `atan2(x_hat, y_hat)`
 does not.
 
-## 3. Fitting the model with brms
+## 4. Fitting the model with brms
 
 We model raw octant scores from the `jz2017` data. Octant scores are
 scores on eight scales placed 45° apart around the circle. The data are
@@ -126,7 +142,7 @@ requires a working Stan toolchain. So the model below is not re-fitted
 when this vignette is rebuilt. Its posterior draws were generated once
 by the seeded script `data-raw/bayesian_ssm_draws.R`, and they ship with
 the package. The `normal(0, 1)` prior on the regression coefficients is
-a deliberate modeling choice. Section 5 examines its consequences for
+a deliberate modeling choice. Section 6 examines its consequences for
 the amplitude.
 
 ``` r
@@ -142,7 +158,7 @@ draws <- as.matrix(bfit,
                    variable = c("b_Intercept", "b_cos_theta", "b_sin_theta"))
 ```
 
-## 4. From posterior draws to SSM summaries
+## 5. From posterior draws to SSM summaries
 
 The draws form a matrix with one row per posterior draw and three
 columns interpreted **in column order** as $`(e, x, y)`$. The vignette
@@ -221,7 +237,7 @@ no profile to measure fit against. Profile draws (the second shape) do
 yield fit draws from
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
 
-## 5. The induced prior on amplitude
+## 6. The induced prior on amplitude
 
 Independent priors on $`x`$ and $`y`$ do not induce a flat prior on the
 structural parameters. The induced prior is the prior on $`a`$ and $`d`$
@@ -248,7 +264,7 @@ priors on $`(a, d)`$ directly in a custom Stan model instead. Its
 posterior draws can still be summarized here. Convert them to
 $`(x, y) = (a \cos d, a \sin d)`$, or pass profile draws.
 
-## 6. Where to go next
+## Wrap-up
 
 - Per-person descriptive SSM parameters (no pooling):
   [`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md)
@@ -259,3 +275,8 @@ $`(x, y) = (a \cos d, a \sin d)`$, or pass profile draws.
   [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
 - Frequentist inference on group profiles and contrasts:
   [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md).
+
+The next page to read is “Growth Models on SSM Parameters”. It fits a
+growth model to SSM parameters measured at several waves and turns its
+fixed effects into amplitude and displacement curves with
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).

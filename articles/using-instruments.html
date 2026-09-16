@@ -62,9 +62,10 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,8 +97,10 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Introductory. No earlier page is needed,
+because this is the first page to read.</p>
 <div class="section level2">
-<h2 id="overview-of-instrument-related-functions">1. Overview of Instrument-related Functions<a class="anchor" aria-label="anchor" href="#overview-of-instrument-related-functions"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>Although the circumplex package is capable of analyzing and
 visualizing data in a “source-agnostic” manner (i.e., without knowing
@@ -111,23 +114,24 @@ instruments would provide a convenient and accessible way for users to
 discover and begin using new instruments. To address these needs, a
 suite of new instrument-related functions (and underlying data to power
 them) was added to the circumplex package in version 0.2.0.</p>
-<p>The first part of this vignette will discuss how to preview the
-instruments currently available in the circumplex package, how to load
-information about a specific instrument for use in analysis, and how to
-extract general and specific information about that instrument. The
-following functions will be discussed: <code><a href="../reference/instruments.html">instruments()</a></code>,
+<p>Section 2, “Loading and Examining Instrument Objects”, shows how to
+preview the instruments in the circumplex package. It shows how to load
+the information about one instrument for use in analysis. It also shows
+how to extract general and specific information about that instrument.
+The following functions will be discussed: <code><a href="../reference/instruments.html">instruments()</a></code>,
 <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="../reference/scales.html">scales()</a></code>,
 <code><a href="../reference/items.html">items()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>, <code><a href="../reference/norms.html">norms()</a></code>, and
 <code><a href="https://rdrr.io/r/utils/View.html" class="external-link">View()</a></code>.</p>
-<p>The second part of this vignette will discuss how to use the
-information about an instrument to transform and summarize circumplex
-data. It will demonstrate how to ipsatize item-level responses (i.e.,
-apply deviation scoring across variables), how to calculate scale scores
-from item-level responses (with or without imputing/prorating missing
-values), and how to standardize scale scores using normative/comparison
-data. The following functions will be discussed:
-<code><a href="../reference/ipsatize.html">ipsatize()</a></code>, <code><a href="../reference/score.html">score()</a></code>, and
-<code><a href="../reference/norm_standardize.html">norm_standardize()</a></code>.</p>
+<p>Section 3, “Instrument-related Tidying Functions”, shows how to use
+the information about an instrument to transform and summarize
+circumplex data. It will demonstrate how to ipsatize item-level
+responses (i.e., apply deviation scoring across variables), how to
+calculate scale scores from item-level responses (with or without
+imputing/prorating missing values), and how to standardize scale scores
+using normative/comparison data. The following functions will be
+discussed: <code><a href="../reference/ipsatize.html">ipsatize()</a></code>, <code><a href="../reference/score.html">score()</a></code>, and
+<code><a href="../reference/norm_standardize.html">norm_standardize()</a></code>. The Wrap-up lists what the page covered
+and names the next page to read.</p>
 </div>
 <div class="section level2">
 <h2 id="loading-and-examining-instrument-objects">2. Loading and Examining Instrument Objects<a class="anchor" aria-label="anchor" href="#loading-and-examining-instrument-objects"></a>
@@ -685,16 +689,16 @@ structural summary method).</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="wrap-up">4. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+<h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
 <p>In this vignette, we learned how to preview the instruments available
 in the circumplex package, load and examine the information contained in
 one of these instrument objects, ipsatize item-level data, calculate
 scale scores from item-level data, and standardize those scale scores
 using normative data included in the package. We are now in an excellent
-position to discover and implement new circumplex instruments. Later
-vignettes describe analyses and visualizations that make use of the data
-collected using these tools.</p>
+position to discover and implement new circumplex instruments. The next
+page to read is “Introduction to SSM Analysis”, which analyzes scores
+like the ones these tools produce.</p>
 <p>Special thanks to the authors and publishers who granted permission
 to include information about their instruments in this package: Chloe
 Bliton, Michael Boudreaux, Robert Hatcher, Christopher Hopwood, Leonard

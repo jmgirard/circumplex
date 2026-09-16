@@ -62,9 +62,10 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,8 +97,26 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Introductory. Read “Using Circumplex
+Instruments” first if your data are item-level responses that still need
+scoring.</p>
 <div class="section level2">
-<h2 id="background-and-motivation">1. Background and Motivation<a class="anchor" aria-label="anchor" href="#background-and-motivation"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>This vignette introduces the Structural Summary Method (SSM) and the
+functions that run it. Section 2, “Background and Motivation”, explains
+circumplex models, circumplex scales, and the SSM parameters. Section 3,
+“Example data: jz2017”, loads the dataset that the examples use. Section
+4, “Mean-based SSM Analysis”, runs the SSM on a group’s mean scores with
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code>, <code><a href="../reference/ssm_table.html">ssm_table()</a></code>,
+<code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, and <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code>.
+Section 5, “Correlation-based SSM Analysis”, runs it on the correlations
+between the scales and an external measure. The Wrap-up lists what the
+page covered and names the next page, and the References list the
+sources cited.</p>
+</div>
+<div class="section level2">
+<h2 id="background-and-motivation">2. Background and Motivation<a class="anchor" aria-label="anchor" href="#background-and-motivation"></a>
 </h2>
 <div class="section level3">
 <h3 id="circumplex-models-scales-and-data">Circumplex models, scales, and data<a class="anchor" aria-label="anchor" href="#circumplex-models-scales-and-data"></a>
@@ -239,7 +258,7 @@ below.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="example-data-jz2017">2. Example data: jz2017<a class="anchor" aria-label="anchor" href="#example-data-jz2017"></a>
+<h2 id="example-data-jz2017">3. Example data: jz2017<a class="anchor" aria-label="anchor" href="#example-data-jz2017"></a>
 </h2>
 <p>To illustrate the SSM functions, we will use the example dataset
 <code>jz2017</code>, which was provided by Zimmermann &amp; Wright
@@ -281,7 +300,7 @@ and communion.</p>
 <p><img src="figures/introduction-to-ssm-analysis-iipsc-1.png" alt="plot of chunk iipsc" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="mean-based-ssm-analysis">3. Mean-based SSM Analysis<a class="anchor" aria-label="anchor" href="#mean-based-ssm-analysis"></a>
+<h2 id="mean-based-ssm-analysis">4. Mean-based SSM Analysis<a class="anchor" aria-label="anchor" href="#mean-based-ssm-analysis"></a>
 </h2>
 <div class="section level3">
 <h3 id="conducting-ssm-for-a-groups-mean-scores">Conducting SSM for a group’s mean scores<a class="anchor" aria-label="anchor" href="#conducting-ssm-for-a-groups-mean-scores"></a>
@@ -449,7 +468,7 @@ conventional). This, again, is as simple as passing the
 </div>
 </div>
 <div class="section level2">
-<h2 id="correlation-based-ssm-analysis">4. Correlation-based SSM Analysis<a class="anchor" aria-label="anchor" href="#correlation-based-ssm-analysis"></a>
+<h2 id="correlation-based-ssm-analysis">5. Correlation-based SSM Analysis<a class="anchor" aria-label="anchor" href="#correlation-based-ssm-analysis"></a>
 </h2>
 <div class="section level3">
 <h3 id="conducting-ssm-for-a-groups-correlations-with-an-external-measure">Conducting SSM for a group’s correlations with an external
@@ -588,7 +607,7 @@ octants.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="wrap-up">5. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+<h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
 <p>In this vignette, we learned about circumplex models, scales, and
 data as well as the Structural Summary Method (SSM) for analyzing such

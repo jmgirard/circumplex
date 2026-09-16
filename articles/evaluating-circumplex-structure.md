@@ -5,7 +5,27 @@
 library(circumplex)
 ```
 
-## 1. Two questions to ask before interpreting an SSM analysis
+**Level:** Intermediate. Read “Intermediate SSM Analysis” first.
+
+## 1. Overview
+
+This vignette checks the two conditions, circumplex fit and interval
+accuracy, that an SSM interpretation rests on. Section 2, “Two questions
+to ask before interpreting an SSM analysis”, states them. Section 3,
+“Does the instrument fit a circumplex?”, fits the circular process model
+with [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md).
+Section 4, “Can you trust your confidence intervals?”, runs
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
+at your sample size and profile. Section 5, “Does the instrument have
+circumplex structure at all?”, asks the exploratory version of the
+question with
+[`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md).
+Section 6, “Ipsatization and what it costs”, shows what
+[`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md)
+removes from a profile. The Wrap-up lists what the page covered and
+names the next pages, and the References list the sources cited.
+
+## 2. Two questions to ask before interpreting an SSM analysis
 
 The Structural Summary Method (SSM) condenses a circumplex profile into
 a few interpretable parameters: elevation, amplitude, displacement, and
@@ -38,7 +58,7 @@ same sample of 1,166 undergraduates that Zimmermann and Wright (2017,
 Study 5) analyzed. It has octant scores on the IIP-SC, and personality
 disorder (PD) scale scores from the PDQ-4+.
 
-## 2. Does the instrument fit a circumplex?
+## 3. Does the instrument fit a circumplex?
 
 ### Fitting the circular process model
 
@@ -189,7 +209,7 @@ dependable at small samples. Hu and Bentler (1999) found that the
 ML-based TLI and RMSEA tend to *overreject* true-population models when
 the sample is small. (CFI is not among the indices they flag.)
 Circumplex analyses are often run at modest sample sizes. The SSM
-accuracy thresholds in Section 3 span roughly $`n = 50`$ to $`200`$. At
+accuracy thresholds in Section 4 span roughly $`n = 50`$ to $`200`$. At
 small $`n`$, a TLI or RMSEA that falls short of its benchmark can
 reflect the index’s small-sample behavior as much as the model’s fit.
 
@@ -490,7 +510,7 @@ positions that the data contradict. If the ordering itself fails (scales
 out of sequence around the circle), SSM parameters should not be
 interpreted.
 
-## 3. Can you trust your confidence intervals?
+## 4. Can you trust your confidence intervals?
 
 ### What Zimmermann & Wright (2017) found
 
@@ -731,7 +751,7 @@ summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 6.2s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 5.3s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -832,7 +852,7 @@ the population from the pooled observed correlations instead of the CPM.
 If the two structures yield different verdicts, that disagreement is
 itself informative: structure uncertainty is material for your data.
 Second, the embedded CPM fit is returned as `acc$cpm`, for inspection
-with the tools from Section 2.
+with the tools from Section 3.
 
 The diagnostic itself was validated against Zimmermann and Wright’s
 published results. Configured to their transcribed simulation
@@ -843,7 +863,7 @@ inaccurate.
 
 ### When to trust SSM parameters
 
-Putting Sections 2 and 3 together into a checklist:
+Putting Sections 3 and 4 together into a checklist:
 
 1.  **Structure first.** Fit
     [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
@@ -852,7 +872,7 @@ Putting Sections 2 and 3 together into a checklist:
 2.  **Elevation is the robust parameter.** It is essentially unbiased,
     and its intervals were accurate from $`n \ge 50`$ in every published
     and package-run condition. (On the correlation path, elevation is
-    also the parameter that ipsatizing destroys. See Section 5.)
+    also the parameter that ipsatizing destroys. See Section 6.)
 3.  **Treat amplitude as optimistic.** It cannot go below zero, so it
     overshoots when true differentiation is weak. Before interpreting a
     “marked” amplitude at modest $`n`$, run
@@ -874,9 +894,9 @@ Putting Sections 2 and 3 together into a checklist:
     multivariate normality, with complete data. It is a strong check,
     not a certificate.
 
-## 4. Does the instrument have circumplex structure at all?
+## 5. Does the instrument have circumplex structure at all?
 
-Section 2’s confirmatory model
+Section 3’s confirmatory model
 ([`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md))
 fits one theory-driven circular model and asks how well it fits. A
 complementary, more exploratory question is whether the scales’
@@ -1027,7 +1047,7 @@ plot(res)
 ![plot of chunk
 fit_structure_plot](figures/evaluating-circumplex-structure-fit_structure_plot-1.png)
 
-For the IIP-SC octants, the picture agrees with Section 2’s CPM fit. The
+For the IIP-SC octants, the picture agrees with Section 3’s CPM fit. The
 scales keep their theoretical circular *ordering*, with comparable
 communalities and roughly even spacing. The Fisher, Gap, and
 interstitiality criteria all classify the configuration as consistent
@@ -1094,12 +1114,12 @@ a “not clearly supported” classification
 ([`summary()`](https://rdrr.io/r/base/summary.html) prints
 “unsupported”) as a caution, not as a rejection of any specific
 hypothesis. The caution is to inspect the loading configuration (the
-plot above) and Section 2’s CPM fit together.
+plot above) and Section 3’s CPM fit together.
 
 ### How this complements the CPM fit
 
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-(Section 2) and
+(Section 3) and
 [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
 ask related but different questions.
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md) fits
@@ -1126,7 +1146,7 @@ Disagreement points to exactly which aspect of circumplex structure to
 examine further. An example of disagreement is adequate CPM fit
 alongside a Fisher Test flagging unequal axes.
 
-## 5. Ipsatization and what it costs
+## 6. Ipsatization and what it costs
 
 Ipsatizing is a common preprocessing step in circumplex work. It
 subtracts each respondent’s own mean across the octant scales from each
@@ -1191,7 +1211,7 @@ intercorrelations. So shape parameters shift somewhat too. Guidance:
   that a construct is “not generally interpersonal”. The preprocessing
   made that value uninformative.
 
-## 6. Wrap-up
+## Wrap-up
 
 Evaluating circumplex structure has two layers. The first is whether the
 instrument behaves like a circumplex in your sample
@@ -1203,6 +1223,12 @@ Both are one function call, and both change what you should claim more
 often than users expect. In particular, amplitude and displacement
 intervals earn their trust only when the profile is genuinely
 differentiated relative to the precision that your sample size affords.
+
+Two pages follow this one. “Advanced Circumplex Visualization” builds
+circumplex figures from `ggplot2` components. “SEM-Based SSM Analysis”
+fits a latent version of the SSM. It corrects a measure’s profile for
+scale unreliability, both its average level and its differences across
+scales.
 
 ## References
 

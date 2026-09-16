@@ -62,9 +62,10 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,8 +97,26 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Intermediate. Read “Intermediate SSM
+Analysis” first.</p>
 <div class="section level2">
-<h2 id="two-questions-to-ask-before-interpreting-an-ssm-analysis">1. Two questions to ask before interpreting an SSM analysis<a class="anchor" aria-label="anchor" href="#two-questions-to-ask-before-interpreting-an-ssm-analysis"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>This vignette checks the two conditions, circumplex fit and interval
+accuracy, that an SSM interpretation rests on. Section 2, “Two questions
+to ask before interpreting an SSM analysis”, states them. Section 3,
+“Does the instrument fit a circumplex?”, fits the circular process model
+with <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>. Section 4, “Can you trust your confidence
+intervals?”, runs <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> at your sample size and
+profile. Section 5, “Does the instrument have circumplex structure at
+all?”, asks the exploratory version of the question with
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code>. Section 6, “Ipsatization and what it
+costs”, shows what <code><a href="../reference/ipsatize.html">ipsatize()</a></code> removes from a profile. The
+Wrap-up lists what the page covered and names the next pages, and the
+References list the sources cited.</p>
+</div>
+<div class="section level2">
+<h2 id="two-questions-to-ask-before-interpreting-an-ssm-analysis">2. Two questions to ask before interpreting an SSM analysis<a class="anchor" aria-label="anchor" href="#two-questions-to-ask-before-interpreting-an-ssm-analysis"></a>
 </h2>
 <p>The Structural Summary Method (SSM) condenses a circumplex profile
 into a few interpretable parameters: elevation, amplitude, displacement,
@@ -128,7 +147,7 @@ has octant scores on the IIP-SC, and personality disorder (PD) scale
 scores from the PDQ-4+.</p>
 </div>
 <div class="section level2">
-<h2 id="does-the-instrument-fit-a-circumplex">2. Does the instrument fit a circumplex?<a class="anchor" aria-label="anchor" href="#does-the-instrument-fit-a-circumplex"></a>
+<h2 id="does-the-instrument-fit-a-circumplex">3. Does the instrument fit a circumplex?<a class="anchor" aria-label="anchor" href="#does-the-instrument-fit-a-circumplex"></a>
 </h2>
 <div class="section level3">
 <h3 id="fitting-the-circular-process-model">Fitting the circular process model<a class="anchor" aria-label="anchor" href="#fitting-the-circular-process-model"></a>
@@ -281,7 +300,7 @@ dependable at small samples. Hu and Bentler (1999) found that the
 ML-based TLI and RMSEA tend to <em>overreject</em> true-population
 models when the sample is small. (CFI is not among the indices they
 flag.) Circumplex analyses are often run at modest sample sizes. The SSM
-accuracy thresholds in Section 3 span roughly
+accuracy thresholds in Section 4 span roughly
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n = 50</annotation></semantics></math>
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>200</mn><annotation encoding="application/x-tex">200</annotation></semantics></math>.
@@ -609,7 +628,7 @@ interpreted.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="can-you-trust-your-confidence-intervals">3. Can you trust your confidence intervals?<a class="anchor" aria-label="anchor" href="#can-you-trust-your-confidence-intervals"></a>
+<h2 id="can-you-trust-your-confidence-intervals">4. Can you trust your confidence intervals?<a class="anchor" aria-label="anchor" href="#can-you-trust-your-confidence-intervals"></a>
 </h2>
 <div class="section level3">
 <h3 id="what-zimmermann-wright-2017-found">What Zimmermann &amp; Wright (2017) found<a class="anchor" aria-label="anchor" href="#what-zimmermann-wright-2017-found"></a>
@@ -919,7 +938,7 @@ ladder:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per</span></span>
 <span><span class="co">#&gt; condition.</span></span>
-<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 6.2s.</span></span>
+<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 5.3s.</span></span>
 <span><span class="co">#&gt; Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) &gt;= 0.35.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
@@ -1022,7 +1041,7 @@ pooled observed correlations instead of the CPM. If the two structures
 yield different verdicts, that disagreement is itself informative:
 structure uncertainty is material for your data. Second, the embedded
 CPM fit is returned as <code>acc$cpm</code>, for inspection with the
-tools from Section 2.</p>
+tools from Section 3.</p>
 <p>The diagnostic itself was validated against Zimmermann and Wright’s
 published results. Configured to their transcribed simulation
 conditions, it reproduces their accuracy classifications. It gives
@@ -1034,7 +1053,7 @@ inaccurate.</p>
 <div class="section level3">
 <h3 id="when-to-trust-ssm-parameters">When to trust SSM parameters<a class="anchor" aria-label="anchor" href="#when-to-trust-ssm-parameters"></a>
 </h3>
-<p>Putting Sections 2 and 3 together into a checklist:</p>
+<p>Putting Sections 3 and 4 together into a checklist:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Structure first.</strong> Fit <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> to your
@@ -1046,7 +1065,7 @@ essentially unbiased, and its intervals were accurate from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n \ge 50</annotation></semantics></math>
 in every published and package-run condition. (On the correlation path,
 elevation is also the parameter that ipsatizing destroys. See Section
-5.)</li>
+6.)</li>
 <li>
 <strong>Treat amplitude as optimistic.</strong> It cannot go below
 zero, so it overshoots when true differentiation is weak. Before
@@ -1077,9 +1096,9 @@ not a certificate.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="does-the-instrument-have-circumplex-structure-at-all">4. Does the instrument have circumplex structure at all?<a class="anchor" aria-label="anchor" href="#does-the-instrument-have-circumplex-structure-at-all"></a>
+<h2 id="does-the-instrument-have-circumplex-structure-at-all">5. Does the instrument have circumplex structure at all?<a class="anchor" aria-label="anchor" href="#does-the-instrument-have-circumplex-structure-at-all"></a>
 </h2>
-<p>Section 2’s confirmatory model (<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>) fits one
+<p>Section 3’s confirmatory model (<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>) fits one
 theory-driven circular model and asks how well it fits. A complementary,
 more exploratory question is whether the scales’ correlations show
 circumplex structure <em>at all</em>, without committing to the
@@ -1219,7 +1238,7 @@ departures in even angular spacing. <code>Variance</code> (VT2) and
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/evaluating-circumplex-structure-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%"></p>
-<p>For the IIP-SC octants, the picture agrees with Section 2’s CPM fit.
+<p>For the IIP-SC octants, the picture agrees with Section 3’s CPM fit.
 The scales keep their theoretical circular <em>ordering</em>, with
 comparable communalities and roughly even spacing. The Fisher, Gap, and
 interstitiality criteria all classify the configuration as consistent
@@ -1293,13 +1312,13 @@ tests</strong>. <code><a href="../reference/fit_structure.html">fit_structure()<
 every time an interpretation is shown. Treat a “not clearly supported”
 classification (<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints “unsupported”) as a
 caution, not as a rejection of any specific hypothesis. The caution is
-to inspect the loading configuration (the plot above) and Section 2’s
+to inspect the loading configuration (the plot above) and Section 3’s
 CPM fit together.</p>
 </div>
 <div class="section level3">
 <h3 id="how-this-complements-the-cpm-fit">How this complements the CPM fit<a class="anchor" aria-label="anchor" href="#how-this-complements-the-cpm-fit"></a>
 </h3>
-<p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> (Section 2) and <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
+<p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> (Section 3) and <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
 ask related but different questions. <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> fits a
 circular process model and tests goodness of fit against it. Its default
 quasi-circumplex model estimates each scale’s communality and every
@@ -1322,7 +1341,7 @@ adequate CPM fit alongside a Fisher Test flagging unequal axes.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="ipsatization-and-what-it-costs">5. Ipsatization and what it costs<a class="anchor" aria-label="anchor" href="#ipsatization-and-what-it-costs"></a>
+<h2 id="ipsatization-and-what-it-costs">6. Ipsatization and what it costs<a class="anchor" aria-label="anchor" href="#ipsatization-and-what-it-costs"></a>
 </h2>
 <p>Ipsatizing is a common preprocessing step in circumplex work. It
 subtracts each respondent’s own mean across the octant scales from each
@@ -1382,7 +1401,7 @@ preprocessing made that value uninformative.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="wrap-up">6. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+<h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
 <p>Evaluating circumplex structure has two layers. The first is whether
 the instrument behaves like a circumplex in your sample
@@ -1393,6 +1412,11 @@ change what you should claim more often than users expect. In
 particular, amplitude and displacement intervals earn their trust only
 when the profile is genuinely differentiated relative to the precision
 that your sample size affords.</p>
+<p>Two pages follow this one. “Advanced Circumplex Visualization” builds
+circumplex figures from <code>ggplot2</code> components. “SEM-Based SSM
+Analysis” fits a latent version of the SSM. It corrects a measure’s
+profile for scale unreliability, both its average level and its
+differences across scales.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

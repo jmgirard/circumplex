@@ -5,6 +5,10 @@
 library(circumplex)
 ```
 
+**Level:** Advanced. Read “Evaluating Circumplex Structure” first.
+
+## 1. Overview
+
 The other vignettes model *observed* circumplex scores. These are the
 mean profile of a group, or the profile of correlations between the
 circumplex scales and an external measure. This vignette introduces a
@@ -13,7 +17,7 @@ equation model (SEM) of the circumplex scales.
 [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) and
 its helpers expose it. The vignette teaches two products: the latent
 profile of a measure, and the invariance-gated latent contrast between
-groups (Section 7 explains invariance). It shows how their confidence
+groups (Section 8 explains invariance). It shows how their confidence
 intervals are constructed, and the assumptions that make them
 interpretable.
 
@@ -29,7 +33,21 @@ circular-aware intervals.
 defines these four parameters. Treat this layer as a research tool whose
 assumptions you should understand before relying on it.
 
-## 1. Why a latent SSM?
+Section 2, “Why a latent SSM?”, explains attenuation. Section 3, “The
+measurement model”, shows the lavaan model that
+[`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
+writes. Section 4, “Estimating a latent profile”, fits it with
+[`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) and
+compares the latent profile with the observed one. Section 5, “Where the
+confidence intervals come from”, and Section 6, “What the parameters
+mean now”, explain the intervals and the disattenuated parameters.
+Section 7, “Two questions about group differences”, and Section 8,
+“Invariance-gated latent contrasts”, cover groups. Section 9, “When to
+trust it: limitations”, and Section 10, “Relation to the literature”,
+place the method. The Wrap-up lists what the page covered and names the
+next page, and the References list the sources cited.
+
+## 2. Why a latent SSM?
 
 An observed correlation profile is *attenuated* by measurement error.
 Each circumplex scale is imperfectly reliable, so the correlations
@@ -69,7 +87,7 @@ everything below:
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md) is
   a different tool.
 
-## 2. The measurement model
+## 3. The measurement model
 
 [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
 builds and fits a lavaan measurement model for you, but it is worth
@@ -155,7 +173,7 @@ decisions that matter statistically:
   assumes is known to be violated.
 - The final `NOTE` says that amplitude and displacement are
   **deliberately not defined** in the lavaan syntax. That is the subject
-  of Section 4.
+  of Section 5.
 
 You rarely call
 [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
@@ -167,7 +185,7 @@ yourself and hand back through
 One example is partial invariance, where only some parameters are held
 equal across groups.
 
-## 3. Estimating a latent profile
+## 4. Estimating a latent profile
 
 The everyday entry point is
 [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md). Its
@@ -243,7 +261,7 @@ fit**, and its displacement sits at a somewhat different angle. The
 amplitude increase is the removal of attenuation. The latent
 correlations are not pulled toward zero by scale unreliability. The
 displacement shift and the fit increase are the removal of *reliability
-heterogeneity* around the circle. (Section 5 explains why each moves.)
+heterogeneity* around the circle. (Section 6 explains why each moves.)
 
 [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
 returns a `circumplex_ssm_sem` object, a subclass of the ordinary
@@ -275,9 +293,9 @@ with a robust estimator (`estimator = "MLR"`, maximum likelihood with
 robust corrections) and reports robust global fit indices. This is
 because circumplex scale scores are typically skewed, and the naive
 chi-square over-rejects. The robust (sandwich) standard errors also feed
-the confidence intervals. Section 4 explains why that matters.
+the confidence intervals. Section 5 explains why that matters.
 
-## 4. Where the confidence intervals come from
+## 5. Where the confidence intervals come from
 
 Amplitude and displacement are **nonlinear** functions of the model
 parameters: amplitude is a square root and displacement is an `atan2`.
@@ -333,7 +351,7 @@ coverage. If you supply your own lavaan fit through
 and intend to use `"mvn"`, fit it with `se = "robust.huber.white"` so
 that the propagated covariance stays valid.
 
-## 5. What the parameters mean now
+## 6. What the parameters mean now
 
 Disattenuation changes what two of the parameters *mean*. The vignette
 would be misleading if it did not say so.
@@ -361,7 +379,7 @@ while this happens. The latent layer’s contribution is the removal of
 the *reliability* modulation that additionally rotates the observed
 displacement. It does not remove the saturation modulation. The removal
 of the reliability modulation is why the observed and latent
-displacements in Section 3 differ. This account, with the reliability
+displacements in Section 4 differ. This account, with the reliability
 modulation removed and the saturation modulation kept, is the honest
 description of what `d` estimates here.
 
@@ -373,7 +391,7 @@ interpretable. The low-fit dashing on plots and the displacement caution
 in [`print()`](https://rdrr.io/r/base/print.html) behave exactly as they
 do for observed profiles.
 
-## 6. Two questions about group differences
+## 7. Two questions about group differences
 
 When you have groups, there are **two** distinct estimands (quantities
 to be estimated), and `circumplex` keeps them separate on purpose.
@@ -392,7 +410,7 @@ behaves the same way in both groups. When it does not, the honest answer
 is that the groups cannot be compared on the latent metric. That answer
 is not a number.
 
-## 7. Invariance-gated latent contrasts
+## 8. Invariance-gated latent contrasts
 
 Before it computes a latent group contrast,
 [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) fits
@@ -593,7 +611,7 @@ estimate’s angular branch. So its interval endpoints can legitimately
 fall outside ±180° near the boundary, while still containing the
 estimate.
 
-## 8. When to trust it: limitations
+## 9. When to trust it: limitations
 
 The latent layer buys disattenuation at the price of a set of
 assumptions. The documentation states them, and the vignette should too.
@@ -621,7 +639,7 @@ assumptions. The documentation states them, and the vignette should too.
 - **The scaled tier assumes the general factor is orthogonal to the
   plane.** A true general-factor lean surfaces as misfit under the
   scaled tier. Use the strict tier to model it.
-- **Displacement and fit have the disattenuated meanings of Section 5**,
+- **Displacement and fit have the disattenuated meanings of Section 6**,
   not the naive “angle in latent space” and “cosine-ness” readings.
 - **Disattenuated correlations can be large.** Removing attenuation
   moves correlations toward ±1. Values at or beyond 1 signal
@@ -635,7 +653,7 @@ assumptions. The documentation states them, and the vignette should too.
   error only. The package withholds the verdict everywhere else rather
   than extrapolating it.
 
-## 9. Relation to the literature
+## 10. Relation to the literature
 
 The nearest published models are the confirmatory factor analyses of the
 interpersonal circumplex itself. Wendt et al. (2019) fit a three-factor
@@ -668,6 +686,18 @@ equal-communality version of Browne’s (1992) circumplex model that
 estimates. The SEM-based SSM sits on the fixed-angle side of that
 boundary. To cross to freely estimated angles, use
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md).
+
+## Wrap-up
+
+The latent SSM corrects a measure’s circumplex profile for scale
+unreliability, both its average level and its differences across scales.
+[`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) fits
+the measurement model, propagates its full covariance into
+circular-aware intervals, and gates the latent group contrast on
+measurement invariance. Every latent quantity is conditional on the
+fixed-angle model, so read the global fit first. The next page to read
+is “Axes Reliability”, which asks how reliably an instrument measures
+its two axes.
 
 ## References
 

@@ -5,7 +5,27 @@
 library(circumplex)
 ```
 
-## 1. Background and Motivation
+**Level:** Introductory. Read “Using Circumplex Instruments” first if
+your data are item-level responses that still need scoring.
+
+## 1. Overview
+
+This vignette introduces the Structural Summary Method (SSM) and the
+functions that run it. Section 2, “Background and Motivation”, explains
+circumplex models, circumplex scales, and the SSM parameters. Section 3,
+“Example data: jz2017”, loads the dataset that the examples use. Section
+4, “Mean-based SSM Analysis”, runs the SSM on a group’s mean scores with
+[`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md),
+[`ssm_table()`](http://circumplex.jmgirard.com/reference/ssm_table.md),
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md),
+and
+[`ssm_plot_curve()`](http://circumplex.jmgirard.com/reference/ssm_plot_curve.md).
+Section 5, “Correlation-based SSM Analysis”, runs it on the correlations
+between the scales and an external measure. The Wrap-up lists what the
+page covered and names the next page, and the References list the
+sources cited.
+
+## 2. Background and Motivation
 
 ### Circumplex models, scales, and data
 
@@ -136,7 +156,7 @@ amplitude and displacement parameters into estimates of distance from
 the x-axis and y-axis, which will be shown in the output discussed
 below.
 
-## 2. Example data: jz2017
+## 3. Example data: jz2017
 
 To illustrate the SSM functions, we will use the example dataset
 `jz2017`, which was provided by Zimmermann & Wright (2017) and
@@ -184,7 +204,7 @@ and communion.
 
 ![plot of chunk iipsc](figures/introduction-to-ssm-analysis-iipsc-1.png)
 
-## 3. Mean-based SSM Analysis
+## 4. Mean-based SSM Analysis
 
 ### Conducting SSM for a group’s mean scores
 
@@ -338,7 +358,7 @@ ssm_plot_curve(results2)
 
 ![plot of chunk plot2](figures/introduction-to-ssm-analysis-plot2-1.png)
 
-## 4. Correlation-based SSM Analysis
+## 5. Correlation-based SSM Analysis
 
 ### Conducting SSM for a group’s correlations with an external measure
 
@@ -448,7 +468,7 @@ ssm_plot_curve(results3)
 
 ![plot of chunk plot4](figures/introduction-to-ssm-analysis-plot4-1.png)
 
-## 5. Wrap-up
+## Wrap-up
 
 In this vignette, we learned about circumplex models, scales, and data
 as well as the Structural Summary Method (SSM) for analyzing such data.

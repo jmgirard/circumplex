@@ -5,7 +5,25 @@
 library(circumplex)
 ```
 
-## 1. What is axis reliability?
+**Level:** Advanced. Read “SEM-Based SSM Analysis” first.
+
+## 1. Overview
+
+This vignette estimates how reliably a circumplex instrument measures
+its two axes. Section 2, “What is axis reliability?”, defines the
+quantity and the variance components behind it. Section 3, “A worked
+example”, runs
+[`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+on the `simulated_items` data. Section 4, “Reading the components”,
+reads the components and the global fit from
+[`summary()`](https://rdrr.io/r/base/summary.html). Section 5, “Starting
+from a published correlation matrix”, fits the model from a correlation
+matrix and a sample size. Section 6, “Caveats to keep in mind”, states
+four properties that shape how the output should be read. The Wrap-up
+lists what the page covered and names the next page, and the References
+list the sources cited.
+
+## 2. What is axis reliability?
 
 A circumplex instrument places its scales around a circle. It summarizes
 a person (or a profile of correlations) by a position on two orthogonal
@@ -23,7 +41,7 @@ Holtforth (2013). It fits an item-level measurement model. The model
 splits each item’s variance into orthogonal pieces: a general factor
 shared by all items, the two circumplex **axes**, scale specificity, and
 item error. For an instrument administered in blocks, it adds a
-block-specificity component (Section 5 explains blocks). The function
+block-specificity component (Section 6 explains blocks). The function
 reads axis reliability off the **axes** component alone. Reliability is
 then the Spearman–Brown “list-length” reliability of a composite with
 the axis’s effective test length, built from items that share only their
@@ -41,7 +59,7 @@ all.
 instead reports a single, interpretable number per axis: how well the
 instrument measures communion and agency.
 
-## 2. A worked example
+## 3. A worked example
 
 The package ships `simulated_items`, a synthetic dataset of 1–7 Likert
 responses from 500 respondents on 32 items. There are four items on each
@@ -104,7 +122,7 @@ The header confirms how many complete cases were used. For each axis,
 the per-axis table reports the effective test length (`item_n`), the
 Strack axis `Reliability` and its standard error of measurement (`SEm`).
 It also reports the Nunnally–Bernstein reliability (`NB_Reliability`), a
-simpler formula that Section 3 compares. For a balanced instrument (the
+simpler formula that Section 4 compares. For a balanced instrument (the
 same number of items on every scale), the two axes share one
 axes-variance estimate and carry equal `item_n`. So they report the same
 reliability, which is expected, not an error.
@@ -113,7 +131,7 @@ The recovered reliability (about .77) lands close to the .78 built into
 the simulated population. The axes-variance estimate (below) recovers
 the population value of .18.
 
-## 3. Reading the components
+## 4. Reading the components
 
 [`summary()`](https://rdrr.io/r/base/summary.html) adds the estimated
 variance components and the model’s global fit:
@@ -178,7 +196,7 @@ reliability whenever scale specificity is non-trivial (Strack et al.,
 scale-specific variance the simpler formula would have credited to the
 axes in error.
 
-## 4. Starting from a published correlation matrix
+## 5. Starting from a published correlation matrix
 
 You do not always have the raw data. A paper may print an item
 correlation matrix and nothing else, and that matrix is enough. Pass it
@@ -237,7 +255,7 @@ on a raw scale, pass numeric axis SDs to `sd`. Both are reported rather
 than silently omitted, so a matrix-based result cannot be mistaken for a
 raw-data one.
 
-## 5. Caveats to keep in mind
+## 6. Caveats to keep in mind
 
 Four properties of the method shape how its output should be read.
 
@@ -419,8 +437,8 @@ model does not already know. Blocks that coincide with the scales, a
 single block holding every item, or one block per item all leave `zeta2`
 unidentified. That is, the data cannot pin down its value. It is then
 dropped with `details$zeta2_fitted` set to `FALSE`. This is the same
-treatment that scale specificity gets on a single-item instrument
-(Section 6).
+treatment that scale specificity gets on a single-item instrument (the
+single-item paragraph of the Wrap-up).
 
 What it costs to *ignore* real blocks depends on their geometry. The
 general factor can take up ignored block variance, but it never gives
@@ -457,7 +475,7 @@ scale. Such an interval describes the measurement imprecision of one
 profile’s axis position. It is not a significance test of that position
 against any particular value.
 
-## 6. Wrap-up
+## Wrap-up
 
 [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
 gives a compact, per-axis answer to “how reliably does this instrument
@@ -505,6 +523,10 @@ figures they publish for it come from that three-axis model, and no
 configuration that
 [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
 accepts will reproduce them.
+
+No page follows this one. The observed-score checks of the same
+instrument, the circumplex fit and the interval accuracy, are on
+“Evaluating Circumplex Structure”.
 
 ## References
 

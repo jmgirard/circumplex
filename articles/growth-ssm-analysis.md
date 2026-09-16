@@ -5,7 +5,29 @@
 library(circumplex)
 ```
 
-## 1. The question growth modeling answers
+**Level:** Advanced. Read “Bayesian SSM Analysis” first, because this
+page summarizes draws with the same tools.
+
+## 1. Overview
+
+This vignette fits a growth model to SSM parameters measured at several
+waves. Section 2, “The question growth modeling answers”, states the
+question. Section 3, “From repeated measures to a coordinate table”,
+builds the input with
+[`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md).
+Section 4, “One joint model, not three separate ones”, fits the joint
+mixed model. Section 5, “From fixed effects to $`(a(t), d(t))`$ with
+intervals”, carries the uncertainty through
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
+Section 6, “Certification: when $`d(t)`$ intervals are not
+interpretable”, and Section 7, “A caution about REML intervals at small
+samples”, state the limits. Section 8, “The unwrap alternative:
+[`angle_unwrap()`](http://circumplex.jmgirard.com/reference/angle_unwrap.md)”,
+fits a second recipe. Section 9, “Caveats and upgrades”, closes. The
+Wrap-up lists what the page covered and names the next page, and the
+References list the sources cited.
+
+## 2. The question growth modeling answers
 
 A single Structural Summary Method (SSM) analysis describes one profile:
 an elevation $`e`$, an amplitude $`a`$, and a displacement $`d`$.
@@ -41,7 +63,7 @@ The reference recipe below uses **glmmTMB**. The same stacked-outcome
 formulation can also be fit with `nlme` (shipped with base R), using its
 `varIdent` and `corSymm` machinery.
 
-## 2. From repeated measures to a coordinate table
+## 3. From repeated measures to a coordinate table
 
 The input to the growth model is a person-by-wave table of SSM
 coordinates.
@@ -86,7 +108,7 @@ copy each row’s person and wave onto it. (Passing `id = "person"` would
 instead average each person’s waves into one profile, which is not what
 a growth model needs.)
 
-## 3. One joint model, not three separate ones
+## 4. One joint model, not three separate ones
 
 The growth model treats the three coordinates as a *multivariate*
 outcome. Stack them into long format with an outcome indicator `dv`, a
@@ -138,7 +160,7 @@ contains the true direction. The joint recipe stays at nominal. Strongly
 correlated person effects are realistic, because profile tilts are
 rarely aligned with an axis. Do not fit the coordinates separately.
 
-## 4. From fixed effects to $`(a(t), d(t))`$ with intervals
+## 5. From fixed effects to $`(a(t), d(t))`$ with intervals
 
 The fixed effects are the group intercepts and slopes. They define the
 mean trajectory $`(\hat{e}(t), \hat{x}(t), \hat{y}(t))`$. Three steps
@@ -234,12 +256,12 @@ Placing the intervals by hand is easy to get subtly wrong. The natural
 recipe is to “shift each bound by its signed distance from the
 estimate.” That recipe silently cannot represent an interval wider than
 a half-turn. Such an interval is exactly the near-origin case that
-Section 5 is about.
+Section 6 is about.
 [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
 handles both cases: the interval that straddles the boundary and the
 interval wider than a half-turn.
 
-## 5. Certification: when $`d(t)`$ intervals are not interpretable
+## 6. Certification: when $`d(t)`$ intervals are not interpretable
 
 A direction is only meaningful when the trajectory is far enough from
 the origin of the $`(x, y)`$ plane. As $`a(t) \to 0`$, the draws of
@@ -344,7 +366,7 @@ way, minus the hollow marking and its legend. The figure then makes no
 claim about interpretability either way. That is the honest default when
 the verdict was never computed.
 
-## 6. A caution about REML intervals at small samples
+## 7. A caution about REML intervals at small samples
 
 The model is fit by REML (restricted maximum likelihood). Its variance
 components are the variances and covariances of the random effects and
@@ -363,7 +385,7 @@ Kenward–Roger adjustment for `lme4` fits via **pbkrtest**, the
 approximate denominator degrees of freedom `nlme` supplies, or
 $`t`$-quantile-based intervals.
 
-## 7. The unwrap alternative: `angle_unwrap()`
+## 8. The unwrap alternative: `angle_unwrap()`
 
 There is a second documented recipe. Compute each person’s displacement
 at each wave. **Unwrap** each person’s sequence onto a continuous
@@ -388,7 +410,7 @@ propagates onward. The unwrapped values live on an ordinary line, so any
 univariate mixed model applies. This framing models the *mean of the
 person-level directions*. That is a legitimate (and different) estimand,
 or target of estimation, from the direction of the mean trajectory in
-Section 4.
+Section 5.
 
 Its failure modes are sharp, though, and they are the reason the
 $`(x, y)`$ recipe is the reference:
@@ -407,7 +429,7 @@ $`(x, y)`$ recipe is the reference:
 - **Low amplitude.** Suppose a person’s amplitude is near zero at some
   wave. Their observed displacement at that wave is mostly noise. One
   noisy wave can throw the rest of that person’s sequence onto a wrong
-  branch. This is the same reason that the Section 5 certification
+  branch. This is the same reason that the Section 6 certification
   exists.
 
 The two recipes agree closely in the concentrated, common-branch regime:
@@ -416,7 +438,7 @@ directions clustered. In that regime, our validation simulations find
 mean trajectory differences well under a degree. So the choice matters
 exactly when the unwrap recipe’s assumptions are in doubt.
 
-## 8. Caveats and upgrades
+## 9. Caveats and upgrades
 
 Two statistical facts about the $`(x, y)`$ recipe deserve explicit
 statement:
@@ -424,7 +446,7 @@ statement:
 - **The derived $`d(t)`$ is the direction of the mean trajectory, not
   the mean of the person-level directions.** These differ whenever
   persons disperse directionally. Neither is wrong, but they answer
-  different questions. Section 7’s unwrap recipe targets the latter.
+  different questions. Section 8’s unwrap recipe targets the latter.
 - **The derived $`a(t)`$ shrinks toward zero under directional
   dispersion.** The amplitude of an average profile is smaller than the
   average of individual amplitudes whenever persons point in different
@@ -432,9 +454,9 @@ statement:
   setting inherits it intact.
 
 Finally, the multivariate normal (MVN) draw propagation used here is a
-large-sample approximation. Draw propagation is the Section 4 method of
+large-sample approximation. Draw propagation is the Section 5 method of
 carrying uncertainty through random draws. It is defensible in the
-concentrated regime (Section 7). Outside that regime, the Section 5
+concentrated regime (Section 8). Outside that regime, the Section 6
 certification guards it. The fully model-based upgrade is
 **projected-normal regression**, a regression model for angle outcomes.
 The **bpnreg** package is one implementation. The method models circular
@@ -442,6 +464,21 @@ outcomes directly with person-level structure and gives exact posterior
 inference for $`d(t)`$. circumplex has no function that fits it. But
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
 will happily summarize posterior draws produced by any such model.
+
+## Wrap-up
+
+A growth model on the $`(e, x, y)`$ coordinates describes how a group’s
+mean profile moves over time.
+[`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md)
+builds the person-by-wave input, and one joint mixed model fits the
+three coordinates.
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+turns the fixed effects into $`a(t)`$ and $`d(t)`$ with intervals. The
+certification step says when a direction interval is not interpretable.
+[`angle_unwrap()`](http://circumplex.jmgirard.com/reference/angle_unwrap.md)
+is the alternative when person-level directions are the target. No page
+follows this one. To draw the fitted trajectories across occasions on
+the circumplex canvas, read “Advanced Circumplex Visualization”.
 
 ## References
 

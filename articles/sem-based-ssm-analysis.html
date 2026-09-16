@@ -62,9 +62,10 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,6 +97,11 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Advanced. Read “Evaluating Circumplex
+Structure” first.</p>
+<div class="section level2">
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
 <p>The other vignettes model <em>observed</em> circumplex scores. These
 are the mean profile of a group, or the profile of correlations between
 the circumplex scales and an external measure. This vignette introduces
@@ -103,7 +109,7 @@ a <strong>latent</strong> (not directly observed) counterpart, built on
 a structural equation model (SEM) of the circumplex scales.
 <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> and its helpers expose it. The vignette teaches
 two products: the latent profile of a measure, and the invariance-gated
-latent contrast between groups (Section 7 explains invariance). It shows
+latent contrast between groups (Section 8 explains invariance). It shows
 how their confidence intervals are constructed, and the assumptions that
 make them interpretable.</p>
 <p>The latent-level Structural Summary Method appears to be new. A
@@ -117,8 +123,21 @@ correlations, which are correlations corrected for measurement error
 <code><a href="../articles/introduction-to-ssm-analysis.html">vignette("introduction-to-ssm-analysis")</a></code> defines these four
 parameters. Treat this layer as a research tool whose assumptions you
 should understand before relying on it.</p>
+<p>Section 2, “Why a latent SSM?”, explains attenuation. Section 3, “The
+measurement model”, shows the lavaan model that
+<code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code> writes. Section 4, “Estimating a latent
+profile”, fits it with <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> and compares the latent
+profile with the observed one. Section 5, “Where the confidence
+intervals come from”, and Section 6, “What the parameters mean now”,
+explain the intervals and the disattenuated parameters. Section 7, “Two
+questions about group differences”, and Section 8, “Invariance-gated
+latent contrasts”, cover groups. Section 9, “When to trust it:
+limitations”, and Section 10, “Relation to the literature”, place the
+method. The Wrap-up lists what the page covered and names the next page,
+and the References list the sources cited.</p>
+</div>
 <div class="section level2">
-<h2 id="why-a-latent-ssm">1. Why a latent SSM?<a class="anchor" aria-label="anchor" href="#why-a-latent-ssm"></a>
+<h2 id="why-a-latent-ssm">2. Why a latent SSM?<a class="anchor" aria-label="anchor" href="#why-a-latent-ssm"></a>
 </h2>
 <p>An observed correlation profile is <em>attenuated</em> by measurement
 error. Each circumplex scale is imperfectly reliable, so the
@@ -156,7 +175,7 @@ circumplex model. Examining geometry is a different question, and
 </ul>
 </div>
 <div class="section level2">
-<h2 id="the-measurement-model">2. The measurement model<a class="anchor" aria-label="anchor" href="#the-measurement-model"></a>
+<h2 id="the-measurement-model">3. The measurement model<a class="anchor" aria-label="anchor" href="#the-measurement-model"></a>
 </h2>
 <p><code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> builds and fits a lavaan measurement model for
 you, but it is worth seeing the model it generates.
@@ -239,7 +258,7 @@ instruments in the family of the Inventory of Interpersonal Problems
 violated.</li>
 <li>The final <code>NOTE</code> says that amplitude and displacement are
 <strong>deliberately not defined</strong> in the lavaan syntax. That is
-the subject of Section 4.</li>
+the subject of Section 5.</li>
 </ul>
 <p>You rarely call <code><a href="../reference/ssm_sem_syntax.html">ssm_sem_syntax()</a></code> directly, because
 <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> does. But it is the escape hatch for
@@ -248,7 +267,7 @@ respecifications that you then fit yourself and hand back through
 where only some parameters are held equal across groups.</p>
 </div>
 <div class="section level2">
-<h2 id="estimating-a-latent-profile">3. Estimating a latent profile<a class="anchor" aria-label="anchor" href="#estimating-a-latent-profile"></a>
+<h2 id="estimating-a-latent-profile">4. Estimating a latent profile<a class="anchor" aria-label="anchor" href="#estimating-a-latent-profile"></a>
 </h2>
 <p>The everyday entry point is <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code>. Its arguments
 mirror <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code>: the data, the <code>scales</code> and
@@ -315,7 +334,7 @@ displacement sits at a somewhat different angle. The amplitude increase
 is the removal of attenuation. The latent correlations are not pulled
 toward zero by scale unreliability. The displacement shift and the fit
 increase are the removal of <em>reliability heterogeneity</em> around
-the circle. (Section 5 explains why each moves.)</p>
+the circle. (Section 6 explains why each moves.)</p>
 <p><code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> returns a <code>circumplex_ssm_sem</code>
 object, a subclass of the ordinary <code>circumplex_ssm</code> object,
 so the familiar table and plot functions work on it:</p>
@@ -353,10 +372,10 @@ so the familiar table and plot functions work on it:</p>
 corrections) and reports robust global fit indices. This is because
 circumplex scale scores are typically skewed, and the naive chi-square
 over-rejects. The robust (sandwich) standard errors also feed the
-confidence intervals. Section 4 explains why that matters.</p>
+confidence intervals. Section 5 explains why that matters.</p>
 </div>
 <div class="section level2">
-<h2 id="where-the-confidence-intervals-come-from">4. Where the confidence intervals come from<a class="anchor" aria-label="anchor" href="#where-the-confidence-intervals-come-from"></a>
+<h2 id="where-the-confidence-intervals-come-from">5. Where the confidence intervals come from<a class="anchor" aria-label="anchor" href="#where-the-confidence-intervals-come-from"></a>
 </h2>
 <p>Amplitude and displacement are <strong>nonlinear</strong> functions
 of the model parameters: amplitude is a square root and displacement is
@@ -414,7 +433,7 @@ fit it with <code>se = "robust.huber.white"</code> so that the
 propagated covariance stays valid.</p>
 </div>
 <div class="section level2">
-<h2 id="what-the-parameters-mean-now">5. What the parameters mean now<a class="anchor" aria-label="anchor" href="#what-the-parameters-mean-now"></a>
+<h2 id="what-the-parameters-mean-now">6. What the parameters mean now<a class="anchor" aria-label="anchor" href="#what-the-parameters-mean-now"></a>
 </h2>
 <p>Disattenuation changes what two of the parameters <em>mean</em>. The
 vignette would be misleading if it did not say so.</p>
@@ -441,7 +460,7 @@ displacement. Fit can stay high while this happens. The latent layer’s
 contribution is the removal of the <em>reliability</em> modulation that
 additionally rotates the observed displacement. It does not remove the
 saturation modulation. The removal of the reliability modulation is why
-the observed and latent displacements in Section 3 differ. This account,
+the observed and latent displacements in Section 4 differ. This account,
 with the reliability modulation removed and the saturation modulation
 kept, is the honest description of what <code>d</code> estimates
 here.</p>
@@ -454,7 +473,7 @@ caution in <code><a href="https://rdrr.io/r/base/print.html" class="external-lin
 profiles.</p>
 </div>
 <div class="section level2">
-<h2 id="two-questions-about-group-differences">6. Two questions about group differences<a class="anchor" aria-label="anchor" href="#two-questions-about-group-differences"></a>
+<h2 id="two-questions-about-group-differences">7. Two questions about group differences<a class="anchor" aria-label="anchor" href="#two-questions-about-group-differences"></a>
 </h2>
 <p>When you have groups, there are <strong>two</strong> distinct
 estimands (quantities to be estimated), and <code>circumplex</code>
@@ -499,7 +518,7 @@ does not, the honest answer is that the groups cannot be compared on the
 latent metric. That answer is not a number.</p>
 </div>
 <div class="section level2">
-<h2 id="invariance-gated-latent-contrasts">7. Invariance-gated latent contrasts<a class="anchor" aria-label="anchor" href="#invariance-gated-latent-contrasts"></a>
+<h2 id="invariance-gated-latent-contrasts">8. Invariance-gated latent contrasts<a class="anchor" aria-label="anchor" href="#invariance-gated-latent-contrasts"></a>
 </h2>
 <p>Before it computes a latent group contrast, <code><a href="../reference/ssm_sem.html">ssm_sem()</a></code>
 fits an invariance ladder: configural, then metric, then scalar. It
@@ -683,7 +702,7 @@ fall outside ±180° near the boundary, while still containing the
 estimate.</p>
 </div>
 <div class="section level2">
-<h2 id="when-to-trust-it-limitations">8. When to trust it: limitations<a class="anchor" aria-label="anchor" href="#when-to-trust-it-limitations"></a>
+<h2 id="when-to-trust-it-limitations">9. When to trust it: limitations<a class="anchor" aria-label="anchor" href="#when-to-trust-it-limitations"></a>
 </h2>
 <p>The latent layer buys disattenuation at the price of a set of
 assumptions. The documentation states them, and the vignette should
@@ -720,7 +739,7 @@ the plane.</strong> A true general-factor lean surfaces as misfit under
 the scaled tier. Use the strict tier to model it.</li>
 <li>
 <strong>Displacement and fit have the disattenuated meanings of
-Section 5</strong>, not the naive “angle in latent space” and
+Section 6</strong>, not the naive “angle in latent space” and
 “cosine-ness” readings.</li>
 <li>
 <strong>Disattenuated correlations can be large.</strong> Removing
@@ -738,7 +757,7 @@ withholds the verdict everywhere else rather than extrapolating it.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="relation-to-the-literature">9. Relation to the literature<a class="anchor" aria-label="anchor" href="#relation-to-the-literature"></a>
+<h2 id="relation-to-the-literature">10. Relation to the literature<a class="anchor" aria-label="anchor" href="#relation-to-the-literature"></a>
 </h2>
 <p>The nearest published models are the confirmatory factor analyses of
 the interpersonal circumplex itself. Wendt et al. (2019) fit a
@@ -768,6 +787,18 @@ equal-communality version of Browne’s (1992) circumplex model that
 <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimates. The SEM-based SSM sits on the
 fixed-angle side of that boundary. To cross to freely estimated angles,
 use <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>.</p>
+</div>
+<div class="section level2">
+<h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+</h2>
+<p>The latent SSM corrects a measure’s circumplex profile for scale
+unreliability, both its average level and its differences across scales.
+<code><a href="../reference/ssm_sem.html">ssm_sem()</a></code> fits the measurement model, propagates its full
+covariance into circular-aware intervals, and gates the latent group
+contrast on measurement invariance. Every latent quantity is conditional
+on the fixed-angle model, so read the global fit first. The next page to
+read is “Axes Reliability”, which asks how reliably an instrument
+measures its two axes.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

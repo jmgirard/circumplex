@@ -62,9 +62,10 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/axes-reliability.html">Axes Reliability</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
@@ -96,8 +97,25 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Level:</strong> Intermediate. Read “Introduction to SSM
+Analysis” first.</p>
 <div class="section level2">
-<h2 id="generalizing-the-basic-analyses">1. Generalizing the basic analyses<a class="anchor" aria-label="anchor" href="#generalizing-the-basic-analyses"></a>
+<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>This vignette extends the basic SSM analyses to more than one group
+or measure. Section 2, “Generalizing the basic analyses”, adds the
+<code>grouping</code> and <code>measures</code> arguments of
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code>. Section 3, “Contrast analyses”, adds the
+<code>contrast</code> argument and <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code>.
+Section 4, “Taxonomy of analysis types”, lists every analysis type and
+the arguments that select it. Section 5, “Working with SSM tables”,
+customizes the output of <code><a href="../reference/ssm_table.html">ssm_table()</a></code>. Section 6, “Working
+with SSM figures”, exports figures with <code><a href="../reference/ggsave.html">ggsave()</a></code>. The
+Wrap-up lists what the page covered and names the next pages, and the
+References list the sources cited.</p>
+</div>
+<div class="section level2">
+<h2 id="generalizing-the-basic-analyses">2. Generalizing the basic analyses<a class="anchor" aria-label="anchor" href="#generalizing-the-basic-analyses"></a>
 </h2>
 <div class="section level3">
 <h3 id="generalizing-to-multiple-means">Generalizing to multiple means<a class="anchor" aria-label="anchor" href="#generalizing-to-multiple-means"></a>
@@ -663,7 +681,7 @@ may change as profiles are dropped).</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="contrast-analyses">2. Contrast analyses<a class="anchor" aria-label="anchor" href="#contrast-analyses"></a>
+<h2 id="contrast-analyses">3. Contrast analyses<a class="anchor" aria-label="anchor" href="#contrast-analyses"></a>
 </h2>
 <p>The final argument to master in this vignette is
 <code>contrast</code>, which allows us to compare two groups or
@@ -1172,7 +1190,7 @@ BORPD: Male - Female
 </div>
 </div>
 <div class="section level2">
-<h2 id="taxonomy-of-analysis-types">3. Taxonomy of analysis types<a class="anchor" aria-label="anchor" href="#taxonomy-of-analysis-types"></a>
+<h2 id="taxonomy-of-analysis-types">4. Taxonomy of analysis types<a class="anchor" aria-label="anchor" href="#taxonomy-of-analysis-types"></a>
 </h2>
 <p>Although all SSM analyses are based on the idea of decomposing
 circumplex scores into the parameters of a cosine curve, there are
@@ -1337,7 +1355,7 @@ rather than their contrast.</p></li>
 </ol>
 </div>
 <div class="section level2">
-<h2 id="working-with-ssm-tables">4. Working with SSM tables<a class="anchor" aria-label="anchor" href="#working-with-ssm-tables"></a>
+<h2 id="working-with-ssm-tables">5. Working with SSM tables<a class="anchor" aria-label="anchor" href="#working-with-ssm-tables"></a>
 </h2>
 <div class="section level3">
 <h3 id="basic-customizations-of-tables">Basic customizations of tables<a class="anchor" aria-label="anchor" href="#basic-customizations-of-tables"></a>
@@ -1354,7 +1372,7 @@ packages.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="working-with-ssm-figures">5. Working with SSM figures<a class="anchor" aria-label="anchor" href="#working-with-ssm-figures"></a>
+<h2 id="working-with-ssm-figures">6. Working with SSM figures<a class="anchor" aria-label="anchor" href="#working-with-ssm-figures"></a>
 </h2>
 <div class="section level3">
 <h3 id="exporting-figures-as-files">Exporting figures as files<a class="anchor" aria-label="anchor" href="#exporting-figures-as-files"></a>
@@ -1383,12 +1401,11 @@ quality and used in manuscripts, presentations, or posters.</p>
 <p>In this vignette, we learned how to generalize the SSM analyses to
 multiple groups and measures, how to conduct contrast analyses, how to
 make basic customizations to tables and figures, and how to export
-tables and figures to external files. In the next vignette, “Advanced
-Circumplex Visualization,” we learn how to build circumplex figures from
-scratch by composing the <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> canvas, the
-<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code> and <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> layers,
-and the <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> axis scale with any other
-<code>ggplot2</code> components.</p>
+tables and figures to external files. Two pages follow this one.
+“Evaluating Circumplex Structure” asks whether an instrument fits a
+circumplex and whether its confidence intervals can be trusted.
+“Bayesian SSM Analysis” estimates the same parameters with a Bayesian
+model.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

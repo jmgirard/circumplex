@@ -6,7 +6,9 @@ library(circumplex)
 library(ggplot2)
 ```
 
-## Beyond the built-in plots
+**Level:** Advanced. Read “Evaluating Circumplex Structure” first.
+
+## 1. Overview
 
 The
 [`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md),
@@ -51,8 +53,26 @@ scales, and themes:
   x-axis and score on the y-axis.
 
 This vignette works through each of these and then combines them.
+Section 2, “The circular canvas”, draws the empty canvas with
+[`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md).
+Section 3, “The coordinate system”, builds a figure from scratch with
+[`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md).
+Section 4, “Placing SSM results in the circle”, adds profiles with
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md)
+and
+[`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md).
+Section 5, “Restyling the canvas”, themes it. Section 6, “Composing
+custom layers”, adds respondents behind a group profile with
+[`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md).
+Section 7, “Trajectories across occasions”, draws profiles estimated at
+several occasions. Section 8, “The angle axis for linear plots”, labels
+a linear axis with
+[`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md).
+Section 9, “Relationship to the built-in plots”, says how the built-in
+plots use these parts. The Wrap-up lists what the page covered and names
+the next page, and the References list the sources cited.
 
-## The circular canvas
+## 2. The circular canvas
 
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
 returns a `ggplot2` object containing just the circular backdrop, with
@@ -97,7 +117,7 @@ rather than typed by hand.
 Throughout, displacement runs counterclockwise from the right, and the
 0/360 degree position is labeled 360.
 
-## The coordinate system
+## 3. The coordinate system
 
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
 is a convenience wrapper. Underneath it, the piece that makes a
@@ -217,7 +237,7 @@ They do not add a second coordinate system on top of
 If they did, `ggplot2` would replace the existing coordinate system and
 print a message.
 
-## Placing SSM results in the circle
+## 4. Placing SSM results in the circle
 
 Let’s draw the two-measure profile from above on a labeled canvas
 ourselves, rather than calling
@@ -270,7 +290,7 @@ interval is clearly above zero and the model fits reasonably well. See
 the “Introduction to SSM Analysis” vignette and
 [`?ssm_analyze`](http://circumplex.jmgirard.com/reference/ssm_analyze.md).
 
-## Restyling the canvas
+## 5. Restyling the canvas
 
 [`theme_circumplex()`](http://circumplex.jmgirard.com/reference/theme_circumplex.md)
 is the theme
@@ -297,7 +317,7 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
 
 ![plot of chunk theming](figures/advanced-visualization-theming-1.png)
 
-## Composing custom layers
+## 6. Composing custom layers
 
 Because the canvas and geoms are ordinary `ggplot2` objects, you can add
 anything else to them. A common request is to show where individual
@@ -361,7 +381,7 @@ each person’s profile is flat. None of the built-in functions produce
 this picture directly. Any other `ggplot2` layer (text annotations,
 additional geoms, faceting) can be added the same way.
 
-## Trajectories across occasions
+## 7. Trajectories across occasions
 
 Sometimes the same people are measured on the same scales at two or more
 occasions. Then
@@ -530,7 +550,7 @@ profile) *breaks* the path rather than being interpolated through. The
 segment after the gap is still drawn on the correct branch. A path that
 skipped such an occasion would draw a movement that never happened.
 
-## The angle axis for linear plots
+## 8. The angle axis for linear plots
 
 Not every circumplex figure is circular. The score-by-angle curve drawn
 by
@@ -573,7 +593,7 @@ and
 This guarantees that a circular figure and a linear one label their
 scales identically.
 
-## Relationship to the built-in plots
+## 9. Relationship to the built-in plots
 
 The built-in plotting functions are implemented on exactly these
 components:
@@ -596,6 +616,25 @@ the results line up. Only the amplitude axis can differ: to put it where
 puts it, pass `r_axis_angle` to
 [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md),
 as in the path figure above.
+
+## Wrap-up
+
+Every built-in circumplex figure is a composition of the same parts.
+[`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
+or
+[`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md)
+draws the canvas, and
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md)
+and
+[`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md)
+draw the profiles.
+[`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md)
+labels a linear angle axis, and
+[`theme_circumplex()`](http://circumplex.jmgirard.com/reference/theme_circumplex.md)
+styles the canvas. Start from a built-in plot and add to it, or rebuild
+it from the pieces. No page follows this one. To estimate how a profile
+moves across waves before you draw it, read “Growth Models on SSM
+Parameters”.
 
 ## References
 
