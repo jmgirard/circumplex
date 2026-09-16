@@ -111,6 +111,21 @@ cpm_round_df <- function(df, digits) {
   df
 }
 
+# The printed copy of the results table: rounded, with shorter headers so the
+# table fits in 77 columns (M133). The CI columns print as lci/uci right after
+# their estimate. The returned object keeps its names (D-056, D-057).
+cpm_display_results <- function(df, digits) {
+  out <- cpm_round_df(df, digits)
+  short <- c(
+    Angle_theory = "Theory",
+    Angle_lci = "lci", Angle_uci = "uci",
+    Zeta_lci = "lci", Zeta_uci = "uci"
+  )
+  hit <- names(out) %in% names(short)
+  names(out)[hit] <- short[names(out)[hit]]
+  out
+}
+
 # ---- print ------------------------------------------------------------------
 
 #' Print a circular process model fit
@@ -135,7 +150,7 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
     "\nReference scale:  ", d$scales[[d$reference]],
     "\n\n"
   )
-  print(cpm_round_df(x$results, digits), row.names = FALSE)
+  print(cpm_display_results(x$results, digits), row.names = FALSE)
   cat("\n", cpm_fit_line(x$fit, digits), sep = "")
   for (line in cpm_diagnostic_lines(d)) cat(line)
   invisible(x)
@@ -183,7 +198,7 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
     "\nConfidence level: ", d$interval,
     "\n\n# Estimated angles and communality indices\n\n"
   )
-  print(cpm_round_df(object$results, digits), row.names = FALSE)
+  print(cpm_display_results(object$results, digits), row.names = FALSE)
 
   cat("\n# Correlation-function weights\n\n")
   print(cpm_round_df(object$betas, digits), row.names = FALSE)
