@@ -1,13 +1,12 @@
 # M94: the bootstrap fired-marker line in summary(), and its fences.
 #
-# Byte-identity fences (AC3): the analytic-path summary() output and the
-# bootstrap print() output must be byte-identical to the merge-base commit of
-# the m94 branch. The snapshots under _snaps/cpm_summary_markers.md were
-# captured at that commit; to regenerate the merge-base capture at review,
-# check out `git merge-base master m94-bootstrap-marker-list`, copy this file
-# and its helper fixtures in, run it, and diff the snapshot file — it must not
-# differ from the committed one. Analytic fits use the deterministic cormat
-# path (no RNG); expect_snapshot() does not run on CRAN by design.
+# Snapshot fences (AC3 of M94): the analytic-path summary() output and the
+# bootstrap print() output are pinned as snapshots. M94 captured them
+# byte-identical to the merge-base of its branch. M133 re-captured them after
+# shortening the results-table headers, so they now pin the M133 layout, and
+# expect_cpm_table_one_block() checks that the table's values are unchanged.
+# Analytic fits use the deterministic cormat path (no RNG); expect_snapshot()
+# does not run on CRAN by design.
 
 m94_labels <- function() c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
@@ -71,16 +70,16 @@ m94_boot_clean <- local({
   }
 })
 
-# ---- AC3: analytic path byte-identical to merge-base ------------------------
+# ---- AC3: analytic path snapshot fence ---------------------------------------
 
-test_that("analytic summary() output is byte-identical to merge-base (four regimes)", {
-  # Byte-identity is a same-machine claim: the committed baselines were
-  # captured on the authoring machine at the merge-base, and PR #123's CI
+test_that("analytic summary() output matches its snapshot (four regimes)", {
+  # The snapshot is a same-machine claim: the committed baselines were
+  # captured on the authoring machine, and PR #123's CI
   # measured the cross-platform deltas directly — a third-decimal communality
   # (0.562 vs 0.563 on ubuntu/windows) and the residual tie-break pair of the
   # saturated free fit — while macOS matched. covr perturbs optimizer results
   # the same way (M59). So this fence runs where its baseline was captured,
-  # like the bootstrap print() fence below; regenerate per the file header.
+  # like the bootstrap print() fence below.
   skip_on_ci()
   skip_on_cran()
   skip_on_covr()
@@ -89,20 +88,24 @@ test_that("analytic summary() output is byte-identical to merge-base (four regim
   # (1) clean N >= 2000
   clean <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
                    n = 5000, m = 3)
+  expect_cpm_table_one_block(clean, summary)
   expect_snapshot(summary(clean))
   # (2) marker-firing N >= 2000 (Heywood): warnings at fit time, not display time
   voc <- cpm_oracle_voc()
   hey <- suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
                                   angles = voc$th_start, n = 5000, m = 2))
   expect_true(cpm_boundary_proximity(hey))
+  expect_cpm_table_one_block(hey, summary)
   expect_snapshot(summary(hey))
   # (3) N < 2000
   small <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
                    n = 300, m = 3)
+  expect_cpm_table_one_block(small, summary)
   expect_snapshot(summary(small))
   # (4) free-scaling N >= 2000
   free <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
                   n = 5000, m = 3, scaling = "free")
+  expect_cpm_table_one_block(free, summary)
   expect_snapshot(summary(free))
 })
 
@@ -293,9 +296,9 @@ test_that("a bootstrap fit with no fired marker prints no marker note", {
                      out, fixed = TRUE))
 })
 
-# ---- AC3: bootstrap print() byte-identical to merge-base --------------------
+# ---- AC3: bootstrap print() snapshot fence ----------------------------------
 
-test_that("print() on a bootstrap marker-firing fit is byte-identical to merge-base", {
+test_that("print() on a bootstrap marker-firing fit matches its snapshot", {
   # Bootstrap CI endpoints differ across platforms at the 3rd decimal (BLAS),
   # so this snapshot is a local-only regression pin, per the test-cpm_api.R
   # bootstrap-render precedent.
@@ -303,5 +306,35 @@ test_that("print() on a bootstrap marker-firing fit is byte-identical to merge-b
   skip_on_cran()
   jz <- m94_boot_jz()
   expect_gt(length(cpm_boundary_markers(jz)), 0)
+  expect_cpm_table_one_block(jz, print)
   expect_snapshot(print(jz))
+})
+
+# ---- M133: one-block results table for every fixture in this file -----------
+
+test_that("print() and summary() show the results table as one block for every fixture", {
+  # The check compares the printed table with the same object's rounded
+  # results, so it does not depend on platform numerics and runs on CI.
+  skip_on_cran()
+  tr <- cpm_clean_truth()
+  P0 <- m94_clean_P0()
+  voc <- cpm_oracle_voc()
+  fits <- list(
+    clean = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
+                    angles = tr$angles, n = 5000, m = 3),
+    hey = suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
+                                   angles = voc$th_start, n = 5000, m = 2)),
+    small = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
+                    angles = tr$angles, n = 300, m = 3),
+    free = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
+                   angles = tr$angles, n = 5000, m = 3, scaling = "free"),
+    boot_jz = m94_boot_jz(),
+    boot_big = m94_boot_big(),
+    boot_clean = m94_boot_clean()
+  )
+  for (nm in names(fits)) {
+    for (printer in list(print = print, summary = summary)) {
+      expect_cpm_table_one_block(fits[[nm]], printer)
+    }
+  }
 })

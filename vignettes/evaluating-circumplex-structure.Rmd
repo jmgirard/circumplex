@@ -60,6 +60,11 @@ the default confidence intervals are bootstrapped. We
 lower `boots` from its default of 2000 to keep this vignette quick to
 build. In practice, use the default.
 
+This chunk prints two warnings: the CPM Hessian is ill-conditioned, and some
+bootstrap resamples were excluded. Both are expected for these data. The
+section *When a fit sits at a boundary*, below, explains the first. The
+second means that the intervals rest only on the resamples that were kept.
+
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the reported condition number and the bootstrap
      acceptance counts move across BLAS implementations; the numbers this
@@ -87,24 +92,15 @@ summary(cpm)
 #> 
 #> # Estimated angles and communality indices
 #> 
-#>  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-#>     PA           90  90.000    90.000    90.000 0.767    0.684    0.860
-#>     BC          135 125.074   113.548   137.069 0.931    0.872    1.000
-#>     DE          180 170.353   156.943   185.174 0.780    0.733    0.826
-#>     FG          225 195.425   185.811   206.523 0.861    0.822    0.910
-#>     HI          270 250.721   244.660   258.758 0.956    0.935    0.977
-#>     JK          315 269.491   261.813   279.412 0.942    0.929    0.957
-#>     LM          360 294.230   286.626   303.019 0.806    0.761    0.850
-#>     NO           45  11.305     2.426    20.913 1.000    1.000    1.000
-#>  Communality
-#>        0.589
-#>        0.868
-#>        0.608
-#>        0.741
-#>        0.914
-#>        0.888
-#>        0.650
-#>        1.000
+#>  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality
+#>     PA     90  90.000  90.000  90.000 0.767 0.684 0.860       0.589
+#>     BC    135 125.074 113.548 137.069 0.931 0.872 1.000       0.868
+#>     DE    180 170.353 156.943 185.174 0.780 0.733 0.826       0.608
+#>     FG    225 195.425 185.811 206.523 0.861 0.822 0.910       0.741
+#>     HI    270 250.721 244.660 258.758 0.956 0.935 0.977       0.914
+#>     JK    315 269.491 261.813 279.412 0.942 0.929 0.957       0.888
+#>     LM    360 294.230 286.626 303.019 0.806 0.761 0.850       0.650
+#>     NO     45  11.305   2.426  20.913 1.000 1.000 1.000       1.000
 #> 
 #> # Correlation-function weights
 #> 
@@ -288,24 +284,15 @@ summary(demo)
 #> 
 #> # Estimated angles and communality indices
 #> 
-#>  Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-#>     PA           90  90.000    90.000    90.000 0.785    0.748    0.823
-#>     BC          135 125.057   120.571   129.542 0.881    0.852    0.911
-#>     DE          180 167.802   161.988   173.616 0.799    0.777    0.820
-#>     FG          225 193.344   187.711   198.976 0.878    0.854    0.901
-#>     HI          270 250.958   245.112   256.805 0.958    0.944    0.971
-#>     JK          315 269.528   263.351   275.706 0.948    0.938    0.958
-#>     LM          360 293.619   286.622   300.617 0.803    0.778    0.829
-#>     NO           45  12.673     7.017    18.329 0.929    0.836    1.023
-#>  Communality
-#>        0.617
-#>        0.777
-#>        0.638
-#>        0.770
-#>        0.917
-#>        0.899
-#>        0.645
-#>        0.863
+#>  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality
+#>     PA     90  90.000  90.000  90.000 0.785 0.748 0.823       0.617
+#>     BC    135 125.057 120.571 129.542 0.881 0.852 0.911       0.777
+#>     DE    180 167.802 161.988 173.616 0.799 0.777 0.820       0.638
+#>     FG    225 193.344 187.711 198.976 0.878 0.854 0.901       0.770
+#>     HI    270 250.958 245.112 256.805 0.958 0.944 0.971       0.917
+#>     JK    315 269.528 263.351 275.706 0.948 0.938 0.958       0.899
+#>     LM    360 293.619 286.622 300.617 0.803 0.778 0.829       0.645
+#>     NO     45  12.673   7.017  18.329 0.929 0.836 1.023       0.863
 #> 
 #> # Correlation-function weights
 #> 
@@ -427,7 +414,9 @@ Constrained variants make the structural question sharp. Is the instrument
 consistent with *equally spaced* scales? Is it consistent with *equal*
 communalities? The correlation-matrix path is convenient for this
 comparison, because its point estimates and fit indices are deterministic.
-So no bootstrap is needed:
+So no bootstrap is needed. The first of these refits (`quasi-circumplex`)
+prints the same ill-conditioned Hessian warning that *When a fit sits at a
+boundary* explains.
 
 <!-- precompute:volatile-numbers start -- these three model variants
      refit the same ill-conditioned correlation matrix, so the reported
@@ -624,7 +613,11 @@ explained below. The defaults are
 `boots = 2000`. They give a Monte Carlo standard error under one percentage
 point for coverage near the nominal level, and they are recommended in
 practice. The `parallel`/`ncpus` arguments speed up real runs without
-changing results for a given seed.
+changing results for a given seed. The CPM fit inside the diagnostic prints
+the same ill-conditioned Hessian warning that *When a fit sits at a boundary*
+explains.
+
+`print()` shows the short report: one block of verdicts per profile.
 
 <!-- precompute:volatile-numbers start -- ssm_ci_accuracy() refits an
      ill-conditioned CPM, whose solution moves in the third digit across
@@ -636,11 +629,103 @@ set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
 #> Warning: CPM Hessian is ill-conditioned (condition number 9.24e+16): angles
 #> may be clustered or parameters weakly determined.
+print(acc)
+#> 
+#> SSM CI accuracy, simulated at your n and settings (200 replications per
+#> condition; bootstrap intervals with 500 replicates at level 0.95)
+#> 
+#>   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):
+#>     Elevation      coverage 93.0%: borderline
+#>     Amplitude      coverage 94.5%: borderline
+#>     Displacement   coverage 89.1% when certified: borderline
+#>     Guardrail      under a truly zero amplitude, displacement would be
+#>                    certified 1.0% of the time (user-expectation benchmark
+#>                    2.5%)
+#>   Verdict: BORDERLINE. Elevation, amplitude, and certified displacement
+#>   coverage rates are borderline at this number of replications; a larger
+#>   `reps` would sharpen the verdict.
+#> 
+#>   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):
+#>     Elevation      coverage 95.0%: borderline
+#>     Amplitude      coverage 83.0%: INADEQUATE (under-coverage; misses are
+#>                    almost all below the interval: the amplitude CI tends to
+#>                    sit above the truth)
+#>     Displacement   coverage 50.0% when certified: INADEQUATE (under-coverage)
+#>     Guardrail      under a truly zero amplitude, displacement would be
+#>                    certified 1.0% of the time (user-expectation benchmark
+#>                    2.5%)
+#>   Verdict: CAUTION. Amplitude CIs are less reliable than nominal at this
+#>   sample size and displacement CIs mis-cover even when certified. Elevation
+#>   coverage is borderline at this number of replications; a larger `reps`
+#>   would sharpen the verdict. Consider a larger sample or treat near-zero
+#>   amplitudes as inconclusive rather than absent.
+```
+<!-- precompute:volatile-numbers end -->
+
+How to read this output. Each profile's lines classify its coverage at the
+amplitude it was estimated to have. Coverage is how often your CI procedure
+covered the truth in the simulated replications. The diagnostic compares
+it with the nominal level, using the Wilson interval (an interval around the
+estimated coverage) and the Bradley band.
+
+- **Elevation, Amplitude and Displacement** give the coverage of each
+  parameter and its class. Displacement coverage counts only the replications
+  in which the profile was *certified*. A certified profile has its amplitude
+  CI lower bound at least 0.35 CI-widths above zero.
+- **Guardrail** gives the rate at which a profile whose true amplitude is
+  zero would still be certified. Any such certification is a false
+  certification. The line prints a caution when that rate is materially above
+  the rate that a user would expect from the interval level. This is a
+  measured property of the shipped display rule, not a hypothesis test.
+- **Verdict** states the overall conclusion for the profile.
+
+The two profiles tell usefully different stories. Paranoid PD is
+certified. Its amplitude CI lower bound clears the 0.35-CI-width margin, so
+the printed output adds no displacement note. None of its coverage rates
+clearly leaves the Bradley band at the as-estimated amplitude. Obsessive–compulsive PD is *not* certified. Its
+amplitude (about .02 here) is far too close to zero relative to its CI
+width. So the printed output still shows its displacement and interval, but
+with a note that the displacement is not interpretable. The `ssm_analyze()`
+result flags this on its own, before any coverage question is asked. On top
+of that, the
+diagnostic shows that its amplitude and displacement CIs under-cover badly at
+this sample size. Almost all amplitude misses fall below the interval, so the
+amplitude CI tends to sit above the truth. So its verdict is a caution for
+a genuine reason. The intervals themselves are unreliable, not merely the
+point on the circle.
+
+The guardrail line confirms that the rule is doing its job. At this
+configuration ($n = 250$, eight octant correlations), take a profile whose true
+amplitude is exactly zero. Its estimated certification rate does not clearly
+exceed the benchmark rate. That rate is roughly the one-sided error that a user reading the
+guardrail would expect. So no caution fires from the guardrail itself. This
+is the payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff,
+it keeps false-certification from clearly exceeding the benchmark, even in the
+near-zero regime that Zimmermann and Wright flagged. In that regime, a sample
+amplitude large enough to look non-zero is otherwise the *expected* outcome
+from a flat population.
+
+One reading note: at reduced `reps`, classes tend to print as
+`borderline`. This is because the Wilson interval around the estimated
+coverage is too wide to place it clearly inside or outside the Bradley band.
+That is the diagnostic being honest about its own Monte Carlo error. The
+default `reps = 1000` sharpens such classifications into `adequate` or
+`INADEQUATE`.
+
+#### The full report
+
+`summary()` adds the settings, a note on the simulated population, and a
+table of coverage at every rung of the amplitude ladder:
+
+<!-- precompute:volatile-numbers start -- the summary of the diagnostic run
+     above; its numbers move with that run across BLAS implementations. -->
+
+``` r
 summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 5.2s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 6.2s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -700,37 +785,30 @@ summary(acc)
 ```
 <!-- precompute:volatile-numbers end -->
 
-How to read this output:
+How to read the additions:
 
-- **The coverage table** reports how often your CI procedure covered the
-  truth in the simulated replications, for each parameter. It does so at the
-  amplitude that the profile was estimated to have (`Condition = 1`) and at
-  fractions of it. Compare coverage against the nominal level using the
-  Wilson interval (an interval around the estimated coverage) and the
-  Bradley band. The verdict does this for you.
+- **The structure note** describes the population the replications were
+  drawn from, with its fit indices and any boundary markers from the CPM fit.
+- **The coverage table** reports coverage for each parameter at each rung of
+  the ladder (`Condition = 1` is the amplitude as estimated). The `d_cert`
+  column is displacement coverage when certified.
 - **The amplitude ladder** (`Condition` column) matters because your
   estimated amplitude is biased upward. The population that generated your
   data plausibly has *less* differentiation than your estimate. The rungs
-  below 1 show what happens to coverage in that direction. The 0 rung shows
-  the degenerate flat-profile case. There, displacement has no true value at
-  all, and the amplitude interval cannot cover the boundary truth. (Its
-  printed zero coverage is structural, and the table flags it.) When a
-  profile's estimated amplitude is smaller than half its own CI width, the
-  diagnostic adds one more rung at a scaling factor above 1. This is the
-  case for obsessive–compulsive PD here. That rung is the amplitude at which
-  the population would sit exactly at the observed CI half-width.
-- **The `cert` column** of the coverage table reports how often profiles were
-  *certified* at each rung. Each profile's `Guardrail` line gives the rate at
-  the 0 rung. A certified profile has its amplitude CI lower bound at least
-  0.35 CI-widths above zero. At the 0 rung, any certification is a false
-  certification. The summary prints a caution when the false-certification
-  rate is materially above the rate that a user would expect from the
-  interval level. This is a measured property of the shipped display rule,
-  not a hypothesis test.
-- **The lines under `Verdicts (c = 1, as estimated)`** classify elevation, amplitude, and
-  certification-conditional displacement coverage at your as-estimated
-  amplitude. Each profile's `Verdict:` paragraph states the overall
-  conclusion.
+  below 1 show what happens to coverage in that direction. For paranoid PD,
+  no coverage rate clearly leaves the Bradley band with the population
+  amplitude halved either. The 0 rung shows the degenerate flat-profile
+  case. There, displacement has no true value at all, and the amplitude
+  interval cannot cover the boundary truth. (Its printed zero coverage is
+  structural, and the table flags it.) When a profile's estimated amplitude
+  is smaller than half its own CI width, the diagnostic adds one more rung at
+  a scaling factor above 1. This is the case for obsessive–compulsive PD
+  here. That rung is the amplitude at which the population would sit exactly
+  at the observed CI half-width.
+- **The `cert` column** reports how often profiles were certified at each
+  rung. The `Guardrail` line of the short report is this rate at the 0 rung.
+- **The lines under `Verdicts (c = 1, as estimated)`** are the verdict blocks
+  that `print()` shows.
 
 For a visual summary across the ladder:
 
@@ -740,40 +818,6 @@ plot(acc)
 ```
 
 <img src="figures/evaluating-circumplex-structure-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%" />
-
-The two profiles tell usefully different stories. Paranoid PD is
-certified. Its amplitude CI lower bound clears the 0.35-CI-width margin, so
-the printed output adds no displacement note. Nothing in its coverage table
-clearly leaves the Bradley band, at the as-estimated amplitude or with the
-population amplitude halved. Obsessive–compulsive PD is *not* certified. Its
-amplitude (about .02 here) is far too close to zero relative to its CI
-width. So the printed output still shows its displacement and interval, but
-with a note that the displacement is not interpretable. The `ssm_analyze()`
-result flags this on its own, before any coverage question is asked. On top
-of that, the
-diagnostic shows that its amplitude and displacement CIs under-cover badly at
-this sample size. Almost all amplitude misses fall below the interval, so the
-amplitude CI tends to sit above the truth. So its verdict is a caution for
-a genuine reason. The intervals themselves are unreliable, not merely the
-point on the circle.
-
-The guardrail line confirms that the rule is doing its job. At this
-configuration ($n = 250$, eight octant correlations), take a profile whose true
-amplitude is exactly zero. Its estimated certification rate does not clearly
-exceed the benchmark rate. That rate is roughly the one-sided error that a user reading the
-guardrail would expect. So no caution fires from the guardrail itself. This
-is the payoff of the scale-free rule. Unlike a fixed amplitude-unit cutoff,
-it keeps false-certification from clearly exceeding the benchmark, even in the
-near-zero regime that Zimmermann and Wright flagged. In that regime, a sample
-amplitude large enough to look non-zero is otherwise the *expected* outcome
-from a flat population.
-
-One reading note: at reduced `reps`, classes tend to print as
-`borderline`. This is because the Wilson interval around the estimated
-coverage is too wide to place it clearly inside or outside the Bradley band.
-That is the diagnostic being honest about its own Monte Carlo error. The
-default `reps = 1000` sharpens such classifications into `adequate` or
-`INADEQUATE`.
 
 Two settings are worth knowing. First, `structure = "observed"` rebuilds the
 population from the pooled observed correlations instead of the CPM. If
@@ -802,7 +846,7 @@ Putting Sections 2 and 3 together into a checklist:
 3. **Treat amplitude as optimistic.** It cannot go below zero, so it
    overshoots when true differentiation is weak. Before interpreting a
    "marked" amplitude at modest $n$, run `ssm_ci_accuracy()` and look at
-   the sub-1 ladder rungs.
+   the sub-1 ladder rungs in its `summary()` or `plot()`.
 4. **Only interpret displacement when amplitude is credible.** When the
    amplitude CI lower bound sits less than 0.35 CI-widths above zero, the
    printed output notes that the displacement is not interpretable. The

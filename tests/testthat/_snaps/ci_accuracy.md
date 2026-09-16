@@ -4,7 +4,8 @@
       print(res)
     Output
       
-      SSM CI accuracy, simulated at your n and settings (30 replications per condition; bootstrap intervals with 60 replicates at level 0.95)
+      SSM CI accuracy, simulated at your n and settings (30 replications per
+      condition; bootstrap intervals with 60 replicates at level 0.95)
       
         # Profile [All] (n = 120; 95% bootstrap CIs, 60 replicates):
           Elevation      coverage 100.0%: borderline
@@ -62,7 +63,8 @@
       print(res)
     Output
       
-      SSM CI accuracy, simulated at your n and settings (12 replications per condition; bootstrap intervals with 60 replicates at level 0.95)
+      SSM CI accuracy, simulated at your n and settings (12 replications per
+      condition; bootstrap intervals with 60 replicates at level 0.95)
       
         # Profile [Female] (n = 118; 95% bootstrap CIs, 60 replicates):
           Elevation      coverage 91.7%: borderline

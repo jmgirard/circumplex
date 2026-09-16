@@ -18,7 +18,7 @@
   past a narrow console or stopped short of a wide one. The
   words and their order do not change. Only the line breaks move. A
   fired marker label, such as `Heywood communality`, still stays on one line.
-  Tables, column headers, fit lines and section headings are unchanged,
+  Tables, column headers, fit lines and section headings do not wrap,
   because wrapping them would destroy their columns.
 
 * In `summary()` for an `ssm_ci_accuracy()` result, the heading above the
@@ -26,6 +26,24 @@
   band, 95% Wilson CIs:`. It was two characters longer. The heading is not
   wrapped, so in a vignette, where each output line starts with `#> `, the old
   heading took 81 columns and the new one takes 79.
+
+* In `print()` and `summary()` for a `cpm_fit()` result, the table of angles
+  and communality indices uses shorter column headers: `Theory` for
+  `Angle_theory`, and `lci` and `uci` after each estimate for its confidence
+  limits. At a width of 77 the `Communality` column no longer drops into a
+  second block below the table. The values do not change, and the `results`
+  data frame keeps its column names.
+
+* The heading of `print()` for an `ssm_ci_accuracy()` result now wraps to the
+  console width. The first entry in this section keeps headings unwrapped to
+  protect their columns. This heading is a sentence about the simulation
+  settings with no columns under it, so it wraps. Before this, it printed as
+  one line of any length.
+
+* The "Evaluating Circumplex Structure" vignette now shows the short
+  `print()` report of `ssm_ci_accuracy()` first, and the full `summary()`
+  report after it. It also says before each affected chunk that a warning
+  about an ill-conditioned CPM Hessian will print.
 
 * The vignettes set `options(width = 77)`, so output that follows the console
   width fits, with its `#> ` prefix, in 80 columns. The package website's

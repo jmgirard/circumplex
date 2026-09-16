@@ -58,10 +58,6 @@ caution_width_ledger <- c(
     "  Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)",
   heading =
     "Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)",
-  heading = paste0(
-    "SSM CI accuracy, simulated at your n and settings (3 replications per ",
-    "condition; bootstrap intervals with 40 replicates at level 0.95)"
-  ),
   heading =
     "Verdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:",
   heading =

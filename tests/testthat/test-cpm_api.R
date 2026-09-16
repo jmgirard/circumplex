@@ -549,6 +549,8 @@ test_that("RNG contract: analytic path is RNG-silent, bootstrap consumes the str
 test_that("print and summary render as expected", {
   fit <- cpm_fit(cormat = misfit_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 300)
+  expect_cpm_table_one_block(fit, print)
+  expect_cpm_table_one_block(fit, summary)
   expect_snapshot(print(fit))
   expect_snapshot(summary(fit))
 })
@@ -656,6 +658,8 @@ test_that("print and summary render a bootstrap fit as expected", {
   fit <- suppressWarnings(
     cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 100)
   )
+  expect_cpm_table_one_block(fit, print)
+  expect_cpm_table_one_block(fit, summary)
   expect_snapshot(print(fit))
   expect_snapshot(summary(fit))
 })
