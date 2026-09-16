@@ -505,7 +505,7 @@ How to read this output:
   rate is materially above the rate that a user would expect from the
   interval level. This is a measured property of the shipped display rule,
   not a hypothesis test.
-- **The lines under `Verdicts at c = 1`** classify elevation, amplitude, and
+- **The lines under `Verdicts (c = 1, as estimated)`** classify elevation, amplitude, and
   certification-conditional displacement coverage at your as-estimated
   amplitude. Each profile's `Verdict:` paragraph states the overall
   conclusion.

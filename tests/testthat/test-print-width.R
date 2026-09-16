@@ -63,7 +63,7 @@ caution_width_ledger <- c(
     "condition; bootstrap intervals with 40 replicates at level 0.95)"
   ),
   heading =
-    "Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:",
+    "Verdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:",
   heading =
     "Coverage by condition (d_cert: d when certified; cert: certification rate):",
   `section heading` =

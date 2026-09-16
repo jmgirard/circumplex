@@ -28,6 +28,10 @@ introduction vignette stops passing the deprecated ggplot2 argument
 `label.size` at its five sites. All seven vignettes are re-rendered. A new
 `tools/check-vignette-width.R` guards the rendered files, and
 `.github/workflows/vignette-precompute.yaml` runs it after the re-render.
+The accuracy report's verdict heading at `R/ssm_ci_oop.R:522` is reworded to
+`Verdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:`,
+which is 76 columns. The vignette prose that quotes the heading, its snapshot,
+and its width-ledger entry in `tests/testthat/test-print-width.R` follow.
 
 **Out:** the two live vignettes are outside the guard's reach (plan gate).
 `bayesian-ssm-analysis.Rmd` and `using-instruments.Rmd` are not pre-rendered,
@@ -70,13 +74,13 @@ package's own cautions is M131.
 
 ## Coverage
 
-- AC1 → T1, T2, T4
-- AC2 → T3
-- AC3 → T3, T4
+- AC1 → T1, T2, T3, T4
+- AC2 → T5
+- AC3 → T4, T5
 - AC4 → T4
 - AC5 → T2
-- AC6 → T1, T3
-- AC7 → T5, T6
+- AC6 → T1, T5
+- AC7 → T6, T7
 
 ## Tasks
 
@@ -87,14 +91,16 @@ package's own cautions is M131.
 - [x] T2: Add `options(width = 77)` to all nine setup chunks. Replace
       `label.size = NA` in `introduction-to-ssm-analysis.Rmd.orig` at lines
       64, 84, 302, 315 and 336 with the current ggplot2 argument.
-- [ ] T3: Run the four planted defect forms of AC2 and the inside-exemption
-      control. Record each result.
+- [x] T3: Reword the verdict heading at `R/ssm_ci_oop.R:522`. Update the
+      vignette prose that quotes it, its snapshot, and its width-ledger entry.
 - [ ] T4: Re-render the seven vignettes, commit the render, then run the
       width guard and the staleness guard.
-- [ ] T5: Wire the guard into `.github/workflows/vignette-precompute.yaml`
+- [ ] T5: Run the four planted defect forms of AC2 and the inside-exemption
+      control. Record each result.
+- [ ] T6: Wire the guard into `.github/workflows/vignette-precompute.yaml`
       after the re-render step. Add `tools/check-vignette-width.R` to
       `.Rbuildignore`.
-- [ ] T6: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [ ] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
       Sweep vignette prose for any claim about the old output width.
 
 ## Work log
@@ -106,6 +112,9 @@ package's own cautions is M131.
 - 2026-09-16: implement gate chose a start/end region marker for the exemption (fails when it covers no over-wide line) and a committed tools/m132-planted-defects.R for the AC2 plants. The region's markers add rendered lines, so the exempted lines move from :93-94.
 - 2026-09-16: T1 done. tools/check-vignette-width.R reads `#>` lines of the seven renders, measures display columns against 80, honors vignette-width:exempt regions, and errors on an empty domain. Before the re-render it reports 41 over-wide lines; the plan's 23 was measured at 26bd64ac, before M131's wrapped cautions reached 81-83 columns.
 - 2026-09-16: T2 done. `options(width = 77)` added to eight setup chunks (sem-based already had it). `label.size = NA` became `linewidth = NA` at the five sites, the replacement ggplot2 4.0.3's deprecation warning names.
+- 2026-09-16: amendment (Scope): the first re-render left one 81-column line, the fixed heading `Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:` from `R/ssm_ci_oop.R:522`. Mini gate chose rewording it over raising the limit to 81 or a second exemption. Scope In gained the reworded heading. Criteria unchanged, so no re-audit is owed.
+- 2026-09-16: minor amendment: new T3 (reword the heading) inserted, render moved before the plants (plants read a green render). Old T3-T6 are now T5, T4, T6, T7. Coverage renumbered.
+- 2026-09-16: T3 done. Heading reworded in `R/ssm_ci_oop.R`, `_snaps/ci_accuracy.md`, the `test-print-width.R` ledger and the vignette source prose. The ci_accuracy and print-width tests pass (876).
 
 ## Decisions
 

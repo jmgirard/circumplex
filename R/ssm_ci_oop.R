@@ -519,7 +519,7 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
     print(d$failed_reps)
   }
 
-  cat("\nVerdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:\n")
+  cat("\nVerdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:\n")
   ssm_ci_verdict_blocks(object)
 
   cat("\nCoverage by condition (d_cert: d when certified; cert: certification rate):\n")
