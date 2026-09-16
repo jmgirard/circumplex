@@ -1,6 +1,6 @@
 # M132: Rendered vignette output fits the website's code box
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M131
 - **Driving RR:** —
@@ -100,7 +100,7 @@ package's own cautions is M131.
 - [x] T6: Wire the guard into `.github/workflows/vignette-precompute.yaml`
       after the re-render step. Add `tools/check-vignette-width.R` to
       `.Rbuildignore`.
-- [ ] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T7: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
       Sweep vignette prose for any claim about the old output width.
 
 ## Work log
@@ -121,6 +121,7 @@ package's own cautions is M131.
 - 2026-09-16: T5 done. tools/m132-planted-defects.R: 42 of 42 plants as expected. Forms ascii (81 col), unicode (81 col, 159 bytes), outside (89), rerender (93) went red naming the planted line in each of the 7 files. Controls unicode80 (80 col, 157 bytes) and inside stayed green in each.
 - 2026-09-16: T7 in progress: NEWS.md gained entries for the reworded heading and the vignette width. Full `devtools::test()` passed (FAIL 0, WARN 11, SKIP 1, PASS 10743). Prose sweep of the nine vignette sources, README.Rmd and NEWS.md found no claim about the old output width.
 - 2026-09-16: claim audit: 31 claims read, 4 corrected — tools/m132-planted-defects.R, .github/workflows/vignette-precompute.yaml, the eight vignette setup comments, NEWS.md. Re-read once by the same reader, all four correct.
+- 2026-09-16: T7 done. `devtools::check(args = "--no-manual")` at 756d7167: 0 errors, 0 warnings, 0 notes. The branch workflow run of AC7 happens when review opens the PR. Status set to review.
 
 ## Decisions
 
