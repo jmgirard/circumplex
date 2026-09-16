@@ -77,7 +77,7 @@ records them (plan gate).
       over-wide line. Expand tabs to 8-column stops before
       `nchar(type = "width")`. Rewrite the header per AC4 and remove its marker
       instructions. Keep the per-file report and the empty-domain error.
-- [ ] T2: Remove the two marker comments from
+- [x] T2: Remove the two marker comments from
       `vignettes/sem-based-ssm-analysis.Rmd.orig` (lines 98 and 104) and
       re-render that vignette. Reword the marker sentence in the
       `.github/workflows/vignette-precompute.yaml` header comment (lines
@@ -101,6 +101,7 @@ records them (plan gate).
 - 2026-09-16: plan gate chose a one-off plant run over a committed plant script, because CI never ran the M132 script; falsified by a checker regression that a rerun of the plants catches.
 - 2026-09-16: AC5 and plant (e) were added after the gate. A second [O] re-audit of AC3 and AC5 returned two findings, both fixed. AC3 now limits a stale entry to `#>` lines measured after tab expansion. AC5 was a staleness check, which fails before the render is committed and proves nothing after. It is now a diff that shows only the two marker lines removed.
 - 2026-09-16: T1 done. The checker holds a two-entry EXEMPT list and expands tabs before it measures. On the committed vignettes it exits 0 and exempts `sem-based-ssm-analysis` lines 94 and 95, 86 columns each, while the old markers are still in place. Test suite: 0 failed, 0 errors.
+- 2026-09-16: T2 done. Markers removed and `sem-based-ssm-analysis` re-rendered with the current package installed. The diff against master removes only the two marker lines. The checker exits 0 and exempts lines 93 and 94. The AC2 grep prints nothing, and the plant script is deleted. No package code changed, so the test suite was not re-run.
 
 ## Decisions
 
