@@ -12,6 +12,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ggplot2)
 library(kableExtra)
 set.seed(12345)
+# Output wraps to 77 columns, so with its "#> " prefix it fits the site's code box.
+options(width = 77)
 ```
 
 ```{r setup}

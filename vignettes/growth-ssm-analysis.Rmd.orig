@@ -12,6 +12,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 has_glmmTMB <- requireNamespace("glmmTMB", quietly = TRUE)
 set.seed(20260716)
 library(ggplot2)
+# Output wraps to 77 columns, so with its "#> " prefix it fits the site's code box.
+options(width = 77)
 ```
 
 ```{r setup}

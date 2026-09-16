@@ -9,6 +9,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+# Output wraps to 77 columns, so with its "#> " prefix it fits the site's code box.
+options(width = 77)
 ```
 
 ```{r setup}
