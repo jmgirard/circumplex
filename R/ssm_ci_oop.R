@@ -383,13 +383,13 @@ ssm_ci_structure_note <- function(object) {
 #' @export
 print.circumplex_ci_accuracy <- function(x, digits = 3, ...) {
   d <- x$details
-  cat(
-    "\nSSM CI accuracy, simulated at your n and settings (",
+  header <- paste0(
+    "SSM CI accuracy, simulated at your n and settings (",
     d$reps, " replications per condition; ",
     if (identical(d$method, "montecarlo")) "Monte Carlo" else "bootstrap",
-    " intervals with ", d$boots, " replicates at level ", d$interval, ")\n",
-    sep = ""
+    " intervals with ", d$boots, " replicates at level ", d$interval, ")"
   )
+  cat("\n", paste0(wrap_prose(header), "\n"), sep = "")
   ssm_ci_verdict_blocks(x)
   invisible(x)
 }
