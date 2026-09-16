@@ -50,7 +50,7 @@ The vignette width setting, the re-render and the width guard go to M132.
       an emitter wrapped at a hardcoded width. Form three is an emitter
       wrapped at `width + 1`. Form four is an emitter whose indent is not
       counted against the width. Each red run names the emitter.
-- [ ] AC4: The pre-image for every comparison below is master `26bd64ac`.
+- [x] AC4: The pre-image for every comparison below is master `26bd64ac`.
       In each of the four snapshot files the T1 census names, every line
       that no census row emits stays byte-identical and in order. Blank
       lines count as lines. Each line that does change is attributed to a
@@ -155,6 +155,7 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-16: claim audit re-read, the one the step allows. Six of the seven corrections cleared. One did not: the ledger's kinds comment called a top-level heading and a test-statistic line "column-structured", and neither is. The heading is a running title and the statistic line is a labeled sentence. Corrected to say what actually puts them in the ledger, which is that their layout is written into the line rather than flowed. No further reader spawned; the step allows one re-read.
 - 2026-09-16: all tasks done, status to review. `devtools::test()`: 0 failures, 10743 passing, 1 skip. `devtools::check(args = "--no-manual")` on the finished tree: Status OK, 0 errors, 0 warnings, 0 notes. `devtools::document()` produces no diff and no unresolved-link warning.
 
+- 2026-09-16: second review pass: AC1 to AC5 pass on fresh evidence at `8360f269`, both AC4 probes now go red, consistency gate clean, three-lens review returned 13 findings (0 from the two history lenses), none meeting the return floor. Dispositions go to the gate.
 ## Decisions
 
 ### T1 census: the prose caution and note emitters (2026-09-15)
@@ -244,6 +245,72 @@ The property is tested with a double-width character, which is the only input
 that can tell the two counts apart.
 
 ## Review
+
+### Second pass (2026-09-16)
+
+_Fresh evidence, gathered 2026-09-16 on branch `m131-printed-cautions-wrap` at
+`8360f269`, synced with `origin/master` (17 ahead, 0 behind). No PR exists yet._
+
+**AC1, width compliance.** `test-print-width.R` run alone: 0 failures, 0
+errors. 41 census fixtures each assert at widths 60 and 120. The two warnings
+are the by-design ill-conditioned-Hessian warnings of row01 and row32.
+
+**AC2, word parity.** `Rscript tools/m131-caution-word-parity.R` exits 0: 41 of
+41 fixtures print the same words as `26bd64ac`.
+
+**AC3, four planted forms, one at a time, each reverted.** Form 1 (low-fit
+caution at `R/ssm_oop.R:189` emitted by plain `cat()`): 1 red,
+`row11_low_model_fit`. Form 2 (`width = 78` on the analytic-CI caution,
+`R/cpm_oop.R:297`): 1 red, `row08_analytic_ci_n`. Form 3 (`+ 1` on `room` at
+`R/utils.R:309`): 29 red, each named. Form 4 (`room <- max(width, 1)`): 34 red,
+each named. Tree clean after each.
+
+**AC4, line identity.** `Rscript tools/m131-line-identity.R` exits 0:
+`ci_accuracy.md` 9 groups (6 by marker, 3 re-wrap), `cpm_api.md` 4 (3, 1),
+`cpm_summary_markers.md` 4 (3, 1), `fit_structure_api.md` identical,
+axes-reliability rows 16 to 26 all attributed, 0 unattributed.
+`git diff --stat 26bd64ac HEAD -- tests/testthat/_snaps` touches only three of
+the four census files, so every other snapshot is unchanged, and the full suite
+passes on them. Probe 1 (`right = TRUE` at `R/axes_reliability_oop.R:210`):
+exit 1, 11 fixtures report unattributed groups. Probe 2 (the `cat("\n")` at
+`:212` deleted): exit 1, `row16_boundary_solution` reports 1 unattributed group
+whose words or blank lines moved. Both reverted. Both probes now go red, which
+is what failed on the first pass.
+
+**AC5, suite and check.** `devtools::test()`: FAIL 0, WARN 11, SKIP 1, PASS
+10743. `devtools::check(args = "--no-manual")`: Status OK, 0 errors, 0
+warnings, 0 notes, 7m 12.6s. NEWS.md records the change.
+
+**Consistency gate.** `cairn_validate.py` exit 0, no advisory. `document()` with
+`cli.width = 500`: 0 `resolve link` lines, no diff. README.Rmd untouched.
+`pkgdown::check_pkgdown()`: no problems. New files are tests and `tools/`
+(`^tools$` in `.Rbuildignore`). Master watches: newest push runs of
+`R-CMD-check.yaml` and `test-coverage.yaml` on master are `success` at
+`dba3f96e` (later master commits are tracking-only). `check-master-red-alert.R`,
+`master-red-alert-dryrun.R`, `check-branch-protection.R`: all exit 0.
+
+**Independent review.** [S] blame-history: no findings. [S] prior-review
+record: no findings (GitHub probe `[]`, and the M94, M127, M129, M130 archives read).
+[O] diff-bug: 13 findings, ranked as reported. None shows a criterion failing,
+so none meets the return floor. Proposed dispositions, decided at the gate:
+
+| # | Finding (condensed) | Proposed |
+|---|---|---|
+| P1 | O5 not closed: a new caution with no census row, parked in the ledger under a false kind, passes all three guards (`test-print-width.R:138`). | reject: T9 recorded that no textual rule closes it, and the kind label makes parking a visible false claim in the diff |
+| P2 | The fired-marker note's opening clause is one 51-column atomic unit, so below width 51 it overflows (verified at width 30) (`R/cpm_oop.R:262`). | follow-up |
+| P3 | Scaled-fit note: "They follow lavaan's *.scaled definitions" began its own line on master and now flows mid-line (`R/axes_reliability_oop.R:118`). | follow-up |
+| P4 | `norm_kind_phrase()`'s header comment now sits above `disp_width()` (`R/utils.R:230`). | fix now |
+| P5 | Line breaks can fall inside inequalities, for example `(ζ >` / `0.995, …` (`R/cpm_oop.R:70`). | follow-up, with O11 |
+| P6 | Guard two rebuilds only an empty domain. A partial one (interactive re-run) reads valid entries as unprinted (`test-print-width.R:162`). | reject: unreachable under `devtools::test()`, documented in the file |
+| P7 | Line-identity marker exit compares word and blank-line counts, not positions. | reject: milestone-local instrument, and both AC4 probes go red |
+| P8 | `wrap_prose()` accepts `width = Inf` and `NA_character_`, counts a tab as 0 columns, measures an atomic unit with a newline as one line. No caller hits these. | follow-up |
+| P9 | `ssm_ci_cat_line()` prints nothing, label included, for `text = ""`. No caller passes it. | follow-up |
+| P10 | A 125-column interpolated heading at `R/ssm_ci_oop.R:387` is excused by the ledger as `heading`. | follow-up (Scope leaves headings out) |
+| P11 | NEWS.md says every caution broke "at a column written into the package", but census rows marked U were not wrapped at all. | fix now |
+| P12 | AC4 box unticked. | resolved by this pass's tick |
+| P13 | One ~120-character comment line at `test-cpm_summary_markers.R:139`. | reject: style nit |
+
+### First pass (2026-09-15)
 
 _Fresh evidence, gathered 2026-09-15 on branch `m131-printed-cautions-wrap` at
 `d1efbd5e`, synced with `origin/master` (10 ahead, 0 behind)._
