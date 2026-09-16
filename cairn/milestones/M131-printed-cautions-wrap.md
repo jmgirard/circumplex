@@ -68,11 +68,11 @@ The vignette width setting, the re-render and the width guard go to M132.
 
 ## Coverage
 
-- AC1 → T1, T2, T3
-- AC2 → T4
+- AC1 → T1, T2, T3, T9
+- AC2 → T4, T7
 - AC3 → T3
-- AC4 → T4, T5
-- AC5 → T5, T6
+- AC4 → T4, T5, T7, T8
+- AC5 → T5, T6, T10
 
 ## Tasks
 
@@ -84,7 +84,7 @@ The vignette width setting, the re-render and the width guard go to M132.
 - [x] T2: Add the shared wrapping helper to `R/utils.R`. It wraps prose to
       `getOption("width")`, counts display columns, and counts any indent or
       leader against the width. Leave tables, headers and fit lines alone.
-- [ ] T3: Write `tests/testthat/test-print-width.R` first, one fixture per
+- [x] T3: Write `tests/testthat/test-print-width.R` first, one fixture per
       census row, at widths 60 and 120. Run the four planted defect forms of
       AC3 and record each red run.
 - [x] T4: Move each census emitter onto the helper. Then run the
@@ -93,6 +93,24 @@ The vignette width setting, the re-render and the width guard go to M132.
       Compare the note list against master `26bd64ac`.
 - [x] T6: Add the NEWS.md entry. Sweep `?` help pages and vignette prose for
       any claim about the old fixed-width layout.
+- [x] T7: Make `wrap_prose()` treat each element of `x` as its own paragraph
+      in non-atomic mode, as the `strwrap()` it replaced did. Restore the
+      three settings sentences at `R/ssm_ci_oop.R:472` to their own lines,
+      correct the NEWS.md claim about them and the stale comment at
+      `R/ssm_ci_oop.R:487`, and add multi-element tests to
+      `test-wrap-prose.R`. (Review findings O1, O2.)
+- [ ] T8: Strengthen `tools/m131-line-identity.R` so its marker exit cannot
+      excuse a dropped blank line, or a changed line outside the caution's
+      own text, inside an attributed group. Re-run both of AC4's instrument
+      probes. (Review findings O3, O4.)
+- [ ] T9: Fix the two ledger guards in `test-print-width.R`: check entries
+      against every known caution rather than only registered fixtures'
+      markers, and remove guard two's dependence on the 41 fixture blocks
+      having run first. (Review findings O5, O6.)
+- [ ] T10: Validate `wrap_prose()`'s `width` and `atomic` arguments as it
+      validates the other three, and restore a direct pin on the fired-marker
+      caveat's continuation indent in `test-cpm_summary_markers.R`. (Review
+      findings O8, O9.)
 
 ## Work log
 
@@ -120,6 +138,10 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-15: re-audit: AC4 (full) — six findings: an undecidable "fit line" category, no named baseline for "changes", a fourth sentence AC1 already entails, a word-collapse check blind to column structure, no probe of AC4's own instrument, and eleven axes-reliability emitters that no snapshot records.
 - 2026-09-15: criteria audit ran in full mode and returned ten findings. Five were fixed before writing. A grep clause passed only by changing `fit_est < 0.70` or a preserved caution. An "only wrapping mechanism" claim was already false at `ssm_sem.R:796`. The nchar type was unstated against multibyte cautions. The probe family varied only location. Five clauses bound an instrument. A `0 notes` clause reddens for unrelated reasons, and a width-40 case was unsatisfiable against a 15-column leader.
 - 2026-09-15: review gate, AC4 FAILED, status back to in-progress. Two counts, both inside the domain AC4's own procedure names. (1) `tools/m131-line-identity.R` does not go red against a dropped blank line before a note: removing the `cat("\n")` at `R/axes_reliability_oop.R:213` drops the blank line in the printed output and the tool still exits 0. Its `attributable()` marker exit puts the dropped line in the note's own changed group and excuses it. (2) AC4's byte-identity promise is violated in `_snaps/ci_accuracy.md`: the three settings sentences emitted at `R/ssm_ci_oop.R:472` belong to no census row, so they had to stay byte-identical, and `wrap_prose()` merged them into one flowed paragraph because it collapses a multi-element `x`. The same instrument excused that as a re-wrap. NEWS.md:25 now carries a false claim about those three sentences. AC1, AC2, AC3 and AC5 pass with evidence recorded in the Review section. Defect-return count: 1.
+- 2026-09-15: resumed after the AC4 return. Minor amendment: T7 to T10 added for the review findings the gate took, Coverage lines updated, T3 ticked (it was done at the time and left unticked). No criterion text changed.
+- 2026-09-15: question gate chose a paragraph-aware `wrap_prose()` over a loop at the one multi-element call site, because the collapse is a silent divergence from the `strwrap()` it replaced and the next caller would hit it again. Falsified by a caution that needs several elements flowed into one paragraph.
+- 2026-09-15: question gate chose to take findings O5, O6, O8 and O9 in this milestone, because all four sit in files already open here and O5 and O6 bear on whether the AC1 width test means what it claims. O7 (`ssm_sem.R` wraps one column differently, by a character count) and O11 (spliced failure reasons can break mid-phrase) go to candidate rows.
+- 2026-09-15: T7 done (review findings O1, O2). `wrap_prose()` now treats each element of `x` as its own paragraph in non-atomic mode, as `strwrap()` did; atomic mode keeps element-as-unit semantics. Five tests written first in `test-wrap-prose.R`, four of them red before the change. The three settings sentences at `R/ssm_ci_oop.R:472` print on their own lines again and `_snaps/ci_accuracy.md` is byte-identical to master `26bd64ac` on those lines. AC2 word parity: still 41 of 41. AC4 line identity: `ci_accuracy.md` falls from 10 changed groups to 9, and from 4 re-wraps to 3, the merged-paragraph group being gone. NEWS.md needed no edit: its claim that the settings "print as three short sentences, usually on three lines" is true again once the behavior is restored. The stale comment at `:487` was corrected. `devtools::test()`: 0 failures, 10714 passing.
 
 ## Decisions
 

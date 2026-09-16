@@ -484,8 +484,10 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
       "; groups ", paste0(names(d$n), " = ", d$n, collapse = ", "),
       "; elapsed ", round(d$elapsed, 1), "s."
     ),
-    # The full simulated ladder (margin rung included), so this line always
-    # enumerates the Condition values in the table below
+    # The full simulated ladder (margin rung included), so this sentence
+    # always enumerates the Condition values in the table below. It is its
+    # own paragraph, so it opens a line of its own whatever the width; how
+    # many lines it then takes is the reader's console's business.
     paste0(
       "Ladder c = ", paste(round(d$conditions, 3), collapse = ", "),
       "; certified if a_lci / (a_uci - a_lci) >= ", d$cert_k, "."

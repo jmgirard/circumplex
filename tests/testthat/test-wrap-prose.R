@@ -144,3 +144,51 @@ test_that("cat_prose() adds no blank line of its own", {
     length(wrap_prose(text, prefix = "  ", width = 40)) + 1L
   )
 })
+
+# ---- M131 T7: element boundaries are paragraph boundaries --------------------
+
+test_that("each element of x is its own paragraph in non-atomic mode", {
+  # The regression this pins. wrap_prose() replaced strwrap(), which treats
+  # each element of its input as a separate paragraph. Collapsing them instead
+  # merged three short settings sentences into one flowed paragraph in
+  # summary.circumplex_ci_accuracy(), which no census row emits and AC4
+  # required to stay byte-identical (M131 review, findings O1 and O2).
+  short <- c("First sentence.", "Second sentence.", "Third sentence.")
+  expect_identical(wrap_prose(short, width = 80), short)
+  # The same three would fit on one line if they were flowed together.
+  expect_lt(sum(nchar(short)) + 2L, 80L)
+})
+
+test_that("a long element still wraps, and later elements start a new line", {
+  first <- paste(rep("alpha", 12), collapse = " ")
+  lines <- wrap_prose(c(first, "Tail."), width = 30)
+  expect_gt(length(lines), 2L)
+  expect_identical(lines[[length(lines)]], "Tail.")
+  expect_true(all(nchar(lines, type = "width") <= 30L))
+})
+
+test_that("prefix opens every paragraph and continuation carries its rest", {
+  long <- paste(rep("beta", 10), collapse = " ")
+  lines <- wrap_prose(
+    c(long, long), prefix = ">> ", continuation = "   ", width = 20
+  )
+  opens <- grep("^>> ", lines)
+  expect_identical(length(opens), 2L)
+  expect_true(all(nchar(lines, type = "width") <= 20L))
+})
+
+test_that("empty and whitespace-only elements drop out, as strwrap drops them", {
+  expect_identical(
+    wrap_prose(c("Kept.", "", "   ", "Also kept."), width = 80),
+    c("Kept.", "Also kept.")
+  )
+  expect_identical(wrap_prose(c("", "  "), width = 80), character(0))
+})
+
+test_that("atomic mode keeps element-as-unit semantics, not paragraphs", {
+  # In atomic mode an element is a unit that must not split, and several
+  # units share a line. That is the marker-note layout and must not become
+  # one paragraph per marker.
+  lines <- wrap_prose(c("aa", "bb", "cc"), width = 80, atomic = TRUE)
+  expect_identical(lines, "aa bb cc")
+})

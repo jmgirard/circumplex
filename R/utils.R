@@ -254,10 +254,16 @@ disp_width <- function(x) {
 # same width in spaces.
 #
 # With `atomic = FALSE`, `x` is prose and a break may fall between any two
-# words. With `atomic = TRUE`, each element of `x` is a unit that must not
-# split: a break falls only between elements. The bootstrap marker note uses
-# the atomic form, because a marker label is taught as a unit and reads as one
-# name only while it stays on one line.
+# words. Each ELEMENT of `x` is then a paragraph of its own, as it is for the
+# strwrap() this replaced: elements are never flowed into one another, and
+# `prefix` opens each of them. An empty or whitespace-only element
+# contributes nothing, again as strwrap drops it.
+#
+# With `atomic = TRUE`, each element of `x` is instead a unit that must not
+# split: a break falls only between elements, and the whole vector is one
+# paragraph. The bootstrap marker note uses the atomic form, because a marker
+# label is taught as a unit and reads as one name only while it stays on one
+# line.
 #
 # A single word wider than the room left on a line is placed on its own line
 # rather than split, so that line can exceed the width. Breaking a word would
@@ -272,31 +278,39 @@ wrap_prose <- function(x, prefix = "", continuation = prefix,
   )
   if (!is_scalar_count(width)) width <- 80L
 
-  pieces <- if (atomic) {
-    x
-  } else {
-    unlist(strsplit(paste(x, collapse = " "), "[ \t\r\n]+"))
-  }
-  pieces <- pieces[nzchar(pieces)]
-  if (length(pieces) == 0) return(character(0))
+  # Each element of `x` is a paragraph of its own, as in the strwrap() this
+  # replaced, so a caller that hands over several sentences gets several
+  # paragraphs rather than one flowed block (M131 review, O1). In atomic mode
+  # an element is a unit that must not split, not a paragraph, so the whole
+  # vector is one paragraph there.
+  paragraphs <- if (atomic) list(x) else lapply(x, function(p) {
+    unlist(strsplit(p, "[ \t\r\n]+"))
+  })
 
-  bodies <- character(0)
-  current <- pieces[[1]]
-  for (piece in pieces[-1]) {
-    lead <- if (length(bodies) == 0) prefix else continuation
-    room <- max(width - disp_width(lead), 1)
-    candidate <- paste(current, piece)
-    if (disp_width(candidate) <= room) {
-      current <- candidate
-    } else {
-      bodies <- c(bodies, current)
-      current <- piece
+  out <- character(0)
+  for (pieces in paragraphs) {
+    pieces <- pieces[nzchar(pieces)]
+    if (length(pieces) == 0) next
+
+    bodies <- character(0)
+    current <- pieces[[1]]
+    for (piece in pieces[-1]) {
+      lead <- if (length(bodies) == 0) prefix else continuation
+      room <- max(width - disp_width(lead), 1)
+      candidate <- paste(current, piece)
+      if (disp_width(candidate) <= room) {
+        current <- candidate
+      } else {
+        bodies <- c(bodies, current)
+        current <- piece
+      }
     }
-  }
-  bodies <- c(bodies, current)
+    bodies <- c(bodies, current)
 
-  leads <- c(prefix, rep(continuation, length(bodies) - 1))
-  paste0(leads[seq_along(bodies)], bodies)
+    leads <- c(prefix, rep(continuation, length(bodies) - 1))
+    out <- c(out, paste0(leads[seq_along(bodies)], bodies))
+  }
+  out
 }
 
 # The same wrapping, printed. Every caution site that has nothing to add

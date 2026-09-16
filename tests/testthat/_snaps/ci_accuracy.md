@@ -23,8 +23,8 @@
     Output
       
       Mean scores; bootstrap, 60 replicates, level 0.95; 30 reps per condition.
-      Population: Browne circular model (CPM); groups All = 120; elapsed <masked>. Ladder
-      c = 1, 0.25, 0; certified if a_lci / (a_uci - a_lci) >= 0.35.
+      Population: Browne circular model (CPM); groups All = 120; elapsed <masked>.
+      Ladder c = 1, 0.25, 0; certified if a_lci / (a_uci - a_lci) >= 0.35.
       
       Structure note: population simulated from a Browne circular model fit (m = 3,
       RMSEA = 0.038, SRMR = 0.046).
