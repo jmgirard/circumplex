@@ -23,15 +23,6 @@ Circumplex scales contain multiple subscales that attempt to measure different b
 
 Circumplex data is composed of scores on a set of circumplex scales for one or more participants (e.g., persons or organizations). Such data is usually collected via self-report, informant-report, or observational ratings in order to locate psychological phenomena within the circular space of the circumplex model. For example, a therapist might want to understand the interpersonal problems encountered by an individual patient, a social psychologist might want to understand the emotional experiences of a group of participants during an experiment, and a personality psychologist might want to understand what kind of interpersonal behaviors are associated with a trait (e.g., extraversion).
 
-
-```
-#> Warning: The `label.size` argument of `geom_label()` is deprecated as of ggplot2 3.5.0.
-#> ℹ Please use the `linewidth` argument instead.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
-```
-
 <img src="figures/introduction-to-ssm-analysis-model-1.png" alt="plot of chunk model" width="100%" />
 
 
@@ -78,20 +69,20 @@ To illustrate the SSM functions, we will use the example dataset `jz2017`, which
 ``` r
 data("jz2017")
 head(jz2017)
-#>   Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD BORPD
-#> 1 Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7     8
-#> 2 Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0     1
-#> 3 Female 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00     0     1     0    4     1
-#> 4   Male 2.00 1.75 1.75 2.50 2.00 1.75 2.00 2.50     1     0     0    0     1
-#> 5 Female 0.25 0.50 0.25 0.00 0.00 0.00 0.00 0.00     0     0     0    0     1
-#> 6   Male 1.50 1.75 2.25 1.75 2.00 1.25 2.25 2.50     5     5     7    5     4
-#>   HISPD NARPD AVPD DPNPD OCPD
-#> 1     4     6    3     4    6
-#> 2     2     3    0     1    0
-#> 3     5     4    0     0    1
-#> 4     0     0    0     0    0
-#> 5     0     0    1     0    0
-#> 6     4     7    2     0    3
+#>   Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD
+#> 1 Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7
+#> 2 Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0
+#> 3 Female 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00     0     1     0    4
+#> 4   Male 2.00 1.75 1.75 2.50 2.00 1.75 2.00 2.50     1     0     0    0
+#> 5 Female 0.25 0.50 0.25 0.00 0.00 0.00 0.00 0.00     0     0     0    0
+#> 6   Male 1.50 1.75 2.25 1.75 2.00 1.25 2.25 2.50     5     5     7    5
+#>   BORPD HISPD NARPD AVPD DPNPD OCPD
+#> 1     8     4     6    3     4    6
+#> 2     1     2     3    0     1    0
+#> 3     1     5     4    0     0    1
+#> 4     1     0     0    0     0    0
+#> 5     1     0     0    1     0    0
+#> 6     4     4     7    2     0    3
 ```
 
 The circumplex scales in `jz2017` come from the Inventory of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can be arranged into the following circular model, which is organized around the two primary dimensions of agency (y-axis) and communion (x-axis). Note that the two-letter scale abbreviations and angular values are based in convention. A high score on PA indicates that one has interpersonal problems related to being "domineering" or too high on agency, whereas a high score on DE indicates problems related to being "cold" or too low on communion. Scales that are not directly on the y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.

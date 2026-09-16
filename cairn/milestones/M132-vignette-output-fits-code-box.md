@@ -115,6 +115,7 @@ package's own cautions is M131.
 - 2026-09-16: amendment (Scope): the first re-render left one 81-column line, the fixed heading `Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:` from `R/ssm_ci_oop.R:522`. Mini gate chose rewording it over raising the limit to 81 or a second exemption. Scope In gained the reworded heading. Criteria unchanged, so no re-audit is owed.
 - 2026-09-16: minor amendment: new T3 (reword the heading) inserted, render moved before the plants (plants read a green render). Old T3-T6 are now T5, T4, T6, T7. Coverage renumbered.
 - 2026-09-16: T3 done. Heading reworded in `R/ssm_ci_oop.R`, `_snaps/ci_accuracy.md`, the `test-print-width.R` ledger and the vignette source prose. The ci_accuracy and print-width tests pass (876).
+- 2026-09-16: T4 render committed. Width guard exits 0: output lines per file 284, 147, 9, 255, 65, 41, 94, one exemption (sem-based lines 94-95). Output words match the previous render apart from the heading, a timing, the removed deprecation warning, and table columns that moved when tables wrapped at 77.
 
 ## Decisions
 
