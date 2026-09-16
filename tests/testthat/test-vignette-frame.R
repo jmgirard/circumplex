@@ -58,9 +58,10 @@ frame_titles <- function() {
   vapply(names(frame_levels), function(n) frame_title(frame_lines(n)), character(1))
 }
 
-# Double-quoted titles in a piece of text.
+# Page titles named in a piece of text: double-quoted strings that begin with
+# a capital letter. A quoted question or phrase in lower case is not a title.
 quoted <- function(text) {
-  m <- gregexpr("\"([^\"]+)\"", text)
+  m <- gregexpr("\"([A-Z][^\"]*)\"", text)
   unlist(lapply(regmatches(text, m), function(x) gsub("\"", "", x)))
 }
 
