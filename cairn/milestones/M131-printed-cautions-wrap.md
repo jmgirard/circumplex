@@ -7,7 +7,7 @@
 - **Principles touched:** GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — the cautions are text users read in the console and in the vignettes
-- **Branch/PR:** `m131-printed-cautions-wrap`
+- **Branch/PR:** `m131-printed-cautions-wrap` · https://github.com/jmgirard/circumplex/pull/164
 
 ## Goal
 
