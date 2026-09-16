@@ -89,9 +89,9 @@ The vignette width setting, the re-render and the width guard go to M132.
       AC3 and record each red run.
 - [x] T4: Move each census emitter onto the helper. Then run the
       `git archive` comparison of AC2 and record its result.
-- [ ] T5: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T5: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
       Compare the note list against master `26bd64ac`.
-- [ ] T6: Add the NEWS.md entry. Sweep `?` help pages and vignette prose for
+- [x] T6: Add the NEWS.md entry. Sweep `?` help pages and vignette prose for
       any claim about the old fixed-width layout.
 
 ## Work log
@@ -101,6 +101,8 @@ The vignette width setting, the re-render and the width guard go to M132.
 - 2026-09-15: plan gate chose a shared helper over per-site strwrap calls, because the T1 census found four wrapping mechanisms across six files. Falsified by a caution whose layout the shared helper cannot express.
 - 2026-09-15: T1 census done: 41 emitters, 4 layout classes, not the 6 the plan assumed. Delegated to a Sonnet reader, spot-verified against the source. Table in Decisions.
 - 2026-09-15: T2 done: `wrap_prose()` and `cat_prose()` added to `R/utils.R`, with direct tests in `tests/testthat/test-wrap-prose.R` (33 pass). Four planted defects each turn the tests red: an uncounted prefix, an off-by-one width, a character count in place of a column count, and a split atomic unit.
+- 2026-09-15: T5 done. `devtools::check(args = "--no-manual")` reports Status OK, 0 errors, 0 warnings, 0 notes, so nothing is reported that master `26bd64ac` does not also report. `devtools::document()` produces no diff.
+- 2026-09-15: T6 done. NEWS.md records the wrapping change under Minor improvements and fixes. The sweep of help pages and vignette prose found no claim about the old fixed-width layout. Every `wrap` in the vignettes is about angular wrapping.
 - 2026-09-15: T4 done. All 41 emitters wrap to `getOption("width")`. The two `ssm_ci_oop.R` helpers were converted here. The 25 Class 1 emitters were delegated to an Opus reader and reviewed. All 41 width blocks pass at widths 60 and 120. The full suite passes: 1109 tests, 0 failures, 1 skip.
 - 2026-09-15: T4 defect found in the helper itself. `cat()` appends its separator after the last element too, so `cat_prose()` was adding a blank line after every caution. The delegated reader found it by counting blank lines against master. Fixed, and `test-wrap-prose.R` now has a test that fails if it returns.
 - 2026-09-15: T4 word parity (AC2): 41 of 41 fixtures print the same words as master `26bd64ac`. The oracle discriminates: changing `Heywood-type` to `Heywood` in one caution reddened 10 rows and named the word.
