@@ -227,9 +227,15 @@ is_null_or_num <- function(x, n = NULL) {
 # phrase: the controlled vocabulary is pinned by the test suite, so reaching
 # this branch means the data went somewhere the vocabulary does not cover, and
 # printing a guess there would hide it.
-# Display columns, not characters or bytes. The printed cautions carry "²",
-# "ζ" and "ℹ", whose column count is what a console line budget is
-# spent in, so every width comparison below goes through this one function.
+# Display columns, which is what a console line budget is spent in. Every
+# width comparison below goes through this one function.
+#
+# The cautions carry "²", "ζ" and "ℹ", which take more bytes
+# than characters but occupy one column each, so for the package's own text a
+# character count would give the same answer. Columns are counted because
+# that is the right question to ask of a console, not because these glyphs
+# force it. A double-width character is what tells the two counts apart, and
+# that is what test-wrap-prose.R uses.
 disp_width <- function(x) {
   nchar(x, type = "width")
 }

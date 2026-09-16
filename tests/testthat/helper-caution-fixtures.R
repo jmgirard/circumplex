@@ -80,8 +80,9 @@ caution_fixtures <- function() {
   }
 
   # A cheap axes_reliability() fit: 8 octant scales, 2 items each (16 items),
-  # N = 300, no missingness -- the smallest design the fitter accepts (>= 4
-  # scales) run at a size where lavaan converges quickly.
+  # N = 300, no missingness. Two items per scale is the fewest the fitter
+  # accepts, and eight octant scales are what the rest of the suite uses, at a
+  # size where lavaan converges quickly.
   axes_base <- function() {
     if (is.null(cache$axes)) {
       if (!requireNamespace("lavaan", quietly = TRUE)) {

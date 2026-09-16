@@ -9,7 +9,9 @@
 # Usage, from the repo root:
 #   Rscript tools/m131-caution-word-parity.R [<base-commit>]
 #
-# The base commit defaults to 26bd64ac, the commit M131 branched from.
+# The base commit defaults to 26bd64ac, the last commit before this work that
+# changed any R code. The branch was cut from cf75fd04, whose only content is
+# tracking files, so the two print the same output.
 #
 # Both runs evaluate the SAME fixtures, the ones in
 # tests/testthat/helper-caution-fixtures.R in the working tree, so a fixture
@@ -79,10 +81,11 @@ status <- system2(
 stopifnot(status == 0)
 utils::untar(file.path(work, "base.tar"), exdir = base_tree)
 
-# The width is the one the words are compared at. It is deliberately NOT the
-# width either build wraps to: the comparison collapses line breaks, so the
-# words must match at any width, and a width unlike both defaults keeps the
-# test from passing by accident on identical breaks.
+# The width the words are compared at. The comparison collapses line breaks,
+# so the words must match at any width. It is deliberately not the width the
+# BASE build wraps to, which is 78, so the two sides cannot pass by happening
+# to break in the same places. The branch build reads this width and wraps to
+# it, which is the behavior under test.
 compare_width <- 100L
 
 run_capture <- function(pkg, out) {
