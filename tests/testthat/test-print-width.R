@@ -32,31 +32,54 @@
 # The first guard catches a whole caution parked here, which is the case that
 # matters, because an emitter nobody wrapped prints its caution on one line.
 # It does not catch a single continuation line of a caution, which carries no
-# marker. Nothing here does. Adding an entry is a deliberate act, and the
-# entry has to be classified above.
+# marker. Nothing here does.
+#
+# What the guards cannot decide, and what stands in for it (M131 review, O5).
+# A caution added later, with no census row and so no registered marker, and
+# printed incidentally by one of the fixtures below, would pass both guards.
+# No textual rule separates such a line from a legitimate entry: an unwrapped
+# caution does not go through cat_prose(), so instrumenting the helper does
+# not see it either, and the shape pattern that would catch it was rejected at
+# T3 because it excuses as much as it catches. What stands in for it is the
+# classification: every entry is NAMED by its kind, a third guard requires
+# that kind to be one of the four this milestone leaves alone, and there is no
+# kind a caution could honestly be filed under. Parking one here now means
+# writing down a false kind, which is a visible act in the diff rather than a
+# silent one.
 
 caution_width_ledger <- c(
-  # fit line (R/cpm_oop.R, cpm_fit_line())
-  paste0(
+  `fit line` = paste0(
     "Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 ",
     "[0.063, 0.094]; SRMR = 0.042; CFI = 0.984"
   ),
-  # test-statistic lines (R/fit_structure_oop.R, structure_randall_line())
-  "  Correspondence index = 0.694, p = 0.0167 (exact, 120 relabelings)",
-  "  Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)",
-  # headings
-  "Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)",
-  paste0(
+  `test-statistic line` =
+    "  Correspondence index = 0.694, p = 0.0167 (exact, 120 relabelings)",
+  `test-statistic line` =
+    "  Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)",
+  heading =
+    "Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)",
+  heading = paste0(
     "SSM CI accuracy, simulated at your n and settings (3 replications per ",
     "condition; bootstrap intervals with 40 replicates at level 0.95)"
   ),
-  "Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:",
-  "Coverage by condition (d_cert: d when certified; cert: certification rate):",
-  # section headings inside the accuracy report
-  "  # Profile [All] (n = 150; 95% bootstrap CIs, 40 replicates):",
-  "  # Profile [Female] (n = 71; 95% bootstrap CIs, 40 replicates):",
-  "  # Profile [Male] (n = 79; 95% bootstrap CIs, 40 replicates):",
-  "  # Contrast [Male - Female] (95% bootstrap CIs, 40 replicates):"
+  heading =
+    "Verdicts at c = 1 (as estimated), Bradley (1978) liberal band, 95% Wilson CIs:",
+  heading =
+    "Coverage by condition (d_cert: d when certified; cert: certification rate):",
+  `section heading` =
+    "  # Profile [All] (n = 150; 95% bootstrap CIs, 40 replicates):",
+  `section heading` =
+    "  # Profile [Female] (n = 71; 95% bootstrap CIs, 40 replicates):",
+  `section heading` =
+    "  # Profile [Male] (n = 79; 95% bootstrap CIs, 40 replicates):",
+  `section heading` =
+    "  # Contrast [Male - Female] (95% bootstrap CIs, 40 replicates):"
+)
+
+# The kinds this milestone deliberately leaves unwrapped, per its Scope.
+# Nothing else may be excused, and no caution is any of these.
+caution_ledger_kinds <- c(
+  "fit line", "test-statistic line", "heading", "section heading"
 )
 
 # Lines over the width that the ledger does not account for.
@@ -119,13 +142,44 @@ test_that("no ledger entry carries the text of a known caution", {
 
 test_that("every ledger entry is a line some fixture really prints", {
   # A ledger whose entries no longer occur has stopped being a record of what
-  # is excused and become room to grow. This runs last, on what the blocks
-  # above actually produced.
-  expect_gt(length(caution_seen_overlong$lines), 0)
+  # is excused and become room to grow.
+  #
+  # The domain is normally what the blocks above gathered as they ran. When
+  # this block runs on its own -- a filtered run, or a runner that does not
+  # keep file order -- that environment is empty, and reading it anyway would
+  # fail for a reason that has nothing to do with the ledger, or pass on
+  # whatever a previous run left behind (M131 review, O6). So the guard
+  # rebuilds the domain itself in that case, and says which it used.
+  seen <- caution_seen_overlong$lines
+  rebuilt <- length(seen) == 0
+  if (rebuilt) {
+    for (fx in fixtures) {
+      obj <- fx$build()
+      for (width in c(60, 120)) {
+        lines <- caution_fixture_output(quote(fx$print(obj)), width)
+        seen <- union(seen, sub("[ \t]+$", "", caution_overlong_lines(lines, width)))
+      }
+    }
+  }
+  expect_gt(length(seen), 0)
   for (entry in caution_width_ledger) {
     expect_true(
-      entry %in% caution_seen_overlong$lines,
-      info = paste0("ledger entry never printed: ", entry)
+      entry %in% seen,
+      info = paste0(
+        "ledger entry never printed (domain ",
+        if (rebuilt) "rebuilt here" else "gathered by the blocks above",
+        "): ", entry
+      )
     )
   }
+})
+
+test_that("every ledger entry is named by a kind this milestone leaves alone", {
+  # The classification is what stands in for a guard that cannot be written
+  # (see the header). An entry with no kind, or with a kind outside the four
+  # the Scope leaves unwrapped, is a caution being smuggled in under a label.
+  kinds <- names(caution_width_ledger)
+  expect_false(is.null(kinds))
+  expect_true(all(nzchar(kinds)))
+  expect_true(all(kinds %in% caution_ledger_kinds))
 })
