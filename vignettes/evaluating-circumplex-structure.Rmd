@@ -60,9 +60,10 @@ the default confidence intervals are bootstrapped. We
 lower `boots` from its default of 2000 to keep this vignette quick to
 build. In practice, use the default.
 
-This chunk prints a warning that the CPM Hessian is ill-conditioned. That
-warning is expected for these data. The section *When a fit sits at a
-boundary*, below, explains what it means.
+This chunk prints two warnings: the CPM Hessian is ill-conditioned, and some
+bootstrap resamples were excluded. Both are expected for these data. The
+section *When a fit sits at a boundary*, below, explains the first. The
+second means that the intervals rest only on the resamples that were kept.
 
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the reported condition number and the bootstrap
@@ -413,9 +414,9 @@ Constrained variants make the structural question sharp. Is the instrument
 consistent with *equally spaced* scales? Is it consistent with *equal*
 communalities? The correlation-matrix path is convenient for this
 comparison, because its point estimates and fit indices are deterministic.
-So no bootstrap is needed. These refits of the same data print the same
-ill-conditioned Hessian warning that *When a fit sits at a boundary*
-explains.
+So no bootstrap is needed. The first of these refits (`quasi-circumplex`)
+prints the same ill-conditioned Hessian warning that *When a fit sits at a
+boundary* explains.
 
 <!-- precompute:volatile-numbers start -- these three model variants
      refit the same ill-conditioned correlation matrix, so the reported
