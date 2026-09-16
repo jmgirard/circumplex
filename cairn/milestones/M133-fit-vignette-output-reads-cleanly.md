@@ -67,6 +67,8 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - 2026-09-16: T6 done. The NEWS entry now says the accuracy heading wraps because it has no columns under it, and points at the first entry.
 - 2026-09-16: claim audit: 7 claims read, 0 corrected — NEWS.md, tests/testthat/test-cpm_summary_markers.R (one NEWS line rewrapped to 80 columns).
 - 2026-09-16: implement complete after return 1. devtools::test(): 0 failed, 0 errors, 1 skipped, 11034 passed. Status review.
+- 2026-09-16: review pass 2: all seven criteria verified. Gate fix: NEWS.md:21 wording ([O] a).
+- 2026-09-16: step-7 approval: m133-fit-vignette-output approved for merge
 
 ## Decisions
 
@@ -128,3 +130,8 @@ Independent review, pass 2 (three fresh reviewers). Pass-1 findings [O] 1 and [O
 - [S] blame-history: no finding contradicts a past change or decision. D-056 and D-057 cover the header change. Removing the accuracy heading from the width ledger is correct.
 
 No finding shows an acceptance criterion failing. Dispositions are recorded at the approval gate.
+
+Gate dispositions (2026-09-16, maintainer):
+- [O] a: fix now. NEWS.md:21 now says column headers "do not wrap" in place of "are unchanged".
+- [O] b: follow-up. The free-scaling long-name limit joins the ROADMAP output-width candidate row at hygiene.
+- [O] c to k, and the pass-1 carried findings [O] 4, 5, 7, 8, 9, 10, 11 and the [S] nit: rejected. They are wording, test-style or out-of-scope points, and no criterion or user result depends on them.

@@ -18,7 +18,7 @@
   past a narrow console or stopped short of a wide one. The
   words and their order do not change. Only the line breaks move. A
   fired marker label, such as `Heywood communality`, still stays on one line.
-  Tables, column headers, fit lines and section headings are unchanged,
+  Tables, column headers, fit lines and section headings do not wrap,
   because wrapping them would destroy their columns.
 
 * In `summary()` for an `ssm_ci_accuracy()` result, the heading above the
