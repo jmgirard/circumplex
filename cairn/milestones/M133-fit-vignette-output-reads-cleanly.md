@@ -65,6 +65,7 @@ In the evaluating-circumplex-structure vignette, readers see the CPM table in on
 - 2026-09-16: minor amendment after review return 1: added T5 (AC2 assertions for all seven fixtures in test-cpm_summary_markers.R) and T6 (review finding [O] 3, NEWS contradiction). Coverage now maps AC2 to T5 and AC7 to T6.
 - 2026-09-16: T5 done. New test runs the one-block check on 7 fixtures with print() and summary() (198 expectations, skip_on_cran only). Planted defect (cpm_display_results() with the old headers) turned it red.
 - 2026-09-16: T6 done. The NEWS entry now says the accuracy heading wraps because it has no columns under it, and points at the first entry.
+- 2026-09-16: claim audit: 7 claims read, 0 corrected — NEWS.md, tests/testthat/test-cpm_summary_markers.R (one NEWS line rewrapped to 80 columns).
 
 ## Decisions
 
