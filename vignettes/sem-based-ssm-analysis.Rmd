@@ -43,9 +43,9 @@ relying on it.
 
 Section 2, "Why a latent SSM?", explains attenuation. Section 3, "The
 measurement model", shows the lavaan model that `ssm_sem_syntax()` writes.
-Section 4, "Estimating a latent profile", fits it with `ssm_sem()` and reads
-the result with `ssm_sem_parameters()`. Section 5, "Where the confidence
-intervals come from", and Section 6, "What the parameters mean now", explain
+Section 4, "Estimating a latent profile", fits it with `ssm_sem()` and
+compares the latent profile with the observed one. Section 5, "Where the
+confidence intervals come from", and Section 6, "What the parameters mean now", explain
 the intervals and the disattenuated parameters. Section 7, "Two questions
 about group differences", and Section 8, "Invariance-gated latent contrasts",
 cover groups. Section 9, "When to trust it: limitations", and Section 10,

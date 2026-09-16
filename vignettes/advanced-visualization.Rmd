@@ -50,7 +50,8 @@ built-in plots are themselves made of. These are ordinary
 
 This vignette works through each of these and then combines them. Section 2,
 "The circular canvas", draws the empty canvas with `ggcircumplex()`. Section
-3, "The coordinate system", builds the same figure from `coord_circumplex()`.
+3, "The coordinate system", builds a figure from scratch with
+`coord_circumplex()`.
 Section 4, "Placing SSM results in the circle", adds profiles with
 `geom_ssm_point()` and `geom_ssm_arc()`. Section 5, "Restyling the canvas",
 themes it. Section 6, "Composing custom layers", adds respondents behind a
