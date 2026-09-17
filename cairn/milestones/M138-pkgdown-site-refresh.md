@@ -173,6 +173,23 @@ Both exited 0.
   checked at the step-8 CI wait, which merges only on green, so the box stays unticked
   at the approval gate.
 
+### Consistency gate
+
+Universal cairn-file checks: `cairn_validate.py` exits 0, with all 16 PASS checks green
+and all 7 advisories OK, `release window` among them. No `DESIGN.md` principle changed
+in this diff, so `cairn_impact.py` was not run.
+
+The `r-package` profile's `consistency-gate` slot, check by check:
+`devtools::document()` at `cli.width = 500` emits no `resolve link` line and leaves no
+diff; README.md is newer than README.Rmd; `pkgdown::check_pkgdown()` reports "No
+problems found"; `_pkgdown.yml`, `tools` and `cairn` all carry `.Rbuildignore` entries;
+`devtools::check(args = "--no-manual")` returns Status OK, 0 errors, 0 warnings, 0
+notes in 10m 11s; the newest push run on master reaching a verdict is `success` for
+`R-CMD-check.yaml`, `test-coverage.yaml` and `pkgdown.yaml` alike (head
+`07981358`); `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and
+`tools/check-branch-protection.R` all exit 0. No NEWS.md entry is owed, per the
+milestone's Scope: no package behavior changes.
+
 ### Independent review
 
 The milestone's surface tier is user-facing, so the full three-lens fan-out ran, each
@@ -261,5 +278,16 @@ load-bearing defect in what the site or the guard does for its users: the site r
 as the Goal describes, and the guard keeps every promise its docstring makes. The
 guard's divider gap is a coverage gap outside AC4's five named paths. So no finding
 returns the milestone, and the one fix-now item was a comment correction.
+
+### Disposition
+
+Every acceptance criterion is verified with fresh evidence except AC6's last clause,
+the `pkgdown.yaml` workflow being green on the pull request, which cannot exist before
+the pull request does and is checked at the step-8 CI wait. The consistency gate is
+clean and the three-lens fan-out returned nothing that returns the milestone. The one
+fix-now item, a `_pkgdown.yml` comment, is corrected and re-verified. Five findings go
+to the "Harden the vignette frame and split guards" candidate row at the hygiene pass,
+the Algolia-key-in-history finding gets its own row, and the accepted AC1 limitation
+goes to `DESIGN.md` Known issues there.
 
 ## Decisions
