@@ -8,8 +8,9 @@ authors:
     href: https://www.personalityprocesses.com
 template:
   bootstrap: 5
+  bslib:
+    preset: zephyr
   params:
-    bootswatch: flatly
     docsearch:
       api_key: ec4004481ba8d410e8e20c9e90fa5e60
       index_name: circumplex

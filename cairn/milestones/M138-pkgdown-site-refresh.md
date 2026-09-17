@@ -21,26 +21,26 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 
 ## Acceptance criteria
 
-- [ ] AC1: `_pkgdown.yml` names exactly one theme, under `template: bslib: preset`. The searches `grep -rn "bootswatch" _pkgdown.yml` and `grep -rn "preset" _pkgdown.yml` show that one slot and no other. The preset is the one the maintainer picked at the T2 gate, and the Review holds the three screenshots of the picked build that show a light navbar. In the site built for AC2, no `<nav>` element carries a `bg-dark` class.
+- [ ] AC1: `_pkgdown.yml` names `zephyr` under `template: bslib: preset`. The search `grep -rn "preset" _pkgdown.yml` finds exactly one line, and `grep -rn "bootswatch" _pkgdown.yml` finds none. In the site built for AC2, no `<nav>` line carries a `bg-` class or a `data-bs-theme` attribute. Every `<nav>` line of a build of master carries `bg-primary` and `data-bs-theme="dark"`. The procedure for each build is a grep over the `<nav ...>` lines of every `.html` file that build wrote.
 - [ ] AC2: `_pkgdown.yml` sets `template: light-switch: true` and declares `navbar: structure: right:` naming the search, lightswitch and github components, with no `navbar: right:` key left. In a site built by `pkgdown::build_site()` into an empty directory, every `.html` file under that directory holds an element with id `dropdown-lightswitch`, at least one `[data-bs-theme-value]` control and one element with id `search-input`. The procedure is a grep over every `.html` file the build wrote.
 - [ ] AC3: The Vignettes menu stays hand-written under `navbar: left:`, with a `text:`-only entry per level and `text: "---------"` separator entries, and no `articles:` group carries a `navbar:` key. In the freshly built `index.html`, that dropdown holds exactly three `h6.dropdown-header` elements reading Introductory, Intermediate and Advanced in that order, a `hr.dropdown-divider` between consecutive groups, and under each heading the same pages in the same order as that level's group in the `articles:` index.
 - [ ] AC4: `tools/check-pkgdown-vignettes.R` exits 0 on the grouped `_pkgdown.yml`. In a scratch copy of the repo it exits 1 on each of five planted defects, one per checking path: a page dropped from the navbar menu, a menu entry whose text is not the vignette's title, a page moved to another level group in the `articles:` index, a page moved under the wrong level heading in the navbar menu alone, and an extra vignette file on disk, carrying a well-formed `\VignetteIndexEntry{}`, that the level map does not list. The script's message names the defect it found in each case.
 - [ ] AC5: `_pkgdown.yml` holds no `docsearch` key. The freshly built site has a `search.json` whose entries include the Bayesian article's title, and the search input of AC2 is present.
-- [ ] AC6: `pkgdown::check_pkgdown()` reports no problem. The build writes no warning beyond the pandoc `--mathml` deprecation lines, checked by building master into a second empty directory and comparing the two warning lists. The `pkgdown.yaml` workflow is green on the pull request.
+- [ ] AC6: `pkgdown::check_pkgdown()` reports no problem. The final build goes into an empty directory. T1 builds master on the same machine and toolchain. The final build writes no warning that T1's build did not also write, and the check compares the two warning lists. The `pkgdown.yaml` workflow is green on the pull request.
 
 ## Coverage
 
-- AC1 → T1, T2
+- AC1 → T1, T2, T3
 - AC2 → T3
 - AC3 → T4
 - AC4 → T5
 - AC5 → T3
-- AC6 → T6
+- AC6 → T1, T6
 
 ## Tasks
 
-- [ ] T1: Build the site once from master into a temporary directory, and keep its warning list for AC6. Then render two or three candidate themes with a light navbar (for example `zephyr`, `litera`, `cosmo`, or `flatly` with a light navbar background), each into its own directory. Screenshot the home page, a reference page and an article page for each.
-- [ ] T2: Show the maintainer the screenshots at a gate chip and apply the chosen preset under `template: bslib: preset`, removing `template: params: bootswatch`. Record the choice in the work log.
+- [x] T1: Build the site once from master into a temporary directory. Keep its warning list for AC6 and its built directory for AC1. Then render two or three candidate themes with a light navbar, each into its own directory. Screenshot the home page of each.
+- [x] T2: Show the maintainer the screenshots at a gate chip. Apply the chosen preset under `template: bslib: preset`, removing `template: params: bootswatch`. Record the choice and the three screenshots of the picked build in the work log.
 - [ ] T3: Add `template: light-switch: true`. Replace `navbar: right:` with a `navbar: structure:` declaration that keeps the GitHub icon and restores pkgdown's search and lightswitch components. Delete the `docsearch` keys. Rebuild and grep for the three element ids and for `search.json`.
 - [ ] T4: Group the Vignettes menu in `_pkgdown.yml` with a heading per level and a divider between groups, in the `articles:` index order. Rebuild and read the rendered dropdown.
 - [ ] T5: Repair `tools/check-pkgdown-vignettes.R` so it skips heading and divider entries, reads each group's pages under its heading, and fails when a page sits under the wrong heading. Plant AC4's five defects in a scratch copy of the repo, one at a time, and record each exit status and message as review evidence.
@@ -56,5 +56,14 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 
 - 2026-09-17: implement started on branch `m138-pkgdown-site-refresh`. The step-3 gate merges into the T2 preset gate. The plan already puts the preset pick after rendered candidates.
 - 2026-09-17: pkgdown's guide says a bootswatch preset is unlikely to work with the light switch. T1 renders each candidate with the switch on. Plain Bootstrap 5 joins the candidate set.
+- 2026-09-17: T1 rendered four candidates, `zephyr`, `litera`, `cosmo` and plain Bootstrap 5. All four gave a light navbar, a working search box and a working switch. All four rendered correctly in dark mode, so pkgdown's caveat did not bite.
+- 2026-09-17: T1 built master into a scratch directory. Its warning list is 262 `--mathml` and 14 `--mathjax` pandoc deprecation lines, and nothing else. Its navbar line is `<nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" ...>`.
+- 2026-09-17: T2 gate. The maintainer picked `zephyr` from the four rendered candidates.
+- 2026-09-17: amendment, substantive, taken at the T2 gate. AC1's `bg-dark` search passed on master as well, because master's navbar carries `bg-primary` and `data-bs-theme="dark"`. AC1 now names `zephyr`, forbids any `bg-` class and any `data-bs-theme` attribute on a `<nav>` line, and names its grep procedure. The screenshot clause and the gated-pick clause moved to T2.
+- 2026-09-17: amendment, substantive, taken at the same gate. AC6 allowed only `--mathml` lines, so a build identical to master fails it. AC6 now defers to T1's kept master list and requires the final build to go into an empty directory. Coverage became AC1 to T1, T2, T3 and AC6 to T1, T6. T1 also keeps the master build directory.
+- 2026-09-17: T2 applied `template: bslib: preset: zephyr` and removed `template: params: bootswatch`. Three screenshots of the picked build were taken in this session. They are the home page, `reference/octants.html` and `articles/using-instruments.html`, all with a light navbar.
+- 2026-09-17: the T2 checkpoint landed while `devtools::test()` was still running. The next work-log line records what the suite returned.
+- 2026-09-17: re-audit: AC1 (full) — 7 findings, all fixed before writing. They were an unsatisfiable grep sentence, two clauses binding the evidence record, and an unbounded causal claim. The rest were an unnamed nav search procedure, no named theme, a two-string darkness test, and a Coverage row missing T3.
+- 2026-09-17: re-audit: AC6 (full) — 3 findings, all fixed before writing. The named pandoc line kinds pinned a toolchain version into the criterion. The dropped empty-directory condition let an incremental rebuild pass for the wrong reason. The baseline also needed a same-toolchain clause.
 
 ## Decisions
