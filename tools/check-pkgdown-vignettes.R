@@ -3,7 +3,9 @@
 # Guard: the vignette index and the Vignettes navbar menu in _pkgdown.yml list
 # every vignette in vignettes/ exactly once, in the level order below, and the
 # menu text of each entry is the vignette's title. The navbar menu is grouped
-# by level, so a page must also sit under the heading for its own level.
+# by level, so a page must also sit under the heading for its own level, and
+# the menu's headings must be exactly the level map's, in its order: an extra
+# heading, a missing one or a reordered one fails, whatever the pages under it.
 #
 #   Rscript tools/check-pkgdown-vignettes.R
 #
@@ -83,9 +85,13 @@ if (is.null(groups)) {
 # The navbar menu: one heading per level, and under each heading the same pages
 # in the same order, each with its title. Divider placement is not checked.
 # An entry with no href whose text is three or more dashes is a divider, which
-# this check skips. The dash rule is pkgdown's own `^\s*-{3,}\s*$`, so a shorter
-# run of dashes is a heading here, as pkgdown renders it. An entry with text and no
-# href is a heading. An entry with an href is a page under the heading above it.
+# this check skips, so a shorter run of dashes is a heading here, as pkgdown
+# renders it. The dash pattern is pkgdown's own `^\s*-{3,}\s*$`, but pkgdown's
+# menu_type() tests it BEFORE it looks at href, and this check tests it only
+# among the href-less entries: an entry carrying both dash text and an href is
+# a separator to pkgdown and a page here, so it fails rather than passing
+# wrongly. An entry with text and no href is a heading. An entry with an href
+# is a page under the heading above it.
 menus <- Filter(function(item) identical(item$text, "Vignettes"), cfg$navbar$left)
 if (length(menus) != 1L) {
   fail("expected one navbar menu named Vignettes, found ", length(menus))
