@@ -99,6 +99,8 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - 2026-09-17: re-review in progress. AC1 to AC5 verified with fresh evidence from two new builds; AC6's build half verified, its CI clause waits on the pull request. Consistency gate and the independent review are still running.
 - 2026-09-17: the three-lens fan-out reported 11, 6 and 0 findings. None returns the milestone. One was fixed now, a `_pkgdown.yml` comment that stated pkgdown's heading rule more loosely than `menu_type()` implements it. `devtools::check()` is still running.
 - 2026-09-17: step-7 approval: m138-pkgdown-site-refresh approved for merge
+- 2026-09-17: conversation: PR #171 — empty read, nothing to triage.
+- 2026-09-17: step-7 approval: m138-pkgdown-site-refresh approved for merge
 
 ## Review
 
