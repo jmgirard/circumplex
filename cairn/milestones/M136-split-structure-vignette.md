@@ -1,6 +1,6 @@
 # M136: The structure vignette becomes four shorter vignettes
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M135
 - **Driving RR:** —
@@ -46,7 +46,7 @@
 - [x] T3: Retarget every site in Scope's list, the test's two reads first. Update the `cairn/references/` citations by line to the new page and line.
 - [x] T4: Add the four names to `VIGNETTES`, and the pages to `_pkgdown.yml` and the M135 reading order. Re-render, and run the staleness, width and M135 check scripts.
 - [x] T5: Run the T1 script against the merge base, the sweep on each page, and the word counts, and record the results in the work log.
-- [ ] T6: NEWS.md entry, tests and check, notes compared with the merge base.
+- [x] T6: NEWS.md entry, tests and check, notes compared with the merge base.
 
 ## Work log
 
@@ -66,6 +66,7 @@
 - 2026-09-16: T4 done. `VIGNETTES`, the pkgdown level map, the articles index and the navbar menu carry the four pages (the Advanced group's description gained "Boundary fits"). The seven changed pages re-rendered in their own processes after an install; two figures moved to the pages that draw them and the old copies were removed. Width guard: all 10 pre-computed pages fit. Index script and `check_pkgdown()` clean. The staleness guard runs after the checkpoint, because it compares against the committed copy.
 - 2026-09-16: T5 done. Staleness guard at the T3/T4 checkpoint: all 10 pages up to date (page 1 two masked regions, page 2 one, page 3 two). `tools/check-vignette-split.R --pairs <milestone file> --max-pairs 35` against `master:vignettes/evaluating-circumplex-structure.Rmd.orig`: 486 base sentences outside the frame, 499 across the pages, 22 listed lines, 14 base chunks each in one page, one added chunk `cpm_refit`, four marked regions placed; exit 0. Sweep exit 0 on each page. Prose words 1635, 1520, 1971, 1790 (cap 2600). The `.Rmd.orig` basename set equals `VIGNETTES`.
 - 2026-09-16: claim audit: 21 claims read, 0 corrected — NEWS.md, R/cpm_oop.R, R/fit_structure.R, tests/testthat/test-cpm_boundary_vignette.R, tools/check-vignette-split.R, tools/check-vignette-staleness.R, the four new vignette sources. The fresh Opus reader ran the split guard and its failure modes itself and read the refit's rendered warnings against page 1's.
+- 2026-09-16: T6 done. NEWS.md Documentation entry names the four pages and the page they replace. `devtools::test()`: 0 failures, 11 warnings, 1 skip, 11283 pass; the warnings are the ill-conditioned Hessian and lavaan marker warnings from test-ci_accuracy.R, test-print-width.R and test-ssm_sem.R, files this branch does not touch. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes, the same as the M135 review recorded for master. Status to review.
 
 ## Decisions
 
