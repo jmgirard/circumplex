@@ -137,6 +137,20 @@
 
 ### Documentation
 
+- The “SEM-Based SSM Analysis” and “Axes Reliability” vignettes are each
+  now two pages, with every code chunk kept and the prose moved rather
+  than cut. “SEM-Based SSM Analysis” keeps its name and holds the latent
+  profile of a measure, its measurement model, its confidence intervals
+  and what its parameters mean. “Latent Group Contrasts” holds the two
+  questions about group differences, the invariance-gated latent
+  contrast, the limitations of the method and its relation to the
+  literature. “Axes Reliability” keeps its name and holds the worked
+  example, the variance components and the correlation-matrix input.
+  “Axes Reliability Caveats” holds the correlation-metric correction and
+  its calibration table, missing data, boundary fits, blockwise
+  instruments and the standard error of measurement. The four pages are
+  read in that order.
+
 - The “Evaluating Circumplex Structure” vignette is now four shorter
   pages, with every code chunk kept and the prose moved rather than cut.
   “Evaluating Circumplex Structure” keeps its name and holds the two

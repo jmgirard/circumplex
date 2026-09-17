@@ -34,8 +34,12 @@ estimation, and growth models.
   Visualization](http://circumplex.jmgirard.com/articles/advanced-visualization.md):
 - [SEM-Based SSM
   Analysis](http://circumplex.jmgirard.com/articles/sem-based-ssm-analysis.md):
+- [Latent Group
+  Contrasts](http://circumplex.jmgirard.com/articles/sem-latent-contrasts.md):
 - [Axes
   Reliability](http://circumplex.jmgirard.com/articles/axes-reliability.md):
+- [Axes Reliability
+  Caveats](http://circumplex.jmgirard.com/articles/axes-reliability-caveats.md):
 - [Bayesian SSM
   Analysis](http://circumplex.jmgirard.com/articles/bayesian-ssm-analysis.md):
 - [Growth Models on SSM

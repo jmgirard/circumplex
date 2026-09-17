@@ -159,7 +159,7 @@ number of rows the estimator was actually handed, after listwise
 deletion or after dropping rows with no observed item, and the `n` you
 supplied on the correlation-matrix path. It is the N to divide
 `n_moments` by when locating a fit on the calibration table in
-[`vignette("axes-reliability")`](http://circumplex.jmgirard.com/articles/axes-reliability.md).
+[`vignette("axes-reliability-caveats")`](http://circumplex.jmgirard.com/articles/axes-reliability-caveats.md).
 `n_total` is the number of rows supplied before any of that, and
 `n_complete` the number answering every item. `n_complete` and
 `min_coverage` are present on every path so that a caller can read them
