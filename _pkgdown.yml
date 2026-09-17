@@ -119,9 +119,12 @@ articles:
   contents:
   - intermediate-ssm-analysis
   - evaluating-circumplex-structure
+  - ci-accuracy
+  - structure-tests
 - title: Advanced
-  desc: Custom figures, latent-variable models, Bayesian estimation, and growth models.
+  desc: Boundary fits, custom figures, latent-variable models, Bayesian estimation, and growth models.
   contents:
+  - cpm-boundary-fits
   - advanced-visualization
   - sem-based-ssm-analysis
   - axes-reliability
@@ -176,6 +179,12 @@ navbar:
       href: articles/intermediate-ssm-analysis.html
     - text: Evaluating Circumplex Structure
       href: articles/evaluating-circumplex-structure.html
+    - text: Confidence Interval Accuracy
+      href: articles/ci-accuracy.html
+    - text: Structure Tests and Ipsatization
+      href: articles/structure-tests.html
+    - text: CPM Fits at a Boundary
+      href: articles/cpm-boundary-fits.html
     - text: Advanced Circumplex Visualization
       href: articles/advanced-visualization.html
     - text: SEM-Based SSM Analysis

@@ -132,7 +132,8 @@ paper's; the package's interpretation of the index magnitude is not.
   randomization p-values); surfaced through `fit_structure()` as the RANDALL
   test.
 - `tests/testthat/test-fit_structure.R` — RANDALL statistic/p-value tests.
-- `vignettes/evaluating-circumplex-structure.Rmd` — RANDALL exposition.
+- `vignettes/structure-tests.Rmd` — RANDALL exposition (moved to this page
+  at M136).
 - `man/fit_structure.Rd` (`@references`).
 - Companion: `tracey1997.md` (the FORTRAN operationalization the package
   co-cites).

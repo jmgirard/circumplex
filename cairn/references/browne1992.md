@@ -401,8 +401,8 @@ carries the model the package implements, not the whole paper.
 - `tests/testthat/test-cpm_oracles.R:128-138` — the eq. (4) identity and the
   communality-CI reconstruction it feeds (see `browne1982.md`).
 - `tests/testthat/test-cpm_fit.R:1` — the engine test-file header.
-- `vignettes/evaluating-circumplex-structure.Rmd:49,610` — the CPM
-  introduction and the reference-list entry.
+- `vignettes/evaluating-circumplex-structure.Rmd:62,332` — the CPM
+  introduction and the reference-list entry (lines re-read at M136).
 - `vignettes/sem-based-ssm-analysis.Rmd:80,415,421` — the SEM vignette's
   contrast with the CPM, and its reference-list entry.
 - `cairn/references/grassi2010.md` — the published-value oracle for this
