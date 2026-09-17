@@ -44,7 +44,7 @@
 - [x] T1: Cut each source into its two pages at the section boundaries in Scope. Each page repeats the setup chunk with the lavaan gate and `options(width = 77)`, and carries the M135 frame. Record every reworded sentence in the Decisions section as it happens, the two long SEM sentences among them.
 - [x] T2: Retarget every site in Scope's list, the three axes tests and the width guard's `EXEMPT` entries first. Update the `cairn/references/` citations by line.
 - [x] T3: Add the names of the pre-rendered pages to `VIGNETTES` (the caveats page evaluates no output and ships as a live `.Rmd`), and the pages to `_pkgdown.yml` and the M135 reading order. Re-render, and run the staleness, width and M135 check scripts.
-- [ ] T4: Run the M136 comparison script against the merge base for both splits, the sweep on each page, and the word counts, and record the results in the work log.
+- [x] T4: Run the M136 comparison script against the merge base for both splits, the sweep on each page, and the word counts, and record the results in the work log.
 - [ ] T5: NEWS.md entry, tests and check, notes compared with the merge base.
 
 ## Work log
@@ -59,6 +59,7 @@
 - 2026-09-16: T3 minor amendment. `axes-reliability-caveats` ships as a live `.Rmd`, not pre-rendered: it prints no output, and the width guard fails a pre-rendered page with no output line. AC1's `.Rmd.orig` set still equals `VIGNETTES`.
 - 2026-09-16: T2 done. The three axes tests read the caveats page, the two roxygen pointers to the calibration table name it, the pkgdown workflow comment names the contrasts page, and the `wendt2019`, `browne1992`, `cheung2002` and `INDEX` citations were re-read against the rendered pages. `EXEMPT` unchanged: the syntax chunk stays on the SEM core page.
 - 2026-09-16: T3 done. Three pages re-rendered. Their `#>` output, concatenated with the core page, is identical to the merge base for both splits, and the contrast figure is byte-identical under its new name. Width guard and pkgdown index check exit 0. `devtools::test()` 0 failures (11319 pass, one environment skip). T1 to T3 land in one checkpoint commit, because the tests only pass once all three are in.
+- 2026-09-16: T4 at a731f083. Split guard exit 0 on both splits (axes: 232 base sentences, 4 pairs, 4 chunks; SEM: 227 base sentences, 6 pairs, 11 chunks, 1 added). Prose words: axes core 1047, caveats 2539, SEM core 2014, contrasts 1660. Sweep exit 0 on all four. Staleness guard exit 0 after the commit. AC5 grep: 21 reference lines, each names the page holding its content.
 
 ## Decisions
 
