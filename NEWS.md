@@ -109,7 +109,8 @@
 ## Documentation
 
 * The "Evaluating Circumplex Structure" vignette is now four shorter pages,
-  with every sentence and chunk kept. "Evaluating Circumplex Structure"
+  with every code chunk kept and the prose moved rather than cut.
+  "Evaluating Circumplex Structure"
   keeps its name and holds the two questions, the circular process model fit,
   its fit indices and its model variants. "CPM Fits at a Boundary", an
   Advanced page, holds the boundary section behind a refit of the same

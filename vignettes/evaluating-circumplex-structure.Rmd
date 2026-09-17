@@ -225,7 +225,7 @@ package's own validation simulations:
   approximate fit.
 
 For the same reasons, `summary()` prints a caution for analytic (Wald)
-intervals below $N = 2000$. When a boundary marker (defined on that page)
+intervals below $N = 2000$. When a boundary marker (defined in "CPM Fits at a Boundary")
 is present, the analytic caution prints up to very large $N$. In
 validation, analytic intervals mis-covered in exactly those regimes.
 Analytic intervals are the only option on the correlation-matrix input path.
