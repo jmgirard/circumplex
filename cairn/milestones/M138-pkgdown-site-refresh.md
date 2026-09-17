@@ -1,6 +1,6 @@
 # M138: The website has a light navbar, a theme switch and grouped vignette menus
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -93,6 +93,9 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - 2026-09-17: the mini gate accepted the marker-versus-appearance gap as a limitation: AC1 checks that pkgdown wrote no navbar background class, not that the navbar renders light. It goes to DESIGN.md Known issues at the hygiene pass.
 - 2026-09-17: the mini gate also directed the two guard-comment corrections the review triaged fix-now. The docstring now states that the menu's headings must be exactly the level map's, in its order. The dash-rule comment now says pkgdown's `menu_type()` tests the dash pattern before it looks at `href`, while this check tests it only among the href-less entries, so an entry carrying both dash text and an href fails rather than passing wrongly — planted and observed: exit 1, naming `ci-accuracy`.
 - 2026-09-17: `devtools::test()` clean after the comment corrections: 0 failures, 11319 passes, 1 skip, 11 pre-existing warnings. The AC4 five-defect battery still exits 0 on the control and 1 on each defect.
+
+- 2026-09-17: claim audit: 13 claims read, 0 corrected — `_pkgdown.yml`, `tools/check-pkgdown-vignettes.R`. The reader checked each comment by planting its case in a scratch copy and by calling pkgdown's `menu_type()` and `navbar_html()` directly.
+- 2026-09-17: the amendment is done and the verify slot is clean, so the status returns to review.
 
 ## Review
 
