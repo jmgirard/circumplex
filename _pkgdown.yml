@@ -8,11 +8,9 @@ authors:
     href: https://www.personalityprocesses.com
 template:
   bootstrap: 5
-  params:
-    bootswatch: flatly
-    docsearch:
-      api_key: ec4004481ba8d410e8e20c9e90fa5e60
-      index_name: circumplex
+  bslib:
+    preset: zephyr
+  light-switch: true
 # One site at the root, rebuilt from master on every push, so the published
 # pages always match the current code (there is no separate /dev/ site).
 development:
@@ -171,12 +169,20 @@ navbar:
       href: reference/ipipipc.html
     - text: Interpersonal Sensitivities Circumplex
       href: reference/isc.html
+  # Grouped by level, in the same order as the articles index above. pkgdown's
+  # menu_type() tests `menu:` first, then the dash pattern, then `theme:`, and
+  # only then the heading case, so an entry is a heading when it has text, no
+  # href, no `menu:` and no `theme:`. An entry of three or more dashes is a
+  # divider. A shorter run of dashes renders as a heading, not a divider.
   - text: Vignettes
     menu:
+    - text: Introductory
     - text: Using Circumplex Instruments
       href: articles/using-instruments.html
     - text: Introduction to SSM Analysis
       href: articles/introduction-to-ssm-analysis.html
+    - text: "---------"
+    - text: Intermediate
     - text: Intermediate SSM Analysis
       href: articles/intermediate-ssm-analysis.html
     - text: Evaluating Circumplex Structure
@@ -185,6 +191,8 @@ navbar:
       href: articles/ci-accuracy.html
     - text: Structure Tests and Ipsatization
       href: articles/structure-tests.html
+    - text: "---------"
+    - text: Advanced
     - text: CPM Fits at a Boundary
       href: articles/cpm-boundary-fits.html
     - text: Advanced Circumplex Visualization
@@ -203,7 +211,8 @@ navbar:
       href: articles/growth-ssm-analysis.html
   - text: News
     href: news/index.html
-  right:
-  - icon: fa-github fa-lg
-    href: https://github.com/jmgirard/circumplex
+  # The right side is pkgdown's own component list, so the search box and the
+  # light switch come back. A hand-written right: list would drop both.
+  structure:
+    right: [search, lightswitch, github]
 

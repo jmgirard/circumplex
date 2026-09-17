@@ -2,7 +2,10 @@
 
 # Guard: the vignette index and the Vignettes navbar menu in _pkgdown.yml list
 # every vignette in vignettes/ exactly once, in the level order below, and the
-# menu text of each entry is the vignette's title.
+# menu text of each entry is the vignette's title. The navbar menu is grouped
+# by level, so a page must also sit under the heading for its own level, and
+# the menu's headings must be exactly the level map's, in its order: an extra
+# heading, a missing one or a reordered one fails, whatever the pages under it.
 #
 #   Rscript tools/check-pkgdown-vignettes.R
 #
@@ -79,23 +82,54 @@ if (is.null(groups)) {
   if (length(dup)) fail("listed more than once in articles: ", paste(dup, collapse = ", "))
 }
 
-# The navbar menu: the same pages in the same order, each with its title.
+# The navbar menu: one heading per level, and under each heading the same pages
+# in the same order, each with its title. Divider placement is not checked.
+# An entry with no href whose text is three or more dashes is a divider, which
+# this check skips, so a shorter run of dashes is a heading here, as pkgdown
+# renders it. The dash pattern is pkgdown's own `^\s*-{3,}\s*$`, but pkgdown's
+# menu_type() tests it BEFORE it looks at href, and this check tests it only
+# among the href-less entries: an entry carrying both dash text and an href is
+# a separator to pkgdown and a page here, so it fails rather than passing
+# wrongly. An entry with text and no href is a heading. An entry with an href
+# is a page under the heading above it.
 menus <- Filter(function(item) identical(item$text, "Vignettes"), cfg$navbar$left)
 if (length(menus) != 1L) {
   fail("expected one navbar menu named Vignettes, found ", length(menus))
 } else {
   entries <- menus[[1]]$menu
-  hrefs <- vapply(entries, function(e) e$href, character(1))
-  names_from_href <- sub("^articles/(.*)\\.html$", "\\1", hrefs)
-  if (!identical(names_from_href, EXPECTED)) {
-    fail("navbar Vignettes menu lists [", paste(names_from_href, collapse = ", "),
-         "], expected [", paste(EXPECTED, collapse = ", "), "]")
-  }
+  headings <- character(0)
+  under <- list()
+  current <- NA_character_
   for (e in entries) {
+    text <- if (is.null(e$text)) "" else e$text
+    if (is.null(e$href)) {
+      if (grepl("^\\s*-{3,}\\s*$", text)) next
+      current <- text
+      headings <- c(headings, text)
+      under[[text]] <- character(0)
+      next
+    }
     name <- sub("^articles/(.*)\\.html$", "\\1", e$href)
-    if (name %in% names(titles) && !identical(e$text, titles[[name]])) {
-      fail("navbar text for ", name, " is \"", e$text, "\", the vignette title is \"",
+    if (is.na(current)) {
+      fail("navbar entry ", name, " sits above the first level heading")
+      next
+    }
+    under[[current]] <- c(under[[current]], name)
+    if (name %in% names(titles) && !identical(text, titles[[name]])) {
+      fail("navbar text for ", name, " is \"", text, "\", the vignette title is \"",
            titles[[name]], "\"")
+    }
+  }
+  if (!identical(headings, names(LEVELS))) {
+    fail("navbar level headings are [", paste(headings, collapse = ", "),
+         "], expected [", paste(names(LEVELS), collapse = ", "), "]")
+  }
+  for (level in intersect(headings, names(LEVELS))) {
+    want <- LEVELS[[level]]
+    got <- under[[level]]
+    if (!identical(got, want)) {
+      fail("navbar menu under ", level, " lists [", paste(got, collapse = ", "),
+           "], expected [", paste(want, collapse = ", "), "]")
     }
   }
 }
