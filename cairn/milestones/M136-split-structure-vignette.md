@@ -105,3 +105,23 @@ Reviewed 2026-09-16 at branch head 0a3631cd against master 75757fb9 (master unmo
 - AC4: same guard run: 14 base chunks outside the preamble each in one page, one added chunk `cpm_refit` listed, 4 marked regions placed, exit 0. Ticked.
 - AC5: `test-cpm_boundary_vignette.R` reads `cpm-boundary-fits.Rmd` (line 12-13) and `.Rmd.orig` (line 33). 15 pass, 0 fail, 3 CRAN skips. The grep hits only page 1's own sites. Those are the frame map and reading order in `test-vignette-frame.R`, `VIGNETTES`, the pkgdown index script, `_pkgdown.yml`, and the reference-page citations that page 1 still holds. The gitignored `tests/testthat/_problems/` scratch files also hit and are not tracked. Ticked.
 - AC6: staleness guard: all 10 pages up to date (page 1 two masked regions, page 2 one, page 3 two), exit 0. Width guard: all 10 pages within 80 columns, exit 0. Sweep exit 0 on each of the four pages. Ticked.
+
+Consistency gate: `cairn_validate.py` all checks passed. No DESIGN.md principle changed, so no impact report. `document()` produced no diff and no resolve-link line. README.md is not older than README.Rmd and neither is in the diff. `pkgdown::check_pkgdown()` found no problems. NEWS.md Documentation entry names the four pages and the page they replace. `tools/` is in `.Rbuildignore`. Master watches: the newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master (56d8a147, an ancestor of master's head) both concluded success. Master-red alert audit, its dry run and the branch-protection check all exit clean.
+
+Independent review, three fresh-context lenses. The blame-history lens found nothing. The prior-review lens found no inline PR comments and three findings, each an item of the ROADMAP row "Harden the vignette frame guards", whose promotion condition (a page added) M136 meets.
+- P1: the level map and reading order are kept by hand in `test-vignette-frame.R`, `tools/check-pkgdown-vignettes.R` and `_pkgdown.yml`, and the diff extends all three.
+- P2: `tools/check-pkgdown-vignettes.R` runs in no workflow or test.
+- P3: title cross-references match straight double quotes only.
+The diff-bug lens, ranked most severe first:
+- F1: page 1 line 167 "(defined on that page)" names no page in its paragraph. The page is named eleven lines earlier in a bullet.
+- F2: page 4's added Wrap-up says `fit_structure()` does not commit to the theoretical angles, while the body says RANDALL takes an order hypothesis.
+- F3: the two Advanced pages now say to read "Structure Tests and Ipsatization" first, a reading order stated as a prerequisite.
+- F4: page 1's Wrap-up keeps the `ssm_ci_accuracy()` trust claim on a page that no longer runs it.
+- F5: page 1 line 55 "the two after it" is ambiguous against the navbar order.
+- F6: the split guard prints the word count but never fails on it.
+- F7: the split guard accepts an added region that holds no chunk.
+- F8: `read_pairs` splits a listed text on its first and on its last " => " differently.
+- F9: `strip_frame` also blanks `#` comment lines inside chunks.
+- F10: the scoping comment of `boundary_section_text()` overstates what it buys on a page that is one section.
+- F11: the row body at `cairn/references/plain-vignettes.md:170` says "this page" where four pages now exist.
+- F12: NEWS.md "every sentence and chunk kept" overstates. 17 sentences were reworded and 5 passages added.
