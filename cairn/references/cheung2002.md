@@ -135,8 +135,8 @@ From "Limitations of the Simulation" (p. 251) and the Discussion (p. 250):
 - `tests/testthat/test-ssm_sem_groups.R` — the ΔCFI section: the deterministic
   pin of the ≥ −.01 boundary, both flag directions, and the robust-CFI and
   three-group scope gates.
-- `vignettes/sem-based-ssm-analysis.Rmd` — teaches the criterion with these
-  scope caveats.
+- `vignettes/sem-latent-contrasts.Rmd` — teaches the criterion with these
+  scope caveats (in the SEM vignette until M137, corrected M137).
 - `man/ssm_sem.Rd` (`@references`, `invariance` parameter) — the
   user-facing attribution.
 - `devel/cr2002-transcription.md` — the 2026-07-07 first-channel record; kept

@@ -3114,9 +3114,9 @@ test_that("AC2: the vignette's calibration table and its object pointer travel t
   # guard would never have run on CRAN or CI. The installed copy under
   # inst/doc is the fallback, exactly as the Rd guard above falls back to
   # tools::Rd_db().
-  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
+  vig <- test_path("..", "..", "vignettes", "axes-reliability-caveats.Rmd")
   if (!file.exists(vig)) {
-    vig <- system.file("doc", "axes-reliability.Rmd", package = "circumplex")
+    vig <- system.file("doc", "axes-reliability-caveats.Rmd", package = "circumplex")
   }
   skip_if(!nzchar(vig) || !file.exists(vig),
           "the vignette source is not readable from either location")

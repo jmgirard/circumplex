@@ -18,7 +18,9 @@ frame_levels <- c(
   "cpm-boundary-fits" = "Advanced",
   "advanced-visualization" = "Advanced",
   "sem-based-ssm-analysis" = "Advanced",
+  "sem-latent-contrasts" = "Advanced",
   "axes-reliability" = "Advanced",
+  "axes-reliability-caveats" = "Advanced",
   "bayesian-ssm-analysis" = "Advanced",
   "growth-ssm-analysis" = "Advanced"
 )
@@ -33,7 +35,9 @@ frame_next <- rbind(
   c("ci-accuracy", "structure-tests"),
   c("structure-tests", "advanced-visualization"),
   c("structure-tests", "sem-based-ssm-analysis"),
-  c("sem-based-ssm-analysis", "axes-reliability"),
+  c("sem-based-ssm-analysis", "sem-latent-contrasts"),
+  c("sem-latent-contrasts", "axes-reliability"),
+  c("axes-reliability", "axes-reliability-caveats"),
   c("intermediate-ssm-analysis", "bayesian-ssm-analysis"),
   c("bayesian-ssm-analysis", "growth-ssm-analysis")
 )

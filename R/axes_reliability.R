@@ -1103,7 +1103,7 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   dropping rows with no observed item, and the `n` you supplied on the
 #'   correlation-matrix path. It is the N to divide `n_moments` by when locating
 #'   a fit on the calibration table in
-#'   \code{vignette("axes-reliability")}. `n_total` is the number of rows
+#'   \code{vignette("axes-reliability-caveats")}. `n_total` is the number of rows
 #'   supplied before any of that, and `n_complete` the number answering every
 #'   item. `n_complete` and `min_coverage` are
 #'   present on every path so that a caller can read them unconditionally, and
@@ -1946,7 +1946,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # The count of distinct analyzed moments, p* = p(p+1)/2 (M70). Reported
       # rather than left to the caller because `p*/N` -- with `n` above as the
       # N, the one lavaan was actually handed -- is what the calibration table
-      # in vignette("axes-reliability") is indexed by, and recomputing it off
+      # in vignette("axes-reliability-caveats") is indexed by, and recomputing it off
       # `n_items` invites reading `n_total` or `n_complete` as the denominator.
       n_moments = p * (p + 1) / 2,
       angles = angles_deg, labels = map$labels, sd = sd,

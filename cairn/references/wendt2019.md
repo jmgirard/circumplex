@@ -24,7 +24,8 @@ dimensional, categorical, and hybrid models. *Journal of Abnormal Psychology,
 Note the commonly-cited short title drops the subtitle; the article's own
 title is the full two-part form above.
 
-**Role.** The substantive-validity source for `vignettes/sem-based-ssm-analysis.Rmd`.
+**Role.** The substantive-validity source for `vignettes/sem-based-ssm-analysis.Rmd`
+and `vignettes/sem-latent-contrasts.Rmd` (one vignette until M137).
 It is the nearest published neighbour to this package's SEM layer — a
 three-factor confirmatory circumplex model of the IIP octants — and the
 vignette cites it for four distinct claims, all verified below. It is
@@ -179,16 +180,18 @@ checks themselves remain unperformed by this page — observed 2026-07-24.*
 
 ## Traces to
 
-- `vignettes/sem-based-ssm-analysis.Rmd:44` — the latent-structure-of-scales
+- `vignettes/sem-based-ssm-analysis.Rmd:36` — the latent-structure-of-scales
   framing in the novelty claim.
-- `vignettes/sem-based-ssm-analysis.Rmd:114` — the roughly −.3 general–agency
+- `vignettes/sem-based-ssm-analysis.Rmd:164` — the roughly −.3 general–agency
   correlation, cited as evidence that the scaled tier's `φ_g = 0` orthogonality
   is known to be violated on IIP-family data.
-- `vignettes/sem-based-ssm-analysis.Rmd:368` — the RMSEA .075–.111 real-data
+- `vignettes/sem-latent-contrasts.Rmd:257-259` — the RMSEA .075–.111 real-data
   benchmark for reading the example fits' RMSEA ≈ .12.
-- `vignettes/sem-based-ssm-analysis.Rmd:394-400` — the "Relation to the
+- `vignettes/sem-latent-contrasts.Rmd:290-299` — the "Relation to the
   literature" section: their three-factor CFA as context for the strict tier.
-- `vignettes/sem-based-ssm-analysis.Rmd:428` — the reference-list entry.
+- `vignettes/sem-based-ssm-analysis.Rmd:384` and
+  `vignettes/sem-latent-contrasts.Rmd:340` — the reference-list entries.
+  (Lines re-read at M137, corrected M137.)
 - `devel/m5-wendt-discrepancies.md` — the design-review record reconciled
   above (read-only).
 

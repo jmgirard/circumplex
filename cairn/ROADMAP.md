@@ -11,7 +11,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M135 | Vignettes are labeled by level and framed like the older ones | done | — | high | milestones/archive/M135-vignette-levels-and-frame.md |
 | M136 | The structure vignette becomes four shorter vignettes | done | M135 | high | milestones/archive/M136-split-structure-vignette.md |
-| M137 | The axes-reliability and SEM vignettes each split into a core page and an advanced page | planned | M135 | normal | milestones/M137-split-axes-and-sem-vignettes.md |
+| M137 | The axes-reliability and SEM vignettes each split into a core page and an advanced page | in-progress | M135 | normal | milestones/M137-split-axes-and-sem-vignettes.md |
 | M134 | Simplify the vignette width guard | done | — | normal | milestones/archive/M134-simplify-vignette-width-guard.md |
 
 ## Candidates

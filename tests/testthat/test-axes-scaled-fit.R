@@ -977,7 +977,7 @@ test_that("AC11: the vignette carries the same four claims", {
   # Read through vignette_source(): vignettes/ in the dev tree, inst/doc once
   # installed. Reading the source tree alone skipped this guard under R CMD
   # check, where the vignette's claims are the ones that ship.
-  vig <- vignette_source("axes-reliability.Rmd")
+  vig <- vignette_source("axes-reliability-caveats.Rmd")
   skip_if(!nzchar(vig),
           "vignette source unavailable (build installed without vignettes)")
   txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))

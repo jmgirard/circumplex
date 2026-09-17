@@ -127,7 +127,7 @@ the estimator was actually handed, after listwise deletion or after
 dropping rows with no observed item, and the \code{n} you supplied on the
 correlation-matrix path. It is the N to divide \code{n_moments} by when locating
 a fit on the calibration table in
-\code{vignette("axes-reliability")}. \code{n_total} is the number of rows
+\code{vignette("axes-reliability-caveats")}. \code{n_total} is the number of rows
 supplied before any of that, and \code{n_complete} the number answering every
 item. \code{n_complete} and \code{min_coverage} are
 present on every path so that a caller can read them unconditionally, and
