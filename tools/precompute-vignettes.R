@@ -12,6 +12,9 @@
 
 VIGNETTES <- c(
   "evaluating-circumplex-structure",
+  "cpm-boundary-fits",
+  "ci-accuracy",
+  "structure-tests",
   "sem-based-ssm-analysis",
   "advanced-visualization",
   "intermediate-ssm-analysis",

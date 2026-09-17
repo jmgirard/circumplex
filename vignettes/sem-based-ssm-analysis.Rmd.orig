@@ -26,7 +26,7 @@ options(width = 77)
 library(circumplex)
 ```
 
-**Level:** Advanced. Read "Evaluating Circumplex Structure" first.
+**Level:** Advanced. Read "Structure Tests and Ipsatization" first.
 
 ```{r lavaan-note, eval = !has_lavaan, echo = FALSE, results = "asis"}
 cat(

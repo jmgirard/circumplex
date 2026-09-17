@@ -20,10 +20,13 @@ if (!requireNamespace("yaml", quietly = TRUE)) {
 # new page is placed here and in _pkgdown.yml together.
 LEVELS <- list(
   Introductory = c("using-instruments", "introduction-to-ssm-analysis"),
-  Intermediate = c("intermediate-ssm-analysis", "evaluating-circumplex-structure"),
+  Intermediate = c(
+    "intermediate-ssm-analysis", "evaluating-circumplex-structure",
+    "ci-accuracy", "structure-tests"
+  ),
   Advanced = c(
-    "advanced-visualization", "sem-based-ssm-analysis", "axes-reliability",
-    "bayesian-ssm-analysis", "growth-ssm-analysis"
+    "cpm-boundary-fits", "advanced-visualization", "sem-based-ssm-analysis",
+    "axes-reliability", "bayesian-ssm-analysis", "growth-ssm-analysis"
   )
 )
 EXPECTED <- unlist(LEVELS, use.names = FALSE)

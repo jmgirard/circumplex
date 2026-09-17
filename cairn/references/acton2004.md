@@ -347,7 +347,7 @@ image alone.
   `@references` entry.
 - `R/fit_structure_oop.R:42,107,128,181` — the likelihood phrasing map and the
   print/summary headers naming the source.
-- `vignettes/evaluating-circumplex-structure.Rmd:391,405,437,478-492,603` — the
+- `vignettes/structure-tests.Rmd:39,52,84,184-208,329` (the page and lines re-read at M136) — the
   simple-structure framing, the p. 13 factor-extraction citation, the p. 9
   deviation-scoring citation, the "Where the cutoffs come from" section, and the
   reference-list entry.

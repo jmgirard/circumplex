@@ -25,7 +25,7 @@ The same paper **also appears as** chapter 6, pp. 136–162, of K. A. Bollen &
 J. S. Long (Eds.), *Testing Structural Equation Models* (Sage, 1993) — **the
 edition the package cites in user-facing text**, always as "Browne & Cudeck
 (1993)": the vignette benchmark prose and its reference-list entry
-(`vignettes/evaluating-circumplex-structure.Rmd:93` and `:613`) and the
+(`vignettes/evaluating-circumplex-structure.Rmd:190` and `:335`) and the
 CI-accuracy structure-note snapshot (`tests/testthat/_snaps/ci_accuracy.md:38`),
 which is the frozen render of the `R/ssm_ci_oop.R` sites under "Traces to". The
 chapter carries **the same three RMSEA cutoffs this page extracts** from the 1992
@@ -90,7 +90,7 @@ records rather than launders.
 - The source states a **preference** — the authors "would not want to employ"
   such a model. The package renders this as a property of the model: "the
   structural model fits **poorly**" (`R/ssm_ci_oop.R:340-341`) and "above
-  about .10 poor fit" (`vignettes/evaluating-circumplex-structure.Rmd:93`).
+  about .10 poor fit" (`vignettes/evaluating-circumplex-structure.Rmd:190-191`).
   Browne and Cudeck do not use the word "poor" here.
 
 ### Between-channel discrepancies
@@ -162,8 +162,8 @@ this paper, and the code now says so locally):
   source's RMSEA threshold with `hu1999.md`'s SRMR threshold.
 - `R/ssm_ci_oop.R:404,415-418` — the `summary()` roxygen benchmark note and
   its `@references` entry, which cite the 1993 chapter.
-- `vignettes/evaluating-circumplex-structure.Rmd:92-93,613` — the benchmark
-  prose and the reference-list entry.
+- `vignettes/evaluating-circumplex-structure.Rmd:190-191,335` — the benchmark
+  prose and the reference-list entry (lines re-read at M136).
 - `tests/testthat/_snaps/ci_accuracy.md:38` — the frozen structure-note snapshot
   carrying the "Browne & Cudeck, 1993" adequate-fit citation, the rendered output
   of the `R/ssm_ci_oop.R:349-352` branch.

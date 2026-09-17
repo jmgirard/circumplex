@@ -13,7 +13,7 @@ Structural Summary Approach. *Assessment, 24*(1), 3–23.
 doi:10.1177/1073191115621795
 
 **Role.** The source of the package's sample-size and CI-accuracy guidance —
-`vignettes/evaluating-circumplex-structure.Rmd` ships an accuracy table and
+`vignettes/ci-accuracy.Rmd` ships an accuracy table and
 prose bullets drawn from Studies 1–3, and `jz2017` is this paper's Study 5
 sample. It is also the basis of `ssm_ci_accuracy()`'s framing.
 
@@ -134,13 +134,15 @@ read (M7 T3 section B5), not the M40 machine channel.
 
 ## Traces to
 
-- `vignettes/evaluating-circumplex-structure.Rmd:190-199` — the accuracy table
-  (its header rescoped to "95% bootstrap CI accurate when…" at M7 T3).
-- `vignettes/evaluating-circumplex-structure.Rmd:203-222` — prose bullets
+- `vignettes/ci-accuracy.Rmd:39-48` — the accuracy table
+  (its header rescoped to "95% bootstrap CI accurate when…" at M7 T3; the
+  page and lines re-read at M136, when the structure vignette was split).
+- `vignettes/ci-accuracy.Rmd:50-72` — prose bullets
   carrying six shipped numbers, including one of the two 15.5% values.
-- `vignettes/evaluating-circumplex-structure.Rmd:237-238` — OCPD's amplitude
+- `vignettes/ci-accuracy.Rmd:87-88` — OCPD's amplitude
   .012 as the cautionary near-flat case.
-- `vignettes/evaluating-circumplex-structure.Rmd:151-157,572-573` — Study 5
+- `vignettes/evaluating-circumplex-structure.Rmd:285-288` and
+  `vignettes/structure-tests.Rmd:300-301` — Study 5
   CircE fit indices; PARPD elevation .250.
 - `devel/m4-zw-transcription.md` — the M4/W1 transcription record this page
   supersedes as the citable source; it retains the two-channel protocol

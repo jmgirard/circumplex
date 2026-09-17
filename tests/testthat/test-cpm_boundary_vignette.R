@@ -1,8 +1,7 @@
-# Guards for the boundary-regime guidance in
-# vignettes/evaluating-circumplex-structure.Rmd. That section makes factual
-# claims about fits the reader runs on the page, so these tests run the
-# vignette's own chunks rather than a re-typed copy of them: prose and example
-# cannot drift apart without a failure here.
+# Guards for the boundary-regime guidance in vignettes/cpm-boundary-fits.Rmd.
+# That page makes factual claims about fits the reader runs on it, so these
+# tests run the vignette's own chunks rather than a re-typed copy of them:
+# prose and example cannot drift apart without a failure here.
 
 # The PROSE of the vignette, which survives pre-computation unchanged and so is
 # readable in every build: the source tree under devtools::test(), and inst/doc
@@ -10,9 +9,8 @@
 # only read prose stay live in both, which is where they are meant to bite.
 vignette_path <- function() {
   candidates <- c(
-    test_path("..", "..", "vignettes", "evaluating-circumplex-structure.Rmd"),
-    system.file("doc", "evaluating-circumplex-structure.Rmd",
-                package = "circumplex")
+    test_path("..", "..", "vignettes", "cpm-boundary-fits.Rmd"),
+    system.file("doc", "cpm-boundary-fits.Rmd", package = "circumplex")
   )
   hit <- candidates[nzchar(candidates) & file.exists(candidates)]
   # Some builds install the package without vignettes -- covr does, which is
@@ -32,8 +30,7 @@ vignette_path <- function() {
 # the block, where a reader (and tools/m120-skipped-blocks-live.R) can see which
 # blocks it governs, rather than hidden inside this helper.
 vignette_source_path <- function() {
-  p <- test_path("..", "..", "vignettes",
-                 "evaluating-circumplex-structure.Rmd.orig")
+  p <- test_path("..", "..", "vignettes", "cpm-boundary-fits.Rmd.orig")
   skip_if(
     !file.exists(p),
     "vignette .Rmd.orig source unavailable (not a source-tree run)"
@@ -41,11 +38,11 @@ vignette_source_path <- function() {
   p
 }
 
-boundary_heading <- "### When a fit sits at a boundary"
+boundary_heading <- "## 2. When a fit sits at a boundary"
 
-# The boundary subsection's own text: from its heading to the next heading of
-# the same level (or the end of the file). Scoping is the point -- a marker
-# label named anywhere else in the vignette must not satisfy the sweep below.
+# The boundary section's own text: from its heading to the next heading (the
+# Wrap-up) or the end of the file. Scoping is the point -- a marker label
+# named anywhere else in the vignette must not satisfy the sweep below.
 boundary_section_text <- function(lines = readLines(vignette_path(), warn = FALSE)) {
   start <- which(trimws(lines) == boundary_heading)
   expect_length(start, 1L)
@@ -118,7 +115,7 @@ test_that("the boundary section names every marker label the package prints", {
 
 test_that("the demonstration fit fires exactly the markers the section names", {
   skip_on_cran()
-  env <- run_chunks(c("cpm", "boundary_demo"))
+  env <- run_chunks(c("cpm_refit", "boundary_demo"))
   expect_true(exists("demo", envir = env, inherits = FALSE))
   fired <- cpm_boundary_markers(get("demo", envir = env))
   # The prose reads this fit; the set it names is pinned here so a change to
@@ -160,7 +157,7 @@ test_that("the displayed fit still shows what the section's opening reads", {
   # The section opens by reading this fit: a Heywood case at NO with a
   # zero-width interval, and an ill-conditioning warning from the same chunk.
   # Without these pins the whole premise could go stale silently.
-  env <- run_chunks("cpm")
+  env <- run_chunks("cpm_refit")
   fit <- get("cpm", envir = env)
   expect_true(isTRUE(fit$details$heywood))
   expect_true("Heywood communality" %in% cpm_boundary_markers(fit))
@@ -182,7 +179,7 @@ test_that("the angle paragraph's pinned figures and ordering still hold", {
   # The displayed fit's point estimates do not depend on the bootstrap (the
   # analytic and bootstrap fits agree to 0 on Angle, checked 2026-08-16), but
   # the chunk is evaluated as written so a change to the example is caught.
-  env <- run_chunks("cpm")
+  env <- run_chunks("cpm_refit")
   res <- get("cpm", envir = env)$results
 
   # PA is the fixed reference, so every departure below is measured from it.
@@ -240,7 +237,8 @@ test_that("the summary help page points at the boundary section", {
     expect_false(is.null(entry))
     paste(as.character(entry), collapse = " ")
   }
-  heading <- sub("^#+ ", "", boundary_heading)
+  # The help page names the section by its title, without the page's number.
+  heading <- sub("^#+ ([0-9]+\\. )?", "", boundary_heading)
   expect_true(
     grepl(heading, txt, fixed = TRUE),
     info = "summary.circumplex_cpm.Rd does not name the boundary section"

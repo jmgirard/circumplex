@@ -12,7 +12,7 @@
 #   Rscript tools/check-vignette-staleness.R
 #
 # Why this is not `git diff --exit-code`. One chunk's output is not reproducible
-# across machines: ssm_ci_accuracy() in evaluating-circumplex-structure refits an
+# across machines: ssm_ci_accuracy() in ci-accuracy refits an
 # ill-conditioned CPM, whose solution moves in the third digit between BLAS
 # implementations, and all 200 simulated replications move with it. A byte-exact
 # comparison there can never go green (M120 review F1).

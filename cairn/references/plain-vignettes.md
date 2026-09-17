@@ -167,9 +167,9 @@ The review readers read `53d94913`, and their items carry a V prefix. The claims
 | SEM | VE6, VE10, VE15, VE16, VE22, VE29, VE31 | Rejected | The term is defined in the introduction vignette that the page links, or in a later section that the text names. |
 | SEM | F6, F7: knitr tables are in neither the sweep nor `--chunks`, and the table rule misses other caption forms | Follow-up | Listed under "Known sweep gaps". `vignette-precompute` still compares the table output. |
 
-### M125 (evaluating-circumplex-structure)
+### M125 (the structure page, four pages since M136)
 
-Reader reports, numbered as the rows cite them: claims reader K1 to K10, one-read reader P1 to P39, and gloss re-read G1 to G14. Items not in a row were fixed. The exception is the gloss re-read points other than G8 and G13, which confirmed a gloss (corrected M125 review). Review readers carry an R prefix: claims reader RK1 to RK17, one-read reader RP1 to RP38 and diff-bug lens RD1 to RD10. The M125 Review section gives every review item its disposition. `tests/testthat/test-cpm_boundary_vignette.R` matches phrases of this page's prose, so a rewrite of this page must keep those phrases word for word (added M125).
+Reader reports, numbered as the rows cite them: claims reader K1 to K10, one-read reader P1 to P39, and gloss re-read G1 to G14. Items not in a row were fixed. The exception is the gloss re-read points other than G8 and G13, which confirmed a gloss (corrected M125 review). Review readers carry an R prefix: claims reader RK1 to RK17, one-read reader RP1 to RP38 and diff-bug lens RD1 to RD10. The M125 Review section gives every review item its disposition. `tests/testthat/test-cpm_boundary_vignette.R` matches phrases of the prose of `cpm-boundary-fits` (the boundary section before M136), so a rewrite of that page must keep those phrases word for word (added M125, retargeted M136).
 
 | Page | Item | Disposition | Evidence |
 |---|---|---|---|

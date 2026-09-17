@@ -110,7 +110,7 @@ statistical warrant is entirely Hubert & Arabie's.
 - `R/fit_structure.R` — `structure_randall()` (the CI), `structure_randall_test()`
   (exact p-value), surfaced through `fit_structure()` as RANDALL.
 - `tests/testthat/test-fit_structure.R` — RANDALL tests.
-- `vignettes/evaluating-circumplex-structure.Rmd`; `man/fit_structure.Rd`
+- `vignettes/structure-tests.Rmd`; `man/fit_structure.Rd`
   (`@references`).
 - Companion: `hubert1987.md` (the statistical source).
 
