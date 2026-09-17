@@ -9,7 +9,7 @@ Pre-migration history: `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M138 | The website has a light navbar, a theme switch and grouped vignette menus | review | — | normal | milestones/M138-pkgdown-site-refresh.md |
+| M138 | The website has a light navbar, a theme switch and grouped vignette menus | in-progress | — | normal | milestones/M138-pkgdown-site-refresh.md |
 | M135 | Vignettes are labeled by level and framed like the older ones | done | — | high | milestones/archive/M135-vignette-levels-and-frame.md |
 | M136 | The structure vignette becomes four shorter vignettes | done | M135 | high | milestones/archive/M136-split-structure-vignette.md |
 | M137 | The axes-reliability and SEM vignettes each split into a core page and an advanced page | done | M135 | normal | milestones/archive/M137-split-axes-and-sem-vignettes.md |
