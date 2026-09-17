@@ -97,6 +97,7 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - 2026-09-17: claim audit: 13 claims read, 0 corrected — `_pkgdown.yml`, `tools/check-pkgdown-vignettes.R`. The reader checked each comment by planting its case in a scratch copy and by calling pkgdown's `menu_type()` and `navbar_html()` directly.
 - 2026-09-17: the amendment is done and the verify slot is clean, so the status returns to review.
 - 2026-09-17: re-review in progress. AC1 to AC5 verified with fresh evidence from two new builds; AC6's build half verified, its CI clause waits on the pull request. Consistency gate and the independent review are still running.
+- 2026-09-17: the three-lens fan-out reported 11, 6 and 0 findings. None returns the milestone. One was fixed now, a `_pkgdown.yml` comment that stated pkgdown's heading rule more loosely than `menu_type()` implements it. `devtools::check()` is still running.
 
 ## Review
 
@@ -171,5 +172,94 @@ Both exited 0.
   on the pull request, cannot be evidenced before the pull request exists. It is
   checked at the step-8 CI wait, which merges only on green, so the box stays unticked
   at the approval gate.
+
+### Independent review
+
+The milestone's surface tier is user-facing, so the full three-lens fan-out ran, each
+lens fresh-context, in parallel, on a distinct evidence base.
+
+**[O] diff-bug reviewer (Opus)**, eleven findings, its own ranking. It reproduced
+AC1's and AC2's markers a second way, through `pkgdown:::data_navbar()` on a scratch
+copy rather than a full build, and planted ten defects of its own.
+
+1. The guard cannot protect AC3's divider requirement: `next` on a divider skips it
+   entirely, so nothing constrains how many dividers there are or where they sit.
+   *Reproduced independently at review: deleting both `- text: "---------"` entries
+   exits 0, and moving a divider above the first heading exits 0.* The leading-divider
+   shape is the artifact the plan cited when it ruled out pkgdown's own
+   `articles: navbar:` grouping. **Disposition: follow-up.** AC4 names five defect
+   paths and divider placement is not among them, and the guard's own comment
+   discloses that placement is unchecked, so this is a coverage gap, not a broken
+   promise. It goes to the "Harden the vignette frame and split guards" candidate row.
+2. The AC1 limitation accepted at the amendment's mini gate is not yet in
+   `cairn/DESIGN.md`. The reviewer confirmed the gap is structural:
+   `pkgdown:::data_navbar()` sets `style <- NULL` whenever `uses_lightswitch()` is
+   TRUE, so AC1's "no `bg-` class, no `data-bs-theme`" follows from
+   `light-switch: true` alone and would still pass under a dark preset.
+   **Disposition: scheduled, not a finding.** The work log already directs it to
+   DESIGN.md Known issues at the hygiene pass, which is where this review writes it.
+3. The prior round's follow-up dispositions are on no candidate row yet, because the
+   amendment return ended that pass before its hygiene step. **Disposition: fix at
+   hygiene** — this review writes them.
+4. `under[[""]]` appends rather than replaces when a heading's text is empty, so the
+   accumulated page list would be unreadable. Masked today by the
+   `identical(headings, names(LEVELS))` check firing first. **Disposition: follow-up**,
+   latent.
+5. An articles group whose title is not in `LEVELS` has its contents comparison
+   skipped rather than failed. Masked by the separate `got_titles` identity test, and
+   pre-existing. **Disposition: follow-up**, latent.
+6. The `_pkgdown.yml` heading comment was looser than pkgdown implements: it said an
+   entry with text and no href is a heading, while `menu_type()` tests `menu:` first,
+   then the dash pattern, then `theme:`, and only then the heading case.
+   *Verified against pkgdown 2.2.1's `menu_type()` source, not the reviewer's account
+   of it.* **Disposition: fix now, done.** The comment now states that order. The
+   guard still exits 0, the parsed config is unchanged (a YAML comment), and
+   `check_pkgdown()` still reports no problems.
+7. A page sitting above the first heading skips its own title check, so one edit can
+   mask a second defect. Exit status is unaffected. **Disposition: follow-up**, a
+   message-quality gap, same row.
+8. The message for an entry carrying both dash text and an href does not say the page
+   vanishes from the rendered menu. The failure direction is right and the guard's
+   comment is accurate. **Disposition: follow-up**, same row.
+9. `[search, lightswitch, github]` differs from pkgdown's default component order
+   `[search, github, lightswitch]`. **Disposition: rejected** — a pure style nitpick;
+   no criterion pins the order and the rendered result is correct.
+10. No workflow invokes the guard. **Disposition: rejected** — the milestone's Scope
+    puts running the guard in a workflow out, on the candidate row.
+11. `url:` is `http://`, not `https://`. **Disposition: rejected** — pre-existing, on
+    an unmodified line this diff did not introduce.
+
+Carried from the first pass and re-raised by the [S] blame lens: the Algolia key
+`api_key: ec4004481ba8d410e8e20c9e90fa5e60`, deleted from `_pkgdown.yml` by this diff,
+remains in git history from `abfc81eb` (2018), and deleting it from HEAD does not
+revoke it. A docsearch `api_key` is a search-only public key by design, so this is a
+retire-or-rotate question for the maintainer's Algolia account, not an exposure the
+repo can close. **Disposition: follow-up**, its own candidate row beside the existing
+Codecov-token row.
+
+**[S] blame-history reviewer (Sonnet)**, no regression found. It traced the `LEVELS`
+map through M135, M136 and M137 and confirmed the page set is unchanged with no page
+dropped, duplicated or reordered relative to that history, and found no recorded
+decision the diff contradicts (nothing in `DECISIONS.md` or `DESIGN.md` addresses the
+pkgdown theme, docsearch or the navbar `right:` list). Its independence was partial:
+it read the stale first-pass Review section, so five of its six items restate findings
+already on record there rather than being reached on its own evidence. Its own
+evidence is the M135-M137 lineage trace and the `git log -S` confirmation of the
+Algolia key.
+
+**[S] prior-PR-comments reviewer (Sonnet)**, no prior-review evidence, zero findings.
+No archived `## Review` section in `cairn/milestones/archive/` carries a finding on
+`_pkgdown.yml` or `tools/check-pkgdown-vignettes.R` — M135, M136 and M137 touched both
+files but none of their review findings concern the theme, the navbar `right:` list or
+the heading check. The probe `gh api repos/jmgirard/circumplex/pulls/comments?per_page=1`
+returned `[]`, so the per-PR walk was correctly skipped. The lens no-opped cleanly.
+
+### Return floor
+
+No actioned finding demonstrates an acceptance criterion failing, and none is a
+load-bearing defect in what the site or the guard does for its users: the site renders
+as the Goal describes, and the guard keeps every promise its docstring makes. The
+guard's divider gap is a coverage gap outside AC4's five named paths. So no finding
+returns the milestone, and the one fix-now item was a comment correction.
 
 ## Decisions

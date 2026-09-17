@@ -169,8 +169,10 @@ navbar:
       href: reference/ipipipc.html
     - text: Interpersonal Sensitivities Circumplex
       href: reference/isc.html
-  # Grouped by level, in the same order as the articles index above. An entry
-  # with text and no href is a heading. An entry of three or more dashes is a
+  # Grouped by level, in the same order as the articles index above. pkgdown's
+  # menu_type() tests `menu:` first, then the dash pattern, then `theme:`, and
+  # only then the heading case, so an entry is a heading when it has text, no
+  # href, no `menu:` and no `theme:`. An entry of three or more dashes is a
   # divider. A shorter run of dashes renders as a heading, not a divider.
   - text: Vignettes
     menu:
