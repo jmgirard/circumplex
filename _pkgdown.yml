@@ -10,10 +10,7 @@ template:
   bootstrap: 5
   bslib:
     preset: zephyr
-  params:
-    docsearch:
-      api_key: ec4004481ba8d410e8e20c9e90fa5e60
-      index_name: circumplex
+  light-switch: true
 # One site at the root, rebuilt from master on every push, so the published
 # pages always match the current code (there is no separate /dev/ site).
 development:
@@ -204,7 +201,8 @@ navbar:
       href: articles/growth-ssm-analysis.html
   - text: News
     href: news/index.html
-  right:
-  - icon: fa-github fa-lg
-    href: https://github.com/jmgirard/circumplex
+  # The right side is pkgdown's own component list, so the search box and the
+  # light switch come back. A hand-written right: list would drop both.
+  structure:
+    right: [search, lightswitch, github]
 
