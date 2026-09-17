@@ -63,6 +63,8 @@
 - claim audit: 25 claims read, 4 corrected — vignettes/sem-latent-contrasts.Rmd.orig, vignettes/axes-reliability-caveats.Rmd
 - 2026-09-16: claim-audit fixes: contrasts options comment, two contrasts Overview sentences, and the caveats provenance sentence (a fifth axes pair in M137-D2). Same reader re-read all four: hold. Contrasts page re-rendered; axes split guard and sweep exit 0.
 - 2026-09-16: T5 done. NEWS.md entry names the four pages. `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (built from 4dda5de4, before the prose-only claim-audit fixes); merge base reported 0 notes at M136. Frame test 285 pass and staleness guard exit 0 after the fixes. Status review.
+- 2026-09-16: review gate fixes O1, O2, O6 landed; O3-O5 to a candidate row at hygiene.
+- step-7 approval: m137-split-axes-and-sem-vignettes approved for merge
 
 ## Decisions
 
@@ -112,3 +114,4 @@
 - O11 reworded source lines past 80 columns: proposed reject, formatting nit no guard reads.
 - O12 Scope section numbers ignore the Overview as Section 1: proposed reject, plan-owned record with no effect on pages.
 - O13 D-033/D-034 cite the old axes path: proposed reject, IP4 history.
+- Step-7 triage (user, 2026-09-16): proposed dispositions accepted. Fixed now: O1 (claims table and Open questions in `wendt2019.md` name the page and rendered line), O2 (`INDEX.md:8` names the three vignettes), O6 (setup comment rewritten; axes split guard exit 0, sweep exit 0, staleness exit 0, page renders, frame test 285 pass). Follow-up: O3, O4, O5 as one new candidate row, written at post-merge hygiene because ROADMAP sits at 59 lines and 23,996 bytes until the M137 row compresses. Rejected: P1 and O7 to O13 for the reasons above.

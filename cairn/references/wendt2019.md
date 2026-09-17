@@ -124,12 +124,12 @@ models' in every sample.
 
 | Vignette line | Claim | Verdict |
 |---|---|---|
-| `:44` | related work on the latent structure of circumplex *scales* | **Accurate.** Their estimand is the octants' own latent structure (pp. 829–832), not an external measure's profile. |
-| `:114` | general–agency correlation of roughly −.3 replicated across four samples | **Accurate.** −.283/−.292/−.267/−.324, mean −.2915, all negative (p. 831). |
-| `:368` | RMSEA between .075 and .111 for the fixed-loading circumplex CFA across four large samples | **Accurate and correctly scoped** — the range is exactly the CFA-PC figure on p. 830, and CFA-PC is the fixed-spacing, fixed-communality model. |
-| `:394-397` | three-factor circumplex CFA with fixed unit-cosine plane loadings, four large samples, fully dimensional model competitive with categorical and hybrid alternatives | **Accurate, and conservative.** Three factors and four samples are confirmed in Table 2; "competitive" *understates* p. 832's "superior validity … No evidence … for the incremental validity of categorical or hybrid approaches." See the caveat below on "unit-cosine". |
+| `sem-based-ssm-analysis.Rmd:36` | related work on the latent structure of circumplex *scales* | **Accurate.** Their estimand is the octants' own latent structure (pp. 829–832), not an external measure's profile. |
+| `sem-based-ssm-analysis.Rmd:164` | general–agency correlation of roughly −.3 replicated across four samples | **Accurate.** −.283/−.292/−.267/−.324, mean −.2915, all negative (p. 831). |
+| `sem-latent-contrasts.Rmd:257-259` | RMSEA between .075 and .111 for the fixed-loading circumplex CFA across four large samples | **Accurate and correctly scoped** — the range is exactly the CFA-PC figure on p. 830, and CFA-PC is the fixed-spacing, fixed-communality model. |
+| `sem-latent-contrasts.Rmd:291-295` | three-factor circumplex CFA with fixed unit-cosine plane loadings, four large samples, fully dimensional model competitive with categorical and hybrid alternatives | **Accurate, and conservative.** Three factors and four samples are confirmed in Table 2; "competitive" *understates* p. 832's "superior validity … No evidence … for the incremental validity of categorical or hybrid approaches." See the caveat below on "unit-cosine". |
 
-**One qualifier on `:394`.** The article body establishes that CFA-PC fixes
+**One qualifier on `sem-latent-contrasts.Rmd:292`.** The article body establishes that CFA-PC fixes
 equal spacing and equal communalities and gives the plane "a circular pattern
 of factor loadings" (p. 829), but it does not print the loading values. The
 specific claim that the plane loadings are **unit-cosine** rests on the online
@@ -201,13 +201,13 @@ checks themselves remain unperformed by this page — observed 2026-07-24.*
   the lavaan/Mplus syntax (R Code S25) are cited by the article and by
   `devel/m5-wendt-discrepancies.md` §8, but only the article PDF is in
   `cairn/references/sources/`. The unit-cosine loading detail behind the
-  vignette's `:394` wording is second-hand for that reason — observed
+  vignette's `sem-latent-contrasts.Rmd:292` wording is second-hand for that reason — observed
   2026-07-19.
 - **No value on this page has been read by a human.** Both channels are machine
   channels operating on the same PDF, so a defect in the source document itself
   — as opposed to its text layer — would not have been caught — observed
   2026-07-19.
-- **The vignette understates their conclusion, deliberately or not.** `:396-397`
+- **The vignette understates their conclusion, deliberately or not.** `sem-latent-contrasts.Rmd:294-295`
   says the dimensional model was "competitive with categorical and hybrid
   alternatives"; p. 832 claims "superior validity" and "no evidence … for the
   incremental validity of categorical or hybrid approaches". Understating a

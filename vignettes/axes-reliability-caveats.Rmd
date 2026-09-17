@@ -9,9 +9,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-# This vignette uses lavaan, which circumplex only Suggests. The chunks that
-# fit the model are gated on lavaan being installed so the vignette still
-# builds without it; chunks that need no lavaan carry an explicit eval = TRUE.
+# This page runs no chunk besides this one. The lavaan gate is kept so that a
+# chunk added later, which fits the model, is skipped when lavaan (which
+# circumplex only Suggests) is not installed.
 has_lavaan <- requireNamespace("lavaan", quietly = TRUE)
 knitr::opts_chunk$set(eval = has_lavaan)
 # Output that follows the console width wraps at 77 columns, so with its "#> "
