@@ -1,6 +1,6 @@
 # M137: The axes-reliability and SEM vignettes each split into a core page and an advanced page
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M135
 - **Driving RR:** —
@@ -45,7 +45,7 @@
 - [x] T2: Retarget every site in Scope's list, the three axes tests and the width guard's `EXEMPT` entries first. Update the `cairn/references/` citations by line.
 - [x] T3: Add the names of the pre-rendered pages to `VIGNETTES` (the caveats page evaluates no output and ships as a live `.Rmd`), and the pages to `_pkgdown.yml` and the M135 reading order. Re-render, and run the staleness, width and M135 check scripts.
 - [x] T4: Run the M136 comparison script against the merge base for both splits, the sweep on each page, and the word counts, and record the results in the work log.
-- [ ] T5: NEWS.md entry, tests and check, notes compared with the merge base.
+- [x] T5: NEWS.md entry, tests and check, notes compared with the merge base.
 
 ## Work log
 
@@ -62,6 +62,7 @@
 - 2026-09-16: T4 at a731f083. Split guard exit 0 on both splits (axes: 232 base sentences, 4 pairs, 4 chunks; SEM: 227 base sentences, 6 pairs, 11 chunks, 1 added). Prose words: axes core 1047, caveats 2539, SEM core 2014, contrasts 1660. Sweep exit 0 on all four. Staleness guard exit 0 after the commit. AC5 grep: 21 reference lines, each names the page holding its content.
 - claim audit: 25 claims read, 4 corrected — vignettes/sem-latent-contrasts.Rmd.orig, vignettes/axes-reliability-caveats.Rmd
 - 2026-09-16: claim-audit fixes: contrasts options comment, two contrasts Overview sentences, and the caveats provenance sentence (a fifth axes pair in M137-D2). Same reader re-read all four: hold. Contrasts page re-rendered; axes split guard and sweep exit 0.
+- 2026-09-16: T5 done. NEWS.md entry names the four pages. `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (built from 4dda5de4, before the prose-only claim-audit fixes); merge base reported 0 notes at M136. Frame test 285 pass and staleness guard exit 0 after the fixes. Status review.
 
 ## Decisions
 
