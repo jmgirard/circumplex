@@ -169,12 +169,17 @@ navbar:
       href: reference/ipipipc.html
     - text: Interpersonal Sensitivities Circumplex
       href: reference/isc.html
+  # Grouped by level, in the same order as the articles index above. An entry
+  # with text and no href is a heading; an entry of dashes is a divider.
   - text: Vignettes
     menu:
+    - text: Introductory
     - text: Using Circumplex Instruments
       href: articles/using-instruments.html
     - text: Introduction to SSM Analysis
       href: articles/introduction-to-ssm-analysis.html
+    - text: "---------"
+    - text: Intermediate
     - text: Intermediate SSM Analysis
       href: articles/intermediate-ssm-analysis.html
     - text: Evaluating Circumplex Structure
@@ -183,6 +188,8 @@ navbar:
       href: articles/ci-accuracy.html
     - text: Structure Tests and Ipsatization
       href: articles/structure-tests.html
+    - text: "---------"
+    - text: Advanced
     - text: CPM Fits at a Boundary
       href: articles/cpm-boundary-fits.html
     - text: Advanced Circumplex Visualization
