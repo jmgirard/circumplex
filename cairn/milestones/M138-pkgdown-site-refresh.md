@@ -1,13 +1,13 @@
 # M138: The website has a light navbar, a theme switch and grouped vignette menus
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — changes the published website
-- **Branch/PR:** —
+- **Branch/PR:** `m138-pkgdown-site-refresh`
 
 ## Goal
 
@@ -53,5 +53,8 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - 2026-09-17: the plan gate chose to repair `tools/check-pkgdown-vignettes.R` only, over absorbing the guard-hardening candidate row or deleting the guard, because a repair keeps the guard's promise unchanged. Falsified by the repair needing the guard's promise to widen.
 - 2026-09-17: criteria audit (full mode, fresh [O] reader) found 6 items on the draft. All were fixed before writing. pkgdown emits no `navbar-dark` class, so AC1 now reads the built pages. A hand-written `navbar: right:` list drops the switch and the search box, so AC2 requires `navbar: structure:` and checks for the switch's own elements. `docs/` is not committed, so AC1, AC2, AC3 and AC5 name a fresh build. AC4's four defects hit one checking path each. AC6 names how the warning baseline is produced.
 - 2026-09-17: second fresh [O] audit of the written criteria found 5 items, all fixed. With the light switch on, pkgdown writes no navbar background class and no dark theme attribute, so AC1 now reads the config, a `bg-dark` search and the gate screenshots. A present `navbar: left:` key beats `structure:`, so the structure list covers `right:` only. AC3 now rules out pkgdown's own `articles: navbar:` grouping, which adds a divider before the first heading. AC4's planted vignette carries an index entry, and a fifth defect probes the repair's new wrong-heading path.
+
+- 2026-09-17: implement started on branch `m138-pkgdown-site-refresh`. The step-3 gate merges into the T2 preset gate. The plan already puts the preset pick after rendered candidates.
+- 2026-09-17: pkgdown's guide says a bootswatch preset is unlikely to work with the light switch. T1 renders each candidate with the switch on. Plain Bootstrap 5 joins the candidate set.
 
 ## Decisions
