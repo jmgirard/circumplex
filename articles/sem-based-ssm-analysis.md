@@ -5,7 +5,7 @@
 library(circumplex)
 ```
 
-**Level:** Advanced. Read “Evaluating Circumplex Structure” first.
+**Level:** Advanced. Read “Structure Tests and Ipsatization” first.
 
 ## 1. Overview
 

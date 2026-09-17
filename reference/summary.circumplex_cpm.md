@@ -15,7 +15,7 @@ or competing near-tied optima), the regime where they mis-covered even
 at large N (see
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)). The
 vignette section *When a fit sits at a boundary*
-([`vignette("evaluating-circumplex-structure")`](http://circumplex.jmgirard.com/articles/evaluating-circumplex-structure.md))
+([`vignette("cpm-boundary-fits")`](http://circumplex.jmgirard.com/articles/cpm-boundary-fits.md))
 glosses each marker and gives the interpretation and next steps when one
 fires. When the confidence intervals are bootstrap, any fired markers
 are instead listed in a descriptive note at every sample size; the note

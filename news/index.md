@@ -137,6 +137,20 @@
 
 ### Documentation
 
+- The “Evaluating Circumplex Structure” vignette is now four shorter
+  pages, with every code chunk kept and the prose moved rather than cut.
+  “Evaluating Circumplex Structure” keeps its name and holds the two
+  questions, the circular process model fit, its fit indices and its
+  model variants. “CPM Fits at a Boundary”, an Advanced page, holds the
+  boundary section behind a refit of the same model. “Confidence
+  Interval Accuracy” holds the published accuracy findings,
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
+  and the checklist. “Structure Tests and Ipsatization” holds
+  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
+  and
+  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md).
+  Cross-references that named a section now name a page.
+
 - Every vignette now opens with a Level line (Introductory, Intermediate
   or Advanced) and an Overview that names its sections. Each closes with
   a Wrap-up that names the next page, or a related page where a path

@@ -380,12 +380,18 @@ Groups, measures, contrasts, and the checks an SSM analysis rests on.
   Analysis](http://circumplex.jmgirard.com/articles/intermediate-ssm-analysis.md):
 - [Evaluating Circumplex
   Structure](http://circumplex.jmgirard.com/articles/evaluating-circumplex-structure.md):
+- [Confidence Interval
+  Accuracy](http://circumplex.jmgirard.com/articles/ci-accuracy.md):
+- [Structure Tests and
+  Ipsatization](http://circumplex.jmgirard.com/articles/structure-tests.md):
 
 ### Advanced
 
-Custom figures, latent-variable models, Bayesian estimation, and growth
-models.
+Boundary fits, custom figures, latent-variable models, Bayesian
+estimation, and growth models.
 
+- [CPM Fits at a
+  Boundary](http://circumplex.jmgirard.com/articles/cpm-boundary-fits.md):
 - [Advanced Circumplex
   Visualization](http://circumplex.jmgirard.com/articles/advanced-visualization.md):
 - [SEM-Based SSM

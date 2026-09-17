@@ -708,9 +708,9 @@ multiple groups and measures, how to conduct contrast analyses, how to
 make basic customizations to tables and figures, and how to export
 tables and figures to external files. Two pages follow this one.
 “Evaluating Circumplex Structure” asks whether an instrument fits a
-circumplex and whether its confidence intervals can be trusted.
-“Bayesian SSM Analysis” estimates the same parameters with a Bayesian
-model.
+circumplex, and the pages after it ask whether its confidence intervals
+can be trusted. “Bayesian SSM Analysis” estimates the same parameters
+with a Bayesian model.
 
 ## References
 

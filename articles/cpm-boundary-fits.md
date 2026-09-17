@@ -1,0 +1,305 @@
+# CPM Fits at a Boundary
+
+``` r
+
+library(circumplex)
+```
+
+**Level:** Advanced. Read “Evaluating Circumplex Structure” first.
+
+## 1. Overview
+
+This vignette explains what a boundary solution in a circular process
+model (CPM) fit is, and what to do when one appears. Section 2, “When a
+fit sits at a boundary”, refits the `jz2017` model that “Evaluating
+Circumplex Structure” fits and reads its boundary note. It then glosses
+the five markers that
+[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+records and states what the package’s validation measured about them. It
+ends with four steps to take when one fires. The Wrap-up lists what the
+page covered and names related pages.
+
+## 2. When a fit sits at a boundary
+
+This page starts from the fit of the `jz2017` octants that “Evaluating
+Circumplex Structure” makes. The same call refits it here, with the same
+seed and the same two warnings.
+
+``` r
+
+data("jz2017")
+set.seed(12345)
+cpm <- cpm_fit(jz2017, scales = PANO(), angles = octants(), boots = 500)
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles
+#> may be clustered or parameters weakly determined.
+#> Warning: 11 of 500 bootstrap resamples were excluded (0 with a degenerate or
+#> non-positive-definite correlation matrix, 11 failing the convergence
+#> acceptance criterion); the confidence intervals are based on the remaining
+#> 489 replicates and are conditional on estimability.
+summary(cpm)
+#> 
+#> Circular Process Model (Browne, 1992) 
+#> Model:             quasi-circumplex 
+#> Harmonics (m):     3 
+#> Sample size (N):   1166 
+#> Reference scale:   PA 
+#> CI method:         bootstrap 
+#> Confidence level:  0.95 
+#> 
+#> # Estimated angles and communality indices
+#> 
+#>  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality
+#>     PA     90  90.000  90.000  90.000 0.767 0.684 0.860       0.589
+#>     BC    135 125.074 113.548 137.069 0.931 0.872 1.000       0.868
+#>     DE    180 170.353 156.943 185.174 0.780 0.733 0.826       0.608
+#>     FG    225 195.425 185.811 206.523 0.861 0.822 0.910       0.741
+#>     HI    270 250.721 244.660 258.758 0.956 0.935 0.977       0.914
+#>     JK    315 269.491 261.813 279.412 0.942 0.929 0.957       0.888
+#>     LM    360 294.230 286.626 303.019 0.806 0.761 0.850       0.650
+#>     NO     45  11.305   2.426  20.913 1.000 1.000 1.000       1.000
+#> 
+#> # Correlation-function weights
+#> 
+#>  k  Beta Beta_lci Beta_uci
+#>  0 0.450    0.418    0.481
+#>  1 0.440    0.411    0.466
+#>  2 0.074    0.065    0.087
+#>  3 0.036    0.015    0.057
+#> 
+#> # Fit indices
+#> 
+#>   χ²(10) = 81.169, p = <1e-04
+#>   RMSEA = 0.078 [0.063, 0.094] (90% CI)
+#>   SRMR  = 0.042
+#>   CFI   = 0.984    TLI = 0.956
+#>   AIC   = 117.169    BIC = 208.273
+#> 
+#> # Residuals
+#> 
+#>   Largest absolute residual: 0.134 (PA – HI)
+#> 
+#> # Diagnostics
+#> 
+#>   Note: a communality index reached its upper boundary (ζ > 0.995, a
+#>   Heywood-type solution).
+#>   Note: 11 of 500 bootstrap resamples were excluded (0 degenerate, 11
+#>   non-convergent); the intervals are based on 489 replicates and are
+#>   conditional on estimability.
+#> 
+#>   Note: boundary/weak-identification markers fired: Heywood communality;
+#>   small correlation-function weight; ill-conditioned Hessian.
+#>   What has been measured about these markers covers analytic intervals only,
+#>   and not every marker was measured; they are not validated as predictors of
+#>   the bootstrap intervals shown here (see the vignette section 'When a fit
+#>   sits at a boundary').
+```
+
+The fit above sits at a boundary, and it says so. Its `# Diagnostics`
+block prints a note that a communality index reached its upper boundary.
+The results table shows which one: the NO scale’s communality index is
+1.000, with a confidence interval of \[1.000, 1.000\]. A zero-width
+interval is not a precise estimate. It is an absent one. Both endpoints
+equal the estimate. So at least the middle 95% of the retained bootstrap
+resamples also sat on the boundary. That left the percentile interval no
+width to report. The same chunk also emits a warning that the fit’s
+Hessian is ill-conditioned, a second signal from the same regime. When
+octant scales share a strong general factor, as interpersonal problem
+scales do, fitted solutions frequently sit at or near a parameter
+boundary. This is the estimator meeting real data at finite $`n`$, not a
+data-entry error.
+
+[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+records five such markers, and
+[`summary()`](https://rdrr.io/r/base/summary.html) names the ones that
+fired:
+
+- **Heywood communality**: a communality index estimated at its upper
+  boundary ($`\hat\zeta > 0.995`$). The circle accounts for that scale
+  essentially completely.
+- **boundary harmonic removed**: a correlation-function weight sat at
+  zero and was dropped from the model, with the degrees of freedom
+  adjusted.
+- **small correlation-function weight**: the smallest weight is below
+  0.10, near enough to zero to matter for inference.
+- **ill-conditioned Hessian**: the curvature matrix that the analytic
+  standard errors are computed from is close to singular. Angles may be
+  clustered or parameters weakly determined.
+- **competing near-tied optima**: the search found more than one
+  solution of nearly equal fit, so the reported one may not be uniquely
+  determined.
+
+[`summary()`](https://rdrr.io/r/base/summary.html) prints that list when
+markers fire, but on the analytic path it prints the list only within a
+sample-size window. On the bootstrap path, as in the fit displayed
+above, the list prints as a descriptive note at every sample size.
+Beside the note, a statement says that what has been measured about the
+markers covers analytic intervals only. It also says that not every
+marker was measured. *What a fired marker does and does not tell you*,
+below, has the particulars. So the markers are not validated as
+predictors of the bootstrap intervals they accompany. When the intervals
+are analytic, the list instead arrives inside a coverage caution,
+printed when $`N`$ falls between 2000 and 50000. Below 2000, an
+unconditional caution prints without the list. Above 50000, neither
+prints. To see that caution-embedded form, we simulate a larger sample
+from the structure just estimated with
+[`cpm_simulate()`](http://circumplex.jmgirard.com/reference/cpm_simulate.md).
+Then we refit it on the correlation-matrix path, where the intervals are
+analytic.
+
+``` r
+
+set.seed(2026)
+sim <- cpm_simulate(cpm, n = 2500) # draws from the structure estimated above
+demo <- cpm_fit(
+  cormat = cor(sim), scales = colnames(sim), angles = octants(), n = 2500
+)
+summary(demo)
+#> 
+#> Circular Process Model (Browne, 1992) 
+#> Model:             quasi-circumplex 
+#> Harmonics (m):     3 
+#> Sample size (N):   2500 
+#> Reference scale:   PA 
+#> CI method:         analytic 
+#> Confidence level:  0.95 
+#> 
+#> # Estimated angles and communality indices
+#> 
+#>  Scale Theory   Angle     lci     uci  Zeta   lci   uci Communality
+#>     PA     90  90.000  90.000  90.000 0.785 0.748 0.823       0.617
+#>     BC    135 125.057 120.571 129.542 0.881 0.852 0.911       0.777
+#>     DE    180 167.802 161.988 173.616 0.799 0.777 0.820       0.638
+#>     FG    225 193.344 187.711 198.976 0.878 0.854 0.901       0.770
+#>     HI    270 250.958 245.112 256.805 0.958 0.944 0.971       0.917
+#>     JK    315 269.528 263.351 275.706 0.948 0.938 0.958       0.899
+#>     LM    360 293.619 286.622 300.617 0.803 0.778 0.829       0.645
+#>     NO     45  12.673   7.017  18.329 0.929 0.836 1.023       0.863
+#> 
+#> # Correlation-function weights
+#> 
+#>  k  Beta Beta_lci Beta_uci
+#>  0 0.442    0.422    0.462
+#>  1 0.453    0.436    0.470
+#>  2 0.068    0.058    0.078
+#>  3 0.037    0.030    0.044
+#> 
+#> # Fit indices
+#> 
+#>   χ²(10) = 2.229, p = 0.994
+#>   RMSEA = 0 [0, 0] (90% CI)
+#>   SRMR  = 0.005
+#>   CFI   = 1    TLI = 1.002
+#>   AIC   = 38.229    BIC = 143.062
+#> 
+#> # Residuals
+#> 
+#>   Largest absolute residual: 0.012 (FG – NO)
+#> 
+#>   Note: this solution is near a parameter boundary or weakly identified
+#>   (small correlation-function weight); analytic (Wald) confidence intervals
+#>   mis-covered for such fits in validation even at N in the tens of thousands.
+#>   Interpret them with caution and prefer the bootstrap on the raw-data path
+#>   when available.
+```
+
+One marker fires here, a **small correlation-function weight**, and
+[`summary()`](https://rdrr.io/r/base/summary.html) names it. Notice what
+did *not* happen. The population that this sample was drawn from carries
+NO’s communality at the boundary, yet this draw produced no Heywood
+case. A boundary in the population does not guarantee a boundary in
+every sample from it. In the same way, a quiet fit does not guarantee
+that there is no boundary behind the data.
+
+**What a fired marker does and does not tell you.** The package’s
+validation simulations measured what these markers predict, and the
+measurement is narrower than the markers are. It covered *analytic*
+(Wald) intervals fitted from a correlation matrix. It measured interval
+**coverage** (how often an interval contained the truth), not bias in
+the point estimates.
+
+- *Communality indices* take the worst of it **when an ill-conditioning,
+  a Heywood, or a near-tied-optima marker fires**. All three covered
+  $`\zeta`$ well below nominal, and ill-conditioning was the worst of
+  them. Two failure modes show up in the output rather than hiding in
+  it. First, the analytic standard errors can come back missing. This
+  happens for the communality indices, the angles and the weights at the
+  same time. The reason is that one singular curvature matrix takes all
+  three families down together. Second, an interval can collapse to zero
+  width, because a negative asymptotic variance was clamped at zero.
+  NO’s zero-width interval above arrives by a third route: it is a
+  percentile interval whose resamples sat on the boundary. But it
+  reaches the reader the same way, as an interval with no usable width.
+- *Angles.* Taking all marker-firing fits together, angle intervals
+  actually degraded somewhat *more* than communality intervals did. So
+  the ranking above (communality indices worst under those three
+  markers) belongs to those markers, not to the parameter families in
+  general. The strongest single angle signal was the ill-conditioning
+  marker. The small-weight marker was next, and the Heywood marker was
+  the weakest of the three.
+- *Correlation-function weights* moved least. Marker-firing fits covered
+  $`\beta`$ only slightly less often than quiet ones, so a fired marker
+  tells you least here. The real $`\beta`$ problem is a different one,
+  and it does not depend on any marker. In the package’s bootstrap
+  validation, percentile intervals for a weight whose *population* value
+  sits near zero under-covered at every sample size studied. The
+  shortfall did not shrink as $`n`$ grew. That is a property of
+  percentile intervals at a boundary, not a small-sample artifact. It is
+  about where the truth sits, not about what the fit flagged.
+
+The record does *not* support four things, and no reading of these
+markers should assume them. First, nothing was measured about bias in
+the point estimates. Second, the marker study fitted analytic intervals
+only. So the markers are not validated as predictors on the bootstrap
+path that this vignette uses by default. Third, the **boundary harmonic
+removed** marker showed no evidence of predicting mis-coverage at all.
+Fits carrying it covered as well as fits without it. It is kept because
+it names a real feature of the solution, not because it forecasts
+trouble. Fourth, the numbers behind **Heywood communality**,
+**ill-conditioned Hessian** and **competing near-tied optima** come
+almost entirely from one simulated configuration, chosen deliberately to
+provoke them. In that configuration, those markers fire often enough to
+measure. Even there, near-tied optima fired only rarely. Read them as
+what happens where those markers fire, not as how often they fire.
+
+**What to do when one fires.**
+
+1.  *Locate it.* Read the results table beside the note, and find the
+    scale or weight sitting at the boundary, as NO is above. A marker
+    with no identified owner is not yet a diagnosis.
+2.  *Re-fit to find out what the boundary is about.* The default
+    `"quasi-circumplex"` model is the least constrained of the variants
+    that “Evaluating Circumplex Structure” compares. So a boundary that
+    appears only under a constrained variant was put there by the
+    constraint. A boundary already present in the default fit belongs to
+    the data and the model family, not to an assumption you added. If
+    you fitted from a correlation matrix, refitting from raw data also
+    buys you bootstrap intervals in place of analytic ones.
+3.  *Report it.* Quote the marker alongside the estimate it belongs to:
+    which scales sat at the boundary, and that their intervals are
+    degenerate or missing. An angle or communality reported without its
+    diagnostic note is a number stripped of its own caveat.
+4.  *Keep using what still holds.* Three things remain usable. The first
+    is the point estimates, as the solution the model actually fitted.
+    Their bias in this regime is unmeasured, so read them as estimates,
+    not to the digit. The second is the fit indices and the residual
+    summary. A boundary changes how the *intervals* around them behave.
+    It does not change how the fit indices and the residual summary are
+    computed. Read them with the caution that “Evaluating Circumplex
+    Structure” gives under *Reading the fit indices*, which is about
+    field sample sizes, not about markers. The third is parameter
+    intervals that came back with ordinary width. Read them knowing that
+    marked fits covered less well than unmarked ones across all three
+    families. One thing does not remain usable: a parameter interval
+    that is missing or zero-width. (The demonstration fit above prints
+    `RMSEA = 0 [0, 0]`, which is not that failure. It is a fit statistic
+    at its own floor, because the refit recovers almost exactly the
+    structure it was simulated from.)
+
+## Wrap-up
+
+A boundary solution is the estimator meeting real data, and a fired
+marker is a finding to locate, refit, report and keep in view. No page
+follows this one. “Evaluating Circumplex Structure” compares the model
+variants that a refit chooses among. “Confidence Interval Accuracy” asks
+whether the intervals of an SSM analysis can be trusted at your sample
+size.

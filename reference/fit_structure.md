@@ -103,7 +103,7 @@ are still reported but no interpretation is attached (see
 [`print()`](https://rdrr.io/r/base/print.html)/[`summary()`](https://rdrr.io/r/base/summary.html)).
 The cutoffs were re-derived under Acton and Revelle's own generating
 model at eight scales; see
-[`vignette("evaluating-circumplex-structure")`](http://circumplex.jmgirard.com/articles/evaluating-circumplex-structure.md).
+[`vignette("structure-tests")`](http://circumplex.jmgirard.com/articles/structure-tests.md).
 RANDALL needs no cutoffs: with up to nine scales its null distribution
 is enumerated exactly, so its p-value is available at any scale count of
 four or more.
