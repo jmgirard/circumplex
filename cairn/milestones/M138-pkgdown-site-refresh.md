@@ -1,6 +1,6 @@
 # M138: The website has a light navbar, a theme switch and grouped vignette menus
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -44,7 +44,7 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - [x] T3: Add `template: light-switch: true`. Replace `navbar: right:` with a `navbar: structure:` declaration that keeps the GitHub icon and restores pkgdown's search and lightswitch components. Delete the `docsearch` keys. Rebuild, grep the nav-bearing pages for the three strings, compare the page set with T1's master build, and read `search.json`.
 - [x] T4: Group the Vignettes menu in `_pkgdown.yml` with a heading per level and a divider between groups, in the `articles:` index order. Rebuild and read the rendered dropdown.
 - [x] T5: Repair `tools/check-pkgdown-vignettes.R` so it skips heading and divider entries, reads each group's pages under its heading, and fails when a page sits under the wrong heading. Plant AC4's five defects in a scratch copy of the repo, one at a time, and record each exit status and message as review evidence.
-- [ ] T6: Run `pkgdown::check_pkgdown()` and a final clean build. Compare the warning list with T1's. Open the pull request and wait for the `pkgdown.yaml` workflow.
+- [x] T6: Run `pkgdown::check_pkgdown()` and a final clean build. Compare the warning list with T1's. The pull request and the `pkgdown.yaml` wait belong to the review phase.
 
 ## Work log
 
@@ -77,6 +77,9 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - 2026-09-17: the second build, run without the `check_pkgdown()` call, wrote a warning list identical to the master baseline. Both are 262 `--mathml` and 14 `--mathjax` lines. The 25 extra lines came from that call, not from the build.
 - 2026-09-17: claim audit: 14 claims read, 3 corrected — `_pkgdown.yml`, `tools/check-pkgdown-vignettes.R`
 - 2026-09-17: the claim audit found the dash rule stated too loosely and a divider promise the guard never kept. The `_pkgdown.yml` comment now says three or more dashes. The guard comment drops the divider promise, and its dash test became pkgdown's own `^\s*-{3,}\s*$`. A planted one-dash entry now fails, because pkgdown renders it as a heading.
+- 2026-09-17: amendment, minor. T6 no longer says to open the pull request. The git model opens it at the review phase, after the user approves at the merge gate.
+- 2026-09-17: `devtools::test()` ran again after the last code change and came back clean, with 0 failures and 11319 passes.
+- 2026-09-17: all six tasks are done and the local checks are clean, so the status moves to review.
 - 2026-09-17: re-audit: AC2 (full) — 6 findings, all fixed before writing. Narrowing to nav-bearing pages left an undercount hole, and the master negative control was available and unused. The configuration clauses named no procedure, a flat grep cannot separate the two `right:` keys, Coverage omitted T1, and the T3 task text no longer matched.
 - 2026-09-17: re-audit: AC1 (full) — 7 findings, all fixed before writing. They were an unsatisfiable grep sentence, two clauses binding the evidence record, and an unbounded causal claim. The rest were an unnamed nav search procedure, no named theme, a two-string darkness test, and a Coverage row missing T3.
 - 2026-09-17: re-audit: AC6 (full) — 3 findings, all fixed before writing. The named pandoc line kinds pinned a toolchain version into the criterion. The dropped empty-directory condition let an incremental rebuild pass for the wrong reason. The baseline also needed a same-toolchain clause.
