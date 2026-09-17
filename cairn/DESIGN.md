@@ -135,6 +135,15 @@ an n-dependent quantity against an n-free exact value, conservative and
 sub-ulp; and M108's nine cosmetic and performance residues plus M111's F16,
 whose texts are in those milestones' review histories.
 
+Accepted 2026-09-17 (M138), on the website's navbar. AC1 checks that the built
+pages carry no navbar background class and no `data-bs-theme` attribute, which
+is a marker for a light navbar, not a test that the navbar renders light.
+`pkgdown:::data_navbar()` drops the style whenever `light-switch: true` is set,
+whatever the preset, so the same check would pass under a dark preset. Accepted
+at the M138 amendment's mini gate: judging rendered appearance needs a visual
+oracle the repo does not have, and the maintainer picked the preset from
+rendered screenshots at the plan gate.
+
 ## Design Principles
 
 _Adopted at the 2026-08-04 design interview (D-038). IP = inviolable (never
