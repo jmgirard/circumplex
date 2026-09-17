@@ -21,12 +21,12 @@
 
 ## Acceptance criteria
 
-- [ ] AC1: `vignettes/` holds the four sources named in Scope. The set of `.Rmd.orig` basenames in `vignettes/` equals `VIGNETTES` in `tools/precompute-vignettes.R`. Each page is in the `_pkgdown.yml` articles groups and navbar menu, and the M135 check script passes over every source file.
-- [ ] AC2: For each of the two merge-base sources, the multiset of non-heading sentences that `tools/prose-sweep.R --prose` prints equals the union of the multisets printed for its two new sources, apart from at most 20 sentences per split that the Decisions section lists as reworded, each with its old and new text. No sentence is dropped. Procedure: the M136 comparison script.
-- [ ] AC3: `tools/prose-sweep.R --prose <source> | wc -w` is at most 2600 for each of the four new sources.
-- [ ] AC4: For each of the two merge-base sources, every chunk that `tools/prose-sweep.R --chunks` prints appears once across its two new sources with the same code and options, apart from the chunk labelled `setup`, which each new source carries. Procedure: the M136 comparison script.
+- [x] AC1: `vignettes/` holds the four sources named in Scope. The set of `.Rmd.orig` basenames in `vignettes/` equals `VIGNETTES` in `tools/precompute-vignettes.R`. Each page is in the `_pkgdown.yml` articles groups and navbar menu, and the M135 check script passes over every source file.
+- [x] AC2: For each of the two merge-base sources, the multiset of non-heading sentences that `tools/prose-sweep.R --prose` prints equals the union of the multisets printed for its two new sources, apart from at most 20 sentences per split that the Decisions section lists as reworded, each with its old and new text. No sentence is dropped. Procedure: the M136 comparison script.
+- [x] AC3: `tools/prose-sweep.R --prose <source> | wc -w` is at most 2600 for each of the four new sources.
+- [x] AC4: For each of the two merge-base sources, every chunk that `tools/prose-sweep.R --chunks` prints appears once across its two new sources with the same code and options, apart from the chunk labelled `setup`, which each new source carries. Procedure: the M136 comparison script.
 - [ ] AC5: The three tests that read the axes vignette (`test-axes-scaled-fit.R`, `test-axes-corrected-se.R`, `test-axes-reliability.R`) read `vignettes/axes-reliability-caveats.Rmd` (through `vignette_source()` or `test_path()`) and pass. The `EXEMPT` entries in `tools/check-vignette-width.R` name the page that holds the `cx =~` and `cy =~` lines. At the branch head, every `vignette("<page>")` call, every `articles/<page>.html` link, and every `vignettes/<page>.Rmd` mention in `cairn/references/`, with or without `:<line>`, among the lines that `git grep -n -e 'axes-reliability' -e 'sem-based-ssm-analysis' -e 'sem-latent-contrasts' -- R/ vignettes/ README.Rmd tests/ tools/ .github/ _pkgdown.yml cairn/references/` returns, names a page that exists and holds the content that line attributes to it. For a `:<line>` mention, that content is on that line. Page-list entries, which AC1 covers, and figure `src` paths are excluded.
-- [ ] AC6: `tools/check-vignette-staleness.R` and `tools/check-vignette-width.R` pass at the branch head, and `tools/prose-sweep.R` exits 0 on each of the four new sources (the SEM page has two long sentences at master, at lines 379 and 455 of the source, which the split fixes).
+- [x] AC6: `tools/check-vignette-staleness.R` and `tools/check-vignette-width.R` pass at the branch head, and `tools/prose-sweep.R` exits 0 on each of the four new sources (the SEM page has two long sentences at master, at lines 379 and 455 of the source, which the split fixes).
 - [ ] AC7: `Rscript -e 'devtools::test()'` reports 0 failures, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings and no note that the merge base does not report. NEWS.md names the four pages and the two they replace.
 
 ## Coverage
@@ -88,3 +88,9 @@
 - Added chunk: lavaan-note-contrasts
 
 ## Review
+
+- AC1 (2026-09-16, at 8eeb80fa): `vignettes/` holds `axes-reliability.Rmd.orig`, `axes-reliability-caveats.Rmd`, `sem-based-ssm-analysis.Rmd.orig` and `sem-latent-contrasts.Rmd.orig`. The 11 `.Rmd.orig` basenames equal the 11 names in `VIGNETTES`. All four pages are in the `_pkgdown.yml` articles list (lines 129-132) and navbar (193-199). `tools/check-pkgdown-vignettes.R` exit 0 (14 pages agree); `test-vignette-frame.R` 285 pass, 0 fail. Pass.
+- AC2: `tools/check-vignette-split.R --pairs <subsection> --max-pairs 20` against merge base 045828f9, exit 0 on both. Axes: 232 base sentences, 234 across pages, 5 listed pairs. SEM: 227 base, 235 across pages, 6 listed pairs. Both report every sentence in exactly one page. Pass.
+- AC3: `prose-sweep.R --prose | wc -w`: axes core 1047, caveats 2534, SEM core 2014, contrasts 1665. All at most 2600. Pass.
+- AC4: same split-guard runs. Axes: 4 base chunks outside the preamble, 0 added. SEM: 11 base chunks, 1 added (`lavaan-note-contrasts`, listed as an added chunk in M137-D2). Every base chunk in exactly one page byte for byte. Pass.
+- AC6: `check-vignette-staleness.R` exit 0, `check-vignette-width.R` exit 0 (11 pre-computed pages within 80 columns), `prose-sweep.R` exit 0 on each of the four sources. Pass.
