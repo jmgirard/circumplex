@@ -26,15 +26,18 @@
 # an added line moves its sentences out of the pages' residual only. A pair
 # whose old text is not in the base residual, or whose new text is not in the
 # pages' residual, is reported. More listed lines than `--max-pairs` allows
-# is a failure.
+# is a failure. A pairs file with a `## Decisions` heading is read from that
+# heading to the next `## ` heading only.
 #
 # Chunks. Every fenced block of the base must appear once across the pages,
-# byte for byte, header line included. The two preamble chunks that every
-# page carries, the unlabelled `include = FALSE` options chunk and the chunk
-# labelled `setup`, are left out on both sides. A block only a page holds is
-# listed as added, which is not a failure. Every `precompute:volatile-numbers`
-# start marker of the base must be in the page that holds the labelled chunk
-# after it, still directly before that chunk, and that page must close it.
+# byte for byte, header line included. The two preamble chunks, the first
+# unlabelled chunk (the `include = FALSE` options chunk) and the first chunk
+# labelled `setup`, are left out on both sides, and a page that lacks either
+# fails. A block only a page holds must be listed in the `--pairs` file as
+# `- Added chunk: <label>`. Every `precompute:volatile-numbers` region of the
+# base (a start marker to its end marker) must be in the page that holds its
+# first chunk, holding the same chunk labels and no other, and a region a
+# page adds may hold added chunks only.
 #
 # Word counts. The prose word count of each page, the number `--prose | wc -w`
 # gives, is printed for the page-length check.
@@ -86,7 +89,9 @@ strip_frame <- function(lines) {
   }
   blank_section("^## 1\\. Overview")
   out[grepl("^\\*\\*Level:\\*\\*", lines)] <- ""
-  out[grepl("^\\s{0,3}#{1,6}\\s", lines)] <- ""
+  # The References heading stays, so the sweep still drops the section under it.
+  refs <- grepl("^\\s{0,3}#{1,6}\\s+references?\\s*#*\\s*$", lines, ignore.case = TRUE)
+  out[grepl("^\\s{0,3}#{1,6}\\s", lines) & !refs] <- ""
   out
 }
 
@@ -113,9 +118,20 @@ chunk_label <- function(block) {
   trimws(sub("^\\s{0,3}```\\{r[ ,]*", "", sub("[,}].*$", "", header)))
 }
 
-is_preamble <- function(block) {
-  lab <- chunk_label(block)
-  !is.na(lab) && lab %in% PREAMBLE_LABELS
+# Drops the preamble, the first unlabelled chunk and the first chunk labelled
+# `setup`, from a page's blocks. A page without both is reported by name.
+without_preamble <- function(blocks, what) {
+  labs <- vapply(blocks, chunk_label, character(1))
+  drop <- integer(0)
+  for (p in PREAMBLE_LABELS) {
+    i <- which(!is.na(labs) & labs == p)
+    if (!length(i)) {
+      fail(what, " has no ", if (nzchar(p)) paste0("chunk labelled `", p, "`") else "unlabelled options chunk")
+    } else {
+      drop <- c(drop, i[[1]])
+    }
+  }
+  if (length(drop)) blocks[-drop] else blocks
 }
 
 # Removes each element of `what` once from `from`; returns what was not there.
@@ -128,16 +144,25 @@ take <- function(from, what) {
   list(rest = from, missing = missing)
 }
 
+# Reads the listed lines. A file with a `## Decisions` heading is read from
+# that heading to the next `## ` heading only.
 read_pairs <- function(path) {
   lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
+  dec <- which(grepl("^## Decisions\\s*$", lines))
+  if (length(dec)) {
+    later <- which(grepl("^## ", lines) & seq_along(lines) > dec[[1]])
+    end <- if (length(later)) later[[1]] - 1L else length(lines)
+    lines <- lines[seq(dec[[1]], end)]
+  }
   rew <- sub("^\\s*- Reworded:\\s*", "", lines[grepl("^\\s*- Reworded:", lines)])
   add <- sub("^\\s*- Added:\\s*", "", lines[grepl("^\\s*- Added:", lines)])
+  addc <- trimws(sub("^\\s*- Added chunk:\\s*", "", lines[grepl("^\\s*- Added chunk:", lines)]))
   bad <- rew[!grepl(" => ", rew, fixed = TRUE)]
   if (length(bad)) usage(paste0("a Reworded line has no ` => `: ", bad[[1]]))
   list(
     old = vapply(rew, function(x) sub(" => .*$", "", x), character(1), USE.NAMES = FALSE),
     new = c(vapply(rew, function(x) sub("^.* => ", "", x), character(1), USE.NAMES = FALSE), add),
-    n_reworded = length(rew), n_added = length(add)
+    n_reworded = length(rew), n_added = length(add), added_chunks = addc
   )
 }
 
@@ -187,6 +212,7 @@ old_residual <- common$rest        # in the base, not in the pages
 new_residual <- common$missing     # in the pages, not in the base
 
 n_pairs <- 0L
+pr <- NULL
 if (!is.null(pairs_path)) {
   pr <- read_pairs(pairs_path)
   n_pairs <- pr$n_reworded + pr$n_added
@@ -209,13 +235,23 @@ for (s in new_residual) fail("unlisted new sentence: ", s)
 
 # --- chunks ------------------------------------------------------------------
 
-base_c <- Filter(Negate(is_preamble), chunks_of(base))
-page_c <- lapply(page_lines, function(l) Filter(Negate(is_preamble), chunks_of(l)))
+base_c <- without_preamble(chunks_of(base), base_spec)
+page_c <- lapply(pages, function(p) without_preamble(chunks_of(page_lines[[p]]), p))
+names(page_c) <- pages
 union_c <- unlist(page_c, use.names = FALSE)
 if (!length(base_c)) usage("the base has no chunks outside its preamble")
 tc <- take(union_c, base_c)
 for (b in tc$missing) fail("base chunk not in any page byte for byte: ", sub("\n.*$", "", b))
 added_chunks <- tc$rest
+added_labels <- vapply(added_chunks, chunk_label, character(1))
+listed_added <- if (!is.null(pairs_path)) pr$added_chunks else character(0)
+for (k in seq_along(added_chunks)) {
+  lab <- added_labels[[k]]
+  if (is.na(lab) || !lab %in% listed_added)
+    fail("added chunk not listed as `- Added chunk: <label>`: ", sub("\n.*$", "", added_chunks[[k]]))
+}
+for (lab in setdiff(listed_added, added_labels[!is.na(added_labels)]))
+  fail("listed added chunk `", lab, "` is not in any page")
 for (b in base_c) {
   n <- sum(union_c == b)
   if (n > 1L) fail("base chunk in ", n, " pages: ", sub("\n.*$", "", b))
@@ -267,6 +303,20 @@ for (m in base_m) {
   if (!length(hit)) {
     fail(holder, " has no closed marked region holding exactly chunk(s) ",
          paste0("`", m$labels, "`", collapse = ", "))
+  }
+}
+# A region a page adds may hold added chunks only: a new mask over a base
+# chunk would hide a stale digit the staleness guard compared before.
+base_sets <- lapply(base_m, function(m) m$labels)
+for (p in pages) {
+  for (r in page_m[[p]]) {
+    if (!r$closed) {
+      fail(p, ": a marked region at line ", r$line, " is not closed")
+    } else if (!any(vapply(base_sets, identical, logical(1), r$labels)) &&
+               !all(r$labels %in% added_labels)) {
+      fail(p, ": the marked region at line ", r$line, " is not the base's and holds base chunk(s) ",
+           paste0("`", setdiff(r$labels, added_labels), "`", collapse = ", "))
+    }
   }
 }
 
