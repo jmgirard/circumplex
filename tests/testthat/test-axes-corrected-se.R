@@ -749,7 +749,7 @@ test_that("AC7: the vignette's caveats match the corrected contract", {
   # sits in vignettes/ in the dev tree and in inst/doc once installed, so the
   # read goes through vignette_source(), which tries both -- a source-tree-only
   # read skipped under R CMD check, which is the gate that ships.
-  vig <- vignette_source("axes-reliability.Rmd")
+  vig <- vignette_source("axes-reliability-caveats.Rmd")
   skip_if(!nzchar(vig),
           "vignette source unavailable (build installed without vignettes)")
   txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))

@@ -26,7 +26,8 @@ LEVELS <- list(
   ),
   Advanced = c(
     "cpm-boundary-fits", "advanced-visualization", "sem-based-ssm-analysis",
-    "axes-reliability", "bayesian-ssm-analysis", "growth-ssm-analysis"
+    "sem-latent-contrasts", "axes-reliability", "axes-reliability-caveats",
+    "bayesian-ssm-analysis", "growth-ssm-analysis"
   )
 )
 EXPECTED <- unlist(LEVELS, use.names = FALSE)

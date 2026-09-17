@@ -16,6 +16,7 @@ VIGNETTES <- c(
   "ci-accuracy",
   "structure-tests",
   "sem-based-ssm-analysis",
+  "sem-latent-contrasts",
   "advanced-visualization",
   "intermediate-ssm-analysis",
   "introduction-to-ssm-analysis",

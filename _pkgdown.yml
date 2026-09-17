@@ -127,7 +127,9 @@ articles:
   - cpm-boundary-fits
   - advanced-visualization
   - sem-based-ssm-analysis
+  - sem-latent-contrasts
   - axes-reliability
+  - axes-reliability-caveats
   - bayesian-ssm-analysis
   - growth-ssm-analysis
 navbar:
@@ -189,8 +191,12 @@ navbar:
       href: articles/advanced-visualization.html
     - text: SEM-Based SSM Analysis
       href: articles/sem-based-ssm-analysis.html
+    - text: Latent Group Contrasts
+      href: articles/sem-latent-contrasts.html
     - text: Axes Reliability
       href: articles/axes-reliability.html
+    - text: Axes Reliability Caveats
+      href: articles/axes-reliability-caveats.html
     - text: Bayesian SSM Analysis
       href: articles/bayesian-ssm-analysis.html
     - text: Growth Models on SSM Parameters

@@ -403,8 +403,10 @@ carries the model the package implements, not the whole paper.
 - `tests/testthat/test-cpm_fit.R:1` — the engine test-file header.
 - `vignettes/evaluating-circumplex-structure.Rmd:62,332` — the CPM
   introduction and the reference-list entry (lines re-read at M136).
-- `vignettes/sem-based-ssm-analysis.Rmd:80,415,421` — the SEM vignette's
-  contrast with the CPM, and its reference-list entry.
+- `vignettes/sem-based-ssm-analysis.Rmd:85,377` — the SEM vignette's
+  contrast with the CPM, and its reference-list entry (lines re-read at M137).
+- `vignettes/sem-latent-contrasts.Rmd:314,329` — where the fixed-loading CFA
+  meets the CPM, and the reference-list entry (lines re-read at M137).
 - `cairn/references/grassi2010.md` — the published-value oracle for this
   model; its Table 2/3 communality column is eq. (4)'s ρ̂.
 - `cairn/references/browne1982.md` — supplies the CI machinery that eq. (4)
