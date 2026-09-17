@@ -21,7 +21,7 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 
 ## Acceptance criteria
 
-- [ ] AC1: Read with `yaml::read_yaml()`, `cfg$template$bslib$preset` is `"zephyr"`. The search `grep -rn "preset" _pkgdown.yml` finds exactly one line, and `grep -rn "bootswatch" _pkgdown.yml` finds none. This review makes both builds below on one machine and toolchain: a branch build into an empty directory, and a build of master. The procedure for each build is a grep over the `<nav ...>` opening tags of every `.html` file that build wrote, and the clauses below are about those tags, not the lines that hold them. In the branch build, no `<nav ...>` opening tag carries a `bg-` class or a `data-bs-theme` attribute. In each build, the `<nav ...>` opening tags bearing `aria-label="Site navigation"` number one per nav-bearing `.html` file, over the same page set AC2 pins, and in the master build every one of them carries `bg-primary` and `data-bs-theme="dark"`.
+- [x] AC1: Read with `yaml::read_yaml()`, `cfg$template$bslib$preset` is `"zephyr"`. The search `grep -rn "preset" _pkgdown.yml` finds exactly one line, and `grep -rn "bootswatch" _pkgdown.yml` finds none. This review makes both builds below on one machine and toolchain: a branch build into an empty directory, and a build of master. The procedure for each build is a grep over the `<nav ...>` opening tags of every `.html` file that build wrote, and the clauses below are about those tags, not the lines that hold them. In the branch build, no `<nav ...>` opening tag carries a `bg-` class or a `data-bs-theme` attribute. In each build, the `<nav ...>` opening tags bearing `aria-label="Site navigation"` number one per nav-bearing `.html` file, over the same page set AC2 pins, and in the master build every one of them carries `bg-primary` and `data-bs-theme="dark"`.
 - [x] AC2: `_pkgdown.yml` sets `template: light-switch: true` and declares `navbar: structure: right:` naming the search, lightswitch and github components. Read with `yaml::read_yaml()`, `cfg$navbar$right` is NULL and `cfg$navbar$structure$right` is `[search, lightswitch, github]`. In the final site, built by `pkgdown::build_site()` into an empty directory at T6, the check reads every `.html` file that holds a `<nav` element. Each such file holds the strings `id="dropdown-lightswitch"`, `data-bs-theme-value` and `id="search-input"`. No `<nav`-bearing file of T1's build of master holds any of the three. The final build writes the same set of `.html` paths as that build, and the files carrying no `<nav` are the same eight in both. The procedure is a grep over every `.html` file each build wrote.
 - [x] AC3: The Vignettes menu stays hand-written under `navbar: left:`, with a `text:`-only entry per level and `text: "---------"` separator entries, and no `articles:` group carries a `navbar:` key. In the freshly built `index.html`, that dropdown holds exactly three `h6.dropdown-header` elements reading Introductory, Intermediate and Advanced in that order, a `hr.dropdown-divider` between consecutive groups, and under each heading the same pages in the same order as that level's group in the `articles:` index.
 - [x] AC4: `tools/check-pkgdown-vignettes.R` exits 0 on the grouped `_pkgdown.yml`. In a scratch copy of the repo it exits 1 on each of five planted defects, one per checking path: a page dropped from the navbar menu, a menu entry whose text is not the vignette's title, a page moved to another level group in the `articles:` index, a page moved under the wrong level heading in the navbar menu alone, and an extra vignette file on disk, carrying a well-formed `\VignetteIndexEntry{}`, that the level map does not list. The script's message names the defect it found in each case.
@@ -96,145 +96,80 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 
 - 2026-09-17: claim audit: 13 claims read, 0 corrected — `_pkgdown.yml`, `tools/check-pkgdown-vignettes.R`. The reader checked each comment by planting its case in a scratch copy and by calling pkgdown's `menu_type()` and `navbar_html()` directly.
 - 2026-09-17: the amendment is done and the verify slot is clean, so the status returns to review.
+- 2026-09-17: re-review in progress. AC1 to AC5 verified with fresh evidence from two new builds; AC6's build half verified, its CI clause waits on the pull request. Consistency gate and the independent review are still running.
 
 ## Review
 
-Fresh evidence, gathered 2026-09-17 on `m138-pkgdown-site-refresh` at `9401dfb8`, with
-master unmoved since the branch was cut. Two builds were made for this review: master
-built from a scratch worktree into an empty directory, and the branch built into a
-second empty directory. Both ran on the same machine and toolchain.
+Second review pass, after the AC1 amendment. Fresh evidence gathered 2026-09-17 on
+`m138-pkgdown-site-refresh` at `18a1c2ef`, with master unmoved since the branch was
+cut (`git rev-list --left-right --count origin/master...HEAD` is `0 10`). Two builds
+were made for this pass on one machine and toolchain: master built from a scratch
+worktree into an empty directory, and the branch built into a second empty directory.
+Both exited 0.
 
 ### Acceptance criteria
 
-- **AC1 — FAILS AS WRITTEN.** The configuration half passes: `template: bslib: preset:
-  zephyr` is present, `grep -rn "preset" _pkgdown.yml` returns exactly one line
-  (`_pkgdown.yml:12`), and `grep -rn "bootswatch" _pkgdown.yml` returns none. The
-  branch half passes: over all 110 `.html` files the branch build wrote, no `<nav ...>`
-  line carries a `bg-` class or a `data-bs-theme` attribute. The master half is
-  **falsified**. The criterion's own named procedure is a grep over the `<nav ...>`
-  lines of every `.html` file the build wrote. Run on master, that grep returns two
-  distinct lines: the site-navigation line, on 102 files, carrying `bg-primary` and
-  `data-bs-theme="dark"`; and `<nav id="toc" aria-label="Table of contents">`, on 96
-  files, carrying neither. So "Every `<nav>` line of a build of master carries
-  `bg-primary` and `data-bs-theme="dark"`" is false of 96 files. The work is right and
-  the criterion is over-broad, so this is an amendment return, not a defect return.
+- **AC1 — verified.** Configuration half: `yaml::read_yaml("_pkgdown.yml")` gives
+  `cfg$template$bslib$preset` equal to `"zephyr"`; `grep -rn "preset" _pkgdown.yml`
+  returns exactly one line (`_pkgdown.yml:12`); `grep -rn "bootswatch" _pkgdown.yml`
+  returns none. Build half, by the criterion's named procedure — every `<nav ...>`
+  opening tag of every `.html` file each build wrote, matched as a tag and not as a
+  line. Branch build: of all its `<nav ...>` opening tags, none carries a `bg-` class
+  or a `data-bs-theme` attribute (0 of them). The two nav tag kinds it emits are
+  `<nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation">` and
+  `<nav id="toc" aria-label="Table of contents">`. Site-navigation tags: in each
+  build, the tags bearing `aria-label="Site navigation"` number exactly one per
+  nav-bearing `.html` file — 102 files with exactly one and 8 with none, in both
+  builds, and that file set equals the nav-bearing set AC2 pins. In the master build
+  all 102 of them carry `bg-primary` and `data-bs-theme="dark"`
+  (`<nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark"
+  aria-label="Site navigation">`).
 - **AC2 — verified.** `yaml::read_yaml("_pkgdown.yml")` gives `cfg$navbar$right` NULL,
   `cfg$navbar$structure$right` equal to `search, lightswitch, github`, and
-  `cfg$template$"light-switch"` TRUE. The branch build wrote 110 `.html` files, 102 of
-  them holding a `<nav` element. All 102 hold `id="dropdown-lightswitch"`,
-  `data-bs-theme-value` and `id="search-input"`. Of master's 102 nav-bearing files,
-  none holds any of the three. The two builds wrote the identical set of 110 `.html`
-  paths, and the eight files carrying no `<nav` are the same eight in both.
-- **AC3 — verified.** The Vignettes menu stays under `navbar: left:` with `text:`-only
-  heading entries and `text: "---------"` separators, and no `articles:` group carries
-  a `navbar:` key (counted through `yaml::read_yaml()`). Parsed out of the freshly
-  built `index.html`, the dropdown holds exactly three `h6.dropdown-header` elements
+  `cfg$template$"light-switch"` TRUE. The branch build is this pass's own, made by
+  AC2's named procedure (`pkgdown::build_site()` into an empty directory), standing in
+  for T6's build, which the review re-makes for freshness. It wrote 110 `.html` files,
+  102 of them holding a `<nav` element. All 102 hold `id="dropdown-lightswitch"`,
+  `data-bs-theme-value` and `id="search-input"` (102 of 102 for each of the three).
+  Of the master build's 102 nav-bearing files, none holds any of the three (0 of 102
+  for each). The two builds wrote the identical set of 110 `.html` paths, and the
+  eight files carrying no `<nav` are the same eight in both
+  (`reference/GeomSsmArc.html`, `reference/GeomSsmPath.html`,
+  `reference/GeomSsmPoint.html`, `reference/circumplex.html`,
+  `reference/simulated_growth_origin.html`, and the three
+  `reference/ssm_plot_trajectory.*.html` stubs).
+- **AC3 — verified.** The Vignettes menu stays under `navbar: left:` with three
+  `text:`-only heading entries (Introductory, Intermediate, Advanced) and two
+  `text: "---------"` separator entries, and no `articles:` group carries a `navbar:`
+  key (zero, counted through `yaml::read_yaml()`). Parsed out of the freshly built
+  `index.html`, the dropdown's element sequence is heading, 2 pages, divider, heading,
+  4 pages, divider, heading, 8 pages: exactly three `h6.dropdown-header` elements
   reading Introductory, Intermediate, Advanced in that order, exactly two
   `hr.dropdown-divider` elements, one between each consecutive pair, and under each
   heading the same pages in the same order as that level's group in the `articles:`
-  index.
-- **AC4 — verified.** The guard exits 0 on the shipped `_pkgdown.yml` and on an
-  unplanted scratch copy. Five defects were planted, one per scratch copy, and each
-  exited 1 with a message naming the defect: a page dropped from the navbar menu
-  (named the short Intermediate list), a menu text that is not the vignette title
-  (named `axes-reliability` and both strings), a page moved to another level group in
-  the `articles:` index (named both affected groups), a page moved under the wrong
-  navbar heading alone (named both affected headings), and an extra vignette file on
-  disk carrying a well-formed `\VignetteIndexEntry{}` (named `stray-page`).
-- **AC5 — verified.** `_pkgdown.yml` holds no `docsearch` key. The freshly built
+  index, each carrying its vignette title.
+- **AC4 — verified.** The guard exits 0 on the shipped `_pkgdown.yml` ("the articles
+  index, the navbar menu and vignettes/ agree on 14 pages") and on an unplanted scratch
+  copy. Five defects were then planted, one per scratch copy, and each exited 1 with a
+  message naming the defect: a page dropped from the navbar menu (named the short
+  Intermediate list against the expected one), a menu text that is not the vignette
+  title (named `axes-reliability` and both strings), a page moved to another level
+  group in the `articles:` index (named both affected article groups), a page moved
+  under the wrong navbar heading alone (named both affected navbar groups, and no
+  articles-group failure, so the two paths are distinguished), and an extra vignette
+  file on disk carrying a well-formed `\VignetteIndexEntry{}` (named `stray-page`).
+- **AC5 — verified.** `_pkgdown.yml` holds no `docsearch` key
+  (`grep -rn "docsearch" _pkgdown.yml` returns nothing). The freshly built
   `search.json` has 688 entries and includes the title "Bayesian SSM Analysis". The
-  AC2 search input is present in `index.html`.
+  AC2 search input, `id="search-input"`, is present in the built `index.html`.
 - **AC6 — partially verified, not ticked.** `pkgdown::check_pkgdown()` reports "No
-  problems found." The final build went into an empty directory. Its warning list is
-  identical to the master baseline's: 262 `--mathml` and 14 `--mathjax` pandoc
-  deprecation lines in both, with no warning kind in the branch list that is absent
-  from master's, and no other warning or error line in either log. The remaining
-  clause, that the `pkgdown.yaml` workflow is green on the pull request, cannot be
-  evidenced before the pull request exists, so the box stays unticked.
-
-### Consistency gate
-
-`cairn_validate.py` exits 0, all 16 PASS checks green and all 7 advisories OK,
-including `release window`. No `DESIGN.md` principle changed, so `cairn_impact.py`
-was not run. The `r-package` profile's `consistency-gate` slot: `devtools::document()`
-produces no diff and no `resolve link` warning at `cli.width = 500`; README.md is
-newer than README.Rmd; `pkgdown::check_pkgdown()` passes; `_pkgdown.yml`, `tools` and
-`cairn` all carry `.Rbuildignore` entries; `devtools::check(args = "--no-manual")`
-returns Status OK, 0 errors, 0 warnings, 0 notes in 10m 12s; the newest push run on
-master reaching a verdict is `success` for `R-CMD-check.yaml`, `test-coverage.yaml`
-and `pkgdown.yaml` alike; `tools/check-master-red-alert.R`,
-`tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all exit
-clean. No NEWS.md entry is owed, per the milestone's Scope: no package behavior
-changes.
-
-### Independent review
-
-The milestone's surface tier is user-facing, so the full three-lens fan-out ran, each
-lens fresh-context and on a distinct evidence base.
-
-**[O] diff-bug reviewer**, eight findings, its own ranking:
-
-1. The guard passes a divider planted before the first heading, exiting 0, although
-   pkgdown then renders `hr.dropdown-divider` as the dropdown's first element — the
-   exact artifact the plan cited when it ruled out pkgdown's own `articles: navbar:`
-   grouping. *Reproduced independently: exit 0.* **Disposition: follow-up.** AC4 does
-   not name this defect and the guard's own comment discloses that divider placement
-   is unchecked, so it is a coverage gap rather than a broken promise.
-2. Removing both dividers entirely also passes with exit 0, so the grouping can
-   silently degrade to three unseparated headings even though AC3 requires a divider
-   between consecutive groups. *Reproduced independently: exit 0.* **Disposition:
-   follow-up**, same row as 1.
-3. The guard tests the dash pattern only inside its `is.null(e$href)` branch, while
-   pkgdown's `menu_type()` tests the dash pattern *before* it looks at `href`. An entry
-   with dash text and an href is therefore a separator on the site and a page to the
-   guard. *Verified against pkgdown 2.2.1's `menu_type()` source, not the reviewer's
-   account of it: the `separator` test does precede the `heading` test.* The guard's
-   comment claiming the dash rule is pkgdown's own is inaccurate as implemented. The
-   error direction is conservative, a false failure rather than a false pass.
-   **Disposition: fix now**, in the amendment round — the diff introduced the comment.
-4. `under[[""]]` misbehaves when a heading's text is empty, because in R `l[[""]] <- x`
-   appends rather than replaces. Masked today by the `identical(headings,
-   names(LEVELS))` test firing first. **Disposition: follow-up**, latent.
-5. The articles-group contents comparison is skipped when a group title is not in
-   `LEVELS`, so a renamed group's page list goes unchecked. Masked today by the
-   separate `got_titles` comparison. **Disposition: follow-up**, latent.
-6. The guard's docstring understates the rule it now enforces: `identical(headings,
-   names(LEVELS))` also forbids any extra or reordered heading in the dropdown.
-   **Disposition: fix now**, in the amendment round, a comment correction.
-7. A live Algolia key, `api_key: ec4004481ba8d410e8e20c9e90fa5e60`, was deleted from
-   `_pkgdown.yml` by this diff but remains in git history from `abfc81eb` (2018).
-   *Confirmed by `git log -S`.* Removing it from HEAD does not revoke it.
-   **Disposition: follow-up**, a candidate row, beside the existing Codecov-token row.
-   A docsearch `api_key` is a search-only public key by design, so this is a retire-or-
-   rotate question for the maintainer's Algolia account, not an exposure the repo can
-   close.
-8. Pre-existing: a vignette missing a `\VignetteIndexEntry{}` aborts the guard with an
-   R traceback from `stop()` rather than a `FAIL:` line. Exit status is still 1, so
-   AC4 is unaffected. **Disposition: rejected** — a pre-existing issue this diff did
-   not introduce.
-
-**[S] blame-history reviewer**, no regression found. It traced the `LEVELS` map cleanly
-through M135, M136 and M137, confirmed the page set is unchanged and no page is dropped
-or duplicated across that history, and found no recorded decision this diff contradicts
-(no entry in `DECISIONS.md` mentions the pkgdown theme, docsearch or the navbar `right:`
-list). It added one minor observation for completeness: that the new parsing loop does
-not detect a page listed under two different level headings. **Disposition: rejected,
-refuted against the implementation** — a page duplicated under a second heading makes
-that level's parsed list longer than its expected list, so the `identical()` comparison
-fails. Reproduced: planting it exits 1 with a message naming the Advanced group.
-
-**[S] prior-PR-comments reviewer**, no prior-review evidence, zero findings. No archived
-`## Review` section in `cairn/milestones/archive/` carries a finding on `_pkgdown.yml`
-or `tools/check-pkgdown-vignettes.R`, and the probe `gh api
-repos/jmgirard/circumplex/pulls/comments?per_page=1` returned `[]`, so the per-PR walk
-was correctly skipped. The lens no-opped cleanly, as designed.
-
-### Disposition
-
-AC1 fails as written while the work it describes is right, so this review takes the
-amendment return rather than a defect return. Status goes back to `in-progress` for
-that amendment alone. Nothing else in the gate or the fan-out demonstrates an
-acceptance criterion failing or a load-bearing defect in what the site or the guard
-does for its users.
+  problems found." Both builds went into empty directories on one machine and
+  toolchain. The two warning lists are identical: 262 `[WARNING] Deprecated: --mathml`
+  lines and 14 `[WARNING] Deprecated: --mathjax` lines in each, and no other warning
+  or error line in either log, so the branch build writes no warning the master build
+  did not also write. The remaining clause, that the `pkgdown.yaml` workflow is green
+  on the pull request, cannot be evidenced before the pull request exists. It is
+  checked at the step-8 CI wait, which merges only on green, so the box stays unticked
+  at the approval gate.
 
 ## Decisions
