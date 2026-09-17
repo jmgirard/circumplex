@@ -26,7 +26,7 @@ The pkgdown site drops its dark navbar for a theme the maintainer picks, gains a
 - [x] AC3: The Vignettes menu stays hand-written under `navbar: left:`, with a `text:`-only entry per level and `text: "---------"` separator entries, and no `articles:` group carries a `navbar:` key. In the freshly built `index.html`, that dropdown holds exactly three `h6.dropdown-header` elements reading Introductory, Intermediate and Advanced in that order, a `hr.dropdown-divider` between consecutive groups, and under each heading the same pages in the same order as that level's group in the `articles:` index.
 - [x] AC4: `tools/check-pkgdown-vignettes.R` exits 0 on the grouped `_pkgdown.yml`. In a scratch copy of the repo it exits 1 on each of five planted defects, one per checking path: a page dropped from the navbar menu, a menu entry whose text is not the vignette's title, a page moved to another level group in the `articles:` index, a page moved under the wrong level heading in the navbar menu alone, and an extra vignette file on disk, carrying a well-formed `\VignetteIndexEntry{}`, that the level map does not list. The script's message names the defect it found in each case.
 - [x] AC5: `_pkgdown.yml` holds no `docsearch` key. The freshly built site has a `search.json` whose entries include the Bayesian article's title, and the search input of AC2 is present.
-- [ ] AC6: `pkgdown::check_pkgdown()` reports no problem. The final build goes into an empty directory. T1 builds master on the same machine and toolchain. The final build writes no warning that T1's build did not also write, and the check compares the two warning lists. The `pkgdown.yaml` workflow is green on the pull request.
+- [x] AC6: `pkgdown::check_pkgdown()` reports no problem. The final build goes into an empty directory. T1 builds master on the same machine and toolchain. The final build writes no warning that T1's build did not also write, and the check compares the two warning lists. The `pkgdown.yaml` workflow is green on the pull request.
 
 ## Coverage
 
@@ -164,16 +164,29 @@ Both exited 0.
   (`grep -rn "docsearch" _pkgdown.yml` returns nothing). The freshly built
   `search.json` has 688 entries and includes the title "Bayesian SSM Analysis". The
   AC2 search input, `id="search-input"`, is present in the built `index.html`.
-- **AC6 — partially verified, not ticked.** `pkgdown::check_pkgdown()` reports "No
-  problems found." Both builds went into empty directories on one machine and
-  toolchain. The two warning lists are identical: 262 `[WARNING] Deprecated: --mathml`
-  lines and 14 `[WARNING] Deprecated: --mathjax` lines in each, and no other warning
-  or error line in either log, so the branch build writes no warning the master build
-  did not also write. The remaining clause, that the `pkgdown.yaml` workflow is green
-  on the pull request, cannot be evidenced before the pull request exists. It is
-  checked at the step-8 CI wait, which merges only on green, so the box stays unticked
-  at the approval gate.
+- **AC6 — verified.** `pkgdown::check_pkgdown()` reports "No problems found." Both
+  builds went into empty directories on one machine and toolchain. The two warning
+  lists are identical: 262 `[WARNING] Deprecated: --mathml` lines and 14
+  `[WARNING] Deprecated: --mathjax` lines in each, and no other warning or error line
+  in either log, so the branch build writes no warning the master build did not also
+  write. The last clause closed once the pull request existed: on PR #171, head
+  `a5fb2325`, `gh pr checks 171` reports `pkgdown` pass in 4m 28s, and the other three
+  checks pass too (`matrix` 33s, `vignette-precompute` 3m 4s, `ubuntu-latest (release)`
+  27m 0s).
 
+### Resume
+
+The first pass through the approval gate approved the merge and opened PR #171, then
+the CI watcher reached the harness ceiling and was stopped rather than left armed, so
+the session closed before the merge. On re-entry the pull request is `OPEN`, not
+merged, `origin/master` is unmoved (the branch is 15 ahead, 0 behind) and the working
+tree is clean, so the evidence above still describes this exact tree and was not
+re-gathered. AC6's CI clause is now evidenced and its box ticked.
+
+### PR conversation
+
+The read of PR #171 came back empty: no reviews, no conversation comments and no
+unresolved review threads.
 ### Consistency gate
 
 Universal cairn-file checks: `cairn_validate.py` exits 0, with all 16 PASS checks green
