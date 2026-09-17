@@ -7,7 +7,7 @@
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — changes the published website
-- **Branch/PR:** `m138-pkgdown-site-refresh`
+- **Branch/PR:** `m138-pkgdown-site-refresh` / https://github.com/jmgirard/circumplex/pull/171
 
 ## Goal
 
