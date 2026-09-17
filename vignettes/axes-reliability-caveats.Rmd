@@ -184,7 +184,7 @@ need items observed by every respondent. The Nunnally-Bernstein comparison is
 `NA` with a stated reason, and `sd = "raw"` is refused in favour of numeric axis
 SDs.
 
-Note the provenance, because it differs from the rest of this vignette. Strack
+Note the provenance of the FIML path. Strack
 et al. (2013) report no missing-data analyses at all, so nothing about the FIML
 path rests on their results. It is certified against this package's own
 simulated test data, where the true variance components are known by

@@ -60,6 +60,8 @@
 - 2026-09-16: T2 done. The three axes tests read the caveats page, the two roxygen pointers to the calibration table name it, the pkgdown workflow comment names the contrasts page, and the `wendt2019`, `browne1992`, `cheung2002` and `INDEX` citations were re-read against the rendered pages. `EXEMPT` unchanged: the syntax chunk stays on the SEM core page.
 - 2026-09-16: T3 done. Three pages re-rendered. Their `#>` output, concatenated with the core page, is identical to the merge base for both splits, and the contrast figure is byte-identical under its new name. Width guard and pkgdown index check exit 0. `devtools::test()` 0 failures (11319 pass, one environment skip). T1 to T3 land in one checkpoint commit, because the tests only pass once all three are in.
 - 2026-09-16: T4 at a731f083. Split guard exit 0 on both splits (axes: 232 base sentences, 4 pairs, 4 chunks; SEM: 227 base sentences, 6 pairs, 11 chunks, 1 added). Prose words: axes core 1047, caveats 2539, SEM core 2014, contrasts 1660. Sweep exit 0 on all four. Staleness guard exit 0 after the commit. AC5 grep: 21 reference lines, each names the page holding its content.
+- claim audit: 25 claims read, 4 corrected — vignettes/sem-latent-contrasts.Rmd.orig, vignettes/axes-reliability-caveats.Rmd
+- 2026-09-16: claim-audit fixes: contrasts options comment, two contrasts Overview sentences, and the caveats provenance sentence (a fifth axes pair in M137-D2). Same reader re-read all four: hold. Contrasts page re-rendered; axes split guard and sweep exit 0.
 
 ## Decisions
 
@@ -72,6 +74,7 @@
 - Reworded: The examples above all use the canonical eight octant scales, but nothing in the model requires them. => The examples in "Axes Reliability" all use the canonical eight octant scales, but nothing in the model requires them.
 - Added: The next page to read is "Axes Reliability Caveats", which states those caveats and the limits of the model.
 - Added: Sections 2 to 5 take them in turn.
+- Reworded: Note the provenance, because it differs from the rest of this vignette. => Note the provenance of the FIML path.
 
 ### SEM split
 

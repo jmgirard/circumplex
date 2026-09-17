@@ -30,11 +30,11 @@ previous page did. Section 2, "Two questions about group differences",
 separates the observed contrast from the latent one. Section 3,
 "Invariance-gated latent contrasts", fits the invariance ladder and shows a
 comparison that the gate refuses. It then shows a contrast of two measures
-that the gate lets through. Section 4, "When to trust it: limitations", lists the
-assumptions that the latent layer rests on. Section 5, "Relation to the
-literature", places the method beside the published circumplex models. The
-Wrap-up lists what the page covered and names the next page, and the
-References list the sources cited.
+within one group, where no invariance gate applies. Section 4, "When to trust
+it: limitations", lists the assumptions that the latent layer rests on.
+Section 5, "Relation to the literature", places the method beside the
+published circumplex models. The Wrap-up restates when a latent contrast is
+computed and names the next page, and the References list the sources cited.
 
 ## 2. Two questions about group differences
 
