@@ -80,10 +80,12 @@ if (is.null(groups)) {
   if (length(dup)) fail("listed more than once in articles: ", paste(dup, collapse = ", "))
 }
 
-# The navbar menu: one heading per level, a divider between groups, and under
-# each heading the same pages in the same order, each with its title. An entry
-# whose text is all dashes is a divider; an entry with text and no href is a
-# heading; an entry with an href is a page under the heading above it.
+# The navbar menu: one heading per level, and under each heading the same pages
+# in the same order, each with its title. Divider placement is not checked.
+# An entry with no href whose text is three or more dashes is a divider, which
+# this check skips. The dash rule is pkgdown's own `^\s*-{3,}\s*$`, so a shorter
+# run of dashes is a heading here, as pkgdown renders it. An entry with text and no
+# href is a heading. An entry with an href is a page under the heading above it.
 menus <- Filter(function(item) identical(item$text, "Vignettes"), cfg$navbar$left)
 if (length(menus) != 1L) {
   fail("expected one navbar menu named Vignettes, found ", length(menus))
@@ -95,7 +97,7 @@ if (length(menus) != 1L) {
   for (e in entries) {
     text <- if (is.null(e$text)) "" else e$text
     if (is.null(e$href)) {
-      if (grepl("^-+$", text)) next
+      if (grepl("^\\s*-{3,}\\s*$", text)) next
       current <- text
       headings <- c(headings, text)
       under[[text]] <- character(0)
