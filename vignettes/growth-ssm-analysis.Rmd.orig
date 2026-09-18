@@ -175,7 +175,8 @@ coverage drops from the nominal 95% to roughly 86%. Pointwise coverage is how
 often the interval at one wave contains the true direction. The joint recipe
 stays at nominal. Strongly correlated person effects are realistic, because
 profile tilts are rarely aligned with an axis.
-Do not fit the coordinates separately.
+Do not fit the coordinates separately. Section 5 shows one check
+that tells a joint fit apart from separate fits assembled afterward.
 
 ## 5. From fixed effects to $(a(t), d(t))$ with intervals
 
@@ -194,6 +195,21 @@ means, equal-tailed intervals with correct wrapping at the boundary).
 fe <- glmmTMB::fixef(fit)$cond
 V <- as.matrix(vcov(fit)$cond)
 ```
+
+Before the first step, here is the check that Section 4 promised. Take the
+block of `V` that crosses the $x$ fixed effects with the $y$ fixed effects
+and ask whether every entry differs from zero.
+
+```{r cross-block, eval = has_glmmTMB}
+all(V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")] != 0)
+```
+
+A joint fit estimates these entries, so they are nonzero. Separate fits
+produce one covariance matrix per coordinate, and a full matrix assembled
+from them block by block holds exact zeros in every cross block. The check
+detects only that assembled structure. A nonzero block does not show that
+the model is right: a misspecified joint model passes it too. Carry this
+check to your own fits.
 
 The first step draws 4000 coefficient vectors from the multivariate normal
 distribution with mean `fe` and covariance matrix `V`. The draws are stored in
