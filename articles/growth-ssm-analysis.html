@@ -256,6 +256,26 @@ omitted.)</p>
 <span><span class="co">#&gt;  0.5249198595  0.6085429795 -0.1036244260 -0.0007414075 -0.0010567782 </span></span>
 <span><span class="co">#&gt;      dvy:wave </span></span>
 <span><span class="co">#&gt;  0.0649480442</span></span></code></pre></div>
+<p>The person block of the variance components is one place where the
+fit shows that it is joint. Its three standard deviations say how much
+the persons’ stable shifts in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+vary. Its three correlations tie those shifts together across the
+coordinates, and three separate fits could not estimate them. The
+residual row shows <code>NA</code> because the per-coordinate residual
+variances live in the dispersion model, not in this table.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/VarCorr.html" class="external-link">VarCorr</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Conditional model:</span></span>
+<span><span class="co">#&gt;  Groups   Name Std.Dev. Corr          </span></span>
+<span><span class="co">#&gt;  person   dve  0.29987                </span></span>
+<span><span class="co">#&gt;           dvx  0.16637  -0.222        </span></span>
+<span><span class="co">#&gt;           dvy  0.16763   0.039 -0.032 </span></span>
+<span><span class="co">#&gt;  Residual           NA</span></span></code></pre></div>
 <p>Why joint? The displacement
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 is derived from the estimated mean coordinates at time
@@ -292,7 +312,8 @@ coverage drops from the nominal 95% to roughly 86%. Pointwise coverage
 is how often the interval at one wave contains the true direction. The
 joint recipe stays at nominal. Strongly correlated person effects are
 realistic, because profile tilts are rarely aligned with an axis. Do not
-fit the coordinates separately.</p>
+fit the coordinates separately. Section 5 shows one check that detects a
+covariance matrix assembled from separate fits.</p>
 </div>
 <div class="section level2">
 <h2 id="from-fixed-effects-to-at-dt-with-intervals">5. From fixed effects to
@@ -315,9 +336,33 @@ draw’s coordinates at that wave. Third, hand the per-wave draws to
 <code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>. It applies the package’s circular-statistics
 machinery (medians and circular means, equal-tailed intervals with
 correct wrapping at the boundary).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fe</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
 <span><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span></span></code></pre></div>
+<p>Before the first step, here is the check that Section 4 promised.
+Take the block of <code>V</code> that crosses the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+fixed effects with the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+fixed effects and ask whether any entry differs from zero.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">V</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dvx"</span>, <span class="st">"dvx:wave"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dvy"</span>, <span class="st">"dvy:wave"</span><span class="op">)</span><span class="op">]</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>A joint fit estimates this whole block, so nothing in it is
+structurally zero. Only the intercept covariance is appreciable here.
+The other three entries are floating-point residue near
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>20</mn></mrow></msup><annotation encoding="application/x-tex">10^{-20}</annotation></semantics></math>,
+numerically zero, which is why the check asks for any nonzero entry
+rather than for every entry. It is a structural test, not a test of
+size. Separate fits produce one covariance matrix per coordinate, and a
+full matrix assembled from them block by block holds exact zeros in
+every cross block. The check detects only that assembled structure, and
+it has no power outside that case: a matrix whose cross block holds any
+nonzero value, however small, passes. A nonzero block does not show that
+the model is right: a misspecified joint model passes it too. Carry this
+check to your own fits, and replace the four names with the intercept
+and slope terms of your own model, which this vignette’s outcome factor
+<code>dv</code> and time variable <code>wave</code> produce.</p>
 <p>The first step draws 4000 coefficient vectors from the multivariate
 normal distribution with mean <code>fe</code> and covariance matrix
 <code>V</code>. The draws are stored in the matrix <code>B</code>, with
@@ -326,7 +371,7 @@ names of <code>fe</code>, such as <code>dvx</code> and
 <code>dvx:wave</code>. (The code that draws them is omitted.)</p>
 <p>The second and third steps, at wave 2, look like this. Each draw’s
 coordinate at wave 2 is its intercept plus 2 times its slope:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wave2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>  e <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
@@ -366,7 +411,7 @@ directly. The table has one row per time point, with
 <code>a_est</code>/<code>a_lci</code>/<code>a_uci</code>,
 <code>d_est</code>/<code>d_lci</code>/<code>d_uci</code>, and optionally
 <code>certified</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/growth-ssm-analysis-plot-1.png" alt="plot of chunk plot"></p>
 <p>The displacement panel is drawn on an <em>unwrapped</em> branch. An
@@ -422,7 +467,7 @@ stays near zero). The package ships these data too, as
 columns as <code>simulated_growth</code>, and
 <code><a href="../reference/simulated_growth.html">?simulated_growth</a></code> describes both. We compute its
 coordinates the same way:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_growth_origin"</span><span class="op">)</span></span>
 <span><span class="va">coord2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="va">simulated_growth_origin</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">coord2</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="va">simulated_growth_origin</span><span class="op">$</span><span class="va">person</span></span>
@@ -430,7 +475,7 @@ coordinates the same way:</p>
 <p>As before, <code>coord2</code> is stacked into <code>long2</code>,
 with the same four columns as <code>long</code>. (The reshaping code is
 omitted.) The model is the same:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">value</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">+</span> <span class="va">dv</span><span class="op">:</span><span class="va">wave</span> <span class="op">+</span> <span class="fu">us</span><span class="op">(</span><span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">|</span> <span class="va">person</span><span class="op">)</span>,</span>
 <span>  dispformula <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span>, data <span class="op">=</span> <span class="va">long2</span>, REML <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -439,7 +484,7 @@ omitted.) The model is the same:</p>
 <p>Its 4000 coefficient draws are stored in <code>B2</code>, drawn the
 same way as <code>B</code>. (That code is omitted.) The summary at wave
 2 is:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>  e <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
@@ -469,7 +514,7 @@ intervals keep their nominal coverage.</p>
 <code>certified</code> verdict into the table, lets the plot mark the
 verdict itself. The table <code>trajectory2</code> has the same columns
 as <code>trajectory</code>. (The loop that builds it is omitted.)</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"></p>
 <p>Uncertified waves are drawn as <strong>hollow</strong> points on the
@@ -512,7 +557,7 @@ intervals.</p>
 displacement at each wave. <strong>Unwrap</strong> each person’s
 sequence onto a continuous branch. Then fit an ordinary univariate
 growth model to the unwrapped angles.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One person's displacement over five waves, drifting across the boundary</span></span>
 <span><span class="va">d_person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">350</span>, <span class="fl">355</span>, <span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/angle_unwrap.html">angle_unwrap</a></span><span class="op">(</span><span class="va">d_person</span><span class="op">)</span></span>

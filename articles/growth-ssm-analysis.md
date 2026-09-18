@@ -138,6 +138,26 @@ glmmTMB::fixef(fit)$cond
 #>  0.0649480442
 ```
 
+The person block of the variance components is one place where the fit
+shows that it is joint. Its three standard deviations say how much the
+persons’ stable shifts in $`e`$, $`x`$, and $`y`$ vary. Its three
+correlations tie those shifts together across the coordinates, and three
+separate fits could not estimate them. The residual row shows `NA`
+because the per-coordinate residual variances live in the dispersion
+model, not in this table.
+
+``` r
+
+glmmTMB::VarCorr(fit)
+#> 
+#> Conditional model:
+#>  Groups   Name Std.Dev. Corr          
+#>  person   dve  0.29987                
+#>           dvx  0.16637  -0.222        
+#>           dvy  0.16763   0.039 -0.032 
+#>  Residual           NA
+```
+
 Why joint? The displacement $`d(t)`$ is derived from the estimated mean
 coordinates at time $`t`$, $`\hat{x}(t)`$ and $`\hat{y}(t)`$,
 *together*. So its uncertainty depends on their **joint** sampling
@@ -159,6 +179,8 @@ roughly 86%. Pointwise coverage is how often the interval at one wave
 contains the true direction. The joint recipe stays at nominal. Strongly
 correlated person effects are realistic, because profile tilts are
 rarely aligned with an axis. Do not fit the coordinates separately.
+Section 5 shows one check that detects a covariance matrix assembled
+from separate fits.
 
 ## 5. From fixed effects to $`(a(t), d(t))`$ with intervals
 
@@ -181,6 +203,31 @@ boundary).
 fe <- glmmTMB::fixef(fit)$cond
 V <- as.matrix(vcov(fit)$cond)
 ```
+
+Before the first step, here is the check that Section 4 promised. Take
+the block of `V` that crosses the $`x`$ fixed effects with the $`y`$
+fixed effects and ask whether any entry differs from zero.
+
+``` r
+
+any(V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")] != 0)
+#> [1] TRUE
+```
+
+A joint fit estimates this whole block, so nothing in it is structurally
+zero. Only the intercept covariance is appreciable here. The other three
+entries are floating-point residue near $`10^{-20}`$, numerically zero,
+which is why the check asks for any nonzero entry rather than for every
+entry. It is a structural test, not a test of size. Separate fits
+produce one covariance matrix per coordinate, and a full matrix
+assembled from them block by block holds exact zeros in every cross
+block. The check detects only that assembled structure, and it has no
+power outside that case: a matrix whose cross block holds any nonzero
+value, however small, passes. A nonzero block does not show that the
+model is right: a misspecified joint model passes it too. Carry this
+check to your own fits, and replace the four names with the intercept
+and slope terms of your own model, which this vignette’s outcome factor
+`dv` and time variable `wave` produce.
 
 The first step draws 4000 coefficient vectors from the multivariate
 normal distribution with mean `fe` and covariance matrix `V`. The draws

@@ -14,6 +14,15 @@
 
 ### Minor improvements and fixes
 
+- The “Growth Models on SSM Parameters” vignette prints the variance
+  components of the joint model after the first fit, so the reader sees
+  the correlated person block that separate fits cannot estimate. It
+  also shows one check on the fixed-effect covariance matrix: the block
+  that crosses the `x` and `y` fixed effects holds exact zeros
+  throughout when the matrix was assembled from separate fits, and the
+  check detects that structure only. A nonzero block does not show that
+  the model is right.
+
 - Every prose caution and note that
   [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) show now wraps to
