@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-17 (M138 done and archived, M135's terminal row dro
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M139 | The growth vignette shows the correlated person block and a zero check on the cross block | planned | — | normal | milestones/M139-growth-vignette-joint-check.md |
+| M139 | The growth vignette shows the correlated person block and a zero check on the cross block | review | — | normal | milestones/M139-growth-vignette-joint-check.md |
 | M138 | The website has a light navbar, a theme switch and grouped vignette menus | done | — | normal | milestones/archive/M138-pkgdown-site-refresh.md |
 | M136 | The structure vignette becomes four shorter vignettes | done | M135 | high | milestones/archive/M136-split-structure-vignette.md |
 | M137 | The axes-reliability and SEM vignettes each split into a core page and an advanced page | done | M135 | normal | milestones/archive/M137-split-axes-and-sem-vignettes.md |

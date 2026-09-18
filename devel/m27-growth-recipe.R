@@ -84,11 +84,14 @@ fe <- glmmTMB::fixef(fit)$cond
 V <- as.matrix(vcov(fit)$cond)
 stopifnot(identical(names(fe), colnames(V)))
 
-# The joint fit must carry nonzero cross-outcome fixed-effect covariance --
-# exactly what independent univariate fits zero out
-xy_cov <- V["dvx", "dvy"]
-cat("Cov(b_x0_hat, b_y0_hat) =", format(xy_cov, digits = 3), "\n")
-stopifnot(abs(xy_cov) > 0)
+# The x/y cross block of V (intercept and slope terms) is not structurally
+# zero in a joint fit. Independent univariate fits assembled block by block
+# put exact zeros throughout it; this guard detects that structure only, and
+# says nothing about whether the joint model is right.
+V_xy <- V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")]
+cat("x/y cross block of V (intercept and slope terms):\n")
+print(V_xy)
+stopifnot(any(V_xy != 0))
 
 # --- 3. Fixed-effect draws -> per-t (e, x, y) draws -> SSM summaries ----------
 n_draws <- 4000
