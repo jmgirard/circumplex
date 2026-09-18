@@ -149,9 +149,11 @@ glmmTMB::fixef(fit)$cond
 ```
 
 The person block of the variance components is where the fit is joint. Its
-three standard deviations are each person's stable shift in $e$, $x$, and
-$y$. Its three correlations tie those shifts together across the three
-coordinates, which three separate fits could not estimate.
+three standard deviations say how much the persons' stable shifts in $e$,
+$x$, and $y$ vary. Its three correlations tie those shifts together across
+the coordinates, and three separate fits could not estimate them. The
+residual row shows `NA` because the per-coordinate residual variances live
+in the dispersion model, not in this table.
 
 ```{r varcorr, eval = has_glmmTMB}
 glmmTMB::VarCorr(fit)

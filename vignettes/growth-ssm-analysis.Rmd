@@ -136,6 +136,25 @@ glmmTMB::fixef(fit)$cond
 #>  0.0649480442
 ```
 
+The person block of the variance components is where the fit is joint. Its
+three standard deviations say how much the persons' stable shifts in $e$,
+$x$, and $y$ vary. Its three correlations tie those shifts together across
+the coordinates, and three separate fits could not estimate them. The
+residual row shows `NA` because the per-coordinate residual variances live
+in the dispersion model, not in this table.
+
+
+``` r
+glmmTMB::VarCorr(fit)
+#> 
+#> Conditional model:
+#>  Groups   Name Std.Dev. Corr          
+#>  person   dve  0.29987                
+#>           dvx  0.16637  -0.222        
+#>           dvy  0.16763   0.039 -0.032 
+#>  Residual           NA
+```
+
 Why joint? The displacement $d(t)$ is derived from the estimated mean
 coordinates at time $t$, $\hat{x}(t)$ and $\hat{y}(t)$, *together*. So its
 uncertainty depends on their **joint** sampling distribution, including the
@@ -154,7 +173,8 @@ coverage drops from the nominal 95% to roughly 86%. Pointwise coverage is how
 often the interval at one wave contains the true direction. The joint recipe
 stays at nominal. Strongly correlated person effects are realistic, because
 profile tilts are rarely aligned with an axis.
-Do not fit the coordinates separately.
+Do not fit the coordinates separately. Section 5 shows one check
+that tells a joint fit apart from separate fits assembled afterward.
 
 ## 5. From fixed effects to $(a(t), d(t))$ with intervals
 
@@ -174,6 +194,23 @@ means, equal-tailed intervals with correct wrapping at the boundary).
 fe <- glmmTMB::fixef(fit)$cond
 V <- as.matrix(vcov(fit)$cond)
 ```
+
+Before the first step, here is the check that Section 4 promised. Take the
+block of `V` that crosses the $x$ fixed effects with the $y$ fixed effects
+and ask whether every entry differs from zero.
+
+
+``` r
+all(V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")] != 0)
+#> [1] TRUE
+```
+
+A joint fit estimates these entries, so they are nonzero. Separate fits
+produce one covariance matrix per coordinate, and a full matrix assembled
+from them block by block holds exact zeros in every cross block. The check
+detects only that assembled structure. A nonzero block does not show that
+the model is right: a misspecified joint model passes it too. Carry this
+check to your own fits.
 
 The first step draws 4000 coefficient vectors from the multivariate normal
 distribution with mean `fe` and covariance matrix `V`. The draws are stored in
