@@ -15,9 +15,9 @@
   components of the joint model after the first fit, so the reader sees the
   correlated person block that separate fits cannot estimate. It also shows
   one check on the fixed-effect covariance matrix: the block that crosses
-  the `x` and `y` fixed effects is all exact zeros only when the matrix was
-  assembled from separate fits. A nonzero block does not show that the model
-  is right.
+  the `x` and `y` fixed effects holds exact zeros throughout when the matrix
+  was assembled from separate fits, and the check detects that structure
+  only. A nonzero block does not show that the model is right.
 
 * Every prose caution and note that `print()` and `summary()` show now wraps
   to the console width you set with `options(width = )`. Before this, the

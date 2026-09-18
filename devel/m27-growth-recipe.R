@@ -89,6 +89,7 @@ stopifnot(identical(names(fe), colnames(V)))
 # put exact zeros throughout it; this guard detects that structure only, and
 # says nothing about whether the joint model is right.
 V_xy <- V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")]
+cat("x/y cross block of V (intercept and slope terms):\n")
 print(V_xy)
 stopifnot(any(V_xy != 0))
 
