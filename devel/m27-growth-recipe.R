@@ -84,13 +84,13 @@ fe <- glmmTMB::fixef(fit)$cond
 V <- as.matrix(vcov(fit)$cond)
 stopifnot(identical(names(fe), colnames(V)))
 
-# The x/y cross block of V (intercept and slope terms) must hold no exact
-# zero. Independent univariate fits assembled block by block put exact zeros
-# there; this guard detects that structure only, and says nothing about
-# whether the joint model is right.
+# The x/y cross block of V (intercept and slope terms) is not structurally
+# zero in a joint fit. Independent univariate fits assembled block by block
+# put exact zeros throughout it; this guard detects that structure only, and
+# says nothing about whether the joint model is right.
 V_xy <- V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")]
 print(V_xy)
-stopifnot(all(V_xy != 0))
+stopifnot(any(V_xy != 0))
 
 # --- 3. Fixed-effect draws -> per-t (e, x, y) draws -> SSM summaries ----------
 n_draws <- 4000
