@@ -148,6 +148,15 @@ fit <- glmmTMB::glmmTMB(
 glmmTMB::fixef(fit)$cond
 ```
 
+The person block of the variance components is where the fit is joint. Its
+three standard deviations are each person's stable shift in $e$, $x$, and
+$y$. Its three correlations tie those shifts together across the three
+coordinates, which three separate fits could not estimate.
+
+```{r varcorr, eval = has_glmmTMB}
+glmmTMB::VarCorr(fit)
+```
+
 Why joint? The displacement $d(t)$ is derived from the estimated mean
 coordinates at time $t$, $\hat{x}(t)$ and $\hat{y}(t)$, *together*. So its
 uncertainty depends on their **joint** sampling distribution, including the

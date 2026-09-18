@@ -1,13 +1,13 @@
 # M139: The growth vignette shows the correlated person block and a zero check on the cross block
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — a shipped vignette changes
-- **Branch/PR:** —
+- **Branch/PR:** `m139-growth-vignette-joint-check`
 
 ## Goal
 
@@ -41,7 +41,7 @@ The growth vignette shows the reader that the fit is joint and gives one check t
 
 ## Tasks
 
-- [ ] T1: Add the `varcorr` chunk after the `fit` chunk at `vignettes/growth-ssm-analysis.Rmd.orig:141` with one sentence of prose that names the three correlations as the joint structure. Render locally and read the width; add the `EXEMPT` entry in `tools/check-vignette-width.R` only if the print runs past 80 columns.
+- [x] T1: Add the `varcorr` chunk after the `fit` chunk at `vignettes/growth-ssm-analysis.Rmd.orig:141` with one sentence of prose that names the three correlations as the joint structure. Render locally and read the width; add the `EXEMPT` entry in `tools/check-vignette-width.R` only if the print runs past 80 columns.
 - [ ] T2: Add the `cross-block` chunk after the `fixef` chunk (`.orig:184`) and the AC3 prose. Add the forward-pointing sentence to the end of Section 4's warning paragraph (`.orig:170`). Keep every name the chunks use defined in an echoed chunk (LESSONS 2026-07-21).
 - [ ] T3: `Rscript tools/precompute-vignettes.R`, then `Rscript tools/check-vignette-staleness.R` and `Rscript tools/check-vignette-width.R`. Commit the regenerated `.Rmd` and figures.
 - [ ] T4: Replace the guard at `devel/m27-growth-recipe.R:86` with the full cross-block exact-zero test and its comment. Run the script.
@@ -54,6 +54,7 @@ The growth vignette shows the reader that the fit is joint and gives one check t
 - 2026-09-17: plan gate chose the check in Section 5 after `V` exists over Section 4 beside the warning because the reader already holds `V` there; falsified by a reader report that the warning and the check sit too far apart to connect.
 - 2026-09-17: plan gate chose first fit only over both fits because the second fit teaches certification, not joint structure; falsified by a reader who applies the check to the second fit and finds it fails.
 - 2026-09-17: plan gate chose a width-guard exemption over a hand-built narrower print because the plain `VarCorr` call is what the reader reuses; falsified by an exempt print that later overflows the rendered page.
+- 2026-09-17: T1 done. The `varcorr` chunk prints at 38 columns (measured by a scratch run of the fit), so no `EXEMPT` entry is added.
 
 ## Decisions
 
