@@ -24,7 +24,7 @@ The growth vignette shows the reader that the fit is joint and gives one check t
 - [ ] AC1: `vignettes/growth-ssm-analysis.Rmd.orig` has an echoed chunk, evaluated under `has_glmmTMB`, directly after the `fit` chunk, whose only call is `glmmTMB::VarCorr(fit)`. The shipped `vignettes/growth-ssm-analysis.Rmd` carries that chunk's printed output with the `person` block's three standard deviations and three correlations. The output passes `tools/check-vignette-width.R`, through an exemption entry for that chunk if its print runs past the guard.
 - [ ] AC2: `vignettes/growth-ssm-analysis.Rmd.orig` has an echoed chunk, evaluated under `has_glmmTMB`, directly after the `fixef` chunk, that takes the cross block `V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")]` and prints `any(... != 0)`. The shipped `.Rmd` shows `#> [1] TRUE` as that chunk's output.
 - [ ] AC3: The prose beside the AC2 chunk states three things. The zeros come from assembling separate per-coordinate covariance matrices block by block. The check detects only that structure. A nonzero block does not show the model is right. Section 4's warning paragraph ends with one sentence that points to the check.
-- [ ] AC4: In `devel/m27-growth-recipe.R` the guard replaces the current `stopifnot(abs(xy_cov) > 0)`. It tests every entry of the full `x`/`y` cross block of `V` (intercept and slope terms) for exact inequality to zero. A comment above it says it detects the independent-fits structure only. `Rscript devel/m27-growth-recipe.R` exits 0.
+- [ ] AC4: In `devel/m27-growth-recipe.R` the guard replaces the current `stopifnot(abs(xy_cov) > 0)`. It stops exactly when the full `x`/`y` cross block of `V` (intercept and slope terms) is identically zero, and passes whenever at least one of its four entries is nonzero; an entry of floating-point size counts as nonzero. A comment above it says it detects the independent-fits structure only. `Rscript devel/m27-growth-recipe.R` exits 0.
 - [ ] AC5: The re-rendered `vignettes/growth-ssm-analysis.Rmd` and its figures are committed, and on the committed tree `Rscript tools/check-vignette-staleness.R` and `Rscript tools/check-vignette-width.R` exit 0.
 - [ ] AC6: `NEWS.md` carries one entry under the development version naming the two vignette additions.
 - [ ] AC7: `Rscript -e 'devtools::test()'` reports 0 failures, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings, and no note that the base commit's check does not report.
@@ -62,6 +62,7 @@ The growth vignette shows the reader that the fit is joint and gives one check t
 - 2026-09-17: substantive amendment (mini gate, user chose the recommended option): AC2 and AC4 change from `all(... != 0)` to a check that the cross block is not identically zero (`any(... != 0)`); the Scope clause now reads "is not identically zero". The vignette, recipe and NEWS prose were corrected in the same turn and the vignette re-rendered.
 - 2026-09-17: re-audit: AC2 (full) — nothing.
 - 2026-09-17: re-audit: AC4 (full) — finding: "stops when every entry is exactly zero" is one-directional and also satisfied by the defective `all()` guard; reworded to state both directions and re-entered once.
+- 2026-09-17: re-audit: AC4 (full) — nothing; the two-way wording is now written to the file. Second `re-audit: AC4` line: further churn on AC4 goes to the user.
 
 ## Decisions
 
