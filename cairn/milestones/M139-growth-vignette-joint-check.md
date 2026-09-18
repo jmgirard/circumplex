@@ -87,3 +87,5 @@ The growth vignette shows the reader that the fit is joint and gives one check t
   - O7 `devel/m27-growth-recipe.R:86-91` — the guard is correct in both directions, but the bare `print(V_xy)` no longer names what the printed 2x2 is, unlike the old labeled `cat()`. Disposition: fix now (5f48cdcd): a cat() line names the printed 2x2 as the x/y cross block of V.
   - O8 `.Rmd:155` — the `Residual NA` explanation verified correct for `dispformula = ~ 0 + dv`; no defect. Disposition: noted, no action.
 - 2026-09-17: gate triage (user): O1-O4, O6, O7 fix now; O5 rejected; O8 noted. Fix-now committed as 5f48cdcd, vignette re-rendered, staleness and width guards exit 0, recipe exit 0; tests and check re-run recorded below.
+- 2026-09-17: re-verification after fix-now: `devtools::test()` FAIL 0, WARN 11 (lavaan, pre-existing), SKIP 1, PASS 11319; `devtools::check(args = "--no-manual")` Status OK, 0 notes; width guard 49 lines all fit.
+- 2026-09-17: step-7 approval: m139-growth-vignette-joint-check approved for merge
