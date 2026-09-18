@@ -2125,3 +2125,54 @@ SEM vignette and NEWS.md under this entry. The returned object does not change.
 **Reopens.** A user report that needs the out-of-scope `dcfi` value in the
 printed output, or a report of a reader who applied the .01 rule to a robust
 CFI taken from the returned table.
+
+### D-060 (2026-09-17): the package fits no growth mixed model; the adapter-not-engine holding survives its second review (RB23/RR23, no milestone)
+
+**Context.** The maintainer asked whether wrapper functions that fit the
+growth model through glmmTMB or brms are worth adding. The spec section 4.1
+(D-013) decided that the package owns the coordinate transform and not the
+fit, and RR06 accepted that. This was the holding's second escalation, so
+RB23 also put retirement of the growth recipe to the reviewer. RR23 (Fable,
+2026-09-17, archived under `cairn/reviews/archive/`) read the spec, both
+vignettes, the recipe, the adapters and the design principles. It ran the
+recipe and probed four random-effects structures in glmmTMB 1.1.15.
+
+**Decision.** No fitter ships for either engine. `ssm_parameters_id()` and
+`ssm_draws()` stay the only growth-facing exports. glmmTMB and brms stay in
+Suggests as vignette engines only (D-015, D-016 unchanged). The growth
+vignette and the recipe are kept. The reader's real gap is the omitted glue
+around the six-line fit call, not the call itself. The parked
+draws-to-trajectory helper row (ROADMAP) owns that gap. A fitter must return
+the bare engine object under GP4, so its value collapses onto that helper. A
+fixed wrapper covers only the vignette's design, and a flexible one becomes
+a formula builder for an engine the package does not own. The package has
+two honest levers against the univariate shortcut. One is the vignette's
+teaching. The other is a mechanical exact-zero check on the `x`/`y` cross
+block of the fixed-effect covariance at the output boundary. Neither costs
+an export.
+
+**Rejected.** A glmmTMB-only fitter (covers one design, inherits glmmTMB's
+binary fragility as a user-facing error, forces the helper open). A brms
+fitter alone or behind an `engine` argument. Its fit step is untestable
+under D-015, one signature returns two types, and a brms growth model is
+new statistics with no oracle. Retirement of the recipe (saves no dependency
+cost, removes the one demonstration that stands between readers and the
+shortcut).
+
+**Consequences.** RR23's recommendations were triaged at ingestion. Apply:
+recommendation 1 (this entry). Candidate rows: recommendation 2, print
+`glmmTMB::VarCorr(fit)` and the exact-zero cross-block check in the growth
+vignette. Recommendation 3, sharpen the recipe guard at
+`devel/m27-growth-recipe.R:86` to an exact-zero test. Recommendation 4, a
+shared-intercept `(1 | person)` coverage-oracle cell. Recommendation 5
+amends the parked helper row so the joint-structure refusal lives there and
+its input contract is engine-agnostic.
+
+**Reopens.** One public analysis, traceable to this vignette lineage, that
+fits the coordinates separately or with a shared person intercept and
+reports d(t) intervals. Three independent user requests for a fitter, or
+one request that carries a design the raw call cannot express and a wrapper
+can. A glmmTMB or brms change to `us()`, `dispformula`, `fixef()$cond` or
+`vcov()$cond` that makes the raw call the fragile thing. Toward retirement:
+the growth vignette's conditional chunks fail on CRAN builders twice in a
+row because of glmmTMB's own build state.
