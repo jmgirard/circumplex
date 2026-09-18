@@ -1,15 +1,14 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-17 (M138 done and archived, M135's terminal row dropped to retention; the guard-hardening row dispositioned to a promoted milestone, Algolia-key row added. ROADMAP 59 lines / 25,401 bytes, LESSONS 48 lines / 19,993 bytes — 7 bytes under its cap — test-craft 28 lines / 8,924 bytes against its stated < 35 / < 9,000.)_
+_Last hygiene check: 2026-09-17 (M139 done and archived, M136's terminal row dropped to retention; one LESSONS clause added on the staleness guard, no candidate row touched. ROADMAP 57 lines / 26,193 bytes, LESSONS 48 lines / 19,986 bytes against its 50 / 20,000 cap, test-craft 28 lines / 8,924 bytes against its stated < 35 / < 9,000.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M139 | The growth vignette shows the correlated person block and a zero check on the cross block | review | — | normal | milestones/M139-growth-vignette-joint-check.md |
+| M139 | The growth vignette shows the correlated person block and a zero check on the cross block | done | — | normal | milestones/archive/M139-growth-vignette-joint-check.md |
 | M138 | The website has a light navbar, a theme switch and grouped vignette menus | done | — | normal | milestones/archive/M138-pkgdown-site-refresh.md |
-| M136 | The structure vignette becomes four shorter vignettes | done | M135 | high | milestones/archive/M136-split-structure-vignette.md |
 | M137 | The axes-reliability and SEM vignettes each split into a core page and an advanced page | done | M135 | normal | milestones/archive/M137-split-axes-and-sem-vignettes.md |
 
 ## Candidates
