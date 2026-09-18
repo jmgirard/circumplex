@@ -44,7 +44,7 @@ The growth vignette shows the reader that the fit is joint and gives one check t
 - [x] T1: Add the `varcorr` chunk after the `fit` chunk at `vignettes/growth-ssm-analysis.Rmd.orig:141` with one sentence of prose that names the three correlations as the joint structure. Render locally and read the width; add the `EXEMPT` entry in `tools/check-vignette-width.R` only if the print runs past 80 columns.
 - [x] T2: Add the `cross-block` chunk after the `fixef` chunk (`.orig:184`) and the AC3 prose. Add the forward-pointing sentence to the end of Section 4's warning paragraph (`.orig:170`). Keep every name the chunks use defined in an echoed chunk (LESSONS 2026-07-21).
 - [x] T3: `Rscript tools/precompute-vignettes.R`, then `Rscript tools/check-vignette-staleness.R` and `Rscript tools/check-vignette-width.R`. Commit the regenerated `.Rmd` and figures.
-- [ ] T4: Replace the guard at `devel/m27-growth-recipe.R:86` with the full cross-block exact-zero test and its comment. Run the script.
+- [x] T4: Replace the guard at `devel/m27-growth-recipe.R:86` with the full cross-block exact-zero test and its comment. Run the script.
 - [ ] T5: NEWS entry. `devtools::test()` and `devtools::check(args = "--no-manual")`, with the note list compared against the base commit.
 
 ## Work log
@@ -57,6 +57,7 @@ The growth vignette shows the reader that the fit is joint and gives one check t
 - 2026-09-17: T1 done. The `varcorr` chunk prints at 38 columns (measured by a scratch run of the fit), so no `EXEMPT` entry is added.
 - 2026-09-17: T2 done. The `cross-block` chunk is one `all()` call over the indexed cross block; `V` comes from the echoed `fixef` chunk. Section 4's warning paragraph ends with one sentence pointing at Section 5.
 - 2026-09-17: T3 done. Re-rendered `growth-ssm-analysis` only; the figures did not change (same seed, same draws). The `VarCorr` print carries a `Residual NA` row, so its prose gained one sentence saying why. Width guard: all fit, 0 exempted.
+- 2026-09-17: T4 done. The recipe guard is `stopifnot(all(V_xy != 0))` over the 2x2 intercept/slope cross block, printed above it; `Rscript devel/m27-growth-recipe.R` exits 0.
 
 ## Decisions
 
