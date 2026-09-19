@@ -1,4 +1,4 @@
-# Forward-looking source prospects — four shelved circumplex sources (M46)
+# Forward-looking source prospects — shelved circumplex sources (M46; wester2026 added 2026-09-19)
 
 **Provenance.** Ingested 2026-07-20 by M46 from a survey reading of four PDFs on
 the gitignored shelf (`cairn/references/sources/{nagy2019,weide2021,rogoza2021,tracey2000}.pdf`),
@@ -24,6 +24,7 @@ matter, section headings), not line-by-line:
 - weide2021 — `cairn/references/sources/weide2021.pdf` (14 pp) — observed 2026-07-20.
 - rogoza2021 — `cairn/references/sources/rogoza2021.pdf` (9 pp; the shelf copy is an accepted proof, printed volume/page shown as placeholders) — observed 2026-07-20.
 - tracey2000 — `cairn/references/sources/tracey2000.pdf` (24 pp; an Acrobat Paper-Capture OCR scan — a single text channel, M42-D1) — observed 2026-07-20.
+- wester2026 — `cairn/references/sources/wester2026.pdf` (15 pp + front matter; born-digital, `pdftotext` clean) — added to the shelf by Jeff 2026-09-19 after a SITAR reader sent it; read in full (not survey altitude) the same day.
 
 ## What these four sources are
 
@@ -67,6 +68,27 @@ operationalized (circulant vs. quasi-circumplex) and demonstrates several
 analytic tools for testing circular structure, citing Hubert & Arabie (1987)
 order tests among them — adjacent to the `fit_structure()` family.
 
+**wester2026** — Wester, Etzel, Zimmermann, Hanraths, Iovoli, Hall & Rubel
+(2026), *A Latent Structural Comparison Between the Circumplex Scales of
+Interpersonal Problems (CSIP) and the Inventory of Interpersonal Problems
+(IIP-C)*, Journal of Personality Assessment, 108(5), 657–671,
+doi:10.1080/00223891.2026.2614580. An applied use of nagy2019's SPMC-E: a
+German CSIP translation and the German IIP-C in a community sample
+(N_T1 = 677, N_T2 = 514, one month apart), each instrument fit separately to
+Browne's quasi-circumplex (CSIP best at m = 2, IIP-C at m = 3), then each
+instrument's scales and two clinical covariates (dysphoria, personality
+dysfunction) projected onto the *other* instrument's latent circumplex. It
+reports the SPMC-E triple per projected variable (γ0 level, γ1 content
+sensitivity, δ angle with CI), the Etzel, Holland & Nagy (2021) RMSECA
+alignment index (≤ .08 = good) as the latent analogue of the SSM's R², the
+β0-based level/shape variance split, and Fisher et al.'s (1985) A* congruence.
+Substantive findings: both instruments fit a latent quasi-circumplex with
+mean absolute angular deviations from theory of 9–13°; IIP-C LM and JK sit
+15–21° apart versus 35–37° in the CSIP; the CSIP's dominance-pole scales (BC,
+PA, NO) span ~78° versus ~119° in the IIP-C; dysphoria and personality
+dysfunction show a submissive / submissive-cold style on the CSIP but no
+interpersonal specificity on the IIP-C. Mplus 8.10, robust FIML; data on OSF.
+
 ## Prospect ledger — seedable oracles / methods / references
 
 Tag vocabulary (the *kind* of prospect each is, the axis a later planner sorts
@@ -80,6 +102,7 @@ never renumber.
 | E2 | weide2021 | oracle / reference | An inference-comparison oracle/benchmark for Bayesian vs. ML circumplex estimation, or a reference for a higher-level-scores feature | that the IIP three-factor model matches the package's SEM circumplex convention (`ssm_sem()`); that the priors/estimator are reproducible; that any borrowed number is page-anchored |
 | E3 | rogoza2021 | method / reference | Vignette/method material tying the package's SSM to a full circumplex-analysis workflow, or a Procrustes-congruence step | that the SSM step matches the package's `ssm_*` estimand; that the equal-spacing / equal-communality definitions align with the package's angle conventions; whether the Procrustes step is in or out of scope |
 | E4 | tracey2000 | reference | A background/reference page for `fit_structure()` structure-evaluation methods, or vignette context | which specific tools/definitions the repo actually relies on before any extraction; and — because it is an OCR scan — a second channel for any extracted value (M42-D1) |
+| E5 | wester2026 | oracle / reference | A published end-to-end SPMC-E application (Table 2 CPM angles and communalities for the CSIP and IIP-C at two occasions, m = 2 and m = 3; Tables 3–4 SPMC-E γ0/γ1/δ with CIs; RMSECA values) usable as a numeric oracle for the CPM covariate-extension candidate and for `cpm_fit()` at m > 1; a reference for the bundled `csip` instrument's German validation and retest reliability; RMSECA as a candidate alignment index | that the paper's rotational constraint (minimize discrepancy to theoretical positions) is reproduced before comparing angles to `cpm_fit()`'s reference-scale convention; that two CSIP uniquenesses were fixed at 0.001, which any oracle must mirror; that the OSF data are actually retrievable (view-only link in the paper); the RMSECA definition against Etzel et al. (2021), which is not on the shelf |
 
 ## Disposition
 
@@ -90,6 +113,7 @@ graduates here, and no per-source `<citekey>.md` page is authored (D-024):
 - E2 → candidate "weide2021 — Bayesian-vs-ML inference-comparison oracle / higher-level-scores reference".
 - E3 → candidate "rogoza2021 — three-step SSM + Procrustes method / vignette".
 - E4 → candidate "tracey2000 — circumplex-evaluation reference for `fit_structure()`".
+- E5 → folded into the ROADMAP's "Covariate extension of the CPM" candidate (registered 2026-09-19) as its published-application oracle; no separate row.
 
 ## Open questions
 
@@ -98,7 +122,7 @@ Claims about the repo's own state, dated where they sit:
 - tracey2000 is **uncited** by any shipped code — the CAIS `@source` at
   `R/instrument_data.R:5` is Sodano & Tracey (2006), a different work; the M46
   plan's "appears only as CAIS provenance" note was wrong — observed 2026-07-20.
-- None of the four sources has been read below survey altitude; the "must
+- wester2026 was read in full on 2026-09-19; its numbers above are from that reading, not banked as verified values — any oracle use re-reads the tables. The other four sources have not been read below survey altitude; the "must
   verify" items above are the reading a graduating milestone still owes —
   observed 2026-07-20.
 - rogoza2021's shelf copy is an accepted proof; its printed volume and page
