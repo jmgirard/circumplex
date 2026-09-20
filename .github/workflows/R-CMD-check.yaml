@@ -89,7 +89,13 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true
+          # "always" routes macOS through Posit Package Manager too. Since
+          # 2026-09-20 CRAN serves its macOS R 4.6 binaries as zstd archives
+          # under the .tgz name, and the pak that setup-r-dependencies installs
+          # (0.11.1, pkgdepends 0.9.1) rejects them as "unknown archive type"
+          # (r-lib/pkgdepends#485). Package Manager still serves gzip. Revert to
+          # `true` once a released pak extracts zstd.
+          use-public-rspm: always
 
       # Runs BEFORE the dependency install, so a drifted allowlist fails the
       # job instead of silently skipping the package it forgot
