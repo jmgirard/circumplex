@@ -113,7 +113,7 @@ Re-verification on 2026-09-20. The default branch moved (hotfix #174, the macOS 
 - AC3: the line equals `corfun` over 0 to 180. The 28 filled points equal the upper triangle of `matrices$R` at the inline modular separation (18.8 to 179.5 degrees). The hollow points equal `Zeta_i * Zeta_j * corfun(sep)`.
 - AC4: no `echo = FALSE` or `include = FALSE` among the four fences. The `--vanilla` run exited 0 with the one Hessian warning.
 - AC5: the phrase test passes 7 expectations.
-- AC6: the width, staleness and pkgdown guards exit 0. The source diff has five hunks: the Overview paragraph (one added sentence, ten sentences differing only in numbers and breaks), the new section with its following heading, two heading renumbers, and one Browne 1992 References entry. The setup chunk is untouched. The `devtools::check()` result is recorded below.
+- AC6: the width, staleness and pkgdown guards exit 0. The source diff has five hunks: the Overview paragraph (one added sentence, ten sentences differing only in numbers and breaks), the new section with its following heading, two heading renumbers, and one Browne 1992 References entry. The setup chunk is untouched. `devtools::check(args = "--no-manual")` on the merged tree: Status OK, 0 errors, 0 warnings, 0 notes.
 - AC7: one entry under the development heading, no milestone token in NEWS.
 
 Gate re-run: `cairn_validate.py` all pass. `document()` printed no `resolve link` line and left no diff. `check_pkgdown()` found no problems. The master watches read the newest run with a verdict, `0c37cddb`, success on both workflows (the run on `28dd3a2c` was still in progress). The two alert audits and the branch-protection check exit 0. PR #173 conversation read: no reviews, comments or unresolved threads.
