@@ -332,10 +332,11 @@ theta_text_grob <- function(p) {
 
 test_that("ggcircumplex() validates grid and angle_labels (AC1, AC3)", {
   expect_error(ggcircumplex(octants(), grid = "square"), "`grid`", fixed = TRUE)
-  expect_error(ggcircumplex(octants(), angle_labels = "yes"), "`angle_labels`", fixed = TRUE)
-  expect_error(ggcircumplex(octants(), angle_labels = NA), "`angle_labels`", fixed = TRUE)
-  expect_error(ggcircumplex(octants(), angle_labels = c(TRUE, FALSE)), "`angle_labels`", fixed = TRUE)
-  expect_error(ggcircumplex(octants(), angle_labels = 1), "`angle_labels`", fixed = TRUE)
+  # is_flag() names the argument in stopifnot()'s message (D-005 idiom).
+  expect_error(ggcircumplex(octants(), angle_labels = "yes"), "is_flag(angle_labels)", fixed = TRUE)
+  expect_error(ggcircumplex(octants(), angle_labels = NA), "is.na(angle_labels)", fixed = TRUE)
+  expect_error(ggcircumplex(octants(), angle_labels = c(TRUE, FALSE)), "is_flag(angle_labels)", fixed = TRUE)
+  expect_error(ggcircumplex(octants(), angle_labels = 1), "is_flag(angle_labels)", fixed = TRUE)
 })
 
 test_that("angle_labels = TRUE formats text labels as <label> (<angle>°) (AC3)", {
@@ -380,6 +381,16 @@ test_that("angle_labels = TRUE rotates each theta label along its radius (AC3)",
   txt0 <- theta_text_grob(ggcircumplex(octants(), labels = PANO()))
   expect_false(is.null(txt0))
   expect_equal(rep_len(txt0$rot, 8) %% 360, rep(0, 8))
+  # With the default degree labels angle_labels = TRUE is a no-op in full:
+  # no rotation and no widened margin, not only an unchanged format.
+  deg_on <- ggcircumplex(octants(), angle_labels = TRUE)
+  deg_off <- ggcircumplex(octants())
+  expect_equal(rep_len(theta_text_grob(deg_on)$rot, 8) %% 360, rep(0, 8))
+  expect_identical(deg_on$theme, deg_off$theme)
+  expect_gt(
+    as.numeric(ggplot2::calc_element("plot.margin", p$theme))[[1]],
+    as.numeric(ggplot2::calc_element("plot.margin", deg_off$theme))[[1]]
+  )
 })
 
 test_that("grid = \"cartesian\" turns the theta tick marks on; polar leaves the theme as today (AC3)", {

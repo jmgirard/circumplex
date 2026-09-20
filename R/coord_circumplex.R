@@ -39,7 +39,7 @@
 #'   degrees) along which the amplitude (radial) axis and its labels are drawn.
 #'   `NULL` (the default) places it automatically in the widest gap between the
 #'   displacement spokes, so the amplitude labels never collide with a spoke
-#'   label.
+#'   label. Ignored when `grid = "cartesian"`, which draws no amplitude axis.
 #' @param grid Optional. A single string naming the canvas furniture. `"polar"`
 #'   (the default) draws amplitude rings, displacement spokes and the amplitude
 #'   axis. `"cartesian"` draws one ring at the outer amplitude, a crosshair

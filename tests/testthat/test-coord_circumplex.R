@@ -715,11 +715,43 @@ test_that("the cartesian canvas draws a rim, a labelled crosshair and nothing el
   expect_gte(sum(keep), 1L)
   expect_true(0.2 %in% br[keep])
   expect_cartesian_panel(q, amax = 0.7, center = 0.1, inner = br[keep], inner_labels = lb[keep])
+  # A trained rim (amax = NULL): the appended, blank-labelled rim break of M38
+  # is the ring, and the inner breaks stop short of it.
+  tr <- ggplot2::ggplot(data.frame(x = 45, y = 0.73)) +
+    ggplot2::geom_point(ggplot2::aes(x, y)) +
+    coord_circumplex(grid = "cartesian")
+  ppt <- ggplot2::ggplot_build(tr)$layout$panel_params[[1]]
+  brt <- ppt$r$get_breaks()
+  lbt <- as.character(ppt$r$get_labels())
+  expect_equal(max(brt[is.finite(brt)]), 0.73)
+  keept <- is.finite(brt) & brt > 1e-9 & brt < 0.73 - 1e-9
+  expect_cartesian_panel(tr, amax = 0.73, center = 0, inner = brt[keept], inner_labels = lbt[keept])
   # Control: the polar canvas keeps its grid and radial axis.
   polar <- panel_grobs(ggcircumplex(octants(), labels = PANO()))
   expect_gt(length(grobs_named(polar, "^panel\\.grid\\.major")), 0L)
   expect_length(grobs_named(polar, "^axis$"), 1L)
   expect_length(grobs_named(polar, "^circumplex-cartesian-rim$"), 0L)
+})
+
+test_that("no inner breaks and a filled panel background both render (M142 review)", {
+  skip_on_cran()
+  # Breaks at the center and rim only: rim and crosshair, no ticks, no labels.
+  bare <- suppressMessages(
+    ggcircumplex(octants(), grid = "cartesian") +
+      ggplot2::scale_y_continuous(breaks = c(0, 0.5))
+  )
+  grobs <- panel_grobs(bare)
+  expect_length(grobs_named(grobs, "^circumplex-cartesian-rim$"), 1L)
+  expect_length(grobs_named(grobs, "^circumplex-cartesian-ticks-x$"), 0L)
+  expect_length(grobs_named(grobs, "^circumplex-cartesian-labels-x$"), 0L)
+  # A themed panel background is drawn as a polygon clipped to the rim.
+  filled <- ggcircumplex(octants(), grid = "cartesian") +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "pink"))
+  bg <- grobs_named(panel_grobs(filled), "^circumplex-cartesian-background$")
+  expect_length(bg, 1L)
+  expect_s3_class(bg[[1]], "polygon")
+  expect_length(grobs_named(panel_grobs(ggcircumplex(octants(), grid = "cartesian")),
+                            "^circumplex-cartesian-background$"), 0L)
 })
 
 test_that("suppressed amplitude labels draw crosshair ticks and no labels (M142 review)", {

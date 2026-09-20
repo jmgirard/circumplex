@@ -25,7 +25,7 @@ are guaranteed to agree.}
 degrees) along which the amplitude (radial) axis and its labels are drawn.
 \code{NULL} (the default) places it automatically in the widest gap between the
 displacement spokes, so the amplitude labels never collide with a spoke
-label.}
+label. Ignored when \code{grid = "cartesian"}, which draws no amplitude axis.}
 
 \item{grid}{Optional. A single string naming the canvas furniture. \code{"polar"}
 (the default) draws amplitude rings, displacement spokes and the amplitude

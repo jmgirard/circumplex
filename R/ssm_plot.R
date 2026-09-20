@@ -683,12 +683,14 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
   stopifnot(is_num(amax, n = 1) && amax > 0)
   stopifnot(is_num(font_size, n = 1) && font_size > 0)
   grid <- circumplex_grid(grid)
-  if (!isTRUE(angle_labels) && !isFALSE(angle_labels)) {
-    stop("`angle_labels` must be TRUE or FALSE.", call. = FALSE)
-  }
+  stopifnot(is_flag(angle_labels), !is.na(angle_labels))
 
   ang <- resolved$angles
   lab <- resolved$labels
+  # angle_labels acts on text labels only: the default degree labels already
+  # read as their angle and are left as they are, format, rotation and margin
+  # alike (implement gate, 2026-09-20).
+  angle_labels <- angle_labels && !is.null(lab)
   if (is.null(lab)) {
     lab <- circumplex_degree_labels(ang)
   } else if (angle_labels) {
