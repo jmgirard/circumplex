@@ -1,7 +1,8 @@
 # The "Advanced Circumplex Visualization" vignette's section on the latent
-# circumplex draws figures whose angles come from two different sources: a
-# cpm_fit() estimate on the rim, and an SSM computed on the theoretical angles
-# for the measures. The prose has to say which is which, or a reader takes a
+# circumplex draws three figures whose angles come from two different sources:
+# a cpm_fit() estimate on the rim, and an SSM computed on the theoretical
+# angles for the measures (the ellipse figure at the section's end is on the
+# theoretical canvas). The prose has to say which is which, or a reader takes a
 # measure's position for a latent location. These phrases carry that
 # distinction, name the figures' model (Nagy, Etzel & Lüdtke 2019), and keep
 # the tangent lines apart from the wedge, so each must stay in the shipped

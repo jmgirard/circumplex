@@ -386,14 +386,16 @@ to it. Where the two differ, the instrument's scales do not sit where the
 theory placed them, relative to PA, in this sample. Here every scale but PA
 sits clockwise of its theoretical angle. BC and DE sit 10 degrees clockwise
 and the rest 19 to 66 degrees clockwise. NO's estimated angle of 11 degrees
-is near the theoretical position of LM. This table is the only place the
-section compares the two sets of angles. The figures below draw the
-estimated angles alone. `Zeta` is each scale's communality index, which the
-correlation-function figure uses.
+is near the theoretical position of LM. The three circle figures that
+follow draw the estimated angles alone. The ellipse figure at the end of
+the section returns to the theoretical `octants()` canvas. `Zeta` is each
+scale's communality index, which the discussion of the correlation-function
+figure below uses.
 
 The circle figures in this section follow Nagy, Etzel and Lüdtke (2019).
-Their Figures 3 and 6 draw the scales of a circumplex at their estimated
-angles on a plain circle with a labelled crosshair. The canvas is
+Their Figure 6, and the two extension panels of their Figure 3, place the
+scales at their estimated angles. The canvas is a plain circle with a
+labelled crosshair. The canvas is
 `ggcircumplex()` with two arguments. `grid = "cartesian"` draws that circle
 and crosshair and no rings or spokes. `angle_labels = TRUE` writes each
 scale's angle into its rim label.
@@ -428,8 +430,9 @@ a measure is placed inside the circle.
 
 ### Measure vectors on the same rim
 
-Nagy, Etzel and Lüdtke (2019, Figure 6) draw each external measure as a
-labelled point joined to the origin by a straight line. The point's direction
+Nagy, Etzel and Lüdtke (2019) draw each external measure as a labelled
+point on the estimated rim (Figure 6). Their Figure 3 joins the point to the
+origin by a straight line. The point's direction
 from the origin is the measure's displacement and its distance from the
 origin is the measure's amplitude. `ssm_analyze()` supplies both. The second
 figure adds five personality-disorder measures from `jz2017` in that form, on
@@ -629,12 +632,14 @@ ellipse: their angles are the smallest and largest displacements of any point
 in the ellipse. Two join the origin to the nearest and farthest points of the
 ellipse's boundary. Their lengths are the smallest and largest amplitudes of
 any point in the ellipse. The function below computes all four from the
-one-row data frame above and the ellipse's confidence level. It works in the
-covariance form that `geom_ssm_ellipse()` draws, not in the parametric form
-of the paper's appendices. A direction from the origin is tangent to the
-ellipse when the line along it meets the ellipse at exactly one point. That
-condition makes the quadratic in the direction's slope have a double root.
-The two distances are the extremes of the boundary radius over the ellipse's
+one-row data frame above and the ellipse's confidence level. It works from
+the covariance form that `geom_ssm_ellipse()` draws and solves the two
+problems numerically, rather than transcribing the appendices' quartic and
+slope equations. A direction from the origin is tangent to the ellipse when
+the line along it meets the ellipse at exactly one point. That makes the
+quadratic for where the line meets the ellipse have a double root. Setting
+its discriminant to zero gives a quadratic in the direction's slope, whose
+two roots are the two tangent directions. The two distances are the extremes of the boundary radius over the ellipse's
 parametric angle, found on a fine grid and refined with `optimize()`. When
 the origin lies inside the ellipse there are no tangents, so those two
 angles are `NA`. The nearest distance is then the smallest boundary radius.

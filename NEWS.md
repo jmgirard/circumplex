@@ -55,9 +55,10 @@
   points joined to the origin. The third annotates one measure with an arc
   for its displacement and its two values. A fourth, linear figure draws the
   fitted correlation function against angular separation, with the observed
-  and reproduced correlations as points. The ellipse figure adds the two
-  tangent lines from the origin to the confidence ellipse and the lines to
-  its nearest and farthest boundary points, computed in an echoed chunk that
+  and reproduced correlations as points. The ellipse figure adds two
+  tangent lines from the origin out to the rim, at the angles of the
+  confidence ellipse's tangents, and the lines from the origin to the
+  ellipse's nearest and farthest boundary points, computed in an echoed chunk that
   the test suite runs against two oracles. The prose states which model each
   set of angles comes from.
 
