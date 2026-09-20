@@ -157,7 +157,16 @@ cartesian_grid_grob <- function(coord, panel_params, theme) {
   center <- coord$center
   r_scale <- panel_params$r
   breaks <- r_scale$get_breaks()
-  labels <- as.character(r_scale$get_labels())
+  # A caller suppressing the amplitude labels (`labels = NULL`) gets NULL back
+  # from the view scale; indexing into it would fabricate literal NA labels
+  # (the M38 lesson), so it is widened to a vector of NAs and the label grob
+  # is skipped below.
+  labels <- r_scale$get_labels()
+  labels <- if (is.null(labels)) {
+    rep(NA_character_, length(breaks))
+  } else {
+    as.character(labels)
+  }
   ok <- is.finite(breaks)
   breaks <- breaks[ok]
   labels <- labels[ok]
@@ -220,10 +229,15 @@ cartesian_grid_grob <- function(coord, panel_params, theme) {
     ticks <- grid::grobTree(ticks_x, ticks_y, name = "circumplex-cartesian-ticks")
 
     # Labels above the horizontal axis and to the right of the vertical one,
-    # as Nagy draws them, a gap of half a tick plus 2pt off the axis.
+    # as Nagy draws them, a gap of half a tick plus 2pt off the axis. A blank
+    # or missing label draws nothing (and no minus sign).
     el_text <- ggplot2::calc_element("axis.text.r", theme)
     gap <- 0.5 * len + grid::unit(2, "pt")
-    signed <- c(lab, paste0("-", lab))
+    has_lab <- !is.na(lab) & lab != ""
+    lab[!has_lab] <- ""
+    signed <- c(lab, ifelse(has_lab, paste0("-", lab), ""))
+  }
+  if (k > 0L && any(has_lab)) {
     labs_x <- ggplot2::element_grob(
       el_text, label = signed,
       x = grid::unit(along, "npc"), y = grid::unit(rep(origin$y, 2 * k), "npc"),

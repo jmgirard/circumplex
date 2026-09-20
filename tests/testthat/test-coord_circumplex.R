@@ -722,6 +722,27 @@ test_that("the cartesian canvas draws a rim, a labelled crosshair and nothing el
   expect_length(grobs_named(polar, "^circumplex-cartesian-rim$"), 0L)
 })
 
+test_that("suppressed amplitude labels draw crosshair ticks and no labels (M142 review)", {
+  skip_on_cran()
+  # `labels = NULL` on the amplitude scale returns NULL labels from the view
+  # scale; indexing into NULL fabricated literal NA / "-NA" labels (the M38
+  # lesson, reopened on the cartesian path at review).
+  p <- suppressMessages(
+    ggcircumplex(octants(), grid = "cartesian") +
+      ggplot2::scale_y_continuous(labels = NULL)
+  )
+  grobs <- panel_grobs(p)
+  expect_length(grobs_named(grobs, "^circumplex-cartesian-ticks-x$"), 1L)
+  expect_length(grobs_named(grobs, "^circumplex-cartesian-labels-x$"), 0L)
+  texts <- grobs_of_class(grobs, "text")
+  labels <- unlist(lapply(texts, function(t) as.character(t$label)))
+  expect_false(any(is.na(labels)))
+  expect_false(any(grepl("NA", labels, fixed = TRUE)))
+  # The control: with labels the label grobs are present.
+  ctl <- panel_grobs(ggcircumplex(octants(), grid = "cartesian"))
+  expect_length(grobs_named(ctl, "^circumplex-cartesian-labels-x$"), 1L)
+})
+
 # --- AC4: the grid mode never touches the polar transform ---------------------
 
 # The npc vertex coordinates of every grob a data layer draws, and its built

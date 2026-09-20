@@ -399,6 +399,7 @@ test_that("grid = \"cartesian\" turns the theta tick marks on; polar leaves the 
 })
 
 test_that("cartesian canvas snapshots (AC2, AC3)", {
+  skip_if_not_installed("vdiffr")
   skip_on_ci()
   vdiffr::expect_doppelganger(
     "ggcircumplex cartesian canvas",
