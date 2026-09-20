@@ -427,9 +427,9 @@ GeomSsmArc <- ggplot2::ggproto(
 #' Vertices are unwrapped along the outline so that an ellipse straddling the
 #' 0/360 seam is drawn across it, and an ellipse containing the origin winds
 #' once round the centre of the canvas. Unwrapped displacements may therefore
-#' fall outside `[0, 360)`. Each input row is one outline: the layer sets the
-#' `group` aesthetic to the row index, replacing any `group` the mapping
-#' supplies.
+#' fall outside `[0, 360)`. Each retained input row is one outline: the layer
+#' sets the `group` aesthetic to one value per retained row, replacing any
+#' `group` the mapping supplies.
 #'
 #' @param mapping,data,stat,position,show.legend,inherit.aes,... Standard
 #'   \pkg{ggplot2} layer arguments. `mapping` must supply the `x0`, `y0`,

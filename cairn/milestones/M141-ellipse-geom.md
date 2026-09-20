@@ -1,6 +1,6 @@
 # M141: A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M140
 - **Driving RR:** —
@@ -46,7 +46,7 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - [x] T3: Tests in `test-geom_ssm.R` and `test-ssm_draws.R` for AC1–AC5 (closed-form oracle over the three rows, seam and origin cases, every abort branch, `na.rm` both ways); two vdiffr snapshots (seam, origin) under `_snaps/geom_ssm/`; a non-visual CRAN guard in `test-plot-cran-guards.R`.
 - [x] T4: Vignette subsection + prose with the five AC6 phrases; re-render; look at the figure; add the five phrases to M140's `test-vignette-latent-figures.R`.
 - [x] T5: `_pkgdown.yml` rows; NEWS; `document()`; `check()`; guards.
-- [ ] T6 (review return, 2026-09-20): apply the gate's fix-now findings O1, O4, O5, O6, O7, and P1 as logged in the Review section (roxygen wording for the centre; group-aware AC2 test; a roxygen sentence on the `group` override; the DESIGN.md "Visualization extension" list naming the path and ellipse geoms; `@seealso` in place of `@family ssm functions`; six vignette sentences under the 25-word cap, then re-render and re-run the guards).
+- [x] T6 (review return, 2026-09-20): apply the gate's fix-now findings O1, O4, O5, O6, O7, and P1 as logged in the Review section (roxygen wording for the centre; group-aware AC2 test; a roxygen sentence on the `group` override; the DESIGN.md "Visualization extension" list naming the path and ellipse geoms; `@seealso` in place of `@family ssm functions`; six vignette sentences under the 25-word cap, then re-render and re-run the guards).
 
 ## Work log
 
@@ -70,6 +70,8 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - 2026-09-20: re-audit: AC3 (full) — two findings, one missing test for the both-case and one index-basis ambiguity, each with a proposed clause. Satisfiable (R/geom_ssm.R masks the definiteness test by the finiteness mask), reachable, bounded, deliverable-level, proportionate, no probe applies; AC3 and AC4 now partition the rows with no gap or overlap, and the existing AC3 tests satisfy the amended text. Finding 1: no fixture holds a row that is both non-finite and not positive definite, so the clause "a non-finite row is AC4's to drop" fires no test. Finding 2: "every offending row index" does not say the index counts against the input rows before the drop, which the code does. Taken to the mini gate below.
 - 2026-09-20: AC3 amended at a mini gate (user chose the return text as written over adding the reader's two clauses). The criterion now scopes the positive-definiteness abort to rows whose five aesthetics are all finite; its review tick is cleared for fresh evidence. Both re-audit findings are closed by tests under T6 with no criterion change: a row that is both non-finite and not positive definite in the AC4 fixture, asserted dropped and not named, and an assertion that the abort names the input row number after a dropped earlier row.
 - 2026-09-20: T6 edits applied (O1, O4, O5, O6, O7, P1 and the two AC3 re-audit tests); `document()` clean, geom, draws, guard and phrase tests pass (279 + 12, both locales), `pkgdown::check_pkgdown()` clean, vignette re-rendered with the figure unchanged, prose sweep leaves only line 572 (the accepted overrun) and a pre-existing M140 sentence. Checkpoint before the full suite, `devtools::check()` and the claim audit of the added lines finish; T6 stays unticked until they do.
+- 2026-09-20: claim audit: 12 claims read, 1 corrected — R/geom_ssm.R, R/ssm_draws.R, tests/testthat/test-geom_ssm.R, vignettes/advanced-visualization.Rmd and .Rmd.orig (the lines T6 added; the 62-claim pass above covered the rest of the branch). Corrected: the roxygen sentence saying the ellipse's `group` is the row index, where after a drop it is one value per retained row (the abort message, not the group, indexes input rows). The two figure claims were verified numerically: ellipse amplitude extent 0.4165 to 0.5345 against the wedge's 0.4274 to 0.5217, displacement 310.76 to 324.81 against 312.27 to 323.29, and quadratic forms 7.08, 8.11, 7.53, 7.41 at the wedge corners against 5.99.
+- 2026-09-20: T6 done. `devtools::test()` under NOT_CRAN 11391 pass, 0 fail, 1 skip (12 warnings, all lavaan's in the SEM and print-width tests); `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (7m22s), run before the one-sentence roxygen correction above, which `document()` followed with no link warnings; staleness guard exits 0 on the committed render. Status set to review.
 
 ## Decisions
 
