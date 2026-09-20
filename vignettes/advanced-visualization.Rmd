@@ -352,7 +352,8 @@ new function.
 The fit below uses analytic confidence intervals, because only the point
 estimates are drawn. The same call emits a warning that its Hessian is
 ill-conditioned, so its condition number and some later digits differ across
-BLAS libraries. The "CPM Boundary Fits" vignette reads that warning in full.
+BLAS libraries. The "CPM Fits at a Boundary" vignette reads that warning in
+full.
 
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the condition number in the warning and the later
