@@ -299,6 +299,57 @@ print.circumplex_ssm_draws <- function(x, digits = 3, ...) {
   invisible(x)
 }
 
+#' Centre and covariance of the Cartesian SSM coordinates for an ellipse layer
+#'
+#' Compute the five columns [geom_ssm_ellipse()] draws from: the centre
+#' `(x0, y0)` of a profile's Cartesian coordinates and the elements `var_x`,
+#' `var_y`, `cov_xy` of their 2 by 2 covariance matrix. This is an S3 generic;
+#' the method for [ssm_draws()] objects takes the centre from the object's
+#' point summaries (`results$x_est`, `results$y_est`, the posterior medians
+#' the package also plots) and the covariance from `stats::cov()` of the `x`
+#' and `y` columns of the object's draws. Objects that retain no draws, such
+#' as the result of [ssm_analyze()], have no method and are refused.
+#'
+#' @param x An object of class `"circumplex_ssm_draws"`.
+#' @param ... Passed to methods; unused by the shipped method.
+#' @return A one-row data frame with columns `x0`, `y0`, `var_x`, `var_y`, and
+#'   `cov_xy`, in the score metric of the coordinates.
+#' @family ssm functions
+#' @export
+#' @examples
+#' set.seed(1)
+#' draws <- cbind(rnorm(500, 0.4, 0.1), rnorm(500, 0.9, 0.1),
+#'                rnorm(500, -0.3, 0.1))
+#' ssm_ellipse_data(ssm_draws(draws, type = "parameters"))
+ssm_ellipse_data <- function(x, ...) {
+  UseMethod("ssm_ellipse_data")
+}
+
+#' @rdname ssm_ellipse_data
+#' @export
+ssm_ellipse_data.circumplex_ssm_draws <- function(x, ...) {
+  S <- stats::cov(x$draws[, c("x", "y"), drop = FALSE])
+  data.frame(
+    x0 = x$results$x_est,
+    y0 = x$results$y_est,
+    var_x = S[1, 1],
+    var_y = S[2, 2],
+    cov_xy = S[1, 2]
+  )
+}
+
+#' @rdname ssm_ellipse_data
+#' @export
+ssm_ellipse_data.default <- function(x, ...) {
+  stop(
+    "ssm_ellipse_data(): no method for an object of class <",
+    paste(class(x), collapse = "/"),
+    ">. The ellipse needs draws of the (x, y) coordinates; supply the ",
+    "result of ssm_draws().",
+    call. = FALSE
+  )
+}
+
 # Summary method for objects of ssm_draws class
 #' @method summary circumplex_ssm_draws
 #' @export

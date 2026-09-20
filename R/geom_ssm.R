@@ -132,14 +132,15 @@ geom_ssm_point <- function(mapping = NULL, data = NULL, stat = "identity",
 #' These are the \pkg{ggplot2} [ggplot2::ggproto()] classes that back the
 #' circumplex layers and coordinate system: `GeomSsmPoint` (the profile-point
 #' geom), `GeomSsmArc` (the confidence-region arc geom), `GeomSsmPath` (the
-#' movement-path geom), and `CoordCircumplex` (the coordinate system). They are
+#' movement-path geom), `GeomSsmEllipse` (the confidence-ellipse geom), and
+#' `CoordCircumplex` (the coordinate system). They are
 #' exported so that downstream packages can subclass them to build custom
 #' circumplex layers; most users should use the [geom_ssm_point()],
-#' [geom_ssm_arc()], [geom_ssm_path()], and [coord_circumplex()] constructors
-#' instead.
+#' [geom_ssm_arc()], [geom_ssm_path()], [geom_ssm_ellipse()], and
+#' [coord_circumplex()] constructors instead.
 #'
 #' @seealso [geom_ssm_point()], [geom_ssm_arc()], [geom_ssm_path()],
-#'   [coord_circumplex()]
+#'   [geom_ssm_ellipse()], [coord_circumplex()]
 #' @name circumplex-ggproto
 #' @keywords internal
 NULL
@@ -399,6 +400,157 @@ GeomSsmArc <- ggplot2::ggproto(
     data$xmax <- data$displacement_min + span
     data$ymin <- data$amplitude_min
     data$ymax <- data$amplitude_max
+    data
+  }
+)
+
+#' Draw a joint confidence ellipse for SSM coordinates in circumplex space
+#'
+#' A \pkg{ggplot2} layer that draws, for each profile, the ellipse of a
+#' bivariate normal region on the Cartesian `(x, y)` coordinates of the
+#' Structural Summary Method, on a circumplex canvas built with
+#' [coord_circumplex()] (for example the canvas from [ggcircumplex()]). Each
+#' row supplies the centre `(x0, y0)` and the three elements of a 2 by 2
+#' covariance matrix; the layer computes the ellipse's outline in Cartesian
+#' space, converts each vertex to a displacement and an amplitude, and hands
+#' those to the coordinate system, which owns the polar transform.
+#'
+#' The outline is the contour `(v - c)' S^-1 (v - c) = qchisq(level, 2)`,
+#' where `c` is the centre and `S` the covariance: under a bivariate normal
+#' approximation to the sampling distribution of `(x, y)`, it encloses the
+#' joint region at confidence `level`. [ssm_ellipse_data()] computes the five
+#' columns from an [ssm_draws()] object. The ellipse is a statement about the
+#' Cartesian pair, not about amplitude and displacement separately; the wedge
+#' [geom_ssm_arc()] draws is the pair of marginal intervals on those two
+#' parameters, and the two regions need not coincide.
+#'
+#' Vertices are unwrapped along the outline so that an ellipse straddling the
+#' 0/360 seam is drawn across it, and an ellipse containing the origin winds
+#' once round the centre of the canvas. Unwrapped displacements may therefore
+#' fall outside `[0, 360)`.
+#'
+#' @param mapping,data,stat,position,show.legend,inherit.aes,... Standard
+#'   \pkg{ggplot2} layer arguments. `mapping` must supply the `x0`, `y0`,
+#'   `var_x`, `var_y`, and `cov_xy` aesthetics: the centre and the variances
+#'   of `x` and `y` and their covariance, all in the score metric of the
+#'   Cartesian coordinates.
+#' @param level A single number strictly between 0 and 1: the confidence level
+#'   of the region (default 0.95).
+#' @param n The number of vertices on each outline (default 100); the path is
+#'   closed by repeating the first vertex.
+#' @param na.rm If `FALSE`, warn (with the dropped-row count) before removing
+#'   rows with a non-finite centre or covariance element; if `TRUE` (the
+#'   default) remove them silently. A covariance that is not positive
+#'   definite is an error, not a missing value.
+#' @return A \pkg{ggplot2} layer.
+#' @family circumplex layers
+#' @export
+#' @examples
+#' set.seed(1)
+#' draws <- cbind(rnorm(500, 0.4, 0.1), rnorm(500, 0.3, 0.05),
+#'                rnorm(500, -0.2, 0.05))
+#' res <- ssm_draws(draws, type = "parameters")
+#' ggcircumplex(octants(), amax = 0.5) +
+#'   geom_ssm_ellipse(
+#'     data = ssm_ellipse_data(res),
+#'     mapping = ggplot2::aes(
+#'       x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy
+#'     )
+#'   ) +
+#'   geom_ssm_point(
+#'     data = res$results,
+#'     mapping = ggplot2::aes(amplitude = a_est, displacement = d_est)
+#'   )
+geom_ssm_ellipse <- function(mapping = NULL, data = NULL, stat = "identity",
+                             position = "identity", ..., level = 0.95,
+                             n = 100, na.rm = TRUE, show.legend = NA,
+                             inherit.aes = TRUE) {
+  if (!is.numeric(level) || length(level) != 1L || !is.finite(level) ||
+      level <= 0 || level >= 1) {
+    stop(
+      "geom_ssm_ellipse(): `level` must be a single number strictly between ",
+      "0 and 1.",
+      call. = FALSE
+    )
+  }
+  if (!is.numeric(n) || length(n) != 1L || !is.finite(n) || n < 3 ||
+      n != round(n)) {
+    stop(
+      "geom_ssm_ellipse(): `n` must be a single whole number of at least 3.",
+      call. = FALSE
+    )
+  }
+  ggplot2::layer(
+    geom = GeomSsmEllipse, mapping = mapping, data = data, stat = stat,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(level = level, n = as.integer(n), na.rm = na.rm, ...)
+  )
+}
+
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+GeomSsmEllipse <- ggplot2::ggproto(
+  "GeomSsmEllipse", ggplot2::GeomPath,
+  required_aes = c("x0", "y0", "var_x", "var_y", "cov_xy"),
+  extra_params = c("na.rm", "level", "n"),
+  setup_data = function(data, params) {
+    aes <- c("x0", "y0", "var_x", "var_y", "cov_xy")
+    # Non-finite rows have no ellipse; drop them under the na.rm convention
+    # BEFORE the definiteness check, so an NA never reads as "not positive
+    # definite" and an Inf never reaches atan2().
+    keep <- Reduce(`&`, lapply(data[aes], is.finite))
+    ssm_warn_dropped(
+      sum(!keep), params$na.rm, "geom_ssm_ellipse",
+      "a non-finite ellipse centre or covariance"
+    )
+    # Row indices are reported against the input rows, before the drop.
+    bad <- keep & (
+      data$var_x <= 0 | data$var_y <= 0 |
+        data$cov_xy^2 >= data$var_x * data$var_y
+    )
+    if (any(bad)) {
+      stop(
+        "geom_ssm_ellipse(): the covariance is not positive definite in row(s) ",
+        paste(which(bad), collapse = ", "),
+        " (need var_x > 0, var_y > 0 and cov_xy^2 < var_x * var_y).",
+        call. = FALSE
+      )
+    }
+    data <- data[keep, , drop = FALSE]
+    if (nrow(data) == 0L) {
+      data$x <- numeric(0)
+      data$y <- numeric(0)
+      return(data)
+    }
+
+    # One closed outline per input row: the unit circle, mapped through the
+    # Cholesky factor of S scaled to the chi-square radius, is the level set
+    # of the quadratic form. Each vertex then becomes (radius, angle); the
+    # angle is wrapped with `d + 2*pi*(d < 0)` (the M26 lesson, D-003) and
+    # the outline is unwrapped along the path by extension, so the coord's
+    # periodic transform carries a seam-straddling ellipse the short way and
+    # an origin-containing one once round the centre (values may leave
+    # [0, 360)). The first vertex is repeated to close the path.
+    t <- seq(0, 2 * pi, length.out = params$n + 1L)
+    unit <- rbind(cos(t), sin(t))
+    radius <- sqrt(stats::qchisq(params$level, df = 2))
+    rows <- lapply(seq_len(nrow(data)), function(i) {
+      S <- matrix(
+        c(data$var_x[i], data$cov_xy[i], data$cov_xy[i], data$var_y[i]), 2, 2
+      )
+      v <- c(data$x0[i], data$y0[i]) + radius * (t(chol(S)) %*% unit)
+      d <- atan2(v[2, ], v[1, ])
+      d <- d + 2 * pi * (d < 0)
+      out <- data[rep(i, ncol(v)), , drop = FALSE]
+      out$x <- angle_unwrap(as.numeric(as_degree(as_radian(d))))
+      out$y <- sqrt(v[1, ]^2 + v[2, ]^2)
+      out$group <- i
+      out
+    })
+    data <- do.call(rbind, rows)
+    rownames(data) <- NULL
     data
   }
 )

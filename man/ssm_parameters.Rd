@@ -95,6 +95,7 @@ Other ssm functions:
 \code{\link[=ssm_analyze_long]{ssm_analyze_long()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_draws]{ssm_draws()}},
+\code{\link[=ssm_ellipse_data]{ssm_ellipse_data()}},
 \code{\link[=ssm_parameters_id]{ssm_parameters_id()}},
 \code{\link[=ssm_score]{ssm_score()}},
 \code{\link[=ssm_sem]{ssm_sem()}},

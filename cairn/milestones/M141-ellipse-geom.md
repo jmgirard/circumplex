@@ -1,13 +1,13 @@
 # M141: A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M140
 - **Driving RR:** —
 - **Principles touched:** GP4, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — two new exports and a vignette subsection
-- **Branch/PR:** —
+- **Branch/PR:** `m141-ellipse-geom`
 
 ## Goal
 
@@ -41,9 +41,9 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 
 ## Tasks
 
-- [ ] T1: `GeomSsmEllipse` in `R/geom_ssm.R`: `setup_data()` validates, computes `n` Cartesian vertices from the Cholesky factor of `S` scaled by `sqrt(qchisq(level, 2))`, converts to radius and degrees with `d + 2*pi*(d < 0)` (M26 lesson), unwraps by extension along the path (`xmax = xmin + span` pattern, may exceed 360), emits `group` per input row; constructor `geom_ssm_ellipse()` mirrors `geom_ssm_path()`; roxygen with `@family circumplex layers`; export `GeomSsmEllipse` on the `circumplex-ggproto` page.
-- [ ] T2: `ssm_ellipse_data()` generic + `circumplex_ssm_draws` method in `R/ssm_draws.R`; roxygen; export.
-- [ ] T3: Tests in `test-geom_ssm.R` and `test-ssm_draws.R` for AC1–AC5 (closed-form oracle over the three rows, seam and origin cases, every abort branch, `na.rm` both ways); two vdiffr snapshots (seam, origin) under `_snaps/geom_ssm/`; a non-visual CRAN guard in `test-plot-cran-guards.R`.
+- [x] T1: `GeomSsmEllipse` in `R/geom_ssm.R`: `setup_data()` validates, computes `n` Cartesian vertices from the Cholesky factor of `S` scaled by `sqrt(qchisq(level, 2))`, converts to radius and degrees with `d + 2*pi*(d < 0)` (M26 lesson), unwraps by extension along the path (`xmax = xmin + span` pattern, may exceed 360), emits `group` per input row; constructor `geom_ssm_ellipse()` mirrors `geom_ssm_path()`; roxygen with `@family circumplex layers`; export `GeomSsmEllipse` on the `circumplex-ggproto` page.
+- [x] T2: `ssm_ellipse_data()` generic + `circumplex_ssm_draws` method in `R/ssm_draws.R`; roxygen; export.
+- [x] T3: Tests in `test-geom_ssm.R` and `test-ssm_draws.R` for AC1–AC5 (closed-form oracle over the three rows, seam and origin cases, every abort branch, `na.rm` both ways); two vdiffr snapshots (seam, origin) under `_snaps/geom_ssm/`; a non-visual CRAN guard in `test-plot-cran-guards.R`.
 - [ ] T4: Vignette subsection + prose with the five AC6 phrases; re-render; look at the figure; add the five phrases to M140's `test-vignette-latent-figures.R`.
 - [ ] T5: `_pkgdown.yml` rows; NEWS; `document()`; `check()`; guards.
 
@@ -52,6 +52,9 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - 2026-09-19: created by /milestone-plan; criteria audit record is in M140's work log (one reader, both files).
 - 2026-09-19: plan gate chose centring the ellipse on `results$x_est`/`y_est` (the plotted medians) with covariance from the draws over centring on the draws' mean because the ellipse must attach to the point a reader sees, and the two coincide under the normal approximation the ellipse already assumes; falsified by a draws object where the median and mean centres differ by more than the ellipse's own semi-minor axis at the default level.
 - 2026-09-19: plan gate chose exporting `ssm_ellipse_data()` over vignette-only code because the five-column contract is small and a later SEM/bootstrap method needs a generic to hang on; falsified by the generic gaining no second method within two minor releases (then it is a candidate for folding into the geom's docs).
+- 2026-09-20: /milestone-implement started on branch `m141-ellipse-geom`. The question gate was skipped because the plan gate fixed the API and the three remaining choices were routine: `level` and `n` are validated in the constructor, the path repeats its first vertex (n + 1 rows per ellipse), and each input row gets its own `group`.
+- 2026-09-20: T1 and T2 done. AC1 to AC5 tests pass (64 in test-geom_ssm.R, 140 in test-ssm_draws.R) and two vdiffr snapshots were added (seam, origin). Check discrimination: three planted defects in the geom (transposed Cholesky factor, chi-square with 1 df, `abs()` angle wrap) each move the AC1 residual from 3e-14 to over 2, so the oracle can fail. The seam, origin, and draws figures were rendered and inspected.
+- 2026-09-20: T3 done. The CRAN guard in test-plot-cran-guards.R asserts the built vertices against the chi-square contour and the centre (mean of the antipodal vertex pairs). Full suite under NOT_CRAN: 11377 pass, 1 fail, which was the guard's first draft asserting a diagonal-only property of the first vertex. Fixed, the file passes (27).
 
 ## Decisions
 

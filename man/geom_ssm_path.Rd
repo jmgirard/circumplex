@@ -97,6 +97,7 @@ ggcircumplex(octants(), amax = 0.5) +
 Other circumplex layers:
 \code{\link[=coord_circumplex]{coord_circumplex()}},
 \code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=geom_ssm_ellipse]{geom_ssm_ellipse()}},
 \code{\link[=geom_ssm_point]{geom_ssm_point()}},
 \code{\link[=ggcircumplex]{ggcircumplex()}},
 \code{\link[=scale_x_circumplex]{scale_x_circumplex()}},
