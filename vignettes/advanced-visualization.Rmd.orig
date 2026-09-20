@@ -660,27 +660,73 @@ rim. The two distance lines are dotted and run from the origin to the
 nearest and farthest boundary points.
 
 ```{r ellipse-figure}
-ggcircumplex(octants(), labels = PANO(), amax = 0.6) +
+amax <- 0.6
+tangents <- data.frame(
+  line = rep(lines$line[1:2], each = 2),
+  amplitude = rep(c(0, amax), times = 2),
+  displacement = rep(lines$displacement[1:2], each = 2)
+)
+distances <- data.frame(
+  line = rep(lines$line[3:4], each = 2),
+  amplitude = c(rbind(0, lines$amplitude[3:4])),
+  displacement = rep(lines$displacement[3:4], each = 2)
+)
+
+ggcircumplex(
+  octants(), labels = PANO(), amax = amax,
+  grid = "cartesian", angle_labels = TRUE
+) +
   geom_ssm_arc(
     data = post$results,
     mapping = aes(
       amplitude_min = a_lci, amplitude_max = a_uci,
       displacement_min = d_lci, displacement_max = d_uci
     ),
-    alpha = 0.3
+    alpha = 0.15
+  ) +
+  geom_ssm_path(
+    data = tangents,
+    mapping = aes(
+      amplitude = amplitude, displacement = displacement, group = line
+    ),
+    linetype = "dashed"
+  ) +
+  geom_ssm_path(
+    data = distances,
+    mapping = aes(
+      amplitude = amplitude, displacement = displacement, group = line
+    ),
+    linetype = "dotted", color = "gray40"
   ) +
   geom_ssm_ellipse(
     data = ellipse,
     mapping = aes(
       x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy
-    ),
-    color = "firebrick"
+    )
   ) +
   geom_ssm_point(
     data = post$results,
-    mapping = aes(amplitude = a_est, displacement = d_est)
+    mapping = aes(amplitude = a_est, displacement = d_est),
+    size = 1.5
+  ) +
+  geom_text(
+    data = post$results,
+    mapping = aes(x = d_est, y = a_est, label = "Mean profile"),
+    hjust = -0.3
   )
 ```
+
+The label names what the draws describe: the mean octant profile of the
+subsample the "Bayesian SSM Analysis" vignette fits. The ellipse is small
+on this canvas because the posterior is tight, so the point is drawn small
+to keep the outline visible. The wedge is drawn light so that the ellipse
+and the four lines read over it. The tangent lines bound the directions the
+ellipse spans under the normal approximation and are not the displacement
+interval the wedge draws. The wedge's displacement interval is a
+circular-quantile interval of the draws, and the tangent angles come from
+the ellipse alone, so the two pairs of angles differ. Here the tangents at
+311 and 325 degrees sit outside the wedge's interval from 312 to 323
+degrees.
 
 Here the ellipse is centred on the posterior medians of `x` and `y`, not on
 the plotted point, and its covariance comes from the draws. The
@@ -921,9 +967,10 @@ across waves before you draw it, read "Growth Models on SSM Parameters".
 * Browne, M. W. (1992). Circumplex models for correlation matrices.
   _Psychometrika, 57_(4), 469--497.
 
-* Gurtman, M. B. (1992). Construct validity of interpersonal personality
-  measures: The interpersonal circumplex as a nomological net. _Journal of
-  Personality and Social Psychology, 63_(1), 105--118.
+* Nagy, G., Etzel, J. M., & Lüdtke, O. (2019). Integrating covariates into
+  circumplex structures: An extension procedure for Browne's circular
+  stochastic process model. _Multivariate Behavioral Research, 54_(3),
+  404--428.
 
 * Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth, M. J. (2009).
   Integrating methods to optimize circumplex description and comparison of

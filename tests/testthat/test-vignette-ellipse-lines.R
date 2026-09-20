@@ -139,6 +139,52 @@ test_that("oracle (ii): circular ellipses match the closed form", {
   }
 })
 
+test_that("the ellipse figure draws the four lines from the chunk's values", {
+  skip_if_no_chunk()
+  env <- ellipse_lines_chunk()
+  code <- vignette_chunk("advanced-visualization.Rmd.orig", "ellipse-figure")
+  fig_env <- new.env(parent = asNamespace("ggplot2"))
+  for (v in c("post", "ellipse", "lines")) assign(v, get(v, env), envir = fig_env)
+  p <- eval(parse(text = code), envir = fig_env)
+  expect_s3_class(p, "ggplot")
+  expect_identical(p$coordinates$grid, "cartesian")
+  built <- ggplot2::ggplot_build(p)
+  expect_equal(built$layout$panel_scales_x[[1]]$get_breaks(), as.numeric(octants()),
+               ignore_attr = TRUE)
+  geoms <- unname(vapply(p$layers, function(l) class(l$geom)[1], character(1)))
+  expect_identical(
+    geoms,
+    c("GeomBlank", "GeomSsmArc", "GeomSsmPath", "GeomSsmPath", "GeomSsmEllipse",
+      "GeomSsmPoint", "GeomText")
+  )
+  lines <- env$lines
+  amax <- p$coordinates$amax
+  # The wedge, light.
+  expect_lte(p$layers[[2]]$aes_params$alpha, 0.15)
+  expect_identical(p$layers[[2]]$data, env$post$results)
+  # Dashed tangents from the origin to the rim at the chunk's angles.
+  tang <- p$layers[[3]]
+  expect_identical(tang$aes_params$linetype, "dashed")
+  for (i in 1:2) {
+    rows <- tang$data[tang$data$line == lines$line[i], ]
+    expect_equal(sort(rows$amplitude), c(0, amax))
+    expect_equal(unique(rows$displacement), lines$displacement[i])
+  }
+  # Dotted distances from the origin to the nearest and farthest points.
+  dist <- p$layers[[4]]
+  expect_identical(dist$aes_params$linetype, "dotted")
+  for (i in 3:4) {
+    rows <- dist$data[dist$data$line == lines$line[i], ]
+    expect_equal(sort(rows$amplitude), c(0, lines$amplitude[i]))
+    expect_equal(unique(rows$displacement), lines$displacement[i])
+  }
+  # The ellipse from ssm_ellipse_data(post), the point and one label.
+  expect_identical(p$layers[[5]]$data, env$ellipse)
+  expect_identical(rlang::as_label(p$layers[[6]]$mapping$amplitude), "a_est")
+  expect_identical(rlang::as_label(p$layers[[6]]$mapping$displacement), "d_est")
+  expect_equal(nrow(p$layers[[7]]$data), 1L)
+})
+
 test_that("oracle (ii): a circle containing the origin has NA tangents and nearest r - c", {
   skip_if_no_chunk()
   env <- ellipse_lines_chunk()
