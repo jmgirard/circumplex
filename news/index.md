@@ -23,6 +23,18 @@
   check detects that structure only. A nonzero block does not show that
   the model is right.
 
+- The “Advanced Circumplex Visualization” vignette has a new section,
+  “The latent circumplex from a CPM fit”. It draws three figures from a
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  result with the layers the package already exports. The first puts the
+  estimated scale angles as ticks on the rim of a canvas whose spokes
+  sit at the theoretical angles. The second adds five measures from
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
+  as vectors from the origin on the same rim. The third draws the fitted
+  correlation function against angular separation, with the observed and
+  reproduced correlations as points. The prose states which model each
+  set of angles comes from.
+
 - Every prose caution and note that
   [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) show now wraps to
