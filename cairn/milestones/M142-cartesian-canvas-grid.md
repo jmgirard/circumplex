@@ -1,13 +1,13 @@
 # M142: A Cartesian-grid style for the circumplex canvas
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP2, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — exported arguments on `coord_circumplex()` and `ggcircumplex()`
-- **Branch/PR:** —
+- **Branch/PR:** `m142-cartesian-canvas-grid`
 
 ## Goal
 
