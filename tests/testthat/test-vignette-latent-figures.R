@@ -37,6 +37,8 @@ test_that("the latent-circumplex section hides no chunk", {
   heads <- which(grepl("^## ", lines))
   start <- heads[grepl("^## [0-9]+\\. The latent circumplex from a CPM fit$", lines[heads])]
   expect_length(start, 1L)
+  # A renamed heading has already failed above; stop before min(integer(0)).
+  if (length(start) != 1L) return(invisible(NULL))
   end <- min(heads[heads > start]) - 1L
   section <- lines[seq(start, end)]
   fences <- section[grepl("^```\\{r", section)]

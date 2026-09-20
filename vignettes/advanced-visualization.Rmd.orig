@@ -320,42 +320,46 @@ layer (text annotations, additional geoms, faceting) can be added the same way.
 ## 7. The latent circumplex from a CPM fit
 
 The canvases above place every scale at its theoretical angle. Those angles
-are an assumption. `cpm_fit()` estimates them instead: it fits Browne's
+are an assumption. `cpm_fit()` estimates them instead. It fits Browne's
 (1992) circular process model, which places each scale at an angle on a
-latent circle and describes the correlation between two scales as a function
-of their angular separation. The "Evaluating Circumplex Structure" vignette
-covers the model and its fit indices. This section draws what the fit
-estimated, with the layers the earlier sections used. Nothing here needs a
-new function.
+latent circle. The model describes the correlation between two scales as a
+function of their angular separation. The "Evaluating Circumplex Structure"
+vignette covers the model and its fit indices. This section draws what the
+fit estimated, with the layers the earlier sections used. Nothing here needs
+a new function.
 
-The fit below uses analytic confidence intervals, because only the point
-estimates are drawn. The same call emits a warning that its Hessian is
-ill-conditioned, so its condition number and some later digits differ across
-BLAS libraries. The "CPM Fits at a Boundary" vignette reads that warning in
-full.
+The call below asks for analytic confidence intervals, but the figures draw
+only the point estimates. On this sample the fit sits at a boundary: the
+communality index of NO reached its upper limit, so `print(cpm)` notes a
+Heywood-type solution. The analytic intervals all come back `NA`. The
+Hessian is also ill-conditioned, so the call warns, and its condition number
+and some later digits differ across BLAS libraries. The "CPM Fits at a
+Boundary" vignette reads both the note and the warning in full.
 
 <!-- precompute:volatile-numbers start -- cpm_fit() on jz2017 is
      ill-conditioned, so the condition number in the warning and the later
      digits of the estimates move across BLAS implementations. -->
 ```{r latent-fit}
 cpm <- cpm_fit(jz2017, scales = PANO(), angles = octants(), ci_method = "analytic")
-cpm$results[, c("Scale", "Angle_theory", "Angle", "Communality")]
+cpm$results[, c("Scale", "Angle_theory", "Angle", "Zeta")]
 ```
 <!-- precompute:volatile-numbers end -->
 
 `Angle_theory` is the angle each scale was given. `Angle` is the angle the
-model estimated for it, with the first scale fixed at its theoretical angle to
-set the rotation. Where the two differ, the instrument's scales do not sit
-where the theory placed them in this sample.
+model estimated for it. The first scale, PA, is not estimated: it is fixed at
+its theoretical angle to set the rotation. Every other angle is read relative
+to it. Where the two differ, the instrument's scales do not sit where the
+theory placed them, relative to PA, in this sample. `Zeta` is each scale's
+communality index, which the third figure uses.
 
 ### Estimated angles as ticks on the rim
 
 The first figure draws each estimated angle as a short radial tick just inside
-the rim, on a canvas whose spokes sit at the theoretical angles. A tick is a
-path with two points at the same displacement, one at amplitude 0.94 and one
-at amplitude 1, so `geom_ssm_path()` draws it with `group = Scale`. The
-canvas is built from its parts, as in Section 3, because the spoke breaks
-come from the fit's `Angle_theory` column rather than from `octants()`.
+the rim. The canvas's spokes sit at the theoretical angles. A tick is a path
+with two points at the same displacement, one at amplitude 0.94 and one at
+amplitude 1. `geom_ssm_path()` draws it with `group = Scale`. The canvas is
+`ggcircumplex()` with the fit's `Angle_theory` column as its angles, so the
+spokes and labels sit where the theory put each scale.
 
 ```{r latent-ticks}
 ticks <- data.frame(
@@ -365,10 +369,7 @@ ticks <- data.frame(
 )
 ticks$Scale <- factor(ticks$Scale, levels = cpm$results$Scale)
 
-ggplot() +
-  coord_circumplex(amax = 1) +
-  scale_x_continuous(breaks = cpm$results$Angle_theory, labels = PANO()) +
-  theme_circumplex() +
+ggcircumplex(angles = cpm$results$Angle_theory, labels = PANO(), amax = 1) +
   geom_ssm_path(
     data = ticks,
     mapping = aes(
@@ -381,15 +382,16 @@ ggplot() +
 
 Read the figure this way: the ticks are the angles `cpm_fit()` estimated, and
 the labelled spokes are the theoretical angles. A tick that sits on its spoke
-is a scale the model placed where the theory did. In this sample the ticks
+is a scale the model placed where the theory did. PA's tick sits on its spoke
+by construction, because its angle was fixed. In this sample the other ticks
 drift clockwise from BC round to NO, and the NO tick lands near the LM spoke.
 The amplitude rings carry no meaning in this figure. Radius here only keeps
 the ticks at the rim.
 
 ### Measure vectors on the same rim
 
-Gurtman (1992) draws each external measure as a vector from the origin, with
-its direction at the measure's displacement and its length at the measure's
+Gurtman (1992) draws each external measure as a vector from the origin. Its
+direction is the measure's displacement and its length is the measure's
 amplitude. `ssm_analyze()` supplies both. The second figure adds five
 personality-disorder measures from `jz2017` as such vectors, on the same rim
 ticks. Each vector is a two-row path from amplitude 0 to the measure's
@@ -408,10 +410,7 @@ vectors <- data.frame(
   displacement = rep(ssm$results$d_est, each = 2)
 )
 
-ggplot() +
-  coord_circumplex(amax = 0.3) +
-  scale_x_continuous(breaks = cpm$results$Angle_theory, labels = PANO()) +
-  theme_circumplex() +
+ggcircumplex(angles = cpm$results$Angle_theory, labels = PANO(), amax = 0.3) +
   geom_ssm_path(
     data = ticks,
     mapping = aes(
@@ -448,49 +447,51 @@ fit it inside the model, which `cpm_fit()` does not do.
 ### The fitted correlation function
 
 The third figure is linear. The fit's `corfun` element is the estimated
-correlation function: a function of the angular separation between two
-scales, in degrees, that returns the correlation between their common parts.
-The figure draws it over separations from 0 to 180 degrees and places every
-pair of scales on the same axes. A pair's separation is the absolute angular
-distance between its two estimated angles, computed with the modular
-expression below so that a pair straddling 0/360 gets the short way round.
-The filled points are the observed correlations from `matrices$R`. The hollow
-points are the correlations the model reproduces, from `matrices$Phat`.
+correlation function. It takes the angular separation between two scales, in
+degrees, and returns the correlation between their common parts. The figure
+draws it over separations from 0 to 180 degrees and places every pair of
+scales on the same axes. A pair's separation is the absolute angular distance
+between its two estimated angles. The modular expression below computes it so
+that a pair straddling 0/360 gets the short way round. The filled points are
+the observed correlations from `matrices$R`. The hollow points are the
+correlations the model reproduces, from `matrices$Phat`.
 
 ```{r latent-corfun}
 curve <- data.frame(separation = 0:180)
 curve$correlation <- cpm$corfun(curve$separation)
 
-pairs <- which(upper.tri(cpm$matrices$R), arr.ind = TRUE)
-a <- cpm$results$Angle[pairs[, 1]]
-b <- cpm$results$Angle[pairs[, 2]]
+pair_idx <- which(upper.tri(cpm$matrices$R), arr.ind = TRUE)
+a <- cpm$results$Angle[pair_idx[, 1]]
+b <- cpm$results$Angle[pair_idx[, 2]]
 observed <- data.frame(
   separation = abs(((a - b + 180) %% 360) - 180),
-  observed = cpm$matrices$R[pairs],
-  implied = cpm$matrices$Phat[pairs]
+  observed = cpm$matrices$R[pair_idx],
+  implied = cpm$matrices$Phat[pair_idx]
 )
 
 ggplot(observed, aes(x = separation)) +
   geom_line(data = curve, aes(y = correlation)) +
-  geom_point(aes(y = observed), size = 2) +
-  geom_point(aes(y = implied), shape = 1, size = 2) +
+  geom_point(aes(y = observed, shape = "Observed"), size = 2) +
+  geom_point(aes(y = implied, shape = "Reproduced"), size = 2) +
+  scale_shape_manual(values = c(Observed = 16, Reproduced = 1), name = NULL) +
   scale_x_continuous(breaks = seq(0, 180, by = 45)) +
   labs(x = "Angular separation (degrees)", y = "Correlation") +
   theme_bw()
 ```
 
 In this figure the points are observed correlations and the line is the
-fitted correlation function. The points sit below the line at most
-separations, and that gap is part of the model, not a misfit. The line is
-the correlation between two scales' common parts. Under the default unit
-scaling, the correlation the model reproduces for a pair is the line's value
-at the pair's separation multiplied by both scales' communality indices, the
-square roots of the `Communality` column. A scale with communality below one
-pulls every point it belongs to below the line by that factor. The hollow
-points show where each pair lands after that attenuation, and the vertical
-distance from a hollow point to its filled point is the pair's residual, the
-entry of `matrices$residuals`. Read the line for the shape of the latent
-circumplex and the residuals for the fit.
+fitted correlation function. The hollow points are the correlations the model
+reproduces, not observations. The filled points sit below the line at most
+separations, and part of that gap is attenuation, not misfit. The line is the
+correlation between two scales' common parts. Under the default unit scaling,
+the model reproduces a pair's correlation as the line's value at the pair's
+separation multiplied by both scales' communality indices. Those indices are
+the `Zeta` column. A scale with a communality index below one pulls every
+point it belongs to below the line by that factor. The hollow points show
+where each pair lands after that attenuation. The filled point minus the
+hollow point is the pair's residual, the entry of `matrices$residuals`. Read
+the line for the shape of the latent circumplex and the residuals for the
+fit.
 
 ## 8. Trajectories across occasions
 

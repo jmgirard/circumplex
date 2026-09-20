@@ -67,6 +67,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - 2026-09-20: T6 in progress. NEWS entry written; `devtools::document()` produced no diff; `pkgdown::check_pkgdown()` found no problems; `devtools::check(args = "--no-manual")` still running at this checkpoint (it built from the tree before the one-title fix, which changes prose only).
 - 2026-09-20: T6 done. `devtools::check(args = "--no-manual")`: Status: OK (0 errors, 0 warnings, 0 notes). All tasks checked; status set to review.
 - 2026-09-20: review checkpoint (partial). AC1 to AC5 and AC7 verified with fresh evidence and ticked. Consistency gate green apart from `devtools::check()`, still running. Three fresh-context reviewers running. AC6 and the gate presentation follow.
+- 2026-09-20: review fix-now work from the three-lens review landed (Heywood and NA-interval prose, PA fixed-angle consequence, eight sentence splits, signed residual, `Zeta` column, shape legend on the corfun figure, `pair_idx` rename, `ggcircumplex()` canvases, test guard). Vignette re-rendered. AC1 to AC5 and AC7 re-verified on the fixed tree. Findings and dispositions in the Review section. Full check re-running.
 
 ## Decisions
 
@@ -80,5 +81,23 @@ Fresh evidence on 2026-09-20, branch `m140-vignette-latent-circumplex-figures` a
 - AC4: verified. The section's four fences carry no `echo = FALSE` or `include = FALSE`. The purled run exited 0 with one warning (the ill-conditioned Hessian the prose names) and no error.
 - AC5: verified. All four phrases match verbatim in the rendered `.Rmd` after whitespace collapse. `test-vignette-latent-figures.R` passes 7 expectations with 0 failures.
 - AC7: verified. One entry under `# circumplex (development version)` names "The latent circumplex from a CPM fit". No `M1nn` token appears in NEWS.
+
+Independent review, 2026-09-20, three fresh-context lenses. Prior-review lens [S]: no prior-review evidence on the touched files (18 archives read, the PR-comment probe returned nothing), zero findings. Findings below are ranked as the reviewers ranked them, with the disposition taken at the gate.
+
+- O1 (diff-bug): the fit is a Heywood-type solution (`details$heywood` is TRUE, NO's `Zeta` is 1) and the four printed columns hide the note. Fix now: the prose names the boundary and the note, and points to the boundary page for both.
+- O2: PA's tick sits on its spoke because its angle is fixed, and the other ticks are read relative to it. Fix now: two sentences added.
+- O3: nine sentences over the 25-word prose rule on a page clean at the cut (`tools/prose-sweep.R` 0 to 9). Fix now for eight. The ninth is AC5 phrase (ii), 27 words by the criterion's own text, so it stays. Rejected for that one sentence.
+- O4: "that gap is part of the model, not a misfit" attributed the whole gap to attenuation. Fix now: "part of that gap is attenuation, not misfit".
+- O5: AC5 phrase (iii) "the points are observed correlations" reads as mislabelling the hollow points. Put to the user at the gate. Applied disposition: a sentence directly after the phrase says the hollow points are reproduced, not observed. The alternative is an amendment return rewording AC5(iii).
+- O6: the prose said the fit "uses analytic confidence intervals" while every interval is `NA`. Fix now: the prose says the intervals are not drawn and all come back `NA`.
+- O7: `tools/vignette-echo-sweep.R` flags five frame-building lines in the echoed chunks. Rejected with reason: AC4 forbids hidden chunks by the plan gate's choice, and the frames are the teaching content here. The sweep is not wired into CI or the test suite as a vignette gate.
+- O8 and S1 (history lens): the new `ssm_analyze()` call consumes RNG, so section 8's bootstrap intervals and two of its PNGs re-rendered with different draws. The proposed fix, a `set.seed()` at the occasions chunk, edits lines outside AC6's diff bound. Put to the user at the gate. Applied disposition: rejected. The introduction vignette teaches the seed-once semantics, and point estimates are unchanged.
+- O9: the prose sent readers to square roots of `Communality` when `Zeta` is that column. Fix now: the chunk prints `Zeta` and the prose names it.
+- O10: the two point sets in the corfun figure were indistinguishable. Fix now: a shape legend (Observed filled, Reproduced hollow). Figure re-rendered and read.
+- O11: the sentence said the warning caused the BLAS sensitivity. Fix now: reworded.
+- O12: "vertical distance" dropped the residual's sign. Fix now: "the filled point minus the hollow point".
+- O13 and S2: the no-hidden-chunk test reads the `.Rmd.orig` and skips under R CMD check, and a renamed heading errors in `min(integer(0))`. Fix now for the guard. Chunk options do not survive rendering, so the source-tree-only scope is the accepted category that `test-vignette-echo-sweep.R` established. Logged here as that classification.
+- O14: `pairs` shadowed `base::pairs`. Fix now: renamed `pair_idx`.
+- O15: AC1 says a `ggcircumplex()` canvas but the chunks composed the canvas from parts. Fix now: both canvases are `ggcircumplex(angles = cpm$results$Angle_theory, labels = PANO(), amax = )`, which the function accepts. The code now matches the criterion as written.
 
 Consistency gate, 2026-09-20. `cairn_validate.py` exit 0, all checks pass, no advisory fired. No DESIGN.md principle changed, so `cairn_impact.py` was skipped. `devtools::document()` at `cli.width = 500` printed no `resolve link` line and left no diff in `NAMESPACE`, `man/` or `R/RcppExports.R`. README is untouched by the branch. `pkgdown::check_pkgdown()` found no problems. NEWS carries the entry (AC7). Master watches: the newest push run of `R-CMD-check.yaml` and of `test-coverage.yaml` on master (`0c37cddb`, 2026-09-18) both concluded `success`. `check-master-red-alert.R`, `master-red-alert-dryrun.R` and `check-branch-protection.R` each exit 0.
