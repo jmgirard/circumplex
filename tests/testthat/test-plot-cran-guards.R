@@ -164,9 +164,10 @@ test_that("geom_ssm_ellipse builds the chi-square contour of ssm_ellipse_data() 
   dv <- cbind(vx - ell$x0, vy - ell$y0)
   q <- rowSums((dv %*% solve(S)) * dv)
   expect_equal(q, rep(stats::qchisq(0.95, 2), 101L), tolerance = 1e-8)
-  # The centre is the plotted point (x_est, y_est): the 100 distinct vertices
-  # come in antipodal pairs about the centre, so their mean is the centre
-  # itself, whatever the covariance's orientation.
+  # The centre is (x_est, y_est), the posterior medians of x and y (not the
+  # polar point (a_est, d_est) that geom_ssm_point draws): the 100 distinct
+  # vertices come in antipodal pairs about the centre, so their mean is the
+  # centre itself, whatever the covariance's orientation.
   expect_equal(mean(vx[1:100]), res$results$x_est, tolerance = 1e-8)
   expect_equal(mean(vy[1:100]), res$results$y_est, tolerance = 1e-8)
 })

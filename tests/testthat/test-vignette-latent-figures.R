@@ -17,10 +17,12 @@ latent_figure_phrases <- c(
   # The ellipse subsection: what the ellipse is, how it differs from the
   # wedge, and what excluding the origin does and does not mean.
   "a joint region on the Cartesian coordinates under a normal approximation to the draws",
-  "the wedge is the marginal circular-quantile interval on amplitude and displacement",
+  "the wedge is the pair of marginal intervals on amplitude and displacement, a percentile interval on amplitude and a circular-quantile interval on displacement",
   "the two need not coincide",
-  "an ellipse that excludes the origin is a Wald test of zero amplitude at that level, and only under that approximation",
-  "the ellipse is centred on the plotted point estimate, and its covariance comes from the draws"
+  # Raw UTF-8 (a minus sign U+2212 and a Greek alpha), not \u escapes: under
+  # LC_ALL=C an escaped literal parses with unknown encoding and never matches.
+  "an ellipse at confidence level 1 − α that excludes the origin rejects zero amplitude in a Wald test at significance level α, and only under that approximation",
+  "the ellipse is centred on the posterior medians of `x` and `y`, not on the plotted point, and its covariance comes from the draws"
 )
 
 test_that("the latent-circumplex section states where each figure's angles come from", {

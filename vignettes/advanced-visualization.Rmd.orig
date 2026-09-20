@@ -542,27 +542,44 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.6) +
   )
 ```
 
-In the figure, the ellipse is centred on the plotted point estimate, and its
-covariance comes from the draws. The centre is the posterior median of `x`
-and of `y`, the values `ssm_draws()` reports as `x_est` and `y_est`. The
-covariance is the sample covariance of the draws of `x` and `y`. The wedge
-and the ellipse are two different summaries of the same draws. The ellipse is
-a joint region on the Cartesian coordinates under a normal approximation to
-the draws, whereas the wedge is the marginal circular-quantile interval on
-amplitude and displacement, drawn as a pair. The displacement interval is a
-circular quantile interval, and the amplitude interval is a percentile
-interval, so neither depends on a normal approximation. The two regions
+In the figure, the ellipse is centred on the posterior medians of `x` and
+`y`, not on the plotted point, and its covariance comes from the draws. The
+medians are the values `ssm_draws()` reports as `x_est` and `y_est`. The
+plotted point is `a_est` at `d_est`: the median amplitude at the circular
+mean displacement. Those are marginal summaries, so the point is not the
+polar form of the medians of `x` and `y`. The chunk below computes the
+distance between the centre and the point in the score metric. Here it is
+too small to see.
+
+```{r ellipse-centre}
+point <- post$results$a_est *
+  c(cos(post$results$d_est * pi / 180), sin(post$results$d_est * pi / 180))
+sqrt(sum((c(ellipse$x0, ellipse$y0) - point)^2))
+```
+
+The covariance is the sample covariance of the draws of `x` and `y`. The
+wedge and the ellipse are two different summaries of the same draws. The
+ellipse is a joint region on the Cartesian coordinates under a normal
+approximation to the draws, whereas the wedge is the pair of marginal
+intervals on amplitude and displacement, a percentile interval on amplitude
+and a circular-quantile interval on displacement, drawn together as one
+region. Neither interval depends on a normal approximation. The two regions
 answer different questions, so the two need not coincide. Here the ellipse
 reaches farther than the wedge along the amplitude axis and along the
 displacement axis, and the wedge's four corners fall outside the ellipse.
 
-Read the ellipse against the origin with care: an ellipse that excludes the
-origin is a Wald test of zero amplitude at that level, and only under that
-approximation. A Wald test compares an estimate with its standard error, here
-the pair `(x, y)` with its covariance, and the ellipse is the acceptance
-region of that test. The wedge makes no such test. A displacement interval
-that excludes some angle is not a significance test of that angle, and an
-amplitude interval above zero is a statement about amplitude alone.
+Read the ellipse against the origin with care: an ellipse at confidence
+level 1 − α that excludes the origin rejects zero amplitude in a Wald test at
+significance level α, and only under that approximation. A Wald test
+compares an estimate with its standard error, here the pair `(x, y)` with
+its covariance, and the ellipse is the acceptance region of that test. The
+ellipse above is drawn at confidence level 0.95, so it is the acceptance
+region of the test at significance level 0.05. Its covariance is a posterior
+covariance, so that reading also treats the posterior under the normal
+approximation as the sampling distribution of the estimate. The wedge makes
+no such test. A displacement interval that excludes some angle is not a
+significance test of that angle, and an amplitude interval above zero is a
+statement about amplitude alone.
 
 ## 8. Trajectories across occasions
 
