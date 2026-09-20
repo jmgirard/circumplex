@@ -25,14 +25,16 @@
 * `coord_circumplex()` and `ggcircumplex()` take a `grid` argument. The
   default `"polar"` is the canvas as before. `"cartesian"` draws one ring at
   the outer amplitude, a crosshair along displacements 0/180 and 90/270 with
-  a tick mark and a signed label at each amplitude break on every half-axis,
-  and no other ring, spoke or amplitude axis. The labels on the 180 and 270
-  halves are Cartesian coordinates, not negative amplitudes. On
-  `ggcircumplex()` the cartesian grid also puts tick marks across the rim at
-  the scale angles, and a new `angle_labels = TRUE` labels each scale as
-  `<label> (<angle>°)`, the 0/360 pole written as 360, read along its
-  radius. This is the canvas of Nagy, Etzel and Lüdtke (2019). The data
-  are drawn the same way on both grids.
+  a tick mark and a signed label at each amplitude break between the center
+  and the rim on every half-axis, and no other ring, spoke or amplitude axis.
+  The labels on the 180 and 270 halves are Cartesian coordinates, not
+  negative amplitudes. On `ggcircumplex()` the cartesian grid also puts tick
+  marks outward from the rim at the scale angles. This is the canvas of Nagy,
+  Etzel and Lüdtke (2019). The data are drawn the same way on both grids.
+  `ggcircumplex()` also has a new `angle_labels` argument, independent of
+  `grid`: `TRUE` labels each text label as `<label> (<angle>°)`, the 0/360
+  pole written as 360, read along its radius. The default degree labels are
+  left as they are.
 
 ## Minor improvements and fixes
 

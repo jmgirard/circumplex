@@ -40,15 +40,16 @@ object (see \code{instrument()}). When supplied, the scale \code{angles} and (un
 \code{\link[=coord_circumplex]{coord_circumplex()}}. \code{"polar"} (the default) draws amplitude rings,
 displacement spokes and the amplitude axis. \code{"cartesian"} draws one rim
 ring, a crosshair with a tick mark and a signed label at each amplitude
-break on every half-axis, and tick marks across the rim at the scale
-angles (the canvas of Nagy, Etzel and Lüdtke, 2019). The labels on the 180
-and 270 halves are negative Cartesian coordinates, not negative
-amplitudes.}
+break between the center and the rim on every half-axis, and tick marks
+outward from the rim at the scale angles (the canvas of Nagy et al.,
+2019). The labels on the 180 and 270 halves are negative Cartesian
+coordinates, not negative amplitudes.}
 
-\item{angle_labels}{Optional. A single logical. \code{TRUE} labels each scale
-as \verb{<label> (<angle>°)}, the angle rounded to the nearest whole degree
-and the 0/360 pole written as 360, and turns each label to read along its
-radius (default = \code{FALSE}). It applies to text labels, from \code{labels} or an
+\item{angle_labels}{Optional. A single logical, independent of \code{grid}.
+\code{TRUE} appends each scale's angle to its label, in parentheses with the
+degree sign, the angle rounded to the nearest whole degree and the 0/360
+pole written as 360, and turns each label to read along its radius
+(default = \code{FALSE}). It applies to text labels, from \code{labels} or an
 instrument; the default degree labels already show the angle and are left
 as they are.}
 }

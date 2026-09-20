@@ -31,8 +31,9 @@ label.}
 (the default) draws amplitude rings, displacement spokes and the amplitude
 axis. \code{"cartesian"} draws one ring at the outer amplitude, a crosshair
 along displacements 0/180 and 90/270, and a tick mark with a signed label
-at each amplitude break on every half-axis, and no other ring, spoke or
-amplitude axis (the canvas of Nagy, Etzel and Lüdtke, 2019). The labels on
+at each amplitude break between the center and the rim on every half-axis
+(the center and the rim value itself are not labelled), and no other ring,
+spoke or amplitude axis (the canvas of Nagy et al., 2019). The labels on
 the 180 and 270 halves are negative Cartesian coordinates, not negative
 amplitudes. The mapping of the data onto the canvas is the same in both
 modes.}

@@ -526,7 +526,7 @@ stays independent.
   `ggplot() + coord_circumplex() + <breaks/labels + theme>` (a `geom_blank`
   establishes the extent). It no longer draws geometry — the former
   `circle_base()` is gone. Its `grid` passes to the coord; the cartesian grid
-  also turns the theta tick marks on across the rim, and `angle_labels = TRUE`
+  also turns the theta tick marks on, outward from the rim, and `angle_labels = TRUE`
   formats text labels as `<label> (<angle>°)` (0/360 written 360), rotated
   along the radius by `guide_axis_theta(angle = 90)`, with a plot margin
   sized to the longest label (M142).
