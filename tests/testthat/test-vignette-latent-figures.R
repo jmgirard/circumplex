@@ -1,19 +1,24 @@
 # The "Advanced Circumplex Visualization" vignette's section on the latent
-# circumplex draws three figures whose angles come from three different
-# sources: a cpm_fit() estimate, the theoretical angles, and an SSM computed on
-# the theoretical angles. The prose has to say which is which, or a reader
-# takes a measure vector for a latent location. These four phrases carry that
-# distinction, so each must stay in the shipped page verbatim.
+# circumplex draws figures whose angles come from two different sources: a
+# cpm_fit() estimate on the rim, and an SSM computed on the theoretical angles
+# for the measures. The prose has to say which is which, or a reader takes a
+# measure's position for a latent location. These phrases carry that
+# distinction, name the figures' model (Nagy, Etzel & Lüdtke 2019), and keep
+# the tangent lines apart from the wedge, so each must stay in the shipped
+# page verbatim.
 #
 # The rendered .Rmd is read (vignette_source() in helper-vignette.R), not the
 # .Rmd.orig: the shipped page is what the reader sees. A build installed
 # without vignettes (covr) skips.
 
 latent_figure_phrases <- c(
-  "the ticks are the angles `cpm_fit()` estimated, and the labelled spokes are the theoretical angles",
-  "the spoke and the tick for the same scale come from different models, and the vectors come from a third: the SSM computed on the theoretical angles",
+  "ticks and their labels sit at the angles `cpm_fit()` estimated, and the theoretical angles appear only in the table above the figure",
+  "a measure's distance from the origin is its SSM amplitude computed on the theoretical angles and not a loading on the latent circle",
+  "tangent lines bound the directions the ellipse spans under the normal approximation and are not the displacement interval the wedge draws",
+  # Raw UTF-8 for the umlaut, as for the phrases below.
+  "The circle figures in this section follow Nagy, Etzel and Lüdtke (2019)",
+  "Nagy, G., Etzel, J. M., & Lüdtke, O. (2019). Integrating covariates into circumplex structures",
   "the points are observed correlations and the line is the fitted correlation function",
-  "a vector's length is the measure's amplitude, not its correlation with the latent circumplex",
   # The ellipse subsection: what the ellipse is, how it differs from the
   # wedge, and what excluding the origin does and does not mean.
   "a joint region on the Cartesian coordinates under a normal approximation to the draws",
@@ -21,7 +26,7 @@ latent_figure_phrases <- c(
   "the two need not coincide",
   # Raw UTF-8 (a minus sign U+2212 and a Greek alpha), not \u escapes: under
   # LC_ALL=C an escaped literal parses with unknown encoding and never matches.
-  "an ellipse at confidence level 1 − α that excludes the origin rejects zero amplitude in a Wald test at significance level α, and only under that approximation",
+  "An ellipse at confidence level 1 − α that excludes the origin rejects zero amplitude in a Wald test at significance level α. That holds only under the normal approximation.",
   "the ellipse is centred on the posterior medians of `x` and `y`, not on the plotted point, and its covariance comes from the draws"
 )
 

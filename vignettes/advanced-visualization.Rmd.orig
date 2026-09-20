@@ -351,24 +351,24 @@ model estimated for it. The first scale, PA, is not estimated: it is fixed at
 its theoretical angle to set the rotation. Every other angle is read relative
 to it. Where the two differ, the instrument's scales do not sit where the
 theory placed them, relative to PA, in this sample. Here every scale but PA
-sits clockwise of its theoretical angle, by 10 degrees for BC and DE and by
-19 to 66 degrees for the rest, and NO's estimated angle of 11 degrees is
-near the theoretical position of LM. This table is the only place the
+sits clockwise of its theoretical angle. BC and DE sit 10 degrees clockwise
+and the rest 19 to 66 degrees clockwise. NO's estimated angle of 11 degrees
+is near the theoretical position of LM. This table is the only place the
 section compares the two sets of angles. The figures below draw the
 estimated angles alone. `Zeta` is each scale's communality index, which the
 correlation-function figure uses.
 
-The circle figures in this section follow Nagy, Etzel and Lüdtke (2019),
-whose Figures 3 and 6 draw the scales of a circumplex at their estimated
+The circle figures in this section follow Nagy, Etzel and Lüdtke (2019).
+Their Figures 3 and 6 draw the scales of a circumplex at their estimated
 angles on a plain circle with a labelled crosshair. The canvas is
-`ggcircumplex()` with `grid = "cartesian"`, which draws that circle and
-crosshair and no rings or spokes, and `angle_labels = TRUE`, which writes
-each scale's angle into its rim label.
+`ggcircumplex()` with two arguments. `grid = "cartesian"` draws that circle
+and crosshair and no rings or spokes. `angle_labels = TRUE` writes each
+scale's angle into its rim label.
 
 ### Estimated angles as ticks on the rim
 
 The first figure is the canvas alone. Its angles are the fit's `Angle`
-column, so each rim tick sits at a scale's estimated angle, and each label
+column, so each rim tick sits at a scale's estimated angle. Each label
 carries the scale's name and its estimated angle rounded to the nearest
 degree. The crosshair marks the Cartesian coordinates of the score metric.
 The rim's amplitude is 0.3, the value the measure figures below need.
@@ -381,14 +381,14 @@ canvas <- ggcircumplex(
 canvas
 ```
 
-Read the figure this way: the ticks and their labels sit at the angles
-`cpm_fit()` estimated, and the theoretical angles appear only in the table
-above the figure. PA sits at 90 degrees by construction, because its angle
-was fixed. The other scales sit where the model placed them relative to PA.
-The tick for NO sits 11 degrees counterclockwise of LM's theoretical
-position, and DE and FG are 25 degrees apart where the theory puts them 45
-apart. The crosshair's labels are Cartesian coordinates and carry no meaning
-in this figure. They matter once a measure is placed inside the circle.
+The ticks and their labels sit at the angles `cpm_fit()` estimated, and the
+theoretical angles appear only in the table above the figure. PA sits at 90
+degrees by construction, because its angle was fixed. The other scales sit
+where the model placed them relative to PA. The tick for NO sits 11 degrees
+counterclockwise of LM's theoretical position. DE and FG are 25 degrees
+apart where the theory puts them 45 apart. The crosshair's labels are
+Cartesian coordinates and carry no meaning in this figure. They matter once
+a measure is placed inside the circle.
 
 ### Measure vectors on the same rim
 
@@ -447,20 +447,20 @@ curve's amplitude in the measure's correlations with the eight scales, in the
 correlation metric that `ssm_analyze()` reports. To place a measure on the
 estimated circle itself, you would fit it inside the model, which `cpm_fit()`
 does not do. `geom_text()` places a label at `x = d_est` and `y = a_est`
-because `coord_circumplex()` reads `x` as displacement and `y` as amplitude,
-which is how every circumplex layer hands its positions to the coordinate
+because `coord_circumplex()` reads `x` as displacement and `y` as amplitude.
+That is how every circumplex layer hands its positions to the coordinate
 system.
 
 ### One measure with its amplitude and displacement
 
-Nagy, Etzel and Lüdtke (2019, Figure 3) annotate a single measure: the point,
-its line from the origin, an arc that sweeps counterclockwise from 0 degrees
-to the measure's displacement, and the two values written beside them. The
-third figure draws SCZPD that way. The arc is a path at one fixed amplitude
-whose displacement runs from 0 to `d_est`, so it shows how the displacement
-is measured, counterclockwise from the positive horizontal axis. The two
-`annotate()` calls write `d_est` rounded to the nearest degree and `a_est`
-rounded to two decimals.
+Nagy, Etzel and Lüdtke (2019, Figure 3) annotate a single measure. They draw
+the point, its line from the origin, and an arc that sweeps counterclockwise
+from 0 degrees to the measure's displacement. The two values are written
+beside them. The third figure draws SCZPD that way. The arc is a path at one
+fixed amplitude whose displacement runs from 0 to `d_est`. It shows how the
+displacement is measured, counterclockwise from the positive horizontal
+axis. The two `annotate()` calls write `d_est` rounded to the nearest degree
+and `a_est` rounded to two decimals.
 
 ```{r latent-measure}
 one <- measures[measures$Label == "SCZPD", ]
@@ -579,17 +579,17 @@ Nagy, Etzel and Lüdtke (2019, Figure 4 and Appendices B and C) read four
 lines off such an ellipse. Two are the tangents from the origin to the
 ellipse: their angles are the smallest and largest displacements of any point
 in the ellipse. Two join the origin to the nearest and farthest points of the
-ellipse's boundary: their lengths are the smallest and largest amplitudes of
+ellipse's boundary. Their lengths are the smallest and largest amplitudes of
 any point in the ellipse. The function below computes all four from the
 one-row data frame above and the ellipse's confidence level. It works in the
 covariance form that `geom_ssm_ellipse()` draws, not in the parametric form
 of the paper's appendices. A direction from the origin is tangent to the
-ellipse when the line along it meets the ellipse at exactly one point, which
-makes the quadratic in the direction's slope have a double root. The two
-distances are the extremes of the boundary radius over the ellipse's
+ellipse when the line along it meets the ellipse at exactly one point. That
+condition makes the quadratic in the direction's slope have a double root.
+The two distances are the extremes of the boundary radius over the ellipse's
 parametric angle, found on a fine grid and refined with `optimize()`. When
 the origin lies inside the ellipse there are no tangents, so those two
-angles are `NA`, and the nearest distance is the smallest boundary radius.
+angles are `NA`. The nearest distance is then the smallest boundary radius.
 
 ```{r ellipse-lines}
 ellipse_lines <- function(ellipse, level = 0.95) {
@@ -723,8 +723,8 @@ to keep the outline visible. The wedge is drawn light so that the ellipse
 and the four lines read over it. The tangent lines bound the directions the
 ellipse spans under the normal approximation and are not the displacement
 interval the wedge draws. The wedge's displacement interval is a
-circular-quantile interval of the draws, and the tangent angles come from
-the ellipse alone, so the two pairs of angles differ. Here the tangents at
+circular-quantile interval of the draws. The tangent angles come from the
+ellipse alone, so the two pairs of angles differ. Here the tangents at
 311 and 325 degrees sit outside the wedge's interval from 312 to 323
 degrees.
 
@@ -755,9 +755,9 @@ the ellipse reaches farther than the wedge along both the amplitude axis and
 the displacement axis. The wedge's four corners still fall outside the
 ellipse.
 
-Read the ellipse against the origin with care: an ellipse at confidence
+Read the ellipse against the origin with care. An ellipse at confidence
 level 1 − α that excludes the origin rejects zero amplitude in a Wald test at
-significance level α, and only under that approximation. A Wald test
+significance level α. That holds only under the normal approximation. A Wald test
 compares an estimate with its standard error, here the pair `(x, y)` with
 its covariance. The ellipse above is drawn at confidence level 0.95. It is
 the set of `(x, y)` values the test does not reject at significance level

@@ -383,57 +383,60 @@ cpm$results[, c("Scale", "Angle_theory", "Angle", "Zeta")]
 model estimated for it. The first scale, PA, is not estimated: it is fixed at
 its theoretical angle to set the rotation. Every other angle is read relative
 to it. Where the two differ, the instrument's scales do not sit where the
-theory placed them, relative to PA, in this sample. `Zeta` is each scale's
-communality index, which the third figure uses.
+theory placed them, relative to PA, in this sample. Here every scale but PA
+sits clockwise of its theoretical angle. BC and DE sit 10 degrees clockwise
+and the rest 19 to 66 degrees clockwise. NO's estimated angle of 11 degrees
+is near the theoretical position of LM. This table is the only place the
+section compares the two sets of angles. The figures below draw the
+estimated angles alone. `Zeta` is each scale's communality index, which the
+correlation-function figure uses.
+
+The circle figures in this section follow Nagy, Etzel and Lüdtke (2019).
+Their Figures 3 and 6 draw the scales of a circumplex at their estimated
+angles on a plain circle with a labelled crosshair. The canvas is
+`ggcircumplex()` with two arguments. `grid = "cartesian"` draws that circle
+and crosshair and no rings or spokes. `angle_labels = TRUE` writes each
+scale's angle into its rim label.
 
 ### Estimated angles as ticks on the rim
 
-The first figure draws each estimated angle as a short radial tick just inside
-the rim. The canvas's spokes sit at the theoretical angles. A tick is a path
-with two points at the same displacement, one at amplitude 0.94 and one at
-amplitude 1. `geom_ssm_path()` draws it with `group = Scale`. The canvas is
-`ggcircumplex()` with the fit's `Angle_theory` column as its angles, so the
-spokes and labels sit where the theory put each scale.
+The first figure is the canvas alone. Its angles are the fit's `Angle`
+column, so each rim tick sits at a scale's estimated angle. Each label
+carries the scale's name and its estimated angle rounded to the nearest
+degree. The crosshair marks the Cartesian coordinates of the score metric.
+The rim's amplitude is 0.3, the value the measure figures below need.
 
 
 ``` r
-ticks <- data.frame(
-  Scale = rep(cpm$results$Scale, each = 2),
-  amplitude = rep(c(0.94, 1), times = nrow(cpm$results)),
-  displacement = rep(cpm$results$Angle, each = 2)
+canvas <- ggcircumplex(
+  angles = cpm$results$Angle, labels = cpm$results$Scale,
+  amax = 0.3, grid = "cartesian", angle_labels = TRUE
 )
-ticks$Scale <- factor(ticks$Scale, levels = cpm$results$Scale)
-
-ggcircumplex(angles = cpm$results$Angle_theory, labels = PANO(), amax = 1) +
-  geom_ssm_path(
-    data = ticks,
-    mapping = aes(
-      amplitude = amplitude, displacement = displacement,
-      group = Scale, color = Scale
-    ),
-    linewidth = 1.5
-  )
+canvas
 ```
 
 <img src="figures/advanced-visualization-latent-ticks-1.png" alt="plot of chunk latent-ticks" width="100%" />
 
-Read the figure this way: the ticks are the angles `cpm_fit()` estimated, and
-the labelled spokes are the theoretical angles. A tick that sits on its spoke
-is a scale the model placed where the theory did. PA's tick sits on its spoke
-by construction, because its angle was fixed. In this sample the other ticks
-drift clockwise from BC round to NO, and the NO tick lands near the LM spoke.
-The amplitude rings carry no meaning in this figure. Radius here only keeps
-the ticks at the rim.
+The ticks and their labels sit at the angles `cpm_fit()` estimated, and the
+theoretical angles appear only in the table above the figure. PA sits at 90
+degrees by construction, because its angle was fixed. The other scales sit
+where the model placed them relative to PA. The tick for NO sits 11 degrees
+counterclockwise of LM's theoretical position. DE and FG are 25 degrees
+apart where the theory puts them 45 apart. The crosshair's labels are
+Cartesian coordinates and carry no meaning in this figure. They matter once
+a measure is placed inside the circle.
 
 ### Measure vectors on the same rim
 
-Gurtman (1992) draws each external measure as a vector from the origin. Its
-direction is the measure's displacement and its length is the measure's
-amplitude. `ssm_analyze()` supplies both. The second figure adds five
-personality-disorder measures from `jz2017` as such vectors, on the same rim
-ticks. Each vector is a two-row path from amplitude 0 to the measure's
-`a_est` at its `d_est`. The ticks are scaled by the canvas's `amax` so that
-they stay just inside the rim.
+Nagy, Etzel and Lüdtke (2019, Figure 6) draw each external measure as a
+labelled point joined to the origin by a straight line. The point's direction
+from the origin is the measure's displacement and its distance from the
+origin is the measure's amplitude. `ssm_analyze()` supplies both. The second
+figure adds five personality-disorder measures from `jz2017` in that form, on
+the canvas above. Each measure is one point at `a_est` and `d_est`, one
+two-row path from amplitude 0 to that point, and one text label. The `hjust`
+and `vjust` columns place each label beside its point, away from the other
+labels, and are chosen by hand.
 
 
 ``` r
@@ -442,51 +445,111 @@ ssm <- ssm_analyze(
   scales = PANO(),
   measures = c("NARPD", "ASPD", "HISPD", "AVPD", "SCZPD")
 )
-vectors <- data.frame(
-  Measure = rep(ssm$results$Label, each = 2),
-  amplitude = c(rbind(0, ssm$results$a_est)),
-  displacement = rep(ssm$results$d_est, each = 2)
+measures <- ssm$results
+measures$hjust <- c(-0.15, 1.1, -0.15, 0.5, 1.15)
+measures$vjust <- c(1.4, -0.3, 0.5, 1.6, 0.5)
+spokes <- data.frame(
+  Label = rep(measures$Label, each = 2),
+  amplitude = c(rbind(0, measures$a_est)),
+  displacement = rep(measures$d_est, each = 2)
 )
 
-ggcircumplex(angles = cpm$results$Angle_theory, labels = PANO(), amax = 0.3) +
+canvas +
   geom_ssm_path(
-    data = ticks,
+    data = spokes,
     mapping = aes(
-      amplitude = 0.3 * amplitude, displacement = displacement,
-      group = Scale
-    ),
-    linewidth = 1.5
+      amplitude = amplitude, displacement = displacement, group = Label
+    )
   ) +
-  geom_ssm_path(
-    data = vectors,
+  geom_ssm_point(
+    data = measures,
+    mapping = aes(amplitude = a_est, displacement = d_est)
+  ) +
+  geom_text(
+    data = measures,
     mapping = aes(
-      amplitude = amplitude, displacement = displacement,
-      color = Measure
-    ),
-    arrow = arrow(length = unit(0.15, "inches"), type = "closed"),
-    linewidth = 0.8
+      x = d_est, y = a_est, label = Label, hjust = hjust, vjust = vjust
+    )
   )
 ```
 
 <img src="figures/advanced-visualization-latent-vectors-1.png" alt="plot of chunk latent-vectors" width="100%" />
 
-This figure combines three sets of angles, and they do not share a model. The
-spokes are the theoretical angles. The ticks are the angles the circular
-process model estimated. The vectors are SSM displacements, and the SSM was
-computed with the theoretical angles, not the estimated ones. So the spoke and
-the tick for the same scale come from different models, and the vectors come
-from a third: the SSM computed on the theoretical angles. A vector that
-points at a tick does not mean that the measure loads on that scale's latent
-position. Likewise, a vector's length is the measure's amplitude, not its
-correlation with the latent circumplex. The amplitude is the cosine curve's
-amplitude in the measure's correlations with the eight scales, in the
-correlation metric that `ssm_analyze()` reports. It is not a loading on the
-latent circle. To place a measure on the estimated circle itself, you would
-fit it inside the model, which `cpm_fit()` does not do.
+The rim and the points do not share a model. The rim ticks are the angles
+the circular process model estimated. The points are SSM displacements and
+amplitudes, and the SSM was computed with the theoretical angles, not the
+estimated ones. A point that lies in the direction of a tick does not mean
+that the measure loads on that scale's latent position. Likewise, a measure's
+distance from the origin is its SSM amplitude computed on the theoretical
+angles and not a loading on the latent circle. The amplitude is the cosine
+curve's amplitude in the measure's correlations with the eight scales, in the
+correlation metric that `ssm_analyze()` reports. To place a measure on the
+estimated circle itself, you would fit it inside the model, which `cpm_fit()`
+does not do. `geom_text()` places a label at `x = d_est` and `y = a_est`
+because `coord_circumplex()` reads `x` as displacement and `y` as amplitude.
+That is how every circumplex layer hands its positions to the coordinate
+system.
+
+### One measure with its amplitude and displacement
+
+Nagy, Etzel and Lüdtke (2019, Figure 3) annotate a single measure. They draw
+the point, its line from the origin, and an arc that sweeps counterclockwise
+from 0 degrees to the measure's displacement. The two values are written
+beside them. The third figure draws SCZPD that way. The arc is a path at one
+fixed amplitude whose displacement runs from 0 to `d_est`. It shows how the
+displacement is measured, counterclockwise from the positive horizontal
+axis. The two `annotate()` calls write `d_est` rounded to the nearest degree
+and `a_est` rounded to two decimals.
+
+
+``` r
+one <- measures[measures$Label == "SCZPD", ]
+arc <- data.frame(
+  amplitude = 0.08,
+  displacement = seq(0, one$d_est, length.out = 100)
+)
+
+canvas +
+  geom_ssm_path(
+    data = spokes[spokes$Label == "SCZPD", ],
+    mapping = aes(amplitude = amplitude, displacement = displacement)
+  ) +
+  geom_ssm_path(
+    data = arc,
+    mapping = aes(amplitude = amplitude, displacement = displacement)
+  ) +
+  geom_ssm_point(
+    data = one,
+    mapping = aes(amplitude = a_est, displacement = d_est)
+  ) +
+  geom_text(
+    data = one,
+    mapping = aes(x = d_est, y = a_est, label = Label),
+    hjust = 1.2
+  ) +
+  annotate(
+    "text", x = 60, y = 0.13, hjust = 0,
+    label = paste0("d = ", round(one$d_est), "°")
+  ) +
+  annotate(
+    "text", x = one$d_est, y = one$a_est / 2,
+    label = paste0("a = ", sprintf("%.2f", one$a_est)), vjust = 1.5
+  )
+```
+
+<img src="figures/advanced-visualization-latent-measure-1.png" alt="plot of chunk latent-measure" width="100%" />
+
+The displacement label starts above the arc at 60 degrees and runs to the
+right, clear of the vertical axis and its labels. The amplitude label sits at half the
+amplitude, below the line. SCZPD's
+displacement is past 180 degrees, so the arc passes through the upper half
+of the circle and ends just below the negative horizontal axis. The values
+are the `d_est` and `a_est` columns of `ssm$results`, not values read off
+the figure.
 
 ### The fitted correlation function
 
-The third figure is linear. The fit's `corfun` element is the estimated
+The fourth figure is linear. The fit's `corfun` element is the estimated
 correlation function. It takes the angular separation between two scales, in
 degrees, and returns the correlation between their common parts. The figure
 draws it over separations from 0 to 180 degrees and places every pair of
@@ -560,35 +623,167 @@ ellipse
 #> 1 0.3523431 -0.3192543 0.0005952007 0.0005500366 -6.093168e-06
 ```
 
-The figure draws the wedge, the ellipse, and the point estimate for the same
-profile on one canvas. The wedge and the point come from `post$results`, as in
-Section 4. The ellipse comes from the one-row data frame above.
+Nagy, Etzel and Lüdtke (2019, Figure 4 and Appendices B and C) read four
+lines off such an ellipse. Two are the tangents from the origin to the
+ellipse: their angles are the smallest and largest displacements of any point
+in the ellipse. Two join the origin to the nearest and farthest points of the
+ellipse's boundary. Their lengths are the smallest and largest amplitudes of
+any point in the ellipse. The function below computes all four from the
+one-row data frame above and the ellipse's confidence level. It works in the
+covariance form that `geom_ssm_ellipse()` draws, not in the parametric form
+of the paper's appendices. A direction from the origin is tangent to the
+ellipse when the line along it meets the ellipse at exactly one point. That
+condition makes the quadratic in the direction's slope have a double root.
+The two distances are the extremes of the boundary radius over the ellipse's
+parametric angle, found on a fine grid and refined with `optimize()`. When
+the origin lies inside the ellipse there are no tangents, so those two
+angles are `NA`. The nearest distance is then the smallest boundary radius.
 
 
 ``` r
-ggcircumplex(octants(), labels = PANO(), amax = 0.6) +
+ellipse_lines <- function(ellipse, level = 0.95) {
+  centre <- c(ellipse$x0, ellipse$y0)
+  S <- matrix(
+    c(ellipse$var_x, ellipse$cov_xy, ellipse$cov_xy, ellipse$var_y), 2, 2
+  )
+  r2 <- qchisq(level, df = 2)
+  A <- solve(S)
+  # A direction w is tangent when (w'Ac)^2 = (w'Aw)(c'Ac - r2), so w'Mw = 0.
+  # The origin is outside the ellipse when c'Ac exceeds r2.
+  outside <- drop(t(centre) %*% A %*% centre) - r2
+  tangents <- c(NA_real_, NA_real_)
+  if (outside > 0) {
+    Ac <- drop(A %*% centre)
+    M <- tcrossprod(Ac) - outside * A
+    # The zero directions of w'Mw solve a quadratic in the slope. Use the
+    # slope or its reciprocal, whichever gives the larger leading coefficient.
+    if (abs(M[2, 2]) >= abs(M[1, 1])) {
+      w <- rbind(1, Re(polyroot(c(M[1, 1], 2 * M[1, 2], M[2, 2]))))
+    } else {
+      w <- rbind(Re(polyroot(c(M[2, 2], 2 * M[1, 2], M[1, 1]))), 1)
+    }
+    # Point each direction towards the ellipse, then order the pair so that
+    # the counterclockwise arc from the first to the second holds the centre.
+    w <- sweep(w, 2, sign(colSums(w * Ac)), `*`)
+    tangents <- (atan2(w[2, ], w[1, ]) * 180 / pi) %% 360
+    if ((tangents[2] - tangents[1]) %% 360 > 180) tangents <- rev(tangents)
+  }
+  # The boundary radius as a function of the parametric angle.
+  L <- t(chol(S)) * sqrt(r2)
+  boundary <- function(theta) centre + L %*% rbind(cos(theta), sin(theta))
+  radius <- function(theta) sqrt(colSums(boundary(theta)^2))
+  grid <- seq(0, 2 * pi, length.out = 3601)[-3601]
+  step <- grid[2] - grid[1]
+  refine <- function(i, maximum) {
+    optimize(radius, grid[i] + c(-step, step), maximum = maximum, tol = 1e-12)
+  }
+  nearest <- refine(which.min(radius(grid)), maximum = FALSE)
+  farthest <- refine(which.max(radius(grid)), maximum = TRUE)
+  angle_of <- function(theta) {
+    v <- boundary(theta)
+    (atan2(v[2], v[1]) * 180 / pi) %% 360
+  }
+  data.frame(
+    line = c("tangent_1", "tangent_2", "nearest", "farthest"),
+    displacement = c(
+      tangents, angle_of(nearest$minimum), angle_of(farthest$maximum)
+    ),
+    amplitude = c(NA, NA, nearest$objective, farthest$objective)
+  )
+}
+lines <- ellipse_lines(ellipse, level = 0.95)
+lines
+#>        line displacement amplitude
+#> 1 tangent_1     310.7611        NA
+#> 2 tangent_2     324.8137        NA
+#> 3   nearest     317.5519 0.4164769
+#> 4  farthest     318.0873 0.5344676
+```
+
+The `displacement` column holds the two tangent angles and the directions of
+the nearest and farthest boundary points. The `amplitude` column holds the
+two distances. The tangents are listed so that the counterclockwise arc from
+`tangent_1` to `tangent_2` holds the ellipse, which matters for an ellipse
+that straddles 0/360 degrees.
+
+The figure draws the wedge, the ellipse, the four lines and the point
+estimate for the same profile on one canvas. The wedge and the point come
+from `post$results`, as in Section 4. The ellipse comes from the one-row data
+frame above. The two tangent lines are dashed and run from the origin to the
+rim. The two distance lines are dotted and run from the origin to the
+nearest and farthest boundary points.
+
+
+``` r
+amax <- 0.6
+tangents <- data.frame(
+  line = rep(lines$line[1:2], each = 2),
+  amplitude = rep(c(0, amax), times = 2),
+  displacement = rep(lines$displacement[1:2], each = 2)
+)
+distances <- data.frame(
+  line = rep(lines$line[3:4], each = 2),
+  amplitude = c(rbind(0, lines$amplitude[3:4])),
+  displacement = rep(lines$displacement[3:4], each = 2)
+)
+
+ggcircumplex(
+  octants(), labels = PANO(), amax = amax,
+  grid = "cartesian", angle_labels = TRUE
+) +
   geom_ssm_arc(
     data = post$results,
     mapping = aes(
       amplitude_min = a_lci, amplitude_max = a_uci,
       displacement_min = d_lci, displacement_max = d_uci
     ),
-    alpha = 0.3
+    alpha = 0.15
+  ) +
+  geom_ssm_path(
+    data = tangents,
+    mapping = aes(
+      amplitude = amplitude, displacement = displacement, group = line
+    ),
+    linetype = "dashed"
+  ) +
+  geom_ssm_path(
+    data = distances,
+    mapping = aes(
+      amplitude = amplitude, displacement = displacement, group = line
+    ),
+    linetype = "dotted", color = "gray40"
   ) +
   geom_ssm_ellipse(
     data = ellipse,
     mapping = aes(
       x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy
-    ),
-    color = "firebrick"
+    )
   ) +
   geom_ssm_point(
     data = post$results,
-    mapping = aes(amplitude = a_est, displacement = d_est)
+    mapping = aes(amplitude = a_est, displacement = d_est),
+    size = 1.5
+  ) +
+  geom_text(
+    data = post$results,
+    mapping = aes(x = d_est, y = a_est, label = "Mean profile"),
+    hjust = -0.3
   )
 ```
 
 <img src="figures/advanced-visualization-ellipse-figure-1.png" alt="plot of chunk ellipse-figure" width="100%" />
+
+The label names what the draws describe: the mean octant profile of the
+subsample the "Bayesian SSM Analysis" vignette fits. The ellipse is small
+on this canvas because the posterior is tight, so the point is drawn small
+to keep the outline visible. The wedge is drawn light so that the ellipse
+and the four lines read over it. The tangent lines bound the directions the
+ellipse spans under the normal approximation and are not the displacement
+interval the wedge draws. The wedge's displacement interval is a
+circular-quantile interval of the draws. The tangent angles come from the
+ellipse alone, so the two pairs of angles differ. Here the tangents at
+311 and 325 degrees sit outside the wedge's interval from 312 to 323
+degrees.
 
 Here the ellipse is centred on the posterior medians of `x` and `y`, not on
 the plotted point, and its covariance comes from the draws. The
@@ -619,9 +814,9 @@ the ellipse reaches farther than the wedge along both the amplitude axis and
 the displacement axis. The wedge's four corners still fall outside the
 ellipse.
 
-Read the ellipse against the origin with care: an ellipse at confidence
+Read the ellipse against the origin with care. An ellipse at confidence
 level 1 − α that excludes the origin rejects zero amplitude in a Wald test at
-significance level α, and only under that approximation. A Wald test
+significance level α. That holds only under the normal approximation. A Wald test
 compares an estimate with its standard error, here the pair `(x, y)` with
 its covariance. The ellipse above is drawn at confidence level 0.95. It is
 the set of `(x, y)` values the test does not reject at significance level
@@ -844,9 +1039,10 @@ across waves before you draw it, read "Growth Models on SSM Parameters".
 * Browne, M. W. (1992). Circumplex models for correlation matrices.
   _Psychometrika, 57_(4), 469--497.
 
-* Gurtman, M. B. (1992). Construct validity of interpersonal personality
-  measures: The interpersonal circumplex as a nomological net. _Journal of
-  Personality and Social Psychology, 63_(1), 105--118.
+* Nagy, G., Etzel, J. M., & Lüdtke, O. (2019). Integrating covariates into
+  circumplex structures: An extension procedure for Browne's circular
+  stochastic process model. _Multivariate Behavioral Research, 54_(3),
+  404--428.
 
 * Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth, M. J. (2009).
   Integrating methods to optimize circumplex description and comparison of
