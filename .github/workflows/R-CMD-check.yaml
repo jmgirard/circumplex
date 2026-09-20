@@ -89,7 +89,30 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true
+          # "always" routes macOS through Posit Package Manager too; see the
+          # macOS step below for why, and for the two settings it still needs.
+          use-public-rspm: always
+
+      # Since 2026-09-20 CRAN serves its macOS R 4.6 binaries as zstd archives
+      # under the .tgz name, and the pak that setup-r-dependencies installs
+      # (0.11.1, pkgdepends 0.9.1) rejects them as "unknown archive type"
+      # (r-lib/pkgdepends#485). Package Manager still serves gzip builds of the
+      # same versions. use-public-rspm: always above puts it first, but setup-r
+      # keeps CRAN as a second repo, and pak still resolved two packages from it
+      # on the first try. So: PKG_CRAN_MIRROR makes pak read the CRAN entry as
+      # Package Manager too, and mac.cran.dev is blocked, because pkgcache
+      # attaches that host as a second download URL to every macOS CRAN binary
+      # and keeps whichever download finishes first (it serves CRAN's zstd file
+      # directly). Drop this step, and set use-public-rspm back to true, once a
+      # released pak extracts zstd.
+      - name: Use Package Manager binaries on macOS
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          P3M='https://packagemanager.posit.co/cran/latest'
+          echo "PKG_CRAN_MIRROR=${P3M}" >> "$GITHUB_ENV"
+          echo '127.0.0.1 mac.cran.dev' | sudo tee -a /etc/hosts > /dev/null
+          echo "PKG_CRAN_MIRROR set to ${P3M}; mac.cran.dev blocked"
 
       # Runs BEFORE the dependency install, so a drifted allowlist fails the
       # job instead of silently skipping the package it forgot
