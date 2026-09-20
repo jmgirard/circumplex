@@ -1,6 +1,6 @@
 # M140: The visualization vignette draws a fitted quasi-circumplex, measure vectors and the correlation function from existing layers
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -46,7 +46,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - [x] T3: Run the three named `tools/check-vignette-*.R` guards; fix width overruns by narrowing prints, never by exemption.
 - [x] T4: Add `tests/testthat/test-vignette-latent-figures.R`: reads the installed vignette via `system.file("doc", ...)` with the covr/CRAN skip pattern from `test-plot-cran-guards.R`, asserts the four AC5 phrases.
 - [x] T5: Run the AC4 procedure (`knitr::purl()` on the section's chunks, `Rscript --vanilla` after the setup chunk); then plant two defects — a name from the vignette's mid-page hidden `people` chunk and a name shadowing an export — in an echoed chunk, see the run fail on each, revert, and record all three runs in the work log.
-- [ ] T6: NEWS entry; `devtools::document()` no diff; `devtools::check()`; `pkgdown::check_pkgdown()`.
+- [x] T6: NEWS entry; `devtools::document()` no diff; `devtools::check()`; `pkgdown::check_pkgdown()`.
 
 ## Work log
 
@@ -65,6 +65,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - 2026-09-20: T5 done. AC4 procedure (`knitr::purl()` of the section's four chunks after the `setup` chunk, `Rscript --vanilla`): clean source exits 0. Plant 1 (`nrow(people)` in `latent-ticks`, a name from the hidden section-6 chunk): exit 1, `Error: object 'people' not found`. Plant 2 first tried `PANO <- NULL` before `PANO()` and did NOT fail, because R skips non-function bindings on a call lookup; replanted as `jz2017 <- NULL` before `cpm_fit(jz2017, ...)` (the dataset export shadowed): exit 1, `Error: Supply exactly one of \`data\` or \`cormat\`.`. Plants ran on scratch copies; the working copy was never modified.
 - 2026-09-20: claim audit: 29 claims read, 1 corrected — vignettes/advanced-visualization.Rmd.orig, vignettes/advanced-visualization.Rmd, tests/testthat/test-vignette-latent-figures.R, NEWS.md. The correction: the cross-referenced page is titled "CPM Fits at a Boundary", not "CPM Boundary Fits"; fixed in source and rendered copy, re-read once by the same reader as correct.
 - 2026-09-20: T6 in progress. NEWS entry written; `devtools::document()` produced no diff; `pkgdown::check_pkgdown()` found no problems; `devtools::check(args = "--no-manual")` still running at this checkpoint (it built from the tree before the one-title fix, which changes prose only).
+- 2026-09-20: T6 done. `devtools::check(args = "--no-manual")`: Status: OK (0 errors, 0 warnings, 0 notes). All tasks checked; status set to review.
 
 ## Decisions
 

@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-17 (M139 done and archived, M136's terminal row dro
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M140 | The visualization vignette draws a fitted quasi-circumplex, measure vectors and the correlation function from existing layers | in-progress | — | normal | milestones/M140-vignette-latent-circumplex-figures.md |
+| M140 | The visualization vignette draws a fitted quasi-circumplex, measure vectors and the correlation function from existing layers | review | — | normal | milestones/M140-vignette-latent-circumplex-figures.md |
 | M141 | A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws | planned | M140 | normal | milestones/M141-ellipse-geom.md |
 | M139 | The growth vignette shows the correlated person block and a zero check on the cross block | done | — | normal | milestones/archive/M139-growth-vignette-joint-check.md |
 | M138 | The website has a light navbar, a theme switch and grouped vignette menus | done | — | normal | milestones/archive/M138-pkgdown-site-refresh.md |
