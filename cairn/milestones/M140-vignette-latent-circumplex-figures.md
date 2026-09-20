@@ -7,7 +7,7 @@
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — a shipped vignette section on the pkgdown site
-- **Branch/PR:** `m140-vignette-latent-circumplex-figures`
+- **Branch/PR:** `m140-vignette-latent-circumplex-figures` · https://github.com/jmgirard/circumplex/pull/173
 
 ## Goal
 
