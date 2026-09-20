@@ -51,8 +51,8 @@ those to the coordinate system, which owns the polar transform.
 \details{
 The outline is the contour \verb{(v - c)' S^-1 (v - c) = qchisq(level, 2)},
 where \code{c} is the centre and \code{S} the covariance: under a bivariate normal
-approximation to the sampling distribution of \verb{(x, y)}, it encloses the
-joint region at confidence \code{level}. \code{\link[=ssm_ellipse_data]{ssm_ellipse_data()}} computes the five
+approximation to the distribution of \verb{(x, y)}, sampling or posterior, it
+encloses the joint region at confidence \code{level}. \code{\link[=ssm_ellipse_data]{ssm_ellipse_data()}} computes the five
 columns from an \code{\link[=ssm_draws]{ssm_draws()}} object. The ellipse is a statement about the
 Cartesian pair, not about amplitude and displacement separately; the wedge
 \code{\link[=geom_ssm_arc]{geom_ssm_arc()}} draws is the pair of marginal intervals on those two

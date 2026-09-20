@@ -1,6 +1,6 @@
 # M141: A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M140
 - **Driving RR:** —
@@ -45,7 +45,7 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - [x] T2: `ssm_ellipse_data()` generic + `circumplex_ssm_draws` method in `R/ssm_draws.R`; roxygen; export.
 - [x] T3: Tests in `test-geom_ssm.R` and `test-ssm_draws.R` for AC1–AC5 (closed-form oracle over the three rows, seam and origin cases, every abort branch, `na.rm` both ways); two vdiffr snapshots (seam, origin) under `_snaps/geom_ssm/`; a non-visual CRAN guard in `test-plot-cran-guards.R`.
 - [x] T4: Vignette subsection + prose with the five AC6 phrases; re-render; look at the figure; add the five phrases to M140's `test-vignette-latent-figures.R`.
-- [ ] T5: `_pkgdown.yml` rows; NEWS; `document()`; `check()`; guards.
+- [x] T5: `_pkgdown.yml` rows; NEWS; `document()`; `check()`; guards.
 
 ## Work log
 
@@ -62,6 +62,7 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - 2026-09-20: re-audit: AC6 (full) — (ii) and (v) verified against R/ssm_bootstrap.R and R/ssm_draws.R; satisfiable, reachable, bounded, deliverable-level, proportionate, no probe applies; one finding: phrase (iv) "at that level" reads as a test at level 0.95 where the significance level is 0.05, replacement proposed ("an ellipse at confidence level 1 − α that excludes the origin rejects zero amplitude in a Wald test at significance level α, and only under that approximation"), and two vignette sentences now duplicate (ii) and (v) and must be folded.
 - 2026-09-20: AC6 amended again at a second mini gate (user chose amend over keep). Phrase (iv) was "an ellipse that excludes the origin is a Wald test of zero amplitude at that level, and only under that approximation" and is now "an ellipse at confidence level 1 − α that excludes the origin rejects zero amplitude in a Wald test at significance level α, and only under that approximation". Reason: "at that level" read as a test at level 0.95 where the significance level is 0.05, and the ellipse is the test's acceptance region, not the test.
 - 2026-09-20: re-audit: AC6 (full) — nothing statistically false: (iv)'s equivalence verified both ways (origin outside the level-(1 − α) ellipse iff c'S⁻¹c > qchisq(1 − α, 2) iff the Wald test rejects at α), (ii) and (v) match the code, D-058 exempts the .rds fixture, no IP blocks it; two notes: spell "1 − α" and "α" as raw UTF-8 in the test file (a \u escape fails to match under LC_ALL=C), and the three phrases add long-sentence findings to tools/prose-sweep.R, which gates nothing. This is AC6's second re-audit line, so no further reader runs on it.
+- 2026-09-20: T5 done on the amended tree: `devtools::check()` 0/0/0 (7m16s), `devtools::test()` 11383 pass 0 fail, phrase test passes under the default locale and LC_ALL=C, width and staleness guards exit 0, `cairn_validate` all checks passed. After the check, one roxygen sentence in `geom_ssm_ellipse()` was reworded from "sampling distribution" to "distribution, sampling or posterior" (the claim audit's flag), followed by `document()` with no link warnings and the geom test file; review's own check covers it. Status set to review.
 
 ## Decisions
 

@@ -417,8 +417,8 @@ GeomSsmArc <- ggplot2::ggproto(
 #'
 #' The outline is the contour `(v - c)' S^-1 (v - c) = qchisq(level, 2)`,
 #' where `c` is the centre and `S` the covariance: under a bivariate normal
-#' approximation to the sampling distribution of `(x, y)`, it encloses the
-#' joint region at confidence `level`. [ssm_ellipse_data()] computes the five
+#' approximation to the distribution of `(x, y)`, sampling or posterior, it
+#' encloses the joint region at confidence `level`. [ssm_ellipse_data()] computes the five
 #' columns from an [ssm_draws()] object. The ellipse is a statement about the
 #' Cartesian pair, not about amplitude and displacement separately; the wedge
 #' [geom_ssm_arc()] draws is the pair of marginal intervals on those two
