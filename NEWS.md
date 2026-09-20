@@ -19,6 +19,16 @@
   was assembled from separate fits, and the check detects that structure
   only. A nonzero block does not show that the model is right.
 
+* The "Advanced Circumplex Visualization" vignette has a new section, "The
+  latent circumplex from a CPM fit". It draws three figures from a
+  `cpm_fit()` result with the layers the package already exports. The first
+  puts the estimated scale angles as ticks on the rim of a canvas whose
+  spokes sit at the theoretical angles. The second adds five measures from
+  `ssm_analyze()` as vectors from the origin on the same rim. The third
+  draws the fitted correlation function against angular separation, with the
+  observed and reproduced correlations as points. The prose states which
+  model each set of angles comes from.
+
 * Every prose caution and note that `print()` and `summary()` show now wraps
   to the console width you set with `options(width = )`. Before this, the
   text ignored the width you set. Some cautions broke their lines at a column
