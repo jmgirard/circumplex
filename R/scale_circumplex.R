@@ -24,6 +24,16 @@ circumplex_degree_labels <- function(angles) {
   paste0(angles, "\u00B0")
 }
 
+# Text labels carrying their angle, `<label> (<angle>\u00B0)`, for
+# ggcircumplex(angle_labels = TRUE). The angle is rounded to the nearest whole
+# degree, and an angle at the 0/360 pole is written 360 (LM = 360; CLAUDE.md),
+# never 0.
+circumplex_angle_labels <- function(labels, angles) {
+  deg <- round(angles)
+  deg[deg %% 360 == 0] <- 360
+  paste0(labels, " (", deg, "\u00B0)")
+}
+
 #' Angle-labeled x-axis scale for circumplex plots
 #'
 #' A \pkg{ggplot2} continuous position scale for the angle axis of a linear

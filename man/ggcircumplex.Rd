@@ -9,7 +9,9 @@ ggcircumplex(
   labels = NULL,
   amax = 0.5,
   font_size = 12,
-  instrument = NULL
+  instrument = NULL,
+  grid = c("polar", "cartesian"),
+  angle_labels = FALSE
 )
 }
 \arguments{
@@ -33,6 +35,22 @@ of the scale and amplitude labels (default = 12).}
 object (see \code{instrument()}). When supplied, the scale \code{angles} and (unless
 \code{labels} is given) the scale abbreviations are taken from the instrument
 (default = \code{NULL}).}
+
+\item{grid}{Optional. A single string naming the canvas furniture, passed to
+\code{\link[=coord_circumplex]{coord_circumplex()}}. \code{"polar"} (the default) draws amplitude rings,
+displacement spokes and the amplitude axis. \code{"cartesian"} draws one rim
+ring, a crosshair with a tick mark and a signed label at each amplitude
+break on every half-axis, and tick marks across the rim at the scale
+angles (the canvas of Nagy, Etzel and Lüdtke, 2019). The labels on the 180
+and 270 halves are negative Cartesian coordinates, not negative
+amplitudes.}
+
+\item{angle_labels}{Optional. A single logical. \code{TRUE} labels each scale
+as \verb{<label> (<angle>°)}, the angle rounded to the nearest whole degree
+and the 0/360 pole written as 360, and turns each label to read along its
+radius (default = \code{FALSE}). It applies to text labels, from \code{labels} or an
+instrument; the default degree labels already show the angle and are left
+as they are.}
 }
 \value{
 A \pkg{ggplot2} object containing the empty circumplex canvas.
@@ -54,6 +72,12 @@ ggcircumplex(octants(), labels = PANO())
 
 # Derive the angles and labels from a circumplex instrument
 ggcircumplex(instrument = csip)
+
+# A Cartesian grid: one rim ring and a labelled crosshair
+ggcircumplex(octants(), labels = PANO(), grid = "cartesian")
+
+# Each scale labelled with its angle, read along the radius
+ggcircumplex(octants(), labels = PANO(), grid = "cartesian", angle_labels = TRUE)
 }
 \seealso{
 \code{\link[=coord_circumplex]{coord_circumplex()}}, which owns the transform this canvas is built

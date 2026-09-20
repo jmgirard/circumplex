@@ -528,3 +528,265 @@ test_that("a plotmath label is measured as drawn, not as its source text (M39 F3
     expect_false(grepl("strwidth", w, ignore.case = TRUE))
   }
 })
+
+# --- M142: the cartesian grid mode --------------------------------------------
+
+# Every grob under a rendered panel, flattened, so furniture is found by name
+# and class rather than by index (M32: positional paths into the panel are not
+# stable across ggplot2 versions).
+panel_grobs <- function(p) {
+  g <- ggplot2::ggplotGrob(p)
+  panel <- g$grobs[[which(g$layout$name == "panel")]]
+  out <- list()
+  walk <- function(gr) {
+    out[[length(out) + 1L]] <<- gr
+    kids <- if (inherits(gr, "gtable")) gr$grobs else gr$children
+    for (k in kids) walk(k)
+  }
+  walk(panel)
+  out
+}
+grobs_named <- function(grobs, pattern) {
+  hit <- vapply(grobs, function(g) {
+    is.character(g$name) && grepl(pattern, g$name)
+  }, logical(1))
+  grobs[hit]
+}
+grobs_of_class <- function(grobs, class) {
+  grobs[vapply(grobs, inherits, logical(1), what = class)]
+}
+# npc radius of amplitude `r` on a built plot's canvas, measured from the origin.
+npc_radius <- function(p, r) {
+  b <- ggplot2::ggplot_build(p)
+  pp <- b$layout$panel_params[[1]]
+  # The coord's radial range, not the scale's limits (those are the data's).
+  at <- b$layout$coord$transform(data.frame(x = c(0, 0), y = c(pp$r.range[[1]], r)), pp)
+  sqrt(diff(at$x)^2 + diff(at$y)^2)
+}
+
+test_that("coord_circumplex() validates grid and defaults to polar (AC1)", {
+  expect_identical(coord_circumplex()$grid, "polar")
+  expect_identical(coord_circumplex(grid = "polar")$grid, "polar")
+  expect_identical(coord_circumplex(grid = "cartesian")$grid, "cartesian")
+  # The failure names `grid` (match.arg()'s message would not).
+  expect_error(coord_circumplex(grid = "square"), "`grid`", fixed = TRUE)
+  expect_error(coord_circumplex(grid = c("polar", "polar")), "`grid`", fixed = TRUE)
+  expect_error(coord_circumplex(grid = 1), "`grid`", fixed = TRUE)
+  expect_error(coord_circumplex(grid = NA_character_), "`grid`", fixed = TRUE)
+})
+
+# The four named furniture grobs of a cartesian canvas, each required once.
+cartesian_furniture <- function(p) {
+  grobs <- panel_grobs(p)
+  one <- function(name) {
+    hits <- grobs_named(grobs, paste0("^", name, "$"))
+    expect_length(hits, 1L)
+    hits[[1]]
+  }
+  list(
+    all = grobs,
+    rim = one("circumplex-cartesian-rim"),
+    crosshair = one("circumplex-cartesian-crosshair"),
+    ticks = one("circumplex-cartesian-ticks"),
+    labels = one("circumplex-cartesian-labels")
+  )
+}
+
+# AC2 on one canvas: `inner` are the radial breaks strictly between the center
+# and the rim, `inner_labels` the scale's labels for them. Every assertion
+# reads the rendered panel, not the coord's fields.
+expect_cartesian_panel <- function(p, amax, center, inner, inner_labels) {
+  f <- cartesian_furniture(p)
+  origin <- {
+    b <- ggplot2::ggplot_build(p)
+    pp <- b$layout$panel_params[[1]]
+    b$layout$coord$transform(data.frame(x = 0, y = center), pp)
+  }
+  cx <- origin$x
+  cy <- origin$y
+  rim_r <- npc_radius(p, amax)
+  tol <- 1e-6
+
+  # One rim ring at amax: a closed polyline, every vertex at the rim radius.
+  expect_s3_class(f$rim, "polyline")
+  rx <- as.numeric(f$rim$x)
+  ry <- as.numeric(f$rim$y)
+  expect_gt(length(rx), 100)
+  expect_equal(sqrt((rx - cx)^2 + (ry - cy)^2), rep(rim_r, length(rx)), tolerance = 1e-6)
+  expect_equal(c(rx[[1]], ry[[1]]), c(rx[[length(rx)]], ry[[length(ry)]]), tolerance = tol)
+
+  # Two crosshair lines through the origin: one along displacements 0/180
+  # (constant y), one along 90/270 (constant x), each ending on the rim.
+  expect_s3_class(f$crosshair, "polyline")
+  expect_equal(f$crosshair$id.lengths, c(2L, 2L))
+  hx <- as.numeric(f$crosshair$x)
+  hy <- as.numeric(f$crosshair$y)
+  expect_equal(hy[1:2], c(cy, cy), tolerance = tol)
+  expect_equal(sort(hx[1:2]), c(cx - rim_r, cx + rim_r), tolerance = tol)
+  expect_equal(hx[3:4], c(cx, cx), tolerance = tol)
+  expect_equal(sort(hy[3:4]), c(cy - rim_r, cy + rim_r), tolerance = tol)
+
+  # A tick mark at every inner break on each of the four half-axes: the ticks
+  # cross the axis inside a viewport as tall (wide) as the tick length, centred
+  # on the axis, so the along-axis coordinate is a plain npc value.
+  k <- length(inner)
+  inner_r <- vapply(inner, function(r) npc_radius(p, r), numeric(1))
+  ticks <- grobs_of_class(panel_grobs_under(f$ticks), "polyline")
+  expect_length(ticks, 2L)
+  along <- lapply(ticks, function(t) {
+    # The horizontal axis's ticks live in a viewport whose height is the tick
+    # length (an absolute unit), centred on the axis; the vertical axis's in
+    # one whose width is.
+    if (grid::unitType(t$vp$height) != "npc") {
+      expect_equal(as.numeric(t$vp$y), cy, tolerance = tol)
+      expect_gt(as.numeric(t$vp$height), 0)
+      list(axis = "x", at = as.numeric(t$x)[c(TRUE, FALSE)] - cx, across = as.numeric(t$y))
+    } else {
+      expect_equal(as.numeric(t$vp$x), cx, tolerance = tol)
+      list(axis = "y", at = as.numeric(t$y)[c(TRUE, FALSE)] - cy, across = as.numeric(t$x))
+    }
+  })
+  expect_setequal(vapply(along, `[[`, character(1), "axis"), c("x", "y"))
+  for (a in along) {
+    expect_equal(sort(a$at), sort(c(inner_r, -inner_r)), tolerance = 1e-6)
+    expect_equal(a$across, rep(c(0, 1), k * 2))
+  }
+
+  # A signed numeric label at every inner break on each half-axis: positive
+  # text on the 0 and 90 halves, negative text on the 180 and 270 halves, each
+  # anchored at its break (a plain npc value; the gap off the axis is the
+  # enclosing viewport's fixed offset).
+  texts <- grobs_of_class(panel_grobs_under(f$labels), "text")
+  expect_length(texts, 2L)
+  signed <- c(inner_labels, paste0("-", inner_labels))
+  for (t in texts) {
+    lab <- as.character(t$label)
+    expect_setequal(lab, signed)
+    expect_equal(sort(lab), sort(signed))
+    x <- as.numeric(t$x) - cx
+    y <- as.numeric(t$y) - cy
+    on_x <- all(abs(y) < tol)
+    at <- if (on_x) x else y
+    if (!on_x) expect_equal(x, rep(0, length(x)), tolerance = tol)
+    expect_equal(sort(at), sort(c(inner_r, -inner_r)), tolerance = 1e-6)
+    sign_of <- ifelse(startsWith(lab, "-"), -1, 1)
+    expect_equal(sign(at), sign_of)
+    expect_equal(abs(at), inner_r[match(sub("^-", "", lab), inner_labels)], tolerance = 1e-6)
+  }
+
+  # No ring below the rim, no spoke, no radial-axis guide: the themed grid
+  # grobs and the radial axis gtable of the polar canvas are absent.
+  expect_length(grobs_named(f$all, "^panel\\.grid\\."), 0L)
+  expect_length(grobs_named(f$all, "^grill"), 0L)
+  expect_length(grobs_named(f$all, "^axis$"), 0L)
+  expect_length(grobs_named(f$all, "^circumplex-label-backdrop$"), 0L)
+  invisible(f)
+}
+# Flatten one grob's subtree (the grob itself included).
+panel_grobs_under <- function(gr) {
+  out <- list()
+  walk <- function(g) {
+    out[[length(out) + 1L]] <<- g
+    kids <- if (inherits(g, "gtable")) g$grobs else g$children
+    for (k in kids) walk(k)
+  }
+  walk(gr)
+  out
+}
+
+test_that("the cartesian canvas draws a rim, a labelled crosshair and nothing else (AC2)", {
+  skip_on_cran()
+  # The public canvas: breaks 0.1..0.4 lie strictly inside [0, 0.5].
+  p <- ggcircumplex(octants(), labels = PANO(), grid = "cartesian")
+  expect_cartesian_panel(
+    p, amax = 0.5, center = 0,
+    inner = c(0.1, 0.2, 0.3, 0.4), inner_labels = c("0.1", "0.2", "0.3", "0.4")
+  )
+  # The coord alone, under ggplot2's default theme, with a nonzero center: the
+  # inner breaks are read from the built radial scale and must exclude both the
+  # center and the rim.
+  q <- ggplot2::ggplot(data.frame(x = 45, y = 0.5)) +
+    ggplot2::geom_point(ggplot2::aes(x, y)) +
+    coord_circumplex(amax = 0.7, center = 0.1, grid = "cartesian")
+  pp <- ggplot2::ggplot_build(q)$layout$panel_params[[1]]
+  br <- pp$r$get_breaks()
+  lb <- as.character(pp$r$get_labels())
+  keep <- is.finite(br) & br > 0.1 + 1e-9 & br < 0.7 - 1e-9
+  expect_gte(sum(keep), 1L)
+  expect_true(0.2 %in% br[keep])
+  expect_cartesian_panel(q, amax = 0.7, center = 0.1, inner = br[keep], inner_labels = lb[keep])
+  # Control: the polar canvas keeps its grid and radial axis.
+  polar <- panel_grobs(ggcircumplex(octants(), labels = PANO()))
+  expect_gt(length(grobs_named(polar, "^panel\\.grid\\.major")), 0L)
+  expect_length(grobs_named(polar, "^axis$"), 1L)
+  expect_length(grobs_named(polar, "^circumplex-cartesian-rim$"), 0L)
+})
+
+# --- AC4: the grid mode never touches the polar transform ---------------------
+
+# The npc vertex coordinates of every grob a data layer draws, and its built
+# data, on a canvas of the given grid mode.
+layer_render <- function(layer, grid, amax = 0.5) {
+  p <- ggcircumplex(octants(), amax = amax, grid = grid) + layer
+  idx <- which(vapply(p$layers, function(l) inherits(l$geom, "GeomSsmPoint") ||
+                        inherits(l$geom, "GeomSsmArc") ||
+                        inherits(l$geom, "GeomSsmPath") ||
+                        inherits(l$geom, "GeomSsmEllipse"), logical(1)))[[1]]
+  gr <- ggplot2::layer_grob(p, idx)[[1]]
+  xy <- list()
+  walk <- function(g) {
+    if (!is.null(g$x) && !is.null(g$y)) {
+      xy[[length(xy) + 1L]] <<- list(x = as.numeric(g$x), y = as.numeric(g$y))
+    }
+    for (k in g$children) walk(k)
+  }
+  walk(gr)
+  list(xy = xy, data = ggplot2::ggplot_build(p)$data[[idx]])
+}
+
+test_that("the data layers render identically on the cartesian and polar canvases (AC4)", {
+  skip_on_cran()
+  seam <- data.frame(
+    x0 = 0.5 * cos(358 * pi / 180), y0 = 0.5 * sin(358 * pi / 180),
+    var_x = 0.004, var_y = 0.004, cov_xy = 0.001
+  )
+  cases <- list(
+    path = list(layer = geom_ssm_path(
+      data = data.frame(a_est = c(0.3, 0.3), d_est = c(350, 10)),
+      mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est)
+    )),
+    straddling_arc = list(layer = geom_ssm_arc(
+      data = data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 10),
+      mapping = ggplot2::aes(
+        amplitude_min = .data$a_lci, amplitude_max = .data$a_uci,
+        displacement_min = .data$d_lci, displacement_max = .data$d_uci
+      )
+    )),
+    adjacent_arc = list(layer = geom_ssm_arc(
+      data = data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 360),
+      mapping = ggplot2::aes(
+        amplitude_min = .data$a_lci, amplitude_max = .data$a_uci,
+        displacement_min = .data$d_lci, displacement_max = .data$d_uci
+      )
+    )),
+    pole_points = list(layer = geom_ssm_point(
+      data = data.frame(a_est = c(0.3, 0.3), d_est = c(0, 360)),
+      mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est)
+    )),
+    seam_ellipse = list(amax = 1, layer = geom_ssm_ellipse(
+      data = seam,
+      mapping = ggplot2::aes(
+        x0 = .data$x0, y0 = .data$y0,
+        var_x = .data$var_x, var_y = .data$var_y, cov_xy = .data$cov_xy
+      )
+    ))
+  )
+  for (nm in names(cases)) {
+    amax <- if (is.null(cases[[nm]]$amax)) 0.5 else cases[[nm]]$amax
+    cart <- layer_render(cases[[nm]]$layer, "cartesian", amax)
+    polar <- layer_render(cases[[nm]]$layer, "polar", amax)
+    expect_gt(length(cart$xy), 0L, label = nm)
+    expect_equal(cart$xy, polar$xy, label = nm)
+    expect_equal(cart$data, polar$data, label = nm)
+  }
+})

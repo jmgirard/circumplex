@@ -640,6 +640,20 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'   object (see `instrument()`). When supplied, the scale `angles` and (unless
 #'   `labels` is given) the scale abbreviations are taken from the instrument
 #'   (default = `NULL`).
+#' @param grid Optional. A single string naming the canvas furniture, passed to
+#'   [coord_circumplex()]. `"polar"` (the default) draws amplitude rings,
+#'   displacement spokes and the amplitude axis. `"cartesian"` draws one rim
+#'   ring, a crosshair with a tick mark and a signed label at each amplitude
+#'   break on every half-axis, and tick marks across the rim at the scale
+#'   angles (the canvas of Nagy, Etzel and Lüdtke, 2019). The labels on the 180
+#'   and 270 halves are negative Cartesian coordinates, not negative
+#'   amplitudes.
+#' @param angle_labels Optional. A single logical. `TRUE` labels each scale
+#'   as `<label> (<angle>°)`, the angle rounded to the nearest whole degree
+#'   and the 0/360 pole written as 360, and turns each label to read along its
+#'   radius (default = `FALSE`). It applies to text labels, from `labels` or an
+#'   instrument; the default degree labels already show the angle and are left
+#'   as they are.
 #' @return A \pkg{ggplot2} object containing the empty circumplex canvas.
 #' @family circumplex layers
 #' @seealso [coord_circumplex()], which owns the transform this canvas is built
@@ -654,16 +668,56 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'
 #' # Derive the angles and labels from a circumplex instrument
 #' ggcircumplex(instrument = csip)
+#'
+#' # A Cartesian grid: one rim ring and a labelled crosshair
+#' ggcircumplex(octants(), labels = PANO(), grid = "cartesian")
+#'
+#' # Each scale labelled with its angle, read along the radius
+#' ggcircumplex(octants(), labels = PANO(), grid = "cartesian", angle_labels = TRUE)
 ggcircumplex <- function(angles = octants(), labels = NULL,
-                         amax = 0.5, font_size = 12, instrument = NULL) {
+                         amax = 0.5, font_size = 12, instrument = NULL,
+                         grid = c("polar", "cartesian"), angle_labels = FALSE) {
 
   resolved <- resolve_circumplex_labels(angles, labels, instrument)
   stopifnot(is_num(amax, n = 1) && amax > 0)
   stopifnot(is_num(font_size, n = 1) && font_size > 0)
+  grid <- circumplex_grid(grid)
+  if (!isTRUE(angle_labels) && !isFALSE(angle_labels)) {
+    stop("`angle_labels` must be TRUE or FALSE.", call. = FALSE)
+  }
 
   ang <- resolved$angles
   lab <- resolved$labels
-  if (is.null(lab)) lab <- circumplex_degree_labels(ang)
+  if (is.null(lab)) {
+    lab <- circumplex_degree_labels(ang)
+  } else if (angle_labels) {
+    lab <- circumplex_angle_labels(lab, ang)
+  }
+  # The cartesian canvas marks the scale angles with ticks across the rim; the
+  # theme's blank `axis.ticks` is overridden for the theta axis alone, and for
+  # the crosshair ticks the coord draws from `axis.ticks.r`.
+  grid_theme <- if (identical(grid, "cartesian")) {
+    ggplot2::theme(
+      axis.ticks.theta = ggplot2::element_line(colour = "gray30"),
+      axis.ticks.length.theta = grid::unit(5, "pt"),
+      axis.ticks.r = ggplot2::element_line(colour = "gray30"),
+      axis.ticks.length.r = grid::unit(4, "pt")
+    )
+  }
+  # angle = 90 in guide_axis_theta() is the radial direction: each label is
+  # turned by its own angle from there, and one that would read upside down is
+  # flipped, so the text runs along the radius everywhere. A radial label runs
+  # outward from the rim by its own length, and the panel keeps only a tenth of
+  # its width outside the rim, so the plot margin grows with the longest label
+  # (about half the font size per character) to keep the labels on the page.
+  label_guide <- if (angle_labels) {
+    list(
+      ggplot2::guides(theta = ggplot2::guide_axis_theta(angle = 90)),
+      ggplot2::theme(
+        plot.margin = grid::unit(rep(0.5 * font_size * max(nchar(lab)), 4), "pt")
+      )
+    )
+  }
 
   # coord_circumplex() owns the amplitude->radius scaling and the polar
   # transform, so the canvas and any data layers added later share one amax and
@@ -676,7 +730,7 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
   # rings/spokes/labels train and draw; it censors nothing, so a seam-straddling
   # arc added later (unwrapped xmax > 360) still extends the range freely.
   ggplot2::ggplot() +
-    coord_circumplex(amax = amax, center = 0) +
+    coord_circumplex(amax = amax, center = 0, grid = grid) +
     ggplot2::geom_blank(
       data = data.frame(.x = c(0, 360), .y = c(0, amax)),
       mapping = ggplot2::aes(x = .data$.x, y = .data$.y),
@@ -684,7 +738,9 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
     ) +
     ggplot2::scale_x_continuous(breaks = ang, labels = lab) +
     ggplot2::scale_y_continuous(name = NULL) +
-    theme_circumplex(base_size = font_size)
+    theme_circumplex(base_size = font_size) +
+    grid_theme +
+    label_guide
 }
 
 #' Circumplex canvas theme
