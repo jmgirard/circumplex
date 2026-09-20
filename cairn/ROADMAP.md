@@ -8,7 +8,7 @@ _Last hygiene check: 2026-09-20 (M142 and M143 planned, M139's terminal row drop
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M140 | The visualization vignette draws a fitted quasi-circumplex, measure vectors and the correlation function from existing layers | done | — | normal | milestones/archive/M140-vignette-latent-circumplex-figures.md |
-| M142 | A Cartesian-grid style for the circumplex canvas (`coord_circumplex(grid = "cartesian")`, `ggcircumplex(angle_labels = TRUE)`) | in-progress | — | normal | milestones/M142-cartesian-canvas-grid.md |
+| M142 | A Cartesian-grid style for the circumplex canvas (`coord_circumplex(grid = "cartesian")`, `ggcircumplex(angle_labels = TRUE)`) | review | — | normal | milestones/M142-cartesian-canvas-grid.md |
 | M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | planned | M142 | normal | milestones/M143-vignette-nagy-figures.md |
 | M141 | A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws | done | M140 | normal | milestones/archive/M141-ellipse-geom.md |
 

@@ -1,6 +1,6 @@
 # M142: A Cartesian-grid style for the circumplex canvas
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -43,7 +43,7 @@ Give `coord_circumplex()` a `grid = "cartesian"` mode that draws a plain rim, a 
 - [x] T2: `grid` on `coord_circumplex()` (R/coord_circumplex.R:54) stored on the ggproto object, and a `render_bg` override on `CoordCircumplex` (beside `render_fg`, R/coord_circumplex.R:387) that in cartesian mode draws the rim ring, crosshair, tick marks and signed labels from the `panel.grid.major`, `axis.ticks.r` and `axis.text.r` theme elements and suppresses the radial-axis guide. (RB tripwire: irreversible-api)
 - [x] T3: `ggcircumplex(grid, angle_labels)` (R/ssm_plot.R:657): label formatting after `resolve_circumplex_labels()` with the 0-or-360 rule, theta tick theme lines in cartesian mode, radial rotation through `guide_axis_theta()`.
 - [x] T4: Roxygen for both functions, `Rscript -e 'devtools::document()'`, the two DESIGN.md bullets, the NEWS entry.
-- [ ] T5: Render-and-inspect pass (LESSONS M33): a PNG of the cartesian canvas at `cpm_fit(jz2017, scales = PANO(), angles = octants())`'s angles with `angle_labels = TRUE`, compared by eye against Nagy Figure 3's right panels (`cairn/references/sources/nagy2019.pdf` p. 410). Regenerate the two new snapshots. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T5: Render-and-inspect pass (LESSONS M33): a PNG of the cartesian canvas at `cpm_fit(jz2017, scales = PANO(), angles = octants())`'s angles with `angle_labels = TRUE`, compared by eye against Nagy Figure 3's right panels (`cairn/references/sources/nagy2019.pdf` p. 410). Regenerate the two new snapshots. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -55,6 +55,7 @@ Give `coord_circumplex()` a `grid = "cartesian"` mode that draws a plain rim, a 
 - 2026-09-20: checkpoint, half-done. T1–T4 written (tests, `grid` on the coord with a `render_bg`/`setup_panel_guides` override, `ggcircumplex(grid, angle_labels)`, roxygen, DESIGN, NEWS); the two new test files pass and `document()` leaves no diff. Not yet ticked: the full `devtools::test()` and the claim audit are still running; `check()` and the two snapshots' final regeneration (T5) not run. Minor refinements beyond T3's list: cartesian mode also sets `axis.ticks.r`/`axis.ticks.length.r` (the coord's crosshair ticks draw from them, and `theme_minimal()` blanks `axis.ticks`), and `angle_labels = TRUE` adds a plot margin sized to the longest label, since radial labels ran off the page at 5 in.
 - 2026-09-20: T1–T4 done. Full `devtools::test()` clean but for the Rd guard (`ü`, `°` in roxygen, replaced by "Nagy et al." and a prose description); two stale snapshot diffs were the pre-margin styling, regenerated. Tests: `grid` validation (explicit `stop()` naming it), the AC2 panel walk on the public canvas and on a coord-only canvas with `center = 0.1`, the AC3 formats (0, 360, 11.4, 200.6, instrument), radial rotation read from the text grob's `rot`, the theme elements, the five-case AC4 grob-vertex and layer-data identity, two vdiffr cases.
 - 2026-09-20: claim audit: 41 claims read, 5 corrected — NEWS.md, R/coord_circumplex.R, R/ssm_plot.R ("each amplitude break" now "between the center and the rim"; theta ticks "outward from the rim", not "across"; `angle_labels` stated independent of `grid`; the ticks comment and the `+ theme()` comment made exact). Three Nagy attributions could not be code-checked (bibliographic).
+- 2026-09-20: T5 done. Rendered the cartesian canvas with `angle_labels = TRUE` at the `cpm_fit(jz2017, scales = PANO(), angles = octants())` estimated angles (90, 125, 170, 195, 251, 269, 294, 11) and compared by eye with Nagy Figure 3's right panels (p. 410): rim, crosshair with ±0.1–0.4 labels, outward rim ticks and radial labels match; two differences accepted — the rim and crosshair keep `theme_circumplex()`'s gray80 (Nagy's are black; restyling is M143's), and the label at exactly 270° reads downward where Nagy's reads upward (ggplot2's flip rule is exclusive at 270). The first render at 5 in clipped the radial labels, which motivated the plot margin. Snapshots regenerated after the final styling. `devtools::test()` clean; `devtools::check(args = "--no-manual")`: Status OK, 0 errors, 0 warnings, 0 notes. Status → review.
 
 ## Decisions
 
