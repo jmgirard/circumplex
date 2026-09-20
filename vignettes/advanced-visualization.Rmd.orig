@@ -575,9 +575,89 @@ ellipse <- ssm_ellipse_data(post)
 ellipse
 ```
 
-The figure draws the wedge, the ellipse, and the point estimate for the same
-profile on one canvas. The wedge and the point come from `post$results`, as in
-Section 4. The ellipse comes from the one-row data frame above.
+Nagy, Etzel and Lüdtke (2019, Figure 4 and Appendices B and C) read four
+lines off such an ellipse. Two are the tangents from the origin to the
+ellipse: their angles are the smallest and largest displacements of any point
+in the ellipse. Two join the origin to the nearest and farthest points of the
+ellipse's boundary: their lengths are the smallest and largest amplitudes of
+any point in the ellipse. The function below computes all four from the
+one-row data frame above and the ellipse's confidence level. It works in the
+covariance form that `geom_ssm_ellipse()` draws, not in the parametric form
+of the paper's appendices. A direction from the origin is tangent to the
+ellipse when the line along it meets the ellipse at exactly one point, which
+makes the quadratic in the direction's slope have a double root. The two
+distances are the extremes of the boundary radius over the ellipse's
+parametric angle, found on a fine grid and refined with `optimize()`. When
+the origin lies inside the ellipse there are no tangents, so those two
+angles are `NA`, and the nearest distance is the smallest boundary radius.
+
+```{r ellipse-lines}
+ellipse_lines <- function(ellipse, level = 0.95) {
+  centre <- c(ellipse$x0, ellipse$y0)
+  S <- matrix(
+    c(ellipse$var_x, ellipse$cov_xy, ellipse$cov_xy, ellipse$var_y), 2, 2
+  )
+  r2 <- qchisq(level, df = 2)
+  A <- solve(S)
+  # A direction w is tangent when (w'Ac)^2 = (w'Aw)(c'Ac - r2), so w'Mw = 0.
+  # The origin is outside the ellipse when c'Ac exceeds r2.
+  outside <- drop(t(centre) %*% A %*% centre) - r2
+  tangents <- c(NA_real_, NA_real_)
+  if (outside > 0) {
+    Ac <- drop(A %*% centre)
+    M <- tcrossprod(Ac) - outside * A
+    # The zero directions of w'Mw solve a quadratic in the slope. Use the
+    # slope or its reciprocal, whichever gives the larger leading coefficient.
+    if (abs(M[2, 2]) >= abs(M[1, 1])) {
+      w <- rbind(1, Re(polyroot(c(M[1, 1], 2 * M[1, 2], M[2, 2]))))
+    } else {
+      w <- rbind(Re(polyroot(c(M[2, 2], 2 * M[1, 2], M[1, 1]))), 1)
+    }
+    # Point each direction towards the ellipse, then order the pair so that
+    # the counterclockwise arc from the first to the second holds the centre.
+    w <- sweep(w, 2, sign(colSums(w * Ac)), `*`)
+    tangents <- (atan2(w[2, ], w[1, ]) * 180 / pi) %% 360
+    if ((tangents[2] - tangents[1]) %% 360 > 180) tangents <- rev(tangents)
+  }
+  # The boundary radius as a function of the parametric angle.
+  L <- t(chol(S)) * sqrt(r2)
+  boundary <- function(theta) centre + L %*% rbind(cos(theta), sin(theta))
+  radius <- function(theta) sqrt(colSums(boundary(theta)^2))
+  grid <- seq(0, 2 * pi, length.out = 3601)[-3601]
+  step <- grid[2] - grid[1]
+  refine <- function(i, maximum) {
+    optimize(radius, grid[i] + c(-step, step), maximum = maximum, tol = 1e-12)
+  }
+  nearest <- refine(which.min(radius(grid)), maximum = FALSE)
+  farthest <- refine(which.max(radius(grid)), maximum = TRUE)
+  angle_of <- function(theta) {
+    v <- boundary(theta)
+    (atan2(v[2], v[1]) * 180 / pi) %% 360
+  }
+  data.frame(
+    line = c("tangent_1", "tangent_2", "nearest", "farthest"),
+    displacement = c(
+      tangents, angle_of(nearest$minimum), angle_of(farthest$maximum)
+    ),
+    amplitude = c(NA, NA, nearest$objective, farthest$objective)
+  )
+}
+lines <- ellipse_lines(ellipse, level = 0.95)
+lines
+```
+
+The `displacement` column holds the two tangent angles and the directions of
+the nearest and farthest boundary points. The `amplitude` column holds the
+two distances. The tangents are listed so that the counterclockwise arc from
+`tangent_1` to `tangent_2` holds the ellipse, which matters for an ellipse
+that straddles 0/360 degrees.
+
+The figure draws the wedge, the ellipse, the four lines and the point
+estimate for the same profile on one canvas. The wedge and the point come
+from `post$results`, as in Section 4. The ellipse comes from the one-row data
+frame above. The two tangent lines are dashed and run from the origin to the
+rim. The two distance lines are dotted and run from the origin to the
+nearest and farthest boundary points.
 
 ```{r ellipse-figure}
 ggcircumplex(octants(), labels = PANO(), amax = 0.6) +
