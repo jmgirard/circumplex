@@ -317,6 +317,12 @@ Composable ggplot2 components for building custom circumplex figures
   : Draw SSM confidence-region arcs in circumplex space
 - [`geom_ssm_path()`](http://circumplex.jmgirard.com/reference/geom_ssm_path.md)
   : Draw a profile's movement across occasions in circumplex space
+- [`geom_ssm_ellipse()`](http://circumplex.jmgirard.com/reference/geom_ssm_ellipse.md)
+  : Draw a joint confidence ellipse for SSM coordinates in circumplex
+  space
+- [`ssm_ellipse_data()`](http://circumplex.jmgirard.com/reference/ssm_ellipse_data.md)
+  : Centre and covariance of the Cartesian SSM coordinates for an
+  ellipse layer
 - [`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md)
   : Angle-labeled x-axis scale for circumplex plots
 - [`theme_circumplex()`](http://circumplex.jmgirard.com/reference/theme_circumplex.md)

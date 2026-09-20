@@ -175,9 +175,10 @@ a figure from scratch with <code><a href="../reference/coord_circumplex.html">co
 layers”, adds respondents behind a group profile with
 <code><a href="../reference/ssm_score.html">ssm_score()</a></code>. Section 7, “The latent circumplex from a CPM
 fit”, draws the angles a <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimated, measure
-vectors, and the fitted correlation function. Section 8, “Trajectories
-across occasions”, draws profiles estimated at several occasions.
-Section 9, “The angle axis for linear plots”, labels a linear axis with
+vectors, and the fitted correlation function. It closes with a joint
+confidence ellipse from posterior draws. Section 8, “Trajectories across
+occasions”, draws profiles estimated at several occasions. Section 9,
+“The angle axis for linear plots”, labels a linear axis with
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code>. Section 10, “Relationship to the
 built-in plots”, says how the built-in plots use these parts. The
 Wrap-up lists what the page covered and names the next page, and the
@@ -614,6 +615,95 @@ filled point minus the hollow point is the pair’s residual, the entry of
 <code>matrices$residuals</code>. Read the line for the shape of the
 latent circumplex and the residuals for the fit.</p>
 </div>
+<div class="section level3">
+<h3 id="a-joint-confidence-ellipse-from-posterior-draws">A joint confidence ellipse from posterior draws<a class="anchor" aria-label="anchor" href="#a-joint-confidence-ellipse-from-posterior-draws"></a>
+</h3>
+<p>The wedge that <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> draws is built from two
+intervals, one on amplitude and one on displacement. A profile’s
+uncertainty can also be shown as a joint region on the Cartesian
+coordinates under a normal approximation to the draws.
+<code><a href="../reference/geom_ssm_ellipse.html">geom_ssm_ellipse()</a></code> draws that region as an ellipse. It
+takes a centre <code>(x0, y0)</code> and the three elements of a 2 by 2
+covariance matrix as aesthetics. <code><a href="../reference/ssm_ellipse_data.html">ssm_ellipse_data()</a></code>
+computes those five columns from an <code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> object, so
+the layer needs a result that retains draws. The draws below are the
+posterior draws that the “Bayesian SSM Analysis” vignette analyses. They
+ship with the package in <code>bayesian_ssm_draws.rds</code>, generated
+once by the seeded script <code>data-raw/bayesian_ssm_draws.R</code>,
+and that vignette states the model they come from.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"bayesian_ssm_draws.rds"</span><span class="op">)</span></span>
+<span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="va">draws</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
+<span><span class="va">ellipse</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ellipse_data.html">ssm_ellipse_data</a></span><span class="op">(</span><span class="va">post</span><span class="op">)</span></span>
+<span><span class="va">ellipse</span></span>
+<span><span class="co">#&gt;          x0         y0        var_x        var_y        cov_xy</span></span>
+<span><span class="co">#&gt; 1 0.3523431 -0.3192543 0.0005952007 0.0005500366 -6.093168e-06</span></span></code></pre></div>
+<p>The figure draws the wedge, the ellipse, and the point estimate for
+the same profile on one canvas. The wedge and the point come from
+<code>post$results</code>, as in Section 4. The ellipse comes from the
+one-row data frame above.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_arc.html">geom_ssm_arc</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>      amplitude_min <span class="op">=</span> <span class="va">a_lci</span>, amplitude_max <span class="op">=</span> <span class="va">a_uci</span>,</span>
+<span>      displacement_min <span class="op">=</span> <span class="va">d_lci</span>, displacement_max <span class="op">=</span> <span class="va">d_uci</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_ellipse.html">geom_ssm_ellipse</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">ellipse</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>      x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, var_x <span class="op">=</span> <span class="va">var_x</span>, var_y <span class="op">=</span> <span class="va">var_y</span>, cov_xy <span class="op">=</span> <span class="va">cov_xy</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"firebrick"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="figures/advanced-visualization-ellipse-figure-1.png" alt="plot of chunk ellipse-figure" width="100%"></p>
+<p>Here the ellipse is centred on the posterior medians of
+<code>x</code> and <code>y</code>, not on the plotted point, and its
+covariance comes from the draws. The medians are the values
+<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> reports as <code>x_est</code> and
+<code>y_est</code>. The plotted point is <code>a_est</code> at
+<code>d_est</code>: the median amplitude at the circular mean
+displacement. Those are marginal summaries, so the point is not the
+polar form of the medians of <code>x</code> and <code>y</code>. The
+chunk below computes the distance between the centre and the point in
+the score metric. Here it is too small to see.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">point</span> <span class="op">&lt;-</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span> <span class="op">*</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ellipse</span><span class="op">$</span><span class="va">x0</span>, <span class="va">ellipse</span><span class="op">$</span><span class="va">y0</span><span class="op">)</span> <span class="op">-</span> <span class="va">point</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.0004661232</span></span></code></pre></div>
+<p>The covariance is the sample covariance of the draws of
+<code>x</code> and <code>y</code>. The wedge and the ellipse are two
+different summaries of the same draws. The ellipse is a joint region on
+the Cartesian coordinates under a normal approximation to the draws. By
+contrast, the wedge is the pair of marginal intervals on amplitude and
+displacement, a percentile interval on amplitude and a circular-quantile
+interval on displacement. The wedge draws those two intervals together
+as one region. Neither interval depends on a normal approximation. The
+two regions answer different questions, so the two need not coincide. In
+this figure the ellipse reaches farther than the wedge along both the
+amplitude axis and the displacement axis. The wedge’s four corners still
+fall outside the ellipse.</p>
+<p>Read the ellipse against the origin with care: an ellipse at
+confidence level 1 − α that excludes the origin rejects zero amplitude
+in a Wald test at significance level α, and only under that
+approximation. A Wald test compares an estimate with its standard error,
+here the pair <code>(x, y)</code> with its covariance. The ellipse above
+is drawn at confidence level 0.95. It is the set of <code>(x, y)</code>
+values the test does not reject at significance level 0.05. Its
+covariance is a posterior covariance, so that reading also treats the
+posterior under the normal approximation as the sampling distribution of
+the estimate. The wedge makes no such test. A displacement interval that
+excludes some angle is not a significance test of that angle. An
+amplitude interval above zero is a statement about amplitude alone.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="trajectories-across-occasions">8. Trajectories across occasions<a class="anchor" aria-label="anchor" href="#trajectories-across-occasions"></a>
@@ -634,7 +724,7 @@ columns are an <code>id</code>, a <code>wave</code> factor with levels
 <code><a href="../reference/PANO.html">PANO()</a></code> scales. <code><a href="../reference/simulated_occasions.html">?simulated_occasions</a></code> states how
 it was simulated. We load it and estimate one profile per wave with
 <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code>:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_occasions"</span><span class="op">)</span></span>
 <span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze_long.html">ssm_analyze_long</a></span><span class="op">(</span></span>
 <span>  <span class="va">simulated_occasions</span>,</span>
@@ -650,7 +740,7 @@ selects these columns is omitted.)</p>
 <span><span class="co">#&gt; 1       T1 0.5707423 332.41252 329.28366 335.57815</span></span>
 <span><span class="co">#&gt; 2       T2 0.5968632 354.84909 351.80498 357.66599</span></span>
 <span><span class="co">#&gt; 3       T3 0.5959438  21.05834  17.83082  24.00907</span></span></code></pre>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">results_long</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-plot-1.png" alt="plot of chunk occasions-plot" width="100%"></p>
 <p>Two things about the displacement panel are worth reading carefully.
@@ -706,7 +796,7 @@ occasion are split across two panels. <code><a href="../reference/geom_ssm_path.
 the same series as a path on the circular canvas, so a change in
 (amplitude, displacement) reads as movement through circumplex
 space.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># The amplitude axis goes in the 45-90 gap, clear of the three occasions</span></span>
 <span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.8</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -744,7 +834,7 @@ sorting for you.</p>
 <p>The same figure is available ready-made from
 <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, which adds the path to its usual points
 and confidence wedges:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results_long</span>, path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-path-wrapper-1.png" alt="plot of chunk occasions-path-wrapper" width="100%"></p>
 <p>An occasion whose displacement is undefined (a flat or zero-amplitude
@@ -764,14 +854,14 @@ that axis consistently with the circular canvas: by default with the
 angle in degrees, or with custom labels or an instrument’s
 abbreviations.</p>
 <p>The example below draws a made-up profile at the octant angles:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The data frame <code>curve</code> has one row per angle in
 <code>angles</code>, in its <code>angle</code> column. Its
 <code>score</code> column follows a cosine curve with elevation 1,
 amplitude 0.8 and displacement 135 degrees. (The code that builds
 <code>curve</code> is omitted.)</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">curve</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">angle</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>

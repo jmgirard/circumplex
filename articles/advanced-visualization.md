@@ -66,8 +66,9 @@ custom layers”, adds respondents behind a group profile with
 [`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md).
 Section 7, “The latent circumplex from a CPM fit”, draws the angles a
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-estimated, measure vectors, and the fitted correlation function. Section
-8, “Trajectories across occasions”, draws profiles estimated at several
+estimated, measure vectors, and the fitted correlation function. It
+closes with a joint confidence ellipse from posterior draws. Section 8,
+“Trajectories across occasions”, draws profiles estimated at several
 occasions. Section 9, “The angle axis for linear plots”, labels a linear
 axis with
 [`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md).
@@ -593,6 +594,112 @@ line by that factor. The hollow points show where each pair lands after
 that attenuation. The filled point minus the hollow point is the pair’s
 residual, the entry of `matrices$residuals`. Read the line for the shape
 of the latent circumplex and the residuals for the fit.
+
+### A joint confidence ellipse from posterior draws
+
+The wedge that
+[`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md)
+draws is built from two intervals, one on amplitude and one on
+displacement. A profile’s uncertainty can also be shown as a joint
+region on the Cartesian coordinates under a normal approximation to the
+draws.
+[`geom_ssm_ellipse()`](http://circumplex.jmgirard.com/reference/geom_ssm_ellipse.md)
+draws that region as an ellipse. It takes a centre `(x0, y0)` and the
+three elements of a 2 by 2 covariance matrix as aesthetics.
+[`ssm_ellipse_data()`](http://circumplex.jmgirard.com/reference/ssm_ellipse_data.md)
+computes those five columns from an
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+object, so the layer needs a result that retains draws. The draws below
+are the posterior draws that the “Bayesian SSM Analysis” vignette
+analyses. They ship with the package in `bayesian_ssm_draws.rds`,
+generated once by the seeded script `data-raw/bayesian_ssm_draws.R`, and
+that vignette states the model they come from.
+
+``` r
+
+draws <- readRDS("bayesian_ssm_draws.rds")
+post <- ssm_draws(draws, type = "parameters")
+ellipse <- ssm_ellipse_data(post)
+ellipse
+#>          x0         y0        var_x        var_y        cov_xy
+#> 1 0.3523431 -0.3192543 0.0005952007 0.0005500366 -6.093168e-06
+```
+
+The figure draws the wedge, the ellipse, and the point estimate for the
+same profile on one canvas. The wedge and the point come from
+`post$results`, as in Section 4. The ellipse comes from the one-row data
+frame above.
+
+``` r
+
+ggcircumplex(octants(), labels = PANO(), amax = 0.6) +
+  geom_ssm_arc(
+    data = post$results,
+    mapping = aes(
+      amplitude_min = a_lci, amplitude_max = a_uci,
+      displacement_min = d_lci, displacement_max = d_uci
+    ),
+    alpha = 0.3
+  ) +
+  geom_ssm_ellipse(
+    data = ellipse,
+    mapping = aes(
+      x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy
+    ),
+    color = "firebrick"
+  ) +
+  geom_ssm_point(
+    data = post$results,
+    mapping = aes(amplitude = a_est, displacement = d_est)
+  )
+```
+
+![plot of chunk
+ellipse-figure](figures/advanced-visualization-ellipse-figure-1.png)
+
+Here the ellipse is centred on the posterior medians of `x` and `y`, not
+on the plotted point, and its covariance comes from the draws. The
+medians are the values
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
+reports as `x_est` and `y_est`. The plotted point is `a_est` at `d_est`:
+the median amplitude at the circular mean displacement. Those are
+marginal summaries, so the point is not the polar form of the medians of
+`x` and `y`. The chunk below computes the distance between the centre
+and the point in the score metric. Here it is too small to see.
+
+``` r
+
+point <- post$results$a_est *
+  c(cos(post$results$d_est * pi / 180), sin(post$results$d_est * pi / 180))
+sqrt(sum((c(ellipse$x0, ellipse$y0) - point)^2))
+#> [1] 0.0004661232
+```
+
+The covariance is the sample covariance of the draws of `x` and `y`. The
+wedge and the ellipse are two different summaries of the same draws. The
+ellipse is a joint region on the Cartesian coordinates under a normal
+approximation to the draws. By contrast, the wedge is the pair of
+marginal intervals on amplitude and displacement, a percentile interval
+on amplitude and a circular-quantile interval on displacement. The wedge
+draws those two intervals together as one region. Neither interval
+depends on a normal approximation. The two regions answer different
+questions, so the two need not coincide. In this figure the ellipse
+reaches farther than the wedge along both the amplitude axis and the
+displacement axis. The wedge’s four corners still fall outside the
+ellipse.
+
+Read the ellipse against the origin with care: an ellipse at confidence
+level 1 − α that excludes the origin rejects zero amplitude in a Wald
+test at significance level α, and only under that approximation. A Wald
+test compares an estimate with its standard error, here the pair
+`(x, y)` with its covariance. The ellipse above is drawn at confidence
+level 0.95. It is the set of `(x, y)` values the test does not reject at
+significance level 0.05. Its covariance is a posterior covariance, so
+that reading also treats the posterior under the normal approximation as
+the sampling distribution of the estimate. The wedge makes no such test.
+A displacement interval that excludes some angle is not a significance
+test of that angle. An amplitude interval above zero is a statement
+about amplitude alone.
 
 ## 8. Trajectories across occasions
 

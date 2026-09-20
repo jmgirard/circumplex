@@ -62,6 +62,7 @@ here.
 
 Other circumplex layers:
 [`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md),
+[`geom_ssm_ellipse()`](http://circumplex.jmgirard.com/reference/geom_ssm_ellipse.md),
 [`geom_ssm_path()`](http://circumplex.jmgirard.com/reference/geom_ssm_path.md),
 [`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md),
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md),
