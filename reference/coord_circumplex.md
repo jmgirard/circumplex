@@ -14,7 +14,13 @@ disagree.
 ## Usage
 
 ``` r
-coord_circumplex(amax = NULL, center = 0, r_axis_angle = NULL, ...)
+coord_circumplex(
+  amax = NULL,
+  center = 0,
+  r_axis_angle = NULL,
+  grid = c("polar", "cartesian"),
+  ...
+)
 ```
 
 ## Arguments
@@ -38,7 +44,21 @@ coord_circumplex(amax = NULL, center = 0, r_axis_angle = NULL, ...)
   which the amplitude (radial) axis and its labels are drawn. `NULL`
   (the default) places it automatically in the widest gap between the
   displacement spokes, so the amplitude labels never collide with a
-  spoke label.
+  spoke label. Ignored when `grid = "cartesian"`, which draws no
+  amplitude axis.
+
+- grid:
+
+  Optional. A single string naming the canvas furniture. `"polar"` (the
+  default) draws amplitude rings, displacement spokes and the amplitude
+  axis. `"cartesian"` draws one ring at the outer amplitude, a crosshair
+  along displacements 0/180 and 90/270, and a tick mark with a signed
+  label at each amplitude break between the center and the rim on every
+  half-axis (the center and the rim value itself are not labelled), and
+  no other ring, spoke or amplitude axis (the canvas of Nagy et al.,
+  2019). The labels on the 180 and 270 halves are negative Cartesian
+  coordinates, not negative amplitudes. The mapping of the data onto the
+  canvas is the same in both modes.
 
 - ...:
 
@@ -76,5 +96,11 @@ data("jz2017")
 res <- ssm_analyze(jz2017, scales = 2:9, measures = "NARPD")
 ggplot2::ggplot(res$results) +
   coord_circumplex(amax = 0.5) +
+  geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
+
+
+# A Cartesian grid: one rim ring and a labelled crosshair, no rings or spokes
+ggplot2::ggplot(res$results) +
+  coord_circumplex(amax = 0.5, grid = "cartesian") +
   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
 ```

@@ -105,7 +105,9 @@ canvas.</p>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  amax <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  instrument <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  instrument <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"polar"</span>, <span class="st">"cartesian"</span><span class="op">)</span>,</span>
+<span>  angle_labels <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -143,6 +145,27 @@ object (see <code>instrument()</code>). When supplied, the scale <code>angles</c
 <code>labels</code> is given) the scale abbreviations are taken from the instrument
 (default = <code>NULL</code>).</p></dd>
 
+
+<dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
+<dd><p>Optional. A single string naming the canvas furniture, passed to
+<code><a href="coord_circumplex.html">coord_circumplex()</a></code>. <code>"polar"</code> (the default) draws amplitude rings,
+displacement spokes and the amplitude axis. <code>"cartesian"</code> draws one rim
+ring, a crosshair with a tick mark and a signed label at each amplitude
+break between the center and the rim on every half-axis, and tick marks
+outward from the rim at the scale angles (the canvas of Nagy et al.,
+2019). The labels on the 180 and 270 halves are negative Cartesian
+coordinates, not negative amplitudes.</p></dd>
+
+
+<dt id="arg-angle-labels">angle_labels<a class="anchor" aria-label="anchor" href="#arg-angle-labels"></a></dt>
+<dd><p>Optional. A single logical, independent of <code>grid</code>.
+<code>TRUE</code> appends each scale's angle to its label, in parentheses with the
+degree sign, the angle rounded to the nearest whole degree and the 0/360
+pole written as 360, and turns each label to read along its radius
+(default = <code>FALSE</code>). It applies to text labels, from <code>labels</code> or an
+instrument; the default degree labels already show the angle and are left
+as they are.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -175,6 +198,14 @@ on; <code><a href="ssm_plot_circle.html">ssm_plot_circle()</a></code>, which dra
 <span class="r-in"><span><span class="co"># Derive the angles and labels from a circumplex instrument</span></span></span>
 <span class="r-in"><span><span class="fu">ggcircumplex</span><span class="op">(</span>instrument <span class="op">=</span> <span class="va">csip</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="ggcircumplex-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A Cartesian grid: one rim ring and a labelled crosshair</span></span></span>
+<span class="r-in"><span><span class="fu">ggcircumplex</span><span class="op">(</span><span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, grid <span class="op">=</span> <span class="st">"cartesian"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ggcircumplex-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Each scale labelled with its angle, read along the radius</span></span></span>
+<span class="r-in"><span><span class="fu">ggcircumplex</span><span class="op">(</span><span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, grid <span class="op">=</span> <span class="st">"cartesian"</span>, angle_labels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ggcircumplex-5.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

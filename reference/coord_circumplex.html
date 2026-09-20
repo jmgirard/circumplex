@@ -100,7 +100,13 @@ no longer take an <code>amax</code>, and the canvas and data layers can never di
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">coord_circumplex</span><span class="op">(</span>amax <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="fl">0</span>, r_axis_angle <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">coord_circumplex</span><span class="op">(</span></span>
+<span>  amax <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  center <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  r_axis_angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"polar"</span>, <span class="st">"cartesian"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -124,7 +130,20 @@ are guaranteed to agree.</p></dd>
 degrees) along which the amplitude (radial) axis and its labels are drawn.
 <code>NULL</code> (the default) places it automatically in the widest gap between the
 displacement spokes, so the amplitude labels never collide with a spoke
-label.</p></dd>
+label. Ignored when <code>grid = "cartesian"</code>, which draws no amplitude axis.</p></dd>
+
+
+<dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
+<dd><p>Optional. A single string naming the canvas furniture. <code>"polar"</code>
+(the default) draws amplitude rings, displacement spokes and the amplitude
+axis. <code>"cartesian"</code> draws one ring at the outer amplitude, a crosshair
+along displacements 0/180 and 90/270, and a tick mark with a signed label
+at each amplitude break between the center and the rim on every half-axis
+(the center and the rim value itself are not labelled), and no other ring,
+spoke or amplitude axis (the canvas of Nagy et al., 2019). The labels on
+the 180 and 270 halves are negative Cartesian coordinates, not negative
+amplitudes. The mapping of the data onto the canvas is the same in both
+modes.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -164,6 +183,12 @@ the radial limits, set once here.</p>
 <span class="r-in"><span>  <span class="fu">coord_circumplex</span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="coord_circumplex-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A Cartesian grid: one rim ring and a labelled crosshair, no rings or spokes</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">coord_circumplex</span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.5</span>, grid <span class="op">=</span> <span class="st">"cartesian"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="coord_circumplex-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
