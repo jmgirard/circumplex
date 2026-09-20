@@ -58,9 +58,9 @@
   and reproduced correlations as points. The ellipse figure adds two
   tangent lines from the origin out to the rim, at the angles of the
   confidence ellipse's tangents, and the lines from the origin to the
-  ellipse's nearest and farthest boundary points, computed in an echoed chunk that
-  the test suite runs against two oracles. The prose states which model each
-  set of angles comes from.
+  ellipse's nearest and farthest boundary points, computed in an echoed chunk
+  that the test suite runs against independent oracles. The prose states
+  which model each set of angles comes from.
 
 * Every prose caution and note that `print()` and `summary()` show now wraps
   to the console width you set with `options(width = )`. Before this, the

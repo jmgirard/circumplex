@@ -428,18 +428,18 @@ apart where the theory puts them 45 apart. The crosshair's labels are
 Cartesian coordinates and carry no meaning in this figure. They matter once
 a measure is placed inside the circle.
 
-### Measure vectors on the same rim
+### Measure points on the same rim
 
-Nagy, Etzel and Lüdtke (2019) draw each external measure as a labelled
-point on the estimated rim (Figure 6). Their Figure 3 joins the point to the
-origin by a straight line. The point's direction
+Nagy, Etzel and Lüdtke (2019, Figure 6) draw each external measure as a
+labelled point inside a circle whose rim carries the estimated angles. Their
+Figure 3 joins the point to the origin by a straight line. The point's direction
 from the origin is the measure's displacement and its distance from the
 origin is the measure's amplitude. `ssm_analyze()` supplies both. The second
 figure adds five personality-disorder measures from `jz2017` in that form, on
 the canvas above. Each measure is one point at `a_est` and `d_est`, one
 two-row path from amplitude 0 to that point, and one text label. The `hjust`
-and `vjust` columns place each label beside its point, away from the other
-labels, and are chosen by hand.
+and `vjust` values place each label beside its point, away from the other
+labels. They are chosen by hand and keyed by measure name.
 
 
 ``` r
@@ -449,8 +449,10 @@ ssm <- ssm_analyze(
   measures = c("NARPD", "ASPD", "HISPD", "AVPD", "SCZPD")
 )
 measures <- ssm$results
-measures$hjust <- c(-0.15, 1.1, -0.15, 0.5, 1.15)
-measures$vjust <- c(1.4, -0.3, 0.5, 1.6, 0.5)
+hjust <- c(NARPD = -0.15, ASPD = 1.1, HISPD = -0.15, AVPD = 0.5, SCZPD = 1.15)
+vjust <- c(NARPD = 1.4, ASPD = -0.3, HISPD = 0.5, AVPD = 1.6, SCZPD = 0.5)
+measures$hjust <- hjust[measures$Label]
+measures$vjust <- vjust[measures$Label]
 spokes <- data.frame(
   Label = rep(measures$Label, each = 2),
   amplitude = c(rbind(0, measures$a_est)),
@@ -543,8 +545,8 @@ canvas +
 <img src="figures/advanced-visualization-latent-measure-1.png" alt="plot of chunk latent-measure" width="100%" />
 
 The displacement label starts above the arc at 60 degrees and runs to the
-right, clear of the vertical axis and its labels. The amplitude label sits at half the
-amplitude, below the line. SCZPD's
+right, clear of the vertical axis and its labels. The amplitude label sits
+at half the amplitude, below the line. SCZPD's
 displacement is past 180 degrees, so the arc passes through the upper half
 of the circle and ends just below the negative horizontal axis. The values
 are the `d_est` and `a_est` columns of `ssm$results`, not values read off
@@ -628,8 +630,9 @@ ellipse
 
 Nagy, Etzel and Lüdtke (2019, Figure 4 and Appendices B and C) read four
 lines off such an ellipse. Two are the tangents from the origin to the
-ellipse: their angles are the smallest and largest displacements of any point
-in the ellipse. Two join the origin to the nearest and farthest points of the
+ellipse. Their angles bound the arc of directions the ellipse spans, read
+counterclockwise from the first tangent to the second. Two join the origin
+to the nearest and farthest points of the
 ellipse's boundary. Their lengths are the smallest and largest amplitudes of
 any point in the ellipse. The function below computes all four from the
 one-row data frame above and the ellipse's confidence level. It works from
@@ -639,8 +642,9 @@ slope equations. A direction from the origin is tangent to the ellipse when
 the line along it meets the ellipse at exactly one point. That makes the
 quadratic for where the line meets the ellipse have a double root. Setting
 its discriminant to zero gives a quadratic in the direction's slope, whose
-two roots are the two tangent directions. The two distances are the extremes of the boundary radius over the ellipse's
-parametric angle, found on a fine grid and refined with `optimize()`. When
+two roots are the two tangent directions. The two distances are the extremes
+of the boundary radius over the ellipse's parametric angle, found on a fine
+grid and refined with `optimize()`. When
 the origin lies inside the ellipse there are no tangents, so those two
 angles are `NA`. The nearest distance is then the smallest boundary radius.
 
@@ -662,6 +666,8 @@ ellipse_lines <- function(ellipse, level = 0.95) {
     M <- tcrossprod(Ac) - outside * A
     # The zero directions of w'Mw solve a quadratic in the slope. Use the
     # slope or its reciprocal, whichever gives the larger leading coefficient.
+    # Both roots are real whenever the origin is outside (det(M) < 0), so
+    # Re() drops only a zero imaginary part.
     if (abs(M[2, 2]) >= abs(M[1, 1])) {
       w <- rbind(1, Re(polyroot(c(M[1, 1], 2 * M[1, 2], M[2, 2]))))
     } else {
@@ -696,8 +702,9 @@ ellipse_lines <- function(ellipse, level = 0.95) {
     amplitude = c(NA, NA, nearest$objective, farthest$objective)
   )
 }
-lines <- ellipse_lines(ellipse, level = 0.95)
-lines
+level <- 0.95
+four_lines <- ellipse_lines(ellipse, level = level)
+four_lines
 #>        line displacement amplitude
 #> 1 tangent_1     310.7611        NA
 #> 2 tangent_2     324.8137        NA
@@ -714,7 +721,8 @@ that straddles 0/360 degrees.
 The figure draws the wedge, the ellipse, the four lines and the point
 estimate for the same profile on one canvas. The wedge and the point come
 from `post$results`, as in Section 4. The ellipse comes from the one-row data
-frame above. The two tangent lines are dashed and run from the origin to the
+frame above, drawn at the same `level` the four lines were computed at. The
+two tangent lines are dashed and run from the origin to the
 rim. The two distance lines are dotted and run from the origin to the
 nearest and farthest boundary points.
 
@@ -722,14 +730,14 @@ nearest and farthest boundary points.
 ``` r
 amax <- 0.6
 tangents <- data.frame(
-  line = rep(lines$line[1:2], each = 2),
+  line = rep(four_lines$line[1:2], each = 2),
   amplitude = rep(c(0, amax), times = 2),
-  displacement = rep(lines$displacement[1:2], each = 2)
+  displacement = rep(four_lines$displacement[1:2], each = 2)
 )
 distances <- data.frame(
-  line = rep(lines$line[3:4], each = 2),
-  amplitude = c(rbind(0, lines$amplitude[3:4])),
-  displacement = rep(lines$displacement[3:4], each = 2)
+  line = rep(four_lines$line[3:4], each = 2),
+  amplitude = c(rbind(0, four_lines$amplitude[3:4])),
+  displacement = rep(four_lines$displacement[3:4], each = 2)
 )
 
 ggcircumplex(
@@ -762,7 +770,8 @@ ggcircumplex(
     data = ellipse,
     mapping = aes(
       x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy
-    )
+    ),
+    level = level
   ) +
   geom_ssm_point(
     data = post$results,
@@ -821,8 +830,8 @@ ellipse.
 
 Read the ellipse against the origin with care. An ellipse at confidence
 level 1 − α that excludes the origin rejects zero amplitude in a Wald test at
-significance level α. That holds only under the normal approximation. A Wald test
-compares an estimate with its standard error, here the pair `(x, y)` with
+significance level α. That holds only under the normal approximation. A Wald
+test compares an estimate with its standard error, here the pair `(x, y)` with
 its covariance. The ellipse above is drawn at confidence level 0.95. It is
 the set of `(x, y)` values the test does not reject at significance level
 0.05. Its covariance is a posterior

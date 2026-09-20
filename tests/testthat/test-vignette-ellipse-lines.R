@@ -14,12 +14,17 @@
 # (ii) Circular ellipses (var_x = var_y, cov_xy = 0), where the tangents are
 #      the centre's displacement +/- asin(r / c) and the distances c - r and
 #      c + r, in closed form and independent of GeomSsmEllipse.
+# (iii) Non-circular ellipses whose major axis points at the origin, where
+#       the nearest and farthest boundary points sit on that axis at
+#       c -/+ the semi-major length, in closed form and independent of
+#       GeomSsmEllipse. Oracle (ii) never exercises the cross terms of the
+#       covariance, so this one carries the distances on a real ellipse.
 #
 # The .orig is .Rbuildignore'd, so R CMD check and covr skip.
 
-ellipse_row <- function(c, d, var_x, var_y, cov_xy) {
+ellipse_row <- function(cen, d, var_x, var_y, cov_xy) {
   data.frame(
-    x0 = c * cos(d * pi / 180), y0 = c * sin(d * pi / 180),
+    x0 = cen * cos(d * pi / 180), y0 = cen * sin(d * pi / 180),
     var_x = var_x, var_y = var_y, cov_xy = cov_xy
   )
 }
@@ -40,9 +45,17 @@ ellipse_lines_chunk <- local({
   }
 })
 
-# Absolute tolerances: every bound in the acceptance criteria is absolute.
+# Absolute tolerances: every bound in the acceptance criteria is absolute. A
+# failure reports the observed gap, so a marginal miss shows its size.
 expect_within <- function(got, want, tol, info = NULL) {
-  expect_lt(max(abs(got - want)), tol, label = info)
+  err <- max(abs(got - want))
+  expect_true(
+    err < tol,
+    info = paste0(
+      if (!is.null(info)) paste0(info, ": "),
+      "max abs error ", signif(err, 3), " against tolerance ", tol
+    )
+  )
 }
 
 skip_if_no_chunk <- function() {
@@ -66,7 +79,7 @@ test_that("the chunk defines ellipse_lines() and runs it on the vignette's ellip
   skip_if_no_chunk()
   env <- ellipse_lines_chunk()
   expect_true(is.function(env$ellipse_lines))
-  lines <- env$lines
+  lines <- env$four_lines
   expect_s3_class(lines, "data.frame")
   expect_identical(lines$line, c("tangent_1", "tangent_2", "nearest", "farthest"))
   expect_true(all(lines$displacement >= 0 & lines$displacement < 360))
@@ -119,22 +132,50 @@ test_that("oracle (i): an origin-containing ellipse has NA tangents and the outl
 test_that("oracle (ii): circular ellipses match the closed form", {
   skip_if_no_chunk()
   env <- ellipse_lines_chunk()
-  c <- 0.6
+  cen <- 0.6
   for (ratio in c(0.2, 0.5, 0.9)) {
     for (d in c(30, 350)) {
       for (level in c(0.5, 0.95)) {
-        r <- ratio * c
+        r <- ratio * cen
         s2 <- r^2 / stats::qchisq(level, 2)
-        ellipse <- ellipse_row(c, d, s2, s2, 0)
+        ellipse <- ellipse_row(cen, d, s2, s2, 0)
         got <- env$ellipse_lines(ellipse, level = level)
-        half <- asin(r / c) * 180 / pi
+        half <- asin(r / cen) * 180 / pi
         info <- sprintf("ratio %s, d %s, level %s", ratio, d, level)
         expect_within(got$displacement[1:2], c((d - half) %% 360, (d + half) %% 360),
                       1e-6, info = info)
-        expect_within(got$amplitude[3:4], c(c - r, c + r), 1e-6, info = info)
+        expect_within(got$amplitude[3:4], c(cen - r, cen + r), 1e-6, info = info)
         # The nearest and farthest points lie on the centre's own direction.
-        expect_within(got$displacement[3:4], c(d, d), 1e-6, info = info)
+        # optimize() locates a stationary point only to about sqrt(eps) in
+        # its argument, so the direction is held to 1e-4 degrees; the
+        # distances above, flat there, are held to 1e-6.
+        expect_within(got$displacement[3:4], c(d, d), 1e-4, info = info)
       }
+    }
+  }
+})
+
+test_that("oracle (iii): an ellipse whose major axis points at the origin has its extremes on that axis", {
+  skip_if_no_chunk()
+  env <- ellipse_lines_chunk()
+  cen <- 0.6
+  major <- 0.02
+  minor <- 0.005
+  for (d in c(30, 200, 350)) {
+    for (level in c(0.5, 0.95)) {
+      th <- d * pi / 180
+      R <- matrix(c(cos(th), sin(th), -sin(th), cos(th)), 2, 2)
+      S <- R %*% diag(c(major, minor)) %*% t(R)
+      ellipse <- ellipse_row(cen, d, S[1, 1], S[2, 2], S[1, 2])
+      semi <- sqrt(major * stats::qchisq(level, 2))
+      expect_lt(semi, cen)
+      got <- env$ellipse_lines(ellipse, level = level)
+      info <- sprintf("d %s, level %s", d, level)
+      expect_within(got$amplitude[3:4], c(cen - semi, cen + semi), 1e-6, info = info)
+      expect_within(got$displacement[3:4], c(d, d), 1e-4, info = info)
+      # The tangents straddle the centre direction symmetrically.
+      gap <- (got$displacement[2] - got$displacement[1]) %% 360
+      expect_within((got$displacement[1] + gap / 2) %% 360, d, 1e-4, info = info)
     }
   }
 })
@@ -144,7 +185,9 @@ test_that("the ellipse figure draws the four lines from the chunk's values", {
   env <- ellipse_lines_chunk()
   code <- vignette_chunk("advanced-visualization.Rmd.orig", "ellipse-figure")
   fig_env <- new.env(parent = asNamespace("ggplot2"))
-  for (v in c("post", "ellipse", "lines")) assign(v, get(v, env), envir = fig_env)
+  for (v in c("post", "ellipse", "level", "four_lines")) {
+    assign(v, get(v, env), envir = fig_env)
+  }
   p <- eval(parse(text = code), envir = fig_env)
   expect_s3_class(p, "ggplot")
   expect_identical(p$coordinates$grid, "cartesian")
@@ -157,7 +200,7 @@ test_that("the ellipse figure draws the four lines from the chunk's values", {
     c("GeomBlank", "GeomSsmArc", "GeomSsmPath", "GeomSsmPath", "GeomSsmEllipse",
       "GeomSsmPoint", "GeomText")
   )
-  lines <- env$lines
+  lines <- env$four_lines
   amax <- p$coordinates$amax
   # The wedge, light.
   expect_lte(p$layers[[2]]$aes_params$alpha, 0.15)
@@ -188,10 +231,10 @@ test_that("the ellipse figure draws the four lines from the chunk's values", {
 test_that("oracle (ii): a circle containing the origin has NA tangents and nearest r - c", {
   skip_if_no_chunk()
   env <- ellipse_lines_chunk()
-  c <- 0.2
+  cen <- 0.2
   r <- 0.3
   s2 <- r^2 / stats::qchisq(0.95, 2)
-  got <- env$ellipse_lines(ellipse_row(c, 30, s2, s2, 0), level = 0.95)
+  got <- env$ellipse_lines(ellipse_row(cen, 30, s2, s2, 0), level = 0.95)
   expect_identical(got$displacement[1:2], c(NA_real_, NA_real_))
-  expect_within(got$amplitude[3:4], c(r - c, r + c), 1e-6)
+  expect_within(got$amplitude[3:4], c(r - cen, r + cen), 1e-6)
 })
