@@ -1,13 +1,13 @@
 # M143: The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M142
 - **Driving RR:** —
 - **Principles touched:** IP2, IP3, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — a vignette section and its figures
-- **Branch/PR:** —
+- **Branch/PR:** m143-vignette-nagy-figures
 
 ## Goal
 
@@ -39,7 +39,7 @@ Redraw the circle figures of the visualization vignette's section 7 on the M142 
 
 ## Tasks
 
-- [ ] T1: Author `cairn/references/nagy2019.md` from the source-note template with its `INDEX.md` line: page anchors for Figures 1 (p. 406), 3 (p. 410), 4 (p. 416) and 6 (p. 421) and Appendix B and C (pp. 426–427), each anchor naming its channel (`pdftotext` text or a visual read of the rendered page). A figure convention is a rasterized read (M42-D1).
+- [x] T1: Author `cairn/references/nagy2019.md` from the source-note template with its `INDEX.md` line: page anchors for Figures 1 (p. 406), 3 (p. 410), 4 (p. 416) and 6 (p. 421) and Appendix B and C (pp. 426–427), each anchor naming its channel (`pdftotext` text or a visual read of the rendered page). A figure convention is a rasterized read (M42-D1).
 - [ ] T2: `latent-ticks` and `latent-vectors` on the cartesian canvas, prose rewritten with estimated angles only. The comparison with `Angle_theory` moves to the table paragraph. No `echo = FALSE` chunk.
 - [ ] T3: `latent-measure`: one measure with the increasing-displacement arc and the two value labels, prose naming Nagy Figure 3 as its model.
 - [ ] T4: Test first: `tests/testthat/test-vignette-ellipse-lines.R` purling `ellipse-lines` with both oracles and the origin-inside case. Then the chunk: tangent directions from the quadratic in the direction vector, distances from the boundary extremes, `NA` tangents when the origin's Mahalanobis distance is within the level's radius. The no-oracle RB tripwire does not fire because oracle (ii) is closed-form.
@@ -54,6 +54,8 @@ Redraw the circle figures of the visualization vignette's section 7 on the M142 
 - 2026-09-20: plan gate chose the tangent and distance lines as echoed vignette code with the wedge kept light, over no lines or an unchanged figure; the geom aesthetic stays parked. Falsified by a reader asking for the lines outside the vignette, which promotes the helper candidate row.
 - 2026-09-20: plan chose the increasing-displacement arc for `latent-measure` (Nagy Figure 3 sweeps from 0° counterclockwise) over the short way; falsified by a measure past 180° whose arc reads wrong on inspection.
 - 2026-09-20: criteria audit in full mode ([O] reader), two rounds. Round two on this file: FIX applied (one distance definition across both oracles, `geom_blank` wording), DECIDE settled (arc direction, oracle (i) kept as a discretization with oracle (ii) independent).
+- 2026-09-20: /milestone-implement started; branch `m143-vignette-nagy-figures` cut from pushed master. Implement gate: `latent-measure` annotates SCZPD (187°, past 180 so the sweeping arc is exercised; nearest Nagy's 205° example) and both measure figures are black with text labels and no legend, as Nagy draws them. Both the recommended options.
+- 2026-09-20: T1 done. `cairn/references/nagy2019.md` and its INDEX line: captions and p. 415 body text by `pdftotext`, figure geometry by a visual read of rendered pp. 406, 410, 416, 421; Appendices B and C anchored by heading only. Figure 4's scenario covariances are not printed, so its values are no oracle. The simple-english lint hook flags cairn record prose (em dashes, the template's one-line Extraction status); left as the template shapes it.
 
 ## Decisions
 
