@@ -66,8 +66,9 @@ Section 4, "Placing SSM results in the circle", adds profiles with
 `geom_ssm_point()` and `geom_ssm_arc()`. Section 5, "Restyling the canvas",
 themes it. Section 6, "Composing custom layers", adds respondents behind a
 group profile with `ssm_score()`. Section 7, "The latent circumplex from a
-CPM fit", draws the angles a `cpm_fit()` estimated, measure vectors, and the
-fitted correlation function. Section 8, "Trajectories across occasions",
+CPM fit", draws the angles a `cpm_fit()` estimated, measure vectors, the
+fitted correlation function, and a joint confidence ellipse from posterior
+draws. Section 8, "Trajectories across occasions",
 draws profiles estimated at several occasions. Section 9, "The angle axis for
 linear plots", labels a linear axis with `scale_x_circumplex()`. Section 10,
 "Relationship to the built-in plots", says how the built-in plots use these
@@ -492,6 +493,76 @@ where each pair lands after that attenuation. The filled point minus the
 hollow point is the pair's residual, the entry of `matrices$residuals`. Read
 the line for the shape of the latent circumplex and the residuals for the
 fit.
+
+### A joint confidence ellipse from posterior draws
+
+The wedge that `geom_ssm_arc()` draws is built from two intervals, one on
+amplitude and one on displacement. A profile's uncertainty can also be shown
+as a joint region on the Cartesian coordinates under a normal approximation
+to the draws. `geom_ssm_ellipse()` draws that region as an ellipse. It takes
+a centre `(x0, y0)` and the three elements of a 2 by 2 covariance matrix as
+aesthetics. `ssm_ellipse_data()` computes those five columns from an
+`ssm_draws()` object, so the layer needs a result that retains draws. The
+draws below are the posterior draws that the "Bayesian SSM Analysis" vignette
+analyses. They ship with the package in `bayesian_ssm_draws.rds`, generated
+once by the seeded script `data-raw/bayesian_ssm_draws.R`, and that vignette
+states the model they come from.
+
+```{r ellipse-data}
+draws <- readRDS("bayesian_ssm_draws.rds")
+post <- ssm_draws(draws, type = "parameters")
+ellipse <- ssm_ellipse_data(post)
+ellipse
+```
+
+The figure draws the wedge, the ellipse, and the point estimate for the same
+profile on one canvas. The wedge and the point come from `post$results`, as in
+Section 4. The ellipse comes from the one-row data frame above.
+
+```{r ellipse-figure}
+ggcircumplex(octants(), labels = PANO(), amax = 0.6) +
+  geom_ssm_arc(
+    data = post$results,
+    mapping = aes(
+      amplitude_min = a_lci, amplitude_max = a_uci,
+      displacement_min = d_lci, displacement_max = d_uci
+    ),
+    alpha = 0.3
+  ) +
+  geom_ssm_ellipse(
+    data = ellipse,
+    mapping = aes(
+      x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy
+    ),
+    color = "firebrick"
+  ) +
+  geom_ssm_point(
+    data = post$results,
+    mapping = aes(amplitude = a_est, displacement = d_est)
+  )
+```
+
+In the figure, the ellipse is centred on the plotted point estimate, and its
+covariance comes from the draws. The centre is the posterior median of `x`
+and of `y`, the values `ssm_draws()` reports as `x_est` and `y_est`. The
+covariance is the sample covariance of the draws of `x` and `y`. The wedge
+and the ellipse are two different summaries of the same draws. The ellipse is
+a joint region on the Cartesian coordinates under a normal approximation to
+the draws, whereas the wedge is the marginal circular-quantile interval on
+amplitude and displacement, drawn as a pair. The displacement interval is a
+circular quantile interval, and the amplitude interval is a percentile
+interval, so neither depends on a normal approximation. The two regions
+answer different questions, so the two need not coincide. Here the ellipse
+reaches farther than the wedge along the amplitude axis and along the
+displacement axis, and the wedge's four corners fall outside the ellipse.
+
+Read the ellipse against the origin with care: an ellipse that excludes the
+origin is a Wald test of zero amplitude at that level, and only under that
+approximation. A Wald test compares an estimate with its standard error, here
+the pair `(x, y)` with its covariance, and the ellipse is the acceptance
+region of that test. The wedge makes no such test. A displacement interval
+that excludes some angle is not a significance test of that angle, and an
+amplitude interval above zero is a statement about amplitude alone.
 
 ## 8. Trajectories across occasions
 

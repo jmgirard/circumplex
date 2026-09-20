@@ -44,7 +44,7 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - [x] T1: `GeomSsmEllipse` in `R/geom_ssm.R`: `setup_data()` validates, computes `n` Cartesian vertices from the Cholesky factor of `S` scaled by `sqrt(qchisq(level, 2))`, converts to radius and degrees with `d + 2*pi*(d < 0)` (M26 lesson), unwraps by extension along the path (`xmax = xmin + span` pattern, may exceed 360), emits `group` per input row; constructor `geom_ssm_ellipse()` mirrors `geom_ssm_path()`; roxygen with `@family circumplex layers`; export `GeomSsmEllipse` on the `circumplex-ggproto` page.
 - [x] T2: `ssm_ellipse_data()` generic + `circumplex_ssm_draws` method in `R/ssm_draws.R`; roxygen; export.
 - [x] T3: Tests in `test-geom_ssm.R` and `test-ssm_draws.R` for AC1–AC5 (closed-form oracle over the three rows, seam and origin cases, every abort branch, `na.rm` both ways); two vdiffr snapshots (seam, origin) under `_snaps/geom_ssm/`; a non-visual CRAN guard in `test-plot-cran-guards.R`.
-- [ ] T4: Vignette subsection + prose with the five AC6 phrases; re-render; look at the figure; add the five phrases to M140's `test-vignette-latent-figures.R`.
+- [x] T4: Vignette subsection + prose with the five AC6 phrases; re-render; look at the figure; add the five phrases to M140's `test-vignette-latent-figures.R`.
 - [ ] T5: `_pkgdown.yml` rows; NEWS; `document()`; `check()`; guards.
 
 ## Work log
@@ -55,6 +55,7 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - 2026-09-20: /milestone-implement started on branch `m141-ellipse-geom`. The question gate was skipped because the plan gate fixed the API and the three remaining choices were routine: `level` and `n` are validated in the constructor, the path repeats its first vertex (n + 1 rows per ellipse), and each input row gets its own `group`.
 - 2026-09-20: T1 and T2 done. AC1 to AC5 tests pass (64 in test-geom_ssm.R, 140 in test-ssm_draws.R) and two vdiffr snapshots were added (seam, origin). Check discrimination: three planted defects in the geom (transposed Cholesky factor, chi-square with 1 df, `abs()` angle wrap) each move the AC1 residual from 3e-14 to over 2, so the oracle can fail. The seam, origin, and draws figures were rendered and inspected.
 - 2026-09-20: T3 done. The CRAN guard in test-plot-cran-guards.R asserts the built vertices against the chi-square contour and the centre (mean of the antipodal vertex pairs). Full suite under NOT_CRAN: 11377 pass, 1 fail, which was the guard's first draft asserting a diagonal-only property of the first vertex. Fixed, the file passes (27).
+- 2026-09-20: T4 done. Subsection "A joint confidence ellipse from posterior draws" closes section 7 of the visualization vignette, with the Overview map sentence extended. Re-rendered with tools/precompute-vignettes.R after reinstalling (the first render ran against a stale install and errored on both new functions). Rendered diff is two hunks (Overview line, the new subsection). The figure was inspected. A first prose claim, "the wedge sits inside the ellipse", was refuted by a corner check (all four wedge corners at quadratic form 7.1 to 8.1 against 5.99) and replaced with what the numbers show. Phrase test passes with the five AC6 phrases added (12).
 
 ## Decisions
 
