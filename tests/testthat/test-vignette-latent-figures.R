@@ -13,7 +13,16 @@ latent_figure_phrases <- c(
   "the ticks are the angles `cpm_fit()` estimated, and the labelled spokes are the theoretical angles",
   "the spoke and the tick for the same scale come from different models, and the vectors come from a third: the SSM computed on the theoretical angles",
   "the points are observed correlations and the line is the fitted correlation function",
-  "a vector's length is the measure's amplitude, not its correlation with the latent circumplex"
+  "a vector's length is the measure's amplitude, not its correlation with the latent circumplex",
+  # The ellipse subsection: what the ellipse is, how it differs from the
+  # wedge, and what excluding the origin does and does not mean.
+  "a joint region on the Cartesian coordinates under a normal approximation to the draws",
+  "the wedge is the pair of marginal intervals on amplitude and displacement, a percentile interval on amplitude and a circular-quantile interval on displacement",
+  "the two need not coincide",
+  # Raw UTF-8 (a minus sign U+2212 and a Greek alpha), not \u escapes: under
+  # LC_ALL=C an escaped literal parses with unknown encoding and never matches.
+  "an ellipse at confidence level 1 − α that excludes the origin rejects zero amplitude in a Wald test at significance level α, and only under that approximation",
+  "the ellipse is centred on the posterior medians of `x` and `y`, not on the plotted point, and its covariance comes from the draws"
 )
 
 test_that("the latent-circumplex section states where each figure's angles come from", {

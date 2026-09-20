@@ -249,3 +249,148 @@ test_that("a canvas-plus-geoms plot renders (visual regression)", {
       amplitude = a_est, displacement = d_est, group = Label))
   vdiffr::expect_doppelganger("ggcircumplex with ssm geoms", p)
 })
+
+# --- confidence ellipse (geom_ssm_ellipse) ------------------------------------
+# The layer emits one closed path per input row: n + 1 vertices (the first
+# repeated) whose (x = degrees, y = radius) the coord bends onto the canvas.
+# Converting the built vertices back to Cartesian and evaluating the quadratic
+# form (v - c)' S^-1 (v - c) is the closed-form oracle: every vertex of the
+# level-`level` ellipse satisfies it equal to qchisq(level, 2).
+
+ellipse_aes <- ggplot2::aes(
+  x0 = .data$x0, y0 = .data$y0,
+  var_x = .data$var_x, var_y = .data$var_y, cov_xy = .data$cov_xy
+)
+ellipse_plot <- function(df, level = 0.95, n = 100, na.rm = TRUE) {
+  ggcircumplex(octants(), amax = 1) +
+    geom_ssm_ellipse(
+      data = df, mapping = ellipse_aes, level = level, n = n, na.rm = na.rm
+    )
+}
+# Built layer data -> Cartesian vertices, per input row (group).
+ellipse_vertices <- function(p) {
+  d <- layer_data_for(p, "GeomSsmEllipse")
+  th <- d$x * pi / 180
+  split(data.frame(vx = d$y * cos(th), vy = d$y * sin(th), x = d$x), d$group)
+}
+mahalanobis_sq <- function(v, row) {
+  S <- matrix(c(row$var_x, row$cov_xy, row$cov_xy, row$var_y), 2, 2)
+  dv <- cbind(v$vx - row$x0, v$vy - row$y0)
+  rowSums((dv %*% solve(S)) * dv)
+}
+
+test_that("every ellipse vertex sits on the chi-square contour of its covariance (AC1)", {
+  # Row 1: negative cov_xy. Row 2: anisotropic diagonal S, var_x the larger.
+  df <- data.frame(
+    x0 = c(0.5, -0.3), y0 = c(0.2, 0.4),
+    var_x = c(0.010, 0.040), var_y = c(0.020, 0.005), cov_xy = c(-0.008, 0)
+  )
+  verts <- ellipse_vertices(ellipse_plot(df))
+  expect_length(verts, 2L)
+  for (i in 1:2) {
+    v <- verts[[i]]
+    expect_equal(nrow(v), 101L)
+    expect_lt(max(abs(mahalanobis_sq(v, df[i, ]) - stats::qchisq(0.95, 2))), 1e-8)
+  }
+  # Diagonal case: the farthest vertex from the centre is at the semi-major
+  # axis length sqrt(qchisq(level, 2) * max(diag(S))).
+  v2 <- verts[[2]]
+  far <- max(sqrt((v2$vx - df$x0[2])^2 + (v2$vy - df$y0[2])^2))
+  expect_lt(abs(far - sqrt(stats::qchisq(0.95, 2) * 0.040)), 1e-8)
+})
+
+test_that("the contour follows `level` and the vertex count follows `n` (AC1)", {
+  df <- data.frame(x0 = 0.1, y0 = -0.6, var_x = 0.02, var_y = 0.02, cov_xy = 0.01)
+  v <- ellipse_vertices(ellipse_plot(df, level = 0.8, n = 64))[[1]]
+  expect_equal(nrow(v), 65L)
+  expect_lt(max(abs(mahalanobis_sq(v, df) - stats::qchisq(0.8, 2))), 1e-8)
+  # A different level is a different contour: the 0.95 oracle fails here.
+  expect_gt(max(abs(mahalanobis_sq(v, df) - stats::qchisq(0.95, 2))), 1e-3)
+})
+
+test_that("a seam-adjacent ellipse and an origin-containing one unwrap the short way (AC2)", {
+  seam <- data.frame(
+    x0 = 0.5 * cos(358 * pi / 180), y0 = 0.5 * sin(358 * pi / 180),
+    var_x = 0.004, var_y = 0.004, cov_xy = 0.001
+  )
+  origin <- data.frame(x0 = 0.05, y0 = 0.02, var_x = 0.04, var_y = 0.04, cov_xy = 0)
+  # The two-row fixture draws both outlines in one layer; the step bound is
+  # taken within each group, so the jump between outlines is never measured.
+  for (df in list(seam, origin, rbind(seam, origin))) {
+    d <- layer_data_for(ellipse_plot(df), "GeomSsmEllipse")
+    expect_false(anyNA(d$x))
+    expect_false(anyNA(d$y))
+    expect_equal(length(unique(d$group)), nrow(df))
+    for (xg in split(d$x, d$group)) expect_lt(max(abs(diff(xg))), 180)
+  }
+  # The seam path closes on its own branch; the origin path winds once round.
+  xs <- layer_data_for(ellipse_plot(seam), "GeomSsmEllipse")$x
+  expect_equal(xs[[length(xs)]], xs[[1]])
+  xo <- layer_data_for(ellipse_plot(origin), "GeomSsmEllipse")$x
+  expect_equal(abs(xo[[length(xo)]] - xo[[1]]), 360)
+})
+
+test_that("geom_ssm_ellipse aborts naming `level` outside (0, 1) (AC3)", {
+  expect_error(geom_ssm_ellipse(level = 1), "`level`")
+  expect_error(geom_ssm_ellipse(level = 0), "`level`")
+  expect_error(geom_ssm_ellipse(level = 1.5), "`level`")
+  expect_error(geom_ssm_ellipse(level = c(0.5, 0.9)), "`level`")
+  expect_no_error(geom_ssm_ellipse(level = 0.5))
+  # `n` must be a single whole number of at least 3 (its abort names `n`).
+  expect_error(geom_ssm_ellipse(n = 2), "`n`")
+  expect_error(geom_ssm_ellipse(n = 4.5), "`n`")
+  expect_error(geom_ssm_ellipse(n = c(3, 4)), "`n`")
+  expect_no_error(geom_ssm_ellipse(n = 3))
+})
+
+test_that("geom_ssm_ellipse aborts naming every non-positive-definite row (AC3)", {
+  df <- data.frame(
+    x0 = c(0.1, 0.2, 0.3, 0.4), y0 = 0,
+    var_x = c(0.01, 0, 0.01, 0.01), var_y = c(0.01, 0.01, -0.01, 0.01),
+    cov_xy = c(0, 0, 0, 0.01) # row 4: cov_xy^2 == var_x * var_y
+  )
+  err <- tryCatch(
+    ggplot2::ggplot_build(ellipse_plot(df)),
+    error = function(e) conditionMessage(e)
+  )
+  expect_type(err, "character")
+  expect_match(err, "positive definite")
+  expect_match(err, "2, 3, 4", fixed = TRUE)
+  # The well-formed row alone builds.
+  expect_no_error(ggplot2::ggplot_build(ellipse_plot(df[1, ])))
+  # Indices count against the input rows: a non-finite first row is dropped
+  # (AC4), and the bad row behind it is still named as row 2, not row 1.
+  shifted <- data.frame(
+    x0 = c(NA, 0.2), y0 = 0, var_x = c(0.01, 0), var_y = 0.01, cov_xy = 0
+  )
+  err <- tryCatch(
+    ggplot2::ggplot_build(ellipse_plot(shifted)),
+    error = function(e) conditionMessage(e)
+  )
+  expect_match(err, "row(s) 2 ", fixed = TRUE)
+})
+
+test_that("geom_ssm_ellipse drops non-finite rows silently under na.rm = TRUE and warns by count under FALSE (AC4)", {
+  # Row 4 is both non-finite and not positive definite: it is AC4's to drop,
+  # not AC3's to name, so the build warns and never aborts.
+  df <- data.frame(
+    x0 = c(0.1, Inf, 0.3, NA), y0 = 0,
+    var_x = c(0.01, 0.01, NA, -1), var_y = 0.01, cov_xy = 0
+  )
+  expect_warning(
+    ggplot2::ggplot_build(ellipse_plot(df, na.rm = FALSE)), "[Rr]emoved 3 rows"
+  )
+  expect_no_warning(b <- ggplot2::ggplot_build(ellipse_plot(df, na.rm = TRUE)))
+  expect_equal(nrow(layer_data_for(ellipse_plot(df), "GeomSsmEllipse")), 101L)
+})
+
+test_that("ellipse snapshots at the seam and over the origin (visual regression)", {
+  skip_if_not_installed("vdiffr")
+  seam <- data.frame(
+    x0 = 0.5 * cos(358 * pi / 180), y0 = 0.5 * sin(358 * pi / 180),
+    var_x = 0.004, var_y = 0.004, cov_xy = 0.001
+  )
+  origin <- data.frame(x0 = 0.05, y0 = 0.02, var_x = 0.04, var_y = 0.04, cov_xy = 0)
+  vdiffr::expect_doppelganger("ellipse at the seam", ellipse_plot(seam))
+  vdiffr::expect_doppelganger("ellipse over the origin", ellipse_plot(origin))
+})

@@ -81,6 +81,8 @@ reference:
   - geom_ssm_point
   - geom_ssm_arc
   - geom_ssm_path
+  - geom_ssm_ellipse
+  - ssm_ellipse_data
   - scale_x_circumplex
   - theme_circumplex
 - title: Secondary SSM Functions

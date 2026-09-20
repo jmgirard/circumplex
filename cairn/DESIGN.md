@@ -493,9 +493,10 @@ What reproducibility does **not** mean:
 
 The public ggplot2 extension (M3) turns the former inline plotting code into
 composable pieces: `ggcircumplex()` (canvas), `geom_ssm_point()` /
-`geom_ssm_arc()` (polar-native layers), and `scale_x_circumplex()` (angle
-axis). `ssm_plot_circle()`/`_curve()` are built on them; `ssm_plot_contrast()`
-is a Cartesian difference plot and stays independent.
+`geom_ssm_arc()` / `geom_ssm_path()` / `geom_ssm_ellipse()` (polar-native
+layers), and `scale_x_circumplex()` (angle axis). `ssm_plot_circle()`/`_curve()`
+are built on them; `ssm_plot_contrast()` is a Cartesian difference plot and
+stays independent.
 
 **Architecture (M31 rewrite; D-019 coord + D-020 ggforce removal).**
 
@@ -525,6 +526,15 @@ is a Cartesian difference plot and stays independent.
   zero-width regions, unwraps a seam-straddling interval by extension
   (`xmax = xmin + span`, may exceed 360) and validates the span; the polar coord
   bends the rectangle into an annular wedge.
+- **Path geom** (`GeomSsmPath` ⊂ `GeomPath`): `setup_data()` maps amplitude
+  and displacement to `y`/`x` and unwraps each group's displacements onto a
+  continuous branch (`angle_unwrap()`), so a trajectory crossing the seam is
+  drawn the short way.
+- **Ellipse geom** (`GeomSsmEllipse` ⊂ `GeomPath`): `setup_data()` drops
+  non-finite rows, aborts on a covariance that is not positive definite, and
+  computes each row's chi-square contour in Cartesian space from the Cholesky
+  factor, then converts vertices to (amplitude, displacement) and unwraps them
+  along the outline; the coord owns the polar transform, as for every layer.
 - **Label resolution**: a shared `resolve_circumplex_labels()` backs both the
   canvas theta axis and `scale_x_circumplex()`, so identical
   `angles`/`labels`/`instrument` inputs label both contexts consistently.
@@ -535,7 +545,8 @@ each is structurally impossible to reintroduce once the coord owns the transform
 (M30 design; D-019). `ggforce` is no longer a dependency (D-020) — the arc is a
 coord-bent `GeomRect` and the rings are the coord's r-gridlines; the dead
 cartesian helpers `ggrad()`/`ssm_to_cartesian()`/`ssm_radius()` went with it.
-The `GeomSsmPoint` / `GeomSsmArc` / `CoordCircumplex` ggproto generators are
+The `GeomSsmPoint` / `GeomSsmArc` / `GeomSsmPath` / `GeomSsmEllipse` /
+`CoordCircumplex` ggproto generators are
 exported for downstream subclassing (M32; documented under `circumplex-ggproto`
 with `@keywords internal`), alongside the layer/coord constructors that most
 users call. `na.rm` follows the ggplot2 convention as an opt-in (M32): the geom

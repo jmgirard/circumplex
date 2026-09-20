@@ -135,3 +135,39 @@ test_that("geom_ssm_path draws its vertices on the short arc across the pole", {
   expect_equal(as.numeric(d$amplitude), c(0.5, 0.5), tolerance = 1e-8)
   expect_true(all(is.finite(d$x)) && all(is.finite(d$y)))
 })
+
+test_that("geom_ssm_ellipse builds the chi-square contour of ssm_ellipse_data() on CRAN", {
+  # The ellipse's own snapshots are vdiffr (skipped on CRAN); this block asserts
+  # the built vertices instead. Draws with a known covariance, so the expected
+  # contour is stated independently of the layer: every vertex, mapped back to
+  # Cartesian, sits at squared Mahalanobis distance qchisq(0.95, 2) from the
+  # centre under the covariance ssm_ellipse_data() reports.
+  set.seed(4)
+  draws <- cbind(rnorm(300, 0.5, 0.1), rnorm(300, 0.3, 0.05), rnorm(300, 0.2, 0.08))
+  res <- ssm_draws(draws, type = "parameters")
+  ell <- ssm_ellipse_data(res)
+  p <- ggcircumplex(octants(), labels = PANO()) +
+    geom_ssm_ellipse(
+      ggplot2::aes(x0 = x0, y0 = y0, var_x = var_x, var_y = var_y, cov_xy = cov_xy),
+      data = ell
+    )
+  expect_true(ggplot2::is_ggplot(p))
+  layers <- ggplot2::ggplot_build(p)$data
+  hit <- Filter(function(d) "cov_xy" %in% names(d), layers)
+  expect_length(hit, 1L)
+  d <- hit[[1]]
+  expect_equal(nrow(d), 101L)
+  expect_true(all(is.finite(d$x)) && all(is.finite(d$y)))
+  vx <- d$y * cos(d$x * pi / 180)
+  vy <- d$y * sin(d$x * pi / 180)
+  S <- matrix(c(ell$var_x, ell$cov_xy, ell$cov_xy, ell$var_y), 2, 2)
+  dv <- cbind(vx - ell$x0, vy - ell$y0)
+  q <- rowSums((dv %*% solve(S)) * dv)
+  expect_equal(q, rep(stats::qchisq(0.95, 2), 101L), tolerance = 1e-8)
+  # The centre is (x_est, y_est), the posterior medians of x and y (not the
+  # polar point (a_est, d_est) that geom_ssm_point draws): the 100 distinct
+  # vertices come in antipodal pairs about the centre, so their mean is the
+  # centre itself, whatever the covariance's orientation.
+  expect_equal(mean(vx[1:100]), res$results$x_est, tolerance = 1e-8)
+  expect_equal(mean(vy[1:100]), res$results$y_est, tolerance = 1e-8)
+})

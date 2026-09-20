@@ -52,6 +52,7 @@ ggplot2::ggplot(res$results) +
 \seealso{
 Other circumplex layers:
 \code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=geom_ssm_ellipse]{geom_ssm_ellipse()}},
 \code{\link[=geom_ssm_path]{geom_ssm_path()}},
 \code{\link[=geom_ssm_point]{geom_ssm_point()}},
 \code{\link[=ggcircumplex]{ggcircumplex()}},

@@ -464,3 +464,34 @@ test_that("a tiny-negative-direction draw wraps to 360, never 0 (modu parity)", 
   expect_equal(as.numeric(res$draws[, "d"]), c(360, 360))
   expect_equal(as.numeric(res$results$d_est), 360)
 })
+
+# ssm_ellipse_data(): the five-column contract for geom_ssm_ellipse() ---------
+
+test_that("ssm_ellipse_data centres on the posterior medians x_est, y_est and takes cov() of the draws (AC5)", {
+  set.seed(7)
+  draws <- cbind(rnorm(400, 0.5, 0.1), rnorm(400, 0.6, 0.08), rnorm(400, -0.2, 0.12))
+  res <- ssm_draws(draws, type = "parameters")
+  out <- ssm_ellipse_data(res)
+  expect_s3_class(out, "data.frame")
+  expect_equal(nrow(out), 1L)
+  expect_named(out, c("x0", "y0", "var_x", "var_y", "cov_xy"))
+  expect_equal(out$x0, res$results$x_est)
+  expect_equal(out$y0, res$results$y_est)
+  # Oracle: stats::cov() of the x and y columns of the object's draws.
+  S <- stats::cov(res$draws[, c("x", "y")])
+  expect_equal(out$var_x, S["x", "x"])
+  expect_equal(out$var_y, S["y", "y"])
+  expect_equal(out$cov_xy, S["x", "y"])
+  # And the draws' centre is the medians, not their mean.
+  expect_equal(out$x0, stats::median(draws[, 2]))
+  expect_equal(out$y0, stats::median(draws[, 3]))
+})
+
+test_that("ssm_ellipse_data refuses an object with no draws, naming the class and ssm_draws() (AC5)", {
+  data("jz2017")
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = "NARPD", boots = 10)
+  err <- tryCatch(ssm_ellipse_data(res), error = function(e) conditionMessage(e))
+  expect_type(err, "character")
+  expect_match(err, "circumplex_ssm", fixed = TRUE)
+  expect_match(err, "ssm_draws()", fixed = TRUE)
+})
