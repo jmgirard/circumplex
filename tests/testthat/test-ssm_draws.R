@@ -467,7 +467,7 @@ test_that("a tiny-negative-direction draw wraps to 360, never 0 (modu parity)", 
 
 # ssm_ellipse_data(): the five-column contract for geom_ssm_ellipse() ---------
 
-test_that("ssm_ellipse_data centres on the plotted medians and takes cov() of the draws (AC5)", {
+test_that("ssm_ellipse_data centres on the posterior medians x_est, y_est and takes cov() of the draws (AC5)", {
   set.seed(7)
   draws <- cbind(rnorm(400, 0.5, 0.1), rnorm(400, 0.6, 0.08), rnorm(400, -0.2, 0.12))
   res <- ssm_draws(draws, type = "parameters")

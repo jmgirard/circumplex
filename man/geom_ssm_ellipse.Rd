@@ -27,8 +27,8 @@ Cartesian coordinates.}
 \item{level}{A single number strictly between 0 and 1: the confidence level
 of the region (default 0.95).}
 
-\item{n}{The number of vertices on each outline (default 100); the path is
-closed by repeating the first vertex.}
+\item{n}{The number of vertices on each outline (default 100), a single
+whole number of at least 3; the path returns to its first vertex.}
 
 \item{na.rm}{If \code{FALSE}, warn (with the dropped-row count) before removing
 rows with a non-finite centre or covariance element; if \code{TRUE} (the
@@ -59,8 +59,9 @@ Cartesian pair, not about amplitude and displacement separately; the wedge
 parameters, and the two regions need not coincide.
 
 Vertices are unwrapped along the outline so that an ellipse straddling the
-0/360 seam is drawn across it, and an ellipse containing the origin winds
-once round the centre of the canvas. Unwrapped displacements may therefore
+0/360 seam is drawn across it, and an ellipse whose inscribed polygon
+contains the origin winds once round the centre of the canvas. Unwrapped
+displacements may therefore
 fall outside \verb{[0, 360)}. Each retained input row is one outline: the layer
 sets the \code{group} aesthetic to one value per retained row, replacing any
 \code{group} the mapping supplies.

@@ -6,8 +6,9 @@
   each row it draws the confidence ellipse of a bivariate normal region on
   the Cartesian `(x, y)` SSM coordinates, from a centre `(x0, y0)` and the
   three elements of a 2 by 2 covariance matrix, at a chosen `level`. An
-  ellipse that straddles 0/360 degrees is drawn across the seam, and one that
-  contains the origin winds once round the centre. `ssm_ellipse_data()` is a
+  ellipse that straddles 0/360 degrees is drawn across the seam, and one whose
+  inscribed polygon contains the origin winds once round the centre.
+  `ssm_ellipse_data()` is a
   new generic that computes those five columns from an `ssm_draws()` object:
   the centre is the object's `x_est` and `y_est`, and the covariance is the
   sample covariance of the draws of `x` and `y`. The "Advanced Circumplex

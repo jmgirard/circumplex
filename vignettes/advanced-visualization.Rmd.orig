@@ -560,7 +560,7 @@ sqrt(sum((c(ellipse$x0, ellipse$y0) - point)^2))
 The covariance is the sample covariance of the draws of `x` and `y`. The
 wedge and the ellipse are two different summaries of the same draws. The
 ellipse is a joint region on the Cartesian coordinates under a normal
-approximation to the draws. Instead, the wedge is the pair of marginal
+approximation to the draws. By contrast, the wedge is the pair of marginal
 intervals on amplitude and displacement, a percentile interval on amplitude
 and a circular-quantile interval on displacement. The wedge draws those two
 intervals together as one region. Neither interval depends on a normal approximation. The two regions
@@ -573,9 +573,9 @@ Read the ellipse against the origin with care: an ellipse at confidence
 level 1 − α that excludes the origin rejects zero amplitude in a Wald test at
 significance level α, and only under that approximation. A Wald test
 compares an estimate with its standard error, here the pair `(x, y)` with
-its covariance. The ellipse is the acceptance region of that test. The
-ellipse above is drawn at confidence level 0.95, so it is the acceptance
-region of the test at significance level 0.05. Its covariance is a posterior
+its covariance. The ellipse above is drawn at confidence level 0.95. It is
+the set of `(x, y)` values the test does not reject at significance level
+0.05. Its covariance is a posterior
 covariance, so that reading also treats the posterior under the normal
 approximation as the sampling distribution of the estimate. The wedge makes
 no such test. A displacement interval that excludes some angle is not a

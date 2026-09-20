@@ -336,6 +336,11 @@ test_that("geom_ssm_ellipse aborts naming `level` outside (0, 1) (AC3)", {
   expect_error(geom_ssm_ellipse(level = 1.5), "`level`")
   expect_error(geom_ssm_ellipse(level = c(0.5, 0.9)), "`level`")
   expect_no_error(geom_ssm_ellipse(level = 0.5))
+  # `n` must be a single whole number of at least 3 (its abort names `n`).
+  expect_error(geom_ssm_ellipse(n = 2), "`n`")
+  expect_error(geom_ssm_ellipse(n = 4.5), "`n`")
+  expect_error(geom_ssm_ellipse(n = c(3, 4)), "`n`")
+  expect_no_error(geom_ssm_ellipse(n = 3))
 })
 
 test_that("geom_ssm_ellipse aborts naming every non-positive-definite row (AC3)", {

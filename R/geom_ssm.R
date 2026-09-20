@@ -425,8 +425,9 @@ GeomSsmArc <- ggplot2::ggproto(
 #' parameters, and the two regions need not coincide.
 #'
 #' Vertices are unwrapped along the outline so that an ellipse straddling the
-#' 0/360 seam is drawn across it, and an ellipse containing the origin winds
-#' once round the centre of the canvas. Unwrapped displacements may therefore
+#' 0/360 seam is drawn across it, and an ellipse whose inscribed polygon
+#' contains the origin winds once round the centre of the canvas. Unwrapped
+#' displacements may therefore
 #' fall outside `[0, 360)`. Each retained input row is one outline: the layer
 #' sets the `group` aesthetic to one value per retained row, replacing any
 #' `group` the mapping supplies.
@@ -438,8 +439,8 @@ GeomSsmArc <- ggplot2::ggproto(
 #'   Cartesian coordinates.
 #' @param level A single number strictly between 0 and 1: the confidence level
 #'   of the region (default 0.95).
-#' @param n The number of vertices on each outline (default 100); the path is
-#'   closed by repeating the first vertex.
+#' @param n The number of vertices on each outline (default 100), a single
+#'   whole number of at least 3; the path returns to its first vertex.
 #' @param na.rm If `FALSE`, warn (with the dropped-row count) before removing
 #'   rows with a non-finite centre or covariance element; if `TRUE` (the
 #'   default) remove them silently. A covariance that is not positive
@@ -514,7 +515,7 @@ GeomSsmEllipse <- ggplot2::ggproto(
     )
     if (any(bad)) {
       stop(
-        "geom_ssm_ellipse(): the covariance is not positive definite in row(s) ",
+        "geom_ssm_ellipse(): the covariance is not positive definite in input row(s) ",
         paste(which(bad), collapse = ", "),
         " (need var_x > 0, var_y > 0 and cov_xy^2 < var_x * var_y).",
         call. = FALSE
