@@ -69,6 +69,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - 2026-09-20: review checkpoint (partial). AC1 to AC5 and AC7 verified with fresh evidence and ticked. Consistency gate green apart from `devtools::check()`, still running. Three fresh-context reviewers running. AC6 and the gate presentation follow.
 - 2026-09-20: review fix-now work from the three-lens review landed (Heywood and NA-interval prose, PA fixed-angle consequence, eight sentence splits, signed residual, `Zeta` column, shape legend on the corfun figure, `pair_idx` rename, `ggcircumplex()` canvases, test guard). Vignette re-rendered. AC1 to AC5 and AC7 re-verified on the fixed tree. Findings and dispositions in the Review section. Full check re-running.
 - 2026-09-20: gate triage: O5 kept the added hollow-points sentence (no amendment); O8/S1 rejected, no follow-up. step-7 approval: m140-vignette-latent-circumplex-figures approved for merge.
+- 2026-09-20: PR #173 opened after approval. CI wait hit the harness ceiling: macOS job failed in dependency install (pak could not extract the CRAN RcppArmadillo binary, a corrupt download unrelated to the branch); ubuntu and windows still pending, matrix, pkgdown and vignette-precompute green. Watcher stopped. Next: re-run the failed macOS job once the run completes, then resume `/milestone-review M140` for the merge.
 
 ## Decisions
 
