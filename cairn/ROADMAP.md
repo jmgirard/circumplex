@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-20 (M140 done and archived, M137's terminal row dropped to retention, the joined ladder-print candidate row split back onto its own line; one LESSONS line added, the M106 pgrep line retired to the rulebook's wait rule, the M105 merge-guard line corrected in place. ROADMAP 59 lines / 29,106 bytes, over its 24,000 byte budget and awaiting a `/cairn-triage` compression pass; LESSONS 48 lines / 19,980 bytes against its 50 / 20,000 cap; test-craft 28 lines / 8,924 bytes against its stated < 35 / < 9,000.)_
+_Last hygiene check: 2026-09-20 (M141 done and archived, M138's terminal row dropped to retention, the R5 note added to the "Covariate extension" row on the branch; no LESSONS change. ROADMAP 58 lines / 29,292 bytes, over its 24,000 byte budget and awaiting a `/cairn-triage` compression pass; LESSONS 48 lines / 19,980 bytes against its 50 / 20,000 cap; test-craft 28 lines / 8,924 bytes against its stated < 35 / < 9,000.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M140 | The visualization vignette draws a fitted quasi-circumplex, measure vectors and the correlation function from existing layers | done | — | normal | milestones/archive/M140-vignette-latent-circumplex-figures.md |
-| M141 | A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws | review | M140 | normal | milestones/M141-ellipse-geom.md |
+| M141 | A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws | done | M140 | normal | milestones/archive/M141-ellipse-geom.md |
 | M139 | The growth vignette shows the correlated person block and a zero check on the cross block | done | — | normal | milestones/archive/M139-growth-vignette-joint-check.md |
-| M138 | The website has a light navbar, a theme switch and grouped vignette menus | done | — | normal | milestones/archive/M138-pkgdown-site-refresh.md |
 
 ## Candidates
 
