@@ -71,6 +71,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - 2026-09-20: gate triage: O5 kept the added hollow-points sentence (no amendment); O8/S1 rejected, no follow-up. step-7 approval: m140-vignette-latent-circumplex-figures approved for merge.
 - 2026-09-20: PR #173 opened after approval. CI wait hit the harness ceiling: macOS job failed in dependency install (pak could not extract the CRAN RcppArmadillo binary, a corrupt download unrelated to the branch); ubuntu and windows still pending, matrix, pkgdown and vignette-precompute green. Watcher stopped. Next: re-run the failed macOS job once the run completes, then resume `/milestone-review M140` for the merge.
 - 2026-09-20: resume: PR #173 OPEN; conversation read empty (no reviews, comments or threads); macOS job re-run after its corrupt-download failure. step-7 approval: m140-vignette-latent-circumplex-figures approved for merge (re-posed).
+- 2026-09-20: merge held at the user's choice: the macOS CI job fails on every re-run because CRAN serves the RcppArmadillo 15.6.0-1 macOS binary as a zstd archive that the runner's pak cannot extract (external, not the branch). Required checks are green. A /hotfix to the workflow goes first; then resume `/milestone-review M140` on green. Approval stands.
 
 ## Decisions
 
