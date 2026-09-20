@@ -73,6 +73,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - 2026-09-20: resume: PR #173 OPEN; conversation read empty (no reviews, comments or threads); macOS job re-run after its corrupt-download failure. step-7 approval: m140-vignette-latent-circumplex-figures approved for merge (re-posed).
 - 2026-09-20: merge held at the user's choice: the macOS CI job fails on every re-run because CRAN serves the RcppArmadillo 15.6.0-1 macOS binary as a zstd archive that the runner's pak cannot extract (external, not the branch). Required checks are green. A /hotfix to the workflow goes first; then resume `/milestone-review M140` on green. Approval stands.
 - 2026-09-20: resume: PR #173 OPEN, route (c). Master had moved (hotfix #174) and was merged into the branch. AC1 to AC7 and the gate were re-run on the merged tree (Review section). The conversation read was empty.
+- 2026-09-20: step-7 approval: m140-vignette-latent-circumplex-figures approved for merge (re-posed after the master merge and re-verification).
 
 ## Decisions
 
