@@ -75,6 +75,7 @@ Export `geom_ssm_ellipse()`, which draws a joint confidence ellipse for a profil
 - 2026-09-20: /milestone-review re-entered after the AC3 return. AC1 to AC6 re-verified at c1594ba7 and AC3 ticked. AC7 waits on the running check and full suite. The history lens found nothing new. The diff-bug and prior-review lenses are running. Checkpoint, review not finished.
 - 2026-09-20: AC7 re-verified at c1594ba7 (check 0/0/0, suite no failures). The prior-review lens found nothing. The diff-bug lens reported R1 to R11, recorded in the Review section with proposed dispositions. Checkpoint before the triage gate.
 - 2026-09-20: gate triage accepted. R1, R2, R3, R6, R7, R8, R9 fixed on the branch, R5 filed on the "Covariate extension" candidate row, R4 and R10 rejected. Vignette re-rendered, figure unchanged. Full check re-running on this tree before the merge chip.
+- 2026-09-20: step-7 approval: m141-ellipse-geom approved for merge.
 
 ## Decisions
 
