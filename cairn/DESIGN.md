@@ -515,10 +515,21 @@ stays independent.
   rendered label width rather than break spacing, and suppressing the crowded
   neighbour would delete a ring the break algorithm chose (M38-D1). Where `amax`
   is already a generated break it keeps its own label and nothing is appended.
+  The coord also owns the **grid mode** (M142): `grid = "cartesian"` replaces
+  the themed grill and the radial-axis guide with one rim ring, a crosshair
+  along displacements 0/180 and 90/270, and a tick mark with a signed label at
+  every radial break strictly between the center and the rim on each half-axis
+  (Cartesian coordinates, not amplitudes), drawn in `render_bg` from the same
+  theme elements (`panel.grid.major`, `axis.ticks.r`, `axis.text.r`); the
+  transform is identical in both modes.
 - **Canvas** (`ggcircumplex()`): a thin constructor returning
   `ggplot() + coord_circumplex() + <breaks/labels + theme>` (a `geom_blank`
   establishes the extent). It no longer draws geometry — the former
-  `circle_base()` is gone.
+  `circle_base()` is gone. Its `grid` passes to the coord; the cartesian grid
+  also turns the theta tick marks on, outward from the rim, and `angle_labels = TRUE`
+  formats text labels as `<label> (<angle>°)` (0/360 written 360), rotated
+  along the radius by `guide_axis_theta(angle = 90)`, with a plot margin
+  sized to the longest label (M142).
 - **Point geom** (`GeomSsmPoint` ⊂ `GeomPoint`): `setup_data()` drops rows with
   no location and maps amplitude/displacement to the coord's `y`/`x` (no
   cartesian math; the coord owns the transform).

@@ -39,7 +39,17 @@
 #'   degrees) along which the amplitude (radial) axis and its labels are drawn.
 #'   `NULL` (the default) places it automatically in the widest gap between the
 #'   displacement spokes, so the amplitude labels never collide with a spoke
-#'   label.
+#'   label. Ignored when `grid = "cartesian"`, which draws no amplitude axis.
+#' @param grid Optional. A single string naming the canvas furniture. `"polar"`
+#'   (the default) draws amplitude rings, displacement spokes and the amplitude
+#'   axis. `"cartesian"` draws one ring at the outer amplitude, a crosshair
+#'   along displacements 0/180 and 90/270, and a tick mark with a signed label
+#'   at each amplitude break between the center and the rim on every half-axis
+#'   (the center and the rim value itself are not labelled), and no other ring,
+#'   spoke or amplitude axis (the canvas of Nagy et al., 2019). The labels on
+#'   the 180 and 270 halves are negative Cartesian coordinates, not negative
+#'   amplitudes. The mapping of the data onto the canvas is the same in both
+#'   modes.
 #' @param ... Reserved for future extensions; currently unused.
 #' @return A \pkg{ggplot2} coordinate system that can be added to a plot with
 #'   `+`.
@@ -51,7 +61,14 @@
 #' ggplot2::ggplot(res$results) +
 #'   coord_circumplex(amax = 0.5) +
 #'   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
-coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) {
+#'
+#' # A Cartesian grid: one rim ring and a labelled crosshair, no rings or spokes
+#' ggplot2::ggplot(res$results) +
+#'   coord_circumplex(amax = 0.5, grid = "cartesian") +
+#'   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
+coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL,
+                             grid = c("polar", "cartesian"), ...) {
+  grid <- circumplex_grid(grid)
   # Every numeric argument here is guarded with !is.finite() rather than
   # is.na(): is.na(Inf) is FALSE, so an infinite limit slips past an is.na()
   # guard and surfaces only as a cryptic error deep in the render, never naming
@@ -96,7 +113,155 @@ coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) 
     r_axis_inside = base$r_axis_inside, rotate_angle = base$rotate_angle,
     inner_radius = base$inner_radius, clip = base$clip,
     # Circumplex-specific state.
-    amax = amax, center = center, r_axis_angle = r_axis_angle
+    amax = amax, center = center, r_axis_angle = r_axis_angle, grid = grid
+  )
+}
+
+# `grid` as one validated string. The unevaluated default pair reads as
+# "polar"; anything else must be exactly one of the two names. An explicit
+# stop() rather than match.arg(), whose message does not name the argument.
+circumplex_grid <- function(grid) {
+  if (identical(grid, c("polar", "cartesian"))) {
+    return("polar")
+  }
+  if (!is.character(grid) || length(grid) != 1L || is.na(grid) ||
+      !grid %in% c("polar", "cartesian")) {
+    stop("`grid` must be \"polar\" or \"cartesian\".", call. = FALSE)
+  }
+  grid
+}
+
+# The cartesian grid (M142): a rim ring at the outer amplitude, a crosshair
+# along displacements 0/180 and 90/270, and a tick mark with a signed label at
+# every radial break strictly between the center and the rim on each of the
+# four half-axes -- the canvas of Nagy, Etzel and Lüdtke (2019, Figures 3 and
+# 6). It replaces the themed grill (rings and spokes) that the polar mode draws
+# in render_bg, and the radial axis guide, which setup_panel_guides drops. It
+# draws from the theme elements the polar canvas already uses: `panel.grid.major`
+# for the rim and crosshair, `axis.ticks.r` / `axis.ticks.length.r` for the
+# ticks and `axis.text.r` for the labels, so `+ theme()` restyles it (through
+# the parent `panel.grid.major`; the polar grill reads its `.x`/`.y` children).
+# The labels on the 180 and 270 halves carry a minus sign: they are
+# Cartesian coordinates, not negative amplitudes.
+#
+# Positions along an axis are plain npc values. The tick length and the label
+# gap are carried by fixed-size viewports instead of unit arithmetic (a tick's
+# viewport is as tall as the tick and centred on the axis; a label group's
+# viewport is shifted off the axis by the gap), so the tests can read every
+# rendered position back exactly: as.numeric() on a unit sum returns nothing
+# useful.
+cartesian_grid_grob <- function(coord, panel_params, theme) {
+  to_npc <- function(theta, r) {
+    coord$transform(data.frame(x = theta, y = r), panel_params)
+  }
+  center <- coord$center
+  r_scale <- panel_params$r
+  breaks <- r_scale$get_breaks()
+  # A caller suppressing the amplitude labels (`labels = NULL`) gets NULL back
+  # from the view scale; indexing into it would fabricate literal NA labels
+  # (the M38 lesson), so it is widened to a vector of NAs and the label grob
+  # is skipped below.
+  labels <- r_scale$get_labels()
+  labels <- if (is.null(labels)) {
+    rep(NA_character_, length(breaks))
+  } else {
+    as.character(labels)
+  }
+  ok <- is.finite(breaks)
+  breaks <- breaks[ok]
+  labels <- labels[ok]
+  # rim_view_scale() guarantees a break at the rim, so the rim is the largest
+  # finite break; the inner breaks exclude both ends.
+  rim <- max(breaks)
+  tol <- (rim - center) * 1e-9
+  inner <- breaks > center + tol & breaks < rim - tol
+  b <- breaks[inner]
+  lab <- labels[inner]
+  k <- length(b)
+  origin <- to_npc(0, center)
+
+  # Rim ring and crosshair from the major grid element. The panel background,
+  # when the theme draws one, is clipped to the rim as guide_grid() does.
+  el_grid <- ggplot2::calc_element("panel.grid.major", theme)
+  ring <- to_npc(seq(0, 360, length.out = 361), rim)
+  bg <- ggplot2::element_grob(ggplot2::calc_element("panel.background", theme))
+  if (!inherits(bg, "zeroGrob")) {
+    bg <- grid::polygonGrob(
+      ring$x, ring$y, gp = bg$gp, name = "circumplex-cartesian-background"
+    )
+  }
+  rim_grob <- ggplot2::element_grob(
+    el_grid, x = ring$x, y = ring$y, id.lengths = nrow(ring),
+    name = "circumplex-cartesian-rim"
+  )
+  ends <- to_npc(c(0, 180, 90, 270), rim)
+  cross_grob <- ggplot2::element_grob(
+    el_grid, x = ends$x, y = ends$y, id.lengths = c(2L, 2L),
+    name = "circumplex-cartesian-crosshair"
+  )
+
+  ticks <- grid::grobTree(name = "circumplex-cartesian-ticks")
+  labs <- grid::grobTree(name = "circumplex-cartesian-labels")
+  if (k > 0L) {
+    # npc distance of each inner break from the origin: displacement 0 runs
+    # along +x, so the x offset is the radius.
+    pos <- vapply(b, function(r) to_npc(0, r)$x - origin$x, numeric(1))
+    along <- c(origin$x + pos, origin$x - pos)   # 0 half, then 180 half
+    up <- c(origin$y + pos, origin$y - pos)      # 90 half, then 270 half
+    el_tick <- ggplot2::calc_element("axis.ticks.r", theme)
+    len <- ggplot2::calc_element("axis.ticks.length.r", theme)
+    ticks_x <- ggplot2::element_grob(
+      el_tick,
+      x = grid::unit(rep(along, each = 2), "npc"),
+      y = grid::unit(rep(c(0, 1), 2 * k), "npc"),
+      id.lengths = rep(2L, 2 * k),
+      name = "circumplex-cartesian-ticks-x",
+      vp = grid::viewport(y = grid::unit(origin$y, "npc"), height = len)
+    )
+    ticks_y <- ggplot2::element_grob(
+      el_tick,
+      x = grid::unit(rep(c(0, 1), 2 * k), "npc"),
+      y = grid::unit(rep(up, each = 2), "npc"),
+      id.lengths = rep(2L, 2 * k),
+      name = "circumplex-cartesian-ticks-y",
+      vp = grid::viewport(x = grid::unit(origin$x, "npc"), width = len)
+    )
+    ticks <- grid::grobTree(ticks_x, ticks_y, name = "circumplex-cartesian-ticks")
+
+    # Labels above the horizontal axis and to the right of the vertical one,
+    # as Nagy draws them, a gap of half a tick plus 2pt off the axis. A blank
+    # or missing label draws nothing (and no minus sign).
+    el_text <- ggplot2::calc_element("axis.text.r", theme)
+    gap <- 0.5 * len + grid::unit(2, "pt")
+    has_lab <- !is.na(lab) & lab != ""
+    lab[!has_lab] <- ""
+    signed <- c(lab, ifelse(has_lab, paste0("-", lab), ""))
+  }
+  if (k > 0L && any(has_lab)) {
+    labs_x <- ggplot2::element_grob(
+      el_text, label = signed,
+      x = grid::unit(along, "npc"), y = grid::unit(rep(origin$y, 2 * k), "npc"),
+      hjust = 0.5, vjust = 0, angle = 0
+    )
+    labs_x <- grid::grobTree(
+      labs_x, name = "circumplex-cartesian-labels-x",
+      vp = grid::viewport(y = gap, height = grid::unit(1, "npc"), just = "bottom")
+    )
+    labs_y <- ggplot2::element_grob(
+      el_text, label = signed,
+      x = grid::unit(rep(origin$x, 2 * k), "npc"), y = grid::unit(up, "npc"),
+      hjust = 0, vjust = 0.5, angle = 0
+    )
+    labs_y <- grid::grobTree(
+      labs_y, name = "circumplex-cartesian-labels-y",
+      vp = grid::viewport(x = gap, width = grid::unit(1, "npc"), just = "left")
+    )
+    labs <- grid::grobTree(labs_x, labs_y, name = "circumplex-cartesian-labels")
+  }
+
+  grid::grobTree(
+    bg, rim_grob, cross_grob, ticks, labs,
+    name = "circumplex-cartesian-grid"
   )
 }
 
@@ -379,6 +544,33 @@ CoordCircumplex <- ggplot2::ggproto(
     params$r <- rim_view_scale(params$r, r_max)
     params$r.major <- params$r$map(params$r$get_breaks())
     params
+  },
+
+  # In cartesian mode the signed crosshair labels carry the amplitude scale, so
+  # the radial axis guide is dropped before the parent positions it (M142). The
+  # view scale's own guide is what the parent's Guides setup reads when the
+  # plot sets none for `r`.
+  setup_panel_guides = function(self, panel_params, guides, params = list()) {
+    if (identical(self$grid, "cartesian")) {
+      panel_params$r$guide <- ggplot2::guide_none()
+      if (!is.null(panel_params$r.sec)) {
+        panel_params$r.sec$guide <- ggplot2::guide_none()
+      }
+    }
+    ggplot2::ggproto_parent(
+      ggplot2::CoordRadial, self
+    )$setup_panel_guides(panel_params, guides, params)
+  },
+
+  # The polar grill (rings and spokes) is the parent's; the cartesian grid is
+  # drawn here instead (M142). The data transform is untouched either way.
+  render_bg = function(self, panel_params, theme) {
+    if (identical(self$grid, "cartesian")) {
+      return(cartesian_grid_grob(self, panel_params, theme))
+    }
+    ggplot2::ggproto_parent(
+      ggplot2::CoordRadial, self
+    )$render_bg(panel_params, theme)
   },
 
   # Let the parent draw the foreground exactly as it does -- the radial axis is
