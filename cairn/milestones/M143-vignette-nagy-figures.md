@@ -100,3 +100,5 @@ Independent review (2026-09-20, head 527f21e5, user-facing tier, three lenses). 
 - O15 reject: `vignette_chunk()` errors unhelpfully on an unclosed fence and interpolates the label into a regex unescaped. Every label is the repo's own and every fence is closed, and either fault is loud, not silent.
 - O16 reject: the 0.1° tolerance against the 3600-vertex outline is looser than the oracle delivers. AC3 states 0.1°, so tightening it is an amendment, and oracle (ii) already holds the tangents to 1e-6.
 - O17 fix now: `hjust`/`vjust` are positional against the `measures` argument order with nothing pinning the pairing. Keyed by label.
+
+Re-verification after the fixes (2026-09-20, head 895f8e1e): staleness guard exit 0 on the committed render, width guard exit 0, prose sweep exit 0 on both files, full `devtools::test()` exit 0 with no failures, `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes in 13m 54s, `cairn_validate.py` all checks passed. The four figure PNGs are unchanged, so the AC1, AC2 and AC4 plot evidence stands, and the AC5 phrases are unchanged on the re-rendered page. AC3's evidence now also covers oracle (iii).
