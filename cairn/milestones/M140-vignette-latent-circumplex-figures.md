@@ -72,6 +72,7 @@ Add a section to `advanced-visualization` that builds three figures from a `cpm_
 - 2026-09-20: PR #173 opened after approval. CI wait hit the harness ceiling: macOS job failed in dependency install (pak could not extract the CRAN RcppArmadillo binary, a corrupt download unrelated to the branch); ubuntu and windows still pending, matrix, pkgdown and vignette-precompute green. Watcher stopped. Next: re-run the failed macOS job once the run completes, then resume `/milestone-review M140` for the merge.
 - 2026-09-20: resume: PR #173 OPEN; conversation read empty (no reviews, comments or threads); macOS job re-run after its corrupt-download failure. step-7 approval: m140-vignette-latent-circumplex-figures approved for merge (re-posed).
 - 2026-09-20: merge held at the user's choice: the macOS CI job fails on every re-run because CRAN serves the RcppArmadillo 15.6.0-1 macOS binary as a zstd archive that the runner's pak cannot extract (external, not the branch). Required checks are green. A /hotfix to the workflow goes first; then resume `/milestone-review M140` on green. Approval stands.
+- 2026-09-20: resume: PR #173 OPEN, route (c). Master had moved (hotfix #174) and was merged into the branch. AC1 to AC7 and the gate were re-run on the merged tree (Review section). The conversation read was empty.
 
 ## Decisions
 
@@ -104,5 +105,17 @@ Independent review, 2026-09-20, three fresh-context lenses. Prior-review lens [S
 - O13 and S2: the no-hidden-chunk test reads the `.Rmd.orig` and skips under R CMD check, and a renamed heading errors in `min(integer(0))`. Fix now for the guard. Chunk options do not survive rendering, so the source-tree-only scope is the accepted category that `test-vignette-echo-sweep.R` established. Logged here as that classification.
 - O14: `pairs` shadowed `base::pairs`. Fix now: renamed `pair_idx`.
 - O15: AC1 says a `ggcircumplex()` canvas but the chunks composed the canvas from parts. Fix now: both canvases are `ggcircumplex(angles = cpm$results$Angle_theory, labels = PANO(), amax = )`, which the function accepts. The code now matches the criterion as written.
+
+Re-verification on 2026-09-20. The default branch moved (hotfix #174, the macOS CI workaround) and was merged into the branch at `b879fa65`. The merge changed no file outside `.github/` and `cairn/`. The AC1 to AC4 procedure ran again fresh.
+
+- AC1: 16 tick rows over 8 scales at amplitudes 0.94 and 1. Each displacement equals the fit's `Angle`. Both circular canvases carry breaks equal to `Angle_theory` and labels equal to `PANO()`.
+- AC2: 10 vector rows, each from amplitude 0 to `a_est` at `d_est`. The tick layer is identical to AC1's.
+- AC3: the line equals `corfun` over 0 to 180. The 28 filled points equal the upper triangle of `matrices$R` at the inline modular separation (18.8 to 179.5 degrees). The hollow points equal `Zeta_i * Zeta_j * corfun(sep)`.
+- AC4: no `echo = FALSE` or `include = FALSE` among the four fences. The `--vanilla` run exited 0 with the one Hessian warning.
+- AC5: the phrase test passes 7 expectations.
+- AC6: the width, staleness and pkgdown guards exit 0. The source diff has five hunks: the Overview paragraph (one added sentence, ten sentences differing only in numbers and breaks), the new section with its following heading, two heading renumbers, and one Browne 1992 References entry. The setup chunk is untouched. The `devtools::check()` result is recorded below.
+- AC7: one entry under the development heading, no milestone token in NEWS.
+
+Gate re-run: `cairn_validate.py` all pass. `document()` printed no `resolve link` line and left no diff. `check_pkgdown()` found no problems. The master watches read the newest run with a verdict, `0c37cddb`, success on both workflows (the run on `28dd3a2c` was still in progress). The two alert audits and the branch-protection check exit 0. PR #173 conversation read: no reviews, comments or unresolved threads.
 
 Consistency gate, 2026-09-20. `cairn_validate.py` exit 0, all checks pass, no advisory fired. No DESIGN.md principle changed, so `cairn_impact.py` was skipped. `devtools::document()` at `cli.width = 500` printed no `resolve link` line and left no diff in `NAMESPACE`, `man/` or `R/RcppExports.R`. README is untouched by the branch. `pkgdown::check_pkgdown()` found no problems. NEWS carries the entry (AC7). Master watches: the newest push run of `R-CMD-check.yaml` and of `test-coverage.yaml` on master (`0c37cddb`, 2026-09-18) both concluded `success`. `check-master-red-alert.R`, `master-red-alert-dryrun.R` and `check-branch-protection.R` each exit 0.
