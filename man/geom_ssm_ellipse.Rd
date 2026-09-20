@@ -61,7 +61,9 @@ parameters, and the two regions need not coincide.
 Vertices are unwrapped along the outline so that an ellipse straddling the
 0/360 seam is drawn across it, and an ellipse containing the origin winds
 once round the centre of the canvas. Unwrapped displacements may therefore
-fall outside \verb{[0, 360)}.
+fall outside \verb{[0, 360)}. Each input row is one outline: the layer sets the
+\code{group} aesthetic to the row index, replacing any \code{group} the mapping
+supplies.
 }
 \examples{
 set.seed(1)

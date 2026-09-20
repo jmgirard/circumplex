@@ -305,16 +305,19 @@ print.circumplex_ssm_draws <- function(x, digits = 3, ...) {
 #' `(x0, y0)` of a profile's Cartesian coordinates and the elements `var_x`,
 #' `var_y`, `cov_xy` of their 2 by 2 covariance matrix. This is an S3 generic;
 #' the method for [ssm_draws()] objects takes the centre from the object's
-#' point summaries (`results$x_est`, `results$y_est`, the posterior medians
-#' the package also plots) and the covariance from `stats::cov()` of the `x`
-#' and `y` columns of the object's draws. Objects that retain no draws, such
+#' point summaries (`results$x_est`, `results$y_est`, the posterior medians of
+#' `x` and `y`) and the covariance from `stats::cov()` of the `x` and `y`
+#' columns of the object's draws. The point [geom_ssm_point()] draws from the
+#' same object is `a_est` at `d_est`, which need not coincide with those
+#' medians. Objects that retain no draws, such
 #' as the result of [ssm_analyze()], have no method and are refused.
 #'
 #' @param x An object of class `"circumplex_ssm_draws"`.
 #' @param ... Passed to methods; unused by the shipped method.
 #' @return A one-row data frame with columns `x0`, `y0`, `var_x`, `var_y`, and
 #'   `cov_xy`, in the score metric of the coordinates.
-#' @family ssm functions
+#' @seealso [geom_ssm_ellipse()], which draws the ellipse, and [ssm_draws()],
+#'   which produces the input.
 #' @export
 #' @examples
 #' set.seed(1)

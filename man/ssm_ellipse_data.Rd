@@ -26,9 +26,11 @@ Compute the five columns \code{\link[=geom_ssm_ellipse]{geom_ssm_ellipse()}} dra
 \verb{(x0, y0)} of a profile's Cartesian coordinates and the elements \code{var_x},
 \code{var_y}, \code{cov_xy} of their 2 by 2 covariance matrix. This is an S3 generic;
 the method for \code{\link[=ssm_draws]{ssm_draws()}} objects takes the centre from the object's
-point summaries (\code{results$x_est}, \code{results$y_est}, the posterior medians
-the package also plots) and the covariance from \code{stats::cov()} of the \code{x}
-and \code{y} columns of the object's draws. Objects that retain no draws, such
+point summaries (\code{results$x_est}, \code{results$y_est}, the posterior medians of
+\code{x} and \code{y}) and the covariance from \code{stats::cov()} of the \code{x} and \code{y}
+columns of the object's draws. The point \code{\link[=geom_ssm_point]{geom_ssm_point()}} draws from the
+same object is \code{a_est} at \code{d_est}, which need not coincide with those
+medians. Objects that retain no draws, such
 as the result of \code{\link[=ssm_analyze]{ssm_analyze()}}, have no method and are refused.
 }
 \examples{
@@ -38,18 +40,6 @@ draws <- cbind(rnorm(500, 0.4, 0.1), rnorm(500, 0.9, 0.1),
 ssm_ellipse_data(ssm_draws(draws, type = "parameters"))
 }
 \seealso{
-Other ssm functions:
-\code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
-\code{\link[=ssm_analyze]{ssm_analyze()}},
-\code{\link[=ssm_analyze_long]{ssm_analyze_long()}},
-\code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
-\code{\link[=ssm_draws]{ssm_draws()}},
-\code{\link[=ssm_parameters]{ssm_parameters()}},
-\code{\link[=ssm_parameters_id]{ssm_parameters_id()}},
-\code{\link[=ssm_score]{ssm_score()}},
-\code{\link[=ssm_sem]{ssm_sem()}},
-\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
-\code{\link[=ssm_table]{ssm_table()}},
-\code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}}
+\code{\link[=geom_ssm_ellipse]{geom_ssm_ellipse()}}, which draws the ellipse, and \code{\link[=ssm_draws]{ssm_draws()}},
+which produces the input.
 }
-\concept{ssm functions}

@@ -314,11 +314,14 @@ test_that("a seam-adjacent ellipse and an origin-containing one unwrap the short
     var_x = 0.004, var_y = 0.004, cov_xy = 0.001
   )
   origin <- data.frame(x0 = 0.05, y0 = 0.02, var_x = 0.04, var_y = 0.04, cov_xy = 0)
-  for (df in list(seam, origin)) {
+  # The two-row fixture draws both outlines in one layer; the step bound is
+  # taken within each group, so the jump between outlines is never measured.
+  for (df in list(seam, origin, rbind(seam, origin))) {
     d <- layer_data_for(ellipse_plot(df), "GeomSsmEllipse")
     expect_false(anyNA(d$x))
     expect_false(anyNA(d$y))
-    expect_lt(max(abs(diff(d$x))), 180)
+    expect_equal(length(unique(d$group)), nrow(df))
+    for (xg in split(d$x, d$group)) expect_lt(max(abs(diff(xg))), 180)
   }
   # The seam path closes on its own branch; the origin path winds once round.
   xs <- layer_data_for(ellipse_plot(seam), "GeomSsmEllipse")$x
@@ -350,15 +353,27 @@ test_that("geom_ssm_ellipse aborts naming every non-positive-definite row (AC3)"
   expect_match(err, "2, 3, 4", fixed = TRUE)
   # The well-formed row alone builds.
   expect_no_error(ggplot2::ggplot_build(ellipse_plot(df[1, ])))
+  # Indices count against the input rows: a non-finite first row is dropped
+  # (AC4), and the bad row behind it is still named as row 2, not row 1.
+  shifted <- data.frame(
+    x0 = c(NA, 0.2), y0 = 0, var_x = c(0.01, 0), var_y = 0.01, cov_xy = 0
+  )
+  err <- tryCatch(
+    ggplot2::ggplot_build(ellipse_plot(shifted)),
+    error = function(e) conditionMessage(e)
+  )
+  expect_match(err, "row(s) 2 ", fixed = TRUE)
 })
 
 test_that("geom_ssm_ellipse drops non-finite rows silently under na.rm = TRUE and warns by count under FALSE (AC4)", {
+  # Row 4 is both non-finite and not positive definite: it is AC4's to drop,
+  # not AC3's to name, so the build warns and never aborts.
   df <- data.frame(
-    x0 = c(0.1, Inf, 0.3), y0 = 0,
-    var_x = c(0.01, 0.01, NA), var_y = 0.01, cov_xy = 0
+    x0 = c(0.1, Inf, 0.3, NA), y0 = 0,
+    var_x = c(0.01, 0.01, NA, -1), var_y = 0.01, cov_xy = 0
   )
   expect_warning(
-    ggplot2::ggplot_build(ellipse_plot(df, na.rm = FALSE)), "[Rr]emoved 2 rows"
+    ggplot2::ggplot_build(ellipse_plot(df, na.rm = FALSE)), "[Rr]emoved 3 rows"
   )
   expect_no_warning(b <- ggplot2::ggplot_build(ellipse_plot(df, na.rm = TRUE)))
   expect_equal(nrow(layer_data_for(ellipse_plot(df), "GeomSsmEllipse")), 101L)
