@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-21 (M146 done: code-box-width row trimmed to (i), (
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M147 | The certificate is the sole conditioning judge | blocked | — | normal | milestones/M147-certificate-sole-conditioning-judge.md |
+| M147 | The certificate is the sole conditioning judge | in-progress | — | normal | milestones/M147-certificate-sole-conditioning-judge.md |
 | M148 | Close the five remaining accuracy-certificate validation-layer fragilities | planned | M147 | normal | milestones/M148-certificate-validation-fragilities.md |
 | M146 | Printed text wraps at its edge cases, and the CPM table drops Communality | done | — | normal | milestones/archive/M146-printed-text-wrapping-edges.md |
 | M145 | Per-side label margins and plotmath crosshair labels on the circumplex canvas | done | — | normal | milestones/archive/M145-cartesian-canvas-follow-ons.md |

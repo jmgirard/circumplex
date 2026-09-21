@@ -2225,3 +2225,41 @@ old gate refused: an under-report, which reopens D-051's mechanism. A
 reachable design that passes the floor and reaches a structurally singular
 information matrix through a route the duplicate check and the selector do
 not see.
+
+### D-062 (2026-09-21): the selector that routes a fit to the certificate reads `rcond(info)` against `sqrt(.Machine$double.eps)`, not eps, and `"unidentified"` has three exact grounds — supersedes D-061's threshold clause and its two-grounds clause, moves nothing else it decided (M147, RR24)
+
+**Context.** D-061 keyed the selector at eps, the old gate's own threshold.
+RR24 measured that at the one class the selector exists for, a design
+singular in exact arithmetic whose stored information matrix LU inverts
+under `tol = 0`, the condition estimate is itself order-eps noise, so a
+selector at eps repeats at the selector the coin flip RR22 diagnosed at the
+refusal, and a miss there is a computed number with no warning. RR24 also
+found one exact dependence the pairwise check cannot see: a component matrix
+equal to the identity, the sum of the item-error matrices.
+
+**Decision.** The selector threshold is `sqrt(.Machine$double.eps)`, a
+machine constant decades above the structural band and decades below the
+reachable floor-admitted designs. `"unidentified"` fires on exactly three
+grounds, each exact and tolerance-free: a pair of bit-identical component
+matrices, a component matrix identical to the identity, and an inversion
+that is non-finite or that LAPACK reports exactly singular. The certificate
+is not consulted on every fit.
+
+**Rejected.** A threshold at eps or at a decade count above it, for the
+reason in Context. A rank test on the stacked derivative matrices, which
+adds a tolerance to a literal that means bit-identity elsewhere. Consulting
+the certificate on every fit, which prices every fit at the certificate's
+cost and ties every fit to that surface's health for no measured gain above
+the floor.
+
+**Consequences.** A fit the floor admits whose information matrix sits below
+the threshold pays for its certificate and computes when it passes; RR24
+lists the reachable ones in the sweep, every one passing. The sweep's
+acceptance (b) is restated as the threshold by name, a low-side gap at
+committed structural probes, and a high-side list of routed reachable fits.
+The measurements are in RR24 and the M147 file.
+
+**Reopens.** A floor-admitted design the exported API reaches whose
+certificate exceeds the target: that reopens the floor's tau (D-048), not
+the selector. A structurally singular design the three grounds and the
+selector both miss.

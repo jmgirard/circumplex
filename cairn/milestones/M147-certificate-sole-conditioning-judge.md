@@ -2,10 +2,10 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M147: The certificate is the sole conditioning judge
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
-- **Driving RR:** —
+- **Driving RR:** RR24 (advisory)
 - **Principles touched:** IP1, IP3, GP2, GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — it changes which refusal literal and warning `axes_reliability()` emits on an ill-conditioned fit below the floor
@@ -63,5 +63,13 @@ The per-fit accuracy certificate alone decides whether an `axes_reliability()` f
 
 ## Decisions
 
+- 2026-09-21 (RR24 Q1): the certificate is licensed below eps by mechanism, not only by measurement: both routes run one algorithm on bit-identical inputs at roundoff eps and about eps squared, so the estimate-to-truth ratio is pinned at the safety factor (9.9996 to 10.005 at the 55 graded region matrices with true error below 1e-2); an under-report needs the double-double route sixteen decades unluckier than the double route at one matrix. Unmeasured classes to sweep before T5: zeta2 designs, p = 64, negative component estimates, 6 and 12 scales.
+- 2026-09-21 (RR24 Q2, Q4): selector threshold `sqrt(.Machine$double.eps)`, home `axes_degeneracy_refusal()` with the core returning `rcond(info)` as data; the certificate on every fit rejected (140x the pricing's cost, exposure of every fit to the certificate surface). Promoted to D-062.
+- 2026-09-21 (RR24 Q3): the exact structural check is the pairwise clause plus an identity clause; a rank test rejected (adds a tolerance to a literal meaning bit-identity); dropping the check rejected (an exact zero pivot on identical rows is not guaranteed by blocked LU). Promoted to D-062.
+- 2026-09-21 (RR24 Q5): AC2 (b) restated as the threshold by name, a low-side gap at committed structural probes, and a high-side list of routed reachable fits; "reachable" is the API's conjunction (four or more equally spaced scales, zeta1 per `axes_fits_zeta1()`, zeta2 per `axes_fits_zeta2()`), and the p = 3 rows stay measured and out of domain.
+- 2026-09-21 (RR24 Q6): the raw arm keeps the default tolerance; `naive_reason` becomes the one platform-dependent literal, at counterexample B in particular, and any test asserting it in the band takes the two-route shape; AC4's prose says so.
+- 2026-09-21 (RR24 B2): the p = 3 Q4 perturbation `t = 0.999975` is the first floor-admitted matrix measured with a certificate past the target (cval 1.67e-2); unreachable, recorded in the sweep summary and in D-062's Reopens as a tau matter at four or more scales.
+
 ## Review
 - 2026-09-21: blocked on RB24 (T2: the certificate's licensing below eps, the selector's home, the duplicate-pair check).
+- 2026-09-21: RR24 ingested (Fable, spawned at the gate). Triage: recs 1, 2, 4, 5, 6 apply (D-062; AC1 and AC2 amended at the mini gate, T3, T5, T7 task lines extended); rec 3 apply (the sweep gains a zeta2 family, a structural family, a p = 64 row, 6- and 12-scale rows, negative-component rows); recs 7, 8 apply inside T7 (the `naive_reason` sentence; the B3, B4, B5 comment restatements); recs 9 to 13 are the review's own rejections, adopted. Mini gate: the user adopted both departures from D-061 and both amendments.
