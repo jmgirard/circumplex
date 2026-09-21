@@ -161,9 +161,16 @@ cartesian_grid_grob <- function(coord, panel_params, theme) {
   # from the view scale; indexing into it would fabricate literal NA labels
   # (the M38 lesson), so it is widened to a vector of NAs and the label grob
   # is skipped below.
+  # Plotmath labels reach the view scale as a list of calls and symbols (an
+  # expression vector comes back as one); as.character() would deparse them to
+  # their source text, so they are kept as a list and drawn as an expression.
   labels <- r_scale$get_labels()
+  plotmath <- is.expression(labels) ||
+    (is.list(labels) && any(vapply(labels, is.language, logical(1))))
   labels <- if (is.null(labels)) {
     rep(NA_character_, length(breaks))
+  } else if (plotmath) {
+    as.list(labels)
   } else {
     as.character(labels)
   }
@@ -233,9 +240,18 @@ cartesian_grid_grob <- function(coord, panel_params, theme) {
     # or missing label draws nothing (and no minus sign).
     el_text <- ggplot2::calc_element("axis.text.r", theme)
     gap <- 0.5 * len + grid::unit(2, "pt")
-    has_lab <- !is.na(lab) & lab != ""
-    lab[!has_lab] <- ""
-    signed <- c(lab, ifelse(has_lab, paste0("-", lab), ""))
+    if (plotmath) {
+      has_lab <- !vapply(lab, is_blank_axis_label, logical(1))
+      lab[!has_lab] <- list("")
+      neg <- lapply(seq_len(k), function(i) {
+        if (has_lab[[i]]) negate_axis_label(lab[[i]]) else ""
+      })
+      signed <- as.expression(c(lab, neg))
+    } else {
+      has_lab <- !is.na(lab) & lab != ""
+      lab[!has_lab] <- ""
+      signed <- c(lab, ifelse(has_lab, paste0("-", lab), ""))
+    }
   }
   if (k > 0L && any(has_lab)) {
     labs_x <- ggplot2::element_grob(
@@ -263,6 +279,25 @@ cartesian_grid_grob <- function(coord, panel_params, theme) {
     bg, rim_grob, cross_grob, ticks, labs,
     name = "circumplex-cartesian-grid"
   )
+}
+
+# An element of a plotmath label list that draws nothing: NULL, NA, or an
+# empty string. is.na() and `!= ""` cannot be applied to a call.
+is_blank_axis_label <- function(x) {
+  is.null(x) || (is.atomic(x) && length(x) == 1L && (is.na(x) || identical(x, "")))
+}
+
+# A plotmath label with a leading minus, for the 180 and 270 half-axes.
+# plotmath draws a call's structure, not brackets it was never given, so
+# `-` applied to `a + b` would read "-a + b": a label that is itself a call
+# is wrapped in parentheses, unless it is a subscript, a superscript or
+# already bracketed, which bind tighter than the minus. A plain string gets
+# the minus as text, as the character path does.
+negate_axis_label <- function(x) {
+  if (is.character(x)) return(paste0("-", x))
+  tight <- is.symbol(x) || is.numeric(x) ||
+    (is.call(x) && is.symbol(x[[1]]) && as.character(x[[1]]) %in% c("[", "^", "("))
+  if (tight) call("-", x) else call("-", call("(", x))
 }
 
 # Upper bound to hand ggplot2 for the radial range, a few ULPs above `amax`.

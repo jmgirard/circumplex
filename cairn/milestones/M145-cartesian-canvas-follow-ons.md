@@ -40,7 +40,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - [x] T1: Write the tests first, in `tests/testthat/test-ssm_plot.R` beside the M142 block (~line 306). Add the AC1 margin cases on both grids, with an oracle written in the test, and the AC2 four-way case. Before T2, see the AC1 cases fail on the current symmetric rule.
 - [x] T2: Replace the symmetric `plot.margin` in `ggcircumplex()` (`R/ssm_plot.R`, `label_guide` block, ~lines 710-723) with the per-side rule, in a small internal helper. Update the code comment and the `angle_labels` roxygen. Render the PANO canvas and a long-label canvas on both grids and look at them (M33 lesson). Then regenerate the vdiffr snapshot that the margin change moves (`test-ssm_plot.R` ~line 421) under `NOT_CRAN=true` (M31 lesson).
 - [x] T3: Write the tests first, in `tests/testthat/test-coord_circumplex.R`. Add the AC3 expression-label cases, and walk the cartesian grid grob by name (`circumplex-cartesian-labels-x`/`-y`). Before T4, see them fail on the current `as.character()`.
-- [ ] T4: In `cartesian_grid_grob()` (`R/coord_circumplex.R`, ~lines 170-250), keep language labels as they are and build the negated halves by the AC3 rule. Replace the `is.na()`/`!= ""` blank test with one that is safe for language objects. Render one canvas with plotmath labels and look at it.
+- [x] T4: In `cartesian_grid_grob()` (`R/coord_circumplex.R`, ~lines 170-250), keep language labels as they are and build the negated halves by the AC3 rule. Replace the `is.na()`/`!= ""` blank test with one that is safe for language objects. Render one canvas with plotmath labels and look at it.
 - [ ] T5: Add NEWS.md entries for both changes. Run `devtools::document()`, then `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -51,6 +51,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - 2026-09-20: T1 done. The AC1 margin tests failed on the old symmetric rule (every side 54 pt, or 190 pt at font size 20), and the AC2 cases passed. T2 code, roxygen and the regenerated snapshot are in this checkpoint. Renders of the PANO, long-label and uneven canvases kept every label on the page. T2 stays open until the full suite result is in.
 - 2026-09-20: T2 done. The full `devtools::test()` run on 1cddc494 had no failures.
 - 2026-09-20: T3 done. The AC3 tests fail on the current code because the grob labels are character, for example `'-a - b'` where the call `-(a - b)` is expected.
+- 2026-09-20: T4 done. `cartesian_grid_grob()` keeps language labels as a list, and two helpers apply the AC3 minus rule and the blank test. The coord and plot tests pass, and a rendered canvas shows α, α₂, −(a + b) and −(a/b) drawn as plotmath.
 
 ## Decisions
 
