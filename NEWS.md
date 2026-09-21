@@ -159,6 +159,10 @@
 
 ## Documentation
 
+* The website's vignette menu is now built by pkgdown from the articles index
+  rather than written out a second time by hand, so the menu is titled
+  "Articles" and lists each level's pages in the index's own order.
+
 * The "SEM-Based SSM Analysis" and "Axes Reliability" vignettes are each now
   two pages, with every code chunk kept and the prose moved rather than cut.
   "SEM-Based SSM Analysis" keeps its name and holds the latent profile of a

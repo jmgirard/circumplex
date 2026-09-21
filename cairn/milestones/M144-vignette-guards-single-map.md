@@ -1,6 +1,6 @@
 # M144: The vignette guards keep one level map, check section numbers, and pkgdown builds the vignette menu
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,7 +47,7 @@ The vignette guards that remain each check shipped behavior from one level map, 
 - [x] T4: In `_pkgdown.yml` add `navbar: <title>` to each `articles:` group and delete the Vignettes menu. Move the home icon, Reference, Instruments and News entries to `navbar: components:` and list them in `navbar: structure: left:` in the present order with `articles` where Vignettes sat. Build into an empty directory and read the dropdown per AC4. Write the milestone-local decision that supersedes the M138 plan's rule-out of `articles: navbar:` grouping, naming the evidence: the hand menu duplicated the index and its guard took five defects in one milestone.
 - [x] T5: Cut the navbar half of `tools/check-pkgdown-vignettes.R` (its lines 81-133) and reword its header. Add the group-order check. Plant the five AC5 defects on scratch copies, record each message in the work log.
 - [x] T6: Add the workflow step to `.github/workflows/pkgdown.yaml` between the dependency install and the build. Run the script from the repo root.
-- [ ] T7: NEWS entry. Add the leading divider to the accepted-limitations paragraph in `cairn/DESIGN.md` beside the M138 one. Run the AC7 checks.
+- [x] T7: NEWS entry. Add the leading divider to the accepted-limitations paragraph in `cairn/DESIGN.md` beside the M138 one. Run the AC7 checks.
 
 ## Work log
 
@@ -65,6 +65,8 @@ The vignette guards that remain each check shipped behavior from one level map, 
 - 2026-09-20: T4 gave each `articles:` group a `navbar:` heading, deleted the hand-written Vignettes menu, and moved the home icon and the Instruments menu to `navbar: components:` with `structure: left: [home, reference, instruments, articles, news]`. A present `navbar: left:` beats `structure:` in pkgdown's `navbar_link_components()`, so the list had to go, not just shrink. Build into an empty directory exit 0. The dropdown holds 3 `h6.dropdown-header` elements reading Introductory, Intermediate, Advanced, each level's pages under its heading in the index order with their titles, and 3 `hr.dropdown-divider` elements, one above each heading. Left order renders home, reference, instruments, articles, news. The search input and the light switch are still present. Decision M144-D1 records the supersession.
 - 2026-09-20: T5 cut the guard's navbar half (53 lines) and rewrote its header. It also added a check that each group's `navbar:` key equals its title, since the generated heading depends on that key and nothing else guarded it. Guard exit 0 on the shipped config. Six plants, one per scratch copy, plus an unplanted control. Control exit 0. Dropped page: names the short Intermediate list against the expected one. Moved page: names both affected groups. Two pages swapped inside a group: names the reordered Intermediate list. Two groups swapped: names the group order and both contents lists. Stray `vignettes/stray-page.Rmd` with an index entry: names `stray-page`. Deleted `navbar:` key: says the group gets no heading in the menu. Suite 0 failures, 11861 passes.
 - 2026-09-20: T6 added the guard step to `.github/workflows/pkgdown.yaml`. Parsed step order: checkout, setup-pandoc, setup-r, setup-r-dependencies, the guard, Build site, Deploy. The script exits 0 run from the repo root.
+- 2026-09-20: T7 added the NEWS Documentation entry and the accepted-limitations paragraph in `cairn/DESIGN.md` for the Articles label and the leading divider. AC7 checks: suite 0 failures and 11861 passes, `devtools::check(args = "--no-manual")` Status OK with 0 errors, 0 warnings and 0 notes in 7m 58s, `pkgdown::check_pkgdown()` no problems.
+- 2026-09-20: claim audit: 36 claims read, 1 corrected — `tools/check-pkgdown-vignettes.R`, `_pkgdown.yml`, `NEWS.md`, `.github/workflows/pkgdown.yaml`, `tests/testthat/test-vignette-frame.R`, `tests/testthat/helper-vignette-frame.R`, `tests/testthat/test-cpm_boundary_vignette.R`. The false claim said pkgdown takes a menu entry's text from the `\VignetteIndexEntry{}` the guard reads. It takes it from the page's yaml `title:`, a second copy of the string that nothing makes agree. The header now says so. The same reader flagged the boundary comment's section count as off by one, now "one numbered section after the Overview". Guard and both touched test files re-run green after the two edits.
 
 ## Decisions
 

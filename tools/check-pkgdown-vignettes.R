@@ -47,7 +47,9 @@ fail <- function(...) failures <<- c(failures, paste0(...))
 rmd <- sort(list.files("vignettes", pattern = "\\.Rmd$"))
 on_disk <- sub("\\.Rmd$", "", rmd)
 # Every page's title is read, so a file carrying no index entry, or two, stops
-# the guard by name. pkgdown takes each menu entry's text from the same entry.
+# the guard by name. pkgdown takes each menu entry's text from the page's yaml
+# front matter `title:` instead, which is a second place the same string is
+# written; nothing here or in pkgdown makes the two agree.
 invisible(vapply(file.path("vignettes", rmd), vignette_title, character(1)))
 
 if (!setequal(on_disk, EXPECTED)) {
