@@ -128,7 +128,7 @@ cpm_round_df <- function(df, digits) {
 # their estimate. The returned object keeps its names (D-056, D-057).
 # Communality is left out of the printed copy: it is Zeta squared, which the
 # table already prints, and with it a free-scaling table with 16-character
-# scale names reached 87 columns (M146). `results$Communality` still holds it.
+# scale names reached 84 columns (M146). `results$Communality` still holds it.
 cpm_display_results <- function(df, digits) {
   df$Communality <- NULL
   out <- cpm_round_df(df, digits)

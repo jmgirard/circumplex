@@ -45,6 +45,29 @@
 
 ## Minor improvements and fixes
 
+* `scales(x, items = TRUE)` no longer stops with "subscript out of bounds"
+  on `iip32` and `iip64`. These licensed instruments ship a notice in place
+  of their item text, and `scales()` now prints that notice once, after the
+  scale lines.
+
+* `items()` and `scales(items = TRUE)` wrap long item text, and the item
+  prefix and suffix, to the console width. A wrapped item continues under
+  the first character of its text.
+
+* `print()` and `summary()` of a `cpm_fit()` result no longer show the
+  Communality column in the results table. It equals `Zeta` squared, which
+  the table still prints, and `results$Communality` still holds it. Without
+  it, a table with long scale names fits in 77 columns.
+
+* Printed notes wrap more cleanly at narrow console widths. In `cpm_fit()`
+  output, the Heywood note keeps "(ζ > 0.995," on one line, and the
+  bootstrap marker note breaks its opening words instead of running past the
+  width. In `summary()` of an `axes_reliability()` result, the sentence about
+  lavaan's `*.scaled` definitions starts a new line. In `print()` of an
+  `ssm_sem()` result with an invariance ladder, the `Verdict:` line wraps,
+  and all ladder notes wrap by the same rule as the package's other notes.
+  These changes move line breaks only. The text of every note is the same.
+
 * The "Growth Models on SSM Parameters" vignette prints the variance
   components of the joint model after the first fit, so the reader sees the
   correlated person block that separate fits cannot estimate. It also shows

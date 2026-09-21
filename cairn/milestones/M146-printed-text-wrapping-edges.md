@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M146: Printed text wraps at its edge cases, and the CPM table drops Communality
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -57,7 +57,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - [x] T4: Remove Communality from `cpm_display_results()` (R/cpm_oop.R:117) and from `expect_cpm_table_one_block()`'s expected header (helper-cpm-table.R). Add the eight-name, 16-character, free-scaling, analytic-interval fixture to the M133 one-block test. Grep R/ roxygen, `man/` sources and vignette prose for text that describes the printed CPM table's columns, and update each hit. Note that "communality index" names ζ and stays.
 - [x] T5: Replace the `strwrap()` calls at R/ssm_sem.R:803, :814 and :1894 with `wrap_prose()`, and route the `Verdict:` line and the stored-verdict fallback through it. Add a test that calls each formatter directly with double-width text across widths 30-120.
 - [x] T6: Regression test first for `scales(iip32, items = TRUE)`. Then, in R/instrument_oop.R (`scales()` :66, `items()` :100), print a notice-only instrument's notice once after the scale lines, and wrap item, Prefix and Suffix lines with `wrap_prose()` using a hanging indent. Add the `instrument_names()` loop test at widths 40, 60 and 80.
-- [ ] T7: Re-capture the changed snapshots and read each diff. Line breaks and the Communality column must be the only changes (D-056, D-057). Regenerate the precomputed vignettes' frozen output through the repo's precompute script. Add NEWS.md entries. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T7: Re-capture the changed snapshots and read each diff. Line breaks and the Communality column must be the only changes (D-056, D-057). Regenerate the precomputed vignettes' frozen output through the repo's precompute script. Add NEWS.md entries. Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates. -->
@@ -75,6 +75,9 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: item (iii)'s premise is false. `strwrap()` measures words with `nchar(type = "w")` (read from its deparsed source, and a 30-word double-width string wrapped at width 40 gave a 39-column maximum), so it already counted display columns. The real defects in `R/ssm_sem.R` were the unwrapped `Verdict:` line, the 20-column floor on labeled values, and strwrap's break one column short of the width. AC2 still holds as written. The candidate row's wording of (iii) is corrected when the row is rewritten at post-merge hygiene.
 - 2026-09-21: T5 done. The three `strwrap()` sites and the `Verdict:` line wrap through `wrap_prose()`, and `grep -n strwrap R/ssm_sem.R` prints nothing. The new `test-ssm_sem_print_wrap.R` drives `sem_dcfi_note()`, `sem_format_verdict()` and `sem_print_invariance()` (rung notes and the stored-verdict fallback) over widths 30-120. The Verdict test failed first. The notes and fallback test passed before the fix too, which matches the refuted premise above. The Delta-CFI note has no caller text, so its test guards the width only. Full suite (T5 and T6 together): 0 failures, and no snapshot moved.
 - 2026-09-21: T6 done. `scales(items = TRUE)` prints a notice-only instrument's notice once after the scale lines. The regression test failed first on the reported `subscriptOutOfBoundsError`. Item, Prefix and Suffix lines wrap through a new internal `cat_item()` with a hanging indent. The new `test-instrument_wrap.R` loops over all 15 `instrument_names()` at widths 40, 60 and 80. No shipped item text is empty, so no item line is dropped. The tests sit in a new file so the full-suite run in progress did not read them.
+- 2026-09-21: T7 done. NEWS.md has four entries under "Minor improvements and fixes". All 11 precomputed vignettes were re-rendered from an installed build. Kept: the three CPM tables without Communality, in `evaluating-circumplex-structure` and `cpm-boundary-fits`, and the lavaan sentence on its own line in `axes-reliability`. Restored: an elapsed-time line in `ci-accuracy` and four figure PNGs that changed from render noise only. The AC7 grep prints nothing. `tools/check-vignette-width.R` passes for all 11. `devtools::document()` makes no diff. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes.
+- 2026-09-21: claim audit: 31 claims read, 3 corrected — R/cpm_oop.R, tests/testthat/test-cpm_summary_markers.R, tests/testthat/test-ssm_sem_print_wrap.R
+- 2026-09-21: the audit measured master's `free_long` table at 84 columns, not the 87 in the plan gate and in two comments, nor the "about 86" in the T4 line above. Both comments now say 84. The one-block result stands: 72 columns without Communality.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->

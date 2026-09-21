@@ -59,7 +59,7 @@ test_that("rung notes and the stored-verdict fallback fit every width", {
       rmsea = c(0.03, 0.04), dchisq = c(NA, 2), ddf = c(NA, 2L),
       p = c(NA, 0.37),
       # Dense double-width text: a character count would read each line at
-      # half its display width.
+      # about three fifths of its display width.
       note = c("", paste(rep(wide, 30), collapse = " "))
     ),
     required = NA_character_,

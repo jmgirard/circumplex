@@ -332,7 +332,7 @@ test_that("print() and summary() show the results table as one block for every f
     free = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
                    angles = tr$angles, n = 5000, m = 3, scaling = "free"),
     # M146: eight 16-character names, free scaling, analytic intervals. With
-    # Communality printed this table reached 87 columns and split at 77.
+    # Communality printed this table reached 84 columns and split at 77.
     free_long = cpm_fit(cormat = P0, scales = m146_long_names(),
                         angles = tr$angles, n = 5000, m = 3,
                         scaling = "free", ci_method = "analytic"),
