@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M146: Printed text wraps at its edge cases, and the CPM table drops Communality
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -79,6 +79,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: claim audit: 31 claims read, 3 corrected — R/cpm_oop.R, tests/testthat/test-cpm_summary_markers.R, tests/testthat/test-ssm_sem_print_wrap.R
 - 2026-09-21: the audit measured master's `free_long` table at 84 columns, not the 87 in the plan gate and in two comments, nor the "about 86" in the T4 line above. Both comments now say 84. The one-block result stands: 72 columns without Communality.
 - 2026-09-21: review return 1 (defect): AC4 fails as written. Its width sweeps cover only `m94_boot_jz()`, not the file's other Heywood fixture (analytic `hey`) or its other marker-firing bootstrap fixture (`m94_boot_big()`). Every other criterion passed fresh evidence, and the suite and check are clean. Twelve reviewer findings are logged untriaged in the Review section.
+- 2026-09-21: return 1 fixed. The Heywood sweep in `test-cpm_summary_markers.R` now runs over both Heywood fixtures (analytic `hey` and `m94_boot_jz()`), and the marker sweep over both marker-firing bootstrap fixtures (`m94_boot_jz()` and `m94_boot_big()`), each asserting its fixture fires what the comment says. 366 and 592 expectations, 0 failures. No red run was possible: the behavior already held (pass-1 probe), so this closes a coverage gap. Full suite: 0 failures. The twelve findings stay for the review gate.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->

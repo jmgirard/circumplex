@@ -356,56 +356,71 @@ test_that("print() and summary() show the results table as one block for every f
 
 # ---- M146: the Heywood clause and the marker note at every width -------------
 #
-# m94_boot_jz() fires the Heywood diagnostic line and three markers, among them
-# "small correlation-function weight", the longest label. Both notes are swept
-# over widths 30 to 120.
+# The Heywood sweep runs over the file's two Heywood fixtures: the analytic
+# cpm_oracle_voc() fit and m94_boot_jz(). The marker sweep runs over its two
+# marker-firing bootstrap fixtures: m94_boot_jz(), which fires three markers,
+# and m94_boot_big(), which fires one. Both fire "small correlation-function
+# weight", the longest label. Both notes are swept over widths 30 to 120.
 
 test_that("the Heywood note never breaks inside its zeta clause (30 to 120)", {
   skip_on_cran()
-  jz <- m94_boot_jz()
-  expect_true(isTRUE(jz$details$heywood))
+  voc <- cpm_oracle_voc()
+  fits <- list(
+    hey = suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
+                                   angles = voc$th_start, n = 5000, m = 2)),
+    boot_jz = m94_boot_jz()
+  )
   unit <- "(ζ > 0.995,"
   old <- options(width = 80)
   on.exit(options(old), add = TRUE)
-  for (w in 30:120) {
-    options(width = w)
-    for (printer in list(print, summary)) {
-      out <- capture.output(printer(jz))
-      expect_true(any(grepl(unit, out, fixed = TRUE)),
-                  info = paste("width", w))
+  for (nm in names(fits)) {
+    fit <- fits[[nm]]
+    expect_true(isTRUE(fit$details$heywood), info = nm)
+    for (w in 30:120) {
+      options(width = w)
+      for (printer in list(print, summary)) {
+        out <- capture.output(printer(fit))
+        expect_true(any(grepl(unit, out, fixed = TRUE)),
+                    info = paste(nm, "width", w))
+      }
     }
   }
 })
 
 test_that("the marker note stays inside the width except for a lone label", {
   skip_on_cran()
-  jz <- m94_boot_jz()
-  fired <- cpm_boundary_markers(jz)
-  expect_true("small correlation-function weight" %in% fired)
-  labels <- c(paste0(fired, ";"), paste0(fired, "."))
+  fits <- list(boot_jz = m94_boot_jz(), boot_big = m94_boot_big())
   old <- options(width = 80)
   on.exit(options(old), add = TRUE)
-  for (w in 30:120) {
-    options(width = w)
-    out <- capture.output(summary(jz))
-    # "Note:" may end the line before this word at narrow widths.
-    first <- grep("boundary/weak-identification", out, fixed = TRUE)
-    if (length(first) == 1 && !grepl("Note:", out[first], fixed = TRUE)) {
-      first <- first - 1L
-    }
-    last <- grep("What has been measured", out, fixed = TRUE)
-    expect_length(first, 1)
-    expect_length(last, 1)
-    block <- out[first:(last - 1L)]
-    wide <- block[nchar(block, type = "width") > w]
-    # A line may pass the width only when it holds one whole marker label.
-    expect_true(all(trimws(wide) %in% labels), info = paste("width", w))
-    # The opening clause breaks between words once it cannot fit whole.
-    if (w < 51) {
-      expect_false(any(grepl(
-        "Note: boundary/weak-identification markers fired:", out,
-        fixed = TRUE
-      )), info = paste("width", w))
+  for (nm in names(fits)) {
+    fit <- fits[[nm]]
+    expect_identical(fit$details$ci_method, "bootstrap", info = nm)
+    fired <- cpm_boundary_markers(fit)
+    expect_true("small correlation-function weight" %in% fired, info = nm)
+    labels <- c(paste0(fired, ";"), paste0(fired, "."))
+    for (w in 30:120) {
+      options(width = w)
+      info <- paste(nm, "width", w)
+      out <- capture.output(summary(fit))
+      # "Note:" may end the line before this word at narrow widths.
+      first <- grep("boundary/weak-identification", out, fixed = TRUE)
+      if (length(first) == 1 && !grepl("Note:", out[first], fixed = TRUE)) {
+        first <- first - 1L
+      }
+      last <- grep("What has been measured", out, fixed = TRUE)
+      expect_length(first, 1)
+      expect_length(last, 1)
+      block <- out[first:(last - 1L)]
+      wide <- block[nchar(block, type = "width") > w]
+      # A line may pass the width only when it holds one whole marker label.
+      expect_true(all(trimws(wide) %in% labels), info = info)
+      # The opening clause breaks between words once it cannot fit whole.
+      if (w < 51) {
+        expect_false(any(grepl(
+          "Note: boundary/weak-identification markers fired:", out,
+          fixed = TRUE
+        )), info = info)
+      }
     }
   }
 })
