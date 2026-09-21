@@ -68,6 +68,8 @@ The vignette guards that remain each check shipped behavior from one level map, 
 - 2026-09-20: T7 added the NEWS Documentation entry and the accepted-limitations paragraph in `cairn/DESIGN.md` for the Articles label and the leading divider. AC7 checks: suite 0 failures and 11861 passes, `devtools::check(args = "--no-manual")` Status OK with 0 errors, 0 warnings and 0 notes in 7m 58s, `pkgdown::check_pkgdown()` no problems.
 - 2026-09-20: claim audit: 36 claims read, 1 corrected — `tools/check-pkgdown-vignettes.R`, `_pkgdown.yml`, `NEWS.md`, `.github/workflows/pkgdown.yaml`, `tests/testthat/test-vignette-frame.R`, `tests/testthat/helper-vignette-frame.R`, `tests/testthat/test-cpm_boundary_vignette.R`. The false claim said pkgdown takes a menu entry's text from the `\VignetteIndexEntry{}` the guard reads. It takes it from the page's yaml `title:`, a second copy of the string that nothing makes agree. The header now says so. The same reader flagged the boundary comment's section count as off by one, now "one numbered section after the Overview". Guard and both touched test files re-run green after the two edits.
 
+- 2026-09-20: step-7 approval: m144-vignette-guards-single-map approved for merge, with findings 1, 2, 3 and 6 fixed on the branch and 4, 5, 7, 8 and 9 rejected.
+
 ## Decisions
 
 ### M144-D1 (2026-09-20): pkgdown builds the grouped vignette menu; supersedes the M138 plan's rule-out of `articles: navbar:`
@@ -127,14 +129,16 @@ Full three-lens fan-out (user-facing tier, executable surface).
 - [S] prior-review: archived M135, M136, M138 Review findings read; `pulls/comments` probe empty. Zero findings.
 - [O] diff-bug: 9 findings, below with dispositions.
 
-[O] findings, ranked by the reviewer, with the disposition proposed at the step-7 gate:
+[O] findings, ranked by the reviewer, with the disposition the maintainer chose at the step-7 gate (recommended triage accepted):
 
-1. `_pkgdown.yml:189`: the navbar's News link now reads "Changelog". pkgdown's default `news` component labels it so, and T4's text named News among the entries to move into `components:`, but only home and instruments moved. Confirmed in the AC4 build (`index.html` line 87). Proposed: fix now (a `news:` component with `text: News`; on a scratch copy it renders "News" with the 3 headings intact).
-2. `NEWS.md:193-194`: an older bullet in the same unreleased section says "its Vignettes menu", which the new bullet makes false. Proposed: fix now.
-3. `tools/check-pkgdown-vignettes.R:76`: `if (!is.null(want) && ...)` still skips the contents check for a group title outside the map. That is the articles-half twin of one of the five menu-half defects M144-D1 names. The title check still exits 1, so there is no false pass. Proposed: fix now (drop the `!is.null(want)` clause).
-4. `tools/check-pkgdown-vignettes.R:69`: a group with no `title:` stops the script with a `vapply` type error, not a named FAIL. Proposed: reject, because it fails closed with a nonzero exit.
-5. `tests/testthat/test-vignette-frame.R:120-125`: the new check requires the right citation but does not forbid a second, wrong-numbered citation of the same title. Proposed: reject, because it is outside AC3's promise and no page cites a title twice.
-6. `tests/testthat/test-cpm_boundary_vignette.R:44-47`: the reworded comment leaves a two-word line and says "only the Overview and the Wrap-up" although the preamble is also outside the scope. Proposed: fix now (comment only).
-7. `_pkgdown.yml:190`: `structure: left:` omits pkgdown's `intro` and `tutorials` components, so a future `vignettes/circumplex.Rmd` would get no "Get started" link. Proposed: reject, because no such page exists and adding one would be its own change.
-8. `tools/check-pkgdown-vignettes.R:32`: the helper path is relative to the working directory. Proposed: reject, because AC6 names the repo root and CI runs there.
-9. `tests/testthat/helper-vignette-frame.R`: `load_all()` puts `frame_levels` and `frame_next` in the dev namespace. Proposed: reject, because the other 14 helpers behave the same.
+1. `_pkgdown.yml:189`: the navbar's News link now reads "Changelog". pkgdown's default `news` component labels it so, and T4's text named News among the entries to move into `components:`, but only home and instruments moved. Confirmed in the AC4 build (`index.html` line 87). Disposition: fixed on the branch (a `news:` component with `text: News`; on a scratch copy it renders "News" with the 3 headings intact).
+2. `NEWS.md:193-194`: an older bullet in the same unreleased section says "its Vignettes menu", which the new bullet makes false. Disposition: fixed on the branch.
+3. `tools/check-pkgdown-vignettes.R:76`: `if (!is.null(want) && ...)` still skips the contents check for a group title outside the map. That is the articles-half twin of one of the five menu-half defects M144-D1 names. The title check still exits 1, so there is no false pass. Disposition: fixed on the branch (drop the `!is.null(want)` clause).
+4. `tools/check-pkgdown-vignettes.R:69`: a group with no `title:` stops the script with a `vapply` type error, not a named FAIL. Disposition: rejected, because it fails closed with a nonzero exit.
+5. `tests/testthat/test-vignette-frame.R:120-125`: the new check requires the right citation but does not forbid a second, wrong-numbered citation of the same title. Disposition: rejected, because it is outside AC3's promise and no page cites a title twice.
+6. `tests/testthat/test-cpm_boundary_vignette.R:44-47`: the reworded comment leaves a two-word line and says "only the Overview and the Wrap-up" although the preamble is also outside the scope. Disposition: fixed on the branch (comment only).
+7. `_pkgdown.yml:190`: `structure: left:` omits pkgdown's `intro` and `tutorials` components, so a future `vignettes/circumplex.Rmd` would get no "Get started" link. Disposition: rejected, because no such page exists and adding one would be its own change.
+8. `tools/check-pkgdown-vignettes.R:32`: the helper path is relative to the working directory. Disposition: rejected, because AC6 names the repo root and CI runs there.
+9. `tests/testthat/helper-vignette-frame.R`: `load_all()` puts `frame_levels` and `frame_next` in the dev namespace. Disposition: rejected, because the other 14 helpers behave the same.
+
+Fix-now re-verification after the four fixes: guard exit 0 on the shipped config; a scratch copy with the Advanced group retitled Advance and two pages swapped now fails on both the group title and that group's contents (exit 1); `data_navbar()` renders the news link as News with 3 dropdown headings; `pkgdown::check_pkgdown()` no problems; `devtools::test()` FAIL 0, PASS 11861.

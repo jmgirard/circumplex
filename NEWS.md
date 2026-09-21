@@ -191,7 +191,7 @@
   Advanced) and an Overview that names its sections. Each closes with a
   Wrap-up that names the next page, or a related page where a path ends.
   The website groups the vignettes by level in reading order, and the "Axes
-  Reliability" vignette now appears in its Vignettes menu.
+  Reliability" vignette now appears in its menu.
 
 * The code shown in six vignettes now keeps to the package calls and model
   fits they teach. Code that simulates data, builds or formats a display table,

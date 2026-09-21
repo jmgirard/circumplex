@@ -143,10 +143,14 @@ navbar:
   title: circumplex
   # There is no `navbar: left:` list: pkgdown's navbar_link_components() lets a
   # present one beat `structure:`, which would drop the generated Articles
-  # menu. The two entries pkgdown has no component for are defined here, and
-  # `structure: left:` orders them with pkgdown's own reference, articles and
-  # news components.
+  # menu. The two entries pkgdown has no component for are defined here, with
+  # `news` redefined so its link keeps the label News rather than pkgdown's
+  # Changelog, and `structure: left:` orders them with pkgdown's own reference
+  # and articles components.
   components:
+    news:
+      text: News
+      href: news/index.html
     home:
       icon: fa-home fa-lg
       href: index.html

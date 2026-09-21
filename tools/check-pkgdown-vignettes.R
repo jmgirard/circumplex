@@ -73,9 +73,11 @@ if (is.null(groups)) {
          "], expected [", paste(names(level_pages), collapse = ", "), "]")
   }
   for (g in groups) {
+    # A title outside the map expects no pages, so its contents are reported
+    # too rather than skipped.
     want <- level_pages[[g$title]]
     got <- unlist(g$contents)
-    if (!is.null(want) && !identical(got, want)) {
+    if (!identical(got, want)) {
       fail("articles group ", g$title, " lists [", paste(got, collapse = ", "),
            "], expected [", paste(want, collapse = ", "), "]")
     }
