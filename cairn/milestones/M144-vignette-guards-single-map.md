@@ -42,7 +42,7 @@ The vignette guards that remain each check shipped behavior from one level map, 
 ## Tasks
 
 - [x] T1: Delete `tools/check-vignette-split.R`. Run the AC1 grep and fix any hit. Reword the scoping comment of `boundary_section_text()` in `tests/testthat/test-cpm_boundary_vignette.R:43-51` so it does not overstate on a page with one section.
-- [ ] T2: Create `tests/testthat/helper-vignette-frame.R` holding `frame_levels` and `frame_next` (moved from `test-vignette-frame.R:11-40`). In `tools/check-pkgdown-vignettes.R` replace the `LEVELS` literal by `sys.source()` of the helper and a level-to-pages list derived from `frame_levels`, keeping the map's page order within a level. Run the frame test and the script.
+- [x] T2: Create `tests/testthat/helper-vignette-frame.R` holding `frame_levels` and `frame_next` (moved from `test-vignette-frame.R:11-40`). In `tools/check-pkgdown-vignettes.R` replace the `LEVELS` literal by `sys.source()` of the helper and a level-to-pages list derived from `frame_levels`, keeping the map's page order within a level. Run the frame test and the script.
 - [ ] T3: In the headings test of `test-vignette-frame.R`, require `Section N, "Title"` in the Overview body for each numbered heading after the first. Plant the two AC3 defects one at a time (commit first, restore by copy), record each failure message in the work log.
 - [ ] T4: In `_pkgdown.yml` add `navbar: <title>` to each `articles:` group and delete the Vignettes menu. Move the home icon, Reference, Instruments and News entries to `navbar: components:` and list them in `navbar: structure: left:` in the present order with `articles` where Vignettes sat. Build into an empty directory and read the dropdown per AC4. Write the milestone-local decision that supersedes the M138 plan's rule-out of `articles: navbar:` grouping, naming the evidence: the hand menu duplicated the index and its guard took five defects in one milestone.
 - [ ] T5: Cut the navbar half of `tools/check-pkgdown-vignettes.R` (its lines 81-133) and reword its header. Add the group-order check. Plant the five AC5 defects on scratch copies, record each message in the work log.
@@ -60,6 +60,7 @@ The vignette guards that remain each check shipped behavior from one level map, 
 - 2026-09-20: plan chose a testthat helper file as the map's home over the test reading `_pkgdown.yml` because a test that reads it needs yaml, a dependency change, and `_pkgdown.yml` is not in the built package; falsified by the helper being unreadable under `R CMD check`.
 
 - 2026-09-20: T1 deleted `tools/check-vignette-split.R`; the AC1 grep returns no line; the boundary test's scoping comment now says the page has one numbered section since M136. `devtools::test()`: no failures.
+- 2026-09-20: T2 moved `frame_levels` and `frame_next` to `tests/testthat/helper-vignette-frame.R`. The script sources the helper and derives `level_pages` by `split()` on the map, so level order and page order within a level come from the map itself. AC2 grep: two lines, both in the helper. Script exit 0 on the shipped config, suite 0 failures and 11802 passes.
 
 ## Decisions
 

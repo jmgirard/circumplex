@@ -19,21 +19,14 @@ if (!requireNamespace("yaml", quietly = TRUE)) {
   quit(status = 2L)
 }
 
-# The level map. A vignette that does not appear here fails the check, so a
-# new page is placed here and in _pkgdown.yml together.
-LEVELS <- list(
-  Introductory = c("using-instruments", "introduction-to-ssm-analysis"),
-  Intermediate = c(
-    "intermediate-ssm-analysis", "evaluating-circumplex-structure",
-    "ci-accuracy", "structure-tests"
-  ),
-  Advanced = c(
-    "cpm-boundary-fits", "advanced-visualization", "sem-based-ssm-analysis",
-    "sem-latent-contrasts", "axes-reliability", "axes-reliability-caveats",
-    "bayesian-ssm-analysis", "growth-ssm-analysis"
-  )
-)
-EXPECTED <- unlist(LEVELS, use.names = FALSE)
+# The level map is `frame_levels` in the frame test's helper, the one place it
+# is defined; a vignette that does not appear there fails the check, so a new
+# page is placed there and in _pkgdown.yml together. Level order and the page
+# order within a level are the map's own order.
+frame <- new.env()
+sys.source("tests/testthat/helper-vignette-frame.R", envir = frame)
+level_pages <- split(names(frame$frame_levels), factor(frame$frame_levels, levels = unique(frame$frame_levels)))
+EXPECTED <- names(frame$frame_levels)
 
 vignette_title <- function(path) {
   lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
@@ -65,12 +58,12 @@ if (is.null(groups)) {
   fail("_pkgdown.yml has no articles: section")
 } else {
   got_titles <- vapply(groups, function(g) g$title, character(1))
-  if (!identical(got_titles, names(LEVELS))) {
+  if (!identical(got_titles, names(level_pages))) {
     fail("articles groups are [", paste(got_titles, collapse = ", "),
-         "], expected [", paste(names(LEVELS), collapse = ", "), "]")
+         "], expected [", paste(names(level_pages), collapse = ", "), "]")
   }
   for (g in groups) {
-    want <- LEVELS[[g$title]]
+    want <- level_pages[[g$title]]
     got <- unlist(g$contents)
     if (!is.null(want) && !identical(got, want)) {
       fail("articles group ", g$title, " lists [", paste(got, collapse = ", "),
@@ -120,12 +113,12 @@ if (length(menus) != 1L) {
            titles[[name]], "\"")
     }
   }
-  if (!identical(headings, names(LEVELS))) {
+  if (!identical(headings, names(level_pages))) {
     fail("navbar level headings are [", paste(headings, collapse = ", "),
-         "], expected [", paste(names(LEVELS), collapse = ", "), "]")
+         "], expected [", paste(names(level_pages), collapse = ", "), "]")
   }
-  for (level in intersect(headings, names(LEVELS))) {
-    want <- LEVELS[[level]]
+  for (level in intersect(headings, names(level_pages))) {
+    want <- level_pages[[level]]
     got <- under[[level]]
     if (!identical(got, want)) {
       fail("navbar menu under ", level, " lists [", paste(got, collapse = ", "),
