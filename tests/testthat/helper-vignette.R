@@ -18,3 +18,20 @@ vignette_source <- function(file) {
   hit <- candidates[nzchar(candidates) & file.exists(candidates)]
   if (length(hit) == 0L) "" else hit[[1]]
 }
+
+# The code of one named chunk of a vignettes/<name>.Rmd.orig source, as a
+# character vector of lines, so a test can evaluate what the page echoes.
+# Chunk labels live only in the .orig (the rendered .Rmd carries plain ```r
+# fences), and the .orig is .Rbuildignore'd, so a caller skips when the file
+# is absent. A label must open exactly one chunk.
+vignette_chunk <- function(file, label) {
+  path <- testthat::test_path("..", "..", "vignettes", file)
+  if (!file.exists(path)) return(NULL)
+  lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
+  open <- which(grepl(paste0("^```\\{r ", label, "(,|\\})"), lines))
+  if (length(open) != 1L) {
+    stop("chunk `", label, "` opens ", length(open), " times in ", file)
+  }
+  close <- which(lines == "```" & seq_along(lines) > open)[1]
+  lines[seq(open + 1L, close - 1L)]
+}
