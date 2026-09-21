@@ -466,108 +466,172 @@ vignette reads both the note and the warning in full.</p>
 scale, PA, is not estimated: it is fixed at its theoretical angle to set
 the rotation. Every other angle is read relative to it. Where the two
 differ, the instrument’s scales do not sit where the theory placed them,
-relative to PA, in this sample. <code>Zeta</code> is each scale’s
-communality index, which the third figure uses.</p>
+relative to PA, in this sample. Here every scale but PA sits clockwise
+of its theoretical angle. BC and DE sit 10 degrees clockwise and the
+rest 19 to 66 degrees clockwise. NO’s estimated angle of 11 degrees is
+near the theoretical position of LM. The three circle figures that
+follow draw the estimated angles alone. The ellipse figure at the end of
+the section returns to the theoretical <code><a href="../reference/octants.html">octants()</a></code> canvas.
+<code>Zeta</code> is each scale’s communality index, which the
+discussion of the correlation-function figure below uses.</p>
+<p>The circle figures in this section follow Nagy, Etzel and Lüdtke
+(2019). Their Figure 6, and the two extension panels of their Figure 3,
+place the scales at their estimated angles. The canvas is a plain circle
+with a labelled crosshair. The canvas is <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code>
+with two arguments. <code>grid = "cartesian"</code> draws that circle
+and crosshair and no rings or spokes. <code>angle_labels = TRUE</code>
+writes each scale’s angle into its rim label.</p>
 <div class="section level3">
 <h3 id="estimated-angles-as-ticks-on-the-rim">Estimated angles as ticks on the rim<a class="anchor" aria-label="anchor" href="#estimated-angles-as-ticks-on-the-rim"></a>
 </h3>
-<p>The first figure draws each estimated angle as a short radial tick
-just inside the rim. The canvas’s spokes sit at the theoretical angles.
-A tick is a path with two points at the same displacement, one at
-amplitude 0.94 and one at amplitude 1. <code><a href="../reference/geom_ssm_path.html">geom_ssm_path()</a></code>
-draws it with <code>group = Scale</code>. The canvas is
-<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> with the fit’s <code>Angle_theory</code>
-column as its angles, so the spokes and labels sit where the theory put
-each scale.</p>
+<p>The first figure is the canvas alone. Its angles are the fit’s
+<code>Angle</code> column, so each rim tick sits at a scale’s estimated
+angle. Each label carries the scale’s name and its estimated angle
+rounded to the nearest degree. The crosshair marks the Cartesian
+coordinates of the score metric. The rim’s amplitude is 0.3, the value
+the measure figures below need.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ticks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  Scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Scale</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  amplitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.94</span>, <span class="fl">1</span><span class="op">)</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Angle</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">canvas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span></span>
+<span>  angles <span class="op">=</span> <span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Angle</span>, labels <span class="op">=</span> <span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Scale</span>,</span>
+<span>  amax <span class="op">=</span> <span class="fl">0.3</span>, grid <span class="op">=</span> <span class="st">"cartesian"</span>, angle_labels <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">ticks</span><span class="op">$</span><span class="va">Scale</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">ticks</span><span class="op">$</span><span class="va">Scale</span>, levels <span class="op">=</span> <span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Scale</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span>angles <span class="op">=</span> <span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Angle_theory</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">ticks</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
-<span>      amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span>,</span>
-<span>      group <span class="op">=</span> <span class="va">Scale</span>, color <span class="op">=</span> <span class="va">Scale</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    linewidth <span class="op">=</span> <span class="fl">1.5</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">canvas</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-latent-ticks-1.png" alt="plot of chunk latent-ticks" width="100%"></p>
-<p>Read the figure this way: the ticks are the angles
-<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimated, and the labelled spokes are the
-theoretical angles. A tick that sits on its spoke is a scale the model
-placed where the theory did. PA’s tick sits on its spoke by
-construction, because its angle was fixed. In this sample the other
-ticks drift clockwise from BC round to NO, and the NO tick lands near
-the LM spoke. The amplitude rings carry no meaning in this figure.
-Radius here only keeps the ticks at the rim.</p>
+<p>The ticks and their labels sit at the angles <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>
+estimated, and the theoretical angles appear only in the table above the
+figure. PA sits at 90 degrees by construction, because its angle was
+fixed. The other scales sit where the model placed them relative to PA.
+The tick for NO sits 11 degrees counterclockwise of LM’s theoretical
+position. DE and FG are 25 degrees apart where the theory puts them 45
+apart. The crosshair’s labels are Cartesian coordinates and carry no
+meaning in this figure. They matter once a measure is placed inside the
+circle.</p>
 </div>
 <div class="section level3">
-<h3 id="measure-vectors-on-the-same-rim">Measure vectors on the same rim<a class="anchor" aria-label="anchor" href="#measure-vectors-on-the-same-rim"></a>
+<h3 id="measure-points-on-the-same-rim">Measure points on the same rim<a class="anchor" aria-label="anchor" href="#measure-points-on-the-same-rim"></a>
 </h3>
-<p>Gurtman (1992) draws each external measure as a vector from the
-origin. Its direction is the measure’s displacement and its length is
-the measure’s amplitude. <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> supplies both. The
-second figure adds five personality-disorder measures from
-<code>jz2017</code> as such vectors, on the same rim ticks. Each vector
-is a two-row path from amplitude 0 to the measure’s <code>a_est</code>
-at its <code>d_est</code>. The ticks are scaled by the canvas’s
-<code>amax</code> so that they stay just inside the rim.</p>
+<p>Nagy, Etzel and Lüdtke (2019, Figure 6) draw each external measure as
+a labelled point inside a circle whose rim carries the estimated angles.
+Their Figure 3 joins the point to the origin by a straight line. The
+point’s direction from the origin is the measure’s displacement and its
+distance from the origin is the measure’s amplitude.
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> supplies both. The second figure adds five
+personality-disorder measures from <code>jz2017</code> in that form, on
+the canvas above. Each measure is one point at <code>a_est</code> and
+<code>d_est</code>, one two-row path from amplitude 0 to that point, and
+one text label. The <code>hjust</code> and <code>vjust</code> values
+place each label beside its point, away from the other labels. They are
+chosen by hand and keyed by measure name.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ssm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span>, <span class="st">"HISPD"</span>, <span class="st">"AVPD"</span>, <span class="st">"SCZPD"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">vectors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  Measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">ssm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Label</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  amplitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">ssm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">ssm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">measures</span> <span class="op">&lt;-</span> <span class="va">ssm</span><span class="op">$</span><span class="va">results</span></span>
+<span><span class="va">hjust</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>NARPD <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>, ASPD <span class="op">=</span> <span class="fl">1.1</span>, HISPD <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>, AVPD <span class="op">=</span> <span class="fl">0.5</span>, SCZPD <span class="op">=</span> <span class="fl">1.15</span><span class="op">)</span></span>
+<span><span class="va">vjust</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>NARPD <span class="op">=</span> <span class="fl">1.4</span>, ASPD <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>, HISPD <span class="op">=</span> <span class="fl">0.5</span>, AVPD <span class="op">=</span> <span class="fl">1.6</span>, SCZPD <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="va">measures</span><span class="op">$</span><span class="va">hjust</span> <span class="op">&lt;-</span> <span class="va">hjust</span><span class="op">[</span><span class="va">measures</span><span class="op">$</span><span class="va">Label</span><span class="op">]</span></span>
+<span><span class="va">measures</span><span class="op">$</span><span class="va">vjust</span> <span class="op">&lt;-</span> <span class="va">vjust</span><span class="op">[</span><span class="va">measures</span><span class="op">$</span><span class="va">Label</span><span class="op">]</span></span>
+<span><span class="va">spokes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  Label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">measures</span><span class="op">$</span><span class="va">Label</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  amplitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">measures</span><span class="op">$</span><span class="va">a_est</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">measures</span><span class="op">$</span><span class="va">d_est</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span>angles <span class="op">=</span> <span class="va">cpm</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">Angle_theory</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">canvas</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">ticks</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">spokes</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
-<span>      amplitude <span class="op">=</span> <span class="fl">0.3</span> <span class="op">*</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span>,</span>
-<span>      group <span class="op">=</span> <span class="va">Scale</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    linewidth <span class="op">=</span> <span class="fl">1.5</span></span>
+<span>      amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span>, group <span class="op">=</span> <span class="va">Label</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">vectors</span>,</span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">measures</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">measures</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
-<span>      amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span>,</span>
-<span>      color <span class="op">=</span> <span class="va">Measure</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.15</span>, <span class="st">"inches"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>    linewidth <span class="op">=</span> <span class="fl">0.8</span></span>
+<span>      x <span class="op">=</span> <span class="va">d_est</span>, y <span class="op">=</span> <span class="va">a_est</span>, label <span class="op">=</span> <span class="va">Label</span>, hjust <span class="op">=</span> <span class="va">hjust</span>, vjust <span class="op">=</span> <span class="va">vjust</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-latent-vectors-1.png" alt="plot of chunk latent-vectors" width="100%"></p>
-<p>This figure combines three sets of angles, and they do not share a
-model. The spokes are the theoretical angles. The ticks are the angles
-the circular process model estimated. The vectors are SSM displacements,
-and the SSM was computed with the theoretical angles, not the estimated
-ones. So the spoke and the tick for the same scale come from different
-models, and the vectors come from a third: the SSM computed on the
-theoretical angles. A vector that points at a tick does not mean that
-the measure loads on that scale’s latent position. Likewise, a vector’s
-length is the measure’s amplitude, not its correlation with the latent
-circumplex. The amplitude is the cosine curve’s amplitude in the
+<p>The rim and the points do not share a model. The rim ticks are the
+angles the circular process model estimated. The points are SSM
+displacements and amplitudes, and the SSM was computed with the
+theoretical angles, not the estimated ones. A point that lies in the
+direction of a tick does not mean that the measure loads on that scale’s
+latent position. Likewise, a measure’s distance from the origin is its
+SSM amplitude computed on the theoretical angles and not a loading on
+the latent circle. The amplitude is the cosine curve’s amplitude in the
 measure’s correlations with the eight scales, in the correlation metric
-that <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports. It is not a loading on the
-latent circle. To place a measure on the estimated circle itself, you
-would fit it inside the model, which <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> does not
-do.</p>
+that <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports. To place a measure on the
+estimated circle itself, you would fit it inside the model, which
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> does not do. <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code> places a
+label at <code>x = d_est</code> and <code>y = a_est</code> because
+<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> reads <code>x</code> as displacement and
+<code>y</code> as amplitude. That is how every circumplex layer hands
+its positions to the coordinate system.</p>
+</div>
+<div class="section level3">
+<h3 id="one-measure-with-its-amplitude-and-displacement">One measure with its amplitude and displacement<a class="anchor" aria-label="anchor" href="#one-measure-with-its-amplitude-and-displacement"></a>
+</h3>
+<p>Nagy, Etzel and Lüdtke (2019, Figure 3) annotate a single measure.
+They draw the point, its line from the origin, and an arc that sweeps
+counterclockwise from 0 degrees to the measure’s displacement. The two
+values are written beside them. The third figure draws SCZPD that way.
+The arc is a path at one fixed amplitude whose displacement runs from 0
+to <code>d_est</code>. It shows how the displacement is measured,
+counterclockwise from the positive horizontal axis. The two
+<code><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate()</a></code> calls write <code>d_est</code> rounded to the
+nearest degree and <code>a_est</code> rounded to two decimals.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">one</span> <span class="op">&lt;-</span> <span class="va">measures</span><span class="op">[</span><span class="va">measures</span><span class="op">$</span><span class="va">Label</span> <span class="op">==</span> <span class="st">"SCZPD"</span>, <span class="op">]</span></span>
+<span><span class="va">arc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  amplitude <span class="op">=</span> <span class="fl">0.08</span>,</span>
+<span>  displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">one</span><span class="op">$</span><span class="va">d_est</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">canvas</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">spokes</span><span class="op">[</span><span class="va">spokes</span><span class="op">$</span><span class="va">Label</span> <span class="op">==</span> <span class="st">"SCZPD"</span>, <span class="op">]</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">arc</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">one</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">one</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">d_est</span>, y <span class="op">=</span> <span class="va">a_est</span>, label <span class="op">=</span> <span class="va">Label</span><span class="op">)</span>,</span>
+<span>    hjust <span class="op">=</span> <span class="fl">1.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span></span>
+<span>    <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">0.13</span>, hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"d = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">one</span><span class="op">$</span><span class="va">d_est</span><span class="op">)</span>, <span class="st">"°"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span></span>
+<span>    <span class="st">"text"</span>, x <span class="op">=</span> <span class="va">one</span><span class="op">$</span><span class="va">d_est</span>, y <span class="op">=</span> <span class="va">one</span><span class="op">$</span><span class="va">a_est</span> <span class="op">/</span> <span class="fl">2</span>,</span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"a = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="va">one</span><span class="op">$</span><span class="va">a_est</span><span class="op">)</span><span class="op">)</span>, vjust <span class="op">=</span> <span class="fl">1.5</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="figures/advanced-visualization-latent-measure-1.png" alt="plot of chunk latent-measure" width="100%"></p>
+<p>The displacement label starts above the arc at 60 degrees and runs to
+the right, clear of the vertical axis and its labels. The amplitude
+label sits at half the amplitude, below the line. SCZPD’s displacement
+is past 180 degrees, so the arc passes through the upper half of the
+circle and ends just below the negative horizontal axis. The values are
+the <code>d_est</code> and <code>a_est</code> columns of
+<code>ssm$results</code>, not values read off the figure.</p>
 </div>
 <div class="section level3">
 <h3 id="the-fitted-correlation-function">The fitted correlation function<a class="anchor" aria-label="anchor" href="#the-fitted-correlation-function"></a>
 </h3>
-<p>The third figure is linear. The fit’s <code>corfun</code> element is
+<p>The fourth figure is linear. The fit’s <code>corfun</code> element is
 the estimated correlation function. It takes the angular separation
 between two scales, in degrees, and returns the correlation between
 their common parts. The figure draws it over separations from 0 to 180
@@ -578,7 +642,7 @@ straddling 0/360 gets the short way round. The filled points are the
 observed correlations from <code>matrices$R</code>. The hollow points
 are the correlations the model reproduces, from
 <code>matrices$Phat</code>.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>separation <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">180</span><span class="op">)</span></span>
 <span><span class="va">curve</span><span class="op">$</span><span class="va">correlation</span> <span class="op">&lt;-</span> <span class="va">cpm</span><span class="op">$</span><span class="fu">corfun</span><span class="op">(</span><span class="va">curve</span><span class="op">$</span><span class="va">separation</span><span class="op">)</span></span>
 <span></span>
@@ -631,39 +695,175 @@ posterior draws that the “Bayesian SSM Analysis” vignette analyses. They
 ship with the package in <code>bayesian_ssm_draws.rds</code>, generated
 once by the seeded script <code>data-raw/bayesian_ssm_draws.R</code>,
 and that vignette states the model they come from.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"bayesian_ssm_draws.rds"</span><span class="op">)</span></span>
 <span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="va">draws</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
 <span><span class="va">ellipse</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ellipse_data.html">ssm_ellipse_data</a></span><span class="op">(</span><span class="va">post</span><span class="op">)</span></span>
 <span><span class="va">ellipse</span></span>
 <span><span class="co">#&gt;          x0         y0        var_x        var_y        cov_xy</span></span>
 <span><span class="co">#&gt; 1 0.3523431 -0.3192543 0.0005952007 0.0005500366 -6.093168e-06</span></span></code></pre></div>
-<p>The figure draws the wedge, the ellipse, and the point estimate for
-the same profile on one canvas. The wedge and the point come from
-<code>post$results</code>, as in Section 4. The ellipse comes from the
-one-row data frame above.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
+<p>Nagy, Etzel and Lüdtke (2019, Figure 4 and Appendices B and C) read
+four lines off such an ellipse. Two are the tangents from the origin to
+the ellipse. Their angles bound the arc of directions the ellipse spans,
+read counterclockwise from the first tangent to the second. Two join the
+origin to the nearest and farthest points of the ellipse’s boundary.
+Their lengths are the smallest and largest amplitudes of any point in
+the ellipse. The function below computes all four from the one-row data
+frame above and the ellipse’s confidence level. It works from the
+covariance form that <code><a href="../reference/geom_ssm_ellipse.html">geom_ssm_ellipse()</a></code> draws and solves
+the two problems numerically, rather than transcribing the appendices’
+quartic and slope equations. A direction from the origin is tangent to
+the ellipse when the line along it meets the ellipse at exactly one
+point. That makes the quadratic for where the line meets the ellipse
+have a double root. Setting its discriminant to zero gives a quadratic
+in the direction’s slope, whose two roots are the two tangent
+directions. The two distances are the extremes of the boundary radius
+over the ellipse’s parametric angle, found on a fine grid and refined
+with <code><a href="https://rdrr.io/r/stats/optimize.html" class="external-link">optimize()</a></code>. When the origin lies inside the ellipse
+there are no tangents, so those two angles are <code>NA</code>. The
+nearest distance is then the smallest boundary radius.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ellipse_lines</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ellipse</span>, <span class="va">level</span> <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">centre</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ellipse</span><span class="op">$</span><span class="va">x0</span>, <span class="va">ellipse</span><span class="op">$</span><span class="va">y0</span><span class="op">)</span></span>
+<span>  <span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ellipse</span><span class="op">$</span><span class="va">var_x</span>, <span class="va">ellipse</span><span class="op">$</span><span class="va">cov_xy</span>, <span class="va">ellipse</span><span class="op">$</span><span class="va">cov_xy</span>, <span class="va">ellipse</span><span class="op">$</span><span class="va">var_y</span><span class="op">)</span>, <span class="fl">2</span>, <span class="fl">2</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="va">r2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html" class="external-link">qchisq</a></span><span class="op">(</span><span class="va">level</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span></span>
+<span>  <span class="co"># A direction w is tangent when (w'Ac)^2 = (w'Aw)(c'Ac - r2), so w'Mw = 0.</span></span>
+<span>  <span class="co"># The origin is outside the ellipse when c'Ac exceeds r2.</span></span>
+<span>  <span class="va">outside</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">centre</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">A</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">centre</span><span class="op">)</span> <span class="op">-</span> <span class="va">r2</span></span>
+<span>  <span class="va">tangents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">outside</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">Ac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="va">A</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">centre</span><span class="op">)</span></span>
+<span>    <span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">tcrossprod</a></span><span class="op">(</span><span class="va">Ac</span><span class="op">)</span> <span class="op">-</span> <span class="va">outside</span> <span class="op">*</span> <span class="va">A</span></span>
+<span>    <span class="co"># The zero directions of w'Mw solve a quadratic in the slope. Use the</span></span>
+<span>    <span class="co"># slope or its reciprocal, whichever gives the larger leading coefficient.</span></span>
+<span>    <span class="co"># Both roots are real whenever the origin is outside (det(M) &lt; 0), so</span></span>
+<span>    <span class="co"># Re() drops only a zero imaginary part.</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">M</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">M</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/complex.html" class="external-link">Re</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/polyroot.html" class="external-link">polyroot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">M</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">M</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>, <span class="va">M</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/complex.html" class="external-link">Re</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/polyroot.html" class="external-link">polyroot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">M</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">]</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">M</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>, <span class="va">M</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="co"># Point each direction towards the ellipse, then order the pair so that</span></span>
+<span>    <span class="co"># the counterclockwise arc from the first to the second holds the centre.</span></span>
+<span>    <span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sweep.html" class="external-link">sweep</a></span><span class="op">(</span><span class="va">w</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">w</span> <span class="op">*</span> <span class="va">Ac</span><span class="op">)</span><span class="op">)</span>, <span class="va">`*`</span><span class="op">)</span></span>
+<span>    <span class="va">tangents</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">atan2</a></span><span class="op">(</span><span class="va">w</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span>, <span class="va">w</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="fl">180</span> <span class="op">/</span> <span class="va">pi</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">360</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="op">(</span><span class="va">tangents</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">tangents</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">360</span> <span class="op">&gt;</span> <span class="fl">180</span><span class="op">)</span> <span class="va">tangents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">tangents</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="co"># The boundary radius as a function of the parametric angle.</span></span>
+<span>  <span class="va">L</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">r2</span><span class="op">)</span></span>
+<span>  <span class="va">boundary</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="va">centre</span> <span class="op">+</span> <span class="va">L</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">radius</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="fu">boundary</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">3601</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">3601</span><span class="op">]</span></span>
+<span>  <span class="va">step</span> <span class="op">&lt;-</span> <span class="va">grid</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">grid</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">refine</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">i</span>, <span class="va">maximum</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/optimize.html" class="external-link">optimize</a></span><span class="op">(</span><span class="va">radius</span>, <span class="va">grid</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">step</span>, <span class="va">step</span><span class="op">)</span>, maximum <span class="op">=</span> <span class="va">maximum</span>, tol <span class="op">=</span> <span class="fl">1e-12</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">nearest</span> <span class="op">&lt;-</span> <span class="fu">refine</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="fu">radius</span><span class="op">(</span><span class="va">grid</span><span class="op">)</span><span class="op">)</span>, maximum <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="va">farthest</span> <span class="op">&lt;-</span> <span class="fu">refine</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="fu">radius</span><span class="op">(</span><span class="va">grid</span><span class="op">)</span><span class="op">)</span>, maximum <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">angle_of</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">boundary</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
+<span>    <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">atan2</a></span><span class="op">(</span><span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="fl">180</span> <span class="op">/</span> <span class="va">pi</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">360</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tangent_1"</span>, <span class="st">"tangent_2"</span>, <span class="st">"nearest"</span>, <span class="st">"farthest"</span><span class="op">)</span>,</span>
+<span>    displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="va">tangents</span>, <span class="fu">angle_of</span><span class="op">(</span><span class="va">nearest</span><span class="op">$</span><span class="va">minimum</span><span class="op">)</span>, <span class="fu">angle_of</span><span class="op">(</span><span class="va">farthest</span><span class="op">$</span><span class="va">maximum</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    amplitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="va">nearest</span><span class="op">$</span><span class="va">objective</span>, <span class="va">farthest</span><span class="op">$</span><span class="va">objective</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">level</span> <span class="op">&lt;-</span> <span class="fl">0.95</span></span>
+<span><span class="va">four_lines</span> <span class="op">&lt;-</span> <span class="fu">ellipse_lines</span><span class="op">(</span><span class="va">ellipse</span>, level <span class="op">=</span> <span class="va">level</span><span class="op">)</span></span>
+<span><span class="va">four_lines</span></span>
+<span><span class="co">#&gt;        line displacement amplitude</span></span>
+<span><span class="co">#&gt; 1 tangent_1     310.7611        NA</span></span>
+<span><span class="co">#&gt; 2 tangent_2     324.8137        NA</span></span>
+<span><span class="co">#&gt; 3   nearest     317.5519 0.4164769</span></span>
+<span><span class="co">#&gt; 4  farthest     318.0873 0.5344676</span></span></code></pre></div>
+<p>The <code>displacement</code> column holds the two tangent angles and
+the directions of the nearest and farthest boundary points. The
+<code>amplitude</code> column holds the two distances. The tangents are
+listed so that the counterclockwise arc from <code>tangent_1</code> to
+<code>tangent_2</code> holds the ellipse, which matters for an ellipse
+that straddles 0/360 degrees.</p>
+<p>The figure draws the wedge, the ellipse, the four lines and the point
+estimate for the same profile on one canvas. The wedge and the point
+come from <code>post$results</code>, as in Section 4. The ellipse comes
+from the one-row data frame above, drawn at the same <code>level</code>
+the four lines were computed at. The two tangent lines are dashed and
+run from the origin to the rim. The two distance lines are dotted and
+run from the origin to the nearest and farthest boundary points.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">amax</span> <span class="op">&lt;-</span> <span class="fl">0.6</span></span>
+<span><span class="va">tangents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">four_lines</span><span class="op">$</span><span class="va">line</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  amplitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">amax</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">four_lines</span><span class="op">$</span><span class="va">displacement</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">distances</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">four_lines</span><span class="op">$</span><span class="va">line</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  amplitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">four_lines</span><span class="op">$</span><span class="va">amplitude</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  displacement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">four_lines</span><span class="op">$</span><span class="va">displacement</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="va">amax</span>,</span>
+<span>  grid <span class="op">=</span> <span class="st">"cartesian"</span>, angle_labels <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_arc.html">geom_ssm_arc</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>      amplitude_min <span class="op">=</span> <span class="va">a_lci</span>, amplitude_max <span class="op">=</span> <span class="va">a_uci</span>,</span>
 <span>      displacement_min <span class="op">=</span> <span class="va">d_lci</span>, displacement_max <span class="op">=</span> <span class="va">d_uci</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.15</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">tangents</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>      amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span>, group <span class="op">=</span> <span class="va">line</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"dashed"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_path.html">geom_ssm_path</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">distances</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>      amplitude <span class="op">=</span> <span class="va">amplitude</span>, displacement <span class="op">=</span> <span class="va">displacement</span>, group <span class="op">=</span> <span class="va">line</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"dotted"</span>, color <span class="op">=</span> <span class="st">"gray40"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_ellipse.html">geom_ssm_ellipse</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">ellipse</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>      x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, var_x <span class="op">=</span> <span class="va">var_x</span>, var_y <span class="op">=</span> <span class="va">var_y</span>, cov_xy <span class="op">=</span> <span class="va">cov_xy</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    color <span class="op">=</span> <span class="st">"firebrick"</span></span>
+<span>    level <span class="op">=</span> <span class="va">level</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1.5</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">d_est</span>, y <span class="op">=</span> <span class="va">a_est</span>, label <span class="op">=</span> <span class="st">"Mean profile"</span><span class="op">)</span>,</span>
+<span>    hjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-ellipse-figure-1.png" alt="plot of chunk ellipse-figure" width="100%"></p>
+<p>The label names what the draws describe: the mean octant profile of
+the subsample the “Bayesian SSM Analysis” vignette fits. The ellipse is
+small on this canvas because the posterior is tight, so the point is
+drawn small to keep the outline visible. The wedge is drawn light so
+that the ellipse and the four lines read over it. The tangent lines
+bound the directions the ellipse spans under the normal approximation
+and are not the displacement interval the wedge draws. The wedge’s
+displacement interval is a circular-quantile interval of the draws. The
+tangent angles come from the ellipse alone, so the two pairs of angles
+differ. Here the tangents at 311 and 325 degrees sit outside the wedge’s
+interval from 312 to 323 degrees.</p>
 <p>Here the ellipse is centred on the posterior medians of
 <code>x</code> and <code>y</code>, not on the plotted point, and its
 covariance comes from the draws. The medians are the values
@@ -674,7 +874,7 @@ displacement. Those are marginal summaries, so the point is not the
 polar form of the medians of <code>x</code> and <code>y</code>. The
 chunk below computes the distance between the centre and the point in
 the score metric. Here it is too small to see.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">point</span> <span class="op">&lt;-</span> <span class="va">post</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span> <span class="op">*</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ellipse</span><span class="op">$</span><span class="va">x0</span>, <span class="va">ellipse</span><span class="op">$</span><span class="va">y0</span><span class="op">)</span> <span class="op">-</span> <span class="va">point</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -691,9 +891,9 @@ two regions answer different questions, so the two need not coincide. In
 this figure the ellipse reaches farther than the wedge along both the
 amplitude axis and the displacement axis. The wedge’s four corners still
 fall outside the ellipse.</p>
-<p>Read the ellipse against the origin with care: an ellipse at
+<p>Read the ellipse against the origin with care. An ellipse at
 confidence level 1 − α that excludes the origin rejects zero amplitude
-in a Wald test at significance level α, and only under that
+in a Wald test at significance level α. That holds only under the normal
 approximation. A Wald test compares an estimate with its standard error,
 here the pair <code>(x, y)</code> with its covariance. The ellipse above
 is drawn at confidence level 0.95. It is the set of <code>(x, y)</code>
@@ -724,7 +924,7 @@ columns are an <code>id</code>, a <code>wave</code> factor with levels
 <code><a href="../reference/PANO.html">PANO()</a></code> scales. <code><a href="../reference/simulated_occasions.html">?simulated_occasions</a></code> states how
 it was simulated. We load it and estimate one profile per wave with
 <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_occasions"</span><span class="op">)</span></span>
 <span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze_long.html">ssm_analyze_long</a></span><span class="op">(</span></span>
 <span>  <span class="va">simulated_occasions</span>,</span>
@@ -740,7 +940,7 @@ selects these columns is omitted.)</p>
 <span><span class="co">#&gt; 1       T1 0.5707423 332.41252 329.28366 335.57815</span></span>
 <span><span class="co">#&gt; 2       T2 0.5968632 354.84909 351.80498 357.66599</span></span>
 <span><span class="co">#&gt; 3       T3 0.5959438  21.05834  17.83082  24.00907</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">results_long</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-plot-1.png" alt="plot of chunk occasions-plot" width="100%"></p>
 <p>Two things about the displacement panel are worth reading carefully.
@@ -796,7 +996,7 @@ occasion are split across two panels. <code><a href="../reference/geom_ssm_path.
 the same series as a path on the circular canvas, so a change in
 (amplitude, displacement) reads as movement through circumplex
 space.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># The amplitude axis goes in the 45-90 gap, clear of the three occasions</span></span>
 <span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.8</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -834,7 +1034,7 @@ sorting for you.</p>
 <p>The same figure is available ready-made from
 <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, which adds the path to its usual points
 and confidence wedges:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results_long</span>, path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/advanced-visualization-occasions-path-wrapper-1.png" alt="plot of chunk occasions-path-wrapper" width="100%"></p>
 <p>An occasion whose displacement is undefined (a flat or zero-amplitude
@@ -854,14 +1054,14 @@ that axis consistently with the circular canvas: by default with the
 angle in degrees, or with custom labels or an instrument’s
 abbreviations.</p>
 <p>The example below draws a made-up profile at the octant angles:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The data frame <code>curve</code> has one row per angle in
 <code>angles</code>, in its <code>angle</code> column. Its
 <code>score</code> column follows a cosine curve with elevation 1,
 amplitude 0.8 and displacement 135 degrees. (The code that builds
 <code>curve</code> is omitted.)</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">curve</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">angle</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
@@ -909,10 +1109,10 @@ read “Growth Models on SSM Parameters”.</p>
 <ul>
 <li><p>Browne, M. W. (1992). Circumplex models for correlation matrices.
 <em>Psychometrika, 57</em>(4), 469–497.</p></li>
-<li><p>Gurtman, M. B. (1992). Construct validity of interpersonal
-personality measures: The interpersonal circumplex as a nomological net.
-<em>Journal of Personality and Social Psychology, 63</em>(1),
-105–118.</p></li>
+<li><p>Nagy, G., Etzel, J. M., &amp; Lüdtke, O. (2019). Integrating
+covariates into circumplex structures: An extension procedure for
+Browne’s circular stochastic process model. <em>Multivariate Behavioral
+Research, 54</em>(3), 404–428.</p></li>
 <li><p>Wright, A. G. C., Pincus, A. L., Conroy, D. E., &amp; Hilsenroth,
 M. J. (2009). Integrating methods to optimize circumplex description and
 comparison of groups. <em>Journal of Personality Assessment, 91</em>(4),

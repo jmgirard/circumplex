@@ -61,16 +61,23 @@
   the model is right.
 
 - The “Advanced Circumplex Visualization” vignette has a new section,
-  “The latent circumplex from a CPM fit”. It draws three figures from a
+  “The latent circumplex from a CPM fit”. Its circle figures follow
+  Nagy, Etzel and Lüdtke (2019, Figures 3, 4 and 6) and are drawn on the
+  cartesian canvas with the layers the package already exports. The
+  first is the canvas alone, its rim ticks and labels at the angles
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result with the layers the package already exports. The first puts the
-  estimated scale angles as ticks on the rim of a canvas whose spokes
-  sit at the theoretical angles. The second adds five measures from
+  estimated. The second adds five measures from
   [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
-  as vectors from the origin on the same rim. The third draws the fitted
-  correlation function against angular separation, with the observed and
-  reproduced correlations as points. The prose states which model each
-  set of angles comes from.
+  as labelled points joined to the origin. The third annotates one
+  measure with an arc for its displacement and its two values. A fourth,
+  linear figure draws the fitted correlation function against angular
+  separation, with the observed and reproduced correlations as points.
+  The ellipse figure adds two tangent lines from the origin out to the
+  rim, at the angles of the confidence ellipse’s tangents, and the lines
+  from the origin to the ellipse’s nearest and farthest boundary points,
+  computed in an echoed chunk that the test suite runs against
+  independent oracles. The prose states which model each set of angles
+  comes from.
 
 - Every prose caution and note that
   [`print()`](https://rdrr.io/r/base/print.html) and
