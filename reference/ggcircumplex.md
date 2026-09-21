@@ -76,7 +76,12 @@ ggcircumplex(
   as 360, and turns each label to read along its radius (default =
   `FALSE`). It applies to text labels, from `labels` or an instrument;
   the default degree labels already show the angle and are left as they
-  are.
+  are. Each side of the plot margin is widened to fit the labels that
+  point toward it: a label reaches past a side by its length, estimated
+  at half of `font_size` per character, times the share of its direction
+  that points toward that side. A side that no label points toward keeps
+  the theme's margin, so the circle can sit off-center on the page. Add
+  `+ theme(plot.margin = ...)` to set the margin yourself.
 
 ## Value
 
