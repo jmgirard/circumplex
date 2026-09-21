@@ -837,7 +837,7 @@ axes_degeneracy_refusal <- function(sigma, d) {
   # estimates within a factor 4 to 90 of eps, so the threshold is a machine
   # constant decades above that band. It sits about a decade ABOVE the
   # smallest floor-admitted estimate measured at a design the exported API
-  # reaches (1.15e-9, a near-duplicate pair at kappa 3e4), so those few
+  # reaches (1.15e-9, a near-duplicate pair at kappa 6e4), so those few
   # designs are routed and their certificate decides them -- every one
   # measured passes by three decades. A matrix neither selector picks
   # computes and pays nothing.
