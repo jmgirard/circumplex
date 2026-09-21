@@ -67,22 +67,35 @@ scales <- function(x, items = FALSE) {
   stopifnot(is_instrument(x))
   stopifnot(is_flag(items))
 
-  cat("The ", x$Details$Abbrev, " contains ", x$Details$Scales, 
+  cat("The ", x$Details$Abbrev, " contains ", x$Details$Scales,
       " circumplex scales.\n", sep = "")
+  # A licensed instrument ships one unnumbered notice row in place of its
+  # items, so there is no item text to look up by number: its notice prints
+  # once, after the scale lines.
+  notice_only <- all(is.na(x$Items$Number))
   for (i in 1:nrow(x$Scales)) {
     xi <- x$Scales[i, ]
     cat(xi$Abbrev, ": ", xi$Label, " (", xi$Angle, " degrees)", "\n", sep = "")
-    if (items == TRUE) {
+    if (items == TRUE && !notice_only) {
       item_nums <- as.integer(strsplit(xi$Items, ",")[[1]])
       for (j in 1:length(item_nums)) {
         num_j <- item_nums[[j]]
-        item_j <- x$Items[[num_j, "Text"]]
-        cat("    ", num_j, ". ", item_j, "\n", sep = "")
+        cat_item(x$Items[[num_j, "Text"]], paste0("    ", num_j, ". "))
       }
     }
   }
+  if (items == TRUE && notice_only) {
+    cat_item(x$Items$Text, "    ")
+  }
 
   invisible(x)
+}
+
+# One item line: `lead` (its indent and number) and then the text, wrapped to
+# the console width with every continuation line under the text's first
+# character.
+cat_item <- function(text, lead) {
+  cat_prose(text, prefix = lead, continuation = strrep(" ", disp_width(lead)))
 }
 
 #' Display the items of a circumplex instrument
@@ -100,18 +113,14 @@ scales <- function(x, items = FALSE) {
 items <- function(x) {
   stopifnot(is_instrument(x))
 
-  cat("The ", x$Details$Abbrev, " contains ", x$Details$Items, " items (", 
-    x$Details$Status, "):\n",
-    ifelse(x$Details$Prefix != "", paste("Prefix: ", x$Details$Prefix, "\n", sep = ""), ""),
-    ifelse(x$Details$Suffix != "", paste("Suffix: ", x$Details$Suffix, "\n", sep = ""), ""),
-    sep = ""
-  )
+  cat("The ", x$Details$Abbrev, " contains ", x$Details$Items, " items (",
+    x$Details$Status, "):\n", sep = "")
+  if (x$Details$Prefix != "") cat_item(x$Details$Prefix, "Prefix: ")
+  if (x$Details$Suffix != "") cat_item(x$Details$Suffix, "Suffix: ")
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
-    if (!is.na(xi$Number)) {
-      cat(xi$Number, ". ", sep = "")
-    }
-    cat(xi$Text, "\n", sep = "")
+    lead <- if (is.na(xi$Number)) "" else paste0(xi$Number, ". ")
+    cat_item(xi$Text, lead)
   }
 
   invisible(x)
