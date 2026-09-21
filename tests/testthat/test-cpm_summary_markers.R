@@ -10,6 +10,9 @@
 
 m94_labels <- function() c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
+# Eight scale names of exactly 16 characters (M146 width fixture).
+m146_long_names <- function() sprintf("LongScaleName_%s", m94_labels())
+
 # Analytic fixtures, mirroring the calibration tests in test-cpm_api.R.
 m94_clean_P0 <- function() {
   tr <- cpm_clean_truth()
@@ -328,13 +331,81 @@ test_that("print() and summary() show the results table as one block for every f
                     angles = tr$angles, n = 300, m = 3),
     free = cpm_fit(cormat = P0, scales = paste0("V", 1:8),
                    angles = tr$angles, n = 5000, m = 3, scaling = "free"),
+    # M146: eight 16-character names, free scaling, analytic intervals. With
+    # Communality printed this table reached 87 columns and split at 77.
+    free_long = cpm_fit(cormat = P0, scales = m146_long_names(),
+                        angles = tr$angles, n = 5000, m = 3,
+                        scaling = "free", ci_method = "analytic"),
     boot_jz = m94_boot_jz(),
     boot_big = m94_boot_big(),
     boot_clean = m94_boot_clean()
   )
+  # The long-name fixture is the width case only if its names are 16
+  # characters and its intervals are computed, so both are asserted here.
+  long <- fits$free_long
+  expect_true(all(nchar(long$results$Scale) == 16))
+  free_rows <- seq_len(nrow(long$results)) != long$details$reference
+  expect_true(all(is.finite(long$results$Angle_lci[free_rows])))
+  expect_true(all(is.finite(long$results$Zeta_lci)))
   for (nm in names(fits)) {
     for (printer in list(print = print, summary = summary)) {
       expect_cpm_table_one_block(fits[[nm]], printer)
+    }
+  }
+})
+
+# ---- M146: the Heywood clause and the marker note at every width -------------
+#
+# m94_boot_jz() fires the Heywood diagnostic line and three markers, among them
+# "small correlation-function weight", the longest label. Both notes are swept
+# over widths 30 to 120.
+
+test_that("the Heywood note never breaks inside its zeta clause (30 to 120)", {
+  skip_on_cran()
+  jz <- m94_boot_jz()
+  expect_true(isTRUE(jz$details$heywood))
+  unit <- "(ζ > 0.995,"
+  old <- options(width = 80)
+  on.exit(options(old), add = TRUE)
+  for (w in 30:120) {
+    options(width = w)
+    for (printer in list(print, summary)) {
+      out <- capture.output(printer(jz))
+      expect_true(any(grepl(unit, out, fixed = TRUE)),
+                  info = paste("width", w))
+    }
+  }
+})
+
+test_that("the marker note stays inside the width except for a lone label", {
+  skip_on_cran()
+  jz <- m94_boot_jz()
+  fired <- cpm_boundary_markers(jz)
+  expect_true("small correlation-function weight" %in% fired)
+  labels <- c(paste0(fired, ";"), paste0(fired, "."))
+  old <- options(width = 80)
+  on.exit(options(old), add = TRUE)
+  for (w in 30:120) {
+    options(width = w)
+    out <- capture.output(summary(jz))
+    # "Note:" may end the line before this word at narrow widths.
+    first <- grep("boundary/weak-identification", out, fixed = TRUE)
+    if (length(first) == 1 && !grepl("Note:", out[first], fixed = TRUE)) {
+      first <- first - 1L
+    }
+    last <- grep("What has been measured", out, fixed = TRUE)
+    expect_length(first, 1)
+    expect_length(last, 1)
+    block <- out[first:(last - 1L)]
+    wide <- block[nchar(block, type = "width") > w]
+    # A line may pass the width only when it holds one whole marker label.
+    expect_true(all(trimws(wide) %in% labels), info = paste("width", w))
+    # The opening clause breaks between words once it cannot fit whole.
+    if (w < 51) {
+      expect_false(any(grepl(
+        "Note: boundary/weak-identification markers fired:", out,
+        fixed = TRUE
+      )), info = paste("width", w))
     }
   }
 })
