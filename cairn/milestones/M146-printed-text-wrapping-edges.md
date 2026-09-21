@@ -130,7 +130,7 @@ No box is ticked on this pass. The master branch did not move since the branch w
 - AC4: the Heywood sweep ran 366 expectations over `hey` and `m94_boot_jz()`. The marker sweep ran 592 over `m94_boot_jz()` and `m94_boot_big()`. Both fixtures of the marker sweep fire "small correlation-function weight". 0 failures. This closes return 1.
 - AC5: a probe fit with eight 16-character names, free scaling and analytic intervals keeps `Communality` in `fit$results`. At width 77, `print()` and `summary()` show no Communality and one table header, at 74 and 77 columns at most. The one-block test ran 231 expectations, 0 failures.
 - AC6: the refusals read "is.finite(width) is not TRUE", "`prefix` must not contain a tab" and "`continuation` must not contain a tab". `ssm_ci_cat_line("Label", "")` prints `    Label`. `test-wrap-prose.R`: 22 tests, 0 failures.
-- AC7: the Communality grep prints nothing. NEWS.md adds four entries that name the changed print methods, the dropped column and the `scales()` fix.
+- AC7: the Communality grep prints nothing. NEWS.md adds four entries that name the changed print methods, the dropped column and the `scales()` fix. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes.
 
 Proposed narrowed AC2 clause for the amendment gate: "A test calls each of those four formatters directly at every width from 30 to 120, passing text containing double-width characters to each formatter that takes text, and finds every printed line within the width in display columns, except a line holding one word wider than the room after its indent."
 
