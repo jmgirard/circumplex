@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M146: Printed text wraps at its edge cases, and the CPM table drops Communality
 
-- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -80,6 +80,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: the audit measured master's `free_long` table at 84 columns, not the 87 in the plan gate and in two comments, nor the "about 86" in the T4 line above. Both comments now say 84. The one-block result stands: 72 columns without Communality.
 - 2026-09-21: review return 1 (defect): AC4 fails as written. Its width sweeps cover only `m94_boot_jz()`, not the file's other Heywood fixture (analytic `hey`) or its other marker-firing bootstrap fixture (`m94_boot_big()`). Every other criterion passed fresh evidence, and the suite and check are clean. Twelve reviewer findings are logged untriaged in the Review section.
 - 2026-09-21: return 1 fixed. The Heywood sweep in `test-cpm_summary_markers.R` now runs over both Heywood fixtures, analytic `hey` and `m94_boot_jz()`. The marker sweep runs over both marker-firing bootstrap fixtures, `m94_boot_jz()` and `m94_boot_big()`. Each sweep asserts that its fixture fires what the comment says. The sweeps ran 366 and 592 expectations with 0 failures. No red run was possible, because the behavior already held (pass-1 probe). The change closes a coverage gap. Full suite: 0 failures. The twelve findings stay for the review gate.
+- 2026-09-21: review return 2 (amendment, not a defect): AC2 fails as written. It promises that a test passes double-width text to each of four formatters, but `sem_dcfi_note()` takes no text. The narrowed clause is proposed in the Review section for the implement amendment gate. The other six criteria passed fresh evidence. This return does not count toward the defect-return count.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
@@ -118,3 +119,19 @@ Reviewer findings (reported, not yet triaged; carried to the next gate):
 - [S-prior]1 the dropped Communality column contradicts M133's choice of shorter headers. It is an intentional plan-gate change.
 - [S-prior]2 wrapping the instrument printers contradicts M131's scope, which left them out. It is an intentional scope choice.
 - [S-blame]: no findings.
+
+### Pass 2 (2026-09-21): returned to in-progress, AC2 needs an amendment
+
+No box is ticked on this pass. The master branch did not move since the branch was cut. The evidence below is fresh, from an independent probe script and the test files run with `NOT_CRAN=true`.
+
+- AC1: the probe read 4,240 item, Prefix and Suffix lines from the 13 instruments with item text. It ran `items()` and `scales(items = TRUE)` at widths 40, 60 and 80. It found 0 lines over the width and 541 continuation lines, 0 not under the text's first character. The words of every item came back in order, 0 mismatches. `scales(iip32, items = TRUE)` and `scales(iip64, items = TRUE)` each print 10 lines, the notice last. `test-instrument_wrap.R`: 3 tests, 103 expectations, 0 failures.
+- AC2: FAILS as written. `grep -n strwrap R/ssm_sem.R` prints nothing, and `test-ssm_sem_print_wrap.R` passes (3 tests, 546 expectations). But the criterion says that a test calls each of the four formatters "with text containing double-width characters". The ΔCFI note formatter, `sem_dcfi_note(width)`, takes no text. Its sweep uses the fixed note, and "Δ" is one column wide. No test can pass double-width text to it, so the criterion promises something that cannot exist. This is an amendment return, not a defect in the code.
+- AC3: the sweep test in `test-axes-scaled-fit.R` ran 91 expectations, 0 failures, not skipped.
+- AC4: the Heywood sweep ran 366 expectations over `hey` and `m94_boot_jz()`. The marker sweep ran 592 over `m94_boot_jz()` and `m94_boot_big()`. Both fixtures of the marker sweep fire "small correlation-function weight". 0 failures. This closes return 1.
+- AC5: a probe fit with eight 16-character names, free scaling and analytic intervals keeps `Communality` in `fit$results`. At width 77, `print()` and `summary()` show no Communality and one table header, at 74 and 77 columns at most. The one-block test ran 231 expectations, 0 failures.
+- AC6: the refusals read "is.finite(width) is not TRUE", "`prefix` must not contain a tab" and "`continuation` must not contain a tab". `ssm_ci_cat_line("Label", "")` prints `    Label`. `test-wrap-prose.R`: 22 tests, 0 failures.
+- AC7: the Communality grep prints nothing. NEWS.md adds four entries that name the changed print methods, the dropped column and the `scales()` fix.
+
+Proposed narrowed AC2 clause for the amendment gate: "A test calls each of those four formatters directly at every width from 30 to 120, passing text containing double-width characters to each formatter that takes text, and finds every printed line within the width in display columns, except a line holding one word wider than the room after its indent."
+
+The twelve pass-1 findings stay untriaged for the next gate.
