@@ -58,6 +58,7 @@ The per-fit accuracy certificate alone decides whether an `axes_reliability()` f
 - 2026-09-21: plan gate chose the default tolerance on the raw arm over `tol = 0` there because the certificate never prices raw Sigma-hat; falsified by a certificate extended to the raw arm.
 - 2026-09-21: plan gate chose a Fable brief after the sweep (T2) over Fable at review only because the certificate's behavior where `rcond(info) < eps` is measured, not proven; a timing choice, falsified by nothing.
 - 2026-09-21: plan gate chose M148 for the five remaining fragilities over folding them in, on the sizing tripwire.
+- 2026-09-21: implement started on branch m147-certificate-sole-conditioning-judge. Question gate: the refusal object carries the pricing core to both surfaces (a `core` argument on the pricing helpers); `axes_pricing_core()` gains `tol = 0` and the raw arm passes `.Machine$double.eps`; the core returns `rcond(info)` for the selector; T2's brief runs after T1 as planned.
 
 ## Decisions
 
