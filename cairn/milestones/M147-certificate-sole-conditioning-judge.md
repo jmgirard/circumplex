@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M147: The certificate is the sole conditioning judge
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -64,3 +64,4 @@ The per-fit accuracy certificate alone decides whether an `axes_reliability()` f
 ## Decisions
 
 ## Review
+- 2026-09-21: blocked on RB24 (T2: the certificate's licensing below eps, the selector's home, the duplicate-pair check).
