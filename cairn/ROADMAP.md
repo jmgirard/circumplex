@@ -1,15 +1,14 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-21 (M144 done and archived; its source row struck; no LESSONS change. ROADMAP 28,908 bytes against its 24,000 budget, awaiting `/cairn-triage`; LESSONS 48 lines / 19,980 bytes; test-craft 28 lines / 8,924 bytes.)_
+_Last hygiene check: 2026-09-21 (M145 done and archived. M142 row pruned. One LESSONS line added, the M34 line pruned. ROADMAP 28,202 bytes against its 24,000 budget, awaiting `/cairn-triage`. LESSONS 48 lines / 19,975 bytes. test-craft 28 lines / 8,924 bytes.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M145 | Per-side label margins and plotmath crosshair labels on the circumplex canvas | review | — | normal | milestones/M145-cartesian-canvas-follow-ons.md |
+| M145 | Per-side label margins and plotmath crosshair labels on the circumplex canvas | done | — | normal | milestones/archive/M145-cartesian-canvas-follow-ons.md |
 | M144 | The vignette guards keep one level map, check section numbers, and pkgdown builds the vignette menu | done | — | high | milestones/archive/M144-vignette-guards-single-map.md |
-| M142 | A Cartesian-grid style for the circumplex canvas (`coord_circumplex(grid = "cartesian")`, `ggcircumplex(angle_labels = TRUE)`) | done | — | normal | milestones/archive/M142-cartesian-canvas-grid.md |
 | M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | done | M142 | normal | milestones/archive/M143-vignette-nagy-figures.md |
 
 ## Candidates
