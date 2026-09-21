@@ -829,6 +829,14 @@ test_that("expression amplitude labels draw as plotmath on the crosshair (M145 A
     positive = list(quote(a / b), quote(a == b), "", ""),
     negative = list(quote(-(a / b)), quote(-(a == b)), "", "")
   )
+  # A superscript and a bracketed label take a bare minus. A number takes one
+  # too, unless it is already negative: -0.1 is wrapped, or plotmath would
+  # draw "--0.1".
+  expect_crosshair_labels(
+    list("0.1" = quote(a^2), "0.2" = quote((a)), "0.3" = 0.3, "0.4" = -0.1),
+    positive = list(quote(a^2), quote((a)), 0.3, -0.1),
+    negative = list(quote(-a^2), quote(-(a)), quote(-0.3), call("-", call("(", -0.1)))
+  )
 })
 
 # --- AC4: the grid mode never touches the polar transform ---------------------

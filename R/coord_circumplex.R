@@ -292,11 +292,12 @@ is_blank_axis_label <- function(x) {
 # plotmath draws a call's structure, not brackets it was never given, so
 # `-` applied to `a + b` would read "-a + b": a label that is itself a call
 # is wrapped in parentheses, unless it is a subscript, a superscript or
-# already bracketed, which bind tighter than the minus. A plain string gets
-# the minus as text, as the character path does.
+# already bracketed, which bind tighter than the minus. A negative number is
+# wrapped too, or it would read "--0.1". A plain string gets the minus as
+# text, as the character path does.
 negate_axis_label <- function(x) {
   if (is.character(x)) return(paste0("-", x))
-  tight <- is.symbol(x) || is.numeric(x) ||
+  tight <- is.symbol(x) || (is.numeric(x) && !isTRUE(x < 0)) ||
     (is.call(x) && is.symbol(x[[1]]) && as.character(x[[1]]) %in% c("[", "^", "("))
   if (tight) call("-", x) else call("-", call("(", x))
 }

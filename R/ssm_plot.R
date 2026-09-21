@@ -769,7 +769,10 @@ angle_label_margin <- function(labels, angles, font_size) {
     "plot.margin",
     ggplot2::complete_theme(theme_circumplex(base_size = font_size))
   )
-  grid::unit(pmax(grid::convertUnit(floor, "pt", valueOnly = TRUE), reach), "pt")
+  # The theme's margin is in pt, so it is read as a number: grid::convertUnit()
+  # would open a graphics device just to build the plot.
+  stopifnot(all(grid::unitType(floor) == "points"))
+  grid::unit(pmax(as.numeric(floor), reach), "pt")
 }
 
 #' Circumplex canvas theme

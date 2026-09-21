@@ -55,6 +55,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - 2026-09-20: T5 in progress (checkpoint). NEWS entries are committed. `document()`, the full tests and `check()` are running in the background, and a claim audit ([O] fresh reader) is running on the branch diff.
 - 2026-09-20: claim audit: 17 claims read, 4 corrected — NEWS.md, R/ssm_plot.R, R/coord_circumplex.R, tests/testthat/test-ssm_plot.R. The corrections were the parenthesis rule in NEWS, "off-centre" spelled "off-center", the blank-test comment, and the oracle comment. The reader's one re-read confirmed all four after the Rd regeneration and one comment re-wrap.
 - 2026-09-20: T5 done. `devtools::test()` had no failures. `devtools::check(args = "--no-manual")` gave 0 errors, 0 warnings and 0 notes, and it ran after the audit corrections were on disk. Status set to review.
+- 2026-09-21: step-7 approval: m145-cartesian-canvas-follow-ons approved for merge. The maintainer chose to fix O1, O2 and O4 first. The fixes are small, so approval was not asked again.
 
 ## Decisions
 
@@ -81,3 +82,16 @@ Independent review (3 lenses). [S] prior-review: no regressions of M142 review i
 - O8: tests do not cover the `^` and `(` branches, numeric elements, a direct `expression()` labels argument, or a mixed list with a string element.
 - O9: the AC1 oracle restates the code, and the hard-coded values are the independent check. The AC2 test cannot fail on the old code. The reviewer calls this a regression guard, which AC2 allows.
 - O10: NEWS names expressions and labelling functions that return one, and not a function that returns a plain list of calls.
+
+Triage at the step-7 gate (maintainer chose "fix 3, then merge"):
+- O1 fix now: the margin is read with `as.numeric()` after a points-unit check. A new test closes devices in non-interactive runs, builds the canvas and expects no device. It failed on the old code with `dev.list()` not NULL.
+- O2 fix now: DESIGN.md's canvas and grid-mode entries state the per-side margin and the plotmath negation rule.
+- O4 fix now: a negative number is wrapped, so it draws `-(-0.1)`. The new AC3 test case failed on the old code with `--0.1` against `-(-0.1)`.
+- O8 fix now in part: that case also covers `a^2`, `(a)` and a positive number. The other gaps are rejected, because the current tests already reach those code paths.
+- O3 reject: the parenthesis rule is AC3 as planned, and its output is correct.
+- O5, O7 reject: the plan gate chose an approximate estimate and recorded its falsification condition.
+- O6 reject: the behavior predates the branch.
+- O9 noted.
+- O10 reject: NEWS is accurate for the documented inputs.
+
+After the fixes: `devtools::test()` gave FAIL 0, PASS 11974. `devtools::check(args = "--no-manual")` gave 0 errors, 0 warnings, 0 notes. `document()` left no diff.

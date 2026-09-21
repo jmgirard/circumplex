@@ -528,15 +528,22 @@ stays independent.
   every radial break strictly between the center and the rim on each half-axis
   (Cartesian coordinates, not amplitudes), drawn in `render_bg` from the same
   theme elements (`panel.grid.major`, `axis.ticks.r`, `axis.text.r`); the
-  transform is identical in both modes.
+  transform is identical in both modes. Plotmath amplitude labels stay
+  plotmath on the crosshair (M145). The 180/270 halves put a bare minus on a
+  symbol, a non-negative number, or a `[`, `^` or `(` call. Every other label
+  gets its minus outside parentheses.
 - **Canvas** (`ggcircumplex()`): a thin constructor returning
   `ggplot() + coord_circumplex() + <breaks/labels + theme>` (a `geom_blank`
   establishes the extent). It no longer draws geometry — the former
   `circle_base()` is gone. Its `grid` passes to the coord; the cartesian grid
   also turns the theta tick marks on, outward from the rim, and `angle_labels = TRUE`
   formats text labels as `<label> (<angle>°)` (0/360 written 360), rotated
-  along the radius by `guide_axis_theta(angle = 90)`, with a plot margin
-  sized to the longest label (M142).
+  along the radius by `guide_axis_theta(angle = 90)`. Each side of the plot
+  margin takes the larger of the theme's margin and the longest reach of the
+  labels pointing toward it (`angle_label_margin()`, M145). A label's reach
+  is half the font size per character, times its direction's share toward
+  that side. The circle can therefore sit off-center. (Corrected M145: M142
+  used one symmetric margin.)
 - **Point geom** (`GeomSsmPoint` ⊂ `GeomPoint`): `setup_data()` drops rows with
   no location and maps amplitude/displacement to the coord's `y`/`x` (no
   cartesian math; the coord owns the transform).

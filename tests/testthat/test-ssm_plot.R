@@ -467,6 +467,17 @@ test_that("without angle-labelled text the margin is the theme's (M145 AC2)", {
   }
 })
 
+test_that("building an angle-labelled canvas opens no graphics device (M145 review)", {
+  # Reading the theme margin in pt must not go through grid::convertUnit(),
+  # which opens a device (Rplots.pdf in a script) just to build the plot. An
+  # earlier test can leave a device open, which would hide a new one, so the
+  # devices are closed first; that is skipped where a user's plots are open.
+  skip_if(interactive())
+  grDevices::graphics.off()
+  ggcircumplex(octants(), labels = PANO(), angle_labels = TRUE)
+  expect_null(grDevices::dev.list())
+})
+
 test_that("grid = \"cartesian\" turns the theta tick marks on; polar leaves the theme as today (AC3)", {
   cart <- ggcircumplex(octants(), grid = "cartesian")
   expect_true(ggplot2::is_theme_element(
