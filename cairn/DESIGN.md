@@ -98,6 +98,14 @@ divided by `hi + lo`, which is zero exactly when the exact quantity is, and now
 refuses that denominator. Full text in the M113, M115 and M116 archives' Review
 sections, and in M122's.
 
+Added 2026-09-21 (M146), accepted with no fix planned: three print-side
+limits that no shipped caller reaches. `sem_format_verdict()` drops a labeled
+fact whose value is `""`. `wrap_prose()` refuses a tab in `prefix` or
+`continuation` but accepts a newline, a carriage return or another zero-width
+character. The stored-verdict fallback in `sem_print_invariance()` hangs its
+continuation lines at 2 columns, and the rebuilt `Verdict:` line hangs at 12.
+Full text in the M146 archive's Review section.
+
 Added 2026-09-05 (M122 review, findings 6 and 7), same ROADMAP row, taking the
 count from four open to six. `axes_accuracy_certificate()` returns its sentinel
 by six routes besides "the shipped pricing refused" -- a failed `axes_dd_selftest()`,
