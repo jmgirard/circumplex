@@ -1,18 +1,23 @@
 #!/usr/bin/env Rscript
 
-# Guard: the vignette index and the Vignettes navbar menu in _pkgdown.yml list
-# every vignette in vignettes/ exactly once, in the level order below, and the
-# menu text of each entry is the vignette's title. The navbar menu is grouped
-# by level, so a page must also sit under the heading for its own level, and
-# the menu's headings must be exactly the level map's, in its order: an extra
-# heading, a missing one or a reordered one fails, whatever the pages under it.
+# Guard: the articles index in _pkgdown.yml lists every vignette in vignettes/
+# exactly once, grouped into the levels of the map in
+# tests/testthat/helper-vignette-frame.R, in the map's level order and, inside
+# a level, its page order. Each group also carries a `navbar:` key equal to its
+# title, which is the heading pkgdown puts over that group in the navbar's
+# generated Articles menu.
+#
+# There is no hand-written vignette menu to check: since M144 pkgdown builds
+# the menu from this index, so a page listed once in the right group is enough
+# for the index, the menu and the reading map to agree.
 #
 #   Rscript tools/check-pkgdown-vignettes.R
 #
-# Exit status 0 when the three lists agree, 1 on any difference. Needs the
-# yaml package, which the package does not depend on; the script says so and
-# exits 2 when it is absent. pkgdown::check_pkgdown() is a separate check: it
-# reports a vignette missing from the index but reads no navbar.
+# Exit status 0 when the index, the map and vignettes/ agree, 1 on any
+# difference. Needs the yaml package, which the package does not depend on; the
+# script says so and exits 2 when it is absent. pkgdown::check_pkgdown() is a
+# separate check: it reports a vignette missing from the index, and reads
+# neither the grouping nor the order.
 
 if (!requireNamespace("yaml", quietly = TRUE)) {
   message("check-pkgdown-vignettes: the yaml package is not installed")
@@ -41,8 +46,9 @@ fail <- function(...) failures <<- c(failures, paste0(...))
 
 rmd <- sort(list.files("vignettes", pattern = "\\.Rmd$"))
 on_disk <- sub("\\.Rmd$", "", rmd)
-titles <- vapply(file.path("vignettes", rmd), vignette_title, character(1))
-names(titles) <- on_disk
+# Every page's title is read, so a file carrying no index entry, or two, stops
+# the guard by name. pkgdown takes each menu entry's text from the same entry.
+invisible(vapply(file.path("vignettes", rmd), vignette_title, character(1)))
 
 if (!setequal(on_disk, EXPECTED)) {
   fail("vignettes/ and the level map differ: on disk only [",
@@ -52,7 +58,9 @@ if (!setequal(on_disk, EXPECTED)) {
 
 cfg <- yaml::read_yaml("_pkgdown.yml")
 
-# The articles index: one group per level, the level map's pages in its order.
+# The articles index: one group per level, in the map's order, holding that
+# level's pages in the map's order, and carrying the navbar heading pkgdown
+# puts over the group.
 groups <- cfg$articles
 if (is.null(groups)) {
   fail("_pkgdown.yml has no articles: section")
@@ -69,66 +77,20 @@ if (is.null(groups)) {
       fail("articles group ", g$title, " lists [", paste(got, collapse = ", "),
            "], expected [", paste(want, collapse = ", "), "]")
     }
+    nav <- g$navbar
+    if (!identical(nav, g$title)) {
+      fail("articles group ", g$title, " has navbar heading ",
+           if (is.null(nav)) "none, so the group gets no heading in the menu" else paste0("\"", nav, "\""),
+           ", expected \"", g$title, "\"")
+    }
   }
   listed <- unlist(lapply(groups, function(g) g$contents))
   dup <- unique(listed[duplicated(listed)])
   if (length(dup)) fail("listed more than once in articles: ", paste(dup, collapse = ", "))
 }
 
-# The navbar menu: one heading per level, and under each heading the same pages
-# in the same order, each with its title. Divider placement is not checked.
-# An entry with no href whose text is three or more dashes is a divider, which
-# this check skips, so a shorter run of dashes is a heading here, as pkgdown
-# renders it. The dash pattern is pkgdown's own `^\s*-{3,}\s*$`, but pkgdown's
-# menu_type() tests it BEFORE it looks at href, and this check tests it only
-# among the href-less entries: an entry carrying both dash text and an href is
-# a separator to pkgdown and a page here, so it fails rather than passing
-# wrongly. An entry with text and no href is a heading. An entry with an href
-# is a page under the heading above it.
-menus <- Filter(function(item) identical(item$text, "Vignettes"), cfg$navbar$left)
-if (length(menus) != 1L) {
-  fail("expected one navbar menu named Vignettes, found ", length(menus))
-} else {
-  entries <- menus[[1]]$menu
-  headings <- character(0)
-  under <- list()
-  current <- NA_character_
-  for (e in entries) {
-    text <- if (is.null(e$text)) "" else e$text
-    if (is.null(e$href)) {
-      if (grepl("^\\s*-{3,}\\s*$", text)) next
-      current <- text
-      headings <- c(headings, text)
-      under[[text]] <- character(0)
-      next
-    }
-    name <- sub("^articles/(.*)\\.html$", "\\1", e$href)
-    if (is.na(current)) {
-      fail("navbar entry ", name, " sits above the first level heading")
-      next
-    }
-    under[[current]] <- c(under[[current]], name)
-    if (name %in% names(titles) && !identical(text, titles[[name]])) {
-      fail("navbar text for ", name, " is \"", text, "\", the vignette title is \"",
-           titles[[name]], "\"")
-    }
-  }
-  if (!identical(headings, names(level_pages))) {
-    fail("navbar level headings are [", paste(headings, collapse = ", "),
-         "], expected [", paste(names(level_pages), collapse = ", "), "]")
-  }
-  for (level in intersect(headings, names(level_pages))) {
-    want <- level_pages[[level]]
-    got <- under[[level]]
-    if (!identical(got, want)) {
-      fail("navbar menu under ", level, " lists [", paste(got, collapse = ", "),
-           "], expected [", paste(want, collapse = ", "), "]")
-    }
-  }
-}
-
 if (length(failures)) {
   cat(paste0("FAIL: ", failures, "\n"), sep = "")
   quit(status = 1L)
 }
-cat("the articles index, the navbar menu and vignettes/ agree on", length(EXPECTED), "pages\n")
+cat("the articles index, the level map and vignettes/ agree on", length(EXPECTED), "pages\n")
