@@ -81,7 +81,8 @@ summary(iis32)
 #> 22. I feel enriched by helping others
 #> 23. I'm excited about meeting new people
 #> 24. I recognize when others need privacy
-#> 25. I can let other people know when I think that they're asking for too much from me
+#> 25. I can let other people know when I think that they're asking for too much
+#>     from me
 #> 26. I can rely on myself when I'm having problems with others
 #> 27. I'm cooperative
 #> 28. I'm okay with not being included in all activities
@@ -106,7 +107,8 @@ scales(iis32, items = TRUE)
 #>     3. I can make a decision even if others disagree
 #>     10. I argue effectively with others
 #>     19. I can take care of myself, even when others' needs feel pressing
-#>     25. I can let other people know when I think that they're asking for too much from me
+#>     25. I can let other people know when I think that they're asking for too
+#>         much from me
 #> DE: Balance (180 degrees)
 #>     6. I can help others with their needs without neglecting my own
 #>     8. I can say 'no' to others

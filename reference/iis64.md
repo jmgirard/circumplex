@@ -93,7 +93,8 @@ summary(iis64)
 #> 43. I feel enriched by helping others
 #> 44. I'm excited about meeting new people
 #> 45. I recognize when others need privacy
-#> 46. I can let other people know when I think that they're asking for too much from me
+#> 46. I can let other people know when I think that they're asking for too much
+#>     from me
 #> 47. I'm a good listener
 #> 48. I can rely on myself when I'm having problems with others
 #> 49. I'm cooperative
@@ -135,7 +136,8 @@ scales(iis64, items = TRUE)
 #>     20. I argue effectively with others
 #>     28. I know how to look after my own interests
 #>     39. I can take care of myself, even when others' needs feel pressing
-#>     46. I can let other people know when I think that they're asking for too much from me
+#>     46. I can let other people know when I think that they're asking for too
+#>         much from me
 #>     55. I'm comfortable disagreeing with others
 #>     59. When others get me down, I can bounce back
 #> DE: Balance (180 degrees)

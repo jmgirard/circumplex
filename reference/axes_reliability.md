@@ -640,9 +640,9 @@ summary(res)
 #>   metric (Satorra & Bentler, 1994), which removes a distortion that flatters
 #>   fit; df and srmr are unchanged. The scaled test can modestly over-reject at
 #>   typical sample sizes: it over-flags misfit rather than flattering it; see
-#>   ?axes_reliability for the measured rates. They follow lavaan's *.scaled
-#>   definitions, not its *.robust ones, and differ from what fitMeasures() reports
-#>   for an equivalent ML fit.
+#>   ?axes_reliability for the measured rates.
+#>   They follow lavaan's *.scaled definitions, not its *.robust ones, and differ
+#>   from what fitMeasures() reports for an equivalent ML fit.
 
 # The same estimates from the item correlation matrix alone, as when
 # reanalyzing a matrix published without its raw data.

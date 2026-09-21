@@ -47,7 +47,8 @@ summary(csig)
 #> 4. It is extremely important that...
 #> 
 #> The CSIG contains 32 items (open-access):
-#> Prefix: In dealing with other groups, how important is it that we act or appear or are treated this way?
+#> Prefix: In dealing with other groups, how important is it that we act or appear
+#>         or are treated this way?
 #> 1. We are friendly
 #> 2. We are the winners in any argument or dispute
 #> 3. They respect what we have to say

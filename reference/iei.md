@@ -50,7 +50,8 @@ summary(iei)
 #> 4. Almost always feel that way
 #> 
 #> The IEI contains 64 items (open-access):
-#> Prefix: When I interact with or think about myself in relation to others, I feel...
+#> Prefix: When I interact with or think about myself in relation to others, I
+#>         feel...
 #> 1. Admirable
 #> 2. Confident in my strengths
 #> 3. Sure of myself
