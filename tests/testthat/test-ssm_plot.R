@@ -393,6 +393,91 @@ test_that("angle_labels = TRUE rotates each theta label along its radius (AC3)",
   )
 })
 
+# --- M145: the angle_labels margin is sized per side ------------------------
+
+# The four plot.margin sides in pt, named t/r/b/l (ggplot2's margin order).
+margin_pt <- function(p) {
+  m <- ggplot2::calc_element("plot.margin", ggplot2::complete_theme(p$theme))
+  expect_identical(unique(grid::unitType(m)), "points")
+  stats::setNames(as.numeric(m), c("t", "r", "b", "l"))
+}
+theme_margin_pt <- function(font_size) {
+  m <- ggplot2::calc_element(
+    "plot.margin", ggplot2::complete_theme(theme_circumplex(font_size))
+  )
+  stats::setNames(as.numeric(m), c("t", "r", "b", "l"))
+}
+# The M145 oracle restates the rule in the test; the hard-coded pt values in
+# the test below are the independent check. A drawn label at displacement `a`
+# reaches half the font size per character along its radius, and each side
+# takes the longest projection onto its outward direction (0 = right,
+# 90 = top), or the theme's margin.
+margin_oracle <- function(drawn, a, font_size) {
+  len <- 0.5 * font_size * nchar(drawn)
+  u <- list(t = sin(a * pi / 180), r = cos(a * pi / 180),
+            b = -sin(a * pi / 180), l = -cos(a * pi / 180))
+  reach <- vapply(u, function(ui) max(pmax(0, ui) * len), numeric(1))
+  pmax(theme_margin_pt(font_size), reach[c("t", "r", "b", "l")])
+}
+
+test_that("angle_labels = TRUE sizes each margin side from the labels pointing at it (M145 AC1)", {
+  for (g in c("polar", "cartesian")) {
+    # Octants with PANO, LM at 360. One fact stated independently of the
+    # oracle: at 12 pt, "PA (90°)" (8 characters) sets the top to 48 pt and the
+    # 9-character LM/DE/HI labels set the other sides to 54 pt.
+    p <- ggcircumplex(octants(), labels = PANO(), grid = g, angle_labels = TRUE)
+    expect_equal(margin_pt(p), c(t = 48, r = 54, b = 54, l = 54), tolerance = 1e-10)
+    drawn <- circumplex_angle_labels(PANO(), octants())
+    expect_equal(margin_pt(p), margin_oracle(drawn, octants(), 12), tolerance = 1e-10)
+
+    # Left and right differ: a long label at 180, a short one at 0 (drawn as
+    # 360). Top and bottom keep the theme's margin.
+    lab2 <- c("Warm", "Cold-hearted")
+    q <- ggcircumplex(c(0, 180), labels = lab2, grid = g, angle_labels = TRUE)
+    expect_equal(margin_pt(q), c(t = 6, r = 66, b = 6, l = 114), tolerance = 1e-10)
+    expect_equal(
+      margin_pt(q),
+      margin_oracle(c("Warm (360°)", "Cold-hearted (180°)"), c(0, 180), 12),
+      tolerance = 1e-10
+    )
+
+    # Labels at 90 and 270 only: left and right keep the theme's margin.
+    v <- ggcircumplex(c(90, 270), labels = c("Up", "Down"), grid = g, angle_labels = TRUE)
+    expect_equal(margin_pt(v), c(t = 48, r = 6, b = 66, l = 6), tolerance = 1e-10)
+    expect_equal(margin_pt(v)[c("r", "l")], theme_margin_pt(12)[c("r", "l")])
+
+    # font_size scales both the reach and the theme's floor (10 pt at 20).
+    f <- ggcircumplex(c(0, 180), labels = lab2, grid = g, angle_labels = TRUE,
+                      font_size = 20)
+    expect_equal(margin_pt(f), c(t = 10, r = 110, b = 10, l = 190), tolerance = 1e-10)
+    expect_equal(
+      margin_pt(f),
+      margin_oracle(c("Warm (360°)", "Cold-hearted (180°)"), c(0, 180), 20),
+      tolerance = 1e-10
+    )
+  }
+})
+
+test_that("without angle-labelled text the margin is the theme's (M145 AC2)", {
+  for (g in c("polar", "cartesian")) {
+    off <- ggcircumplex(octants(), labels = PANO(), grid = g, angle_labels = FALSE)
+    deg <- ggcircumplex(octants(), grid = g, angle_labels = TRUE)
+    expect_equal(margin_pt(off), theme_margin_pt(12))
+    expect_equal(margin_pt(deg), theme_margin_pt(12))
+  }
+})
+
+test_that("building an angle-labelled canvas opens no graphics device (M145 review)", {
+  # Reading the theme margin in pt must not go through grid::convertUnit(),
+  # which opens a device (Rplots.pdf in a script) just to build the plot. An
+  # earlier test can leave a device open, which would hide a new one, so the
+  # devices are closed first; that is skipped where a user's plots are open.
+  skip_if(interactive())
+  grDevices::graphics.off()
+  ggcircumplex(octants(), labels = PANO(), angle_labels = TRUE)
+  expect_null(grDevices::dev.list())
+})
+
 test_that("grid = \"cartesian\" turns the theta tick marks on; polar leaves the theme as today (AC3)", {
   cart <- ggcircumplex(octants(), grid = "cartesian")
   expect_true(ggplot2::is_theme_element(

@@ -775,6 +775,70 @@ test_that("suppressed amplitude labels draw crosshair ticks and no labels (M142 
   expect_length(grobs_named(ctl, "^circumplex-cartesian-labels-x$"), 1L)
 })
 
+# --- M145 AC3: plotmath amplitude labels on the crosshair ---------------------
+
+# The crosshair label grobs of a cartesian canvas whose amplitude labels come
+# from `tab`, keyed by break ("0.1" to "0.4"); other breaks get `q`.
+crosshair_label_grobs <- function(tab) {
+  f <- function(b) {
+    as.expression(lapply(b, function(x) {
+      v <- tab[[format(round(x, 1))]]
+      if (is.null(v)) quote(q) else v
+    }))
+  }
+  p <- suppressMessages(
+    ggcircumplex(octants(), grid = "cartesian") +
+      ggplot2::scale_y_continuous(labels = f)
+  )
+  grobs <- panel_grobs(p)
+  lapply(c("x", "y"), function(ax) {
+    hit <- grobs_named(grobs, paste0("^circumplex-cartesian-labels-", ax, "$"))
+    expect_length(hit, 1L)
+    txt <- grobs_of_class(panel_grobs_under(hit[[1]]), "text")
+    expect_length(txt, 1L)
+    txt[[1]]$label
+  })
+}
+expect_crosshair_labels <- function(tab, positive, negative) {
+  for (lab in crosshair_label_grobs(tab)) {
+    # Language labels are carried as plotmath, never as deparsed text.
+    expect_true(is.expression(lab))
+    got <- as.list(lab)
+    want <- c(positive, negative)
+    expect_length(got, length(want))
+    for (i in seq_along(want)) {
+      expect_identical(got[[i]], want[[i]], info = paste("label", i))
+    }
+  }
+}
+
+test_that("expression amplitude labels draw as plotmath on the crosshair (M145 AC3)", {
+  skip_on_cran()
+  # A symbol and a `[` call take a bare minus; a sum and a difference are
+  # wrapped in parentheses, or plotmath would draw "-a + b".
+  expect_crosshair_labels(
+    list("0.1" = quote(alpha), "0.2" = quote(alpha[2]),
+         "0.3" = quote(a + b), "0.4" = quote(a - b)),
+    positive = list(quote(alpha), quote(alpha[2]), quote(a + b), quote(a - b)),
+    negative = list(quote(-alpha), quote(-alpha[2]), quote(-(a + b)), quote(-(a - b)))
+  )
+  # A quotient and a relation are wrapped too; a blank or NA element draws
+  # nothing on either half and carries no minus sign.
+  expect_crosshair_labels(
+    list("0.1" = quote(a / b), "0.2" = quote(a == b), "0.3" = "", "0.4" = NA),
+    positive = list(quote(a / b), quote(a == b), "", ""),
+    negative = list(quote(-(a / b)), quote(-(a == b)), "", "")
+  )
+  # A superscript and a bracketed label take a bare minus. A number takes one
+  # too, unless it is already negative: -0.1 is wrapped, or plotmath would
+  # draw "--0.1".
+  expect_crosshair_labels(
+    list("0.1" = quote(a^2), "0.2" = quote((a)), "0.3" = 0.3, "0.4" = -0.1),
+    positive = list(quote(a^2), quote((a)), 0.3, -0.1),
+    negative = list(quote(-a^2), quote(-(a)), quote(-0.3), call("-", call("(", -0.1)))
+  )
+})
+
 # --- AC4: the grid mode never touches the polar transform ---------------------
 
 # The npc vertex coordinates of every grob a data layer draws, and its built

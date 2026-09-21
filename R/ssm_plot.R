@@ -654,7 +654,12 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'   pole written as 360, and turns each label to read along its radius
 #'   (default = `FALSE`). It applies to text labels, from `labels` or an
 #'   instrument; the default degree labels already show the angle and are left
-#'   as they are.
+#'   as they are. Each side of the plot margin is widened to fit the labels
+#'   that point toward it: a label reaches past a side by its length,
+#'   estimated at half of `font_size` per character, times the share of its
+#'   direction that points toward that side. A side that no label points
+#'   toward keeps the theme's margin, so the circle can sit off-center on the
+#'   page. Add `+ theme(plot.margin = ...)` to set the margin yourself.
 #' @return A \pkg{ggplot2} object containing the empty circumplex canvas.
 #' @family circumplex layers
 #' @seealso [coord_circumplex()], which owns the transform this canvas is built
@@ -712,14 +717,12 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
   # turned by its own angle from there, and one that would read upside down is
   # flipped, so the text runs along the radius everywhere. A radial label runs
   # outward from the rim by its own length, and the panel keeps only a tenth of
-  # its width outside the rim, so the plot margin grows with the longest label
-  # (about half the font size per character) to keep the labels on the page.
+  # its width outside the rim, so each side of the plot margin grows with the
+  # labels pointing toward that side (see angle_label_margin()).
   label_guide <- if (angle_labels) {
     list(
       ggplot2::guides(theta = ggplot2::guide_axis_theta(angle = 90)),
-      ggplot2::theme(
-        plot.margin = grid::unit(rep(0.5 * font_size * max(nchar(lab)), 4), "pt")
-      )
+      ggplot2::theme(plot.margin = angle_label_margin(lab, ang, font_size))
     )
   }
 
@@ -745,6 +748,31 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
     theme_circumplex(base_size = font_size) +
     grid_theme +
     label_guide
+}
+
+# The plot margin for ggcircumplex(angle_labels = TRUE), one value per side. A
+# label read along its radius runs outward from the rim at its angle, so it
+# reaches past a side by its length times the component of its direction
+# toward that side (displacement 0 points right, 90 up). Its length is
+# estimated at half the font size per character, which needs no graphics
+# device when the plot is built. Each side takes the longest such reach, or the
+# theme's own margin when that is larger; a side no label points toward keeps
+# the theme's margin, so the circle may sit off-center on the page.
+angle_label_margin <- function(labels, angles, font_size) {
+  len <- 0.5 * font_size * nchar(labels)
+  toward <- list(
+    t = sinpi(angles / 180), r = cospi(angles / 180),
+    b = -sinpi(angles / 180), l = -cospi(angles / 180)
+  )
+  reach <- vapply(toward, function(u) max(pmax(0, u) * len), numeric(1))
+  floor <- ggplot2::calc_element(
+    "plot.margin",
+    ggplot2::complete_theme(theme_circumplex(base_size = font_size))
+  )
+  # The theme's margin is in pt, so it is read as a number: grid::convertUnit()
+  # would open a graphics device just to build the plot.
+  stopifnot(all(grid::unitType(floor) == "points"))
+  grid::unit(pmax(as.numeric(floor), reach), "pt")
 }
 
 #' Circumplex canvas theme
