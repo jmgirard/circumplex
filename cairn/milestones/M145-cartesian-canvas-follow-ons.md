@@ -1,6 +1,6 @@
 # M145: Per-side label margins and plotmath crosshair labels on the circumplex canvas
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -41,7 +41,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - [x] T2: Replace the symmetric `plot.margin` in `ggcircumplex()` (`R/ssm_plot.R`, `label_guide` block, ~lines 710-723) with the per-side rule, in a small internal helper. Update the code comment and the `angle_labels` roxygen. Render the PANO canvas and a long-label canvas on both grids and look at them (M33 lesson). Then regenerate the vdiffr snapshot that the margin change moves (`test-ssm_plot.R` ~line 421) under `NOT_CRAN=true` (M31 lesson).
 - [x] T3: Write the tests first, in `tests/testthat/test-coord_circumplex.R`. Add the AC3 expression-label cases, and walk the cartesian grid grob by name (`circumplex-cartesian-labels-x`/`-y`). Before T4, see them fail on the current `as.character()`.
 - [x] T4: In `cartesian_grid_grob()` (`R/coord_circumplex.R`, ~lines 170-250), keep language labels as they are and build the negated halves by the AC3 rule. Replace the `is.na()`/`!= ""` blank test with one that is safe for language objects. Render one canvas with plotmath labels and look at it.
-- [ ] T5: Add NEWS.md entries for both changes. Run `devtools::document()`, then `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T5: Add NEWS.md entries for both changes. Run `devtools::document()`, then `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -54,6 +54,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - 2026-09-20: T4 done. `cartesian_grid_grob()` keeps language labels as a list, and two helpers apply the AC3 minus rule and the blank test. The coord and plot tests pass, and a rendered canvas shows α, α₂, −(a + b) and −(a/b) drawn as plotmath.
 - 2026-09-20: T5 in progress (checkpoint). NEWS entries are committed. `document()`, the full tests and `check()` are running in the background, and a claim audit ([O] fresh reader) is running on the branch diff.
 - 2026-09-20: claim audit: 17 claims read, 4 corrected — NEWS.md, R/ssm_plot.R, R/coord_circumplex.R, tests/testthat/test-ssm_plot.R. The corrections were the parenthesis rule in NEWS, "off-centre" spelled "off-center", the blank-test comment, and the oracle comment. The reader's one re-read confirmed all four after the Rd regeneration and one comment re-wrap.
+- 2026-09-20: T5 done. `devtools::test()` had no failures. `devtools::check(args = "--no-manual")` gave 0 errors, 0 warnings and 0 notes, and it ran after the audit corrections were on disk. Status set to review.
 
 ## Decisions
 

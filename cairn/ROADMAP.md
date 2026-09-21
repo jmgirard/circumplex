@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-21 (M144 done and archived; its source row struck; 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M145 | Per-side label margins and plotmath crosshair labels on the circumplex canvas | in-progress | — | normal | milestones/M145-cartesian-canvas-follow-ons.md |
+| M145 | Per-side label margins and plotmath crosshair labels on the circumplex canvas | review | — | normal | milestones/M145-cartesian-canvas-follow-ons.md |
 | M144 | The vignette guards keep one level map, check section numbers, and pkgdown builds the vignette menu | done | — | high | milestones/archive/M144-vignette-guards-single-map.md |
 | M142 | A Cartesian-grid style for the circumplex canvas (`coord_circumplex(grid = "cartesian")`, `ggcircumplex(angle_labels = TRUE)`) | done | — | normal | milestones/archive/M142-cartesian-canvas-grid.md |
 | M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | done | M142 | normal | milestones/archive/M143-vignette-nagy-figures.md |
