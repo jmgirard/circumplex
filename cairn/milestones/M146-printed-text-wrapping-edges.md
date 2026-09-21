@@ -52,7 +52,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
      change is amend-via-gate. -->
 
 - [x] T1: Tests first in `test-wrap-prose.R` and the `ssm_ci_cat_line()` class of `helper-caution-fixtures.R`, then the fix. `wrap_prose()` (R/utils.R:267) refuses a non-finite `width` and a tab in `prefix` or `continuation`. `ssm_ci_cat_line()` (R/ssm_ci_oop.R:32) prints its leader alone when `text` is empty.
-- [ ] T2: Split `axes_fit_scaled_note` (R/axes_reliability_oop.R:113) into two elements so the lavaan sentence is its own paragraph. Add a width-sweep test (30-120) on a scaled fit asserting a line starts with "They follow lavaan's".
+- [x] T2: Split `axes_fit_scaled_note` (R/axes_reliability_oop.R:113) into two elements so the lavaan sentence is its own paragraph. Add a width-sweep test (30-120) on a scaled fit asserting a line starts with "They follow lavaan's".
 - [ ] T3: In R/cpm_oop.R, hand the Heywood note to `wrap_prose(atomic = TRUE)` as words, with "(ζ > 0.995," as one unit. Hand the bootstrap marker note's opening clause over as words, not one 49-column unit. Add width sweeps (30-120) in `test-cpm_summary_markers.R`, including a `small_beta` fixture.
 - [ ] T4: Remove Communality from `cpm_display_results()` (R/cpm_oop.R:117) and from `expect_cpm_table_one_block()`'s expected header (helper-cpm-table.R). Add the eight-name, 16-character, free-scaling, analytic-interval fixture to the M133 one-block test. Grep R/ roxygen, `man/` sources and vignette prose for text that describes the printed CPM table's columns, and update each hit. Note that "communality index" names ζ and stays.
 - [ ] T5: Replace the `strwrap()` calls at R/ssm_sem.R:803, :814 and :1894 with `wrap_prose()`, and route the `Verdict:` line and the stored-verdict fallback through it. Add a test that calls each formatter directly with double-width text across widths 30-120.
@@ -69,6 +69,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: plan chose protected units in `wrap_prose(atomic = TRUE)` for "(ζ > 0.995," over rewording the Heywood note, because rewording changes a caution's text for a layout defect; falsified by the unit leaving a line past the width at a swept width.
 - 2026-09-21: item (iv)'s spliced-failure-reason half was dropped as no defect: every reason `axes_reliability()` splices is a single token, so `wrap_prose()` cannot break inside it; falsified by a multi-word reason reaching those notes.
 - 2026-09-21: T1 done. `wrap_prose()` refuses a non-finite width and a tabbed prefix or continuation (named `stopifnot` messages), and `ssm_ci_cat_line()` prints its label alone on empty text. Tests went red first, then green. The empty-label test sits in `test-wrap-prose.R`, not the caution-fixture ledger, because it is a direct unit test. Full suite: 0 failures.
+- 2026-09-21: T2 done. `axes_fit_scaled_note` is two elements, so the lavaan sentence starts a line. The 30-120 width sweep in `test-axes-scaled-fit.R` failed first and now passes. The full suite ran once over T2-T4 together (0 failures), because an earlier T2-only run was stopped when it began reading T3/T4 test edits.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
