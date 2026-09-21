@@ -165,8 +165,9 @@ axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
 # component fitted, where it equals the sum of the item-error matrices), and an
 # inversion that is non-finite or that LAPACK reports exactly singular. Only
 # the component matrices are compared: every one has a unit diagonal, so none
-# can equal an item-error matrix, and two item-error matrices are never
-# identical. The raw lavaan-tie arm passes `tol = .Machine$double.eps` (the
+# can equal an item-error matrix (except at p = 1, where every matrix is the
+# 1 x 1 unit and the duplicate-pair ground fires first), and two item-error
+# matrices are never identical. The raw lavaan-tie arm passes `tol = .Machine$double.eps` (the
 # certificate never prices raw Sigma-hat, D-037), and nothing else does.
 #
 # SPLIT INTO THREE (M108). The arithmetic below is now also replayed in
@@ -825,18 +826,21 @@ axes_degeneracy_refusal <- function(sigma, d) {
   }
   # THE SELECTOR (M147; D-061, D-062; RR24 section 2). The pricing core is
   # inverted HERE, once, under tol = 0, and its result rides on the returned
-  # object so both surfaces price from it. A structural refusal from the core
-  # ("singular", "unidentified" on an exact ground) is forwarded unchanged. A
-  # fit is then sent to the certificate on either of two selectors: the floor
+  # object so both surfaces price from it. An exact "unidentified" from the
+  # core is forwarded unchanged; a "singular" falls through to the certificate
+  # (below). A fit is then sent to the certificate on either of two selectors: the floor
   # fired ("ill_conditioned", as since M111), OR the information matrix's
   # reciprocal condition estimate sits below sqrt(eps). The second exists for
   # designs the floor cannot see -- singular in exact arithmetic, or nearly,
   # in the DERIVATIVE structure rather than in sigma -- whose rounded
   # information matrix LU inverts on some platforms; RR24 measured their
   # estimates within a factor 4 to 90 of eps, so the threshold is a machine
-  # constant decades above that band (and decades below every floor-admitted
-  # design the exported API reaches, measured at 1.15e-9 and up). A matrix
-  # neither selector picks computes and pays nothing.
+  # constant decades above that band. It sits about a decade ABOVE the
+  # smallest floor-admitted estimate measured at a design the exported API
+  # reaches (1.15e-9, a near-duplicate pair at kappa 3e4), so those few
+  # designs are routed and their certificate decides them -- every one
+  # measured passes by three decades. A matrix neither selector picks
+  # computes and pays nothing.
   core <- axes_pricing_core(sigma, d)
   if (identical(core, "unidentified")) {
     return(list(reason = core, cert = NULL, core = NULL))

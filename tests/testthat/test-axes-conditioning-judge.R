@@ -232,7 +232,7 @@ test_that("AC1: a floor-admitted design below the selector threshold is judged b
   # Two antipodal blocks over the four cardinal scales, two items per scale,
   # zeta2 fitted: C = 2B - Z in exact arithmetic, off by cosine rounding in
   # the stored doubles (cos(pi/2) is 6e-17, not 0). Measured 2026-09-21 on
-  # macOS/arm64: rcond(info) 5.1e-17, tol = 0 inverts, certificate se 5.0.
+  # macOS/arm64: rcond(info) 4.2e-17, tol = 0 inverts, certificate se 5.0.
   ang <- rep(c(90, 180, 270, 360), each = 2L)
   sc <- as.character(rep(1:4, each = 2L))
   bl <- c(1L, 1L, 2L, 2L, 1L, 1L, 2L, 2L)

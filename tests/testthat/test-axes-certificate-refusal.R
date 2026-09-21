@@ -120,7 +120,7 @@ test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses throug
   # makes each scale's items near-duplicates of one another. Until M147 the
   # radius was 1.5e-9, where the default solve() tolerance refused inside the
   # certificate's replay and the sentinel refused; with the certificate the
-  # sole conditioning judge that radius COMPUTES (certificate 2.9e-7), so the
+  # sole conditioning judge that radius COMPUTES (certificate 1.3e-5), so the
   # case moves down to where the certificate's own double-double route gives
   # up and returns its sentinel (measured here), the fail-closed arm (GP2).
   # Whether the sentinel or a graded estimate is reached is the certificate's
