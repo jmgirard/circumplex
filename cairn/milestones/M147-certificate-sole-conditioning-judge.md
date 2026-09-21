@@ -2,14 +2,14 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M147: The certificate is the sole conditioning judge
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP2, GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — it changes which refusal literal and warning `axes_reliability()` emits on an ill-conditioned fit below the floor
-- **Branch/PR:** —
+- **Branch/PR:** m147-certificate-sole-conditioning-judge
 
 ## Goal
 
