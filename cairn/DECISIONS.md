@@ -2176,3 +2176,52 @@ can. A glmmTMB or brms change to `us()`, `dispformula`, `fixef()$cond` or
 `vcov()$cond` that makes the raw call the fragile thing. Toward retirement:
 the growth vignette's conditional chunks fail on CRAN builders twice in a
 row because of glmmTMB's own build state.
+
+### D-061 (2026-09-21): the per-fit certificate is the sole conditioning judge; the information-matrix inversion selects fits for it and refuses only on exact singularity — annotates D-055's tolerance clause and D-051's sentinel clause, moves nothing they decided (M147 plan gate)
+
+**Context.** Since M111 the refusal decision at both `axes_reliability()`
+surfaces is `axes_degeneracy_refusal()`: a floor on `sigma` selects fits for
+the per-fit accuracy certificate (D-051), and the certificate refuses
+`"uncertified"` past the accuracy target. One older gate stayed beside it.
+`axes_pricing_core()` inverts the information matrix with R's default
+`solve()` tolerance, which refuses when the LU condition estimate falls below
+`.Machine$double.eps`. RR22 measured that estimate straddling eps across
+platforms at counterexample B, D-055 admitted both outcomes in the test suite
+for the 2.0.1 fix, and RR22's recommendation 9 left the design change for a
+later gate. That gate is M147's.
+
+**Decision.** The shipped pricing never refuses on conditioning. On the
+certified path the inversion runs with `tol = 0`, and a condition estimate
+below eps selects the fit for the certificate, as the floor does, whether or
+not the floor fired. The certificate then decides. `"unidentified"` keeps two
+grounds only: a pair of bit-identical derivative matrices, an exact check on
+the design with no tolerance, and an inversion that is non-finite or that
+LAPACK reports exactly singular. The raw lavaan-tie arm keeps the default
+tolerance, because the certificate never prices that matrix (D-037) and the
+arm is never user-reported.
+
+**Rejected.** Pure `tol = 0` with no selector and no structural check, as
+RR22's recommendation 9 wrote it: a design the floor admits can carry a
+structurally singular information matrix, and LU under `tol = 0` prices such
+a matrix on some platforms, so the fit would report numbers with no
+certificate consulted. An explicit tolerance stays rejected on D-055's
+grounds. A single priced route at counterexample B in the test suite: a zero
+pivot there is a platform outcome, so the suite keeps two routes and retires
+the committed condition band instead.
+
+**Consequences.** Below the floor, a fit that a platform's inversion refused
+`"unidentified"` now refuses `"uncertified"` with its estimate in the warning,
+or computes when its certificate passes. No number previously reported
+changes. The certificate's licensing where the condition estimate sits below
+eps is measured by M147's sweep against the exact-rational oracle and put to
+Fable review before the core change is written. The test suite's admission at
+counterexample B narrows to exact singularity, and DESIGN.md's constant-
+predicate fragility is retired with the band. D-055's file rule for the
+certificate suite stands.
+
+**Reopens.** A matrix in M147's sweep, or any later one, at which the
+certificate's estimate falls below the exact oracle's true error where the
+old gate refused: an under-report, which reopens D-051's mechanism. A
+reachable design that passes the floor and reaches a structurally singular
+information matrix through a route the duplicate check and the selector do
+not see.
