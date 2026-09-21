@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M146: Printed text wraps at its edge cases, and the CPM table drops Communality
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
 - **Principles touched:** GP4   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
 - **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
 - **Surface tier:** user-facing — changes what print(), summary(), items() and scales() show in the console   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m146-printed-text-wrapping-edges   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -51,7 +51,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 <!-- owner: plan (create) / implement (check-off, minor edits); substantive
      change is amend-via-gate. -->
 
-- [ ] T1: Tests first in `test-wrap-prose.R` and the `ssm_ci_cat_line()` class of `helper-caution-fixtures.R`, then the fix. `wrap_prose()` (R/utils.R:267) refuses a non-finite `width` and a tab in `prefix` or `continuation`. `ssm_ci_cat_line()` (R/ssm_ci_oop.R:32) prints its leader alone when `text` is empty.
+- [x] T1: Tests first in `test-wrap-prose.R` and the `ssm_ci_cat_line()` class of `helper-caution-fixtures.R`, then the fix. `wrap_prose()` (R/utils.R:267) refuses a non-finite `width` and a tab in `prefix` or `continuation`. `ssm_ci_cat_line()` (R/ssm_ci_oop.R:32) prints its leader alone when `text` is empty.
 - [ ] T2: Split `axes_fit_scaled_note` (R/axes_reliability_oop.R:113) into two elements so the lavaan sentence is its own paragraph. Add a width-sweep test (30-120) on a scaled fit asserting a line starts with "They follow lavaan's".
 - [ ] T3: In R/cpm_oop.R, hand the Heywood note to `wrap_prose(atomic = TRUE)` as words, with "(ζ > 0.995," as one unit. Hand the bootstrap marker note's opening clause over as words, not one 49-column unit. Add width sweeps (30-120) in `test-cpm_summary_markers.R`, including a `small_beta` fixture.
 - [ ] T4: Remove Communality from `cpm_display_results()` (R/cpm_oop.R:117) and from `expect_cpm_table_one_block()`'s expected header (helper-cpm-table.R). Add the eight-name, 16-character, free-scaling, analytic-interval fixture to the M133 one-block test. Grep R/ roxygen, `man/` sources and vignette prose for text that describes the printed CPM table's columns, and update each hit. Note that "communality index" names ζ and stays.
@@ -68,6 +68,7 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: plan gate folded the `scales()` notice-row crash into this milestone over a separate /hotfix, because T6 rewrites the same loop; falsified by a user report of the crash before this milestone merges.
 - 2026-09-21: plan chose protected units in `wrap_prose(atomic = TRUE)` for "(ζ > 0.995," over rewording the Heywood note, because rewording changes a caution's text for a layout defect; falsified by the unit leaving a line past the width at a swept width.
 - 2026-09-21: item (iv)'s spliced-failure-reason half was dropped as no defect: every reason `axes_reliability()` splices is a single token, so `wrap_prose()` cannot break inside it; falsified by a multi-word reason reaching those notes.
+- 2026-09-21: T1 done. `wrap_prose()` refuses a non-finite width and a tabbed prefix or continuation (named `stopifnot` messages), and `ssm_ci_cat_line()` prints its label alone on empty text. Tests went red first, then green. The empty-label test sits in `test-wrap-prose.R`, not the caution-fixture ledger, because it is a direct unit test. Full suite: 0 failures.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->

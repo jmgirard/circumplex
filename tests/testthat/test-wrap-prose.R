@@ -221,3 +221,28 @@ test_that("atomic must be TRUE or FALSE, never NA", {
   expect_error(wrap_prose("word", atomic = NA))
   expect_error(wrap_prose("word", atomic = c(TRUE, FALSE)))
 })
+
+# ---- M146: the remaining width and prefix edge cases -------------------------
+
+test_that("an infinite width is refused, because it wraps nothing", {
+  # is_scalar_count() accepts Inf (ceiling and floor agree there), so the
+  # finiteness check is its own condition and the error names the width.
+  expect_error(wrap_prose("word", width = Inf), "width")
+  expect_error(cat_prose("word", width = Inf), "width")
+})
+
+test_that("a tab in the prefix or continuation is refused", {
+  # disp_width() counts a tab as 0 columns, but a console draws it up to 8
+  # wide, so a tabbed lead would push lines past the width it was counted in.
+  expect_error(wrap_prose("word", prefix = "\t"), "prefix")
+  expect_error(wrap_prose("word", continuation = "  \t"), "continuation")
+  # A tab in the prose itself is a word separator and stays legal.
+  expect_identical(wrap_prose("a\tb", width = 40), "a b")
+})
+
+test_that("ssm_ci_cat_line() keeps its label when the text is empty", {
+  out <- capture.output(ssm_ci_cat_line("Guardrail", ""))
+  expect_identical(out, "    Guardrail")
+  out_ws <- capture.output(ssm_ci_cat_line("Guardrail", "   "))
+  expect_identical(out_ws, out)
+})

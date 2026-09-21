@@ -31,9 +31,16 @@ ssm_ci_pct <- function(p, digits = 1) {
 # this file picked.
 ssm_ci_cat_line <- function(leader, text, indent = 4,
                             width = NULL) {
+  prefix <- paste0(strrep(" ", indent), format(leader, width = 15))
+  # wrap_prose() drops an empty paragraph whole, which would take the label
+  # with it, so an empty text prints the label alone.
+  if (!any(nzchar(trimws(text)))) {
+    cat(sub("\\s+$", "", prefix), "\n", sep = "")
+    return(invisible(NULL))
+  }
   cat_prose(
     text,
-    prefix = paste0(strrep(" ", indent), format(leader, width = 15)),
+    prefix = prefix,
     continuation = strrep(" ", indent + 15),
     width = width
   )
