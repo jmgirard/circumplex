@@ -50,11 +50,22 @@ cpm_fit_line <- function(fit, digits = 3) {
 cpm_diagnostic_lines <- function(details) {
   # Each entry is wrapped here rather than by the caller, so the returned
   # character vector stays the finished text the callers cat() unchanged.
-  note <- function(...) {
-    paste0(
-      paste(wrap_prose(paste0(...), prefix = "  "), collapse = "\n"),
-      "\n"
-    )
+  # `keep` names a phrase that must not break across lines: the text is cut
+  # into words, the phrase stays one unit, and the units go to wrap_prose() in
+  # atomic mode, so a break falls only between them (M146).
+  note <- function(..., keep = NULL) {
+    text <- paste0(...)
+    lines <- if (is.null(keep)) {
+      wrap_prose(text, prefix = "  ")
+    } else {
+      glue <- "\001"
+      text <- sub(keep, gsub(" ", glue, keep, fixed = TRUE), text,
+                  fixed = TRUE)
+      units <- strsplit(text, " ", fixed = TRUE)[[1]]
+      wrap_prose(gsub(glue, " ", units, fixed = TRUE), prefix = "  ",
+                 atomic = TRUE)
+    }
+    paste0(paste(lines, collapse = "\n"), "\n")
   }
   msg <- character(0)
   if (!isTRUE(details$accepted)) {
@@ -67,7 +78,8 @@ cpm_diagnostic_lines <- function(details) {
   if (isTRUE(details$heywood)) {
     msg <- c(msg, note(
       "Note: a communality index reached its upper boundary ",
-      "(\u03b6 > 0.995, a Heywood-type solution)."
+      "(\u03b6 > 0.995, a Heywood-type solution).",
+      keep = "(\u03b6 > 0.995,"
     ))
   }
   if (isTRUE(details$sigma_pathology)) {
@@ -114,7 +126,11 @@ cpm_round_df <- function(df, digits) {
 # The printed copy of the results table: rounded, with shorter headers so the
 # table fits in 77 columns (M133). The CI columns print as lci/uci right after
 # their estimate. The returned object keeps its names (D-056, D-057).
+# Communality is left out of the printed copy: it is Zeta squared, which the
+# table already prints, and with it a free-scaling table with 16-character
+# scale names reached 84 columns (M146). `results$Communality` still holds it.
 cpm_display_results <- function(df, digits) {
+  df$Communality <- NULL
   out <- cpm_round_df(df, digits)
   short <- c(
     Angle_theory = "Theory",
@@ -264,9 +280,11 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
 
   if (length(boot_markers) > 0) {
     # Wrap the label sentence at whole-label boundaries only: a marker label
-    # is taught as a unit, so it must never break across lines. The opening
-    # clause and each label are handed to wrap_prose() as atomic units, so a
-    # break can only ever fall between them.
+    # is taught as a unit, so it must never break across lines. Each label is
+    # handed to wrap_prose() as one atomic unit and the opening clause as its
+    # words, so a break falls between words or labels and never inside a
+    # label. (Handed over whole, the 49-column clause overflowed every width
+    # below 51; M146.)
     items <- paste0(boot_markers, ";")
     items[length(items)] <- sub(";$", ".", items[length(items)])
     # The blank separator line is owed only after printed diagnostic lines;
@@ -274,7 +292,11 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
     # already provides the single blank line every other render shows.
     if (length(diag_lines) > 0) cat("\n")
     cat_prose(
-      c("Note: boundary/weak-identification markers fired:", items),
+      c(
+        strsplit("Note: boundary/weak-identification markers fired:", " ",
+                 fixed = TRUE)[[1]],
+        items
+      ),
       prefix = "  ",
       atomic = TRUE
     )

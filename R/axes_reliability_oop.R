@@ -110,17 +110,22 @@ axes_se_corrected_note <- paste0(
 # by the move, and the sentence appears exactly once in a summary() call. The
 # scaling-failure note travels with it for the same reason: it explains four NAs
 # that only summary() displays.
-axes_fit_scaled_note <- paste0(
-  "The global fit statistics chisq, pvalue, rmsea and cfi are scaled to ",
-  "that metric (Satorra & Bentler, 1994), which removes a distortion that ",
-  "flatters fit; df and srmr are unchanged. The scaled test can modestly ",
-  "over-reject at typical sample sizes: it over-flags misfit rather than ",
-  "flattering it; see ?axes_reliability for the measured rates. ",
+axes_fit_scaled_note <- c(
+  paste0(
+    "The global fit statistics chisq, pvalue, rmsea and cfi are scaled to ",
+    "that metric (Satorra & Bentler, 1994), which removes a distortion that ",
+    "flatters fit; df and srmr are unchanged. The scaled test can modestly ",
+    "over-reject at typical sample sizes: it over-flags misfit rather than ",
+    "flattering it; see ?axes_reliability for the measured rates."
+  ),
   # Named here and not only in the help page because the cross-check a reader
   # runs is prompted by seeing these four numbers, and both of the obvious
   # comparisons -- lavaan's bare cfi and its cfi.robust -- disagree with them.
-  "They follow lavaan's *.scaled definitions, not its *.robust ones, and ",
-  "differ from what fitMeasures() reports for an equivalent ML fit."
+  # A second element, so wrap_prose() starts it on a line of its own (M146).
+  paste0(
+    "They follow lavaan's *.scaled definitions, not its *.robust ones, and ",
+    "differ from what fitMeasures() reports for an equivalent ML fit."
+  )
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs

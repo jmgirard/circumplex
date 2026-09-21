@@ -259,7 +259,8 @@ disp_width <- function(x) {
 # split: a break falls only between elements, and the whole vector is one
 # paragraph. The bootstrap marker note uses the atomic form, because a marker
 # label is taught as a unit and reads as one name only while it stays on one
-# line.
+# line. The CPM Heywood note uses it too, so that "(ζ > 0.995," stays whole
+# (see `cpm_diagnostic_lines()`).
 #
 # A single word wider than the room left on a line is placed on its own line
 # rather than split, so that line can exceed the width. Breaking a word would
@@ -272,6 +273,14 @@ wrap_prose <- function(x, prefix = "", continuation = prefix,
     is_char(continuation, n = 1),
     is_flag(atomic), !is.na(atomic)
   )
+  # disp_width() counts a tab as 0 columns while a console draws it up to 8
+  # wide, so a tab in a lead would put lines past the width they were counted
+  # in. A tab in `x` is only a word separator and stays legal.
+  stopifnot(
+    "`prefix` must not contain a tab" = !grepl("\t", prefix, fixed = TRUE),
+    "`continuation` must not contain a tab" =
+      !grepl("\t", continuation, fixed = TRUE)
+  )
   # `width = NULL` means "ask the reader's console". No fallback is needed for
   # that answer: R refuses to delete the width option or to set it outside
   # 10...10000, so getOption("width") is always a usable integer. A width the
@@ -279,7 +288,11 @@ wrap_prose <- function(x, prefix = "", continuation = prefix,
   # passing 0, -5 or "80" has made a mistake, and silently printing at 80
   # would hide it (M131 review, O8).
   if (is.null(width)) width <- getOption("width")
-  stopifnot(is_scalar_count(width))
+  # is_scalar_count() accepts Inf, and an infinite width wraps nothing.
+  stopifnot(
+    is_scalar_count(width),
+    "`width` must be finite" = is.finite(width)
+  )
 
   # Each element of `x` is a paragraph of its own, as in the strwrap() this
   # replaced, so a caller that hands over several sentences gets several

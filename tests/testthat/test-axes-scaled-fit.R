@@ -2630,3 +2630,25 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
     expect_lt(k, 1e7)
   }
 })
+
+
+# ---- M146: the lavaan cross-check sentence starts its own line ---------------
+#
+# The scaled-fit note ends with a sentence a reader acts on (why lavaan's cfi
+# and cfi.robust disagree with the four scaled numbers). Wrapped as one
+# paragraph it began mid-line after "the measured rates."; it now starts a line
+# at every width.
+
+test_that("summary() starts the lavaan sentence on its own line at every width", {
+  fit <- caution_fixtures()$row25_scaled_fit$build()
+  old <- options(width = 80)
+  on.exit(options(old), add = TRUE)
+  for (w in 30:120) {
+    options(width = w)
+    out <- capture.output(summary(fit))
+    expect_true(
+      any(startsWith(trimws(out, "left"), "They follow lavaan's")),
+      info = paste("width", w)
+    )
+  }
+})

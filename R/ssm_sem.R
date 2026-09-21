@@ -800,27 +800,29 @@ sem_dcfi_note <- function(width = getOption("width")) {
     "cr = reject when ", dcfi, " < ", format(sem_dcfi_cutoff),
     "; the verdict does not use it."
   )
-  paste0(paste(strwrap(body, width = width, exdent = 2), collapse = "\n"), "\n")
+  lines <- wrap_prose(body, continuation = "  ", width = width)
+  paste0(paste(lines, collapse = "\n"), "\n")
 }
 
 # The verdict block of the printed ladder: "Verdict:" and the decision, then
 # one labeled line per fact from sem_verdict_facts(). A value too long for its
 # line continues on further lines indented to the value column. With no
-# decision (the print() fallback), only the labeled lines are returned.
+# decision (the print() fallback), only the labeled lines are returned. The
+# Verdict: line wraps the same way (M146), and the label column counts against
+# the width, so no line passes it except one holding a single too-long word.
 sem_format_verdict <- function(facts, width = getOption("width")) {
   col <- 12L
+  hang <- strrep(" ", col)
   labeled <- function(label, values) {
     unlist(lapply(values, function(v) {
-      lines <- strwrap(v, width = max(width - col, 20L))
-      c(
-        paste0(formatC(paste0("  ", label, ":"), width = -col), lines[[1]]),
-        if (length(lines) > 1) paste0(strrep(" ", col), lines[-1])
-      )
+      wrap_prose(v, prefix = formatC(paste0("  ", label, ":"), width = -col),
+                 continuation = hang, width = width)
     }))
   }
   c(
     if (!is.null(facts$decision)) {
-      paste0(formatC("Verdict:", width = -col), facts$decision)
+      wrap_prose(facts$decision, prefix = formatC("Verdict:", width = -col),
+                 continuation = hang, width = width)
     },
     labeled("Test", facts$test),
     labeled("Result", facts$result),
@@ -1885,14 +1887,14 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 
 # The invariance-ladder block of print.circumplex_ssm_sem(): heading, table,
 # rung notes, the Delta-CFI note (in scope only) and the verdict block. The
-# rung notes, the Delta-CFI note and the labeled verdict values (or, in the
-# fallback, the stored verdict) wrap to getOption("width"); the heading and the
-# Verdict: line of the labeled block do not.
+# rung notes, the Delta-CFI note, the Verdict: line and the labeled verdict
+# values (or, in the fallback, the stored verdict) wrap to getOption("width");
+# the heading does not.
 sem_print_invariance <- function(inv, digits = 3, path = NULL) {
   width <- getOption("width")
   wrap <- function(text, indent = 0, exdent = 2) {
-    cat(strwrap(text, width = width, indent = indent, exdent = exdent),
-        sep = "\n")
+    cat_prose(text, prefix = strrep(" ", indent),
+              continuation = strrep(" ", exdent), width = width)
   }
   cat(
     "\nInvariance ladder (gate: ", inv$gate, ", alpha = ",

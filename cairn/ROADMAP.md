@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-21 (triage pass: dropped 3 already-shipped tombston
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M146 | Printed text wraps at its edge cases, and the CPM table drops Communality | planned | — | normal | milestones/M146-printed-text-wrapping-edges.md |
+| M146 | Printed text wraps at its edge cases, and the CPM table drops Communality | review | — | normal | milestones/M146-printed-text-wrapping-edges.md |
 | M145 | Per-side label margins and plotmath crosshair labels on the circumplex canvas | done | — | normal | milestones/archive/M145-cartesian-canvas-follow-ons.md |
 | M144 | The vignette guards keep one level map, check section numbers, and pkgdown builds the vignette menu | done | — | high | milestones/archive/M144-vignette-guards-single-map.md |
 | M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | done | M142 | normal | milestones/archive/M143-vignette-nagy-figures.md |

@@ -18,7 +18,10 @@ expect_cpm_table_one_block <- function(fit, printer, digits = 3) {
   old <- options(width = 77)
   on.exit(options(old), add = TRUE)
   out <- suppressWarnings(capture.output(printer(fit)))
+  # The printed table leaves out Communality (M146); the object keeps it.
+  expect_true("Communality" %in% names(fit$results))
   res <- fit$results
+  res$Communality <- NULL
   expected_header <- names(res)
   hit <- expected_header %in% names(cpm_table_header_map)
   expected_header[hit] <- cpm_table_header_map[expected_header[hit]]
