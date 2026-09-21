@@ -25,7 +25,8 @@
 # Output that no width setting reaches, such as text printed with cat(), is
 # exempted by an entry in EXEMPT below: a vignette name, a regular expression
 # anchored at the start of the line, and the reason. An entry exempts only the
-# lines its pattern matches in its own vignette. An entry that matches no
+# lines its pattern matches in its own vignette, at any width and in any
+# chunk: an exempted line has no width cap. An entry that matches no
 # over-wide "#>" line is an error, so an entry cannot outlive the output it was
 # written for.
 #
