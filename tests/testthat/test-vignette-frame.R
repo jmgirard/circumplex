@@ -1,46 +1,13 @@
 # Guards for the frame every vignette carries: a Level line under the setup
-# chunk, a numbered Overview that names the sections after it, consecutive
-# section numbers, a Wrap-up that names the next page, and References last
-# where the page cites any. The reading map below is the one the pkgdown index
-# follows (tools/check-pkgdown-vignettes.R holds the level order).
+# chunk, a numbered Overview that names the sections after it with their
+# numbers, consecutive section numbers, a Wrap-up that names the next page, and
+# References last where the page cites any. The level map and reading order
+# (`frame_levels`, `frame_next`) live in helper-vignette-frame.R, which
+# tools/check-pkgdown-vignettes.R reads too.
 #
 # The frame is prose, so it survives pre-computation unchanged: the source tree
 # is read under devtools::test() (the .Rmd.orig where one exists) and inst/doc
 # under R CMD check. A build installed without vignettes skips.
-
-frame_levels <- c(
-  "using-instruments" = "Introductory",
-  "introduction-to-ssm-analysis" = "Introductory",
-  "intermediate-ssm-analysis" = "Intermediate",
-  "evaluating-circumplex-structure" = "Intermediate",
-  "ci-accuracy" = "Intermediate",
-  "structure-tests" = "Intermediate",
-  "cpm-boundary-fits" = "Advanced",
-  "advanced-visualization" = "Advanced",
-  "sem-based-ssm-analysis" = "Advanced",
-  "sem-latent-contrasts" = "Advanced",
-  "axes-reliability" = "Advanced",
-  "axes-reliability-caveats" = "Advanced",
-  "bayesian-ssm-analysis" = "Advanced",
-  "growth-ssm-analysis" = "Advanced"
-)
-
-# Reading order: each row is one page and the page that follows it.
-frame_next <- rbind(
-  c("using-instruments", "introduction-to-ssm-analysis"),
-  c("introduction-to-ssm-analysis", "intermediate-ssm-analysis"),
-  c("intermediate-ssm-analysis", "evaluating-circumplex-structure"),
-  c("evaluating-circumplex-structure", "cpm-boundary-fits"),
-  c("evaluating-circumplex-structure", "ci-accuracy"),
-  c("ci-accuracy", "structure-tests"),
-  c("structure-tests", "advanced-visualization"),
-  c("structure-tests", "sem-based-ssm-analysis"),
-  c("sem-based-ssm-analysis", "sem-latent-contrasts"),
-  c("sem-latent-contrasts", "axes-reliability"),
-  c("axes-reliability", "axes-reliability-caveats"),
-  c("intermediate-ssm-analysis", "bayesian-ssm-analysis"),
-  c("bayesian-ssm-analysis", "growth-ssm-analysis")
-)
 
 frame_path <- function(name) {
   candidates <- c(
@@ -147,6 +114,15 @@ test_that("headings run Overview, numbered sections, Wrap-up, References", {
       text <- sub("^## ([0-9]+\\. )?", "", h)
       expect_true(grepl(text, overview, fixed = TRUE),
                   info = paste(name, "Overview lacks", text))
+      # A numbered section is cited by its own number: `Section N, "Title"`.
+      # Citing the title under another number sends the reader to the wrong
+      # section, which the title-only check above cannot see.
+      if (grepl("^## [0-9]+\\. ", h)) {
+        num <- sub("^## ([0-9]+)\\. .*$", "\\1", h)
+        expect_true(grepl(paste0("Section ", num, ", \"", text, "\""), overview, fixed = TRUE),
+                    info = paste0(name, ": the Overview does not cite \"", text,
+                                  "\" as Section ", num))
+      }
     }
   }
 })

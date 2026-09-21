@@ -135,6 +135,13 @@ an n-dependent quantity against an n-free exact value, conservative and
 sub-ulp; and M108's nine cosmetic and performance residues plus M111's F16,
 whose texts are in those milestones' review histories.
 
+Accepted 2026-09-20 (M144), on the website's vignette menu. pkgdown builds the
+menu from the `articles:` index, and its `navbar_articles()` emits a divider
+before every group heading, the first one included. The menu's title is
+pkgdown's own "Articles" and cannot be set. Both were accepted at the M144 plan
+gate as the price of deleting the hand-written menu, which restated the index
+and whose guard took five defects in one review (M144-D1).
+
 Accepted 2026-09-17 (M138), on the website's navbar. AC1 checks that the built
 pages carry no navbar background class and no `data-bs-theme` attribute, which
 is a marker for a light navbar, not a test that the navbar renders light.
