@@ -1,14 +1,14 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-20 (M142 done and archived, one candidate row added for its follow-ons; M140's terminal row dropped for the 60-line cap, M141 and M142 kept; no LESSONS change, the file at its byte cap and nothing retirable shipped. ROADMAP 60 lines / ~30,700 bytes, over its 24,000 byte budget and awaiting a `/cairn-triage` compression pass; LESSONS 48 lines / 19,980 bytes against its 50 / 20,000 cap; test-craft 28 lines / 8,924 bytes against its stated < 35 / < 9,000.)_
+_Last hygiene check: 2026-09-20 (M143 done and archived; no new candidate row, its tangent-helper deferral already on the covariate-extension row; no LESSONS change, the file at its byte cap and nothing new to teach beyond test-craft's tolerance family. Terminal rows M141, M142, M143 kept. ROADMAP 59 lines / ~30,500 bytes, over its 24,000 byte budget and awaiting a `/cairn-triage` compression pass; LESSONS 48 lines / 19,980 bytes against its 50 / 20,000 cap; test-craft 28 lines / 8,924 bytes against its stated < 35 / < 9,000.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M142 | A Cartesian-grid style for the circumplex canvas (`coord_circumplex(grid = "cartesian")`, `ggcircumplex(angle_labels = TRUE)`) | done | — | normal | milestones/archive/M142-cartesian-canvas-grid.md |
-| M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | review | M142 | normal | milestones/M143-vignette-nagy-figures.md |
+| M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | done | M142 | normal | milestones/archive/M143-vignette-nagy-figures.md |
 | M141 | A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws | done | M140 | normal | milestones/archive/M141-ellipse-geom.md |
 
 ## Candidates
