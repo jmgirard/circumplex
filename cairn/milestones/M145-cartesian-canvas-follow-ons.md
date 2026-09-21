@@ -1,13 +1,13 @@
 # M145: Per-side label margins and plotmath crosshair labels on the circumplex canvas
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP3
 - **Resolves:** —
 - **Surface tier:** user-facing — changes the drawn output of the exported `ggcircumplex()` and `coord_circumplex()`
-- **Branch/PR:** —
+- **Branch/PR:** m145-cartesian-canvas-follow-ons
 
 ## Goal
 
@@ -37,7 +37,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 
 ## Tasks
 
-- [ ] T1: Write the tests first, in `tests/testthat/test-ssm_plot.R` beside the M142 block (~line 306). Add the AC1 margin cases on both grids, with an oracle written in the test, and the AC2 four-way case. Before T2, see the AC1 cases fail on the current symmetric rule.
+- [x] T1: Write the tests first, in `tests/testthat/test-ssm_plot.R` beside the M142 block (~line 306). Add the AC1 margin cases on both grids, with an oracle written in the test, and the AC2 four-way case. Before T2, see the AC1 cases fail on the current symmetric rule.
 - [ ] T2: Replace the symmetric `plot.margin` in `ggcircumplex()` (`R/ssm_plot.R`, `label_guide` block, ~lines 710-723) with the per-side rule, in a small internal helper. Update the code comment and the `angle_labels` roxygen. Render the PANO canvas and a long-label canvas on both grids and look at them (M33 lesson). Then regenerate the vdiffr snapshot that the margin change moves (`test-ssm_plot.R` ~line 421) under `NOT_CRAN=true` (M31 lesson).
 - [ ] T3: Write the tests first, in `tests/testthat/test-coord_circumplex.R`. Add the AC3 expression-label cases, and walk the cartesian grid grob by name (`circumplex-cartesian-labels-x`/`-y`). Before T4, see them fail on the current `as.character()`.
 - [ ] T4: In `cartesian_grid_grob()` (`R/coord_circumplex.R`, ~lines 170-250), keep language labels as they are and build the negated halves by the AC3 rule. Replace the `is.na()`/`!= ""` blank test with one that is safe for language objects. Render one canvas with plotmath labels and look at it.
@@ -48,6 +48,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - 2026-09-20: created by /milestone-plan. The criteria audit (full mode, [O] fresh reader) returned 12 findings on the draft. 11 were fixed before the gate: discriminating margin canvases, a varied `font_size`, n defined on the drawn label, the four-way AC2 case, `get_labels()` returning a list, a parenthesis rule that covers every call, blank language labels, a wider probe set, an instrument-bound clause restated as behavior, and NEWS for the fix. AC5 had no finding.
 - 2026-09-20: plan gate chose a per-side margin estimated from label length over measuring rendered widths at draw time, because the estimate needs no graphics device at build time and stays in `ggcircumplex()`. Falsified by a rendered canvas in a common font where a label leaves the page or the margin exceeds the label by more than half its length.
 - 2026-09-20: plan gate chose off-center margins over a centered circle (left/right and top/bottom paired at their maximum), because Nagy's figures do the same and it saves space. Falsified by a user report that an off-center circle misreads or misaligns in a multi-panel figure.
+- 2026-09-20: T1 done. The AC1 margin tests failed on the old symmetric rule (every side 54 pt, or 190 pt at font size 20), and the AC2 cases passed. T2 code, roxygen and the regenerated snapshot are in this checkpoint. Renders of the PANO, long-label and uneven canvases kept every label on the page. T2 stays open until the full suite result is in.
 
 ## Decisions
 
