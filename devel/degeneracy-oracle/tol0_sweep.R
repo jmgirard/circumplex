@@ -34,29 +34,57 @@
 #           the three t of devel/degeneracy-oracle/exact_oracle.R.
 #   m106    the M106 reachable families A (p = 8 and p = 24) and C (p = 4)
 #           and the near-duplicate family B (p = 9), each on an item-error
-#           grid eps = 10^seq(-1, -12, by = -0.5) that crosses the floor.
+#           grid eps = 10^seq(-1, -12, by = -0.5) that crosses the floor;
+#           family A at 6 and 12 equally spaced scales (one item each) on the
+#           same grid (RR24 rec 3); and ONE p = 64 row (8 octant scales, 8
+#           items, item error 0.3, above the floor) whose certificate wall
+#           time is recorded and which is asserted outside the region, so the
+#           exact oracle is never handed a 64 x 64 pipeline.
 #   random  a seeded model-implied family Sigma = xi1*C + xi2*J + zeta1*B +
 #           diag(e), cov2cor'd, at p in {4, 8, 9, 16, 24} (the M106 shapes:
 #           four cardinal scales; one, two and three items per octant scale;
 #           octants plus a duplicate-angle ninth item), with xi1 ~ U(.2,.5),
 #           xi2 ~ U(0,.3), zeta1 ~ U(0,.3) where two or more items share a
 #           scale and 0 otherwise, and e_i = level * exp(N(0, .5)) with
-#           log10(level) ~ U(-12, -1). Draws per p: 40, 40, 40, 30, 20.
-#           set.seed(20260921) once before the family.
+#           log10(level) ~ U(-12, -1). Draws per p: 40, 40, 40, 30, 20; plus
+#           4 rows per p with a NEGATIVE component (zeta1 = -0.05 where a
+#           scale shares items, else xi2 = -0.02), the boundary class
+#           axes_is_boundary() names (RR24 rec 3). set.seed(20260921) once
+#           before the family.
+#   blocks  the crossed-block family fitting zeta2: axes_crossed_blocks()
+#           layouts at 4 and 8 scales with 2 and 3 items, zeta2 in {0.1,
+#           0.25}, xi1 = .3, xi2 = .2, zeta1 = .1, on the m106 item-error
+#           grid; zeta1 and zeta2 fitted per the package's own predicates.
+#   struct  designs singular in exact arithmetic: one item per scale with
+#           zeta1 forced fitted at item errors {.5, .3, .1, .03, .01, 1e-3,
+#           1e-4} (the same-scale matrix IS the identity), and two antipodal
+#           blocks over the four cardinal scales with zeta2 forced fitted at
+#           item errors {.3, .1, .03} (C = 2B - Z up to cosine rounding).
+#           FAMILY MEMBERSHIP DOES NOT DECIDE REGION MEMBERSHIP; the core's
+#           answer does (below): the identity rows are refused on an exact
+#           structural ground and leave the region, the antipodal rows are
+#           cosine-inexact and stay in it.
 #
-# COLUMNS, per matrix: family, id, p, zeta1 (fitted?), min_items (smallest
-# item count on any scale), kappa (eigenvalue ratio), floor (the criterion's
-# answer, "NULL" where it admits), rcond_sigma, rcond_info, default_outcome
-# (the replica at tol = .Machine$double.eps: "inverted", "refused",
-# "sigma-singular"), tol0_outcome (the replica at tol = 0: "inverted",
-# "exact-singular" (LAPACK dgesv INFO > 0), "nonfinite", "other-error",
-# "sigma-singular"), bit_identical (si, sim and acov identical across the two
+# COLUMNS, per matrix: family, id, p, n_scales, spacing
+# (angles_spacing_status() of the distinct scale angles), zeta1 and zeta2
+# (fitted in the derivative set), api_zeta1 and api_zeta2 (what
+# axes_fits_zeta1() / axes_fits_zeta2() would fit for the design), min_items
+# (smallest item count on any scale), kappa (eigenvalue ratio), floor (the
+# criterion's answer, "NULL" where it admits), rcond_sigma, rcond_info
+# (computed here from the information matrix, independently of the core),
+# structural (the design carries an exact ground: a bit-identical pair among
+# the component matrices or a component identical to the identity),
+# default_outcome (the replica at tol = .Machine$double.eps: "inverted",
+# "refused", "sigma-singular", "structural"), tol0_outcome (the replica at
+# tol = 0: "inverted", "exact-singular" (LAPACK dgesv INFO > 0), "nonfinite",
+# "other-error", "sigma-singular", "structural"), cert_secs (the
+# certificate's wall time, recorded only), bit_identical (si, sim and acov identical across the two
 # tolerances where both inverted), shipped_reason (axes_corrected_se()'s
 # `reason` with the shipped core, "computes" where NULL), shipped_naive_reason,
 # tol0_reason and tol0_naive_reason (the same in the tol0 world), cert_se,
 # cert_cval, cert_ratio (the certificate in the tol0 world, where tol = 0
-# inverted), and in the REGION -- default refused, tol = 0 inverted --
-# oracle_status, true_se, true_cval, true_ratio (the exact-rational oracle's
+# inverted), and in the REGION -- default refused, tol = 0 inverted, and no
+# structural ground (no oracle is called outside it) -- oracle_status, true_se, true_cval, true_ratio (the exact-rational oracle's
 # relative errors of the tol0 doubles), and under_report (the certificate is
 # graded, i.e. below its sentinel 1, and some field sits below its true
 # error).
@@ -68,18 +96,29 @@
 #       "uncertified" or every true error is at or below delta_star (1e-4).
 #       At a REGION matrix whose double pricing refused after the inversion
 #       (a nonpositive quadratic form, "indefinite"), tol0_reason is not
-#       "computes". At every matrix BOTH tolerances refused, tol0_reason is
-#       "unidentified".
-#   (b) Every matrix the floor admits ("NULL") whose design fits zeta1 only
-#       with two or more items on every scale was inverted under both
-#       tolerances, with rcond_info >= 1e4 * .Machine$double.eps.
+#       "computes". At every matrix BOTH tolerances refused whose floor answer
+#       is neither "indefinite" nor "singular", tol0_reason is "unidentified".
+#   (b1) At every struct-family matrix rcond_info is below the selector
+#        threshold sqrt(.Machine$double.eps) divided by 1e4.
+#   (b2) Every matrix the floor admits ("NULL") whose recorded columns show a
+#        design the exported API admits (n_scales >= 4, spacing "ok", zeta1
+#        == api_zeta1, zeta2 == api_zeta2) and that the selector routes
+#        (rcond_info below the threshold) passes its certificate (tol0_reason
+#        "computes"); the list is non-empty; at least one blocks-family
+#        matrix with api_zeta2 TRUE is floor-admitted in that domain; the
+#        p = 3 rows are listed separately as out of domain.
 #   (c) Every matrix inverted under the default tolerance has bit_identical
-#       TRUE.
-#   (d) No family is empty.
-# At HEAD (before T4) the second clause of (a) is expected to FAIL: the floor
-# consults the certificate ahead of the pricing there, so a zero pivot
-# surfaces as the sentinel's "uncertified" rather than as "unidentified".
-# That baseline is what T2's brief reads; the acceptance binds the T5 run.
+#       TRUE. Expected to hold BY CONSTRUCTION: La_solve factorises once and
+#       checks rcond afterwards, so `tol` cannot change the factorisation
+#       (RR24 B5); kept as a tripwire against a future solve().
+#   (d) No family is empty, and the run holds at least one p = 64 row, at
+#       least one row each at 6 and 12 scales, and at least one row with a
+#       negative zeta1 or xi2. The p = 64 row is outside the region.
+# At HEAD (before T4) the last clause of (a) was expected to FAIL: the floor
+# consulted the certificate ahead of the pricing there, so a zero pivot
+# surfaced as the sentinel's "uncertified" rather than as "unidentified".
+# That baseline (commit 7856f70d) is what T2's brief read; the acceptance
+# binds the T5 run.
 #
 # ALSO REPORTED, outside the acceptance: every matrix with floor "NULL" and
 # rcond_sigma below .Machine$double.eps (a hit means solve(sigma)'s default
@@ -178,11 +217,22 @@ exact <- function(S, d, df, baseline_df) {
 }
 
 # ---- the families -----------------------------------------------------------
-case <- function(family, id, S, ang, scale) {
-  z <- axes_fits_zeta1(split(seq_along(scale), scale))
-  d <- axes_se_derivs(ang, scale, NULL, z, FALSE)
-  list(family = family, id = id, S = S, ang = ang, scale = scale, d = d,
-       zeta1 = z, min_items = min(lengths(split(seq_along(scale), scale))))
+case <- function(family, id, S, ang, scale, block = NULL,
+                 fit_zeta1 = NULL, fit_zeta2 = NULL, neg = FALSE) {
+  api_z1 <- axes_fits_zeta1(split(seq_along(scale), scale))
+  api_z2 <- axes_fits_zeta2(ang, scale, block)
+  z1 <- if (is.null(fit_zeta1)) api_z1 else fit_zeta1
+  z2 <- if (is.null(fit_zeta2)) api_z2 else fit_zeta2
+  d <- axes_se_derivs(ang, scale, block, z1, z2)
+  comp <- d$mats[seq_len(d$n_comp)]
+  structural <- any(duplicated(comp)) ||
+    any(vapply(comp, identical, TRUE, diag(nrow(S))))
+  list(family = family, id = id, S = S, ang = ang, scale = scale,
+       block = block, d = d, zeta1 = z1, zeta2 = z2, api_zeta1 = api_z1,
+       api_zeta2 = api_z2, structural = structural, neg = neg,
+       n_scales = length(unique(scale)),
+       spacing = angles_spacing_status(unique(ang)),
+       min_items = min(lengths(split(seq_along(scale), scale))))
 }
 oct <- as.numeric(octants())
 
@@ -211,9 +261,28 @@ fam_q4 <- function() {
 }
 
 M106_GRID <- 10^seq(-1, -12, by = -0.5)
+# Family A at k equally spaced scales, one item each (the octant builder
+# generalised; k = 8 reproduces m106_family_a(e, 1L) up to the angle set).
+k_family_a <- function(eps, k, xi1 = 0.3, xi2 = 0.3) {
+  ang <- seq(360 / k, 360, by = 360 / k)
+  rad <- ang * pi / 180
+  sg <- xi1 * outer(rad, rad, function(u, v) cos(u - v)) +
+    xi2 * matrix(1, k, k) + eps * diag(k)
+  nms <- paste0("i", seq_len(k))
+  dimnames(sg) <- list(nms, nms)
+  list(S = stats::cov2cor(sg), ang = ang, scale = as.character(seq_len(k)))
+}
 fam_m106 <- function() {
   out <- list()
+  big <- m106_family_a(0.3, 8L)
+  out <- c(out, list(case("m106", "A64 eps=3.0e-01", big, rep(oct, each = 8L),
+                          as.character(rep(1:8, each = 8L)))))
   for (e in M106_GRID) {
+    for (k in c(6L, 12L)) {
+      g <- k_family_a(e, k)
+      out <- c(out, list(case("m106", sprintf("A%d eps=%.1e", k, e), g$S,
+                              g$ang, g$scale)))
+    }
     tag <- sprintf("eps=%.1e", e)
     out <- c(out, list(
       case("m106", paste0("A8 ", tag), m106_family_a(e, 1L), oct, as.character(1:8)),
@@ -260,6 +329,73 @@ fam_random <- function() {
       out <- c(out, list(case("random", sprintf("p%d #%02d level=%.1e", p, k, level),
                               stats::cov2cor(sg), sh$ang, sh$scale)))
     }
+    # The boundary class: a negative component estimate, as a converged fit
+    # can return (axes_is_boundary()). Non-PD draws are what the floor's
+    # "indefinite" arm exists for and are kept, not resampled.
+    for (k in seq_len(4L)) {
+      xi1 <- stats::runif(1, 0.2, 0.5)
+      xi2 <- if (shares) stats::runif(1, 0, 0.3) else -0.02
+      zeta1 <- if (shares) -0.05 else 0
+      level <- 10^stats::runif(1, -6, -1)
+      e <- level * exp(stats::rnorm(p, 0, 0.5))
+      rad <- sh$ang * pi / 180
+      cm <- outer(rad, rad, function(u, v) cos(u - v))
+      bm <- outer(sh$scale, sh$scale, "==") * 1
+      sg <- xi1 * cm + xi2 * matrix(1, p, p) + zeta1 * bm + diag(e)
+      nms <- paste0("i", seq_len(p))
+      dimnames(sg) <- list(nms, nms)
+      S <- if (all(diag(sg) > 0)) stats::cov2cor(sg) else sg
+      out <- c(out, list(case("random", sprintf("p%d neg#%d level=%.1e", p, k, level),
+                              S, sh$ang, sh$scale, neg = TRUE)))
+    }
+  }
+  out
+}
+
+# The crossed-block family (RR24 rec 3): the fifth component, on layouts the
+# exported API reaches through `blocks`.
+fam_blocks <- function() {
+  out <- list()
+  for (k in c(4L, 8L)) for (n in c(2L, 3L)) for (z2 in c(0.1, 0.25)) {
+    ang_k <- if (k == 4L) c(90, 180, 270, 360) else oct
+    bl <- axes_crossed_blocks(k, n)
+    for (e in M106_GRID) {
+      pop <- axes_population_cor(ang_k, n, xi1 = .3, xi2 = .2, zeta1 = .1,
+                                 zeta2 = z2, item_block = bl)
+      sg <- pop$sigma
+      diag(sg) <- .3 + .2 + .1 + z2 + e
+      p <- nrow(sg)
+      nms <- paste0("i", seq_len(p))
+      dimnames(sg) <- list(nms, nms)
+      out <- c(out, list(case("blocks", sprintf("k%d n%d z2=%.2f eps=%.1e", k, n, z2, e),
+                              stats::cov2cor(sg), rep(ang_k, each = n),
+                              as.character(rep(seq_len(k), each = n)), block = bl)))
+    }
+  }
+  out
+}
+
+# Designs singular in exact arithmetic (RR24 section 2(a) table).
+fam_struct <- function() {
+  out <- list()
+  for (e in c(.5, .3, .1, .03, .01, 1e-3, 1e-4)) {
+    out <- c(out, list(case("struct", sprintf("identity zeta1 eps=%.0e", e),
+                            m106_family_a(e, 1L), oct, as.character(1:8),
+                            fit_zeta1 = TRUE)))
+  }
+  ang4 <- c(90, 180, 270, 360)
+  bl <- c(1L, 1L, 2L, 2L, 1L, 1L, 2L, 2L)
+  for (e in c(.3, .1, .03)) {
+    pop <- axes_population_cor(ang4, 2L, xi1 = .3, xi2 = .2, zeta1 = .1,
+                               zeta2 = .15, item_block = bl)
+    sg <- pop$sigma
+    diag(sg) <- .3 + .2 + .1 + .15 + e
+    nms <- paste0("i", 1:8)
+    dimnames(sg) <- list(nms, nms)
+    out <- c(out, list(case("struct", sprintf("antipodal zeta2 eps=%.0e", e),
+                            stats::cov2cor(sg), rep(ang4, each = 2L),
+                            as.character(rep(1:4, each = 2L)), block = bl,
+                            fit_zeta1 = TRUE, fit_zeta2 = TRUE)))
   }
   out
 }
@@ -267,8 +403,8 @@ fam_random <- function() {
 # ---- one matrix ---------------------------------------------------------------
 surface_reason <- function(cs) {
   got <- suppressWarnings(axes_corrected_se(
-    cs$S, rownames(cs$S), cs$ang, cs$scale, n = N,
-    fit_zeta1 = cs$zeta1, fit_zeta2 = FALSE))
+    cs$S, rownames(cs$S), cs$ang, cs$scale, cs$block, n = N,
+    fit_zeta1 = cs$zeta1, fit_zeta2 = cs$zeta2))
   list(reason = if (is.null(got$reason)) "computes" else got$reason,
        naive = if (is.null(got$naive_reason)) "computes" else got$naive_reason)
 }
@@ -277,11 +413,14 @@ measure <- function(cs) {
   S <- cs$S; d <- cs$d; p <- nrow(S)
   fl <- axes_sigma_degenerate(S)
   row <- list(
-    family = cs$family, id = cs$id, p = p, zeta1 = cs$zeta1,
+    family = cs$family, id = cs$id, p = p, n_scales = cs$n_scales,
+    spacing = cs$spacing, zeta1 = cs$zeta1, zeta2 = cs$zeta2,
+    api_zeta1 = cs$api_zeta1, api_zeta2 = cs$api_zeta2, neg = cs$neg,
     min_items = cs$min_items, kappa = m106_kappa(S),
     floor = if (is.null(fl)) "NULL" else fl,
-    rcond_sigma = rcond(S), rcond_info = NA_real_,
+    rcond_sigma = rcond(S), rcond_info = NA_real_, structural = cs$structural,
     default_outcome = NA_character_, tol0_outcome = NA_character_,
+    cert_secs = NA_real_,
     bit_identical = NA, replica_agrees = NA,
     shipped_reason = NA_character_, shipped_naive_reason = NA_character_,
     tol0_reason = NA_character_, tol0_naive_reason = NA_character_,
@@ -295,6 +434,14 @@ measure <- function(cs) {
   core_0 <- replica(S, d, tol = 0)
   if (identical(core_def, "singular")) {
     row$default_outcome <- row$tol0_outcome <- "sigma-singular"
+  } else if (cs$structural) {
+    # An exact ground: the shipped core refuses ahead of any inversion (after
+    # M147 T4), and the direct solve() below is still run for rcond_info --
+    # (b1) reads it -- but the row is outside the region by definition.
+    row$default_outcome <- row$tol0_outcome <- "structural"
+    info <- tryCatch(info_of(S, d), error = function(e) NULL)
+    row$rcond_info <- if (is.null(info)) NA_real_ else
+      tryCatch(rcond(info), error = function(e) NA_real_)
   } else {
     row$default_outcome <- if (is.character(core_def)) "refused" else "inverted"
     info <- info_of(S, d)
@@ -323,7 +470,9 @@ measure <- function(cs) {
     row$tol0_reason <- tr$reason
     row$tol0_naive_reason <- tr$naive
     if (identical(row$tol0_outcome, "inverted")) {
+      t_cert <- Sys.time()
       cert <- suppressWarnings(axes_accuracy_certificate(S, d))
+      row$cert_secs <- as.numeric(Sys.time() - t_cert, units = "secs")
       row$cert_se <- cert$se
       row$cert_cval <- cert$cval
       row$cert_ratio <- cert$fiml_ratio
@@ -370,8 +519,8 @@ t0 <- Sys.time()
 if (nzchar(Sys.getenv("TOL0_REPORT_ONLY"))) {
   res <- readRDS(OUT_RDS)
 } else {
-cases <- c(fam_cert(), fam_q4(), fam_m106(), fam_random())
-cat(sprintf("%d matrices in four families\n", length(cases)))
+cases <- c(fam_cert(), fam_q4(), fam_m106(), fam_random(), fam_blocks(), fam_struct())
+cat(sprintf("%d matrices in six families\n", length(cases)))
 rows <- vector("list", length(cases))
 for (i in seq_along(cases)) {
   rows[[i]] <- measure(cases[[i]])
@@ -404,15 +553,26 @@ a1 <- nrow(region) > 0 && all(priced$oracle_status %in% "ok") &&
         (priced$true_se <= DELTA_STAR & priced$true_cval <= DELTA_STAR &
            priced$true_ratio <= DELTA_STAR)) &&
   all(unpriced$tol0_reason != "computes")
-a2 <- all(both$tol0_reason == "unidentified")
-covered <- res[res$floor == "NULL" & (!res$zeta1 | res$min_items >= 2L), ]
-b <- nrow(covered) > 0 && all(covered$default_outcome == "inverted" &
-                                 covered$tol0_outcome == "inverted" &
-                                 covered$rcond_info >= 1e4 * EPS)
+both_pd <- both[!(both$floor %in% c("indefinite", "singular")), ]
+a2 <- all(both_pd$tol0_reason == "unidentified")
+THETA <- sqrt(EPS)
+struct <- res[res$family == "struct", ]
+b1 <- nrow(struct) > 0 && all(!is.na(struct$rcond_info) & struct$rcond_info < THETA / 1e4)
+api_ok <- res$n_scales >= 4L & res$spacing == "ok" &
+  res$zeta1 == res$api_zeta1 & res$zeta2 == res$api_zeta2
+domain <- res[res$floor == "NULL" & api_ok, ]
+routed <- domain[!is.na(domain$rcond_info) & domain$rcond_info < THETA, ]
+p3 <- res[res$floor == "NULL" & res$n_scales < 4L &
+            !is.na(res$rcond_info) & res$rcond_info < THETA, ]
+b2 <- nrow(routed) > 0 && all(routed$tol0_reason == "computes") &&
+  any(domain$family == "blocks" & domain$api_zeta2)
 inv <- res[res$default_outcome %in% "inverted", ]
 cc <- nrow(inv) > 0 && all(inv$bit_identical)
-fam_n <- table(factor(res$family, levels = c("cert", "q4", "m106", "random")))
-dd <- all(fam_n > 0)
+fam_n <- table(factor(res$family, levels = c("cert", "q4", "m106", "random", "blocks", "struct")))
+p64 <- res[res$p == 64L, ]
+dd <- all(fam_n > 0) && nrow(p64) > 0 &&
+  !any(p64$default_outcome %in% "refused" & p64$tol0_outcome %in% "inverted") &&
+  any(res$n_scales == 6L) && any(res$n_scales == 12L) && any(res$neg)
 sigma_hits <- res[res$floor == "NULL" & res$rcond_sigma < EPS, ]
 oracle_fail <- region[!(region$oracle_status %in% "ok") &
                         !startsWith(region$oracle_status, "double pricing refused"), ]
@@ -445,11 +605,28 @@ md <- c(
   "",
   sprintf("- (a) region (%d matrices, %d of them priced by the tol0 doubles): oracle ran at every priced one, no under-report, and each refuses `uncertified` or is inside delta_star, and every unpriced one refuses: **%s**; both-refused (%d matrices) all `unidentified`: **%s**",
           nrow(region), nrow(priced), verdict(a1), nrow(both), verdict(a2)),
-  sprintf("- (b) floor-admitted designs with zeta1 fitted only at two or more items per scale (%d matrices): inverted under both tolerances with rcond(info) >= 1e4 eps: **%s** (min rcond(info) %s)",
-          nrow(covered), verdict(b), fmt(suppressWarnings(min(covered$rcond_info)))),
+  sprintf("- (b1) struct family (%d matrices): rcond(info) below sqrt(eps)/1e4 = %s at every one: **%s** (max %s)",
+          nrow(struct), fmt(THETA / 1e4), verdict(b1), fmt(suppressWarnings(max(struct$rcond_info)))),
+  sprintf("- (b2) floor-admitted, API-admitted and selector-routed (%d matrices, of %d in domain, %d blocks-family rows with zeta2 in domain): every one computes: **%s**",
+          nrow(routed), nrow(domain), sum(domain$family == "blocks" & domain$api_zeta2), verdict(b2)),
   sprintf("- (c) bit-identical `si`, `sim`, `acov` across tolerances at every default-inverted matrix (%d): **%s**",
           nrow(inv), verdict(cc)),
-  sprintf("- (d) no family empty: **%s**", verdict(dd)),
+  sprintf("- (d) no family empty, p = 64 row present and outside the region, 6- and 12-scale rows, negative-component rows: **%s** (p = 64 certificate %s s)",
+          verdict(dd), fmt(suppressWarnings(max(p64$cert_secs)))),
+  "",
+  "## The routed reachable list (b2)",
+  "",
+  "| family | id | p | rcond(info) | floor | tol0 | cert se | cert cval | cert ratio |",
+  "|---|---|---|---|---|---|---|---|---|",
+  if (nrow(routed)) vapply(seq_len(nrow(routed)), function(i) {
+    r <- routed[i, ]
+    sprintf("| %s | %s | %d | %s | %s | %s | %s | %s | %s |", r$family, r$id, r$p,
+            fmt(r$rcond_info), r$floor, r$tol0_reason, fmt(r$cert_se),
+            fmt(r$cert_cval), fmt(r$cert_ratio))
+  }, "") else "(empty)",
+  "",
+  sprintf("Out of domain (fewer than four scales), floor-admitted and below the threshold: %d rows%s",
+          nrow(p3), if (nrow(p3)) paste0(" -- ", paste(sprintf("%s (rcond %s, cert cval %s)", p3$id, fmt(p3$rcond_info), fmt(p3$cert_cval)), collapse = "; ")) else ""),
   "",
   "## Outside the acceptance",
   "",
@@ -487,4 +664,4 @@ md <- c(
 writeLines(md, OUT_MD)
 cat(md, sep = "\n")
 cat(sprintf("\n%.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))
-if (!(a1 && a2 && b && cc && dd)) quit(status = 1L)
+if (!(a1 && a2 && b1 && b2 && cc && dd)) quit(status = 1L)

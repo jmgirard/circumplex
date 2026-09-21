@@ -1114,10 +1114,13 @@ test_that("the sentinel is returned where there is nothing to certify", {
   d <- axes_se_derivs(as.numeric(octants()), as.character(1:8), NULL,
                       FALSE, FALSE)
   r <- m106_family_a(2.4e-4, 1L)
-  # A derivative set with a duplicated matrix makes the information matrix
-  # exactly rank-deficient, which is where the shipped route gives up.
+  # A derivative set with a duplicated COMPONENT matrix is refused on an exact
+  # structural ground before any inversion (M147): xi2 planted over xi1. Until
+  # M147 the plant sat in the last item-error slot, where the default-tolerance
+  # inversion refused it; the core now inverts under tol = 0 and compares only
+  # the component matrices, so a plant there would be priced.
   d_dup <- d
-  d_dup$mats[[length(d_dup$mats)]] <- d_dup$mats[[1L]]
+  d_dup$mats[[2L]] <- d_dup$mats[[1L]]
   expect_identical(axes_v_pricing(r, d_dup), "unidentified")
   expect_identical(axes_accuracy_certificate(r, d_dup),
                    list(se = 1, cval = 1, fiml_ratio = 1))

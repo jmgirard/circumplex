@@ -116,13 +116,17 @@ test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses throug
   # than four scales), so without this case nothing would pin the new literal
   # on what a user's own call returns.
   #
-  # Three items per octant scale with the item-error variance driven to 1.5e-9
-  # makes each scale's items near-duplicates of one another. The certificate
-  # returns its sentinel here rather than a graded estimate -- both pricing
-  # routes fail on a matrix this close to rank-deficient -- which is the
-  # fail-closed arm (GP2), and a different mechanism than the counterexample's
-  # graded 4.9e+1. Both must refuse, so both are asserted.
-  bad <- m106_family_a(1.5e-9, 3L)
+  # Three items per octant scale with the item-error variance driven to 1e-13
+  # makes each scale's items near-duplicates of one another. Until M147 the
+  # radius was 1.5e-9, where the default solve() tolerance refused inside the
+  # certificate's replay and the sentinel refused; with the certificate the
+  # sole conditioning judge that radius COMPUTES (certificate 2.9e-7), so the
+  # case moves down to where the certificate's own double-double route gives
+  # up and returns its sentinel (measured here), the fail-closed arm (GP2).
+  # Whether the sentinel or a graded estimate is reached is the certificate's
+  # own arithmetic on this platform, so it is read from the certificate and
+  # the warning is required to agree with it (D-055's file rule).
+  bad <- m106_family_a(1e-13, 3L)
   expect_identical(nrow(bad), 24L)
   expect_identical(axes_sigma_degenerate(bad), "ill_conditioned")
 
@@ -157,11 +161,18 @@ test_that("M111 AC3 (sentinel route): a p = 24 near-duplicate fit refuses throug
   expect_true(any(grepl("scaled fit statistics could not be computed", w)))
   expect_length(grep("estimated relative error", w, fixed = TRUE), 2L)
   # WHICH route this case takes, asserted rather than described (M111 review
-  # F5). The certificate's sentinel is exactly 1 and prints as "1" at the
-  # note's two significant digits; a graded estimate could not. Without this
-  # the file's two AC3 cases could drift onto the same route with every other
-  # assertion still green, collapsing "one on each route" silently.
-  expect_length(grep("estimated relative error 1;", w, fixed = TRUE), 2L)
+  # F5), and read off the certificate rather than off the text: the sentinel
+  # is exactly 1 and prints as "1" at the note's two significant digits; a
+  # graded estimate could not, and must sit past the target.
+  d_bad <- axes_se_derivs(rep(oct, each = 3L), as.character(scale_id), NULL,
+                          TRUE, FALSE)
+  cert_bad <- axes_accuracy_certificate(bad, d_bad)
+  if (identical(cert_bad, list(se = 1, cval = 1, fiml_ratio = 1))) {
+    expect_length(grep("estimated relative error 1;", w, fixed = TRUE), 2L)
+  } else {
+    expect_gt(axes_certificate_worst(cert_bad), axes_degeneracy_delta_star)
+    expect_length(grep("estimated relative error 1;", w, fixed = TRUE), 0L)
+  }
 
   # A unit refusal: the one reason speaks for all three SE vectors (M91).
   expect_null(res$details$naive_reason)
@@ -647,7 +658,9 @@ test_that("M117 AC1: the certificate is evaluated exactly once per checked axes_
   colnames(dat) <- inames
   items <- split(inames, rep(seq_along(oct), each = 3L))
   expect_length(inames, 24L)
-  bad <- m106_family_a(1.5e-9, 3L)
+  # Item error 1e-10: refused "uncertified" by a graded certificate of 1e-2
+  # (M147; 1.5e-9 computes since the certificate became the sole judge).
+  bad <- m106_family_a(1e-10, 3L)
   dimnames(bad) <- list(inames, inames)
   # The precondition that routes this matrix to the certificate at all: the
   # criterion answers "ill_conditioned" for it, the one arm M111 handed over.

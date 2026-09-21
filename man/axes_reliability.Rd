@@ -82,7 +82,10 @@ that correction succeeded or a string naming why the reported SEs are
 \code{NA} -- notably the shared degeneracy criterion's two literals
 (evaluated on \code{cov2cor()} of the fitted covariance matrix; the eigenvalue
 floor \code{sqrt(p * .Machine$double.eps / 1e-5)} decides which fits are
-\emph{checked} by the per-fit accuracy check rather than which are refused,
+\emph{checked} by the per-fit accuracy check rather than which are refused
+(a fit the floor admits is also checked when its information matrix's
+reciprocal condition estimate falls below \code{sqrt(.Machine$double.eps)},
+a near-singularity in the derivative structure the floor cannot see),
 where the \code{1e-5} is the \code{1e-4} accuracy target
 divided by the floor's factor-of-\code{10} calibration ceiling, and the
 target's noise-dominance reading is calibrated for \code{n} up to about
@@ -102,7 +105,10 @@ criterion evaluated on the raw fitted matrix or by that arm's own
 pricing (\code{"singular"}, \code{"unidentified"}, \code{"indefinite"}, and
 \code{"ill_conditioned"} -- the raw arm is refused by the floor itself and
 never reaches the per-fit check, so this is the one field on which that
-literal still appears); it is
+literal still appears, and it inverts at R's default \code{solve()}
+tolerance, so at a fitted matrix whose information matrix sits near
+machine precision this field can differ across platforms while every
+reported field does not); it is
 deliberately silent -- no warning or printed note accompanies it --
 \code{fit_uncorrected}, the six fit statistics as
 lavaan reports them

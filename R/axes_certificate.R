@@ -59,8 +59,16 @@
 # the additive floor of two machine epsilons are what make the estimate behave
 # as an upper estimate, and that behaviour is pinned empirically rather than
 # assumed: at six anchor geometries against the exact-rational oracle
-# (tests/testthat/test-axes-certificate.R, AC2/AC3) and by planted-perturbation
-# sensitivity invariants elsewhere. F is load-bearing, not decorative: at F = 1
+# (tests/testthat/test-axes-certificate.R, AC2/AC3), at the 83 graded region
+# matrices of the M147 sweep (devel/degeneracy-oracle/tol0-sweep-summary.md,
+# ratio 9.9996 to 10.005 wherever the true error is below 1e-2), and by
+# planted-perturbation sensitivity invariants elsewhere. The ratio sits AT F
+# for a reason (RR24 section 1): both routes run the same operations on
+# bit-identical inputs with rounding at eps and at about eps^2, so each
+# route's error is its own roundoff times one matrix-dependent amplification,
+# and |d - r| = |d - e| (1 + O(eps)) to first order. That is an identity, not
+# a calibration; it stops holding only where the errors are O(1) and the
+# variance-to-SE conversion is no longer linear, which is past the target. F is load-bearing, not decorative: at F = 1
 # the raw disagreement sits just BELOW the true error at two of those anchors
 # (ratios 0.997 and 0.983, RR21 section 3), because dropping from v to sqrt(v)
 # is a first-order conversion.
@@ -87,9 +95,12 @@
 # three estimates are 1 -- "no digits certified". It is finite and non-negative
 # like any other return, and it sits four decades above the accuracy target, so a
 # gate keyed to the certificate fails closed on it (GP2). Measured along the
-# degradation path (RR21 section 5): past kappa ~ 3e8 the shipped pricing's own
-# solve() refuses "unidentified" before the certificate matters -- there is no
-# reported number left to certify. The sentinel is returned as a unit for all
+# degradation path (RR21 section 5): until M147, past kappa ~ 3e8 the shipped
+# pricing's own solve() refused "unidentified" at its default tolerance before
+# the certificate mattered. Since M147 the certified path inverts under
+# `tol = 0` and this certificate is the sole conditioning judge (D-061,
+# D-062): the M147 sweep measured it at every matrix the old gate refused,
+# with no under-report, and 37 of 85 such matrices compute inside the target. The sentinel is returned as a unit for all
 # three quantities, never one field at a time, so the two surfaces cannot
 # disagree about whether this fit is certified (M89's nestedness contract).
 

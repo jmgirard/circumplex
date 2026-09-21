@@ -1058,7 +1058,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   `NA` -- notably the shared degeneracy criterion's two literals
 #'   (evaluated on `cov2cor()` of the fitted covariance matrix; the eigenvalue
 #'   floor `sqrt(p * .Machine$double.eps / 1e-5)` decides which fits are
-#'   *checked* by the per-fit accuracy check rather than which are refused,
+#'   *checked* by the per-fit accuracy check rather than which are refused
+#'   (a fit the floor admits is also checked when its information matrix's
+#'   reciprocal condition estimate falls below `sqrt(.Machine$double.eps)`,
+#'   a near-singularity in the derivative structure the floor cannot see),
 #'   where the `1e-5` is the `1e-4` accuracy target
 #'   divided by the floor's factor-of-`10` calibration ceiling, and the
 #'   target's noise-dominance reading is calibrated for `n` up to about
@@ -1078,7 +1081,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   pricing (`"singular"`, `"unidentified"`, `"indefinite"`, and
 #'   `"ill_conditioned"` -- the raw arm is refused by the floor itself and
 #'   never reaches the per-fit check, so this is the one field on which that
-#'   literal still appears); it is
+#'   literal still appears, and it inverts at R's default `solve()`
+#'   tolerance, so at a fitted matrix whose information matrix sits near
+#'   machine precision this field can differ across platforms while every
+#'   reported field does not); it is
 #'   deliberately silent -- no warning or printed note accompanies it --
 #'   `fit_uncorrected`, the six fit statistics as
 #'   lavaan reports them
@@ -2041,15 +2047,24 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       #
       # Three of them are worth naming, for what the M89/M90 re-cuts left:
       #
-      #   "unidentified"  fires when Delta'V Delta is singular. One measured
-      #                   route remains: a degenerate Delta (a one-scale map
-      #                   makes zeta1 identical to the all-ones xi2), which no
-      #                   conditioning test of Sigma-hat can see. The re-cut
-      #                   closed the other measured route (an ordinary map at a
-      #                   correlation-degenerate Sigma-hat): the criterion now
-      #                   prices cov2cor(Sigma-hat) -- the metric everything
-      #                   below computes in -- so that shape is refused at the
-      #                   door (RR18).
+      #   "unidentified"  fires on exactly three EXACT grounds since M147
+      #                   (D-062): a pair of bit-identical component
+      #                   derivative matrices (a one-scale map makes zeta1
+      #                   identical to the all-ones xi2), a component matrix
+      #                   identical to the identity (one item per scale or
+      #                   per block with that component fitted), or an
+      #                   inversion of Delta'V Delta that is non-finite or
+      #                   that LAPACK reports exactly singular under
+      #                   `tol = 0`. Until M147 it also fired wherever the
+      #                   default solve() tolerance refused -- a condition
+      #                   estimate below eps -- which RR22 measured as a
+      #                   platform fact at one committed matrix; such a fit
+      #                   now goes to the certificate (see "uncertified"
+      #                   above), whether or not the floor fired. None of the
+      #                   three grounds is a conditioning test of Sigma-hat,
+      #                   and the re-cut's second route (an ordinary map at a
+      #                   correlation-degenerate Sigma-hat) stays closed at
+      #                   the door (RR18).
       #   "saturated"     fires on df = 0 (M90, RR18 BC4), ahead of every
       #                   matrix computation. Before the guard, the measured
       #                   p = 3 saturated construction (the only p where q can

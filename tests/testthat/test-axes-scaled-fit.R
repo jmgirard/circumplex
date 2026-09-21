@@ -1502,22 +1502,26 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     expect_identical(r$se, "indefinite",
                      label = sprintf("p %d indefinite, SE helper", p))
 
-    # One near-singular matrix per map (one item duplicated, plus a 1e-9 ridge
-    # so the smallest eigenvalue is a hair above zero rather than roundoff-
-    # negative): near-singular in both metrics, refused by both surfaces.
+    # One near-singular matrix per map (one item duplicated, plus a ridge so
+    # the smallest eigenvalue is a hair above zero rather than roundoff-
+    # negative): near-singular in both metrics. The literal moved at M111:
+    # the criterion says "ill_conditioned" here, but that alone no longer
+    # refuses -- the certificate decides. Since M147 the certificate is the
+    # sole conditioning judge and a 1e-9 ridge CERTIFIES at every map (the
+    # default-tolerance inversion that used to sentinel it is gone), so the
+    # ridge is 1e-13, where the certificate refuses. The nestedness contract
+    # is what this asserts, exhaustively over the judge's two answers: one
+    # literal, both surfaces.
     ns <- pp$sigma
     ns[2L, ] <- ns[1L, ]
     ns[, 2L] <- ns[, 1L]
-    ns <- ns + 1e-9 * diag(p)
-    # The literal moved at M111: the criterion still says "ill_conditioned"
-    # here, but that alone no longer refuses -- the certificate does, returning
-    # its sentinel at all three p. The nestedness contract is what this asserts
-    # and it is unchanged: one literal, both surfaces.
+    ns <- ns + 1e-13 * diag(p)
+    expect_identical(axes_sigma_degenerate(stats::cov2cor(ns)), "ill_conditioned")
     r <- check_nested(ns, sprintf("p %d near-singular", p))
-    expect_identical(r$sf, "uncertified",
-                     label = sprintf("p %d near-singular, scaling surface", p))
-    expect_identical(r$se, "uncertified",
-                     label = sprintf("p %d near-singular, SE helper", p))
+    expect_identical(r$se, r$sf,
+                     label = sprintf("p %d near-singular, both surfaces", p))
+    expect_true(is.null(r$sf) || identical(r$sf, "uncertified"),
+                label = sprintf("p %d near-singular, judged by the certificate", p))
   }
 })
 
@@ -2395,20 +2399,21 @@ test_that("M106 review F1: only the ill-conditioning refusal carries the diagnos
 
   # The control: the SAME surface on an ill-conditioned matrix DOES carry it,
   # so the assertion above is about the literal and not about the call site.
-  # The radius moved at M111, for the reason the sibling control in
-  # test-axes-corrected-se.R states: kappa 1.01e5 now computes (certificate
-  # 2.6e-11), so the control moves to pair_eps 1e-8 (kappa 2.01e8), where the
-  # certificate returns its sentinel and the refusal stands.
+  # The radius moved at M111 and again at M147, for the reason the sibling
+  # control in test-axes-corrected-se.R states: with the certificate the sole
+  # conditioning judge, pair_eps 1e-8 (kappa 2.01e8) computes (certificate
+  # 2.1e-7), so the control moves to pair_eps 1e-13 (kappa 2.01e13), where the
+  # certificate reads 1.2e-2, two decades past the target, and refuses.
   ang9 <- c(as.numeric(octants()), as.numeric(octants())[1L])
   sc9 <- as.character(c(1:8, 1L))
   dc <- dfs(9L, ang9, sc9)
   wc <- testthat::capture_warnings(
-    axes_scaling_factor(m106_family_b(1e-8), paste0("i", 1:9), ang9, sc9, NULL,
+    axes_scaling_factor(m106_family_b(1e-13), paste0("i", 1:9), ang9, sc9, NULL,
                         fit_zeta1 = TRUE, fit_zeta2 = FALSE,
                         df = dc$df, baseline_df = dc$baseline_df)
   )
   expect_length(grep("uncertified", wc, fixed = TRUE), 1L)
-  expect_length(grep("condition number 2.01e+08", wc, fixed = TRUE), 1L)
+  expect_length(grep("condition number 2.01e+13", wc, fixed = TRUE), 1L)
 })
 
 
@@ -2501,13 +2506,15 @@ test_that("M106 AC5: both cormat radii resolve as the recalibrated target implie
     res2$components$SE[res2$components$Symbol != "epsilon"]
   )))
 
-  # Radius 3 -- pair_eps 1e-8, kappa 2.01e8. The bracket's refusing half now
-  # sits here, where the certificate's reference route fails and its sentinel
-  # refuses. Injected at the axes_fitted_cov() seam rather than fitted:
+  # Radius 3 -- pair_eps 1e-13, kappa 2.01e13. The bracket's refusing half
+  # sits here since M147: with the certificate the sole conditioning judge,
+  # pair_eps 1e-8 (kappa 2.01e8) computes (certificate 2.1e-7), and the
+  # refusal needs a radius where the certificate itself exceeds the target
+  # (1.2e-2 here). Injected at the axes_fitted_cov() seam rather than fitted:
   # lavaan stops converging past about r = .99999, so a fitted radius this
   # deep would error before either surface was reached. The carrier is
   # radius 1, already fitted above.
-  refuses <- m106_family_b(1e-8)
+  refuses <- m106_family_b(1e-13)
   dimnames(refuses) <- list(inames, inames)
   local_mocked_bindings(axes_fitted_cov = function(fit) refuses)
   w <- testthat::capture_warnings(
@@ -2607,9 +2614,10 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
   expect_length(grep("could not be computed", w), 0L)
 
   # Case 4 -- the same p = 24 construction driven three decades deeper, to
-  # kappa 7.2e8, where the certificate's reference route fails and its
-  # sentinel refuses. Without it this test would assert only that the band
-  # computes, and nothing here would still exercise a refusal at p = 24.
+  # kappa 7.2e8. Until M147 the default solve() tolerance refused this inside
+  # the certificate's replay and the sentinel refused it; with the certificate
+  # the sole conditioning judge it COMPUTES (certificate 2.9e-7, true error
+  # 2.9e-8 against the exact oracle in the M147 sweep).
   r24_worse <- m106_family_a(1e-8, per_scale = 3L)
   dimnames(r24_worse) <- dimnames(r24_ok)
   expect_gt(m106_kappa(r24_worse), 1e8)
@@ -2619,9 +2627,26 @@ test_that("M106 AC4: three kappa across the band, at three p, straddle the commi
       cormat = r24_ok, items = pp$items, angles = oct, n = 600L
     ))
   )
-  expect_identical(res24w$details$se_correction_failed, "uncertified")
-  expect_identical(res24w$details$fit_scaling_failed, "uncertified")
-  expect_length(grep("uncertified", w4, fixed = TRUE), 2L)
+  expect_null(res24w$details$se_correction_failed)
+  expect_null(res24w$details$fit_scaling_failed)
+  expect_length(grep("could not be computed", w4), 0L)
+
+  # Case 5 -- two decades deeper still, kappa 7.2e10, where the certificate
+  # estimates 1e-2 and refuses. Without it this test would assert only that
+  # the band computes, and nothing here would still exercise a refusal at
+  # p = 24.
+  r24_worst <- m106_family_a(1e-10, per_scale = 3L)
+  dimnames(r24_worst) <- dimnames(r24_ok)
+  expect_gt(m106_kappa(r24_worst), 1e10)
+  local_mocked_bindings(axes_fitted_cov = function(fit) r24_worst)
+  w5 <- testthat::capture_warnings(
+    res24x <- suppressMessages(axes_reliability(
+      cormat = r24_ok, items = pp$items, angles = oct, n = 600L
+    ))
+  )
+  expect_identical(res24x$details$se_correction_failed, "uncertified")
+  expect_identical(res24x$details$fit_scaling_failed, "uncertified")
+  expect_length(grep("uncertified", w5, fixed = TRUE), 2L)
 
   # The first three sit inside the band M89's tightening newly refused and
   # M111's certificate gave back.
