@@ -41,8 +41,9 @@ vignette_source_path <- function() {
 boundary_heading <- "## 2. When a fit sits at a boundary"
 
 # The boundary section's own text: from its heading to the next heading (the
-# Wrap-up) or the end of the file. Scoping is the point -- a marker label
-# named anywhere else in the vignette must not satisfy the sweep below.
+# Wrap-up) or the end of the file. Since M136 the page has one numbered
+# section, so the scoping excludes only the Overview and the Wrap-up: a marker
+# label named there alone must not satisfy the sweep below.
 boundary_section_text <- function(lines = readLines(vignette_path(), warn = FALSE)) {
   start <- which(trimws(lines) == boundary_heading)
   expect_length(start, 1L)
