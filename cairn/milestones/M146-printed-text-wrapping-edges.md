@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M146: Printed text wraps at its edge cases, and the CPM table drops Communality
 
-- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -78,9 +78,42 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: T7 done. NEWS.md has four entries under "Minor improvements and fixes". All 11 precomputed vignettes were re-rendered from an installed build. Kept: the three CPM tables without Communality, in `evaluating-circumplex-structure` and `cpm-boundary-fits`, and the lavaan sentence on its own line in `axes-reliability`. Restored: an elapsed-time line in `ci-accuracy` and four figure PNGs that changed from render noise only. The AC7 grep prints nothing. `tools/check-vignette-width.R` passes for all 11. `devtools::document()` makes no diff. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes.
 - 2026-09-21: claim audit: 31 claims read, 3 corrected — R/cpm_oop.R, tests/testthat/test-cpm_summary_markers.R, tests/testthat/test-ssm_sem_print_wrap.R
 - 2026-09-21: the audit measured master's `free_long` table at 84 columns, not the 87 in the plan gate and in two comments, nor the "about 86" in the T4 line above. Both comments now say 84. The one-block result stands: 72 columns without Communality.
+- 2026-09-21: review return 1 (defect): AC4 fails as written. Its width sweeps cover only `m94_boot_jz()`, not the file's other Heywood fixture (analytic `hey`) or its other marker-firing bootstrap fixture (`m94_boot_big()`). Every other criterion passed fresh evidence, and the suite and check are clean. Twelve reviewer findings are logged untriaged in the Review section.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
 
 ## Review
 <!-- owner: review · exclusive -->
+
+### Pass 1 (2026-09-21): returned to in-progress, AC4 unmet as written
+
+No box is ticked on this pass. The next pass re-verifies every criterion fresh.
+
+Evidence gathered before the return:
+
+- AC1: an independent probe over all 15 instruments at widths 40, 60 and 80 read 4,260 item, Prefix and Suffix lines: 0 over the width, 528 first continuation lines, 0 not under the text's first character. `scales(iip32/iip64, items = TRUE)` prints 10 lines, the notice last. `test-instrument_wrap.R`: 3 tests, 0 failures.
+- AC2: `grep -n strwrap R/ssm_sem.R` prints nothing. `test-ssm_sem_print_wrap.R`: 3 tests, 0 failures.
+- AC3: the M146 test in `test-axes-scaled-fit.R` ran 91 expectations, 0 failures, not skipped.
+- AC4: FAILS as written. The criterion asks for sweeps "over the Heywood and bootstrap-marker fixtures of `test-cpm_summary_markers.R`, including one that fires `small_beta`". Both sweeps use `m94_boot_jz()` only. The file's other Heywood fixture (the analytic `cpm_oracle_voc()` fit, `hey`) and its other marker-firing bootstrap fixture (`m94_boot_big()`, fires `small_beta`) are not swept. A probe found the behavior holds on `hey` (182 print/summary sweeps with the Heywood note, 0 broken inside the ζ clause). The gap is test coverage.
+- AC5: the one-block test ran 231 expectations over all fixtures, `free_long` included, 0 failures.
+- AC6: the probe gave "is.finite(width) is not TRUE", "`prefix` must not contain a tab", "`continuation` must not contain a tab", and `ssm_ci_cat_line("Label", "")` printed `    Label`. `test-wrap-prose.R`: 22 tests, 0 failures.
+- AC7: the Communality grep prints nothing. NEWS.md carries the entries.
+- Full suite: 0 failures. `devtools::check()`: 0 errors, 0 warnings, 0 notes.
+- Gate: `cairn_validate` passes. `document()` makes no diff and 0 `resolve link` lines. `check_pkgdown()` finds no problems. README is in sync. The master-red-alert audits and the branch-protection check exit clean. Master watch: the newest R-CMD-check push run (cd5d2881) is red because Pandoc failed to download (HTTP 504) on macOS and ubuntu release. Its failed jobs were rerun and were still in progress at the return. test-coverage is green.
+
+Reviewer findings (reported, not yet triaged; carried to the next gate):
+
+- [O]1 `test-instrument_wrap.R:52-73`: the hanging-indent test runs one assertion, because every check sits in an `if` that the chosen lines skip.
+- [O]2 `test-instrument_wrap.R:31-50`: the width loop passes if item text stops printing, because it checks only lines that are too wide.
+- [O]3 `R/ssm_sem.R:816-820`: `labeled()` now drops a label whose value is `""` (latent, since no caller builds an empty fact today).
+- [O]4 `R/utils.R:290`: the `is.finite(width)` refusal has no named message, unlike the tab refusals.
+- [O]5 `R/utils.R:275-282`: the lead check refuses tabs but not `\n`, `\r` or other zero-width characters.
+- [O]6 `test-cpm_summary_markers.R:360-411`: the AC4 sweeps use one fixture (the AC4 failure above).
+- [O]7 `test-ssm_sem_print_wrap.R:26-31`: the Delta-CFI sweep also passed on master (the work log says so).
+- [O]8 NEWS.md CPM entry: "a table with long scale names fits in 77 columns" is broader than the tested 16-character case. Names of 20 characters pass 77.
+- [O]9 `R/utils.R:258-262`: the `wrap_prose()` comment names only the marker note as an atomic-mode user.
+- [O]10 the CPM `Fit:` line is not wrapped (90 columns at width 77). It is outside the diff.
+- [S-prior]1 the dropped Communality column contradicts M133's choice of shorter headers. It is an intentional plan-gate change.
+- [S-prior]2 wrapping the instrument printers contradicts M131's scope, which left them out. It is an intentional scope choice.
+- [S-blame]: no findings.
