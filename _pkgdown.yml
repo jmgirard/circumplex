@@ -105,16 +105,22 @@ reference:
   - simulated_occasions
   - simulated_growth
   - simulated_growth_origin
-# The vignette index and the Vignettes navbar menu below list the same pages in
-# the same order, grouped by level and in reading order within a level.
-# tools/check-pkgdown-vignettes.R diffs the two lists against vignettes/.
+# The vignette index, grouped by level and in reading order within a level.
+# tools/check-pkgdown-vignettes.R diffs it against vignettes/ and the level map
+# in tests/testthat/helper-vignette-frame.R. Each group's `navbar:` key is the
+# heading pkgdown puts over that group in the navbar's Articles dropdown, which
+# pkgdown builds from this index: there is no hand-written vignette menu to
+# keep in step. pkgdown emits a divider above every heading, the first one
+# included (cairn/DESIGN.md accepted limitations).
 articles:
 - title: Introductory
+  navbar: Introductory
   desc: Start here. Load an instrument, score its items, and run a first SSM analysis.
   contents:
   - using-instruments
   - introduction-to-ssm-analysis
 - title: Intermediate
+  navbar: Intermediate
   desc: Groups, measures, contrasts, and the checks an SSM analysis rests on.
   contents:
   - intermediate-ssm-analysis
@@ -122,6 +128,7 @@ articles:
   - ci-accuracy
   - structure-tests
 - title: Advanced
+  navbar: Advanced
   desc: Boundary fits, custom figures, latent-variable models, Bayesian estimation, and growth models.
   contents:
   - cpm-boundary-fits
@@ -134,87 +141,52 @@ articles:
   - growth-ssm-analysis
 navbar:
   title: circumplex
-  left:
-  - icon: fa-home fa-lg
-    href: index.html
-  - text: Reference
-    href: reference/index.html
-  - text: Instruments
-    menu:
-    - text: Child and Adolescent Interpersonal Survey
-      href: reference/cais.html
-    - text: Circumplex Scales of Interpersonal Efficacy
-      href: reference/csie.html
-    - text: Circumplex Scales of Intergroup Goals
-      href: reference/csig.html
-    - text: Circumplex Scales of Interpersonal Problems
-      href: reference/csip.html
-    - text: Circumplex Scales of Interpersonal Values
-      href: reference/csiv.html
-    - text: Interpersonal Emotion Inventory
-      href: reference/iei.html
-    - text: Interpersonal Goals Inventory for Children, Revised Version
-      href: reference/igicr.html
-    - text: Inventory of Interpersonal Problems, Brief Version
-      href: reference/iip32.html
-    - text: Inventory of Interpersonal Problems
-      href: reference/iip64.html
-    - text: Inventory of Interpersonal Problems, Short Circumplex
-      href: reference/iipsc.html
-    - text: Inventory of Interpersonal Strengths, Brief Version
-      href: reference/iis32.html
-    - text: Inventory of Interpersonal Strengths
-      href: reference/iis64.html
-    - text: Inventory of Influence Tactics Circumplex
-      href: reference/iitc.html
-    - text: IPIP Interpersonal Circumplex
-      href: reference/ipipipc.html
-    - text: Interpersonal Sensitivities Circumplex
-      href: reference/isc.html
-  # Grouped by level, in the same order as the articles index above. pkgdown's
-  # menu_type() tests `menu:` first, then the dash pattern, then `theme:`, and
-  # only then the heading case, so an entry is a heading when it has text, no
-  # href, no `menu:` and no `theme:`. An entry of three or more dashes is a
-  # divider. A shorter run of dashes renders as a heading, not a divider.
-  - text: Vignettes
-    menu:
-    - text: Introductory
-    - text: Using Circumplex Instruments
-      href: articles/using-instruments.html
-    - text: Introduction to SSM Analysis
-      href: articles/introduction-to-ssm-analysis.html
-    - text: "---------"
-    - text: Intermediate
-    - text: Intermediate SSM Analysis
-      href: articles/intermediate-ssm-analysis.html
-    - text: Evaluating Circumplex Structure
-      href: articles/evaluating-circumplex-structure.html
-    - text: Confidence Interval Accuracy
-      href: articles/ci-accuracy.html
-    - text: Structure Tests and Ipsatization
-      href: articles/structure-tests.html
-    - text: "---------"
-    - text: Advanced
-    - text: CPM Fits at a Boundary
-      href: articles/cpm-boundary-fits.html
-    - text: Advanced Circumplex Visualization
-      href: articles/advanced-visualization.html
-    - text: SEM-Based SSM Analysis
-      href: articles/sem-based-ssm-analysis.html
-    - text: Latent Group Contrasts
-      href: articles/sem-latent-contrasts.html
-    - text: Axes Reliability
-      href: articles/axes-reliability.html
-    - text: Axes Reliability Caveats
-      href: articles/axes-reliability-caveats.html
-    - text: Bayesian SSM Analysis
-      href: articles/bayesian-ssm-analysis.html
-    - text: Growth Models on SSM Parameters
-      href: articles/growth-ssm-analysis.html
-  - text: News
-    href: news/index.html
-  # The right side is pkgdown's own component list, so the search box and the
-  # light switch come back. A hand-written right: list would drop both.
+  # There is no `navbar: left:` list: pkgdown's navbar_link_components() lets a
+  # present one beat `structure:`, which would drop the generated Articles
+  # menu. The two entries pkgdown has no component for are defined here, and
+  # `structure: left:` orders them with pkgdown's own reference, articles and
+  # news components.
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    instruments:
+      text: Instruments
+      menu:
+      - text: Child and Adolescent Interpersonal Survey
+        href: reference/cais.html
+      - text: Circumplex Scales of Interpersonal Efficacy
+        href: reference/csie.html
+      - text: Circumplex Scales of Intergroup Goals
+        href: reference/csig.html
+      - text: Circumplex Scales of Interpersonal Problems
+        href: reference/csip.html
+      - text: Circumplex Scales of Interpersonal Values
+        href: reference/csiv.html
+      - text: Interpersonal Emotion Inventory
+        href: reference/iei.html
+      - text: Interpersonal Goals Inventory for Children, Revised Version
+        href: reference/igicr.html
+      - text: Inventory of Interpersonal Problems, Brief Version
+        href: reference/iip32.html
+      - text: Inventory of Interpersonal Problems
+        href: reference/iip64.html
+      - text: Inventory of Interpersonal Problems, Short Circumplex
+        href: reference/iipsc.html
+      - text: Inventory of Interpersonal Strengths, Brief Version
+        href: reference/iis32.html
+      - text: Inventory of Interpersonal Strengths
+        href: reference/iis64.html
+      - text: Inventory of Influence Tactics Circumplex
+        href: reference/iitc.html
+      - text: IPIP Interpersonal Circumplex
+        href: reference/ipipipc.html
+      - text: Interpersonal Sensitivities Circumplex
+        href: reference/isc.html
+  # Both sides are pkgdown's own component lists, so the search box, the light
+  # switch and the level-grouped Articles menu all come back. A hand-written
+  # left: or right: list would drop them.
   structure:
+    left: [home, reference, instruments, articles, news]
     right: [search, lightswitch, github]
 

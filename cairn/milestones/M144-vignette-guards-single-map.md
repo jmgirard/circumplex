@@ -44,7 +44,7 @@ The vignette guards that remain each check shipped behavior from one level map, 
 - [x] T1: Delete `tools/check-vignette-split.R`. Run the AC1 grep and fix any hit. Reword the scoping comment of `boundary_section_text()` in `tests/testthat/test-cpm_boundary_vignette.R:43-51` so it does not overstate on a page with one section.
 - [x] T2: Create `tests/testthat/helper-vignette-frame.R` holding `frame_levels` and `frame_next` (moved from `test-vignette-frame.R:11-40`). In `tools/check-pkgdown-vignettes.R` replace the `LEVELS` literal by `sys.source()` of the helper and a level-to-pages list derived from `frame_levels`, keeping the map's page order within a level. Run the frame test and the script.
 - [x] T3: In the headings test of `test-vignette-frame.R`, require `Section N, "Title"` in the Overview body for each numbered heading after the first. Plant the two AC3 defects one at a time (commit first, restore by copy), record each failure message in the work log.
-- [ ] T4: In `_pkgdown.yml` add `navbar: <title>` to each `articles:` group and delete the Vignettes menu. Move the home icon, Reference, Instruments and News entries to `navbar: components:` and list them in `navbar: structure: left:` in the present order with `articles` where Vignettes sat. Build into an empty directory and read the dropdown per AC4. Write the milestone-local decision that supersedes the M138 plan's rule-out of `articles: navbar:` grouping, naming the evidence: the hand menu duplicated the index and its guard took five defects in one milestone.
+- [x] T4: In `_pkgdown.yml` add `navbar: <title>` to each `articles:` group and delete the Vignettes menu. Move the home icon, Reference, Instruments and News entries to `navbar: components:` and list them in `navbar: structure: left:` in the present order with `articles` where Vignettes sat. Build into an empty directory and read the dropdown per AC4. Write the milestone-local decision that supersedes the M138 plan's rule-out of `articles: navbar:` grouping, naming the evidence: the hand menu duplicated the index and its guard took five defects in one milestone.
 - [ ] T5: Cut the navbar half of `tools/check-pkgdown-vignettes.R` (its lines 81-133) and reword its header. Add the group-order check. Plant the five AC5 defects on scratch copies, record each message in the work log.
 - [ ] T6: Add the workflow step to `.github/workflows/pkgdown.yaml` between the dependency install and the build. Run the script from the repo root.
 - [ ] T7: NEWS entry. Add the leading divider to the accepted-limitations paragraph in `cairn/DESIGN.md` beside the M138 one. Run the AC7 checks.
@@ -62,7 +62,35 @@ The vignette guards that remain each check shipped behavior from one level map, 
 - 2026-09-20: T1 deleted `tools/check-vignette-split.R`; the AC1 grep returns no line; the boundary test's scoping comment now says the page has one numbered section since M136. `devtools::test()`: no failures.
 - 2026-09-20: T2 moved `frame_levels` and `frame_next` to `tests/testthat/helper-vignette-frame.R`. The script sources the helper and derives `level_pages` by `split()` on the map, so level order and page order within a level come from the map itself. AC2 grep: two lines, both in the helper. Script exit 0 on the shipped config, suite 0 failures and 11802 passes.
 - 2026-09-20: T3 added the `Section N, "Title"` check to the headings test. Test passes 345 on the shipped sources. Plant 1, `Section 5` to `Section 8` in `advanced-visualization`: 1 failure, `advanced-visualization: the Overview does not cite "Restyling the canvas" as Section 5`. Plant 2, `Section 2` to `Section 3` in the one-section page `cpm-boundary-fits`: 1 failure, `cpm-boundary-fits: the Overview does not cite "When a fit sits at a boundary" as Section 2`. Both restored by copy. Suite 0 failures, 11861 passes.
+- 2026-09-20: T4 gave each `articles:` group a `navbar:` heading, deleted the hand-written Vignettes menu, and moved the home icon and the Instruments menu to `navbar: components:` with `structure: left: [home, reference, instruments, articles, news]`. A present `navbar: left:` beats `structure:` in pkgdown's `navbar_link_components()`, so the list had to go, not just shrink. Build into an empty directory exit 0. The dropdown holds 3 `h6.dropdown-header` elements reading Introductory, Intermediate, Advanced, each level's pages under its heading in the index order with their titles, and 3 `hr.dropdown-divider` elements, one above each heading. Left order renders home, reference, instruments, articles, news. The search input and the light switch are still present. Decision M144-D1 records the supersession.
 
 ## Decisions
+
+### M144-D1 (2026-09-20): pkgdown builds the grouped vignette menu; supersedes the M138 plan's rule-out of `articles: navbar:`
+
+The M138 plan ruled out pkgdown's own `articles: navbar:` grouping and kept a
+hand-written `navbar: left:` menu named Vignettes. Its stated ground, in that
+milestone's work log, was that the grouping "adds a divider before the first
+heading". That ground still holds as a fact about pkgdown 2.2.1: a divider
+precedes every heading, the first one included.
+
+It is outweighed by what the hand menu cost. The menu restated the fourteen
+pages and their titles that the `articles:` index already lists, so every page
+added or renamed had to be edited in both places. The guard written to catch a
+divergence took five defects in the M138 review alone, all of them in the half
+that parses the menu: divider count and placement unchecked, `under[[""]]`
+appending on an empty heading, an unknown group title skipping its contents
+comparison, a page above the first heading skipping its title check, and an
+uninformative message for an entry carrying both dash text and an href.
+Generating the menu deletes the duplicate list and that whole parsing half.
+
+Adopted here: each `articles:` group carries a `navbar:` heading, the
+hand-written menu is deleted, and `navbar: structure: left:` orders pkgdown's
+own components. The accepted costs are the dropdown's fixed label, Articles
+rather than Vignettes, and the leading divider, recorded in `cairn/DESIGN.md`
+under accepted limitations.
+
+Reopens on: a reader reporting that the Articles label or the leading divider
+misleads, or pkgdown gaining a way to group the menu without either.
 
 ## Review
