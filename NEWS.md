@@ -33,14 +33,15 @@
   Etzel and Lüdtke (2019). The data are drawn the same way on both grids.
   Plotmath amplitude labels (an expression, or a labelling function returning
   one) draw as plotmath on the crosshair. On the 180 and 270 halves they take
-  a leading minus, and a label that is a call such as `a + b` is put in
+  a leading minus. A label that is a call is put in parentheses, as in
+  `-(a + b)`, unless it is a subscript, a superscript or already in
   parentheses.
   `ggcircumplex()` also has a new `angle_labels` argument, independent of
   `grid`: `TRUE` labels each text label as `<label> (<angle>°)`, the 0/360
   pole written as 360, read along its radius. The default degree labels are
   left as they are. Each side of the plot margin is widened only for the
   labels that point toward it, estimated at half the font size per
-  character, so the circle can sit off-centre when the labels are uneven.
+  character, so the circle can sit off-center when the labels are uneven.
 
 ## Minor improvements and fixes
 

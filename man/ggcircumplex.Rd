@@ -55,7 +55,7 @@ as they are. Each side of the plot margin is widened to fit the labels
 that point toward it: a label reaches past a side by its length,
 estimated at half of \code{font_size} per character, times the share of its
 direction that points toward that side. A side that no label points
-toward keeps the theme's margin, so the circle can sit off-centre on the
+toward keeps the theme's margin, so the circle can sit off-center on the
 page. Add \code{+ theme(plot.margin = ...)} to set the margin yourself.}
 }
 \value{

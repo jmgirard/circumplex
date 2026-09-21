@@ -658,7 +658,7 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'   that point toward it: a label reaches past a side by its length,
 #'   estimated at half of `font_size` per character, times the share of its
 #'   direction that points toward that side. A side that no label points
-#'   toward keeps the theme's margin, so the circle can sit off-centre on the
+#'   toward keeps the theme's margin, so the circle can sit off-center on the
 #'   page. Add `+ theme(plot.margin = ...)` to set the margin yourself.
 #' @return A \pkg{ggplot2} object containing the empty circumplex canvas.
 #' @family circumplex layers
@@ -757,7 +757,7 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
 # estimated at half the font size per character, which needs no graphics
 # device when the plot is built. Each side takes the longest such reach, or the
 # theme's own margin when that is larger; a side no label points toward keeps
-# the theme's margin, so the circle may sit off-centre on the page.
+# the theme's margin, so the circle may sit off-center on the page.
 angle_label_margin <- function(labels, angles, font_size) {
   len <- 0.5 * font_size * nchar(labels)
   toward <- list(

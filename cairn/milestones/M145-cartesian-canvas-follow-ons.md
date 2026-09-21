@@ -53,6 +53,7 @@ Give `ggcircumplex(angle_labels = TRUE)` a plot margin sized per side from the l
 - 2026-09-20: T3 done. The AC3 tests fail on the current code because the grob labels are character, for example `'-a - b'` where the call `-(a - b)` is expected.
 - 2026-09-20: T4 done. `cartesian_grid_grob()` keeps language labels as a list, and two helpers apply the AC3 minus rule and the blank test. The coord and plot tests pass, and a rendered canvas shows α, α₂, −(a + b) and −(a/b) drawn as plotmath.
 - 2026-09-20: T5 in progress (checkpoint). NEWS entries are committed. `document()`, the full tests and `check()` are running in the background, and a claim audit ([O] fresh reader) is running on the branch diff.
+- 2026-09-20: claim audit: 17 claims read, 4 corrected — NEWS.md, R/ssm_plot.R, R/coord_circumplex.R, tests/testthat/test-ssm_plot.R. The corrections were the parenthesis rule in NEWS, "off-centre" spelled "off-center", the blank-test comment, and the oracle comment. The reader's one re-read confirmed all four after the Rd regeneration and one comment re-wrap.
 
 ## Decisions
 

@@ -282,7 +282,8 @@ cartesian_grid_grob <- function(coord, panel_params, theme) {
 }
 
 # An element of a plotmath label list that draws nothing: NULL, NA, or an
-# empty string. is.na() and `!= ""` cannot be applied to a call.
+# empty string. is.na() warns on a call, and `!=` compares its deparsed text,
+# so neither is a sound blank test here.
 is_blank_axis_label <- function(x) {
   is.null(x) || (is.atomic(x) && length(x) == 1L && (is.na(x) || identical(x, "")))
 }

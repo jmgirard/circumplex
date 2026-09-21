@@ -407,10 +407,11 @@ theme_margin_pt <- function(font_size) {
   )
   stats::setNames(as.numeric(m), c("t", "r", "b", "l"))
 }
-# The M145 oracle, written from the rule's statement rather than from the
-# code: a drawn label at displacement `a` reaches half the font size per
-# character along its radius, and each side takes the longest projection onto
-# its outward direction (0 = right, 90 = top), or the theme's margin.
+# The M145 oracle restates the rule in the test; the hard-coded pt values in
+# the test below are the independent check. A drawn label at displacement `a`
+# reaches half the font size per character along its radius, and each side
+# takes the longest projection onto its outward direction (0 = right,
+# 90 = top), or the theme's margin.
 margin_oracle <- function(drawn, a, font_size) {
   len <- 0.5 * font_size * nchar(drawn)
   u <- list(t = sin(a * pi / 180), r = cos(a * pi / 180),
