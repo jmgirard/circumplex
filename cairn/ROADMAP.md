@@ -7,9 +7,9 @@ _Last hygiene check: 2026-09-20 (M143 done and archived; no new candidate row, i
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
+| M144 | The vignette guards keep one level map, check section numbers, and pkgdown builds the vignette menu | planned | — | high | milestones/M144-vignette-guards-single-map.md |
 | M142 | A Cartesian-grid style for the circumplex canvas (`coord_circumplex(grid = "cartesian")`, `ggcircumplex(angle_labels = TRUE)`) | done | — | normal | milestones/archive/M142-cartesian-canvas-grid.md |
 | M143 | The visualization vignette's latent-circumplex figures follow Nagy, Etzel and Lüdtke (2019) | done | M142 | normal | milestones/archive/M143-vignette-nagy-figures.md |
-| M141 | A confidence-ellipse layer on the Cartesian SSM coordinates, fed from draws | done | M140 | normal | milestones/archive/M141-ellipse-geom.md |
 
 ## Candidates
 
