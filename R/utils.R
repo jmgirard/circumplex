@@ -259,7 +259,8 @@ disp_width <- function(x) {
 # split: a break falls only between elements, and the whole vector is one
 # paragraph. The bootstrap marker note uses the atomic form, because a marker
 # label is taught as a unit and reads as one name only while it stays on one
-# line.
+# line. The CPM Heywood note uses it too, so that "(ζ > 0.995," stays whole
+# (see `cpm_diagnostic_lines()`).
 #
 # A single word wider than the room left on a line is placed on its own line
 # rather than split, so that line can exceed the width. Breaking a word would
@@ -288,7 +289,10 @@ wrap_prose <- function(x, prefix = "", continuation = prefix,
   # would hide it (M131 review, O8).
   if (is.null(width)) width <- getOption("width")
   # is_scalar_count() accepts Inf, and an infinite width wraps nothing.
-  stopifnot(is_scalar_count(width), is.finite(width))
+  stopifnot(
+    is_scalar_count(width),
+    "`width` must be finite" = is.finite(width)
+  )
 
   # Each element of `x` is a paragraph of its own, as in the strwrap() this
   # replaced, so a caller that hands over several sentences gets several

@@ -227,8 +227,8 @@ test_that("atomic must be TRUE or FALSE, never NA", {
 test_that("an infinite width is refused, because it wraps nothing", {
   # is_scalar_count() accepts Inf (ceiling and floor agree there), so the
   # finiteness check is its own condition and the error names the width.
-  expect_error(wrap_prose("word", width = Inf), "width")
-  expect_error(cat_prose("word", width = Inf), "width")
+  expect_error(wrap_prose("word", width = Inf), "`width` must be finite")
+  expect_error(cat_prose("word", width = Inf), "`width` must be finite")
 })
 
 test_that("a tab in the prefix or continuation is refused", {

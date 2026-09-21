@@ -57,7 +57,8 @@
 * `print()` and `summary()` of a `cpm_fit()` result no longer show the
   Communality column in the results table. It equals `Zeta` squared, which
   the table still prints, and `results$Communality` still holds it. Without
-  it, a table with long scale names fits in 77 columns.
+  it, the table prints as one block at width 77 for scale names of up to 16
+  characters.
 
 * Printed notes wrap more cleanly at narrow console widths. In `cpm_fit()`
   output, the Heywood note keeps "(ζ > 0.995," on one line, and the

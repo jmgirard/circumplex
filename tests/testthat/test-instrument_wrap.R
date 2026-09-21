@@ -44,30 +44,62 @@ test_that("item, Prefix and Suffix lines fit widths 40, 60 and 80", {
         expect_true(all(vapply(over, lone_word, logical(1))),
                     info = paste(nm, "width", w))
       }
+      # The width check above reads only lines that are too wide, so it would
+      # pass if item text stopped printing. The items() output must give back
+      # every item's words, in order.
+      numbered <- !is.na(x$Items$Number)
+      if (any(numbered)) {
+        out <- capture.output(items(x))
+        block <- out[seq(grep("^\\d+\\. ", out)[1], length(out))]
+        words <- unlist(strsplit(trimws(sub("^\\d+\\. ", "", block)), "\\s+"))
+        expect_identical(
+          words,
+          unlist(strsplit(trimws(x$Items$Text[numbered]), "\\s+")),
+          info = paste(nm, "width", w)
+        )
+      }
     }
   }
 })
 
+# Every line that follows an item's numbered line and is not itself a lead is
+# a continuation. Returns, for each continuation, its indent and the indent it
+# should have (the width of the lead, "12. " or "    12. ").
+continuation_indents <- function(out) {
+  lead_re <- "^(\\s*\\d+\\. )"
+  got <- want <- integer(0)
+  cur <- NA_integer_
+  for (line in out) {
+    if (grepl(lead_re, line)) {
+      cur <- nchar(sub(paste0(lead_re, ".*"), "\\1", line))
+    } else if (!is.na(cur) && grepl("^\\s+\\S", line)) {
+      got <- c(got, regexpr("\\S", line)[[1]] - 1L)
+      want <- c(want, cur)
+    } else {
+      cur <- NA_integer_
+    }
+  }
+  list(got = got, want = want)
+}
+
 test_that("a wrapped item continues under the first character of its text", {
-  x <- instrument_object("iis32")
+  # At width 40, csip items 2 ("2. Acting rude and inconsiderate toward
+  # others") and 11 wrap in items(), and item 1 wraps in scales(). The test
+  # asserts that continuation lines exist, so it cannot pass on an empty set.
+  x <- instrument_object("csip")
   old <- options(width = 40)
   on.exit(options(old), add = TRUE)
   out <- capture.output(items(x))
-  first <- grep("^1\\. ", out)
-  expect_length(first, 1)
-  # Item 1's continuation lines, if any, sit under the text after "1. ".
-  nxt <- out[first + 1L]
-  if (!grepl("^\\d+\\. ", nxt)) expect_match(nxt, "^   \\S")
-  # Two-digit numbers indent their continuation one column further.
-  ten <- grep("^10\\. ", out)
-  if (!grepl("^\\d+\\. ", out[ten + 1L])) {
-    expect_match(out[ten + 1L], "^    \\S")
-  }
+  ind <- continuation_indents(out)
+  expect_gt(length(ind$got), 0)
+  expect_identical(ind$got, ind$want)
+  # One-digit and two-digit leads both hang (3 and 4 columns).
+  expect_match(out[grep("^2\\. ", out) + 1L], "^   \\S")
+  expect_match(out[grep("^11\\. ", out) + 1L], "^    \\S")
   # scales() indents its item lines by four and hangs them under the text.
   s <- capture.output(scales(x, items = TRUE))
-  i <- grep("^    \\d+\\. ", s)[1]
-  lead <- nchar(sub("^(    \\d+\\. ).*", "\\1", s[i]))
-  if (!grepl("^    \\d+\\. |^[A-Z]", s[i + 1L])) {
-    expect_identical(regexpr("\\S", s[i + 1L])[[1]], lead + 1L)
-  }
+  ind <- continuation_indents(s)
+  expect_gt(length(ind$got), 0)
+  expect_identical(ind$got, ind$want)
+  expect_match(s[grep("^    1\\. ", s) + 1L], "^       \\S")
 })

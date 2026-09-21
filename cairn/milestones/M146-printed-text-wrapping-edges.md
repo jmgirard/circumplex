@@ -85,6 +85,8 @@ Close the print-side items (ii)-(viii) of the code-box-width candidate row, so t
 - 2026-09-21: re-audit: AC2 (full) — the branch meets the adopted wording. One wording finding: "four texts" does not say how the named items split into four, though every candidate text is covered either way. This is the second line for AC2, so further wording goes to the user.
 - 2026-09-21: amendment return: AC2 — "Four texts wrap through `wrap_prose()`: the ΔCFI note (`sem_dcfi_note()`), the `Verdict:` line and labeled facts (`sem_format_verdict()`), and the rung notes and stored-verdict fallback (`sem_print_invariance()`). A test calls those three functions at every width from 30 to 120, giving `sem_format_verdict()` facts and `sem_print_invariance()` a rung note and a stored verdict that contain double-width characters. It finds every line of those four texts within the width in display columns, except a line holding one word wider than the room after its label or indent. The ladder heading and table are not wrapped and fall outside this criterion."
 - 2026-09-21: the amendment narrows AC2 and widens nothing. No code or test changed. The suite and check from review pass 2 still stand for the unchanged tree. Status set to review.
+- 2026-09-21: review pass 3 verified all seven criteria with fresh evidence. The gate directed five small fixes (two tests, the NEWS clause, the width message, a comment), committed on the branch before the push.
+- 2026-09-21: step-7 approval: m146-printed-text-wrapping-edges approved for merge
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
@@ -164,3 +166,11 @@ Reviewers (pass 3, fresh): the [S] blame-history lens found no new conflict. It 
 - [O]p3-6 `R/instrument_oop.R:74`: `notice_only` is TRUE for an instrument with zero item rows. No shipped instrument is empty.
 
 No finding shows a criterion failing. The pass-1 findings and these go to the gate for triage.
+
+Triage at the step-7 gate (2026-09-21, the maintainer's choices):
+
+- Fix now: [O]1 and [O]p3-1 (the indent test), [O]2 (the width loop), [O]8 and [O]p3-2 (the NEWS claim), [O]4 (the width message), [O]9 (the comment).
+- Follow-up, into the code-box-width candidate row at hygiene: [O]3, [O]5, [O]10, [O]p3-4.
+- Reject: [O]6, fixed in return 1. [O]7, stated in the test comment and allowed by the amended AC2. [O]p3-3, because AC5 names 16 characters. [O]p3-5, because the column stays in `fit$results` under D-057. [O]p3-6, because no shipped instrument is empty. [S-prior]1 and [S-prior]2, because the plan gate chose both changes.
+
+Fix-now evidence: the indent test now uses csip items that wrap at width 40. It asserts that continuation lines exist and that each sits under its lead. A planted flush-left continuation failed it 5 times. The width loop now asserts that `items()` gives back every item's words in order. A planted dropped item failed it 39 times. Both pass clean (148 expectations in the file). A probe printed 16-character names under unit and free scaling, with analytic and bootstrap intervals. Each printed its table as one block at width 77, which backs the narrowed NEWS clause. Full suite: 13,757 passed, 0 failed, 1 skipped. `check()`: 0 errors, 0 warnings, 0 notes. `document()` makes no diff.
