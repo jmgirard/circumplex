@@ -114,6 +114,15 @@ test_that("headings run Overview, numbered sections, Wrap-up, References", {
       text <- sub("^## ([0-9]+\\. )?", "", h)
       expect_true(grepl(text, overview, fixed = TRUE),
                   info = paste(name, "Overview lacks", text))
+      # A numbered section is cited by its own number: `Section N, "Title"`.
+      # Citing the title under another number sends the reader to the wrong
+      # section, which the title-only check above cannot see.
+      if (grepl("^## [0-9]+\\. ", h)) {
+        num <- sub("^## ([0-9]+)\\. .*$", "\\1", h)
+        expect_true(grepl(paste0("Section ", num, ", \"", text, "\""), overview, fixed = TRUE),
+                    info = paste0(name, ": the Overview does not cite \"", text,
+                                  "\" as Section ", num))
+      }
     }
   }
 })
