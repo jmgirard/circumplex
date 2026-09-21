@@ -63,9 +63,13 @@
 #
 # PRE-REGISTERED ACCEPTANCE (M147 AC2), evaluated on the committed run and
 # printed at the end:
-#   (a) At every REGION matrix: no under-report, and either tol0_reason is
+#   (a) At every REGION matrix whose tol0 double pricing produced numbers:
+#       the oracle ran, no under-report, and either tol0_reason is
 #       "uncertified" or every true error is at or below delta_star (1e-4).
-#       At every matrix BOTH tolerances refused, tol0_reason is "unidentified".
+#       At a REGION matrix whose double pricing refused after the inversion
+#       (a nonpositive quadratic form, "indefinite"), tol0_reason is not
+#       "computes". At every matrix BOTH tolerances refused, tol0_reason is
+#       "unidentified".
 #   (b) Every matrix the floor admits ("NULL") whose design fits zeta1 only
 #       with two or more items on every scale was inverted under both
 #       tolerances, with rcond_info >= 1e4 * .Machine$double.eps.
@@ -325,10 +329,20 @@ measure <- function(cs) {
       row$cert_ratio <- cert$fiml_ratio
       if (identical(row$default_outcome, "refused")) {
         df <- p * (p + 1) / 2 - length(d$mats)
-        ex <- exact(S, d, df, p * (p - 1) / 2)
+        pr <- suppressWarnings(axes_se_pricing(S, d, N))
+        uu <- suppressWarnings(axes_u_pricing(S, d))
+        ex <- if (is.character(pr) || is.character(uu)) {
+          # The inversion succeeded but the quadratic forms did not price
+          # (a nonpositive variance, "indefinite"): no double number exists
+          # to measure, and the surface refuses on that literal.
+          list(status = paste0("double pricing refused: ",
+                               paste(Filter(is.character, list(pr, uu)),
+                                     collapse = ", ")))
+        } else {
+          exact(S, d, df, p * (p - 1) / 2)
+        }
         row$oracle_status <- ex$status
         if (identical(ex$status, "ok")) {
-          pr <- axes_se_pricing(S, d, N)
           se_ex <- vapply(seq_len(d$n_comp),
                           function(i) ex[[sprintf("EXACT_SE%d", i)]], 0)
           rt_ex <- vapply(seq_len(d$n_comp),
@@ -374,11 +388,14 @@ saveRDS(res, OUT_RDS)
 # ---- the pre-registered acceptance --------------------------------------------
 region <- res[res$default_outcome %in% "refused" & res$tol0_outcome %in% "inverted", ]
 both <- res[res$default_outcome %in% "refused" & !(res$tol0_outcome %in% "inverted"), ]
-a1 <- nrow(region) > 0 && all(region$oracle_status %in% "ok") &&
-  !any(region$under_report) &&
-  all(region$tol0_reason == "uncertified" |
-        (region$true_se <= DELTA_STAR & region$true_cval <= DELTA_STAR &
-           region$true_ratio <= DELTA_STAR))
+priced <- region[!startsWith(region$oracle_status, "double pricing refused"), ]
+unpriced <- region[startsWith(region$oracle_status, "double pricing refused"), ]
+a1 <- nrow(region) > 0 && all(priced$oracle_status %in% "ok") &&
+  !any(priced$under_report) &&
+  all(priced$tol0_reason == "uncertified" |
+        (priced$true_se <= DELTA_STAR & priced$true_cval <= DELTA_STAR &
+           priced$true_ratio <= DELTA_STAR)) &&
+  all(unpriced$tol0_reason != "computes")
 a2 <- all(both$tol0_reason == "unidentified")
 covered <- res[res$floor == "NULL" & (!res$zeta1 | res$min_items >= 2L), ]
 b <- nrow(covered) > 0 && all(covered$default_outcome == "inverted" &
@@ -416,8 +433,8 @@ md <- c(
   "",
   "## Pre-registered acceptance",
   "",
-  sprintf("- (a) region (%d matrices): oracle ran at all, no under-report, and each refuses `uncertified` or is inside delta_star: **%s**; both-refused (%d matrices) all `unidentified`: **%s**",
-          nrow(region), verdict(a1), nrow(both), verdict(a2)),
+  sprintf("- (a) region (%d matrices, %d of them priced by the tol0 doubles): oracle ran at every priced one, no under-report, and each refuses `uncertified` or is inside delta_star, and every unpriced one refuses: **%s**; both-refused (%d matrices) all `unidentified`: **%s**",
+          nrow(region), nrow(priced), verdict(a1), nrow(both), verdict(a2)),
   sprintf("- (b) floor-admitted designs with zeta1 fitted only at two or more items per scale (%d matrices): inverted under both tolerances with rcond(info) >= 1e4 eps: **%s** (min rcond(info) %s)",
           nrow(covered), verdict(b), fmt(suppressWarnings(min(covered$rcond_info)))),
   sprintf("- (c) bit-identical `si`, `sim`, `acov` across tolerances at every default-inverted matrix (%d): **%s**",
