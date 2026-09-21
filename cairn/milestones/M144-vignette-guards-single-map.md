@@ -21,13 +21,13 @@ The vignette guards that remain each check shipped behavior from one level map, 
 
 ## Acceptance criteria
 
-- [ ] AC1: `tools/check-vignette-split.R` is not in the tree. `grep -rn "check-vignette-split" tools tests .github _pkgdown.yml NEWS.md README.md cairn/DESIGN.md cairn/references cairn/test-craft.md` returns no line. `cairn/milestones/archive/` and `cairn/DECISIONS.md` are history and stay as they are.
-- [ ] AC2: The level map and the reading order are defined once, in `tests/testthat/helper-vignette-frame.R`, and both `tests/testthat/test-vignette-frame.R` and `tools/check-pkgdown-vignettes.R` read them from that file. `grep -rn "frame_levels <-\|frame_next <-\|LEVELS <-" tests/testthat tools --exclude-dir=_problems` returns exactly two lines, both in the helper file, and the script derives its level order from `frame_levels` after `sys.source()` of that helper.
-- [ ] AC3: For every numbered heading `## N. Title` after `## 1. Overview` on every page in the level map, `tests/testthat/test-vignette-frame.R` requires that the Overview body holds `Section N, "Title"` with that N. The test passes on the shipped sources. It fails and names the page and the section on each of two defects planted one at a time in the working tree: one `Section N` changed to another number in a page with several numbered sections, and the same change in `cpm-boundary-fits`, which has one.
-- [ ] AC4: `_pkgdown.yml` has no hand-written vignette menu: no entry under `navbar:` carries an `href` that begins with `articles/`, and each of the three `articles:` groups carries `navbar:` equal to its `title`. A fresh `pkgdown::build_site()` with its destination overridden to an empty directory writes an `index.html` whose articles dropdown holds exactly three `h6.dropdown-header` elements reading Introductory, Intermediate and Advanced in that order, and under each heading the level's pages in the `articles:` index order, each linked with its vignette title. An `hr.dropdown-divider` precedes each heading, the first included; that is pkgdown's behavior and is accepted.
-- [ ] AC5: `tools/check-pkgdown-vignettes.R` reads no navbar. It checks that the set of `vignettes/*.Rmd` names equals the level map's pages, and that the `articles:` groups are the map's levels in its order, each group's `contents` equal to its level's pages in the map's order. It exits 0 on the shipped `_pkgdown.yml`, and exits 1 naming the defect on each of five defects planted one per scratch copy: a page dropped from its group, a page moved to another group, two pages swapped inside a group, two groups swapped, and an extra `vignettes/*.Rmd` file on disk that carries a `\VignetteIndexEntry{}`.
-- [ ] AC6: `.github/workflows/pkgdown.yaml` runs `Rscript tools/check-pkgdown-vignettes.R` as its own step after the dependency install and before the site build, and the script exits 0 when run from the repo root.
-- [ ] AC7: NEWS.md has one entry saying the website's vignette menu is now built by pkgdown from the articles index and is titled Articles. `devtools::test()` reports 0 failures. `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and 0 notes. `pkgdown::check_pkgdown()` reports no problems.
+- [x] AC1: `tools/check-vignette-split.R` is not in the tree. `grep -rn "check-vignette-split" tools tests .github _pkgdown.yml NEWS.md README.md cairn/DESIGN.md cairn/references cairn/test-craft.md` returns no line. `cairn/milestones/archive/` and `cairn/DECISIONS.md` are history and stay as they are.
+- [x] AC2: The level map and the reading order are defined once, in `tests/testthat/helper-vignette-frame.R`, and both `tests/testthat/test-vignette-frame.R` and `tools/check-pkgdown-vignettes.R` read them from that file. `grep -rn "frame_levels <-\|frame_next <-\|LEVELS <-" tests/testthat tools --exclude-dir=_problems` returns exactly two lines, both in the helper file, and the script derives its level order from `frame_levels` after `sys.source()` of that helper.
+- [x] AC3: For every numbered heading `## N. Title` after `## 1. Overview` on every page in the level map, `tests/testthat/test-vignette-frame.R` requires that the Overview body holds `Section N, "Title"` with that N. The test passes on the shipped sources. It fails and names the page and the section on each of two defects planted one at a time in the working tree: one `Section N` changed to another number in a page with several numbered sections, and the same change in `cpm-boundary-fits`, which has one.
+- [x] AC4: `_pkgdown.yml` has no hand-written vignette menu: no entry under `navbar:` carries an `href` that begins with `articles/`, and each of the three `articles:` groups carries `navbar:` equal to its `title`. A fresh `pkgdown::build_site()` with its destination overridden to an empty directory writes an `index.html` whose articles dropdown holds exactly three `h6.dropdown-header` elements reading Introductory, Intermediate and Advanced in that order, and under each heading the level's pages in the `articles:` index order, each linked with its vignette title. An `hr.dropdown-divider` precedes each heading, the first included; that is pkgdown's behavior and is accepted.
+- [x] AC5: `tools/check-pkgdown-vignettes.R` reads no navbar. It checks that the set of `vignettes/*.Rmd` names equals the level map's pages, and that the `articles:` groups are the map's levels in its order, each group's `contents` equal to its level's pages in the map's order. It exits 0 on the shipped `_pkgdown.yml`, and exits 1 naming the defect on each of five defects planted one per scratch copy: a page dropped from its group, a page moved to another group, two pages swapped inside a group, two groups swapped, and an extra `vignettes/*.Rmd` file on disk that carries a `\VignetteIndexEntry{}`.
+- [x] AC6: `.github/workflows/pkgdown.yaml` runs `Rscript tools/check-pkgdown-vignettes.R` as its own step after the dependency install and before the site build, and the script exits 0 when run from the repo root.
+- [x] AC7: NEWS.md has one entry saying the website's vignette menu is now built by pkgdown from the articles index and is titled Articles. `devtools::test()` reports 0 failures. `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and 0 notes. `pkgdown::check_pkgdown()` reports no problems.
 
 ## Coverage
 
@@ -98,3 +98,43 @@ Reopens on: a reader reporting that the Articles label or the leading divider
 misleads, or pkgdown gaining a way to group the menu without either.
 
 ## Review
+
+Verified 2026-09-20 on branch head `1dc670b5`; `origin/master` had not moved since the branch was cut.
+
+### Acceptance evidence
+
+- AC1: `tools/check-vignette-split.R` absent (`ls` fails). The AC1 grep over tools, tests, .github, _pkgdown.yml, NEWS.md, README.md, cairn/DESIGN.md, cairn/references and cairn/test-craft.md returns no line (exit 1).
+- AC2: the definition grep returns exactly two lines, `helper-vignette-frame.R:8` (`frame_levels <-`) and `:26` (`frame_next <-`). `test-vignette-frame.R` defines neither and reads both through testthat's helper sourcing. `tools/check-pkgdown-vignettes.R` runs `sys.source()` on the helper and builds `level_pages` by `split()` on `frame_levels` with factor levels `unique(frame_levels)`, so level order and page order come from the map.
+- AC3: frame test green on the shipped sources (full suite below). Plant 1 in `advanced-visualization.Rmd.orig`, `Section 5` to `Section 8`: 1 failure, `advanced-visualization: the Overview does not cite "Restyling the canvas" as Section 5`. Plant 2 in the one-section page `cpm-boundary-fits.Rmd.orig`, `Section 2` to `Section 3`: 1 failure, `cpm-boundary-fits: the Overview does not cite "When a fit sits at a boundary" as Section 2`. Each restored by copy; `git status` clean after both.
+- AC4: parsed `_pkgdown.yml`: 0 of 16 navbar hrefs begin with `articles/`, no `navbar: left:` list, and each of the 3 groups has `navbar` identical to `title`. Fresh `pkgdown::build_site()` into an empty scratch directory (0 entries before) exit 0. Its `index.html` articles dropdown (toggle text Articles) holds 3 `h6.dropdown-header` reading Introductory, Intermediate, Advanced in order, each followed by its level's pages in index order (2, 4, 8). Each of the 14 link texts equals that page's `\VignetteIndexEntry{}`, and an `hr.dropdown-divider` precedes each heading, the first included.
+- AC5: the guard exits 0 at the repo root and on an unplanted scratch copy. It exits 1 on each of five scratch copies. Dropped page: names the short Intermediate list against the expected one. Moved page (ci-accuracy to Advanced): names both groups' lists. Swap inside Intermediate: names the reordered list. Intermediate and Advanced swapped: `articles groups are [Introductory, Advanced, Intermediate], expected [...]`. Stray `vignettes/stray-page.Rmd` with an index entry: `on disk only [stray-page]`. The script reads no `navbar:` menu.
+- AC6: parsed `.github/workflows/pkgdown.yaml` step order: checkout, setup-pandoc, setup-r, setup-r-dependencies, `Rscript tools/check-pkgdown-vignettes.R` (own step, default bash shell, no `defaults:` block), Build site, Deploy. The script exits 0 from the repo root.
+- AC7: NEWS.md has one Documentation entry under the development heading (line 162) saying the menu is built by pkgdown from the articles index and titled "Articles". `devtools::test()`: FAIL 0, PASS 11861, SKIP 1. `devtools::check(args = "--no-manual")`: Status OK, 0 errors, 0 warnings, 0 notes, 7m 17s. `pkgdown::check_pkgdown()`: no problems found.
+
+### Consistency gate
+
+- `cairn_validate.py`: all checks passed, exit 0. No DESIGN principle changed, so `cairn_impact` is skipped.
+- `devtools::document()` (cli width 500): no diff, 0 `resolve link` lines. README.Rmd and README.md untouched by the branch. No new top-level file.
+- `pkgdown::check_pkgdown()`: no problems. NEWS entry present, no milestone number in it. Full check as in AC7.
+- Master watches: `R-CMD-check.yaml` and `test-coverage.yaml` both `success` on `2bb3a9c7`, the newest push that touched code; the two later master commits are `cairn/`-only and paths-ignored.
+- `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`, `tools/check-branch-protection.R`: each exit 0.
+
+### Independent review
+
+Full three-lens fan-out (user-facing tier, executable surface).
+
+- [S] blame-history: 5 items, all informational, each a change the plan and M144-D1 name. No undisclosed regression.
+- [S] prior-review: archived M135, M136, M138 Review findings read; `pulls/comments` probe empty. Zero findings.
+- [O] diff-bug: 9 findings, below with dispositions.
+
+[O] findings, ranked by the reviewer, with the disposition proposed at the step-7 gate:
+
+1. `_pkgdown.yml:189`: the navbar's News link now reads "Changelog". pkgdown's default `news` component labels it so, and T4's text named News among the entries to move into `components:`, but only home and instruments moved. Confirmed in the AC4 build (`index.html` line 87). Proposed: fix now (a `news:` component with `text: News`; on a scratch copy it renders "News" with the 3 headings intact).
+2. `NEWS.md:193-194`: an older bullet in the same unreleased section says "its Vignettes menu", which the new bullet makes false. Proposed: fix now.
+3. `tools/check-pkgdown-vignettes.R:76`: `if (!is.null(want) && ...)` still skips the contents check for a group title outside the map. That is the articles-half twin of one of the five menu-half defects M144-D1 names. The title check still exits 1, so there is no false pass. Proposed: fix now (drop the `!is.null(want)` clause).
+4. `tools/check-pkgdown-vignettes.R:69`: a group with no `title:` stops the script with a `vapply` type error, not a named FAIL. Proposed: reject, because it fails closed with a nonzero exit.
+5. `tests/testthat/test-vignette-frame.R:120-125`: the new check requires the right citation but does not forbid a second, wrong-numbered citation of the same title. Proposed: reject, because it is outside AC3's promise and no page cites a title twice.
+6. `tests/testthat/test-cpm_boundary_vignette.R:44-47`: the reworded comment leaves a two-word line and says "only the Overview and the Wrap-up" although the preamble is also outside the scope. Proposed: fix now (comment only).
+7. `_pkgdown.yml:190`: `structure: left:` omits pkgdown's `intro` and `tutorials` components, so a future `vignettes/circumplex.Rmd` would get no "Get started" link. Proposed: reject, because no such page exists and adding one would be its own change.
+8. `tools/check-pkgdown-vignettes.R:32`: the helper path is relative to the working directory. Proposed: reject, because AC6 names the repo root and CI runs there.
+9. `tests/testthat/helper-vignette-frame.R`: `load_all()` puts `frame_levels` and `frame_next` in the dev namespace. Proposed: reject, because the other 14 helpers behave the same.
