@@ -634,7 +634,7 @@ md <- c(
   sprintf("- region matrices whose exact oracle failed (structurally singular information matrix inverted under tol = 0): %d", nrow(oracle_fail)),
   sprintf("- matrices where the replica's verdict disagrees with the direct solve(info, tol = 0): %d", nrow(disagree)),
   sprintf("- matrices refused `uncertified` by the shipped predicate that compute in the tol0 world: %d (largest true error among them %s)",
-          nrow(moved), fmt(suppressWarnings(max(pmax(moved$true_se, moved$true_cval, moved$true_ratio))))),
+          nrow(moved), if (nrow(moved)) fmt(max(pmax(moved$true_se, moved$true_cval, moved$true_ratio))) else "none"),
   "",
   "## The region: default refused, tol = 0 inverted",
   "",
