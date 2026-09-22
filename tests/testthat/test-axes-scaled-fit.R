@@ -1509,19 +1509,21 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     # refuses -- the certificate decides. Since M147 the certificate is the
     # sole conditioning judge and a 1e-9 ridge CERTIFIES at every map (the
     # default-tolerance inversion that used to sentinel it is gone), so the
-    # ridge is 1e-13, where the certificate refuses. The nestedness contract
-    # is what this asserts, exhaustively over the judge's two answers: one
-    # literal, both surfaces.
+    # ridge is 1e-14, where the certificate reads 7e7, 4e8 and 1e9 at the
+    # three maps (measured 2026-09-21, macOS/arm64) -- five decades past
+    # the target, so the refusal is asserted unconditionally, as the sibling
+    # case in test-axes-reliability.R asserts it. The nestedness contract is
+    # what this asserts: one literal, both surfaces.
     ns <- pp$sigma
     ns[2L, ] <- ns[1L, ]
     ns[, 2L] <- ns[, 1L]
-    ns <- ns + 1e-13 * diag(p)
+    ns <- ns + 1e-14 * diag(p)
     expect_identical(axes_sigma_degenerate(stats::cov2cor(ns)), "ill_conditioned")
     r <- check_nested(ns, sprintf("p %d near-singular", p))
-    expect_identical(r$se, r$sf,
-                     label = sprintf("p %d near-singular, both surfaces", p))
-    expect_true(is.null(r$sf) || identical(r$sf, "uncertified"),
-                label = sprintf("p %d near-singular, judged by the certificate", p))
+    expect_identical(r$sf, "uncertified",
+                     label = sprintf("p %d near-singular, scaling surface", p))
+    expect_identical(r$se, "uncertified",
+                     label = sprintf("p %d near-singular, SE helper", p))
   }
 })
 
