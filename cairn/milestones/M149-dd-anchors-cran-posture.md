@@ -1,6 +1,6 @@
 # M149: Reference-route checks at the anchors, and the certificate file's CRAN posture
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -62,6 +62,9 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: claim audit round one (fresh [O] reader): 34 claims read, 5 wrong and 1 unverifiable, all corrected. The CRAN block, D-063's ground and its heading now draw the line at "checks the estimate against exact truth", because the closed-form oracle tests also bracket against exact values and three skipped tests catch a low estimate against a planted or known error. The derivative-set count is now 10 to 12 matrices. The oracle comment now says B's `xi1` is cos() but not pinned. B's bounds are described per field. The margin bound is stated as an analogy and carries a factor of 2 for the squared SE (20 * p * kappa^2 * 2^-51 ulp; b9b bound 0.0066 against a 0.0072 margin). D-063 was corrected in place because it has not left this branch. Re-read pending; T7 to rerun after these edits.
 - 2026-09-22: claim audit: 34 claims read, 6 corrected — R/axes_reliability.R, man/axes_reliability.Rd, tests/testthat/test-axes-certificate.R, devel/degeneracy-oracle/exact_oracle.R. The re-read confirmed four of the six corrections. It found that the detector brackets nothing and that c4's set has 6 matrices. Both were fixed in the test header and in D-063 with no further pass, per the stopping rule.
 - 2026-09-22: T7 done, run at the T6 head. `devtools::test()` reported no failures and one skip, with warnings only from untouched files. `devtools::check(manual = TRUE)` reported 0 errors, 0 warnings and 0 notes, and "checking PDF version of manual ... OK". The certificate file passed again after the bound changed to 20x. Later edits touch comments and records only. Status set to review.
+- 2026-09-22: review evidence recorded. AC1 and AC3-AC6 passed and were ticked. AC2 was not ticked because the margin test's comment says its bound is "by analogy and not separately derived" (finding O1).
+- 2026-09-22: amendment return: AC2 — "The test's comment states that bound and its basis in the anchor's conditioning, and names each premise of that basis that is not proven."
+- 2026-09-22: status set to in-progress for the AC2 amendment only. Fix-now findings O6, O7 and O10 wait for the re-review gate.
 
 ## Decisions
 
@@ -90,3 +93,10 @@ Independent review: three fresh-context reviewers. [S] blame-history: no finding
 - O8: `floor(log2(abs(hi)))` can round up for a mantissa within about 1e-16 of 2. The largest committed mantissa is 1.99992, so this edge is latent.
 - O9: the power-of-two assertion covers the anchors but not counterexample B's four `hi` values.
 - O10: the margin test comment says "no matrix is read", but `cert_anchors()` builds the matrices. The result does not depend on them.
+
+Gate triage, 2026-09-22:
+
+- O1: amendment return. The maintainer chose to reword AC2 over deriving a proven bound. See the work log.
+- O6, O7, O10: fix now. They are small wording edits, and they land on the branch at the re-review gate, before the push.
+- O2, O3, O4, O5, O9: follow-up. They were added to the ROADMAP's RR22 follow-ons row as (vi).
+- O8: rejected. The largest committed mantissa is 1.99992, so `log2()` cannot round up on any committed value.
