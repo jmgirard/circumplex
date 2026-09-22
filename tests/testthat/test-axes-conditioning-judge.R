@@ -75,6 +75,12 @@ test_that("AC1: the core inverts under tol = 0 and returns 'unidentified' from t
   # Three return sites for the literal, and no other.
   expect_identical(sum(vapply(txt, function(l) lengths(regmatches(
     l, gregexpr('"unidentified"', l, fixed = TRUE))), 0L)), 3L)
+  # The two exact grounds compare BITS: identical() defaults to num.eq = TRUE,
+  # under which 0 and -0 are identical (measured), so "bit-identical" holds
+  # only with num.eq = FALSE at both comparison sites (M147 review, second
+  # pass).
+  expect_identical(sum(grepl("num.eq = FALSE", txt, fixed = TRUE)), 2L)
+  expect_false(identical(0, -0, num.eq = FALSE))
   # The selector threshold, by name, where the decision reads it.
   g <- axes_degeneracy_refusal
   attr(g, "srcref") <- NULL
@@ -363,11 +369,13 @@ test_that("T9: the refusal object pins the derivative set it was priced for, and
   shared <- axes_shared_refusal(S, rownames(S), oct, sc, bl,
                                 fit_zeta1 = FALSE, fit_zeta2 = TRUE)
   expect_null(shared$reason)
-  expect_identical(shared$derivs,
-                   list(components = c("xi1", "xi2", "zeta2"), n_mats = 11L))
+  d2 <- axes_se_derivs(oct, sc, bl, FALSE, TRUE)
+  expect_identical(shared$derivs, axes_derivs_pin(d2))
+  expect_identical(shared$derivs$components, c("xi1", "xi2", "zeta2"))
+  expect_identical(shared$derivs$n_comp, 3L)
+  expect_length(shared$derivs$mats, 11L)
 
   # The matched pair is consumed at both surfaces.
-  d2 <- axes_se_derivs(oct, sc, bl, FALSE, TRUE)
   se <- axes_corrected_se(S, rownames(S), oct, sc, bl, n = 600,
                           fit_zeta1 = FALSE, fit_zeta2 = TRUE, refusal = shared)
   expect_null(se$reason)
@@ -400,6 +408,50 @@ test_that("T9: the refusal object pins the derivative set it was priced for, and
                       fit_zeta1 = FALSE, fit_zeta2 = TRUE, refusal = shared),
     "different matrix"
   )
+
+  # The pin is the derivative set ITSELF, not its shape (M147 review, second
+  # pass): the same components and the same p from different ANGLES build a
+  # different set of the same length, and a shape pin let that pair through
+  # -- measured: two octant angles swapped reported SE(xi1) 0.0267 where the
+  # map's own pricing gives 0.0110, with no condition. The probe swaps two
+  # items' angles. (A rigid rotation of every angle builds the same set in
+  # real arithmetic but not in the stored bits -- cos() rounds differently
+  # at the moved angles -- so it is refused too, and is not a control; the
+  # matched pair above is.)
+  swap <- oct[c(2L, 1L, 3:8)]
+  shared0 <- axes_shared_refusal(S, rownames(S), oct, sc, NULL,
+                                 fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  expect_false(identical(axes_se_derivs(swap, sc, NULL, FALSE, FALSE)$mats,
+                         axes_se_derivs(oct, sc, NULL, FALSE, FALSE)$mats))
+  expect_error(
+    axes_corrected_se(S, rownames(S), swap, sc, n = 600,
+                      fit_zeta1 = FALSE, fit_zeta2 = FALSE, refusal = shared0),
+    "different derivative set"
+  )
+  ds <- axes_se_derivs(swap, sc, NULL, FALSE, FALSE)
+  expect_error(
+    axes_scaling_factor(S, rownames(S), swap, sc, fit_zeta1 = FALSE,
+                        fit_zeta2 = FALSE, df = judge_df(S, ds),
+                        baseline_df = judge_bdf(S), refusal = shared0),
+    "different derivative set"
+  )
+})
+
+test_that("review: an error inside the pricing core refuses 'uncertified' through the decision helper's fence", {
+  # axes_degeneracy_refusal()'s contract is to refuse, never to error (M113).
+  # The certificate call was fenced; the core call was not, and the core's
+  # matrix products and rcond() can raise (measured: a mis-dimensioned
+  # derivative matrix errored "non-conformable arguments" out of the
+  # helper). A condition means the fit could not be certified, which is what
+  # the sentinel says.
+  local_mocked_bindings(axes_pricing_core = function(sigma, d, tol = 0)
+    stop("planted core failure"))
+  S <- m106_family_a(0.3, 1L)
+  d <- axes_se_derivs(oct, as.character(1:8), NULL, FALSE, FALSE)
+  r <- axes_degeneracy_refusal(S, d)
+  expect_identical(r$reason, "uncertified")
+  expect_identical(r$cert, axes_certificate_sentinel())
+  expect_null(r$core)
 })
 
 test_that("T9: a named item map builds the same derivative set as an unnamed one, so the exact grounds still fire", {

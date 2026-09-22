@@ -191,13 +191,16 @@ axes_pricing_core <- function(sigma, d, tol = 0) {
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return("singular")
 
+  # num.eq = FALSE: identical()'s default compares doubles by value, under
+  # which 0 and -0 are identical; the grounds are stated as BIT identity
+  # (D-062), so the bits are what is compared (M147 review, second pass).
   comp <- d$mats[seq_len(d$n_comp)]
   for (a in seq_len(length(comp) - 1L)) {
     for (b in seq.int(a + 1L, length(comp))) {
-      if (identical(comp[[a]], comp[[b]])) return("unidentified")
+      if (identical(comp[[a]], comp[[b]], num.eq = FALSE)) return("unidentified")
     }
   }
-  if (any(vapply(comp, identical, TRUE, diag(nrow(sigma))))) {
+  if (any(vapply(comp, identical, TRUE, diag(nrow(sigma)), num.eq = FALSE))) {
     return("unidentified")
   }
 
@@ -848,7 +851,18 @@ axes_degeneracy_refusal <- function(sigma, d) {
   # designs are routed and their certificate decides them -- every one
   # measured passes by three decades. A matrix neither selector picks
   # computes and pays nothing.
-  core <- axes_pricing_core(sigma, d)
+  # Fenced like the certificate below (M113): this helper refuses, never
+  # errors. The core's matrix products and rcond() can raise on an input its
+  # two solve() fences do not cover (measured at the M147 review: a
+  # mis-dimensioned derivative matrix errored out of the helper), and a
+  # condition means the fit could not be certified -- the sentinel's own
+  # meaning, so the fit refuses "uncertified" with the sentinel as its
+  # certificate. On `error` only, so a warning still reaches the user.
+  core <- tryCatch(axes_pricing_core(sigma, d), error = function(e) NA)
+  if (identical(core, NA)) {
+    return(list(reason = "uncertified", cert = axes_certificate_sentinel(),
+                core = NULL))
+  }
   if (identical(core, "unidentified")) {
     return(list(reason = core, cert = NULL, core = NULL))
   }
@@ -941,10 +955,15 @@ axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
 }
 
 # The derivative set a refusal object was priced for, as the consumption
-# guard compares it: the component names and the number of matrices, which
-# together fix `d$mats`' length and order for a given map.
+# guard compares it: the set ITSELF. A shape pin (component names plus the
+# matrix count) let two sets built from different angles on the same map
+# through, and the surface then folded a core priced for the other set --
+# measured at the M147 review: two octant angles swapped reported SE(xi1)
+# 0.0267 where the map's own pricing gives 0.0110, with no condition. The
+# matrices are what the core was priced against, so they are what is pinned;
+# identical() on p + k small matrices costs nothing beside the pricing.
 axes_derivs_pin <- function(d) {
-  list(components = d$components, n_mats = length(d$mats))
+  d[c("mats", "components", "n_comp")]
 }
 
 # The `refusal` argument's consumption guard, one definition for both surfaces

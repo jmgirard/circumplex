@@ -89,7 +89,7 @@ axes_u_pricing <- function(sigma, d, core = NULL, tol = 0) {
   # surface prices with, both taken from axes_pricing_core() -- and
   # B_st = 2 tr(Wc_s Sigma Wc_t Sigma), where Wc is W with the
   # covariance-to-correlation Jacobian folded in exactly as it is there
-  # (R/axes_corrected_se.R:245-257): off the diagonal W is unchanged, and the
+  # (R/axes_corrected_se.R:248-260): off the diagonal W is unchanged, and the
   # diagonal absorbs the standardization because a sample correlation's diagonal
   # does not vary at all.
   #
