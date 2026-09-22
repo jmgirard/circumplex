@@ -887,6 +887,52 @@ test_that("AC3: the anchor case list is not empty", {
 })
 
 
+test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by more than the reference route's error bound", {
+  # WHY cert_dd_vs_exact()'s half-ulp bound is not a frozen measurement (M149).
+  # A committed `hi` is the exact value's correctly rounded double and `lo`
+  # the remainder, so dd_ulp() of a returned double is below one half exactly
+  # when that double IS `hi` -- when the route's own error did not carry its
+  # result across the midpoint between `hi` and a neighbour. That holds
+  # wherever the exact value's distance from the midpoint, 1/2 - |lo|/ulp(hi),
+  # exceeds the route's error. Both sides are asserted here from committed
+  # values alone: `hi`, `lo`, and each anchor's `scale` and `kappa` literals.
+  # Nothing is priced and no matrix is read, so this runs identically on
+  # every machine.
+  #
+  # THE ROUTE'S ERROR BOUND. The a-priori bound the degeneracy floor rests on
+  # is p * kappa^2 * eps for the double route's relative error, and the floor
+  # allows it to undershoot the true error by a factor of 10 (see
+  # `?axes_reliability` on the floor's `1e-5`). The reference route runs the
+  # same pipeline in double-double arithmetic, so the same forward-error
+  # argument holds with the double-double unit roundoff 2^-104 in place of
+  # eps: 10 * p * kappa^2 * 2^-104, as a relative error. A relative error r
+  # is at most r * 2^53 units in the last place of `hi`, since |hi| is below
+  # 2^53 of those units. Hence the bound in ulps is 10 * p * kappa^2 * 2^-51.
+  # `kappa` is each anchor's committed fingerprint, pinned against the
+  # built matrix to 1e-3 relative, so it enters inflated by that tolerance.
+  #
+  # Where `hi` is a power of two the neighbour below is half as far away and
+  # the margin formula changes; no committed `hi` is one, and that is asserted
+  # rather than handled, so a regeneration that produced one fails here.
+  ispow2 <- function(x) abs(x) == 2^floor(log2(abs(x)))
+  for (cs in cert_anchors()) {
+    fz <- cert_frozen[[cs$id]]
+    p <- length(cs$scale)
+    bound <- 10 * p * (cs$kappa * (1 + 1e-3))^2 * 2^-51
+    for (pr in list(c("v_hi", "v_lo"), c("vn_hi", "vn_lo"),
+                    c("u_hi", "u_lo"))) {
+      hi <- as.numeric(fz[[pr[[1L]]]])
+      lo <- as.numeric(fz[[pr[[2L]]]])
+      lbl <- paste0(cs$id, " ", pr[[1L]])
+      expect_false(any(ispow2(hi)), label = paste0(lbl, " is a power of two"))
+      margin <- 0.5 - abs(lo) / 2^(floor(log2(abs(hi))) - 52)
+      expect_gt(min(margin), bound,
+                label = paste0(lbl, " midpoint margin (ulp)"))
+    }
+  }
+})
+
+
 # One test PER CASE, deliberately: `skip()` abandons the whole `test_that()` it
 # fires in, so a single loop would let one non-reproducing case take the other
 # four with it -- and the criterion's "a skip on some platform is expected"
