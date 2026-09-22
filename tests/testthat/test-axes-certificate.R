@@ -295,6 +295,16 @@ cert_rel <- function(hat, hi, lo) {
 # quotient of two SEs). `n` cancels out of both exactly, so none appears.
 cert_root_rel <- function(e) abs(e / (sqrt(1 + e) + 1))
 
+# The measured vector's length against the committed exact array's, asserted
+# as an expectation so a mismatch reddens the case that reached it and names
+# the site (M148). `hi` is the committed array, whose own length cert_shape
+# pins; `hat` is the shipped vector, which nothing else pins.
+cert_pin_length <- function(hat, hi, lbl) {
+  expect_identical(length(hat), length(hi),
+                   label = paste0(lbl, " measured length"),
+                   expected.label = paste0(lbl, " committed length"))
+}
+
 # The certificate's floor, `safety factor * 2 * eps`, with the factor WRITTEN
 # DOWN rather than read from axes_certificate_safety_factor (M115 AC4). An
 # expectation derived from the constant it is checking cannot notice that
@@ -558,6 +568,15 @@ cert_true_error <- function(id, sigma, d) {
     cert_record(id, cert_disp[["refused"]], literals)
     return(NULL)
   }
+  # THE MEASURED SIDE'S LENGTH IS PINNED BEFORE EACH COMPARISON (M148, from
+  # the Known-fragilities list). cert_shape pins the COMMITTED arrays'
+  # lengths, and cert_rel() is elementwise: a shipped vector one component
+  # short would be recycled against the committed pair and every entry
+  # compared with the wrong exact value, with no failure anywhere. The pin
+  # is on the measured side, since that is the side nothing else asserts.
+  cert_pin_length(v$corrected, fz$v_hi, paste0(id, " corrected"))
+  cert_pin_length(v$naive, fz$vn_hi, paste0(id, " naive"))
+  cert_pin_length(u, fz$u_hi, paste0(id, " u"))
   dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
   dn <- cert_rel(v$naive, as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))
   du <- cert_rel(u, as.numeric(fz$u_hi), as.numeric(fz$u_lo))

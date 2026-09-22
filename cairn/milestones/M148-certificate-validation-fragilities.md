@@ -2,14 +2,14 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M148: Close the five remaining accuracy-certificate validation-layer fragilities
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M147
 - **Driving RR:** —
 - **Principles touched:** IP3
 - **Resolves:** —
 - **Surface tier:** internal — repairs to the certificate test suite and the devel oracle driver, no shipped behavior
-- **Branch/PR:** —
+- **Branch/PR:** `m148-certificate-validation-fragilities`
 
 ## Goal
 
@@ -41,7 +41,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 
 ## Tasks
 
-- [ ] T1: The three length pins with the one-short plant proved red first.
+- [x] T1: The three length pins with the one-short plant proved red first.
 - [ ] T2: `cert_root_rel()` failure below -100% and its test.
 - [ ] T3: The naive-arm plant at the driven anchor.
 - [ ] T4: The oracle-driver key guard and its in-process assertion.
@@ -53,6 +53,8 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - 2026-09-21: created by /milestone-plan at the M147 gate, from the ROADMAP degeneracy row's six-fragility remainder (DESIGN.md Known fragilities, M118 and M122 lineage).
 - 2026-09-21: criteria audit ran in reduced mode ([O] fresh reader). Seven findings, all disposed with the tier-preserving answer: the NaN threshold is strictly below -100%; the sentinel-route promise drops per-route naming (a route tag is shipped code); the oracle-driver guard is asserted in process, not across the Python boundary; AC1 names the measured side at the three priced-loop sites, since the committed side is already pinned by `cert_shape`; the `cval` aggregation clause was vacuous and is dropped; AC3 names the one anchor the layer drives; AC6 defines clean as zero failures and warnings with skips permitted.
 - 2026-09-21: plan gate chose a separate milestone over folding these into M147 because the sizing tripwire fires past seven criteria; falsified by nothing (a packaging choice).
+- 2026-09-21: /milestone-implement started; branch `m148-certificate-validation-fragilities` cut from synced master. Question gate skipped: the plan left no choice open that changes the work.
+- 2026-09-21: T1 done. `cert_pin_length()` added and called at the three priced-loop `cert_rel()` sites (now lines 577-579). Plant `[-1L]` on each measured vector: 18 failures, three per priced case, each naming its site ("a4 corrected measured length" and so on). Plant reverted; the file runs clean, all six cases priced on this machine.
 
 ## Decisions
 
