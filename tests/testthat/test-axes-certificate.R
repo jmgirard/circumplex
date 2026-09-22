@@ -277,8 +277,10 @@ cert_hex <- function(x) sprintf("%a", as.vector(x))
 # numerator that is itself a rounding artifact. Every quantity committed in
 # this file is nonzero, so nothing reaches it today; the guard is here because
 # the assertion added at counterexample B divides by a committed value on a
-# route where no shipped number exists to sanity-check the result, and a
-# silent NaN there passes an `expect_lt()` as NA rather than reddening.
+# route where no shipped number exists to sanity-check the result. testthat's
+# comparison expectations redden on a NaN (checked at the M148 review), so
+# a NaN never passed silently; the guard exists so the failure names the
+# zero rather than reporting a comparison against NaN.
 cert_rel <- function(hat, hi, lo) {
   if (any(hi + lo == 0)) {
     stop("cert_rel(): the exact value is zero, so there is no relative error ",
@@ -299,10 +301,10 @@ cert_rel <- function(hat, hi, lo) {
 # sqrt(1 + e) is NaN there: the expression returned NaN. testthat's
 # comparison expectations DO redden on NaN (`expect_lt(NaN, 1)` fails,
 # checked at the M148 review), so the old value never passed a bracket; it
-# failed with a message about NaN that named neither the helper nor the
-# input. No committed quantity reaches it (the certificate's own sentinel
-# path catches a nonpositive form first), so the failure now names the
-# input and stops.
+# failed with a message about NaN that named the bracket's site but not the
+# offending input. No committed quantity reaches it, since every shipped
+# variance in this file is positive, so the failure now names the input and
+# stops.
 cert_root_rel <- function(e) {
   if (any(e < -1)) {
     stop("cert_root_rel(): relative variance error below -100% (",
@@ -327,6 +329,9 @@ cert_pin_length <- function(hat, hi, lbl) {
 # estimate, never the sentinel (M148). Which sentinel exit fired is not
 # recoverable from the value -- that would need a route tag in shipped code
 # -- so the failure says only that the certificate degraded on a priced route.
+# The test is `identical()` against the certificate's own declared constant,
+# not the value coincidence M122 retired in cert_bracket(): a graded estimate
+# equal to the sentinel bit for bit would fail here, never pass silently.
 cert_priced_not_degraded <- function(cert, id) {
   if (identical(cert, axes_certificate_sentinel())) {
     testthat::fail(paste0(

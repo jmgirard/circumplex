@@ -68,13 +68,16 @@ baseline_df_of <- function(S) nrow(S) * (nrow(S) - 1) / 2
 # test file bit for bit (M115); they are what lets that file measure its own
 # machine's error instead of comparing against one frozen on this one.
 #
-# EVERY KEY THIS SCRIPT READS MUST BE PRESENT (M148, from the Known-fragilities
+# EVERY KEY THE PYTHON SCRIPT PRINTS MUST BE PRESENT (M148, from the Known-fragilities
 # list). `res[["EXACT_CVAL"]]` on a list without that name is NULL, not an
 # error: a Python-side rename or a truncated stdout used to flow through as
 # NULL into `abs(NULL - x)` (numeric(0), so every `<=` comparison on it is
 # TRUE-by-vacuity) and into cert_record(), where a NULL field is pasted into
 # the regeneration block as `NULL`. The parser is split from the process call
 # so the guard can be asserted below on a stubbed output, in this process.
+# The list is what the Python script prints, not only what this script reads:
+# EXACT_BASELINE is printed and never read here, and a missing line of either
+# kind says the output is not the one the script expects.
 exact_keys <- function(n_comp) {
   c("EXACT_CVAL", "EXACT_BASELINE", "EXACT_TR_VG", "EXACT_PROJ",
     sprintf("EXACT_SE%d", seq_len(n_comp)),
