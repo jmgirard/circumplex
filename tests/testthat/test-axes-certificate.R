@@ -56,6 +56,26 @@
 # which cost the 2.0.1 release its second pre-test rejection, at the third
 # platform-exact failure site this package has hit. This rule is what
 # ends the series, and it is checked at review rather than by any assertion.
+#
+# WHAT RUNS ON CRAN (M149; D-063). Three classes run under CRAN's own check:
+#
+#   - the exact-oracle dispositions: the five per-anchor bracket tests with
+#     their reference-route checks, counterexample B's test, and the case
+#     detector. They are the only assertions here that can catch the
+#     certificate UNDER-reporting, and CRAN checks on platforms CI does not.
+#   - the committed-value and closed-form checks: the anchor-list test, the
+#     rounding-midpoint margin test, the two closed-form oracle tests and the
+#     safety-factor test. None depends on the platform's arithmetic.
+#   - the contract and harness checks: the disposition vocabulary, the helper
+#     branches, the predicate and warning reading the quotient, the two
+#     sentinel tests, and the condition-inside-the-certificate test.
+#
+# One class skips on CRAN, via skip_on_cran() in each test: the
+# reachable-versus-B discrimination, the admitted-domain sweep, the
+# sample-size independence check, and the two planted-perturbation
+# invariants. None of them can detect an under-report, so a failure specific
+# to one CRAN platform risks a rejection with nothing learned about the
+# certificate's safety. A new test here takes the class its claim belongs to.
 
 
 # ---- the six anchor geometries ----------------------------------------------
@@ -826,8 +846,8 @@ cert_bracket <- function(est, true_rel, lbl, at_floor = est <= cert_floor) {
 
 
 test_that("AC3: the anchor case list is not empty", {
-  skip_on_cran()
-  # Without this, emptying cert_anchors() would take every bracket assertion in
+  # CRAN-live since M149 (D-063): the CRAN-live brackets below are generated
+  # from the list this pins. Without this, emptying cert_anchors() would take every bracket assertion in
   # this file with it -- the per-case tests below are GENERATED from that list,
   # and a loop over nothing generates nothing and reports PASS. The count is
   # written down rather than derived from the list it is checking.
