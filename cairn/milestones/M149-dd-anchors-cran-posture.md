@@ -1,6 +1,6 @@
 # M149: Reference-route checks at the anchors, and the certificate file's CRAN posture
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -74,6 +74,9 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: re-review: all six criteria ticked against fresh evidence. The fix-now findings O6, O7, O10 and R1-R5 are fixed on the branch.
 - 2026-09-22: step-7 approval: m149-dd-anchors-cran-posture approved for merge
 - 2026-09-22: PR #184 opened. The CI watch reached its time limit with 3 checks passed and the three R-CMD-check jobs (macOS, ubuntu, windows) pending. The watcher was stopped, and the approval marker stays in place for the resumed merge.
+- 2026-09-22: resume. PR #184 is OPEN, and `windows-latest (release)` failed. Windows builds `xi1` one ulp differently at all five anchors, although `sig` matches. So `cert_dd_vs_exact()` skipped every anchor case whole, and the detector at test file :1252 failed with no anchor priced. macOS, ubuntu and the other checks passed. Master's last Windows run was green, so this branch caused the failure: it is finding O3 made real.
+- 2026-09-22: amendment return: AC1 — "It runs whenever this machine builds the case's matrix bit for bit as committed. It prices from the committed `xi1` in place of the one this machine builds, so a machine whose `xi1` differs still runs it and does not skip the case for that input. Otherwise it records the case as `skipped` through `cert_record()` and skips, naming the matrix."
+- 2026-09-22: status set to in-progress for the AC1 amendment. The maintainer chose to price from the committed `xi1` over skipping only the reference-route check. The step-7 approval above is void, because the merge is not approved on a red head. The approval marker was deleted, and re-review re-poses the merge gate.
 
 ## Decisions
 

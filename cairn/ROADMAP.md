@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-22 (M148 done: degeneracy row's Known-fragilities r
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M149 | Reference-route checks at the anchors, and the certificate file's CRAN posture | review | — | normal | milestones/M149-dd-anchors-cran-posture.md |
+| M149 | Reference-route checks at the anchors, and the certificate file's CRAN posture | in-progress | — | normal | milestones/M149-dd-anchors-cran-posture.md |
 | M147 | The certificate is the sole conditioning judge | done | — | normal | milestones/archive/M147-certificate-sole-conditioning-judge.md |
 | M148 | Close the five remaining accuracy-certificate validation-layer fragilities | done | M147 | normal | milestones/archive/M148-certificate-validation-fragilities.md |
 | M146 | Printed text wraps at its edge cases, and the CPM table drops Communality | done | — | normal | milestones/archive/M146-printed-text-wrapping-edges.md |
