@@ -277,8 +277,10 @@ cert_hex <- function(x) sprintf("%a", as.vector(x))
 # numerator that is itself a rounding artifact. Every quantity committed in
 # this file is nonzero, so nothing reaches it today; the guard is here because
 # the assertion added at counterexample B divides by a committed value on a
-# route where no shipped number exists to sanity-check the result, and a
-# silent NaN there passes an `expect_lt()` as NA rather than reddening.
+# route where no shipped number exists to sanity-check the result. testthat's
+# comparison expectations redden on a NaN (checked at the M148 review), so
+# a NaN never passed silently; the guard exists so the failure names the
+# zero rather than reporting a comparison against NaN.
 cert_rel <- function(hat, hi, lo) {
   if (any(hi + lo == 0)) {
     stop("cert_rel(): the exact value is zero, so there is no relative error ",
@@ -293,7 +295,55 @@ cert_rel <- function(hat, hi, lo) {
 # rather than the first-order e/2 -- the conversion between what is committed
 # above (pre-root quadratic forms) and what users are handed (an SE, and the
 # quotient of two SEs). `n` cancels out of both exactly, so none appears.
-cert_root_rel <- function(e) abs(e / (sqrt(1 + e) + 1))
+#
+# REFUSED BELOW -100% (M148, from the Known-fragilities list). A relative
+# variance error below -1 says the shipped variance is negative, and
+# sqrt(1 + e) is NaN there: the expression returned NaN. testthat's
+# comparison expectations DO redden on NaN (`expect_lt(NaN, 1)` fails,
+# checked at the M148 review), so the old value never passed a bracket; it
+# failed with a message about NaN that named the bracket's site but not the
+# offending input. No committed quantity reaches it, since every shipped
+# variance in this file is positive, so the failure now names the input and
+# stops.
+cert_root_rel <- function(e) {
+  if (any(e < -1)) {
+    stop("cert_root_rel(): relative variance error below -100% (",
+         paste(format(e[e < -1]), collapse = ", "),
+         ") -- the shipped variance is negative, so its root has no ",
+         "relative error", call. = FALSE)
+  }
+  abs(e / (sqrt(1 + e) + 1))
+}
+
+# The measured vector's length against the committed exact array's, asserted
+# as an expectation so a mismatch reddens the case that reached it and names
+# the site (M148). `hi` is the committed array, whose own length cert_shape
+# pins; `hat` is the shipped vector, which nothing else pins.
+cert_pin_length <- function(hat, hi, lbl) {
+  expect_identical(length(hat), length(hi),
+                   label = paste0(lbl, " measured length"),
+                   expected.label = paste0(lbl, " committed length"))
+}
+
+# A certificate returned where the shipped pricing succeeded must be a graded
+# estimate, never the sentinel (M148). Which sentinel exit fired is not
+# recoverable from the value -- that would need a route tag in shipped code
+# -- so the failure says only that the certificate degraded on a priced route.
+# The test is `identical()` against the certificate's own declared constant,
+# not the value coincidence M122 retired in cert_bracket(): a graded estimate
+# equal to the sentinel bit for bit would fail here, never pass silently.
+cert_priced_not_degraded <- function(cert, id) {
+  if (identical(cert, axes_certificate_sentinel())) {
+    testthat::fail(paste0(
+      "the certificate degraded to its sentinel on a priced route at case '",
+      id, "': the shipped pricing succeeded, so a sentinel here is a ",
+      "certificate-side failure (self-test, replay, or pivot), not a refusal"
+    ))
+  } else {
+    testthat::succeed()
+  }
+  invisible(cert)
+}
 
 # The certificate's floor, `safety factor * 2 * eps`, with the factor WRITTEN
 # DOWN rather than read from axes_certificate_safety_factor (M115 AC4). An
@@ -558,6 +608,15 @@ cert_true_error <- function(id, sigma, d) {
     cert_record(id, cert_disp[["refused"]], literals)
     return(NULL)
   }
+  # THE MEASURED SIDE'S LENGTH IS PINNED BEFORE EACH COMPARISON (M148, from
+  # the Known-fragilities list). cert_shape pins the COMMITTED arrays'
+  # lengths, and cert_rel() is elementwise: a shipped vector one component
+  # short would be recycled against the committed pair and every entry
+  # compared with the wrong exact value, with no failure anywhere. The pin
+  # is on the measured side, since that is the side nothing else asserts.
+  cert_pin_length(v$corrected, fz$v_hi, paste0(id, " corrected"))
+  cert_pin_length(v$naive, fz$vn_hi, paste0(id, " naive"))
+  cert_pin_length(u, fz$u_hi, paste0(id, " u"))
   dv <- cert_rel(v$corrected, as.numeric(fz$v_hi), as.numeric(fz$v_lo))
   dn <- cert_rel(v$naive, as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))
   du <- cert_rel(u, as.numeric(fz$u_hi), as.numeric(fz$u_lo))
@@ -828,8 +887,19 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
     expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")
 
   } else if (identical(disp, cert_disp[["priced"]])) {
-    # THE PRICED ROUTE, unchanged: the three brackets, and the wrongness
-    # itself asserted rather than described.
+    # THE PRICED ROUTE: the three brackets, and the wrongness itself
+    # asserted rather than described. FIRST, that there is a certificate to
+    # bracket (M148, from the Known-fragilities list). The shipped pricing
+    # succeeded here, but the certificate has sentinel exits of its own --
+    # the dd self-test, a non-finite or nonpositive replayed form, a
+    # dd_solve() with no pivot -- and the sentinel (1, 1, 1) is a number the
+    # brackets below can read as a generous estimate. Planted here on
+    # 2026-09-21 (a self-test returning FALSE), the `se` bracket passed the
+    # sentinel and the other two happened to fail it, on the sizes this
+    # machine's errors take (cval's true error 4.9, above the sentinel's 1;
+    # the ratio's ceiling-scaled true error 0.09, below it): which brackets
+    # catch it is a platform fact, and the failure below is not.
+    cert_priced_not_degraded(cert, "cxb")
     cert_bracket(cert$se, true_rel$se, "cxb se")
     cert_bracket(cert$cval, true_rel$cval, "cxb cval")
     cert_bracket(cert$fiml_ratio, true_rel$ratio, "cxb fiml_ratio")
@@ -984,6 +1054,34 @@ test_that("AC7: the two harness helpers select their branches on a stated condit
   expect_error(cert_rel(c(1, 2), c(1, 0), c(0, 0)), "the exact value is zero")
   # ... and an ordinary quantity still divides.
   expect_equal(cert_rel(2 + 2^-51, 2, 0), 2^-52)
+
+  # cert_root_rel(): below -100% the expression returned NaN (M148). The
+  # failure names the input; -1 itself is admitted (a root of zero, relative
+  # error one), and a vector fails on its offending element alone.
+  expect_error(cert_root_rel(-1.5), "below -100%.*-1\\.5")
+  expect_error(cert_root_rel(c(0.5, -2)), "below -100%.*-2")
+  expect_equal(cert_root_rel(-1), 1)
+  expect_equal(cert_root_rel(3), 1)
+  expect_equal(cert_root_rel(c(0, 3)), c(0, 1))
+
+  # cert_pin_length(): the measured side one short reddens, and names the
+  # site (M148).
+  expect_condition(cert_pin_length(1, c(1, 2), "probe"),
+                   class = "expectation_failure",
+                   regexp = "probe measured length")
+  expect_no_condition(cert_pin_length(c(1, 2), c(1, 2), "probe"),
+                      class = "expectation_failure")
+
+  # cert_priced_not_degraded(): the sentinel reddens and says the
+  # certificate degraded on a priced route; a graded estimate passes (M148).
+  expect_condition(cert_priced_not_degraded(list(se = 1, cval = 1,
+                                                 fiml_ratio = 1), "probe"),
+                   class = "expectation_failure",
+                   regexp = "degraded to its sentinel on a priced route")
+  expect_no_condition(cert_priced_not_degraded(list(se = 1e-3, cval = 1e-3,
+                                                    fiml_ratio = 1e-3),
+                                               "probe"),
+                      class = "expectation_failure")
 })
 
 
@@ -1198,6 +1296,48 @@ test_that("the estimate tracks a planted perturbation of the shipped values", {
     expect_lte(cert$se, (f * delta / 2 + base$se) * (1 + delta) + slack)
     expect_gte(cert$cval, (f * delta - base$cval) * (1 - delta) - slack)
     expect_lte(cert$cval, (f * delta + base$cval) * (1 + delta) + slack)
+  }
+})
+
+
+test_that("the quotient's estimate tracks a planted perturbation of the naive arm", {
+  skip_on_cran()
+  # The same sensitivity invariant, extended to the field the layer above
+  # never reached (M148, from the Known-fragilities list): `fiml_ratio` is
+  # priced on the quotient corrected / naive, and the plant above lands on
+  # the corrected arm alone, so a certificate that ignored the denominator
+  # would have passed it. Here the NAIVE arm is multiplied by (1 + delta) and
+  # the quotient's estimate must respond, while `se`, priced on the corrected
+  # arm alone, must not move at all.
+  cs <- cert_anchors()[[1L]]
+  d <- cert_derivs(cs)
+  real_v <- axes_v_pricing
+  base <- axes_accuracy_certificate(cs$r, d)
+  for (delta in c(1e-10, 1e-8, 1e-4, 1e-2)) {
+    testthat::local_mocked_bindings(
+      axes_v_pricing = function(sigma, dd) {
+        out <- real_v(sigma, dd)
+        out$naive <- out$naive * (1 + delta)
+        out
+      },
+      .package = "circumplex"
+    )
+    cert <- axes_accuracy_certificate(cs$r, d)
+    f <- 10
+    slack <- f * .Machine$double.eps
+    # With e0 the quotient's error already present, the planted quotient's
+    # relative error is |e0 - delta| / (1 + delta): the 1/(1 + delta) is the
+    # denominator's own factor, exact rather than a first-order cross term,
+    # and `base$fiml_ratio` is at least f*|e0|/2, so it bounds |e0| from
+    # above in both directions.
+    expect_gte(cert$fiml_ratio,
+               (f * delta / 2 - base$fiml_ratio) / (1 + delta) - slack)
+    expect_lte(cert$fiml_ratio,
+               (f * delta / 2 + base$fiml_ratio) / (1 + delta) + slack)
+    # The plant is on the denominator only: the SE estimate reads the
+    # corrected arm and is bit-identical to the unperturbed certificate's.
+    expect_identical(cert$se, base$se)
+    expect_identical(cert$cval, base$cval)
   }
 })
 

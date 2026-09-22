@@ -80,17 +80,23 @@ corrected 2026-08-06.)
 Added 2026-08-31 (M118), sharing one ROADMAP row: six latent defects in the
 accuracy certificate's validation layers, none reachable by a passing test run
 today, each able to turn a real regression green once it is. **Two were fixed
-by M122 and four remain; corrected 2026-09-05.** (One of the four is latent in
-its misdiagnosis rather than in its branch: the oracle driver's missing-key
-case is reachable by a maintainer regeneration, just not by a test.) In
-`tests/testthat/test-axes-certificate.R`, the measured side's component count
-is unpinned against the committed exact pair's length at three `cert_rel()`
-sites, and the dyadic `cval` bracket is unaggregated, so a regeneration pasted
-in truncated is recycled to length and compared against the wrong exact values;
-`cert_root_rel()` returns NaN rather than failing at a relative variance error
-at or below -100%; and the planted-perturbation layer was never extended to the
-quotient field's denominator. In `devel/degeneracy-oracle/exact_oracle.R`, a
-missing oracle key becomes a silent NULL pasted into the regeneration. **Fixed
+by M122, and the remaining five (the count after M147, below) were fixed by
+M148; none is open. Corrected M148.** (One of the five was latent in its
+misdiagnosis rather than in its branch: the oracle driver's missing-key case
+is reachable by a maintainer regeneration, just not by a test.) **Fixed by
+M148**, in `tests/testthat/test-axes-certificate.R`: the measured side's
+component count was unpinned against the committed exact pair's length at the
+three priced-loop `cert_rel()` sites, so a shipped vector one component short
+was recycled and compared against the wrong exact values, and
+`cert_pin_length()` now asserts it before each comparison (the "dyadic `cval`
+bracket unaggregated" clause recorded beside it was vacuous, since `u_hi` and
+`u_lo` are pinned to length 1, and is dropped); `cert_root_rel()` returned NaN
+at a relative variance error below -100% and now stops naming the input; and
+the planted-perturbation layer, which drove the corrected arm alone, now also
+multiplies the naive arm and brackets the quotient field's response. In
+`devel/degeneracy-oracle/exact_oracle.R`, a missing oracle key became a silent
+NULL pasted into the regeneration; `exact_parse()` now stops naming the
+missing key, with the guard asserted in process at load. **Fixed
 by M122:** `cert_bracket()` selected its at-the-floor branch by
 `identical(est, cert_floor)`, a value coincidence rather than a statement about
 the fit, and now selects it by a stated `at_floor` argument; `cert_rel()`
@@ -108,15 +114,20 @@ Full text in the M146 archive's Review section.
 
 Added 2026-09-05 (M122 review, findings 6 and 7), same ROADMAP row, taking the
 count from four open to six; **the constant admission predicate was retired by
-M147 with the `rcond` band it read, so five remain (corrected M147).**
-`axes_accuracy_certificate()` returns its sentinel
-by six routes besides "the shipped pricing refused" -- a failed `axes_dd_selftest()`,
-a NULL `axes_dd_pricing()`, non-finite `v_hat`/`vn_hat`/`u_hat`, nonpositive
-quadratic forms on either arm, and a vanished cval numerator -- and the
-counterexample-B block's two-branch split does not distinguish them: on a platform
-where one fires while the pricing succeeds, the priced branch brackets a sentinel
-`cert` and passes, since `expect_lte(1, max(cert_ceiling * true_rel, cert_floor))`
-holds. (The sixth, `cert_refusal_admitted()` comparing a committed `rcond`
+M147 with the `rcond` band it read, so five remained (corrected M147), and
+M148 fixed the fifth (corrected M148).** `axes_accuracy_certificate()` returns
+its sentinel by six routes besides "the shipped pricing refused" -- a failed
+`axes_dd_selftest()`, a NULL `axes_dd_pricing()`, non-finite
+`v_hat`/`vn_hat`/`u_hat`, nonpositive quadratic forms on either arm, and a
+vanished cval numerator -- and the counterexample-B block's two-branch split
+did not distinguish them: on a platform where one fires while the pricing
+succeeds, the priced branch bracketed a sentinel `cert`, and whether a bracket
+caught it was a platform fact (planted 2026-09-21 on macOS arm64, the `se`
+bracket passed the sentinel while `cval` and `fiml_ratio` failed it). Since
+M148 `cert_priced_not_degraded()` runs first in that branch and fails saying
+the certificate degraded on a priced route; which of the six routes fired is
+still not named, since that needs a route tag in shipped code, and stays a
+note here. (The sixth, `cert_refusal_admitted()` comparing a committed `rcond`
 band to `.Machine$double.eps` and so naming the case it was written to avoid
 naming, is gone: since M147 a refusal is admitted at any case only as an exact
 zero pivot that a direct `solve(info, tol = 0)` reproduces on the running
