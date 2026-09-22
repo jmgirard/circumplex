@@ -2278,9 +2278,10 @@ admits is an exact zero pivot (D-061, D-062).
 **Decision.** The current posture is kept. Three classes of test run on
 CRAN. The checks against exact truth: the five per-anchor bracket tests with
 their reference-route checks, counterexample B's test, the case detector,
-and the two closed-form oracle tests. They bracket the running machine's own
-error against exact values, which is how the certificate under-reporting is
-caught, and CRAN checks on platforms that CI does not run. The
+and the two closed-form oracle tests. The brackets among them measure the
+running machine's own error against exact values, and the detector keeps
+them from all skipping. Together that is how the certificate under-reporting
+is caught, and CRAN checks on platforms that CI does not run. The
 committed-value checks: the anchor-list test, the rounding-midpoint margin
 test and the safety-factor test, none of which runs the shipped route. The
 contract and harness checks: the disposition vocabulary, the helper

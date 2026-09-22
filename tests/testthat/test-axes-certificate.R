@@ -61,9 +61,11 @@
 #
 #   - the checks against exact truth: the five per-anchor bracket tests with
 #     their reference-route checks, counterexample B's test, the case
-#     detector, and the two closed-form oracle tests. They bracket this
-#     machine's own error against exact values, which is how the certificate
-#     UNDER-reporting is caught, and CRAN checks on platforms CI does not.
+#     detector, and the two closed-form oracle tests. The brackets among them
+#     measure this machine's own error against exact values, and the
+#     detector keeps them from all skipping; together that is how the
+#     certificate UNDER-reporting is caught, and CRAN checks on platforms CI
+#     does not.
 #   - the committed-value checks: the anchor-list test, the rounding-midpoint
 #     margin test and the safety-factor test. None runs the shipped route.
 #   - the contract and harness checks: the disposition vocabulary, the helper
@@ -148,8 +150,8 @@ cert_derivs <- function(cs) {
 #
 # THE DERIVATIVE SET is pinned through `sig` and the exact values together,
 # and at the five anchors also through `xi1` (M149). Most of the set is too
-# large to commit entry by entry (10 to 12 matrices of up to 9x9 at the anchors) and
-# is 0/1 indicators the oracle builds from the same closed forms, so a set
+# large to commit entry by entry (6 to 12 matrices of up to 9x9 at the
+# anchors) and is 0/1 indicators the oracle builds from the same closed forms, so a set
 # that drifted here would move this machine's doubles AWAY from the exact
 # values and redden the bracket rather than hide inside it. `xi1` is the one
 # member built from cos(), and cov2cor() can round a one-ulp cosine change out
@@ -728,9 +730,10 @@ cert_true_error <- function(id, sigma, d) {
   }
   # THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11).
   # Counterexample B asserts this in its own test (the same half-ulp bound for
-  # `v` and `v_naive`, an absolute one for `u`); the five anchors carry a committed `xi1` and are checked here, after the
-  # matrix check and BEFORE the shipped pricing, so the check runs on the
-  # priced and the refusing route alike.
+  # `v` and `v_naive`, an absolute one for `u`); the five anchors carry a
+  # committed `xi1` and are checked here, after the matrix check and BEFORE
+  # the shipped pricing, so the check runs on the priced and the refusing
+  # route alike.
   if (!is.null(fz$xi1)) cert_dd_vs_exact(id, sigma, d, fz)
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
