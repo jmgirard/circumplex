@@ -28,7 +28,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - [x] AC3: At the anchor the planted-perturbation layer drives (`cert_anchors()[[1L]]`), a perturbation planted in the naive arm's quadratic forms reddens the `fiml_ratio` bracket, as the layer's existing plants redden the `se` and `cval` brackets.
 - [x] AC4: In `devel/degeneracy-oracle/exact_oracle.R`, the function that parses the Python driver's output stops with a message naming the missing key when a key it reads is absent. The guard is asserted in process against a stubbed output with one key removed.
 - [x] AC5: In the counterexample-B block of `tests/testthat/test-axes-certificate.R`, a certificate sentinel returned while the shipped pricing succeeded fails the block with a message saying the certificate degraded on a priced route. A planted `axes_dd_selftest()` failure reddens it.
-- [ ] AC6: `devtools::test()` reports zero failures and zero warnings; skips are permitted, since the file skips by design.
+- [ ] AC6: `devtools::test(reporter = "check")` reports zero failures, and no warning reported against `tests/testthat/test-axes-certificate.R` (the only test file this milestone changes), including warnings raised by package code or installed libraries while that file's tests run. Skips are permitted, and so are warnings reported against other test files.
 
 ## Coverage
 
@@ -63,6 +63,11 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - 2026-09-22: /milestone-review started on the user's direct invocation with status `in-progress` and T6 partial (override logged): T6's remaining item was the `devtools::test()` WARN/SKIP re-read, which lands here as AC6 evidence. Status moved to `review`. Master had not moved since the branch was cut (six commits ahead, origin/master an ancestor of HEAD).
 
 - 2026-09-22: amendment return: AC6 — "`devtools::test()` reports zero failures, and no warning raised from a file this milestone touches; skips and warnings from untouched files are permitted." Reason: the suite reports twelve warnings, every one from an untouched file or an installed library, so the criterion as written cannot pass on any branch cut from this master and never could; the work itself is verified (AC1-AC5 PASS). Amendment-return count for M148: 1 (AC6). Status back to `in-progress` for the gated amendment via /milestone-implement step 6, then re-review. Review stops here.
+
+- 2026-09-22: /milestone-implement resumed on the review's amendment return (AC6). Mini gate: the user chose "Amend AC6 as proposed" over keeping it as written or dropping it.
+- 2026-09-22: re-audit: AC6 (reduced) — two definitions of scope ("a file this milestone touches" is a changing diff set, the parenthetical names one fixed file; name the file only); "raised from" is ambiguous between the file the reporter attributes a warning to and the file that calls `warning()` (use "reported against"); the check reporter that attributes warnings is not named; no proportionality or instrument-binding finding. Wording fixed at the gate to the reader's text.
+- 2026-09-22: re-audit: AC6 (reduced) — nothing. Second line on AC6: the stop; no further reader is spawned for it.
+- 2026-09-22: amendment return: AC6 — "`devtools::test(reporter = \"check\")` reports zero failures, and no warning reported against `tests/testthat/test-axes-certificate.R` (the only test file this milestone changes), including warnings raised by package code or installed libraries while that file's tests run. Skips are permitted, and so are warnings reported against other test files." Narrows the original whole-suite zero-warning promise to the file the milestone changes; zero failures stays suite-wide.
 
 ## Decisions
 
