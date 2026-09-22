@@ -7,7 +7,7 @@
 - **Principles touched:** IP1, IP3
 - **Resolves:** —
 - **Surface tier:** user-facing, because a `?axes_reliability` sentence ships beside the internal test and record changes
-- **Branch/PR:** m149-dd-anchors-cran-posture
+- **Branch/PR:** m149-dd-anchors-cran-posture · https://github.com/jmgirard/circumplex/pull/184
 
 ## Goal
 
