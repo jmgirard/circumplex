@@ -59,13 +59,13 @@
 #
 # WHAT RUNS ON CRAN (M149; D-063). Three classes run under CRAN's own check:
 #
-#   - the exact-oracle dispositions: the five per-anchor bracket tests with
-#     their reference-route checks, counterexample B's test, and the case
-#     detector. They are the only assertions here that can catch the
-#     certificate UNDER-reporting, and CRAN checks on platforms CI does not.
-#   - the committed-value and closed-form checks: the anchor-list test, the
-#     rounding-midpoint margin test, the two closed-form oracle tests and the
-#     safety-factor test. None depends on the platform's arithmetic.
+#   - the checks against exact truth: the five per-anchor bracket tests with
+#     their reference-route checks, counterexample B's test, the case
+#     detector, and the two closed-form oracle tests. They bracket this
+#     machine's own error against exact values, which is how the certificate
+#     UNDER-reporting is caught, and CRAN checks on platforms CI does not.
+#   - the committed-value checks: the anchor-list test, the rounding-midpoint
+#     margin test and the safety-factor test. None runs the shipped route.
 #   - the contract and harness checks: the disposition vocabulary, the helper
 #     branches, the predicate and warning reading the quotient, the two
 #     sentinel tests, and the condition-inside-the-certificate test.
@@ -73,9 +73,11 @@
 # One class skips on CRAN, via skip_on_cran() in each test: the
 # reachable-versus-B discrimination, the admitted-domain sweep, the
 # sample-size independence check, and the two planted-perturbation
-# invariants. None of them can detect an under-report, so a failure specific
-# to one CRAN platform risks a rejection with nothing learned about the
-# certificate's safety. A new test here takes the class its claim belongs to.
+# invariants. None of them checks the estimate against exact truth: they
+# test its response to a planted or known-large error, or basic properties
+# of it. A failure specific to one CRAN platform there risks a rejection with
+# no exact yardstick to say whether the certificate was wrong. A new test
+# here takes the class its claim belongs to.
 
 
 # ---- the six anchor geometries ----------------------------------------------
@@ -146,7 +148,7 @@ cert_derivs <- function(cs) {
 #
 # THE DERIVATIVE SET is pinned through `sig` and the exact values together,
 # and at the five anchors also through `xi1` (M149). Most of the set is too
-# large to commit entry by entry (27 matrices of 8x8 at the p = 8 anchors) and
+# large to commit entry by entry (10 to 12 matrices of up to 9x9 at the anchors) and
 # is 0/1 indicators the oracle builds from the same closed forms, so a set
 # that drifted here would move this machine's doubles AWAY from the exact
 # values and redden the bracket rather than hide inside it. `xi1` is the one
@@ -725,8 +727,8 @@ cert_true_error <- function(id, sigma, d) {
     return(NULL)
   }
   # THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11).
-  # Counterexample B asserts this in its own test, under a bound of its own;
-  # the five anchors carry a committed `xi1` and are checked here, after the
+  # Counterexample B asserts this in its own test (the same half-ulp bound for
+  # `v` and `v_naive`, an absolute one for `u`); the five anchors carry a committed `xi1` and are checked here, after the
   # matrix check and BEFORE the shipped pricing, so the check runs on the
   # priced and the refusing route alike.
   if (!is.null(fz$xi1)) cert_dd_vs_exact(id, sigma, d, fz)
@@ -880,7 +882,7 @@ test_that("AC3: the anchor case list is not empty", {
   # (M149). cert_dd_vs_exact() runs only where that field is present, so an
   # anchor whose regeneration dropped it would silently stop checking the
   # reference route. Counterexample B has none: its test asserts the route
-  # under a bound of its own.
+  # itself, with an absolute bound for `u`, and with no `xi1` precondition.
   for (id in c("a4", "a5", "c4", "b9a", "b9b")) {
     p <- cert_shape[[id]][[1L]]
     expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
@@ -919,17 +921,23 @@ test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by 
   # Nothing is priced and no matrix is read, so this runs identically on
   # every machine.
   #
-  # THE ROUTE'S ERROR BOUND. The a-priori bound the degeneracy floor rests on
-  # is p * kappa^2 * eps for the double route's relative error, and the floor
-  # allows it to undershoot the true error by a factor of 10 (see
-  # `?axes_reliability` on the floor's `1e-5`). The reference route runs the
-  # same pipeline in double-double arithmetic, so the same forward-error
-  # argument holds with the double-double unit roundoff 2^-104 in place of
-  # eps: 10 * p * kappa^2 * 2^-104, as a relative error. A relative error r
-  # is at most r * 2^53 units in the last place of `hi`, since |hi| is below
-  # 2^53 of those units. Hence the bound in ulps is 10 * p * kappa^2 * 2^-51.
-  # `kappa` is each anchor's committed fingerprint, pinned against the
-  # built matrix to 1e-3 relative, so it enters inflated by that tolerance.
+  # THE ROUTE'S ERROR BOUND, BY ANALOGY AND NOT SEPARATELY DERIVED. The
+  # a-priori bound the degeneracy floor rests on is p * kappa^2 * eps for the
+  # double route's relative error in the corrected SE, and the floor allows it
+  # to undershoot the true error by a factor of 10 (see `?axes_reliability` on
+  # the floor's `1e-5`). The reference route runs the same pipeline in
+  # double-double arithmetic, so the same bound is taken with the
+  # double-double unit roundoff 2^-104 in place of eps, applied to `v`,
+  # `v_naive` and `u`. `v` is a squared SE, so its relative error is about
+  # twice the SE's, and a factor of 2 is carried for all three: 2 * 10 * p *
+  # kappa^2 * 2^-104, as a relative error. A relative error r is at most
+  # r * 2^53 units in the last place of `hi`, since |hi| is below 2^53 of
+  # those units. Hence the bound in ulps is 20 * p * kappa^2 * 2^-51. `kappa`
+  # is each anchor's committed fingerprint, pinned against the built matrix to
+  # 1e-3 relative, so it enters inflated by that tolerance. For orientation
+  # only (no assertion reads these): on 2026-09-22, on macOS arm64, the
+  # route's own unrounded deviation from the exact values ran 1.3e-15 to
+  # 2.5e-9 ulp across the five anchors, against bounds of 7.1e-6 to 6.6e-3.
   #
   # Where `hi` is a power of two the neighbour below is half as far away and
   # the margin formula changes; no committed `hi` is one, and that is asserted
@@ -938,7 +946,7 @@ test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by 
   for (cs in cert_anchors()) {
     fz <- cert_frozen[[cs$id]]
     p <- length(cs$scale)
-    bound <- 10 * p * (cs$kappa * (1 + 1e-3))^2 * 2^-51
+    bound <- 20 * p * (cs$kappa * (1 + 1e-3))^2 * 2^-51
     for (pr in list(c("v_hi", "v_lo"), c("vn_hi", "vn_lo"),
                     c("u_hi", "u_lo"))) {
       hi <- as.numeric(fz[[pr[[1L]]]])

@@ -2264,7 +2264,7 @@ certificate exceeds the target: that reopens the floor's tau (D-048), not
 the selector. A structurally singular design the three grounds and the
 selector both miss.
 
-### D-063 (2026-09-22): the certificate test file keeps its oracle layer live on CRAN, and only tests that cannot detect an under-report skip there (M149, RR22 rec 12)
+### D-063 (2026-09-22): the certificate test file keeps its checks against exact truth live on CRAN, and only tests that make no such check skip there (M149, RR22 rec 12)
 
 **Context.** `tests/testthat/test-axes-certificate.R` runs its exact-value
 brackets, counterexample B's test and the case detector under CRAN's own
@@ -2276,23 +2276,25 @@ on every route. Since M147 the only platform-dependent refusal the file
 admits is an exact zero pivot (D-061, D-062).
 
 **Decision.** The current posture is kept. Three classes of test run on
-CRAN. The exact-oracle dispositions: the five per-anchor bracket tests with
-their reference-route checks, counterexample B's test, and the case
-detector. These are the only assertions that can catch the certificate
-under-reporting, and CRAN checks on platforms that CI does not run. The
-committed-value and closed-form checks: the anchor-list test, the
-rounding-midpoint margin test, the two closed-form oracle tests and the
-safety-factor test, none of which depends on the platform's arithmetic. The
+CRAN. The checks against exact truth: the five per-anchor bracket tests with
+their reference-route checks, counterexample B's test, the case detector,
+and the two closed-form oracle tests. They bracket the running machine's own
+error against exact values, which is how the certificate under-reporting is
+caught, and CRAN checks on platforms that CI does not run. The
+committed-value checks: the anchor-list test, the rounding-midpoint margin
+test and the safety-factor test, none of which runs the shipped route. The
 contract and harness checks: the disposition vocabulary, the helper
 branches, the refusal predicate and warning reading the quotient, the two
 sentinel tests and the condition-inside-the-certificate test. One class
 skips on CRAN: the reachable-versus-B discrimination, the admitted-domain
 sweep, the sample-size independence check and the two planted-perturbation
 invariants. M120 moved these off CRAN on cost. They stay off because none
-of them can detect an under-report, so a platform-specific failure in one
-risks a CRAN rejection with nothing learned about the certificate's
-safety. The anchor-list test moves to CRAN, because the CRAN-live brackets
-are generated from the list it pins.
+of them checks the estimate against exact truth: they test its response to
+a planted or known-large error, or basic properties of it. A
+platform-specific failure in one risks a CRAN rejection with no exact
+yardstick to say whether the certificate was wrong. The anchor-list test
+moves to CRAN, because the CRAN-live brackets are generated from the list it
+pins.
 
 **Rejected.** RR22's CI-only reading. It lowers the rejection risk, but an
 under-report that appears only on a CRAN platform would then go unseen, and
@@ -2300,8 +2302,8 @@ IP1 ranks that above release timing.
 
 **Consequences.** The file header states the posture and cites this entry.
 A new test in this file takes the class its claim belongs to: a test that
-can detect an under-report runs on CRAN, and one that cannot is free to skip
-there.
+checks the estimate against exact truth runs on CRAN, and one that does not
+is free to skip there.
 
 **Reopens.** A CRAN check failure in a CRAN-live test of this file that is a
 platform fact and not an under-report. A CRAN platform on which the anchors

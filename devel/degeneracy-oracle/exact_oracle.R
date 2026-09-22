@@ -146,11 +146,14 @@ local({
 # and printed as a paste-ready block by CERT_EMIT=1 (see the regeneration note
 # in tests/testthat/test-axes-certificate.R).
 cert_emit <- list()
-# `d` is given for the five cos()-built anchors only (M149). Their `xi1` is
-# cos() at the item angles' differences, and the exact values below were priced
-# from THIS machine's doubles of it, so the packaged file pins it beside `sig`:
-# a machine whose cos() rounds one entry differently has no yardstick at the
-# half-ulp dd-vs-exact bound even where `sig` still matches.
+# `d` is given for the five anchors only (M149). Their `xi1` is cos() at the
+# item angles' differences, and the exact values below were priced from THIS
+# machine's doubles of it, so the packaged file pins it beside `sig`: a
+# machine whose cos() rounds one entry differently has no yardstick at the
+# half-ulp dd-vs-exact bound even where `sig` still matches. Counterexample
+# B's `xi1` is cos() too but is not pinned; its test asserts the reference
+# route with no `xi1` precondition, so a cos() difference there fails rather
+# than skips.
 cert_record <- function(id, S, ex, d = NULL) {
   rec <- list(sig = sprintf("%a", as.vector(S[upper.tri(S)])))
   if (!is.null(d)) {
