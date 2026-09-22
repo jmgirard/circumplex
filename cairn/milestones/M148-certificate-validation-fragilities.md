@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M148: Close the five remaining accuracy-certificate validation-layer fragilities
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M147
 - **Driving RR:** —
@@ -46,7 +46,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - [x] T3: The naive-arm plant at the driven anchor.
 - [x] T4: The oracle-driver key guard and its in-process assertion.
 - [x] T5: The sentinel-on-priced-route failure in the counterexample-B block, with the `axes_dd_selftest()` plant.
-- [ ] T6: DESIGN.md Known fragilities corrected in place (`corrected M148`); `devtools::test()`.
+- [x] T6: DESIGN.md Known fragilities corrected in place (`corrected M148`); `devtools::test()`.
 
 ## Work log
 
@@ -68,6 +68,8 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - 2026-09-22: re-audit: AC6 (reduced) — two definitions of scope ("a file this milestone touches" is a changing diff set, the parenthetical names one fixed file; name the file only); "raised from" is ambiguous between the file the reporter attributes a warning to and the file that calls `warning()` (use "reported against"); the check reporter that attributes warnings is not named; no proportionality or instrument-binding finding. Wording fixed at the gate to the reader's text.
 - 2026-09-22: re-audit: AC6 (reduced) — nothing. Second line on AC6: the stop; no further reader is spawned for it.
 - 2026-09-22: amendment return: AC6 — "`devtools::test(reporter = \"check\")` reports zero failures, and no warning reported against `tests/testthat/test-axes-certificate.R` (the only test file this milestone changes), including warnings raised by package code or installed libraries while that file's tests run. Skips are permitted, and so are warnings reported against other test files." Narrows the original whole-suite zero-warning promise to the file the milestone changes; zero failures stays suite-wide.
+
+- 2026-09-22: T6 done. `devtools::test(reporter = "check")` exit 0: FAIL 0, WARN 12, SKIP 1, PASS 13942; zero warnings reported against `test-axes-certificate.R` (the twelve sit against test-ci_accuracy.R ×4, test-pole-values.R ×4, test-print-width.R ×2, test-growth_invariants.R, test-ssm_sem.R). Claim audit: not owed — internal tier. Status set to `review`.
 
 ## Decisions
 
