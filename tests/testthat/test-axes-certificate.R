@@ -937,17 +937,23 @@ test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by 
   #
   # THREE PREMISES OF THAT BASIS ARE UNPROVEN (M149 review, AC2 amendment):
   #   1. that the floor's p * kappa^2 * eps bound with its factor 10 holds at
-  #      all -- it was MEASURED on the double route's corrected SE, never
-  #      proven (R/axes_corrected_se.R, the floor's derivation);
+  #      all -- its form is a scaling argument and its factor 10 a
+  #      calibration MEASURED on the double route's corrected SE, neither
+  #      proven (R/axes_corrected_se.R, the floor's derivation). The
+  #      calibration covers kappa below the floors that target sets (7.5e4
+  #      at p = 8, 7.1e4 at p = 9), and a5 (1e5) and b9b (2.874e5) sit above
+  #      theirs, so at those two the factor 10 is extrapolated;
   #   2. that it carries to the double-double route with 2^-104 in place of
   #      eps -- nothing here analyses the double-double pipeline's own error;
   #   3. that it applies to `v_naive` and `u`, with the factor 2 for the
   #      squared SE covering all three. For `u` it is already exceeded
   #      elsewhere: at counterexample B (p = 3, kappa 6.65e6) the double
   #      route's measured `cval` relative error of 3.4e-1, recorded in
-  #      R/axes_corrected_se.R, is about 11.5 times p * kappa^2 * 2^-52, so
-  #      it is the factor 2 and not the 10 that keeps the stated bound above
-  #      that ratio.
+  #      R/axes_corrected_se.R, is about 11.5 times p * kappa^2 * 2^-52. The
+  #      factor 10 alone does not cover that ratio; only the product 20
+  #      does, by a factor of 1.7, and its extra 2 was argued for the
+  #      squared SE `v`, not for `u`, whose error that source says is driven
+  #      by df rather than by kappa.
   # If a premise fails, this test still asserts the stated margin, but the
   # half-ulp assertion in cert_dd_vs_exact() then rests on the route being
   # far more accurate than half an ulp, which the measured errors below

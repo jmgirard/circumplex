@@ -1,6 +1,6 @@
 # M149: Reference-route checks at the anchors, and the certificate file's CRAN posture
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -69,6 +69,8 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: re-audit: AC2 (full) — sentence three's "upper bound" was not verifiable once the bound was admitted unproven, and "each premise" had no list. Both were fixed by naming three premises. It also found that the comment, T2 and the ~627 comment still said "derived". No IP or D-entry blocks the amended state.
 - 2026-09-22: amendment applied at the mini gate (maintainer adopted it): AC2 now reads "a stated bound" and names three unproven premises. This text supersedes the clause in the review's amendment-return line above. It is the same return, not a second one. T8 added and AC2 mapped to T2 and T8. T2's wording changed from "derive" to "state".
 - 2026-09-22: T8 done. The margin test's comment now states the bound as not proven and lists the three premises in AC2. Premise 3 cites B's measured `cval` error of 3.4e-1 (`R/axes_corrected_se.R:678`), which is 11.54 times `p * kappa^2 * 2^-52` at p = 3 and kappa 6.65e6, recomputed this session. The `cert_dd_vs_exact()` comment now says its claim holds only as far as those premises hold. The certificate file passes with `NOT_CRAN=true`.
+- 2026-09-22: claim audit: 9 claims read, 2 corrected — tests/testthat/test-axes-certificate.R. It read only the lines T8 added, because the earlier lines had their own pass. Premise 1 now says the bound's form is a scaling argument and its factor 10 a measured calibration. It also says a5 and b9b sit above their floors, so the factor is extrapolated there. The premise-3 sentence "the factor 2 and not the 10" was wrong, and it now says only the product 20 covers the ratio. The same reader's re-read confirmed both corrections.
+- 2026-09-22: completion. `devtools::test()` gave `[ FAIL 0 | WARN 12 | SKIP 1 | PASS 14009 ]`, the same as the review run. Every change since the release check is a comment or a record. Status set to review.
 
 ## Decisions
 
