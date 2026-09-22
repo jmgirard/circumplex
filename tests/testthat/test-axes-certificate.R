@@ -124,19 +124,26 @@ cert_derivs <- function(cs) {
 # ever fires off the authoring machine is read from the pull request's CI run,
 # not assumed here.
 #
-# THE DERIVATIVE SET is pinned through `sig` and the exact values together. It
-# is too large to commit entry by entry (27 matrices of 8x8 at the p = 8
-# anchors), but the committed `v`, `v_naive` and `u` were priced from a
-# derivative set the oracle builds from the same closed forms, so a derivative
-# set that drifted here would move this machine's doubles AWAY from them and
-# redden the bracket rather than hide inside it.
+# THE DERIVATIVE SET is pinned through `sig` and the exact values together,
+# and at the five anchors also through `xi1` (M149). Most of the set is too
+# large to commit entry by entry (27 matrices of 8x8 at the p = 8 anchors) and
+# is 0/1 indicators the oracle builds from the same closed forms, so a set
+# that drifted here would move this machine's doubles AWAY from the exact
+# values and redden the bracket rather than hide inside it. `xi1` is the one
+# member built from cos(), and cov2cor() can round a one-ulp cosine change out
+# of `sig`, so its upper triangle is committed beside `sig` and checked in
+# cert_dd_vs_exact(): a mismatch there skips the case, naming `xi1`.
 #
-# What is still deliberately NOT pinned is the double-double reference route.
-# That route is the artifact under test, and an expectation derived from the
-# artifact under test is blind in the dimension it derives: an earlier draft of
-# the old gate did pin it, and the planted defect that stops the route carrying
-# low-order words then made these cases SKIP instead of redden -- the defect
-# hid inside the precondition meant to protect the comparison.
+# What is still deliberately NOT pinned is the double-double reference route:
+# it is never a PRECONDITION. That route is the artifact under test, and an
+# expectation derived from the artifact under test is blind in the dimension
+# it derives: an earlier draft of the old gate did pin it, and the planted
+# defect that stops the route carrying low-order words then made these cases
+# SKIP instead of redden -- the defect hid inside the precondition meant to
+# protect the comparison. Asserting the route against the committed exact
+# values, failing and never skipping on its output, is a different thing and
+# is done at all six cases: at counterexample B in its own test since M122,
+# and at the five anchors in cert_dd_vs_exact() since M149.
 #
 # This block does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
 # the precondition, so a builder edit that moved a geometry still REDDENS.
@@ -154,6 +161,16 @@ cert_derivs <- function(cs) {
 # SE errors ran 5.9e-14 (family A at kappa 1e4) to 3.4e-02 (counterexample B).
 
 cert_frozen <- list(
+  cxb = list(
+    sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1", "-0x1.ffb4667563093p-1"
+    ),
+    v_hi = c("0x1.a27aa6fa81289p+3", "0x1.9033b1b503c27p+3"),
+    v_lo = c("0x1.14a44927d1499p-52", "0x1.6dd7ad9921fd4p-54"),
+    vn_hi = c("0x1.d7e81cc594451p+5", "0x1.bd654f98f5a5bp+5"),
+    vn_lo = c("-0x1.8bc7343b184ebp-49", "0x1.df2138cd8f0a9p-50"),
+    u_hi = "0x1.c70c587f1f6ecp-5",
+    u_lo = "-0x1.af973c7509042p-59"
+  ),
   a4 = list(
     sig = c("0x1.b4d8379580e2p-1", "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", 
     "0x1.2bcd8009ffbebp-3", "0x1.ffcb979800d1bp-2", "0x1.b4d8379580e2p-1", 
@@ -164,6 +181,16 @@ cert_frozen <- list(
     "0x1.b4d8379580e2p-1", "0x1.ffcb979800d1bp-2", "0x1.2bcd8009ffbebp-3", 
     "0x0p+0", "0x1.2bcd8009ffbe6p-3", "0x1.ffcb979800d1ap-2", "0x1.b4d8379580e2p-1"
     ),
+    xi1 = c("0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1p+0", "-0x1.6a09e667f3bccp-1", 
+    "0x1.1a62633145c07p-54", "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.a79394c9e8a0ap-53", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1.1a62633145c07p-54", 
+    "-0x1.6a09e667f3bccp-1", "-0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1.a79394c9e8a0ap-53", "0x1.6a09e667f3bcbp-1", "0x1p+0"),
     v_hi = c("0x1.7fb171557665bp-3", "0x1.7fe5cdf0c4d5bp-3"),
     v_lo = c("-0x1.a352bdd9f74f6p-64", "0x1.b53cb2eed0db5p-60"),
     vn_hi = c("0x1.ffcb9978a7aa0p-3", "0x1.ffb16679a59dfp-2"),
@@ -181,6 +208,16 @@ cert_frozen <- list(
     "0x1.b50079a0feb12p-1", "0x1.fffac1e05c131p-2", "0x1.2be920fd7587ep-3", 
     "0x0p+0", "0x1.2be920fd75879p-3", "0x1.fffac1e05c12fp-2", "0x1.b50079a0feb12p-1"
     ),
+    xi1 = c("0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1p+0", "-0x1.6a09e667f3bccp-1", 
+    "0x1.1a62633145c07p-54", "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.a79394c9e8a0ap-53", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1.1a62633145c07p-54", 
+    "-0x1.6a09e667f3bccp-1", "-0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1.a79394c9e8a0ap-53", "0x1.6a09e667f3bcbp-1", "0x1p+0"),
     v_hi = c("0x1.7ff822f445090p-3", "0x1.7ffd60f5ad28bp-3"),
     v_lo = c("-0x1.936d3acc2b778p-60", "-0x1.d0ddf75c29bcep-57"),
     vn_hi = c("0x1.fffac1e52b6ddp-3", "0x1.fff822d8710d2p-2"),
@@ -191,6 +228,9 @@ cert_frozen <- list(
   c4 = list(
     sig = c("0x1.fffd60ecbe7bp-2", "0x0p+0", "0x1.fffd60ecbe7bp-2", "0x1.fffd60ecbe7aep-2", 
     "0x0p+0", "0x1.fffd60ecbe7bp-2"),
+    xi1 = c("0x1p+0", "0x1.1a62633145c07p-54", "0x1p+0", "-0x1p+0", "0x1.1a62633145c07p-54", 
+    "0x1p+0", "-0x1.a79394c9e8a0ap-53", "-0x1p+0", "0x1.1a62633145c07p-54", 
+    "0x1p+0"),
     v_hi = c("0x1.7ffd60fdec50dp-3", "0x1.800000036f8e8p-3"),
     v_lo = c("0x1.659fc12469cbep-57", "-0x1.d8e8dce3de8afp-57"),
     vn_hi = c("0x1.000000036f930p-2", "0x1.fffd60ee76447p-2"),
@@ -212,6 +252,19 @@ cert_frozen <- list(
     "0x1.e98a8996b5f8ap-3", "-0x1.db2162eb1137p-7", "-0x1.e98a8996b5f86p-4", 
     "-0x1.db2162eb113aap-7", "0x1.e98a8996b5f86p-3", "0x1.f86394ae0e824p-2"
     ),
+    xi1 = c("0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1p+0", "-0x1.6a09e667f3bccp-1", 
+    "0x1.1a62633145c07p-54", "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.a79394c9e8a0ap-53", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1.1a62633145c07p-54", 
+    "-0x1.6a09e667f3bccp-1", "-0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1.a79394c9e8a0ap-53", "0x1.6a09e667f3bcbp-1", "0x1p+0", "0x1p+0", 
+    "0x1.6a09e667f3bcdp-1", "0x1.1a62633145c07p-54", "-0x1.6a09e667f3bccp-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bcep-1", "-0x1.a79394c9e8a0ap-53", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0"),
     v_hi = c("0x1.eecf3c6f2786bp-4", "0x1.ad14d01e8a4b2p-4", "0x1.dd93c7c70363ep-2"
     ),
     v_lo = c("-0x1.010402a050219p-59", "-0x1.463576282f2f1p-59", "0x1.49f589c2481b9p-59"
@@ -237,6 +290,19 @@ cert_frozen <- list(
     "0x1.e9902d41e6beep-3", "-0x1.db26dc16dcb8p-7", "-0x1.e9902d41e6bebp-4", 
     "-0x1.db26dc16dcbb9p-7", "0x1.e9902d41e6bebp-3", "0x1.f86964229da49p-2"
     ),
+    xi1 = c("0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1p+0", "-0x1.6a09e667f3bccp-1", 
+    "0x1.1a62633145c07p-54", "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "-0x1.a79394c9e8a0ap-53", "-0x1.6a09e667f3bcep-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bccp-1", "0x1.1a62633145c07p-54", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0", "0x1.6a09e667f3bcdp-1", "0x1.1a62633145c07p-54", 
+    "-0x1.6a09e667f3bccp-1", "-0x1p+0", "-0x1.6a09e667f3bcep-1", 
+    "-0x1.a79394c9e8a0ap-53", "0x1.6a09e667f3bcbp-1", "0x1p+0", "0x1p+0", 
+    "0x1.6a09e667f3bcdp-1", "0x1.1a62633145c07p-54", "-0x1.6a09e667f3bccp-1", 
+    "-0x1p+0", "-0x1.6a09e667f3bcep-1", "-0x1.a79394c9e8a0ap-53", 
+    "0x1.6a09e667f3bcdp-1", "0x1p+0"),
     v_hi = c("0x1.eed0c2cfd9376p-4", "0x1.ad165233741c0p-4", "0x1.dda97a116808fp-2"
     ),
     v_lo = c("-0x1.d0ee322f62ab4p-58", "0x1.e441ae46cfc85p-59", "0x1.2a1c6d337b0e1p-56"
@@ -247,16 +313,6 @@ cert_frozen <- list(
     ),
     u_hi = "0x1.dd66a60c11651p+4",
     u_lo = "0x1.a97ef4aa07aebp-50"
-  ),
-  cxb = list(
-    sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1", "-0x1.ffb4667563093p-1"
-    ),
-    v_hi = c("0x1.a27aa6fa81289p+3", "0x1.9033b1b503c27p+3"),
-    v_lo = c("0x1.14a44927d1499p-52", "0x1.6dd7ad9921fd4p-54"),
-    vn_hi = c("0x1.d7e81cc594451p+5", "0x1.bd654f98f5a5bp+5"),
-    vn_lo = c("-0x1.8bc7343b184ebp-49", "0x1.df2138cd8f0a9p-50"),
-    u_hi = "0x1.c70c587f1f6ecp-5",
-    u_lo = "-0x1.af973c7509042p-59"
   )
 )
 
@@ -520,6 +576,84 @@ cert_info <- function(sigma, d) {
   info
 }
 
+# The distance of a double `hat` from the exact value hi + lo, in units in the
+# last place of `hi`. Below one half, `hat` is the exact value's correctly
+# rounded double. Taken against ulp(hi) directly: this divided the RELATIVE
+# error by 2^-53 until the M122 review (finding 1), which is an ulp count only
+# where the mantissa is exactly 2 -- across the four quantities committed at B
+# one such unit is 1.085 to 1.279 true ulp, so a bound written as half an ulp
+# was really demanding 0.391 to 0.461 of one. `hat - hi` is exact wherever the
+# two are within a factor of two of each other (Sterbenz), which a correctly
+# rounded `hat` always is. Lifted to file scope at M149, which asserts it at
+# the five anchors as well as at counterexample B.
+dd_ulp <- function(hat, hi, lo) {
+  if (any(hi == 0)) {
+    stop("dd_ulp(): the exact value is zero, so it has no last place",
+         call. = FALSE)
+  }
+  abs((hat - hi) - lo) / 2^(floor(log2(abs(hi))) - 52)
+}
+
+# The reference route against the committed exact values at one anchor (M149;
+# RR22 rec 11), called from cert_true_error() once `sig` has matched.
+#
+# WHAT IS ASSERTED, AND WHY IT IS NOT A PRECONDITION. The head of this file
+# records a decision not to PIN the double-double route -- not to use it as a
+# gate that skips, which is how a planted defect in the route once hid. This
+# is the other thing: the route asserted against truth derived elsewhere,
+# failing and never skipping on the route's own output. Its bound is half a
+# unit in the last place of the exact value, the correctly rounded double,
+# which is what a route carrying about 106 bits delivers wherever the exact
+# value is not within its error of a rounding midpoint; the test below
+# ("... sits clear of a rounding midpoint") asserts from committed values
+# alone that none is, so the bound is a property of the committed matrices
+# and not a measurement of the machine running it. axes_dd_pricing() is
+# R-level `+`, `-`, `*` and `/` on doubles, touching neither BLAS nor LAPACK,
+# so given the same inputs it is the same arithmetic on every IEEE platform.
+#
+# THE SECOND INPUT. The route reads the derivative set as well as the matrix,
+# and `xi1` is cos() at the item angles' differences -- built on this machine,
+# like the matrix. `sig` matching does not imply `xi1` does: `sig` passes
+# through cov2cor(), where a one-ulp change in a cosine can round away. The
+# exact values were priced from the oracle machine's `xi1`, so where this
+# machine's differs the committed values are not a yardstick at this bound,
+# and the case is recorded `skipped` and skipped, naming that input. Recorded
+# BEFORE skip() for the reason given at the matrix check above.
+cert_dd_vs_exact <- function(id, sigma, d, fz) {
+  x1 <- d$mats$xi1
+  if (!identical(as.vector(x1[upper.tri(x1, diag = TRUE)]),
+                 as.numeric(fz$xi1))) {
+    reason <- paste0(
+      "this machine does not build the derivative set's xi1 at case '", id,
+      "' bit for bit, so the exact quadratic forms committed for that ",
+      "derivative set are not a yardstick for this one"
+    )
+    cert_record(id, cert_disp[["skipped"]], reason)
+    testthat::skip(reason)
+  }
+  ref <- axes_dd_pricing(sigma, d)
+  if (!is.list(ref)) {
+    testthat::fail(paste0(
+      "axes_dd_pricing() returned no quadratic forms at case '", id, "' -- ",
+      "the reference route cannot produce values at a committed anchor"
+    ))
+    return(invisible(NULL))
+  }
+  fields <- list(
+    v = list(ref$v, fz$v_hi, fz$v_lo),
+    v_naive = list(ref$v_naive, fz$vn_hi, fz$vn_lo),
+    u = list(ref$u, fz$u_hi, fz$u_lo)
+  )
+  for (nm in names(fields)) {
+    f <- fields[[nm]]
+    hat <- dd_to_double(f[[1L]])
+    cert_pin_length(hat, f[[2L]], paste0(id, " dd ", nm))
+    expect_lt(max(dd_ulp(hat, as.numeric(f[[2L]]), as.numeric(f[[3L]]))),
+              0.5, label = paste0(id, " dd-vs-exact ", nm, " (ulp)"))
+  }
+  invisible(NULL)
+}
+
 # THIS MACHINE's own relative error at one case, against the committed exact
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
@@ -570,6 +704,12 @@ cert_true_error <- function(id, sigma, d) {
     ))
     return(NULL)
   }
+  # THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11).
+  # Counterexample B asserts this in its own test, under a bound of its own;
+  # the five anchors carry a committed `xi1` and are checked here, after the
+  # matrix check and BEFORE the shipped pricing, so the check runs on the
+  # priced and the refusing route alike.
+  if (!is.null(fz$xi1)) cert_dd_vs_exact(id, sigma, d, fz)
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
   # A REFUSAL from the shipped pricing IS A ROUTE, not a failure to reproduce
@@ -716,6 +856,16 @@ test_that("AC3: the anchor case list is not empty", {
     expect_length(fz$u_hi, 1L)
     expect_length(fz$u_lo, 1L)
   }
+  # ... and each anchor carries its `xi1` upper triangle, diagonal included
+  # (M149). cert_dd_vs_exact() runs only where that field is present, so an
+  # anchor whose regeneration dropped it would silently stop checking the
+  # reference route. Counterexample B has none: its test asserts the route
+  # under a bound of its own.
+  for (id in c("a4", "a5", "c4", "b9a", "b9b")) {
+    p <- cert_shape[[id]][[1L]]
+    expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
+  }
+  expect_null(cert_frozen$cxb$xi1)
 
   # ... and each case's MATRIX is the size the table above says (M116). The
   # `p` column was checked only against `cert_frozen`'s own committed arrays
@@ -818,7 +968,8 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   # route. That decision is about using it as a PRECONDITION -- a gate that
   # skips, which is how a planted defect in the route once hid -- and not
   # about asserting it against truth derived elsewhere; the two closed-form
-  # oracle tests below already do exactly that.
+  # oracle tests below already do exactly that, and so does
+  # cert_dd_vs_exact() at the five anchors (M149).
   #
   # TWO BOUNDS, because the two quantities fail differently.
   #
@@ -838,19 +989,9 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   # 6.1 ulp, a figure with no derivation behind it.
   fz <- cert_frozen$cxb
   ref <- axes_dd_pricing(fx$S, d)
-  # ONE UNIT IN THE LAST PLACE OF `hi`, which is what "ulp" has to mean here.
-  # This divided the RELATIVE error by 2^-53 until the M122 review (finding 1),
-  # which is an ulp count only where the mantissa is exactly 2: across the four
-  # quantities committed at B one such unit is 1.085 to 1.279 true ulp, so a
-  # bound written as half an ulp was really demanding 0.391 to 0.461 of one.
-  # Taken against ulp(hi) directly, the bound means what it says.
-  dd_ulp <- function(hat, hi, lo) {
-    if (any(hi == 0)) {
-      stop("dd_ulp(): the exact value is zero, so it has no last place",
-           call. = FALSE)
-    }
-    abs((hat - hi) - lo) / 2^(floor(log2(abs(hi))) - 52)
-  }
+  # dd_ulp() is at file scope since M149, which asserts the same half-ulp
+  # bound at the five anchors inside cert_true_error(); its note on what "ulp"
+  # means there is the one that used to stand here.
   expect_lt(max(dd_ulp(dd_to_double(ref$v),
                        as.numeric(fz$v_hi), as.numeric(fz$v_lo))), 0.5,
             label = "cxb dd-vs-exact v (ulp)")

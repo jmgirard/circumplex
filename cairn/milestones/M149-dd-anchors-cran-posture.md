@@ -1,13 +1,13 @@
 # M149: Reference-route checks at the anchors, and the certificate file's CRAN posture
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3
 - **Resolves:** —
 - **Surface tier:** user-facing, because a `?axes_reliability` sentence ships beside the internal test and record changes
-- **Branch/PR:** —
+- **Branch/PR:** m149-dd-anchors-cran-posture
 
 ## Goal
 
@@ -39,7 +39,7 @@ The test file asserts the certificate's double-double reference route against th
 
 ## Tasks
 
-- [ ] T1: Commit each anchor's `xi1` upper triangle as hex beside `sig` in `cert_frozen`. Regenerate it through `devel/degeneracy-oracle/exact_oracle.R`, or assert it equal to the oracle's inputs. Add the per-anchor dd-vs-exact test. It has the matrix and `xi1` gate and the `skipped` record before `skip()`. It fails by name on a non-list return and applies the half-ulp bound to `v`, `v_naive` and `u`. Move `dd_ulp()` from the counterexample-B test to file scope and reuse it. Reconcile the header's "deliberately NOT pinned" block (lines ~128-133) and the counterexample-B comment (~816-821) with the new assertions.
+- [x] T1: Commit each anchor's `xi1` upper triangle as hex beside `sig` in `cert_frozen`. Regenerate it through `devel/degeneracy-oracle/exact_oracle.R`, or assert it equal to the oracle's inputs. Add the per-anchor dd-vs-exact test. It has the matrix and `xi1` gate and the `skipped` record before `skip()`. It fails by name on a non-list return and applies the half-ulp bound to `v`, `v_naive` and `u`. Move `dd_ulp()` from the counterexample-B test to file scope and reuse it. Reconcile the header's "deliberately NOT pinned" block (lines ~128-133) and the counterexample-B comment (~816-821) with the new assertions.
 - [ ] T2: Add the committed-values margin test (AC2) and derive the reference route's error bound in its comment. If the derived bound exceeds the margin at any anchor, stop and raise an amendment. Do not loosen the bound.
 - [ ] T3: Prove that the AC1 assertions can fail. Apply each plant alone, revert it, and summarize the result in the work log. Plant (a): `dd_two_sum()` and `dd_two_prod()` return a zero low word, so the route loses its error-free transforms. Plant (b): for each of `v`, `v_naive` and `u`, move the first component's returned high word up by one ulp of that high word. Then do the same to the last component. Also plant a mismatched `xi1`. Show that the case records `skipped` and that the detector stays green for that reason.
 - [ ] T4: Add `expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")` to counterexample B's priced branch.
@@ -53,6 +53,7 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: criteria audit, full mode, by a fresh [O] reader. Round one gave nine findings: seven fixed directly, two posed at the gate. Round two gave four findings, all fixed directly. The plant matrix moved from the criteria to T3 because it is an instrument property.
 - 2026-09-22: plan gate chose to keep the file's current CRAN posture over RR22's CI-only alternative. CRAN runs platforms that CI does not, and since M147 the only platform-dependent refusal left is an exact zero pivot. A CRAN check failure in this file that is a platform fact and not an under-report falsifies the choice.
 - 2026-09-22: plan gate chose a half-ulp bound over RR22's 1e-14 relative bound. The zero-low-word plant moves `u` at a5 by only 87 ulp (about 1e-14), and the relative bound can miss that. An anchor whose committed margin falls below the derived route error falsifies the choice.
+- 2026-09-22: T1 done. `exact_oracle.R` now emits each anchor's `xi1` upper triangle, and a baseline run reproduced all six committed cases bit for bit before the change. The regenerated block went into `cert_frozen` through a script paste, not the Edit tool. `cert_dd_vs_exact()` runs inside `cert_true_error()` after the `sig` check. The header's dd-route block and the counterexample-B comment are reconciled. The file passes, and all six cases are priced on macOS arm64.
 
 ## Decisions
 
