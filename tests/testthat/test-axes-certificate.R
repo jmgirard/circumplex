@@ -59,11 +59,12 @@
 #
 # WHAT RUNS ON CRAN (M149; D-063). Three classes run under CRAN's own check:
 #
-#   - the checks against exact truth: the five per-anchor bracket tests with
-#     their reference-route checks, counterexample B's test, the case
-#     detector, and the two closed-form oracle tests. The brackets among them
-#     measure this machine's own error against exact values, and the
-#     detector keeps them from all skipping; together that is how the
+#   - the checks against exact truth and their detector: the five per-anchor
+#     bracket tests with their reference-route checks, counterexample B's
+#     test, the two closed-form oracle tests, and the case detector. The
+#     brackets among them measure this machine's own error against exact
+#     values; the detector compares nothing with exact values itself, but
+#     keeps the brackets from all skipping. Together that is how the
 #     certificate UNDER-reporting is caught, and CRAN checks on platforms CI
 #     does not.
 #   - the committed-value checks: the anchor-list test, the rounding-midpoint
@@ -914,7 +915,7 @@ test_that("AC3: the anchor case list is not empty", {
 })
 
 
-test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by more than the reference route's error bound", {
+test_that("every anchor's exact value sits clear of a rounding midpoint by more than a stated bound on the reference route's error", {
   # WHY cert_dd_vs_exact()'s half-ulp bound is not a frozen measurement (M149).
   # A committed `hi` is the exact value's correctly rounded double and `lo`
   # the remainder, so dd_ulp() of a returned double is below one half exactly
@@ -923,8 +924,10 @@ test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by 
   # wherever the exact value's distance from the midpoint, 1/2 - |lo|/ulp(hi),
   # exceeds the route's error. Both sides are asserted here from committed
   # values alone: `hi`, `lo`, and each anchor's `scale` and `kappa` literals.
-  # Nothing is priced and no matrix is read, so this runs identically on
-  # every machine.
+  # Nothing is priced, and no built matrix enters an assertion:
+  # cert_anchors() builds each anchor's matrix, but only its `scale` and
+  # `kappa` literals are read here. So this runs identically on every
+  # machine.
   #
   # THE ROUTE'S ERROR BOUND IS STATED, NOT PROVEN. Its basis is the anchor's
   # conditioning: the bound the degeneracy floor rests on is p * kappa^2 * eps
