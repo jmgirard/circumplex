@@ -296,10 +296,13 @@ cert_rel <- function(hat, hi, lo) {
 #
 # REFUSED BELOW -100% (M148, from the Known-fragilities list). A relative
 # variance error below -1 says the shipped variance is negative, and
-# sqrt(1 + e) is NaN there: the expression returned NaN, which passes an
-# `expect_lt()` as NA rather than reddening. No committed quantity reaches it
-# (the certificate's own sentinel path catches a nonpositive form first), so
-# the failure names the input and stops.
+# sqrt(1 + e) is NaN there: the expression returned NaN. testthat's
+# comparison expectations DO redden on NaN (`expect_lt(NaN, 1)` fails,
+# checked at the M148 review), so the old value never passed a bracket; it
+# failed with a message about NaN that named neither the helper nor the
+# input. No committed quantity reaches it (the certificate's own sentinel
+# path catches a nonpositive form first), so the failure now names the
+# input and stops.
 cert_root_rel <- function(e) {
   if (any(e < -1)) {
     stop("cert_root_rel(): relative variance error below -100% (",
