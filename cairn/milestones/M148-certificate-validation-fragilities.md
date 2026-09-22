@@ -71,6 +71,8 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 
 - 2026-09-22: T6 done. `devtools::test(reporter = "check")` exit 0: FAIL 0, WARN 12, SKIP 1, PASS 13942; zero warnings reported against `test-axes-certificate.R` (the twelve sit against test-ci_accuracy.R ×4, test-pole-values.R ×4, test-print-width.R ×2, test-growth_invariants.R, test-ssm_sem.R). Claim audit: not owed — internal tier. Status set to `review`.
 
+- 2026-09-22: step-7 approval: m148-certificate-validation-fragilities approved for merge (second review pass; gate presentation in the Review section).
+
 ## Decisions
 
 ## Review
