@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-21 (M147 done: RR22 follow-ons row gained (iv) and (v); one LESSONS line added, the M26 line pruned for the byte budget; RB24/RR24 already archived; validate green.)_
+_Last hygiene check: 2026-09-21 (M147 done: RR22 follow-ons row gained (iv) and (v); one LESSONS line added, the M26 and M28 lines pruned for the byte budget; RB24/RR24 already archived; validate green.)_
 
 ## Milestones
 
