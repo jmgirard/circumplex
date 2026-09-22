@@ -1427,8 +1427,9 @@ test_that("M106 review round 2 F4: only the SE surface's ill-conditioning refusa
   expect_identical(gc$reason, "uncertified")
   # The clause's exponent is pinned, and the mantissa is bracketed
   # numerically on the matrix itself: the printed third digit moves under
-  # one-ulp perturbation of the matrix (2e+13 to 2.03e+13 measured over 40
-  # draws), the platform-string failure class this milestone removes.
+  # one-ulp perturbation of the matrix's entries (measured at the M147 review
+  # and again at its claim audit, 2026-09-21), the platform-string failure
+  # class this milestone removes.
   expect_length(grep("condition number [0-9.]+e\\+13", wc), 1L)
   k13 <- m106_kappa(m106_family_b(1e-13))
   expect_gt(k13, 1.9e13)
