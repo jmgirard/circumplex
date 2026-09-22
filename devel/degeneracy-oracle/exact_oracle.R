@@ -67,17 +67,70 @@ baseline_df_of <- function(S) nrow(S) * (nrow(S) - 1) / 2
 # forms as hi/lo hex double PAIRS, kept as character so they reach the packaged
 # test file bit for bit (M115); they are what lets that file measure its own
 # machine's error instead of comparing against one frozen on this one.
+#
+# EVERY KEY THIS SCRIPT READS MUST BE PRESENT (M148, from the Known-fragilities
+# list). `res[["EXACT_CVAL"]]` on a list without that name is NULL, not an
+# error: a Python-side rename or a truncated stdout used to flow through as
+# NULL into `abs(NULL - x)` (numeric(0), so every `<=` comparison on it is
+# TRUE-by-vacuity) and into cert_record(), where a NULL field is pasted into
+# the regeneration block as `NULL`. The parser is split from the process call
+# so the guard can be asserted below on a stubbed output, in this process.
+exact_keys <- function(n_comp) {
+  c("EXACT_CVAL", "EXACT_BASELINE", "EXACT_TR_VG", "EXACT_PROJ",
+    sprintf("EXACT_SE%d", seq_len(n_comp)),
+    sprintf("EXACT_RATIO%d", seq_len(n_comp)),
+    "HEX_V_HI", "HEX_V_LO", "HEX_VNAIVE_HI", "HEX_VNAIVE_LO",
+    "HEX_U_HI", "HEX_U_LO")
+}
+
+exact_parse <- function(out, n_comp) {
+  key <- sub(":.*$", "", out)
+  val <- trimws(sub("^[A-Z_0-9]+:", "", out))
+  missing <- setdiff(exact_keys(n_comp), key)
+  if (length(missing)) {
+    stop("exact_parse(): the oracle output is missing key(s) ",
+         paste(missing, collapse = ", "), call. = FALSE)
+  }
+  num <- suppressWarnings(as.numeric(val))
+  hexish <- startsWith(key, "HEX_")
+  if (any(is.na(num[!hexish]))) {
+    stop("exact_parse(): non-numeric value under key(s) ",
+         paste(key[!hexish][is.na(num[!hexish])], collapse = ", "),
+         call. = FALSE)
+  }
+  res <- as.list(stats::setNames(num, key))
+  res[hexish] <- lapply(val[hexish], function(s) strsplit(s, " +")[[1L]])
+  res
+}
+
 exact <- function(S, d, df = DF, baseline_df = BASELINE_DF) {
   out <- system2("python3",
                  c(py, hex_dump(S, d$mats, d$n_comp, df, baseline_df)),
                  stdout = TRUE)
-  key <- sub(":.*$", "", out)
-  val <- trimws(sub("^[A-Z_0-9]+:", "", out))
-  res <- as.list(stats::setNames(suppressWarnings(as.numeric(val)), key))
-  hexish <- startsWith(key, "HEX_")
-  res[hexish] <- lapply(val[hexish], function(s) strsplit(s, " +")[[1L]])
-  res
+  exact_parse(out, d$n_comp)
 }
+
+# The guard, asserted before anything is measured: a stubbed output carrying
+# every key parses, and the same output with one key removed stops naming
+# it. The stub is one line per key with a placeholder value, so the assertion
+# is about the key check alone and not about any number.
+local({
+  stub <- function(keys) {
+    sprintf("%s: %s", keys, ifelse(startsWith(keys, "HEX_"), "0x1p+0 0x1p+0", "1"))
+  }
+  keys <- exact_keys(2L)
+  full <- exact_parse(stub(keys), 2L)
+  stopifnot(identical(sort(names(full)), sort(keys)),
+            identical(full[["HEX_V_HI"]], c("0x1p+0", "0x1p+0")))
+  for (drop in c("EXACT_CVAL", "EXACT_SE2", "HEX_U_LO")) {
+    err <- tryCatch(exact_parse(stub(setdiff(keys, drop)), 2L),
+                    error = function(e) conditionMessage(e))
+    stopifnot(is.character(err), grepl(drop, err, fixed = TRUE))
+  }
+  bad <- tryCatch(exact_parse(sub("^EXACT_PROJ: 1", "EXACT_PROJ: x", stub(keys)), 2L),
+                  error = function(e) conditionMessage(e))
+  stopifnot(is.character(bad), grepl("EXACT_PROJ", bad, fixed = TRUE))
+})
 
 # --- M115: the exact quadratic forms the packaged bracket prices against -----
 #
