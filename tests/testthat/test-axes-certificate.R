@@ -1102,6 +1102,14 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
     expect_gt(true_rel$se, axes_degeneracy_delta_star)
     expect_gt(true_rel$cval, axes_degeneracy_delta_star)
 
+    # ... and the predicate users depend on refuses here too, with the same
+    # literal as on the refusing route (M149). The worst-of assertion above
+    # the branches says the certificate reads past the target; this says what
+    # the user is told. `?axes_reliability` states that the estimate printed
+    # beside the refusal can differ between machines while the refusal does
+    # not, and the two branches of this test are what back the second half.
+    expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")
+
   } else {
     # Neither route: cert_true_error() has already failed (the matrix no
     # longer matches its committed bytes). Say which state this was, so the
