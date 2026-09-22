@@ -64,7 +64,8 @@
 #     test, the two closed-form oracle tests, and the case detector. The
 #     brackets among them measure this machine's own error against exact
 #     values; the detector compares nothing with exact values itself, but
-#     keeps the brackets from all skipping. Together that is how the
+#     fails the run when no anchor was priced, so the brackets cannot all
+#     skip or refuse unseen. Together that is how the
 #     certificate UNDER-reporting is caught, and CRAN checks on platforms CI
 #     does not.
 #   - the committed-value checks: the anchor-list test, the rounding-midpoint
@@ -627,16 +628,17 @@ dd_ulp <- function(hat, hi, lo) {
 # gate that skips, which is how a planted defect in the route once hid. This
 # is the other thing: the route asserted against truth derived elsewhere,
 # failing and never skipping on the route's own output. Its bound is half a
-# unit in the last place of the exact value, the correctly rounded double,
-# which is what a route carrying about 106 bits delivers wherever the exact
-# value is not within its error of a rounding midpoint; the test below
-# ("... sits clear of a rounding midpoint") asserts from committed values
-# alone that none is within a STATED bound on that error, so the bound is a
-# property of the committed matrices and not a measurement of the machine
-# running it -- to the extent the three unproven premises that test names
-# hold. axes_dd_pricing() is
-# R-level `+`, `-`, `*` and `/` on doubles, touching neither BLAS nor LAPACK,
-# so given the same inputs it is the same arithmetic on every IEEE platform.
+# unit in the last place of the exact value, the correctly rounded double.
+# A route carrying about 106 bits is expected to deliver that wherever the
+# exact value is not within the route's error of a rounding midpoint, but
+# that error is not proven here. The test below ("... sits clear of a
+# rounding midpoint") asserts from committed values alone that no exact
+# value is within a STATED bound on that error, so the bound is a property
+# of the committed matrices and not a measurement of the machine running
+# it -- to the extent the three unproven premises that test names hold.
+# axes_dd_pricing() is R-level `+`, `-`, `*` and `/` on doubles, touching
+# neither BLAS nor LAPACK, so given the same inputs it is the same
+# arithmetic on every IEEE platform.
 #
 # THE SECOND INPUT. The route reads the derivative set as well as the matrix,
 # and `xi1` is cos() at the item angles' differences -- built on this machine,
@@ -949,10 +951,12 @@ test_that("every anchor's exact value sits clear of a rounding midpoint by more 
   #   2. that it carries to the double-double route with 2^-104 in place of
   #      eps -- nothing here analyses the double-double pipeline's own error;
   #   3. that it applies to `v_naive` and `u`, with the factor 2 for the
-  #      squared SE covering all three. For `u` it is already exceeded
-  #      elsewhere: at counterexample B (p = 3, kappa 6.65e6) the double
-  #      route's measured `cval` relative error of 3.4e-1, recorded in
-  #      R/axes_corrected_se.R, is about 11.5 times p * kappa^2 * 2^-52. The
+  #      squared SE covering all three. For `u` the factor 10 is already
+  #      exceeded elsewhere, though the stated bound is not: at
+  #      counterexample B (p = 3, kappa 6.65e6) the double route's measured
+  #      `cval` relative error of 3.4e-1, recorded in R/axes_corrected_se.R,
+  #      is about 11.5 times p * kappa^2 * 2^-52. `u` is cval's numerator,
+  #      so its relative error matches cval's only to first order. The
   #      factor 10 alone does not cover that ratio; only the product 20
   #      does, by a factor of 1.7, and its extra 2 was argued for the
   #      squared SE `v`, not for `u`, whose error that source says is driven

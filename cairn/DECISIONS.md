@@ -2281,8 +2281,9 @@ per-anchor bracket tests with their reference-route checks, counterexample
 B's test, the two closed-form oracle tests, and the case detector. The
 brackets among them measure the running machine's own error against exact
 values. The detector compares nothing with exact values itself, but it
-keeps the brackets from all skipping. Together that is how the certificate under-reporting
-is caught, and CRAN checks on platforms that CI does not run. The
+fails the run when no anchor was priced, so the brackets cannot all skip
+or refuse unseen. Together that is how the certificate under-reporting is
+caught, and CRAN checks on platforms that CI does not run. The
 committed-value checks: the anchor-list test, the rounding-midpoint margin
 test and the safety-factor test, none of which runs the shipped route. The
 contract and harness checks: the disposition vocabulary, the helper
