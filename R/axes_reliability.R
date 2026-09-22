@@ -760,8 +760,8 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' admits whose information matrix is nearly singular (reciprocal condition
 #' estimate below `sqrt(.Machine$double.eps)`); every such fit this function
 #' can produce was measured to pass it, and a fit the floor admits but that
-#' this function refuses at its door (fewer than four scales, or unequally
-#' spaced scales) can be refused `"uncertified"` at the internal helpers
+#' this function refuses at its door (fewer than four scales) can be refused
+#' `"uncertified"` at the internal helpers
 #' where it used to compute. Either way the corrected standard errors and the four
 #' scaled statistics go `NA` together (each with its own warning naming that
 #' reason) rather than one surface refusing while the other silently scales.
