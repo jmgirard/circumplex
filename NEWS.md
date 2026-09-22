@@ -56,7 +56,10 @@
   checked when its information matrix is nearly singular. `"unidentified"`
   now names only a design defect: two identical derivative matrices, a
   derivative matrix equal to the identity, or an exactly singular inversion.
-  No number that was reported before changes. The internal uncorrected arm,
+  No number reachable through `axes_reliability()` changes value. A fit the
+  floor admits but that the function itself refuses at its door (fewer than
+  four scales, or unequally spaced scales) can now be refused `"uncertified"`
+  at the internal helpers where it used to compute. The internal uncorrected arm,
   reported in `details$naive_reason`, keeps the default tolerance and can
   still differ across platforms at such a matrix.
 
