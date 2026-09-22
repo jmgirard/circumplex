@@ -16,7 +16,7 @@ Shipped `axes_pricing_core()` carried a `tol` formal at that commit: TRUE.
 
 ## Pre-registered acceptance
 
-- (a) region (157 matrices, 155 of them priced by the tol0 doubles): oracle ran at every priced one, no under-report, and each refuses `uncertified` or is inside delta_star, and every unpriced one refuses: **PASS**; both-refused (0 matrices) all `unidentified`: **PASS**
+- (a) region (157 matrices, 155 of them priced by the tol0 doubles): oracle ran at every priced one, no under-report, and each refuses `uncertified` or is inside delta_star, and every unpriced one refuses: **PASS**; both-refused (0 matrices; conditional, vacuous at 0) all `unidentified`: **PASS**
 - (b1) struct family (10 matrices): rcond(info) below sqrt(eps)/1e4 = 1.49e-12 at every one: **PASS** (max 5.85e-17)
 - (b2) floor-admitted, API-admitted and selector-routed (4 matrices, of 160 in domain, 54 blocks-family rows with zeta2 in domain): every one computes: **PASS**
 - (c) bit-identical `si`, `sim`, `acov` across tolerances at every default-inverted matrix (368): **PASS**

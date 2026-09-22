@@ -185,12 +185,17 @@ test_that("AC1: a component matrix identical to the identity refuses 'unidentifi
 # One routed design: floor-admitted, no exact dependence among the component
 # matrices, information matrix singular up to cosine rounding. `dep` is the
 # exact identity the design realises in real arithmetic, as a function of the
-# component matrices; it must hold to rounding and NOT exactly.
+# component matrices; it holds to rounding. Whether the stored doubles realise
+# it EXACTLY is the platform's cos() to decide, not this test's: a libm that
+# returns an exact value makes the design exactly singular with the code still
+# correct, and the refusing route below covers that case (M147 review).
 judge_routed <- function(lbl, S, ang, sc, bl, fit_zeta1, fit_zeta2, dep) {
+  # The direct solve()'s message is read in English: LAPACK's exact-singular
+  # message is translated under a non-English LANGUAGE (measured: German).
+  testthat::local_reproducible_output(lang = "en")
   d <- axes_se_derivs(ang, sc, bl, fit_zeta1, fit_zeta2)
   gap <- max(abs(d$mats$xi1 - dep(d$mats)))
   expect_lt(gap, 1e-15, label = lbl)
-  expect_gt(gap, 0, label = lbl)
   expect_false(any(duplicated(d$mats[seq_len(d$n_comp)])), label = lbl)
   expect_false(any(vapply(d$mats[seq_len(d$n_comp)], identical, TRUE,
                           diag(nrow(S)))), label = lbl)
@@ -341,4 +346,121 @@ test_that("AC1: the raw arm refuses at the default tolerance into naive_reason w
                    "unidentified")
   zero <- axes_se_pricing(S, d, 600, tol = 0)
   expect_true(is.list(zero) || identical(zero, "unidentified"))
+})
+
+
+# ---- M147 review, fix-now findings (T9) ------------------------------------------
+
+test_that("T9: the refusal object pins the derivative set it was priced for, and both surfaces check it", {
+  # The refusal object carries the pricing core (M147), and the core's
+  # `acov` is folded against the surface's own `d$mats` with Map(), which
+  # recycles on a length mismatch. Pinning the matrix alone (M117) lets a
+  # caller pair `fit_zeta2 = TRUE` at the seam with FALSE at a surface and
+  # get plausible wrong numbers, so the derivative set is pinned beside it.
+  S <- m106_family_a(0.3, 1L)
+  sc <- as.character(1:8)
+  bl <- rep(1:2, each = 4L)
+  shared <- axes_shared_refusal(S, rownames(S), oct, sc, bl,
+                                fit_zeta1 = FALSE, fit_zeta2 = TRUE)
+  expect_null(shared$reason)
+  expect_identical(shared$derivs,
+                   list(components = c("xi1", "xi2", "zeta2"), n_mats = 11L))
+
+  # The matched pair is consumed at both surfaces.
+  d2 <- axes_se_derivs(oct, sc, bl, FALSE, TRUE)
+  se <- axes_corrected_se(S, rownames(S), oct, sc, bl, n = 600,
+                          fit_zeta1 = FALSE, fit_zeta2 = TRUE, refusal = shared)
+  expect_null(se$reason)
+  sf <- axes_scaling_factor(S, rownames(S), oct, sc, bl,
+                            fit_zeta1 = FALSE, fit_zeta2 = TRUE,
+                            df = judge_df(S, d2), baseline_df = judge_bdf(S),
+                            refusal = shared)
+  expect_null(sf$reason)
+
+  # A surface asked for a different derivative set on the SAME matrix aborts,
+  # and names the derivative set (not the matrix) as the mismatch.
+  d0 <- axes_se_derivs(oct, sc, bl, FALSE, FALSE)
+  expect_error(
+    axes_corrected_se(S, rownames(S), oct, sc, bl, n = 600,
+                      fit_zeta1 = FALSE, fit_zeta2 = FALSE, refusal = shared),
+    "different derivative set"
+  )
+  expect_error(
+    axes_scaling_factor(S, rownames(S), oct, sc, bl,
+                        fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                        df = judge_df(S, d0), baseline_df = judge_bdf(S),
+                        refusal = shared),
+    "different derivative set"
+  )
+  # The matrix pin (M117) is unchanged and still checked first.
+  S2 <- S
+  S2[1, 2] <- S2[2, 1] <- S2[1, 2] + 1e-3
+  expect_error(
+    axes_corrected_se(S2, rownames(S2), oct, sc, bl, n = 600,
+                      fit_zeta1 = FALSE, fit_zeta2 = TRUE, refusal = shared),
+    "different matrix"
+  )
+})
+
+test_that("T9: a named item map builds the same derivative set as an unnamed one, so the exact grounds still fire", {
+  # outer() copies names() onto dimnames, and identical() reads dimnames, so
+  # a named `item_scale` used to defeat both exact grounds: the same-scale
+  # indicator no longer matched the unnamed all-ones xi2 and never matched
+  # diag(p). axes_reliability() builds the map unnamed, so the miss was
+  # latent; the derivative builder now strips names.
+  pp <- judge_pop()
+  p <- nrow(pp$sigma)
+  nm <- rownames(pp$sigma)
+  ang <- pp$item_angle
+  names(ang) <- nm
+  one <- rep("A", p)
+  names(one) <- nm
+  bl <- rep(1L, p)
+  names(bl) <- nm
+  dn <- axes_se_derivs(ang, one, bl, TRUE, TRUE)
+  du <- axes_se_derivs(pp$item_angle, rep("A", p), rep(1L, p), TRUE, TRUE)
+  expect_identical(dn, du)
+  expect_true(all(vapply(dn$mats, function(m) is.null(dimnames(m)), TRUE)))
+
+  # The duplicate-pair ground at the M89 one-scale construction, named map.
+  d1 <- axes_se_derivs(ang, one, NULL, TRUE, FALSE)
+  expect_identical(axes_pricing_core(pp$sigma, d1), "unidentified")
+  r1 <- judge_both(pp$sigma, ang, one, NULL, TRUE, FALSE)
+  expect_identical(r1$se$reason, "unidentified")
+  expect_identical(r1$sf$reason, "unidentified")
+
+  # The identity ground at one item per scale, named map.
+  S <- m106_family_a(0.3, 1L)
+  sc <- as.character(1:8)
+  names(sc) <- rownames(S)
+  di <- axes_se_derivs(oct, sc, NULL, TRUE, FALSE)
+  expect_identical(di$mats$zeta1, diag(8))
+  expect_identical(axes_pricing_core(S, di), "unidentified")
+})
+
+test_that("T9: a 'singular' from the core is kept as the literal where the floor admitted the matrix, and falls through to the certificate only where the floor said 'ill_conditioned'", {
+  # "singular" from the core means solve(sigma) itself refused at its default
+  # tolerance. Master returned that literal from the pricing on a
+  # floor-admitted matrix; M111 gave the SAME literal "uncertified" only
+  # where the floor had fired. The fall-through keeps M111's literal on the
+  # "ill_conditioned" branch and master's on the admitted one. No real
+  # matrix reaches the admitted branch (rcond(sigma) is decades above eps
+  # wherever the floor admits), so the core is mocked.
+  local_mocked_bindings(axes_pricing_core = function(sigma, d, tol = 0) "singular")
+  sc <- as.character(1:8)
+  d <- axes_se_derivs(oct, sc, NULL, FALSE, FALSE)
+
+  adm <- m106_family_a(0.3, 1L)
+  expect_null(axes_sigma_degenerate(adm))
+  ra <- axes_degeneracy_refusal(adm, d)
+  expect_identical(ra$reason, "singular")
+  expect_null(ra$cert)
+  expect_null(ra$core)
+
+  ill <- m106_family_a(2.4e-5, 1L)
+  expect_identical(axes_sigma_degenerate(ill), "ill_conditioned")
+  ri <- axes_degeneracy_refusal(ill, d)
+  expect_false(identical(ri$reason, "singular"))
+  expect_false(is.null(ri$cert))
+  expect_null(ri$core)
 })

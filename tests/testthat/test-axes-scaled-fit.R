@@ -2415,7 +2415,13 @@ test_that("M106 review F1: only the ill-conditioning refusal carries the diagnos
                         df = dc$df, baseline_df = dc$baseline_df)
   )
   expect_length(grep("uncertified", wc, fixed = TRUE), 1L)
-  expect_length(grep("condition number 2.01e+13", wc, fixed = TRUE), 1L)
+  # Exponent pinned, mantissa bracketed numerically (the sibling control in
+  # test-axes-corrected-se.R states why the printed third digit is not
+  # platform-stable).
+  expect_length(grep("condition number [0-9.]+e\\+13", wc), 1L)
+  k13 <- m106_kappa(m106_family_b(1e-13))
+  expect_gt(k13, 1.9e13)
+  expect_lt(k13, 2.1e13)
 })
 
 

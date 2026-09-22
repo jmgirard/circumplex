@@ -96,8 +96,11 @@
 #       "uncertified" or every true error is at or below delta_star (1e-4).
 #       At a REGION matrix whose double pricing refused after the inversion
 #       (a nonpositive quadratic form, "indefinite"), tol0_reason is not
-#       "computes". At every matrix BOTH tolerances refused whose floor answer
-#       is neither "indefinite" nor "singular", tol0_reason is "unidentified".
+#       "computes". CONDITIONAL clause: where the run holds any matrix BOTH
+#       tolerances refused whose floor answer is neither "indefinite" nor
+#       "singular", tol0_reason is "unidentified" at every one; the run may
+#       hold none (the committed run holds none), and the count is printed
+#       beside the verdict so a vacuous pass reads as one.
 #   (b1) At every struct-family matrix rcond_info is below the selector
 #        threshold sqrt(.Machine$double.eps) divided by 1e4.
 #   (b2) Every matrix the floor admits ("NULL") whose recorded columns show a
@@ -567,7 +570,7 @@ p3 <- res[res$floor == "NULL" & res$n_scales < 4L &
 b2 <- nrow(routed) > 0 && all(routed$tol0_reason == "computes") &&
   any(domain$family == "blocks" & domain$api_zeta2)
 inv <- res[res$default_outcome %in% "inverted", ]
-cc <- nrow(inv) > 0 && all(inv$bit_identical)
+cc <- isTRUE(nrow(inv) > 0 && all(inv$bit_identical))
 fam_n <- table(factor(res$family, levels = c("cert", "q4", "m106", "random", "blocks", "struct")))
 p64 <- res[res$p == 64L, ]
 dd <- all(fam_n > 0) && nrow(p64) > 0 &&
@@ -603,7 +606,7 @@ md <- c(
   "",
   "## Pre-registered acceptance",
   "",
-  sprintf("- (a) region (%d matrices, %d of them priced by the tol0 doubles): oracle ran at every priced one, no under-report, and each refuses `uncertified` or is inside delta_star, and every unpriced one refuses: **%s**; both-refused (%d matrices) all `unidentified`: **%s**",
+  sprintf("- (a) region (%d matrices, %d of them priced by the tol0 doubles): oracle ran at every priced one, no under-report, and each refuses `uncertified` or is inside delta_star, and every unpriced one refuses: **%s**; both-refused (%d matrices; conditional, vacuous at 0) all `unidentified`: **%s**",
           nrow(region), nrow(priced), verdict(a1), nrow(both), verdict(a2)),
   sprintf("- (b1) struct family (%d matrices): rcond(info) below sqrt(eps)/1e4 = %s at every one: **%s** (max %s)",
           nrow(struct), fmt(THETA / 1e4), verdict(b1), fmt(suppressWarnings(max(struct$rcond_info)))),

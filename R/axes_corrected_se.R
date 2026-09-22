@@ -65,6 +65,13 @@
 axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
                            fit_zeta1, fit_zeta2) {
   p <- length(item_scale)
+  # Names are stripped before outer(): outer() copies names() onto dimnames,
+  # and identical() reads dimnames, so a named map would defeat the exact
+  # grounds in axes_pricing_core() (a named same-scale indicator matches
+  # neither the unnamed all-ones xi2 nor diag(p)). as.numeric() already drops
+  # the angles' names. (M147 review.)
+  item_scale <- unname(item_scale)
+  if (!is.null(item_block)) item_block <- unname(item_block)
   th <- as.numeric(item_angle_deg) * pi / 180
   d <- list(
     xi1 = cos(outer(th, th, "-")),
@@ -388,7 +395,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   degenerate <- if (is.null(refusal)) {
     axes_degeneracy_refusal(cor_sigma, d)
   } else {
-    axes_check_shared_refusal(refusal, cor_sigma)
+    axes_check_shared_refusal(refusal, cor_sigma, d)
     refusal
   }
   if (!is.null(degenerate$reason)) {
@@ -848,9 +855,13 @@ axes_degeneracy_refusal <- function(sigma, d) {
   if (is.character(core)) {
     # "singular": solve(sigma) itself refused at its default tolerance, which
     # is reachable only past the floor (rcond(sigma) is decades above eps
-    # wherever the floor admits). The certificate below cannot price it
-    # either and returns its sentinel, so the fit refuses "uncertified" with
-    # the conditioning hint -- the literal M111 gave this matrix, kept.
+    # wherever the floor admits). Where the floor fired, the certificate
+    # below cannot price it either and returns its sentinel, so the fit
+    # refuses "uncertified" with the conditioning hint -- the literal M111
+    # gave this matrix, kept. Where the floor ADMITTED the matrix, the
+    # pricing returned "singular" before M147 and still does: the
+    # fall-through is limited to the "ill_conditioned" branch (M147 review).
+    if (is.null(reason)) return(list(reason = core, cert = NULL, core = NULL))
     core <- NULL
   } else if (is.null(reason) &&
              core$rcond_info >= sqrt(.Machine$double.eps)) {
@@ -905,10 +916,12 @@ axes_degeneracy_refusal <- function(sigma, d) {
 # before M117. (M117 review F2.)
 #
 # The realigned cov2cor matrix the decision was priced FOR travels with it in
-# `$priced`, and each surface checks it against the matrix in hand before
-# consuming the decision: nothing else ties the argument to the matrix, and a
-# mismatched pair would otherwise report numbers for a matrix the criterion
-# refuses, silently and with no warning (M117 review F1). `axes_reliability()`
+# `$priced`, and the derivative set in `$derivs` (M147 review); each surface
+# checks both against what it has in hand before consuming the decision:
+# nothing else ties the argument to the matrix or the component configuration,
+# and a mismatched pair would otherwise report numbers for a matrix the
+# criterion refuses, or fold the core against the wrong derivative set,
+# silently and with no warning (M117 review F1). `axes_reliability()`
 # passes a matched pair, so the check is an internal invariant, not a
 # user-reachable condition.
 axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
@@ -923,18 +936,36 @@ axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
   cor_sigma <- stats::cov2cor(sigma)
   out <- axes_degeneracy_refusal(cor_sigma, d)
   out$priced <- cor_sigma
+  out$derivs <- axes_derivs_pin(d)
   out
+}
+
+# The derivative set a refusal object was priced for, as the consumption
+# guard compares it: the component names and the number of matrices, which
+# together fix `d$mats`' length and order for a given map.
+axes_derivs_pin <- function(d) {
+  list(components = d$components, n_mats = length(d$mats))
 }
 
 # The `refusal` argument's consumption guard, one definition for both surfaces
 # (M117 review F1). A precomputed decision is consumed only when it was priced
-# for exactly this matrix; anything else is a caller pairing two matrices, and
-# aborting is the only honest answer, since the alternative is a reported
-# number for a matrix the criterion refuses.
-axes_check_shared_refusal <- function(refusal, cor_sigma) {
+# for exactly this matrix AND this derivative set; anything else is a caller
+# pairing two matrices, or two component configurations on one matrix, and
+# aborting is the only honest answer. Since M147 the object also carries the
+# pricing core, whose `acov` is folded against the surface's own `d$mats`
+# with Map(); a set of a different length would recycle there and return
+# plausible wrong numbers with no condition (M147 review), which is why the
+# derivative set is pinned beside the matrix.
+axes_check_shared_refusal <- function(refusal, cor_sigma, d) {
   if (!identical(refusal$priced, cor_sigma)) {
     stop(
       "`refusal` was priced for a different matrix than the one in hand.",
+      call. = FALSE
+    )
+  }
+  if (!identical(refusal$derivs, axes_derivs_pin(d))) {
+    stop(
+      "`refusal` was priced for a different derivative set than the one in hand.",
       call. = FALSE
     )
   }

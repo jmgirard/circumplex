@@ -474,6 +474,11 @@ cert_info <- function(sigma, d) {
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
 cert_true_error <- function(id, sigma, d) {
+  # The refusal branch reads the direct solve()'s message in English:
+  # LAPACK's exact-singular message is translated under a non-English
+  # LANGUAGE (measured: German), and a translated message would call a
+  # genuine zero pivot a regression (M147 review).
+  testthat::local_reproducible_output(lang = "en")
   fz <- cert_frozen[[id]]
   # THE MATRIX CHECK COMES FIRST, before the shipped pricing is even called.
   # The refusal branch below calls a refusal a regression, and that conclusion

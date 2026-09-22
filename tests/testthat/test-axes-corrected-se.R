@@ -1425,7 +1425,14 @@ test_that("M106 review round 2 F4: only the SE surface's ill-conditioning refusa
                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
   )
   expect_identical(gc$reason, "uncertified")
-  expect_length(grep("condition number 2.01e+13", wc, fixed = TRUE), 1L)
+  # The clause's exponent is pinned, and the mantissa is bracketed
+  # numerically on the matrix itself: the printed third digit moves under
+  # one-ulp perturbation of the matrix (2e+13 to 2.03e+13 measured over 40
+  # draws), the platform-string failure class this milestone removes.
+  expect_length(grep("condition number [0-9.]+e\\+13", wc), 1L)
+  k13 <- m106_kappa(m106_family_b(1e-13))
+  expect_gt(k13, 1.9e13)
+  expect_lt(k13, 2.1e13)
   expect_length(grep("items i1 and i9 are nearly collinear", wc, fixed = TRUE), 1L)
   expect_length(grep("estimated relative error", wc, fixed = TRUE), 1L)
 })
