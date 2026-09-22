@@ -1253,6 +1253,48 @@ test_that("the estimate tracks a planted perturbation of the shipped values", {
 })
 
 
+test_that("the quotient's estimate tracks a planted perturbation of the naive arm", {
+  skip_on_cran()
+  # The same sensitivity invariant, extended to the field the layer above
+  # never reached (M148, from the Known-fragilities list): `fiml_ratio` is
+  # priced on the quotient corrected / naive, and the plant above lands on
+  # the corrected arm alone, so a certificate that ignored the denominator
+  # would have passed it. Here the NAIVE arm is multiplied by (1 + delta) and
+  # the quotient's estimate must respond, while `se`, priced on the corrected
+  # arm alone, must not move at all.
+  cs <- cert_anchors()[[1L]]
+  d <- cert_derivs(cs)
+  real_v <- axes_v_pricing
+  base <- axes_accuracy_certificate(cs$r, d)
+  for (delta in c(1e-10, 1e-8, 1e-4, 1e-2)) {
+    testthat::local_mocked_bindings(
+      axes_v_pricing = function(sigma, dd) {
+        out <- real_v(sigma, dd)
+        out$naive <- out$naive * (1 + delta)
+        out
+      },
+      .package = "circumplex"
+    )
+    cert <- axes_accuracy_certificate(cs$r, d)
+    f <- 10
+    slack <- f * .Machine$double.eps
+    # With e0 the quotient's error already present, the planted quotient's
+    # relative error is |e0 - delta| / (1 + delta): the 1/(1 + delta) is the
+    # denominator's own factor, exact rather than a first-order cross term,
+    # and `base$fiml_ratio` is at least f*|e0|/2, so it bounds |e0| from
+    # above in both directions.
+    expect_gte(cert$fiml_ratio,
+               (f * delta / 2 - base$fiml_ratio) / (1 + delta) - slack)
+    expect_lte(cert$fiml_ratio,
+               (f * delta / 2 + base$fiml_ratio) / (1 + delta) + slack)
+    # The plant is on the denominator only: the SE estimate reads the
+    # corrected arm and is bit-identical to the unperturbed certificate's.
+    expect_identical(cert$se, base$se)
+    expect_identical(cert$cval, base$cval)
+  }
+})
+
+
 test_that("the reference route lands on hand-derived exact values (closed-form oracle)", {
   # THE SECOND ORACLE TYPE (IP3; RR21 section 4). One configuration small
   # enough to price by hand, driven through the internal seam, with the matrix
