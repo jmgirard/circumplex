@@ -28,7 +28,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - [x] AC3: At the anchor the planted-perturbation layer drives (`cert_anchors()[[1L]]`), a perturbation planted in the naive arm's quadratic forms reddens the `fiml_ratio` bracket, as the layer's existing plants redden the `se` and `cval` brackets.
 - [x] AC4: In `devel/degeneracy-oracle/exact_oracle.R`, the function that parses the Python driver's output stops with a message naming the missing key when a key it reads is absent. The guard is asserted in process against a stubbed output with one key removed.
 - [x] AC5: In the counterexample-B block of `tests/testthat/test-axes-certificate.R`, a certificate sentinel returned while the shipped pricing succeeded fails the block with a message saying the certificate degraded on a priced route. A planted `axes_dd_selftest()` failure reddens it.
-- [ ] AC6: `devtools::test(reporter = "check")` reports zero failures, and no warning reported against `tests/testthat/test-axes-certificate.R` (the only test file this milestone changes), including warnings raised by package code or installed libraries while that file's tests run. Skips are permitted, and so are warnings reported against other test files.
+- [x] AC6: `devtools::test(reporter = "check")` reports zero failures, and no warning reported against `tests/testthat/test-axes-certificate.R` (the only test file this milestone changes), including warnings raised by package code or installed libraries while that file's tests run. Skips are permitted, and so are warnings reported against other test files.
 
 ## Coverage
 
@@ -108,7 +108,7 @@ Branch at `85a1936f` plus the fix-now comment edits below; master `89989cba` unc
 - AC3: the quotient test (16 expectations, 0 failures) ran in the same clean run; the discrimination probe from the first pass stands (unperturbed 5.97e-13 below every lower bound). PASS.
 - AC4: `Rscript devel/degeneracy-oracle/exact_oracle.R` exit 0, all four verdicts PASS, the in-process key-guard assertion running at load. PASS.
 - AC5: `axes_dd_selftest` mocked FALSE before the counterexample-B certificate call (line 800, located by text; a line-numbered edit missed after the comment fix and was rerun): 3 failures, the first the new "degraded to its sentinel on a priced route at case 'cxb'" message. Reverted. PASS.
-- AC6: full suite running on the final tree at this checkpoint; result appended when it completes.
+- AC6: `devtools::test(reporter = "check")` on the final tree (`74464cc7`) exit 0: FAIL 0, WARN 12, SKIP 1, PASS 13942; zero warnings reported against `test-axes-certificate.R` (the twelve: test-ci_accuracy.R ×4, test-pole-values.R ×4, test-print-width.R ×2, test-growth_invariants.R, test-ssm_sem.R). PASS.
 
 Consistency gate, second pass: `cairn_validate.py` all checks passed; no principle line changed; `document()` no diff, zero `resolve link` lines; `pkgdown::check_pkgdown()` no problems; README and NEWS untouched (internal tier); master watches `success` at `d51b3b73` for both workflows, later master commits `cairn/`-only; the three tool audits exit 0. `devtools::check()` was run on a tree whose non-`cairn/` content is identical to `85a1936f` (`git diff --stat dfbd1582 85a1936f -- . ':!cairn'` empty): Status OK, 0/0/0; the edits since are comments only, and the certificate file and full suite were rerun on the final tree.
 
