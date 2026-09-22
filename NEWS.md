@@ -45,6 +45,26 @@
 
 ## Minor improvements and fixes
 
+* `axes_reliability()` no longer refuses a fit as `"unidentified"` on the
+  conditioning of its information matrix. That refusal came from the default
+  tolerance of `solve()`, and at a fitted matrix near machine precision it
+  fired on some platforms and not on others. The per-fit accuracy check now
+  judges every such fit: below the conditioning floor, a fit that a platform
+  used to refuse `"unidentified"` is refused `"uncertified"` with its
+  estimated relative error in the warning, or computes when the check places
+  its numbers inside the accuracy target. A fit the floor admits is also
+  checked when its information matrix is nearly singular. `"unidentified"`
+  now names only a design defect: two identical derivative matrices, a
+  derivative matrix equal to the identity, or an exactly singular inversion.
+  Where the previous tolerance inverted, every reported number is unchanged,
+  because the tolerance is the only change to that arithmetic, and every
+  newly checked fit of a kind the function can produce that the package's
+  sweep measured passed the check. A fit the floor admits but that the function itself refuses at its
+  door (fewer than four scales) can now be refused `"uncertified"` at the
+  internal helpers where it used to compute. The internal uncorrected arm,
+  reported in `details$naive_reason`, keeps the default tolerance and can
+  still differ across platforms at such a matrix.
+
 * `scales(x, items = TRUE)` no longer stops with "subscript out of bounds"
   on `iip32` and `iip64`. These licensed instruments ship a notice in place
   of their item text, and `scales()` now prints that notice once, after the

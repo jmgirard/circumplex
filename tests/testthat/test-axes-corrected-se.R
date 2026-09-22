@@ -1409,22 +1409,31 @@ test_that("M106 review round 2 F4: only the SE surface's ill-conditioning refusa
   # The control, on the same surface: an ill-conditioned matrix DOES carry the
   # clause, so the assertion above is about the literal and not about whether
   # this call site ever attaches a hint.
-  # The radius moved at M111. m106_family_b(2e-5) -- kappa 1.01e5, the old
-  # exemplar -- now COMPUTES: its certificate estimates 2.6e-11, seven decades
-  # inside the accuracy target, which is precisely the class of fit M111
-  # stopped refusing. The control needs a matrix the certificate actually
-  # refuses, so it moves down to pair_eps 1e-8 (kappa 2.01e8), where the
-  # reference route fails and the sentinel refuses. The named pair is
-  # unchanged, which is the point of the control.
+  # The radius moved at M111 and again at M147. m106_family_b(2e-5) -- kappa
+  # 1.01e5, the old exemplar -- COMPUTES since M111 (certificate 2.6e-11), and
+  # pair_eps 1e-8 (kappa 2.01e8), M111's control, computes since M147: the
+  # default solve() tolerance that sentinelled it inside the certificate's
+  # replay is gone, and the certificate reads 2.1e-7 there. The control needs
+  # a matrix the certificate itself refuses, so it moves down to pair_eps
+  # 1e-13 (kappa 2.01e13, certificate 1.2e-2). The named pair is unchanged,
+  # which is the point of the control.
   nm9 <- paste0("i", 1:9)
   ang9 <- c(as.numeric(octants()), as.numeric(octants())[1L])
   wc <- testthat::capture_warnings(
-    gc <- axes_corrected_se(m106_family_b(1e-8), nm9, ang9,
+    gc <- axes_corrected_se(m106_family_b(1e-13), nm9, ang9,
                             as.character(c(1:8, 1L)),
                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
   )
   expect_identical(gc$reason, "uncertified")
-  expect_length(grep("condition number 2.01e+08", wc, fixed = TRUE), 1L)
+  # The clause's exponent is pinned, and the mantissa is bracketed
+  # numerically on the matrix itself: the printed third digit moves under
+  # one-ulp perturbation of the matrix's entries (measured at the M147 review
+  # and again at its claim audit, 2026-09-21), the platform-string failure
+  # class this milestone removes.
+  expect_length(grep("condition number [0-9.]+e\\+13", wc), 1L)
+  k13 <- m106_kappa(m106_family_b(1e-13))
+  expect_gt(k13, 1.9e13)
+  expect_lt(k13, 2.1e13)
   expect_length(grep("items i1 and i9 are nearly collinear", wc, fixed = TRUE), 1L)
   expect_length(grep("estimated relative error", wc, fixed = TRUE), 1L)
 })

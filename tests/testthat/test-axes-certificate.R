@@ -429,27 +429,25 @@ cert_detail <- function(id) {
 # moves four of the five anchors; the four-variable case c4 moves only on
 # cos(0) and cos(pi), both a full half ulp from any boundary.
 #
-# RCOND_BAND -- the interval the information matrix's reciprocal condition
-# estimate occupies at this case, under one-ulp perturbation of the matrix.
-# Where that band CONTAINS .Machine$double.eps, `solve(info)`'s success is a
-# property of the platform's LU roundoff rather than of the matrix, and a
-# refusal is therefore admitted. Where it does not -- every anchor, whose
-# rcond sits decades above eps -- a refusal stays a regression.
-#
-# The band committed for cxb was measured by RR22 over 300 one-ulp neighbours
-# of the fixture (min 1.667e-16, median 2.41e-16, max 3.35e-16), and BOTH ends
-# have since been straddled by real platforms rather than by perturbation
-# alone: 2.6008e-16 on aarch64-apple-darwin23 with reference BLAS, which
-# prices, and 2.0494e-16 on aarch64-unknown-linux-gnu with OpenBLAS 0.3.33,
-# which refuses (both measured 2026-09-05, the second in tools/arm64's
-# container). eps is 2.220446e-16, between the two.
+# WHERE A REFUSAL IS ADMITTED (M147; D-061, D-062). Until M147 a refusal was
+# admitted where a committed `rcond` band straddled eps -- a constant
+# predicate, since eps is the same on every platform R supports, and so
+# equivalent to naming the case (DESIGN.md's retired fragility). The shipped
+# core now inverts under `tol = 0` and refuses "unidentified" only on an
+# EXACT ground; a matrix whose condition estimate sits below eps is routed to
+# the certificate instead. So the one platform-decided refusal left is LAPACK
+# reporting an exact zero pivot, and that is admitted at ANY case -- anchor or
+# counterexample -- on one condition asserted in cert_true_error(): a direct
+# `solve(info, tol = 0)` on the same information matrix raises the
+# exact-singular condition here and now. A refusal without that pivot is a
+# regression in axes_pricing_core().
 cert_admission <- list(
-  a4  = list(origin = "cos-built",       rcond_band = NULL),
-  a5  = list(origin = "cos-built",       rcond_band = NULL),
-  c4  = list(origin = "cos-built",       rcond_band = NULL),
-  b9a = list(origin = "cos-built",       rcond_band = NULL),
-  b9b = list(origin = "cos-built",       rcond_band = NULL),
-  cxb = list(origin = "committed-bytes", rcond_band = c(1.667e-16, 3.35e-16))
+  a4  = list(origin = "cos-built"),
+  a5  = list(origin = "cos-built"),
+  c4  = list(origin = "cos-built"),
+  b9a = list(origin = "cos-built"),
+  b9b = list(origin = "cos-built"),
+  cxb = list(origin = "committed-bytes")
 )
 
 # A matrix this machine builds itself can differ from the committed one
@@ -458,19 +456,29 @@ cert_matrix_is_built <- function(id) {
   identical(cert_admission[[id]]$origin, "cos-built")
 }
 
-# The admission, read off the committed band rather than off the case name:
-# a refusal is admitted exactly where the band straddles this machine's eps.
-cert_refusal_admitted <- function(id) {
-  band <- cert_admission[[id]]$rcond_band
-  !is.null(band) &&
-    band[[1L]] <= .Machine$double.eps &&
-    .Machine$double.eps <= band[[2L]]
+# The information matrix as the core forms it, so the refusal's ground can be
+# re-asked of LAPACK directly. Copied from the core's loop deliberately: the
+# core returns the inverse and the condition estimate, never the matrix.
+cert_info <- function(sigma, d) {
+  si <- solve(sigma)
+  sim <- lapply(d$mats, function(m) si %*% m)
+  q <- length(sim)
+  info <- matrix(0, q, q)
+  for (s in seq_len(q)) for (t in s:q) {
+    info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
+  }
+  info
 }
 
 # THIS MACHINE's own relative error at one case, against the committed exact
 # values. Returns NULL only where the shipped pricing refused, having already
 # failed; skips where this machine builds a different matrix.
 cert_true_error <- function(id, sigma, d) {
+  # The refusal branch reads the direct solve()'s message in English:
+  # LAPACK's exact-singular message is translated under a non-English
+  # LANGUAGE (measured: German), and a translated message would call a
+  # genuine zero pivot a regression (M147 review).
+  testthat::local_reproducible_output(lang = "en")
   fz <- cert_frozen[[id]]
   # THE MATRIX CHECK COMES FIRST, before the shipped pricing is even called.
   # The refusal branch below calls a refusal a regression, and that conclusion
@@ -515,36 +523,36 @@ cert_true_error <- function(id, sigma, d) {
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
   # A REFUSAL from the shipped pricing IS A ROUTE, not a failure to reproduce
-  # -- but only where the case's committed conditioning band says the platform
-  # decides it (M122; D-055). At the five anchors that band is absent: their
-  # information matrices sit decades clear of eps, they price on every platform
-  # measured, and a refusal there is a regression in axes_pricing_core() which
-  # this fail() is what catches. At counterexample B the band straddles eps,
-  # measured on two real platforms in both directions, so a refusal is one of
-  # the two outcomes the matrix admits and the caller asserts it exhaustively.
+  # -- on exactly one ground (M147). The core inverts under `tol = 0` and the
+  # certificate judges conditioning, so the only platform-decided refusal
+  # left is an exact zero pivot in LAPACK's LU, which blocked kernels can
+  # produce or not on the same matrix. It is admitted at any case, and its
+  # identity is asserted here rather than left to the caller: "unidentified"
+  # from BOTH pricings, and a direct `solve(info, tol = 0)` on the same
+  # information matrix raising the exact-singular condition on this machine.
+  # "singular" would mean solve(sigma) itself failed (rcond(sigma) is
+  # 1.39e-7 at B, five decades inside double range); "indefinite" lives
+  # downstream of both functions called here; a refusal with no zero pivot
+  # is the old conditioning gate come back. Each fails, and so does a refusal
+  # from only one of the two pricings.
   #
   # Either way NULL comes back, and the recorded disposition is what tells the
   # caller which of the two it was; the certificate returns its sentinel at a
   # refusal, which reddens a bracket applied to it.
   if (is.character(v) || is.character(u)) {
     literals <- paste(Filter(is.character, list(v, u)), collapse = ", ")
-    if (!cert_refusal_admitted(id)) {
+    direct <- tryCatch(solve(cert_info(sigma, d), tol = 0),
+                       error = function(e) e)
+    if (!inherits(direct, "error") ||
+        !grepl("exactly singular", conditionMessage(direct))) {
       cert_record(id, cert_disp[["refused"]], literals)
       testthat::fail(paste0(
         "the shipped pricing REFUSES at case '", id, "' (", literals,
-        ") -- no conditioning band is committed for this case, so this is a ",
-        "regression, not a platform difference"
+        ") with no exact zero pivot in solve(info, tol = 0) -- a regression, ",
+        "not a platform difference"
       ))
       return(NULL)
     }
-    # THE REFUSAL'S IDENTITY, asserted here rather than left to the caller:
-    # the admission is for the LU gate giving up on a matrix whose condition
-    # straddles eps, which surfaces as "unidentified" from the acov inversion.
-    # "singular" would mean solve(sigma) itself failed -- rcond(sigma) is
-    # 1.39e-7 at B, five decades inside double range, so that is a regression;
-    # "indefinite" lives downstream of both functions called here, so it would
-    # mean a wiring change. Either fails, and so does a refusal from only one
-    # of the two.
     expect_identical(v, "unidentified", label = paste0(id, " v pricing"))
     expect_identical(u, "unidentified", label = paste0(id, " u pricing"))
     cert_record(id, cert_disp[["refused"]], literals)
@@ -708,12 +716,15 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   # one machine: `solve(info)`'s outcome here is decided by the platform's LU
   # roundoff -- rcond(info) is 2.6008e-16 on macOS/arm64 with reference BLAS
   # and 2.0494e-16 on linux-arm64 with OpenBLAS, straddling eps = 2.220446e-16
-  # -- so the shipped pricing prices on the first and refuses on the second,
+  # -- so the shipped pricing priced on the first and refused on the second,
   # and CRAN's linux-arm64 pre-test rejected 2.0.1 on exactly the fail() this
-  # file used to raise there. The claim is now: B is refused `uncertified` on
-  # EVERY route, the route taken is one of the two the committed conditioning
-  # band admits, and where a value exists the certificate brackets it. Both
-  # branches assert; neither can be empty.
+  # file used to raise there. Since M147 the core inverts under `tol = 0`
+  # and the certificate judges conditioning, so B prices wherever LAPACK's LU
+  # finds no exact zero pivot, and a refusal is admitted only AS that pivot
+  # (asserted in cert_true_error()). The claim is: B is refused `uncertified`
+  # on EVERY route, the route taken is one of those two, and where a value
+  # exists the certificate brackets it. Both branches assert; neither can be
+  # empty.
   fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
   d <- axes_se_derivs(fx$ia, c("A", "B", "C"), NULL, FALSE, FALSE)
 
@@ -807,7 +818,8 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
 
   if (identical(disp, cert_disp[["refused"]])) {
     # THE REFUSING ROUTE. cert_true_error() has already asserted the refusal's
-    # identity ("unidentified" from both `v` and `u`). What is left is the
+    # identity ("unidentified" from both `v` and `u`, on an exact zero pivot
+    # in solve(info, tol = 0)). What is left is the
     # contract that follows from it: the certificate degrades to its sentinel
     # -- D-051's promise, asserted here for the first time at a matrix that
     # reaches it naturally rather than through a planted duplicate derivative
@@ -1107,10 +1119,13 @@ test_that("the sentinel is returned where there is nothing to certify", {
   d <- axes_se_derivs(as.numeric(octants()), as.character(1:8), NULL,
                       FALSE, FALSE)
   r <- m106_family_a(2.4e-4, 1L)
-  # A derivative set with a duplicated matrix makes the information matrix
-  # exactly rank-deficient, which is where the shipped route gives up.
+  # A derivative set with a duplicated COMPONENT matrix is refused on an exact
+  # structural ground before any inversion (M147): xi2 planted over xi1. Until
+  # M147 the plant sat in the last item-error slot, where the default-tolerance
+  # inversion refused it; the core now inverts under tol = 0 and compares only
+  # the component matrices, so a plant there would be priced.
   d_dup <- d
-  d_dup$mats[[length(d_dup$mats)]] <- d_dup$mats[[1L]]
+  d_dup$mats[[2L]] <- d_dup$mats[[1L]]
   expect_identical(axes_v_pricing(r, d_dup), "unidentified")
   expect_identical(axes_accuracy_certificate(r, d_dup),
                    list(se = 1, cval = 1, fiml_ratio = 1))

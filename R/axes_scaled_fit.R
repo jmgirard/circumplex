@@ -52,8 +52,10 @@
 # lets the certificate take neither n nor df (D-051; RR21 section 2).
 #
 # Returns the numerator, or a string naming the failure.
-axes_u_pricing <- function(sigma, d) {
-  core <- axes_pricing_core(sigma, d)
+axes_u_pricing <- function(sigma, d, core = NULL, tol = 0) {
+  # `core` as in axes_v_pricing(): the once-priced result handed down by
+  # axes_degeneracy_refusal() (M147).
+  if (is.null(core)) core <- axes_pricing_core(sigma, d, tol = tol)
   if (is.character(core)) return(core)
   si <- core$si
   sim <- core$sim
@@ -87,7 +89,7 @@ axes_u_pricing <- function(sigma, d) {
   # surface prices with, both taken from axes_pricing_core() -- and
   # B_st = 2 tr(Wc_s Sigma Wc_t Sigma), where Wc is W with the
   # covariance-to-correlation Jacobian folded in exactly as it is there
-  # (R/axes_corrected_se.R:202-214): off the diagonal W is unchanged, and the
+  # (R/axes_corrected_se.R:248-260): off the diagonal W is unchanged, and the
   # diagonal absorbs the standardization because a sample correlation's diagonal
   # does not vary at all.
   #
@@ -250,7 +252,7 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   degenerate <- if (is.null(refusal)) {
     axes_degeneracy_refusal(sigma, d)
   } else {
-    axes_check_shared_refusal(refusal, sigma)
+    axes_check_shared_refusal(refusal, sigma, d)
     refusal
   }
   if (!is.null(degenerate$reason)) {
@@ -262,7 +264,7 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
                   axes_degeneracy_note(degenerate, sigma)))
   }
 
-  u <- axes_u_pricing(sigma, d)
+  u <- axes_u_pricing(sigma, d, core = degenerate$core)
   if (is.character(u)) return(na_out(u))
   up <- upper.tri(sigma)
   rho <- sigma[up]
@@ -286,10 +288,11 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   #     finiteness gate above), so cb is finite and >= 0, with equality only
   #     if every |rho| = 1, a matrix the degeneracy criterion refuses first.
   #     baseline_df > 0 whenever this line runs: the baseline_df guard pins
-  #     baseline_df = p(p - 1)/2, which is 0 only at p = 1 -- where the
-  #     information matrix (q x q from a single moment, rank <= 1 < q) is
-  #     singular, so acov's solve refuses "unidentified" before this line
-  #     (measured at the M90 round-2 review).
+  #     baseline_df = p(p - 1)/2, which is 0 only at p = 1 -- where every
+  #     derivative matrix is the 1 x 1 unit, so the core refuses
+  #     "unidentified" on its exact duplicate-pair ground before this line
+  #     (until M147 the same literal came from the singular inversion,
+  #     measured at the M90 round-2 review).
   #   cval <= 0 and !is.finite(cval): tr(U Gamma) >= 0 in exact arithmetic
   #     (U is the psd projection residual of V, Gamma_R is psd) and df is
   #     nonzero past the saturation guard, so a nonpositive or non-finite cval here

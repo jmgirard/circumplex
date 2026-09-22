@@ -3149,15 +3149,19 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
   # No converged fit is known to reach the degenerate regime, so a degenerate
   # fitted matrix is CONSTRUCTED and injected at the one seam both consumers
   # read (axes_fitted_cov): the population matrix with one item duplicated
-  # (plus a 1e-9 ridge so the smallest eigenvalue is a hair above zero rather
+  # (plus a ridge so the smallest eigenvalue is a hair above zero rather
   # than roundoff-negative), near-singular in the correlation metric the
   # criterion prices since the M89 re-cut -- so BOTH surfaces refuse it --
   # while leaving everything upstream of the two consumers (the fit, the point
-  # estimates, lavaan's own fit measures) untouched.
+  # estimates, lavaan's own fit measures) untouched. The ridge was 1e-9 until
+  # M147: with the certificate the sole conditioning judge that matrix
+  # CERTIFIES (estimate 9.6e-8; the default-tolerance inversion that used to
+  # sentinel it is gone), so the ridge is 1e-14, where the certificate reads
+  # about 7e7 and refuses on every route.
   bad <- sigma
   bad[2L, ] <- bad[1L, ]
   bad[, 2L] <- bad[, 1L]
-  bad <- bad + 1e-9 * diag(nrow(bad))
+  bad <- bad + 1e-14 * diag(nrow(bad))
   local_mocked_bindings(axes_fitted_cov = function(fit) bad)
 
   w <- testthat::capture_warnings(

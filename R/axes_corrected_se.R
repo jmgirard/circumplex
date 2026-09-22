@@ -65,6 +65,13 @@
 axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
                            fit_zeta1, fit_zeta2) {
   p <- length(item_scale)
+  # Names are stripped before outer(): outer() copies names() onto dimnames,
+  # and identical() reads dimnames, so a named map would defeat the exact
+  # grounds in axes_pricing_core() (a named same-scale indicator matches
+  # neither the unnamed all-ones xi2 nor diag(p)). as.numeric() already drops
+  # the angles' names. (M147 review.)
+  item_scale <- unname(item_scale)
+  if (!is.null(item_block)) item_block <- unname(item_block)
   th <- as.numeric(item_angle_deg) * pi / 180
   d <- list(
     xi1 = cos(outer(th, th, "-")),
@@ -151,6 +158,25 @@ axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
 #
 # Returns a list of the two SE vectors, or a single string naming the failure.
 #
+# THE CONDITIONING GATE IS GONE (M147; D-061, D-062; RR22 rec 9, RR24). Until
+# M147 the information matrix was inverted at solve()'s default tolerance,
+# which refused "unidentified" wherever LAPACK's reciprocal condition estimate
+# fell below eps -- a threshold RR22 measured straddling real platforms at one
+# committed matrix, so the literal was a platform fact. The certified path now
+# inverts at `tol = 0` and the per-fit certificate judges conditioning
+# (axes_degeneracy_refusal() below, which reads the `rcond_info` this returns
+# against sqrt(eps)). "unidentified" fires on exactly THREE grounds, each exact
+# and tolerance-free, so it means the same thing on every platform: a pair of
+# bit-identical component matrices (the M89 T10 one-scale design), a component
+# matrix identical to the identity (one item per scale or per block with that
+# component fitted, where it equals the sum of the item-error matrices), and an
+# inversion that is non-finite or that LAPACK reports exactly singular. Only
+# the component matrices are compared: every one has a unit diagonal, so none
+# can equal an item-error matrix (except at p = 1, where every matrix is the
+# 1 x 1 unit and the duplicate-pair ground fires first), and two item-error
+# matrices are never identical. The raw lavaan-tie arm passes `tol = .Machine$double.eps` (the
+# certificate never prices raw Sigma-hat, D-037), and nothing else does.
+#
 # SPLIT INTO THREE (M108). The arithmetic below is now also replayed in
 # compensated double-double precision by axes_accuracy_certificate() in
 # R/axes_certificate.R, whose whole claim is that it prices THIS pipeline. So
@@ -161,9 +187,22 @@ axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
 # n-carrying tail (divide by n, take the root) is what stays here. The split is
 # expression-for-expression, so every returned number is bit-identical to the
 # single function this was before (M108 AC6).
-axes_pricing_core <- function(sigma, d) {
+axes_pricing_core <- function(sigma, d, tol = 0) {
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return("singular")
+
+  # num.eq = FALSE: identical()'s default compares doubles by value, under
+  # which 0 and -0 are identical; the grounds are stated as BIT identity
+  # (D-062), so the bits are what is compared (M147 review, second pass).
+  comp <- d$mats[seq_len(d$n_comp)]
+  for (a in seq_len(length(comp) - 1L)) {
+    for (b in seq.int(a + 1L, length(comp))) {
+      if (identical(comp[[a]], comp[[b]], num.eq = FALSE)) return("unidentified")
+    }
+  }
+  if (any(vapply(comp, identical, TRUE, diag(nrow(sigma)), num.eq = FALSE))) {
+    return("unidentified")
+  }
 
   sim <- lapply(d$mats, function(m) si %*% m)
   q <- length(sim)
@@ -175,10 +214,14 @@ axes_pricing_core <- function(sigma, d) {
       info[s, t] <- info[t, s] <- 0.5 * sum(sim[[s]] * t(sim[[t]]))
     }
   }
-  acov <- tryCatch(solve(info), error = function(e) NULL)
+  acov <- tryCatch(solve(info, tol = tol), error = function(e) NULL)
   if (is.null(acov) || !all(is.finite(acov))) return("unidentified")
 
-  list(si = si, sim = sim, acov = acov)
+  # The condition estimate travels as DATA for the selector in
+  # axes_degeneracy_refusal(), never as a refusal ground here: the certificate
+  # replays this very function, so a refusing string keyed to conditioning
+  # would sentinel the certificate at exactly the fits it is asked to grade.
+  list(si = si, sim = sim, acov = acov, rcond_info = rcond(info))
 }
 
 
@@ -187,8 +230,11 @@ axes_pricing_core <- function(sigma, d) {
 # cancels exactly from a relative error (|sqrt(v_hat/n)/sqrt(v/n) - 1| does not
 # contain n at all), which is what lets the certificate be n-free by
 # construction rather than by test (D-051; RR21 section 2).
-axes_v_pricing <- function(sigma, d) {
-  core <- axes_pricing_core(sigma, d)
+axes_v_pricing <- function(sigma, d, core = NULL, tol = 0) {
+  # `core`, when supplied, is axes_pricing_core()'s result for THIS matrix and
+  # derivative set, priced once by axes_degeneracy_refusal() and handed down
+  # so a fit is inverted once for both surfaces (M147; the M117 seam).
+  if (is.null(core)) core <- axes_pricing_core(sigma, d, tol = tol)
   if (is.character(core)) return(core)
   si <- core$si
   acov <- core$acov
@@ -221,8 +267,8 @@ axes_v_pricing <- function(sigma, d) {
 }
 
 
-axes_se_pricing <- function(sigma, d, n) {
-  v <- axes_v_pricing(sigma, d)
+axes_se_pricing <- function(sigma, d, n, core = NULL, tol = 0) {
+  v <- axes_v_pricing(sigma, d, core = core, tol = tol)
   if (is.character(v)) return(v)
   out <- rbind(sqrt(v$naive / n), sqrt(v$corrected / n))
 
@@ -352,7 +398,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   degenerate <- if (is.null(refusal)) {
     axes_degeneracy_refusal(cor_sigma, d)
   } else {
-    axes_check_shared_refusal(refusal, cor_sigma)
+    axes_check_shared_refusal(refusal, cor_sigma, d)
     refusal
   }
   if (!is.null(degenerate$reason)) {
@@ -368,7 +414,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # the raw arm runs: a matrix destined for a unit refusal never pays for a
   # raw sandwich whose result would be dropped, and by the time the raw arm
   # can record a refusal no na_out() exit remains to discard it.
-  std <- axes_se_pricing(cor_sigma, d, n)
+  std <- axes_se_pricing(cor_sigma, d, n, core = degenerate$core)
   if (is.character(std)) return(na_out(std))
 
   # The raw arm, decoupled (M91): a criterion trip or a pricing failure here
@@ -382,7 +428,11 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   naive_reason <- axes_sigma_degenerate(sigma)
   raw <- NULL
   if (is.null(naive_reason)) {
-    raw <- axes_se_pricing(sigma, d, n)
+    # At the DEFAULT tolerance, deliberately (M147; D-061 keeps it): the
+    # certificate never prices raw Sigma-hat, so a value the default gate
+    # refuses here has no judge, and the refusal lands in `naive_reason`.
+    # This is the one literal left that a platform's LU roundoff can decide.
+    raw <- axes_se_pricing(sigma, d, n, tol = .Machine$double.eps)
     if (is.character(raw)) {
       naive_reason <- raw
       raw <- NULL
@@ -781,8 +831,55 @@ axes_sigma_degenerate <- function(sigma) {
 # denominator and reach the user through it.
 axes_degeneracy_refusal <- function(sigma, d) {
   reason <- axes_sigma_degenerate(sigma)
-  if (!identical(reason, "ill_conditioned")) {
-    return(list(reason = reason, cert = NULL))
+  if (!is.null(reason) && !identical(reason, "ill_conditioned")) {
+    return(list(reason = reason, cert = NULL, core = NULL))
+  }
+  # THE SELECTOR (M147; D-061, D-062; RR24 section 2). The pricing core is
+  # inverted HERE, once, under tol = 0, and its result rides on the returned
+  # object so both surfaces price from it. An exact "unidentified" from the
+  # core is forwarded unchanged; a "singular" falls through to the certificate
+  # (below). A fit is then sent to the certificate on either of two selectors: the floor
+  # fired ("ill_conditioned", as since M111), OR the information matrix's
+  # reciprocal condition estimate sits below sqrt(eps). The second exists for
+  # designs the floor cannot see -- singular in exact arithmetic, or nearly,
+  # in the DERIVATIVE structure rather than in sigma -- whose rounded
+  # information matrix LU inverts on some platforms; RR24 measured their
+  # estimates within a factor 4 to 90 of eps, so the threshold is a machine
+  # constant decades above that band. It sits about a decade ABOVE the
+  # smallest floor-admitted estimate measured at a design the exported API
+  # reaches (1.15e-9, a near-duplicate pair at kappa 6e4), so those few
+  # designs are routed and their certificate decides them -- every one
+  # measured passes by three decades. A matrix neither selector picks
+  # computes and pays nothing.
+  # Fenced like the certificate below (M113): this helper refuses, never
+  # errors. The core's matrix products and rcond() can raise on an input its
+  # two solve() fences do not cover (measured at the M147 review: a
+  # mis-dimensioned derivative matrix errored out of the helper), and a
+  # condition means the fit could not be certified -- the sentinel's own
+  # meaning, so the fit refuses "uncertified" with the sentinel as its
+  # certificate. On `error` only, so a warning still reaches the user.
+  core <- tryCatch(axes_pricing_core(sigma, d), error = function(e) NA)
+  if (identical(core, NA)) {
+    return(list(reason = "uncertified", cert = axes_certificate_sentinel(),
+                core = NULL))
+  }
+  if (identical(core, "unidentified")) {
+    return(list(reason = core, cert = NULL, core = NULL))
+  }
+  if (is.character(core)) {
+    # "singular": solve(sigma) itself refused at its default tolerance, which
+    # is reachable only past the floor (rcond(sigma) is decades above eps
+    # wherever the floor admits). Where the floor fired, the certificate
+    # below cannot price it either and returns its sentinel, so the fit
+    # refuses "uncertified" with the conditioning hint -- the literal M111
+    # gave this matrix, kept. Where the floor ADMITTED the matrix, the
+    # pricing returned "singular" before M147 and still does: the
+    # fall-through is limited to the "ill_conditioned" branch (M147 review).
+    if (is.null(reason)) return(list(reason = core, cert = NULL, core = NULL))
+    core <- NULL
+  } else if (is.null(reason) &&
+             core$rcond_info >= sqrt(.Machine$double.eps)) {
+    return(list(reason = NULL, cert = NULL, core = core))
   }
   # FENCED (M113). This helper's contract is to REFUSE, never to error: it is
   # called from inside axes_corrected_se() and axes_scaling_factor(), both of
@@ -799,9 +896,9 @@ axes_degeneracy_refusal <- function(sigma, d) {
   cert <- tryCatch(axes_accuracy_certificate(sigma, d),
                    error = function(e) axes_certificate_sentinel())
   if (axes_certificate_worst(cert) <= axes_degeneracy_delta_star) {
-    return(list(reason = NULL, cert = cert))
+    return(list(reason = NULL, cert = cert, core = core))
   }
-  list(reason = "uncertified", cert = cert)
+  list(reason = "uncertified", cert = cert, core = core)
 }
 
 # The refusal decision computed ONCE per checked fit (M117), for
@@ -833,10 +930,12 @@ axes_degeneracy_refusal <- function(sigma, d) {
 # before M117. (M117 review F2.)
 #
 # The realigned cov2cor matrix the decision was priced FOR travels with it in
-# `$priced`, and each surface checks it against the matrix in hand before
-# consuming the decision: nothing else ties the argument to the matrix, and a
-# mismatched pair would otherwise report numbers for a matrix the criterion
-# refuses, silently and with no warning (M117 review F1). `axes_reliability()`
+# `$priced`, and the derivative set in `$derivs` (M147 review); each surface
+# checks both against what it has in hand before consuming the decision:
+# nothing else ties the argument to the matrix or the component configuration,
+# and a mismatched pair would otherwise report numbers for a matrix the
+# criterion refuses, or fold the core against the wrong derivative set,
+# silently and with no warning (M117 review F1). `axes_reliability()`
 # passes a matched pair, so the check is an internal invariant, not a
 # user-reachable condition.
 axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
@@ -851,18 +950,41 @@ axes_shared_refusal <- function(sigma, item_names, item_angle_deg, item_scale,
   cor_sigma <- stats::cov2cor(sigma)
   out <- axes_degeneracy_refusal(cor_sigma, d)
   out$priced <- cor_sigma
+  out$derivs <- axes_derivs_pin(d)
   out
+}
+
+# The derivative set a refusal object was priced for, as the consumption
+# guard compares it: the set ITSELF. A shape pin (component names plus the
+# matrix count) let two sets built from different angles on the same map
+# through, and the surface then folded a core priced for the other set --
+# measured at the M147 review: two octant angles swapped reported SE(xi1)
+# 0.0267 where the map's own pricing gives 0.0110, with no condition. The
+# matrices are what the core was priced against, so they are what is pinned;
+# identical() on p + k small matrices costs nothing beside the pricing.
+axes_derivs_pin <- function(d) {
+  d[c("mats", "components", "n_comp")]
 }
 
 # The `refusal` argument's consumption guard, one definition for both surfaces
 # (M117 review F1). A precomputed decision is consumed only when it was priced
-# for exactly this matrix; anything else is a caller pairing two matrices, and
-# aborting is the only honest answer, since the alternative is a reported
-# number for a matrix the criterion refuses.
-axes_check_shared_refusal <- function(refusal, cor_sigma) {
+# for exactly this matrix AND this derivative set; anything else is a caller
+# pairing two matrices, or two component configurations on one matrix, and
+# aborting is the only honest answer. Since M147 the object also carries the
+# pricing core, whose `acov` is folded against the surface's own `d$mats`
+# with Map(); a set of a different length would recycle there and return
+# plausible wrong numbers with no condition (M147 review), which is why the
+# derivative set is pinned beside the matrix.
+axes_check_shared_refusal <- function(refusal, cor_sigma, d) {
   if (!identical(refusal$priced, cor_sigma)) {
     stop(
       "`refusal` was priced for a different matrix than the one in hand.",
+      call. = FALSE
+    )
+  }
+  if (!identical(refusal$derivs, axes_derivs_pin(d))) {
+    stop(
+      "`refusal` was priced for a different derivative set than the one in hand.",
       call. = FALSE
     )
   }
@@ -880,9 +1002,13 @@ axes_certificate_worst <- function(cert) {
 
 # The diagnostic clause attached to a refusal warning, at both surfaces (M111).
 # Only "uncertified" gets one -- the scope note at axes_degeneracy_hint() below
-# gives the grounds, and they are unchanged by M111: "uncertified" is reached
-# only from "ill_conditioned", so the hint's precondition (lambda_min bounded
-# below by -lambda_max*sqrt(p*eps)) still holds wherever this fires.
+# gives the grounds. "uncertified" is reached from the criterion's
+# "ill_conditioned" answer (M111) or, since M147, from the selector at a
+# matrix the floor ADMITS whose information matrix sits below sqrt(eps); on
+# both the hint's precondition (lambda_min bounded below by
+# -lambda_max*sqrt(p*eps)) holds, and on the second the conditioning clause
+# names a condition number the floor accepts -- the refusal is then about the
+# derivative structure, and the estimate that leads is what carries it.
 #
 # The estimate leads (M111 gate; RR21 rec 4): a bare refusal tells the user
 # the matrix is degenerate, which the conditioning clause already said, while
@@ -901,9 +1027,11 @@ axes_degeneracy_note <- function(refusal, sigma) {
 
 
 # The actionable half of the refusal an ill-conditioned matrix draws (M106;
-# RR19 section 6). That refusal is "uncertified" since M111, reached only from
-# the criterion's "ill_conditioned" answer, so this function's precondition is
-# unchanged and the scope note below still reads on the same set of matrices.
+# RR19 section 6). That refusal is "uncertified" since M111, reached from the
+# criterion's "ill_conditioned" answer or (M147) from the selector at a
+# floor-admitted matrix, where lambda_min > 0; on both this function's
+# precondition holds and the scope note below still excludes the same two
+# literals.
 # Returns a clause naming the conditioning, plus every item pair collinear
 # enough to force the refusal on its own -- otherwise the conditioning alone.
 # Deliberately a separate function called at the warning sites rather than
