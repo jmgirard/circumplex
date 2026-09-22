@@ -320,6 +320,23 @@ cert_pin_length <- function(hat, hi, lbl) {
                    expected.label = paste0(lbl, " committed length"))
 }
 
+# A certificate returned where the shipped pricing succeeded must be a graded
+# estimate, never the sentinel (M148). Which sentinel exit fired is not
+# recoverable from the value -- that would need a route tag in shipped code
+# -- so the failure says only that the certificate degraded on a priced route.
+cert_priced_not_degraded <- function(cert, id) {
+  if (identical(cert, axes_certificate_sentinel())) {
+    testthat::fail(paste0(
+      "the certificate degraded to its sentinel on a priced route at case '",
+      id, "': the shipped pricing succeeded, so a sentinel here is a ",
+      "certificate-side failure (self-test, replay, or pivot), not a refusal"
+    ))
+  } else {
+    testthat::succeed()
+  }
+  invisible(cert)
+}
+
 # The certificate's floor, `safety factor * 2 * eps`, with the factor WRITTEN
 # DOWN rather than read from axes_certificate_safety_factor (M115 AC4). An
 # expectation derived from the constant it is checking cannot notice that
@@ -862,8 +879,19 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
     expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")
 
   } else if (identical(disp, cert_disp[["priced"]])) {
-    # THE PRICED ROUTE, unchanged: the three brackets, and the wrongness
-    # itself asserted rather than described.
+    # THE PRICED ROUTE: the three brackets, and the wrongness itself
+    # asserted rather than described. FIRST, that there is a certificate to
+    # bracket (M148, from the Known-fragilities list). The shipped pricing
+    # succeeded here, but the certificate has sentinel exits of its own --
+    # the dd self-test, a non-finite or nonpositive replayed form, a
+    # dd_solve() with no pivot -- and the sentinel (1, 1, 1) is a number the
+    # brackets below can read as a generous estimate. Planted here on
+    # 2026-09-21 (a self-test returning FALSE), the `se` bracket passed the
+    # sentinel and the other two happened to fail it, on the sizes this
+    # machine's errors take (cval's true error 4.9, above the sentinel's 1;
+    # the ratio's ceiling-scaled true error 0.09, below it): which brackets
+    # catch it is a platform fact, and the failure below is not.
+    cert_priced_not_degraded(cert, "cxb")
     cert_bracket(cert$se, true_rel$se, "cxb se")
     cert_bracket(cert$cval, true_rel$cval, "cxb cval")
     cert_bracket(cert$fiml_ratio, true_rel$ratio, "cxb fiml_ratio")
@@ -1034,6 +1062,17 @@ test_that("AC7: the two harness helpers select their branches on a stated condit
                    class = "expectation_failure",
                    regexp = "probe measured length")
   expect_no_condition(cert_pin_length(c(1, 2), c(1, 2), "probe"),
+                      class = "expectation_failure")
+
+  # cert_priced_not_degraded(): the sentinel reddens and says the
+  # certificate degraded on a priced route; a graded estimate passes (M148).
+  expect_condition(cert_priced_not_degraded(list(se = 1, cval = 1,
+                                                 fiml_ratio = 1), "probe"),
+                   class = "expectation_failure",
+                   regexp = "degraded to its sentinel on a priced route")
+  expect_no_condition(cert_priced_not_degraded(list(se = 1e-3, cval = 1e-3,
+                                                    fiml_ratio = 1e-3),
+                                               "probe"),
                       class = "expectation_failure")
 })
 

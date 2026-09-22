@@ -45,7 +45,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - [x] T2: `cert_root_rel()` failure below -100% and its test.
 - [x] T3: The naive-arm plant at the driven anchor.
 - [x] T4: The oracle-driver key guard and its in-process assertion.
-- [ ] T5: The sentinel-on-priced-route failure in the counterexample-B block, with the `axes_dd_selftest()` plant.
+- [x] T5: The sentinel-on-priced-route failure in the counterexample-B block, with the `axes_dd_selftest()` plant.
 - [ ] T6: DESIGN.md Known fragilities corrected in place (`corrected M148`); `devtools::test()`.
 
 ## Work log
@@ -58,6 +58,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - 2026-09-21: T2 done. `cert_root_rel()` stops below -1 with the offending values in the message; -1 itself is admitted. Probes added to the AC7 harness-helpers test (`-1.5`, `c(0.5, -2)`, the -1 boundary), plus a `cert_pin_length()` probe pair (one short reddens naming the site, equal passes). File clean.
 - 2026-09-21: T3 done. New test at `cert_anchors()[[1L]]`: the naive arm multiplied by (1 + delta) at four deltas; `fiml_ratio` must land in [(f*delta/2 - base)/(1 + delta) - slack, (f*delta/2 + base)/(1 + delta) + slack], and `se`, `cval` must stay bit-identical to the unperturbed certificate. Discrimination: a denominator-blind estimate (the base value, 5.97e-13) sits below the lower bound at every delta (4.99e-10 at the smallest). File clean.
 - 2026-09-21: T4 done. `exact()` split into `exact_parse(out, n_comp)` plus the process call; `exact_keys(n_comp)` lists every key the script reads (16 at two components). A missing key stops naming it; a non-numeric `EXACT_*` value stops naming its key (added beside the key guard, same silent-NA class). The in-process assertion runs at load on a stubbed output: full set parses, each of three dropped keys names itself, one corrupted value names its key. `Rscript devel/degeneracy-oracle/exact_oracle.R` runs end to end, all four verdicts PASS.
+- 2026-09-21: T5 done. `cert_priced_not_degraded(cert, id)` fails on the sentinel with "the certificate degraded to its sentinel on a priced route at case 'cxb'", called first in the block's priced branch; probe pair in the AC7 test. Plant (`axes_dd_selftest` mocked FALSE before the block's certificate call): the new failure fired, and on this machine the `cval` and `fiml_ratio` brackets also failed the sentinel while the `se` bracket passed it, so which brackets catch it is a platform fact and the comment says so. Plant removed; file clean.
 
 ## Decisions
 
