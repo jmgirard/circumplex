@@ -293,7 +293,22 @@ cert_rel <- function(hat, hi, lo) {
 # rather than the first-order e/2 -- the conversion between what is committed
 # above (pre-root quadratic forms) and what users are handed (an SE, and the
 # quotient of two SEs). `n` cancels out of both exactly, so none appears.
-cert_root_rel <- function(e) abs(e / (sqrt(1 + e) + 1))
+#
+# REFUSED BELOW -100% (M148, from the Known-fragilities list). A relative
+# variance error below -1 says the shipped variance is negative, and
+# sqrt(1 + e) is NaN there: the expression returned NaN, which passes an
+# `expect_lt()` as NA rather than reddening. No committed quantity reaches it
+# (the certificate's own sentinel path catches a nonpositive form first), so
+# the failure names the input and stops.
+cert_root_rel <- function(e) {
+  if (any(e < -1)) {
+    stop("cert_root_rel(): relative variance error below -100% (",
+         paste(format(e[e < -1]), collapse = ", "),
+         ") -- the shipped variance is negative, so its root has no ",
+         "relative error", call. = FALSE)
+  }
+  abs(e / (sqrt(1 + e) + 1))
+}
 
 # The measured vector's length against the committed exact array's, asserted
 # as an expectation so a mismatch reddens the case that reached it and names
@@ -1003,6 +1018,23 @@ test_that("AC7: the two harness helpers select their branches on a stated condit
   expect_error(cert_rel(c(1, 2), c(1, 0), c(0, 0)), "the exact value is zero")
   # ... and an ordinary quantity still divides.
   expect_equal(cert_rel(2 + 2^-51, 2, 0), 2^-52)
+
+  # cert_root_rel(): below -100% the expression returned NaN (M148). The
+  # failure names the input; -1 itself is admitted (a root of zero, relative
+  # error one), and a vector fails on its offending element alone.
+  expect_error(cert_root_rel(-1.5), "below -100%.*-1\\.5")
+  expect_error(cert_root_rel(c(0.5, -2)), "below -100%.*-2")
+  expect_equal(cert_root_rel(-1), 1)
+  expect_equal(cert_root_rel(3), 1)
+  expect_equal(cert_root_rel(c(0, 3)), c(0, 1))
+
+  # cert_pin_length(): the measured side one short reddens, and names the
+  # site (M148).
+  expect_condition(cert_pin_length(1, c(1, 2), "probe"),
+                   class = "expectation_failure",
+                   regexp = "probe measured length")
+  expect_no_condition(cert_pin_length(c(1, 2), c(1, 2), "probe"),
+                      class = "expectation_failure")
 })
 
 

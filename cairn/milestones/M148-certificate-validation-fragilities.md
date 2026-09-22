@@ -42,7 +42,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 ## Tasks
 
 - [x] T1: The three length pins with the one-short plant proved red first.
-- [ ] T2: `cert_root_rel()` failure below -100% and its test.
+- [x] T2: `cert_root_rel()` failure below -100% and its test.
 - [ ] T3: The naive-arm plant at the driven anchor.
 - [ ] T4: The oracle-driver key guard and its in-process assertion.
 - [ ] T5: The sentinel-on-priced-route failure in the counterexample-B block, with the `axes_dd_selftest()` plant.
@@ -55,6 +55,7 @@ The five latent defects DESIGN.md's Known fragilities records in the accuracy ce
 - 2026-09-21: plan gate chose a separate milestone over folding these into M147 because the sizing tripwire fires past seven criteria; falsified by nothing (a packaging choice).
 - 2026-09-21: /milestone-implement started; branch `m148-certificate-validation-fragilities` cut from synced master. Question gate skipped: the plan left no choice open that changes the work.
 - 2026-09-21: T1 done. `cert_pin_length()` added and called at the three priced-loop `cert_rel()` sites (now lines 577-579). Plant `[-1L]` on each measured vector: 18 failures, three per priced case, each naming its site ("a4 corrected measured length" and so on). Plant reverted; the file runs clean, all six cases priced on this machine.
+- 2026-09-21: T2 done. `cert_root_rel()` stops below -1 with the offending values in the message; -1 itself is admitted. Probes added to the AC7 harness-helpers test (`-1.5`, `c(0.5, -2)`, the -1 boundary), plus a `cert_pin_length()` probe pair (one short reddens naming the site, equal passes). File clean.
 
 ## Decisions
 
