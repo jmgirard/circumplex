@@ -118,8 +118,11 @@ are `NA` – notably the shared degeneracy criterion's two literals
 (evaluated on [`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the
 fitted covariance matrix; the eigenvalue floor
 `sqrt(p * .Machine$double.eps / 1e-5)` decides which fits are *checked*
-by the per-fit accuracy check rather than which are refused, where the
-`1e-5` is the `1e-4` accuracy target divided by the floor's
+by the per-fit accuracy check rather than which are refused (a fit the
+floor admits is also checked when its information matrix's reciprocal
+condition estimate falls below `sqrt(.Machine$double.eps)`, a
+near-singularity in the derivative structure the floor cannot see),
+where the `1e-5` is the `1e-4` accuracy target divided by the floor's
 factor-of-`10` calibration ceiling, and the target's noise-dominance
 reading is calibrated for `n` up to about `5e5` at a typical design
 (`a = 1/sqrt(2)`) and only to about `2e3` at the least favorable
@@ -136,18 +139,21 @@ reported number computed, whether by the same criterion evaluated on the
 raw fitted matrix or by that arm's own pricing (`"singular"`,
 `"unidentified"`, `"indefinite"`, and `"ill_conditioned"` – the raw arm
 is refused by the floor itself and never reaches the per-fit check, so
-this is the one field on which that literal still appears); it is
-deliberately silent – no warning or printed note accompanies it –
-`fit_uncorrected`, the six fit statistics as lavaan reports them before
-the correlation-metric scaling, `scaling_factor`, the two
-Satorra-Bentler factors (`model` and `baseline`), and
-`fit_scaling_failed`, `NULL` when the scaling succeeded or a string
-naming why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `details`
-also carries `n_moments`, the number of distinct analyzed moments \\p^\*
-= p(p+1)/2\\, and `baseline`, the independence model's **unscaled**
-`chisq` and `df`. Those two, with `fit$chisq`, `fit$df` and the
-`baseline` element of `scaling_factor` – five inputs, since the baseline
-chi-square must be scaled by its own factor before it is used –
+this is the one field on which that literal still appears, and it
+inverts at R's default [`solve()`](https://rdrr.io/r/base/solve.html)
+tolerance, so at a fitted matrix whose information matrix sits near
+machine precision this field can differ across platforms while every
+reported field does not); it is deliberately silent – no warning or
+printed note accompanies it – `fit_uncorrected`, the six fit statistics
+as lavaan reports them before the correlation-metric scaling,
+`scaling_factor`, the two Satorra-Bentler factors (`model` and
+`baseline`), and `fit_scaling_failed`, `NULL` when the scaling succeeded
+or a string naming why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`).
+`details` also carries `n_moments`, the number of distinct analyzed
+moments \\p^\* = p(p+1)/2\\, and `baseline`, the independence model's
+**unscaled** `chisq` and `df`. Those two, with `fit$chisq`, `fit$df` and
+the `baseline` element of `scaling_factor` – five inputs, since the
+baseline chi-square must be scaled by its own factor before it is used –
 reproduce the reported `cfi`. Note that `details$baseline` and the
 `baseline` element of `details$scaling_factor` are different quantities
 that share a name: the first is a chi-square and df pair, the second a
@@ -289,18 +295,25 @@ arithmetic check can license), `"singular"` when the matrix carries
 non-finite entries or a nonpositive fitted variance, and `"uncertified"`
 when the per-fit check could not place this fit's numbers inside the
 accuracy target – roundoff-level negativity, exact singularity and
-severe ill-conditioning all arrive here (a numerical caution). Either
-way the corrected standard errors and the four scaled statistics go `NA`
-together (each with its own warning naming that reason) rather than one
-surface refusing while the other silently scales. The standard-error
-surface additionally applies the same criterion to the raw fitted
-matrix, which one internal arm of its computation – the uncorrected
-normal-theory pricing, kept only as a diagnostic tie to lavaan's own
-standard errors – inverts. A matrix degenerate only in the raw metric
-(wildly unequal fitted variances over a well-conditioned correlation
-structure) refuses that internal arm alone: the reported standard errors
-and scaled fit statistics all compute – `details$se_correction_failed`
-and `details$fit_scaling_failed` are both `NULL`, and no warning or note
+severe ill-conditioning all arrive here (a numerical caution). The check
+is also consulted at a fit the floor admits whose information matrix is
+nearly singular (reciprocal condition estimate below
+`sqrt(.Machine$double.eps)`); every such fit of a kind this function can
+produce that the package's sweep measured passed it, and a fit the floor
+admits but that this function refuses at its door (fewer than four
+scales) can be refused `"uncertified"` at the internal helpers where it
+used to compute. Either way the corrected standard errors and the four
+scaled statistics go `NA` together (each with its own warning naming
+that reason) rather than one surface refusing while the other silently
+scales. The standard-error surface additionally applies the same
+criterion to the raw fitted matrix, which one internal arm of its
+computation – the uncorrected normal-theory pricing, kept only as a
+diagnostic tie to lavaan's own standard errors – inverts. A matrix
+degenerate only in the raw metric (wildly unequal fitted variances over
+a well-conditioned correlation structure) refuses that internal arm
+alone: the reported standard errors and scaled fit statistics all
+compute – `details$se_correction_failed` and
+`details$fit_scaling_failed` are both `NULL`, and no warning or note
 fires, because every reported number is present and priced in the metric
 the criterion cleared – and the internal refusal is recorded, silently,
 in `details$naive_reason` under the same reason vocabulary. Under the
