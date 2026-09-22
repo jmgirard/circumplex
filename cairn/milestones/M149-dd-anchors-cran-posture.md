@@ -22,7 +22,7 @@ The test file asserts the certificate's double-double reference route against th
 ## Acceptance criteria
 
 - [ ] AC1: A test in `tests/testthat/test-axes-certificate.R` checks each of the five anchor cases. It converts `axes_dd_pricing()`'s `v`, `v_naive` and `u` with `dd_to_double()`. It asserts that each lies strictly within half a unit in the last place of the committed exact value (`cert_frozen`'s hi/lo pair). If `axes_dd_pricing()` returns anything other than its list, the test fails and names the case. The assertion runs on the priced route and on the refusing route. It runs whenever this machine builds the case's matrix and the derivative set's `xi1` matrix bit for bit as committed. Otherwise it records the case as `skipped` through `cert_record()` and skips, naming which input differed.
-- [ ] AC2: A test reads only committed values. It checks every component of `v`, `v_naive` and `u` at the five anchors. For each, it asserts that the exact value lies farther from the rounding midpoint than an upper bound on the reference route's error. The test's comment derives that bound from the anchor's conditioning. Both figures are in ulps of `hi`. Where `lo` is zero, the distance is half an ulp.
+- [ ] AC2: A test reads only committed values. It checks every component of `v`, `v_naive` and `u` at the five anchors. For each, it asserts that the exact value lies farther from the rounding midpoint than a stated bound on the reference route's error. The test's comment states that bound and its basis in the anchor's conditioning. It names three premises as unproven. The first is that the floor's `p * kappa^2 * eps` bound with its factor 10 holds, because it was measured on the double route's corrected SE and not proven. The second is that it carries to the double-double route with 2^-104 in place of eps. The third is that it applies to `v_naive` and `u`, with the factor 2 for the squared SE covering all three. Both figures are in ulps of `hi`. Where `lo` is zero, the distance is half an ulp.
 - [ ] AC3: `?axes_reliability` (roxygen in `R/axes_reliability.R`, `man/` regenerated) states a fact about a severely ill-conditioned fit. There, the certificate's estimate is a property of the fit as computed on the running machine. The same fitted matrix can print a graded estimate on one machine and 1 on another, and both refuse the fit as `"uncertified"`. The counterexample-B test asserts `"uncertified"` on both of its admitted routes, which backs the refusal half. The differing-estimates half rests on RR22 section 3's cross-machine measurements. The milestone record cites them, and the help page does not.
 - [ ] AC4: A grep of `R/`, `vignettes/` and the development-version section of `NEWS.md` for `relative error` and `uncertified` finds hits. No hit presents the certificate's estimate as the same on every machine. The review evidence lists each hit with its disposition.
 - [ ] AC5: `cairn/DECISIONS.md` gains a D-entry that keeps the file's current CRAN posture. It states which classes of tests run under `R CMD check` on CRAN, which skip there, and the ground for each class. It names RR22's CI-only alternative as rejected, with the evidence that falsifies the choice. The one change is that the anchor-list test stops skipping on CRAN. The file's header states the posture and cites the D-entry. The review evidence lists every `test_that()` in the file as CRAN-live or CRAN-skipped, with its class. Take a machine that builds all five anchors and their `xi1` bit for bit. On it, a run of the file with `NOT_CRAN=false` skips exactly the tests listed as CRAN-skipped.
@@ -31,7 +31,7 @@ The test file asserts the certificate's double-double reference route against th
 ## Coverage
 
 - AC1 → T1, T2, T3
-- AC2 → T2
+- AC2 → T2, T8
 - AC3 → T4, T5
 - AC4 → T5
 - AC5 → T6
@@ -40,12 +40,13 @@ The test file asserts the certificate's double-double reference route against th
 ## Tasks
 
 - [x] T1: Commit each anchor's `xi1` upper triangle as hex beside `sig` in `cert_frozen`. Regenerate it through `devel/degeneracy-oracle/exact_oracle.R`, or assert it equal to the oracle's inputs. Add the per-anchor dd-vs-exact test. It has the matrix and `xi1` gate and the `skipped` record before `skip()`. It fails by name on a non-list return and applies the half-ulp bound to `v`, `v_naive` and `u`. Move `dd_ulp()` from the counterexample-B test to file scope and reuse it. Reconcile the header's "deliberately NOT pinned" block (lines ~128-133) and the counterexample-B comment (~816-821) with the new assertions.
-- [x] T2: Add the committed-values margin test (AC2) and derive the reference route's error bound in its comment. If the derived bound exceeds the margin at any anchor, stop and raise an amendment. Do not loosen the bound.
+- [x] T2: Add the committed-values margin test (AC2) and state the reference route's error bound in its comment. If the derived bound exceeds the margin at any anchor, stop and raise an amendment. Do not loosen the bound.
 - [x] T3: Prove that the AC1 assertions can fail. Apply each plant alone, revert it, and summarize the result in the work log. Plant (a): `dd_two_sum()` and `dd_two_prod()` return a zero low word, so the route loses its error-free transforms. Plant (b): for each of `v`, `v_naive` and `u`, move the first component's returned high word up by one ulp of that high word. Then do the same to the last component. Also plant a mismatched `xi1`. Show that the case records `skipped` and that the detector stays green for that reason.
 - [x] T4: Add `expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")` to counterexample B's priced branch.
 - [x] T5: Write the `?axes_reliability` sentence next to the sentence saying that the warning names the worst estimate (`R/axes_reliability.R` ~730). Run `devtools::document()`. Run the AC4 grep and record the disposition of each hit in the work log.
 - [x] T6: Classify every `test_that()` in the file as CRAN-live or CRAN-skipped, with its ground. Draft and append the D-entry. Write the header posture block. Remove `skip_on_cran()` from the anchor-list test (~689). Run the file with `NOT_CRAN=false` and record its skip list.
 - [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
+- [x] T8: Rewrite the margin test's comment to state its bound as stated, not derived, and to name the three premises AC2 lists as unproven. Reword the `cert_dd_vs_exact()` comment (~627-633) so that its "property of the committed matrices" claim holds only under those premises. Rerun the certificate file.
 
 ## Work log
 
@@ -65,6 +66,9 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: review evidence recorded. AC1 and AC3-AC6 passed and were ticked. AC2 was not ticked because the margin test's comment says its bound is "by analogy and not separately derived" (finding O1).
 - 2026-09-22: amendment return: AC2 — "The test's comment states that bound and its basis in the anchor's conditioning, and names each premise of that basis that is not proven."
 - 2026-09-22: status set to in-progress for the AC2 amendment only. Fix-now findings O6, O7 and O10 wait for the re-review gate.
+- 2026-09-22: re-audit: AC2 (full) — sentence three's "upper bound" was not verifiable once the bound was admitted unproven, and "each premise" had no list. Both were fixed by naming three premises. It also found that the comment, T2 and the ~627 comment still said "derived". No IP or D-entry blocks the amended state.
+- 2026-09-22: amendment applied at the mini gate (maintainer adopted it): AC2 now reads "a stated bound" and names three unproven premises. This text supersedes the clause in the review's amendment-return line above. It is the same return, not a second one. T8 added and AC2 mapped to T2 and T8. T2's wording changed from "derive" to "state".
+- 2026-09-22: T8 done. The margin test's comment now states the bound as not proven and lists the three premises in AC2. Premise 3 cites B's measured `cval` error of 3.4e-1 (`R/axes_corrected_se.R:678`), which is 11.54 times `p * kappa^2 * 2^-52` at p = 3 and kappa 6.65e6, recomputed this session. The `cert_dd_vs_exact()` comment now says its claim holds only as far as those premises hold. The certificate file passes with `NOT_CRAN=true`.
 
 ## Decisions
 

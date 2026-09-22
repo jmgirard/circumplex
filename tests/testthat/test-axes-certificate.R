@@ -630,8 +630,10 @@ dd_ulp <- function(hat, hi, lo) {
 # which is what a route carrying about 106 bits delivers wherever the exact
 # value is not within its error of a rounding midpoint; the test below
 # ("... sits clear of a rounding midpoint") asserts from committed values
-# alone that none is, so the bound is a property of the committed matrices
-# and not a measurement of the machine running it. axes_dd_pricing() is
+# alone that none is within a STATED bound on that error, so the bound is a
+# property of the committed matrices and not a measurement of the machine
+# running it -- to the extent the three unproven premises that test names
+# hold. axes_dd_pricing() is
 # R-level `+`, `-`, `*` and `/` on doubles, touching neither BLAS nor LAPACK,
 # so given the same inputs it is the same arithmetic on every IEEE platform.
 #
@@ -924,16 +926,32 @@ test_that("AC1: every anchor's exact value sits clear of a rounding midpoint by 
   # Nothing is priced and no matrix is read, so this runs identically on
   # every machine.
   #
-  # THE ROUTE'S ERROR BOUND, BY ANALOGY AND NOT SEPARATELY DERIVED. The
-  # a-priori bound the degeneracy floor rests on is p * kappa^2 * eps for the
-  # double route's relative error in the corrected SE, and the floor allows it
-  # to undershoot the true error by a factor of 10 (see `?axes_reliability` on
-  # the floor's `1e-5`). The reference route runs the same pipeline in
-  # double-double arithmetic, so the same bound is taken with the
-  # double-double unit roundoff 2^-104 in place of eps, applied to `v`,
-  # `v_naive` and `u`. `v` is a squared SE, so its relative error is about
-  # twice the SE's, and a factor of 2 is carried for all three: 2 * 10 * p *
-  # kappa^2 * 2^-104, as a relative error. A relative error r is at most
+  # THE ROUTE'S ERROR BOUND IS STATED, NOT PROVEN. Its basis is the anchor's
+  # conditioning: the bound the degeneracy floor rests on is p * kappa^2 * eps
+  # for the double route's relative error in the corrected SE, with a factor
+  # of 10 allowed for that bound undershooting the true error (see
+  # `?axes_reliability` on the floor's `1e-5`). Taken over here, that gives
+  # 2 * 10 * p * kappa^2 * 2^-104 as a relative error: the double-double unit
+  # roundoff 2^-104 in place of eps, and a factor of 2 because `v` is a
+  # squared SE, whose relative error is about twice the SE's.
+  #
+  # THREE PREMISES OF THAT BASIS ARE UNPROVEN (M149 review, AC2 amendment):
+  #   1. that the floor's p * kappa^2 * eps bound with its factor 10 holds at
+  #      all -- it was MEASURED on the double route's corrected SE, never
+  #      proven (R/axes_corrected_se.R, the floor's derivation);
+  #   2. that it carries to the double-double route with 2^-104 in place of
+  #      eps -- nothing here analyses the double-double pipeline's own error;
+  #   3. that it applies to `v_naive` and `u`, with the factor 2 for the
+  #      squared SE covering all three. For `u` it is already exceeded
+  #      elsewhere: at counterexample B (p = 3, kappa 6.65e6) the double
+  #      route's measured `cval` relative error of 3.4e-1, recorded in
+  #      R/axes_corrected_se.R, is about 11.5 times p * kappa^2 * 2^-52, so
+  #      it is the factor 2 and not the 10 that keeps the stated bound above
+  #      that ratio.
+  # If a premise fails, this test still asserts the stated margin, but the
+  # half-ulp assertion in cert_dd_vs_exact() then rests on the route being
+  # far more accurate than half an ulp, which the measured errors below
+  # show on one machine and do not establish. A relative error r is at most
   # r * 2^53 units in the last place of `hi`, since |hi| is below 2^53 of
   # those units. Hence the bound in ulps is 20 * p * kappa^2 * 2^-51. `kappa`
   # is each anchor's committed fingerprint, pinned against the built matrix to
