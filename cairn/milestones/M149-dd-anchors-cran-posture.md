@@ -73,6 +73,7 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: completion. `devtools::test()` gave `[ FAIL 0 | WARN 12 | SKIP 1 | PASS 14009 ]`, the same as the review run. Every change since the release check is a comment or a record. Status set to review.
 - 2026-09-22: re-review: all six criteria ticked against fresh evidence. The fix-now findings O6, O7, O10 and R1-R5 are fixed on the branch.
 - 2026-09-22: step-7 approval: m149-dd-anchors-cran-posture approved for merge
+- 2026-09-22: PR #184 opened. The CI watch reached its time limit with 3 checks passed and the three R-CMD-check jobs (macOS, ubuntu, windows) pending. The watcher was stopped, and the approval marker stays in place for the resumed merge.
 
 ## Decisions
 
