@@ -1,6 +1,6 @@
 # M149: Reference-route checks at the anchors, and the certificate file's CRAN posture
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -45,7 +45,7 @@ The test file asserts the certificate's double-double reference route against th
 - [x] T4: Add `expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")` to counterexample B's priced branch.
 - [x] T5: Write the `?axes_reliability` sentence next to the sentence saying that the warning names the worst estimate (`R/axes_reliability.R` ~730). Run `devtools::document()`. Run the AC4 grep and record the disposition of each hit in the work log.
 - [x] T6: Classify every `test_that()` in the file as CRAN-live or CRAN-skipped, with its ground. Draft and append the D-entry. Write the header posture block. Remove `skip_on_cran()` from the anchor-list test (~689). Run the file with `NOT_CRAN=false` and record its skip list.
-- [ ] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
+- [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
 
 ## Work log
 
@@ -61,6 +61,7 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: T6 done. D-063 appended, the header posture block written, and `skip_on_cran()` removed from the anchor-list test. Timed under `NOT_CRAN=true`, the whole file runs in 1.3 s, and each CRAN-skipped test takes 0.1 s or less, so D-063 grounds the skipped class on what those tests can detect and not on cost. With `NOT_CRAN=false`, the file skips exactly the five tests in the skipped class, and all six cases are priced.
 - 2026-09-22: claim audit round one (fresh [O] reader): 34 claims read, 5 wrong and 1 unverifiable, all corrected. The CRAN block, D-063's ground and its heading now draw the line at "checks the estimate against exact truth", because the closed-form oracle tests also bracket against exact values and three skipped tests catch a low estimate against a planted or known error. The derivative-set count is now 10 to 12 matrices. The oracle comment now says B's `xi1` is cos() but not pinned. B's bounds are described per field. The margin bound is stated as an analogy and carries a factor of 2 for the squared SE (20 * p * kappa^2 * 2^-51 ulp; b9b bound 0.0066 against a 0.0072 margin). D-063 was corrected in place because it has not left this branch. Re-read pending; T7 to rerun after these edits.
 - 2026-09-22: claim audit: 34 claims read, 6 corrected — R/axes_reliability.R, man/axes_reliability.Rd, tests/testthat/test-axes-certificate.R, devel/degeneracy-oracle/exact_oracle.R. The re-read confirmed four of the six corrections. It found that the detector brackets nothing and that c4's set has 6 matrices. Both were fixed in the test header and in D-063 with no further pass, per the stopping rule.
+- 2026-09-22: T7 done, run at the T6 head. `devtools::test()` reported no failures and one skip, with warnings only from untouched files. `devtools::check(manual = TRUE)` reported 0 errors, 0 warnings and 0 notes, and "checking PDF version of manual ... OK". The certificate file passed again after the bound changed to 20x. Later edits touch comments and records only. Status set to review.
 
 ## Decisions
 
