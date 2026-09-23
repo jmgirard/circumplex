@@ -1,13 +1,13 @@
 # M150: Price every certificate case from its committed xi1
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3
 - **Resolves:** —
 - **Surface tier:** user-facing, because a `?axes_reliability` sentence ships beside the internal test changes
-- **Branch/PR:** —
+- **Branch/PR:** m150-pin-xi1-certificate-cases
 
 ## Goal
 
@@ -43,7 +43,7 @@ Every committed case in the certificate test file is priced from its committed `
 
 ## Tasks
 
-- [ ] T1: In `exact_oracle.R` (~149-161, ~210), pass `d` to `cert_record("cxb", ...)` so that the driver emits B's `xi1`. A baseline regeneration must first reproduce the committed block bit for bit. Paste B's `xi1` into `cert_frozen`. In the anchor-list test (~910), replace `expect_null(cert_frozen$cxb$xi1)` with the length check.
+- [x] T1: In `exact_oracle.R` (~149-161, ~210), pass `d` to `cert_record("cxb", ...)` so that the driver emits B's `xi1`. A baseline regeneration must first reproduce the committed block bit for bit. Paste B's `xi1` into `cert_frozen`. In the anchor-list test (~910), replace `expect_null(cert_frozen$cxb$xi1)` with the length check.
 - [ ] T2: Write one helper that rebuilds the full symmetric `xi1` from a committed upper triangle and returns `d` with it in place. Use it in `cert_derivs()` callers for the bracket tests, the five reference-route tests and B's test. Remove the `xi1` skip from `cert_dd_vs_exact()` (~671-679). Add the AC2 guard as its own `test_that()` with `skip_on_cran()`, and give it no other skip. The pricing reads `xi1` only through `d$mats` (the plan audit read `R/axes_corrected_se.R:197,207` and `R/axes_certificate.R:352`). Confirm that again before relying on it.
 - [ ] T3: Change B's `v` and `v_naive` checks (~1129-1134) to identity with `hi`, and write the AC4 comment.
 - [ ] T4: Apply each plant alone, locate it by its text, and assert that `git diff --stat` is non-empty. (a) Change one large entry (about 0.707) of the builder's `xi1` output by one ulp at all six cases. Then none skips, all are priced, all pass, and the guard passes. (b) Change the builder's formula, for example `cos(2 * delta)`. The guard then fails, naming each case. (c) Return zero low words from `dd_two_sum()` and `dd_two_prod()`. The reference route then fails at all six cases. (d) Move B's returned `v` by one ulp, then `v_naive`. Identity then fails for that field. Summarize the results in the work log.
@@ -59,6 +59,7 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: plan gate chose identity with `hi` at B over adding B to the power-of-two assertion. Identity needs no power-of-two premise. A committed B `hi` that `dd_to_double()` cannot return on some IEEE platform falsifies this choice.
 - 2026-09-22: plan gate chose to skip the `xi1` guard on CRAN over running it there. The guard has no exact yardstick (D-063 lets such a check skip), and CI catches edits to the builder. A builder change that reaches CRAN without failing on CI falsifies this choice.
 - 2026-09-22: plan gate chose to re-measure the help sentence over only rewording it, because its measurements predate M147. It dropped O2 and kept the `exact_parse()` check on its row.
+- 2026-09-22: T1 done. A baseline `CERT_EMIT=1` run of `exact_oracle.R` reproduced the committed `cert_frozen` block byte for byte. With `d` passed at cxb, the only diff was B's new six-entry `xi1`, now pasted in. `cert_record()` now requires `d`. The anchor-list test checks the `xi1` length at all six cases. The certificate file passes, and all six cases are priced on macOS arm64.
 
 ## Decisions
 

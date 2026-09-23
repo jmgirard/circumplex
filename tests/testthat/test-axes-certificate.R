@@ -192,6 +192,8 @@ cert_frozen <- list(
   cxb = list(
     sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1", "-0x1.ffb4667563093p-1"
     ),
+    xi1 = c("0x1p+0", "0x1.f3a6975064322p-1", "0x1p+0", "0x1.f0e8bc3840f63p-1",
+    "0x1.c9fca389e73abp-1", "0x1p+0"),
     v_hi = c("0x1.a27aa6fa81289p+3", "0x1.9033b1b503c27p+3"),
     v_lo = c("0x1.14a44927d1499p-52", "0x1.6dd7ad9921fd4p-54"),
     vn_hi = c("0x1.d7e81cc594451p+5", "0x1.bd654f98f5a5bp+5"),
@@ -897,17 +899,15 @@ test_that("AC3: the anchor case list is not empty", {
     expect_length(fz$u_hi, 1L)
     expect_length(fz$u_lo, 1L)
   }
-  # ... and each anchor carries its `xi1` upper triangle, diagonal included
-  # (M149). cert_dd_vs_exact() skips where that field does not match this
-  # machine's, so an anchor whose regeneration dropped it would skip its
-  # reference-route test on every machine, and a skip does not redden.
-  # Counterexample B has none: its test asserts the route itself, with an
-  # absolute bound for `u`, and with no `xi1` precondition.
-  for (id in c("a4", "a5", "c4", "b9a", "b9b")) {
+  # ... and each case carries its `xi1` upper triangle, diagonal included (the
+  # anchors since M149, counterexample B since M150). Every case is priced
+  # from that committed copy, not from the one this machine builds, so a
+  # regeneration pasted in without it, or truncated, fails here by name
+  # rather than in the helper that rebuilds the matrix from it.
+  for (id in names(cert_shape)) {
     p <- cert_shape[[id]][[1L]]
     expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
   }
-  expect_null(cert_frozen$cxb$xi1)
 
   # ... and each case's MATRIX is the size the table above says (M116). The
   # `p` column was checked only against `cert_frozen`'s own committed arrays
