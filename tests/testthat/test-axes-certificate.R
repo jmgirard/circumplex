@@ -215,9 +215,8 @@ cert_pinned_derivs <- function(d, id) {
 # protect the comparison. Asserting the route against the committed exact
 # values, failing and never skipping on its output, is a different thing and
 # is done at all six cases where this machine's matrix matches the committed
-# bytes: at
-# counterexample B in its own test since M122, and at the five anchors in
-# cert_dd_vs_exact() since M149.
+# bytes: at counterexample B in its own test since M122, and at the five
+# anchors in cert_dd_vs_exact() since M149.
 #
 # This block does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
 # the precondition, so a builder edit that moved a geometry still REDDENS.
