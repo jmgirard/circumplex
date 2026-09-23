@@ -80,6 +80,8 @@ Every committed case in the certificate test file is priced from its committed `
 - claim audit: 7 claims read, 2 corrected — R/axes_reliability.R, man/axes_reliability.Rd, NEWS.md
 - 2026-09-22: T9 checkpoint (not ticked). The help sentence now names the three-variable matrix at `tests/testthat/fixtures/rb18-counterexample-b.rds`, which `.Rbuildignore` does not exclude. NEWS.md has a new bullet. The audit's corrections: "The three" became "The three estimates", and the macOS machine is described as having R's reference BLAS and LAPACK. The same reader confirmed both on its re-read. The Linux side of the sentence rests on the pass-2 measurement in the Review section. The full suite and `check(manual = TRUE)` are running.
 - 2026-09-22: T9 done at `ebff2c5a`. `devtools::test()` gave FAIL 0, WARN 12, SKIP 1 and PASS 14022. `devtools::check(manual = TRUE)` built the final text and gave 0 errors, 0 warnings, 0 notes, "checking PDF version of manual ... OK" and `Status: OK`. `document()` gave 0 `resolve link` lines. Status set to review.
+- step-7 approval: m150-pin-xi1-certificate-cases approved for merge
+- 2026-09-22: approved on the condition that AC7 is read from the PR's windows-latest job before the merge, with no merge if a named test skipped there.
 
 ## Decisions
 
