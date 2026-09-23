@@ -270,32 +270,37 @@ check cannot price at all, is refused as `"uncertified"`, and its
 warning names that same worst estimate. At a severely ill-conditioned
 fit that estimate is a property of the fit as computed on the machine
 that ran it, not of the data alone: the numbers being checked are
-dominated by rounding there, so the same fitted matrix can print a
-graded estimate on one machine and 1 (no digits certified) on another,
-while both refuse the fit as `"uncertified"`. The three are read as one
-because both surfaces refuse as a unit, so a fit on any path can be
-refused on the FIML ratio's estimate even where that ratio is not part
-of what it reports. That `1e-5` in the floor is not itself the
-tolerance: it is the accuracy target `1e-4`, the largest relative error
-a reported standard error may carry, divided by the factor of `10` by
-which the floor's a-priori error bound may undershoot the error it
-stands for. The accuracy target is set from two channels that do not
-depend on the sample size – the resolution the standard errors are
-printed at, and the coverage of a nominal 95% Wald interval – and is
-corroborated by a third, the standard error's own sampling variability,
-under which a numerical error at the target is about a tenth of the
-statistical noise already in the number for a typical design (relative
-sampling coefficient `a = 1/sqrt(2)`) at `n` up to about `5e5`. That
-endpoint scales as `1e6 * a^2`, so at the least favorable geometry
-measured, `a = 0.045`, it falls to `n` of about `2e3` – below the `n` of
-about `1e4` typical of published circumplex correlation matrices. Above
-whichever endpoint the design's own coefficient sets, the guarantee is
-the fixed target alone, not noise dominance. The derivation and the
-premises it rests on are stated beside the constant in the source. The
-refusal says which degeneracy happened: `"indefinite"` when the smallest
-eigenvalue is decisively negative (below
-`-lambda_max * sqrt(p * .Machine$double.eps)` – beyond the fit's own
-numerical noise band, so it is a statement about the model, which no
+dominated by rounding there. The one counterexample above shows this. It
+is the three-variable matrix saved in the package sources as
+`tests/testthat/fixtures/rb18-counterexample-b.rds`. Three variables are
+too few scales for `axes_reliability()` itself, so the check was run on
+it through the package's internal functions. Given that same matrix, the
+worst estimate differed between macOS (arm64, R's reference BLAS and
+LAPACK) and Linux (arm64, OpenBLAS), and both machines refused it as
+`"uncertified"`. The standard-error, scaling-factor and FIML-ratio
+estimates are read as one because both surfaces refuse as a unit, so a
+fit on any path can be refused on the FIML ratio's estimate even where
+that ratio is not part of what it reports. That `1e-5` in the floor is
+not itself the tolerance: it is the accuracy target `1e-4`, the largest
+relative error a reported standard error may carry, divided by the
+factor of `10` by which the floor's a-priori error bound may undershoot
+the error it stands for. The accuracy target is set from two channels
+that do not depend on the sample size – the resolution the standard
+errors are printed at, and the coverage of a nominal 95% Wald interval –
+and is corroborated by a third, the standard error's own sampling
+variability, under which a numerical error at the target is about a
+tenth of the statistical noise already in the number for a typical
+design (relative sampling coefficient `a = 1/sqrt(2)`) at `n` up to
+about `5e5`. That endpoint scales as `1e6 * a^2`, so at the least
+favorable geometry measured, `a = 0.045`, it falls to `n` of about `2e3`
+– below the `n` of about `1e4` typical of published circumplex
+correlation matrices. Above whichever endpoint the design's own
+coefficient sets, the guarantee is the fixed target alone, not noise
+dominance. The derivation and the premises it rests on are stated beside
+the constant in the source. The refusal says which degeneracy happened:
+`"indefinite"` when the smallest eigenvalue is decisively negative
+(below `-lambda_max * sqrt(p * .Machine$double.eps)` – beyond the fit's
+own numerical noise band, so it is a statement about the model, which no
 arithmetic check can license), `"singular"` when the matrix carries
 non-finite entries or a nonpositive fitted variance, and `"uncertified"`
 when the per-fit check could not place this fit's numbers inside the
