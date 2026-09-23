@@ -1,6 +1,6 @@
 # M150: Price every certificate case from its committed xi1
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -69,7 +69,35 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: claim audit: 31 claims read, 5 corrected — R/axes_reliability.R, man/axes_reliability.Rd, tests/testthat/test-axes-certificate.R. The help sentence now says the check's worst estimate (the figure the warning prints) differed, not that a fit printed it. The guard comment names only builder edits, because an angle edit already reddens `kappa`, and it no longer claims the Windows difference was one ulp. The header says "matches the committed bytes", because B's matrix is read, not built. B's comment says "is given the same input". The same reader's re-read is pending.
 - 2026-09-22: claim-audit re-read: the same reader confirmed all five corrections. One short header line was rewrapped. T7 is running (`devtools::test()`, then `devtools::check(manual = TRUE)`).
 - 2026-09-22: T7 done at `dc627e0e`. `devtools::test()` gave 0 failures. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings and 0 notes, "checking PDF version of manual ... OK", and `Status: OK`. The Windows reading for AC7 waits for the PR at review. Status set to review.
+- 2026-09-22: review return 1 (a defect return, count 1): AC2 fails. The guard's length check (`expect_length(cert_frozen[[id]]$xi1, ...)`, test file :1110) has no label, so a length mismatch fails as "Expected `cert_frozen[[id]]$xi1` to have length 6" without the case's name (reproduced with testthat; the [O] reviewer found it too). The same unlabelled check in the anchor-list test (:940) contradicts its comment "fails here by name". Status set to in-progress. Pass-1 evidence and the unresolved reviewer findings are in the Review section.
 
 ## Decisions
 
 ## Review
+
+Pass 1, 2026-09-22, at `2be40dfe`. Stopped at AC2, so no box is ticked. Pass 2 re-runs every criterion.
+
+- AC1 (not ticked, pass returned): 11 tests price from `cert_pinned_derivs()`: the bracket loop (:1051), the reference-route loop (:1077) and B's test (:1147), 5 + 5 + 1. The two remaining `skip()` calls (:707, :777) test `sig`, not `xi1`.
+- AC2 FAILED: the value check fails by name (label at :1114), but the length check at :1110 does not name the case.
+- AC3 (not ticked, pass returned): `CERT_EMIT=1 Rscript devel/degeneracy-oracle/exact_oracle.R` printed a `cert_frozen` block equal to the committed one in every field, B's `xi1` included. The only difference was one trailing space in the printed output. The anchor-list test checks the length for all six cases (:938-941).
+- AC4 (not ticked, pass returned): identity checks at :1215-1219, `u` at `2^-53` (:1220-1222), and the comment at :1194-1203 rests identity on committed inputs and R-level arithmetic.
+- AC5 (not ticked, pass returned): measured again with `axes_se_derivs()` as built. macOS arm64, reference LAPACK: se 0.3355, cval 48.9, fiml_ratio 0.008708. `tools/arm64` image, OpenBLAS 0.3.33: se 2.534, cval 5.635, fiml_ratio 0.006238. Both machines refuse the fit as `"uncertified"` and build the same `xi1`. The estimates differ, and the help sentence says so.
+- AC6 (not ticked, pass returned): 36 `xi1` hit lines in the test file and 9 in the oracle driver, read with 5 lines of context. No hit says that an `xi1` mismatch skips or that B is not pinned. :695 is history ("Until M150").
+- AC7: not read. The PR opens only after the approval gate (step 8), so pass 2 reads the windows-latest log during the step-8 CI wait, before the merge.
+- AC8: the suite was stopped when the pass returned.
+
+Reviewer findings, pass 1. The three lenses ran. The prior-review lens found no GitHub threads. The blame-history lens found no conflict with a past decision. Each finding below waits for triage at the pass-2 gate, except the first:
+- [O] 1: the guard's length check does not name the case (AC2). Its disposition is this return.
+- [O] 2: the anchor-list length check (:940) has no label, which contradicts its comment "fails here by name".
+- [O] 3: pinning removes the check of the machine's own `xi1` from the CRAN-live tests. Only the guard checks it now, and CRAN skips the guard. The header (:77-86) does not say so.
+- [O] 4: the comment on B's identity (:1195-1203) assumes no FMA contraction and no extended precision. The test calls `axes_dd_pricing()` directly, without `axes_dd_selftest()`, and a failure there is a false red.
+- [O] 5: B's derivative set is still built inline at :1471, :1561 and :1587, not with `cert_cxb_derivs()`.
+- [O] 6: B's comment at :1282-1285 describes the help page as a general claim. The page now reports one measured difference.
+- [O] 7: the help sentence does not say that the matrix is counterexample B, and it gives no size or direction for the difference.
+- [O] 8: the header clause at :217-219 says "where this machine's matrix matches the committed bytes" and includes B. B's matrix is committed bytes, and a mismatch there fails.
+- [O] 9: the guard's 4-eps tolerance cannot see builder edits smaller than that. The plan gate accepted this.
+- [O] 10: the vacuity paths at :1058 and :707 are older than M150 and are backed by the detector test.
+- [O] 11: the ROADMAP hygiene stamp is dated 2026-09-23, one day after today. That line is older than this branch.
+- [S-prior] 1: M150 reverses the choice M149's review made (skip over pin). The M150 plan gate records this reversal.
+- [S-prior] 2: B's identity check is stricter than the anchors' half-ulp bound, and the asymmetry is intentional (AC4).
+- [S-prior] 3: the new guard never calls `cert_record()`, which follows the LESSONS line about overwrites.
