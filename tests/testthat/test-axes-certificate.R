@@ -937,7 +937,8 @@ test_that("AC3: the anchor case list is not empty", {
   # rather than in the helper that rebuilds the matrix from it.
   for (id in names(cert_shape)) {
     p <- cert_shape[[id]][[1L]]
-    expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
+    expect_identical(length(cert_frozen[[id]]$xi1), (p * (p + 1L)) %/% 2L,
+                     label = paste0(id, " xi1 length"))
   }
 
   # ... and each case's MATRIX is the size the table above says (M116). The
@@ -1107,8 +1108,9 @@ test_that("each case's xi1 as this machine builds it is within 4 eps of the comm
   for (id in names(built)) {
     x1 <- built[[id]]$mats$xi1
     p <- nrow(x1)
-    expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
-    if (length(cert_frozen[[id]]$xi1) != p * (p + 1L) / 2L) next
+    expect_identical(length(cert_frozen[[id]]$xi1), (p * (p + 1L)) %/% 2L,
+                     label = paste0(id, " xi1 length"))
+    if (length(cert_frozen[[id]]$xi1) != (p * (p + 1L)) %/% 2L) next
     pinned <- cert_pinned_derivs(built[[id]], id)$mats$xi1
     expect_lte(max(abs(x1 - pinned)), 4 * .Machine$double.eps,
                label = paste0(id, " xi1: largest distance from the ",

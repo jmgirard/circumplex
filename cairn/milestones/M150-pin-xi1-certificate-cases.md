@@ -33,7 +33,7 @@ Every committed case in the certificate test file is priced from its committed `
 ## Coverage
 
 - AC1 → T2
-- AC2 → T2, T4
+- AC2 → T2, T4, T8
 - AC3 → T1
 - AC4 → T3, T4
 - AC5 → T5
@@ -50,6 +50,7 @@ Every committed case in the certificate test file is priced from its committed `
 - [x] T5: Measure B's estimate as AC5 states, on macOS arm64 and in the `tools/arm64` image. Record each machine and value in the work log. Rewrite the sentence at `R/axes_reliability.R` ~731-736 to match, and run `devtools::document()`.
 - [x] T6: Sweep the comments for `xi1` in both files: the header (~145-174), the `cert_dd_vs_exact()` block (~626-662), B's test and the oracle comment (~149-156). Record each hit's disposition in the work log.
 - [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`. At review, read the PR's windows-latest log for AC7.
+- [ ] T8: Give the two `xi1` length checks a label that names the case: the guard test's check and the anchor-list test's check. Plant a truncated `xi1` and make sure that each failure names the case. Run T7's two commands again.
 
 ## Work log
 
@@ -70,6 +71,8 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: claim-audit re-read: the same reader confirmed all five corrections. One short header line was rewrapped. T7 is running (`devtools::test()`, then `devtools::check(manual = TRUE)`).
 - 2026-09-22: T7 done at `dc627e0e`. `devtools::test()` gave 0 failures. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings and 0 notes, "checking PDF version of manual ... OK", and `Status: OK`. The Windows reading for AC7 waits for the PR at review. Status set to review.
 - 2026-09-22: review return 1 (a defect return, count 1): AC2 fails. The guard's length check (`expect_length(cert_frozen[[id]]$xi1, ...)`, test file :1110) has no label, so a length mismatch fails as "Expected `cert_frozen[[id]]$xi1` to have length 6" without the case's name (reproduced with testthat; the [O] reviewer found it too). The same unlabelled check in the anchor-list test (:940) contradicts its comment "fails here by name". Status set to in-progress. Pass-1 evidence and the unresolved reviewer findings are in the Review section.
+- 2026-09-22: resumed by /milestone-implement. T8 added as a minor amendment (a discovered sub-task, and Coverage AC2 → T2, T4, T8). No question gate, because nothing was open.
+- 2026-09-22: T8 checkpoint (not ticked): both `xi1` length checks are now `expect_identical(length(...), (p * (p + 1L)) %/% 2L, label = "<id> xi1 length")`. A first draft without the outer parentheses gave 32 at p = 8, because `%/%` binds tighter than `*`, and the plant exposed it. With one entry cut from B's committed `xi1`, both checks failed as "Expected cxb xi1 length ..." and named no other case. After the plant was removed, the file with `NOT_CRAN=true` gave 29 tests, 0 failed, 0 skipped. The full suite and `check(manual = TRUE)` are running.
 
 ## Decisions
 
