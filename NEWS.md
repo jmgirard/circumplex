@@ -210,6 +210,12 @@
 
 ## Documentation
 
+* `?axes_reliability` now says that at a severely ill-conditioned fit, the
+  error estimate printed with an `"uncertified"` refusal depends on the
+  machine as well as the data. It cites one test matrix whose estimate
+  differed between macOS with R's reference BLAS and LAPACK and Linux with
+  OpenBLAS, while both machines refused it.
+
 * The website's vignette menu is now built by pkgdown from the articles index
   rather than written out a second time by hand, so the menu is titled
   "Articles" and lists each level's pages in the index's own order.

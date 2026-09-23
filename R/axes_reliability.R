@@ -731,9 +731,15 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' names that same worst estimate. At a severely ill-conditioned fit that
 #' estimate is a property of the fit as computed on the machine that ran it,
 #' not of the data alone: the numbers being checked are dominated by rounding
-#' there, so the same fitted matrix can print a graded estimate on one machine
-#' and 1 (no digits certified) on another, while both refuse the fit as
-#' `"uncertified"`. The three are read as one because both
+#' there. The one counterexample above shows this. It is the three-variable
+#' matrix saved in the package sources as
+#' `tests/testthat/fixtures/rb18-counterexample-b.rds`. Three variables are too
+#' few scales for `axes_reliability()` itself, so the check was run on it
+#' through the package's internal functions. Given that same matrix, the worst
+#' estimate differed between macOS (arm64, R's reference BLAS and LAPACK) and
+#' Linux (arm64, OpenBLAS), and both machines refused it as `"uncertified"`.
+#' The standard-error, scaling-factor and FIML-ratio estimates are read as one
+#' because both
 #' surfaces refuse as a unit, so a fit on any path can be refused on the FIML
 #' ratio's estimate even where that ratio is not part of what it reports. That `1e-5` in the floor is not itself the tolerance: it is the
 #' accuracy target `1e-4`, the largest relative error a reported standard

@@ -76,10 +76,12 @@
 #
 # One class skips on CRAN, via skip_on_cran() in each test: the
 # reachable-versus-B discrimination, the admitted-domain sweep, the
-# sample-size independence check, and the two planted-perturbation
-# invariants. None of them checks the estimate against exact truth: they
-# test its response to a planted or known-large error, or basic properties
-# of it. A failure specific to one CRAN platform there risks a rejection with
+# sample-size independence check, the two planted-perturbation invariants,
+# and (since M150) the `xi1` guard, which compares this machine's `xi1`
+# with the committed copy. None of them checks the estimate against exact
+# truth: they test its response to a planted or known-large error, basic
+# properties of it, or (the guard) an input to it. A failure specific to one
+# CRAN platform there risks a rejection with
 # no exact yardstick to say whether the certificate was wrong. A new test
 # here takes the class its claim belongs to.
 
@@ -122,6 +124,46 @@ cert_derivs <- function(cs) {
   axes_se_derivs(cs$ang, cs$scale, NULL, z, FALSE)
 }
 
+# Counterexample B's derivative set, as the oracle driver builds it
+# (devel/degeneracy-oracle/exact_oracle.R: one item per scale, no blocks, no
+# zeta1 or zeta2). `fx` is the committed fixture.
+cert_cxb_derivs <- function(fx) {
+  axes_se_derivs(fx$ia, c("A", "B", "C"), NULL, FALSE, FALSE)
+}
+
+# The derivative set with its `xi1` replaced by the case's COMMITTED copy
+# (M150). `xi1` is cos() at the item angles' differences, built on the machine
+# running the test, and the exact values in `cert_frozen` were priced from the
+# oracle machine's doubles of it. A machine whose cos() rounds one entry
+# differently -- the windows-latest job on the M149 pull request did, at all
+# five anchors -- would otherwise price an input the exact values do not
+# describe. Every test that compares against those values therefore prices
+# from this copy, and none skips on `xi1`. That this machine's own `xi1` is
+# still the committed one to within a few ulp is asserted separately, in its
+# own test.
+#
+# The committed field is the upper triangle, diagonal included, in the column
+# order `x[upper.tri(x, diag = TRUE)]` extracts it; the lower triangle is its
+# mirror, as cos() is even. Written into the built matrix with `[<-`, so its
+# dimnames and every other field of `d` stay as the package built them. The
+# pricing reads `xi1` only through `d$mats` (R/axes_corrected_se.R and
+# R/axes_certificate.R), so this is the one copy to replace.
+cert_pinned_derivs <- function(d, id) {
+  x1 <- d$mats$xi1
+  tri <- as.numeric(cert_frozen[[id]]$xi1)
+  p <- nrow(x1)
+  if (length(tri) != p * (p + 1L) / 2L) {
+    stop("cert_pinned_derivs(): case '", id, "' commits ", length(tri),
+         " xi1 entries for a ", p, "-variable matrix", call. = FALSE)
+  }
+  full <- matrix(0, p, p)
+  full[upper.tri(full, diag = TRUE)] <- tri
+  full[lower.tri(full)] <- t(full)[lower.tri(full)]
+  x1[] <- full
+  d$mats$xi1 <- x1
+  d
+}
+
 
 # ---- the exact quadratic forms, and the one precondition left --------------
 #
@@ -151,15 +193,18 @@ cert_derivs <- function(cs) {
 # not assumed here.
 #
 # THE DERIVATIVE SET is pinned through `sig` and the exact values together,
-# and at the five anchors also through `xi1` (M149). Most of the set is too
-# large to commit entry by entry (6 to 12 matrices of up to 9x9 at the
-# anchors) and is 0/1 indicators the oracle builds from the same closed forms, so a set
-# that drifted here would move this machine's doubles AWAY from the exact
-# values and redden the bracket rather than hide inside it. `xi1` is the one
-# member built from cos(), and cov2cor() can round a one-ulp cosine change out
-# of `sig`, so its upper triangle is committed beside `sig` and checked in
-# cert_dd_vs_exact(): a mismatch there skips only the anchor's reference-route
-# test, naming `xi1`, and the anchor's brackets still run.
+# and at all six cases through a committed `xi1` (the anchors since M149,
+# counterexample B since M150). Most of the set is too large to commit entry
+# by entry (6 to 12 matrices of up to 9x9 at the anchors) and is 0/1
+# indicators the oracle builds from the same closed forms, so a set that
+# drifted here would move this machine's doubles AWAY from the exact values
+# and redden the bracket rather than hide inside it. `xi1` is the one member
+# built from cos(), and cov2cor() can round a one-ulp cosine change out of
+# `sig`, so its upper triangle is committed beside `sig`. Every test that
+# compares against the exact values prices from that committed copy
+# (cert_pinned_derivs()), so a machine whose cos() differs still prices the
+# input the exact values describe, and no test skips on `xi1`. A separate
+# test asserts that the `xi1` this machine builds is within 4 eps of it.
 #
 # What is still deliberately NOT pinned is the double-double reference route:
 # it is never a PRECONDITION. That route is the artifact under test, and an
@@ -169,9 +214,10 @@ cert_derivs <- function(cs) {
 # SKIP instead of redden -- the defect hid inside the precondition meant to
 # protect the comparison. Asserting the route against the committed exact
 # values, failing and never skipping on its output, is a different thing and
-# is done at all six cases where this machine builds their inputs: at
-# counterexample B in its own test since M122, and at the five anchors in
-# cert_dd_vs_exact() since M149.
+# is done at all six cases. At counterexample B it is in B's own test since
+# M122, and B's matrix is read from committed bytes, so a mismatch there fails
+# rather than skips. At the five anchors it is in cert_dd_vs_exact() since
+# M149, which runs where this machine's matrix matches the committed bytes.
 #
 # This block does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
 # the precondition, so a builder edit that moved a geometry still REDDENS.
@@ -192,6 +238,8 @@ cert_frozen <- list(
   cxb = list(
     sig = c("-0x1.ac70f5bf320e9p-1", "0x1.a2ad9ad37693p-1", "-0x1.ffb4667563093p-1"
     ),
+    xi1 = c("0x1p+0", "0x1.f3a6975064322p-1", "0x1p+0", "0x1.f0e8bc3840f63p-1",
+    "0x1.c9fca389e73abp-1", "0x1p+0"),
     v_hi = c("0x1.a27aa6fa81289p+3", "0x1.9033b1b503c27p+3"),
     v_lo = c("0x1.14a44927d1499p-52", "0x1.6dd7ad9921fd4p-54"),
     vn_hi = c("0x1.d7e81cc594451p+5", "0x1.bd654f98f5a5bp+5"),
@@ -642,39 +690,25 @@ dd_ulp <- function(hat, hi, lo) {
 # neither BLAS nor LAPACK, so given the same inputs it is the same
 # arithmetic on every IEEE platform.
 #
-# THE TWO INPUTS. The route reads the derivative set as well as the matrix,
-# and `xi1` is cos() at the item angles' differences -- built on this machine,
-# like the matrix. `sig` matching does not imply `xi1` does: `sig` passes
-# through cov2cor(), where a one-ulp change in a cosine can round away. The
-# exact values were priced from the oracle machine's `sig` and `xi1`, so where
-# this machine's differs in either, the committed values are not a yardstick
-# at this bound and the test skips, naming which input differed.
+# THE TWO INPUTS. The route reads the derivative set as well as the matrix.
+# The caller passes the derivative set from cert_pinned_derivs(), so its `xi1`
+# is the committed copy the exact values were priced from, whatever this
+# machine's cos() builds (M150). Until M150 this test skipped where this
+# machine's `xi1` differed, and the windows-latest job on the M149 pull
+# request, 2026-09-22, built it differently at all five anchors, so there the
+# check ran at none of them. The matrix is still this machine's: `sig` is
+# compared bit for bit, and a mismatch skips, naming the matrix.
 #
 # IT NEVER CALLS cert_record(). The case's disposition belongs to its bracket
 # test, which records it (`priced`, `refused`, or `skipped` where `sig`
 # differs). cert_record() overwrites, and these tests run after the bracket
-# tests, so a `skipped` written here would erase the bracket test's record;
-# written at every anchor, it would turn the detector red on a machine whose
-# brackets did run. That happened when this check was still
-# inside cert_true_error(): the windows-latest R-CMD-check job on the M149
-# pull request, 2026-09-22, built `xi1` differently at all five anchors and
-# `sig` at none, skipped every anchor case, and failed the detector. Skipping
-# here therefore leaves the case's brackets running (M149 amendment).
+# tests, so a `skipped` written here would erase the bracket test's record.
 cert_dd_vs_exact <- function(id, sigma, d, fz) {
   if (!identical(sigma[upper.tri(sigma)], as.numeric(fz$sig))) {
     testthat::skip(paste0(
       "this machine does not build the matrix at case '", id, "' bit for ",
       "bit, so the exact quadratic forms committed for that matrix are not a ",
       "yardstick for this one"
-    ))
-  }
-  x1 <- d$mats$xi1
-  if (!identical(as.vector(x1[upper.tri(x1, diag = TRUE)]),
-                 as.numeric(fz$xi1))) {
-    testthat::skip(paste0(
-      "this machine does not build the derivative set's xi1 at case '", id,
-      "' bit for bit, so the exact quadratic forms committed for that ",
-      "derivative set are not a yardstick for this one"
     ))
   }
   ref <- axes_dd_pricing(sigma, d)
@@ -897,17 +931,16 @@ test_that("AC3: the anchor case list is not empty", {
     expect_length(fz$u_hi, 1L)
     expect_length(fz$u_lo, 1L)
   }
-  # ... and each anchor carries its `xi1` upper triangle, diagonal included
-  # (M149). cert_dd_vs_exact() skips where that field does not match this
-  # machine's, so an anchor whose regeneration dropped it would skip its
-  # reference-route test on every machine, and a skip does not redden.
-  # Counterexample B has none: its test asserts the route itself, with an
-  # absolute bound for `u`, and with no `xi1` precondition.
-  for (id in c("a4", "a5", "c4", "b9a", "b9b")) {
+  # ... and each case carries its `xi1` upper triangle, diagonal included (the
+  # anchors since M149, counterexample B since M150). Every case is priced
+  # from that committed copy, not from the one this machine builds, so a
+  # regeneration pasted in without it, or truncated, fails here by name
+  # rather than in the helper that rebuilds the matrix from it.
+  for (id in names(cert_shape)) {
     p <- cert_shape[[id]][[1L]]
-    expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
+    expect_identical(length(cert_frozen[[id]]$xi1), (p * (p + 1L)) %/% 2L,
+                     label = paste0(id, " xi1 length"))
   }
-  expect_null(cert_frozen$cxb$xi1)
 
   # ... and each case's MATRIX is the size the table above says (M116). The
   # `p` column was checked only against `cert_frozen`'s own committed arrays
@@ -1015,7 +1048,9 @@ for (cert_case in cert_anchors()) {
   test_that(paste0("AC2: the estimate brackets THIS machine's own error -- ",
                    cert_case$lbl), {
     cs <- cert_case
-    d <- cert_derivs(cs)
+    # The committed `xi1`, so the shipped pricing and the certificate price
+    # the input the exact values describe (M150; see cert_pinned_derivs()).
+    d <- cert_pinned_derivs(cert_derivs(cs), cs$id)
     # OUTSIDE the precondition: a builder edit that moved this geometry must
     # redden here, never skip, because then the exact values committed above
     # would be describing a matrix this file no longer builds.
@@ -1034,16 +1069,55 @@ for (cert_case in cert_anchors()) {
 
 # THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11), one
 # test per anchor for the reason given above the bracket tests. Counterexample
-# B asserts the same in its own test (the same half-ulp bound for `v` and
-# `v_naive`, an absolute one for `u`). These tests never call the shipped
-# pricing, so they run whatever that pricing returns on this machine.
+# B asserts the route in its own test (identity with the committed `hi` for
+# `v` and `v_naive`, an absolute bound for `u`). These tests never call the
+# shipped pricing, so they run whatever that pricing returns on this machine.
 for (cert_case in cert_anchors()) {
   test_that(paste0("the reference route lands within half an ulp of the ",
                    "exact values -- ", cert_case$lbl), {
     cs <- cert_case
-    cert_dd_vs_exact(cs$id, cs$r, cert_derivs(cs), cert_frozen[[cs$id]])
+    cert_dd_vs_exact(cs$id, cs$r, cert_pinned_derivs(cert_derivs(cs), cs$id),
+                     cert_frozen[[cs$id]])
   })
 }
+
+
+# THE COMMITTED `xi1` IS STILL THE ONE THE PACKAGE BUILDS (M150). The tests
+# above price every case from the committed copy (cert_pinned_derivs()), so
+# none of them would notice an edit to the `xi1` builder (the cos() term in
+# axes_se_derivs()): they would go on pricing the old input. This test
+# compares the two directly, full matrices entry by entry, so the mirrored
+# lower triangle is checked too. The tolerance is 4 * eps absolute: the
+# entries are cosines in [-1, 1], where a libm one ulp away differs by at
+# most eps. How far the windows-latest job on the M149 pull request was off
+# was not recorded, only that its `xi1` differed.
+#
+# Skipped on CRAN (D-063): it checks nothing against exact truth, and a libm
+# further off than this tolerance on a CRAN platform is a platform fact, not
+# a defect in the certificate. CI runs it, which is where a builder edit
+# lands first.
+test_that("each case's xi1 as this machine builds it is within 4 eps of the committed copy", {
+  skip_on_cran()
+  fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
+  built <- c(
+    lapply(stats::setNames(cert_anchors(), vapply(cert_anchors(), `[[`, "",
+                                                   "id")),
+           cert_derivs),
+    list(cxb = cert_cxb_derivs(fx))
+  )
+  expect_identical(sort(names(built)), sort(names(cert_frozen)))
+  for (id in names(built)) {
+    x1 <- built[[id]]$mats$xi1
+    p <- nrow(x1)
+    expect_identical(length(cert_frozen[[id]]$xi1), (p * (p + 1L)) %/% 2L,
+                     label = paste0(id, " xi1 length"))
+    if (length(cert_frozen[[id]]$xi1) != (p * (p + 1L)) %/% 2L) next
+    pinned <- cert_pinned_derivs(built[[id]], id)$mats$xi1
+    expect_lte(max(abs(x1 - pinned)), 4 * .Machine$double.eps,
+               label = paste0(id, " xi1: largest distance from the ",
+                              "committed copy"))
+  }
+})
 
 
 test_that("AC2/AC3: counterexample B is refused on every route, and bracketed where it prices", {
@@ -1069,7 +1143,11 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   # exists the certificate brackets it. Both branches assert; neither can be
   # empty.
   fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
-  d <- axes_se_derivs(fx$ia, c("A", "B", "C"), NULL, FALSE, FALSE)
+  # The committed `xi1`, as at the five anchors (M150): B's matrix is read
+  # from committed bytes, and now so is the one cos()-built input its exact
+  # values depend on, so every route below is given the same input on every
+  # machine.
+  d <- cert_pinned_derivs(cert_cxb_derivs(fx), "cxb")
 
   # ---- outside both routes -------------------------------------------------
   #
@@ -1107,12 +1185,25 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   #
   # TWO BOUNDS, because the two quantities fail differently.
   #
-  # `v` and `v_naive`: the bound is HALF a unit in the last place of the exact
-  # value, which is to say the reference route must deliver that value's
-  # correctly rounded double. Measured 2026-09-05 by `dd_ulp()` below,
-  # bit-identical on aarch64-apple-darwin23 and on
-  # aarch64-unknown-linux-gnu/OpenBLAS: 0.135 and 0.045 ulp for `v`, 0.387 and
-  # 0.234 for `v_naive`.
+  # `v` and `v_naive`: the route rounded to double must BE the committed `hi`,
+  # the exact value's correctly rounded double (M150). Until M150 this was
+  # `dd_ulp() < 0.5`, which means the same thing only where `hi` is not a
+  # power of two; identity needs no such premise. The distances `dd_ulp()`
+  # measured on 2026-09-05, on aarch64-apple-darwin23 and on
+  # aarch64-unknown-linux-gnu/OpenBLAS, were 0.135 and 0.045 ulp for `v` and
+  # 0.387 and 0.234 for `v_naive`. Those are |lo|/ulp(hi), the exact value's
+  # own distance from `hi`, so the route already returned `hi` there.
+  #
+  # WHY IDENTITY HOLDS HERE, which is not the anchors' reason. At the anchors
+  # the margin test asserts that each exact value sits farther from a rounding
+  # midpoint than a stated bound on the route's error. At B that bound, with
+  # p = 3 and kappa 6.65e6, is about 1.2 ulp, while `v_naive`'s first
+  # component sits 0.113 ulp from its midpoint, so no margin covers B.
+  # Identity rests instead on the inputs and the arithmetic: B's matrix and its
+  # `xi1` are both committed bytes (the latter since M150), and
+  # axes_dd_pricing() is R-level `+`, `-`, `*` and `/` on doubles, the same
+  # IEEE arithmetic on every platform. So every machine computes the same
+  # doubles as the machine that measured them.
   #
   # `u`: at B it is a difference of two quantities of size about one that
   # comes out 0.0555, so a rounding of either operand is amplified by about
@@ -1123,15 +1214,12 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   # 6.1 ulp, a figure with no derivation behind it.
   fz <- cert_frozen$cxb
   ref <- axes_dd_pricing(fx$S, d)
-  # dd_ulp() is at file scope since M149, which asserts the same half-ulp
-  # bound at the five anchors in their own reference-route tests; its note on
-  # what "ulp" means there is the one that used to stand here.
-  expect_lt(max(dd_ulp(dd_to_double(ref$v),
-                       as.numeric(fz$v_hi), as.numeric(fz$v_lo))), 0.5,
-            label = "cxb dd-vs-exact v (ulp)")
-  expect_lt(max(dd_ulp(dd_to_double(ref$v_naive),
-                       as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))), 0.5,
-            label = "cxb dd-vs-exact v_naive (ulp)")
+  # as.numeric() drops any names, which identical() would otherwise compare.
+  expect_identical(as.numeric(dd_to_double(ref$v)), as.numeric(fz$v_hi),
+                   label = "cxb dd-vs-exact v, rounded to double")
+  expect_identical(as.numeric(dd_to_double(ref$v_naive)),
+                   as.numeric(fz$vn_hi),
+                   label = "cxb dd-vs-exact v_naive, rounded to double")
   expect_lt(abs((dd_to_double(ref$u) - as.numeric(fz$u_hi)) -
                   as.numeric(fz$u_lo)), 2^-53,
             label = "cxb dd-vs-exact u (absolute)")
@@ -1193,9 +1281,10 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
     # ... and the predicate users depend on refuses here too, with the same
     # literal as on the refusing route (M149). The worst-of assertion above
     # the branches says the certificate reads past the target; this says what
-    # the user is told. `?axes_reliability` states that the estimate printed
-    # beside the refusal can differ between machines while the refusal does
-    # not, and the two branches of this test are what back the second half.
+    # the user is told. `?axes_reliability` cites this matrix as one measured
+    # case where the estimate printed beside the refusal differed between two
+    # machines while both refused it. The two branches of this test back the
+    # refusal half on whichever route this machine takes.
     expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")
 
   } else {

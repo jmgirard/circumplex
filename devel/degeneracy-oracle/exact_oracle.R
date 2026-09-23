@@ -146,20 +146,16 @@ local({
 # and printed as a paste-ready block by CERT_EMIT=1 (see the regeneration note
 # in tests/testthat/test-axes-certificate.R).
 cert_emit <- list()
-# `d` is given for the five anchors only (M149). Their `xi1` is cos() at the
-# item angles' differences, and the exact values below were priced from THIS
-# machine's doubles of it, so the packaged file pins it beside `sig`: a
-# machine whose cos() rounds one entry differently has no yardstick at the
-# half-ulp dd-vs-exact bound even where `sig` still matches. Counterexample
-# B's `xi1` is cos() too but is not pinned; its test asserts the reference
-# route with no `xi1` precondition, so a cos() difference there fails rather
-# than skips.
-cert_record <- function(id, S, ex, d = NULL) {
+# `d` is given at all six cases (the five anchors since M149, counterexample
+# B since M150). Each case's `xi1` is cos() at the item angles' differences,
+# and the exact values below were priced from THIS machine's doubles of it,
+# so the packaged file commits it beside `sig` and prices every case from the
+# committed copy. A machine whose cos() rounds one entry differently then
+# still prices the input the exact values describe.
+cert_record <- function(id, S, ex, d) {
   rec <- list(sig = sprintf("%a", as.vector(S[upper.tri(S)])))
-  if (!is.null(d)) {
-    x1 <- d$mats$xi1
-    rec$xi1 <- sprintf("%a", as.vector(x1[upper.tri(x1, diag = TRUE)]))
-  }
+  x1 <- d$mats$xi1
+  rec$xi1 <- sprintf("%a", as.vector(x1[upper.tri(x1, diag = TRUE)]))
   cert_emit[[id]] <<- c(rec, list(
     v_hi = ex[["HEX_V_HI"]], v_lo = ex[["HEX_V_LO"]],
     vn_hi = ex[["HEX_VNAIVE_HI"]], vn_lo = ex[["HEX_VNAIVE_LO"]],
@@ -207,7 +203,7 @@ cat(sprintf("criterion accepts it: %s\n",
             is.null(axes_sigma_degenerate(S))))
 
 ex <- exact(S, d)
-cert_record("cxb", S, ex)
+cert_record("cxb", S, ex, d)
 dbl_se <- axes_se_pricing(S, d, N)$corrected
 dbl_sf <- suppressWarnings(
   axes_scaling_factor(S, nm, ang, ITEM_SCALE, ITEM_BLOCK,
