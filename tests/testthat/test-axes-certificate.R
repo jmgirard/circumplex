@@ -76,10 +76,12 @@
 #
 # One class skips on CRAN, via skip_on_cran() in each test: the
 # reachable-versus-B discrimination, the admitted-domain sweep, the
-# sample-size independence check, and the two planted-perturbation
-# invariants. None of them checks the estimate against exact truth: they
-# test its response to a planted or known-large error, or basic properties
-# of it. A failure specific to one CRAN platform there risks a rejection with
+# sample-size independence check, the two planted-perturbation invariants,
+# and (since M150) the `xi1` guard, which compares this machine's `xi1`
+# with the committed copy. None of them checks the estimate against exact
+# truth: they test its response to a planted or known-large error, basic
+# properties of it, or (the guard) an input to it. A failure specific to one
+# CRAN platform there risks a rejection with
 # no exact yardstick to say whether the certificate was wrong. A new test
 # here takes the class its claim belongs to.
 
@@ -191,15 +193,18 @@ cert_pinned_derivs <- function(d, id) {
 # not assumed here.
 #
 # THE DERIVATIVE SET is pinned through `sig` and the exact values together,
-# and at the five anchors also through `xi1` (M149). Most of the set is too
-# large to commit entry by entry (6 to 12 matrices of up to 9x9 at the
-# anchors) and is 0/1 indicators the oracle builds from the same closed forms, so a set
-# that drifted here would move this machine's doubles AWAY from the exact
-# values and redden the bracket rather than hide inside it. `xi1` is the one
-# member built from cos(), and cov2cor() can round a one-ulp cosine change out
-# of `sig`, so its upper triangle is committed beside `sig` and checked in
-# cert_dd_vs_exact(): a mismatch there skips only the anchor's reference-route
-# test, naming `xi1`, and the anchor's brackets still run.
+# and at all six cases through a committed `xi1` (the anchors since M149,
+# counterexample B since M150). Most of the set is too large to commit entry
+# by entry (6 to 12 matrices of up to 9x9 at the anchors) and is 0/1
+# indicators the oracle builds from the same closed forms, so a set that
+# drifted here would move this machine's doubles AWAY from the exact values
+# and redden the bracket rather than hide inside it. `xi1` is the one member
+# built from cos(), and cov2cor() can round a one-ulp cosine change out of
+# `sig`, so its upper triangle is committed beside `sig`. Every test that
+# compares against the exact values prices from that committed copy
+# (cert_pinned_derivs()), so a machine whose cos() differs still prices the
+# input the exact values describe, and no test skips on `xi1`. A separate
+# test asserts that the `xi1` this machine builds is within 4 eps of it.
 #
 # What is still deliberately NOT pinned is the double-double reference route:
 # it is never a PRECONDITION. That route is the artifact under test, and an
@@ -209,7 +214,7 @@ cert_pinned_derivs <- function(d, id) {
 # SKIP instead of redden -- the defect hid inside the precondition meant to
 # protect the comparison. Asserting the route against the committed exact
 # values, failing and never skipping on its output, is a different thing and
-# is done at all six cases where this machine builds their inputs: at
+# is done at all six cases where this machine builds their matrix: at
 # counterexample B in its own test since M122, and at the five anchors in
 # cert_dd_vs_exact() since M149.
 #

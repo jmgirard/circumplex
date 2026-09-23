@@ -731,9 +731,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' names that same worst estimate. At a severely ill-conditioned fit that
 #' estimate is a property of the fit as computed on the machine that ran it,
 #' not of the data alone: the numbers being checked are dominated by rounding
-#' there, so the same fitted matrix can print a graded estimate on one machine
-#' and 1 (no digits certified) on another, while both refuse the fit as
-#' `"uncertified"`. The three are read as one because both
+#' there. On one ill-conditioned test matrix in the package's tests, macOS
+#' (arm64, R's reference LAPACK) and Linux (arm64, OpenBLAS) printed different
+#' worst estimates, and both refused the fit as `"uncertified"`. The three are
+#' read as one because both
 #' surfaces refuse as a unit, so a fit on any path can be refused on the FIML
 #' ratio's estimate even where that ratio is not part of what it reports. That `1e-5` in the floor is not itself the tolerance: it is the
 #' accuracy target `1e-4`, the largest relative error a reported standard
