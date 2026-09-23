@@ -155,7 +155,7 @@ Reviewer findings, pass 3, with proposed dispositions for the gate:
 - [O3] 4, 5: "That committed counterexample" and "The three estimates" have distant antecedents. Proposed: fix now.
 - [O3] 6: nothing says the two machines had the same input, and OS and library are confounded. Proposed: fix now, with "given the same matrix".
 - [O3] 7: the evidence for reference BLAS was not recorded. Recorded above, so no change is needed.
-- [O3] 8: no magnitudes. Proposed: reject, because a figure in the help page would be a frozen single-machine measurement.
+- [O3] 8: no magnitudes. Proposed: reject, because a figure in the help page is a frozen single-machine measurement.
 - [O3] 9: "estimated error of 1" drops "no digits certified". Resolved by the NEWS rewrite in [O3] 2.
 - [S-prior3] 1: the bullet belongs under the dev section's Documentation heading (NEWS.md:218), per M77's precedent. Proposed: fix now.
 - [S-prior3] 2: the fixture filename carries "rb18", an internal review-brief number. Proposed: accept. The path is the file's real name and AC5 asks for the matrix to be named. Renaming the fixture touches every test that reads it.
