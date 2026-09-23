@@ -61,6 +61,7 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: plan gate chose to re-measure the help sentence over only rewording it, because its measurements predate M147. It dropped O2 and kept the `exact_parse()` check on its row.
 - 2026-09-22: T1 done. A baseline `CERT_EMIT=1` run of `exact_oracle.R` reproduced the committed `cert_frozen` block byte for byte. With `d` passed at cxb, the only diff was B's new six-entry `xi1`, now pasted in. `cert_record()` now requires `d`. The anchor-list test checks the `xi1` length at all six cases. The certificate file passes, and all six cases are priced on macOS arm64.
 - 2026-09-22: T2 done. `cert_pinned_derivs()` writes the committed `xi1` into the built matrix with `[<-`, and `cert_cxb_derivs()` builds B's set. The bracket tests, the reference-route tests and B's test price from the pinned set. The `xi1` skip left `cert_dd_vs_exact()`. The new guard test skips on CRAN only. The pricing reads `xi1` only through `d$mats` (grep of `d$` in `R/axes_corrected_se.R`, `R/axes_certificate.R`, `R/axes_scaled_fit.R`). On macOS arm64 the pinned `xi1` is `identical()` to the built one at all six cases. `devtools::test()`: 0 failures.
+- 2026-09-22: T3 code in (checkpoint, not ticked until the full suite runs after T4). B's `v` and `v_naive` checks assert identity with the committed `hi`. The comment gives B's margin (0.113 ulp at `v_naive[1]`) and stated bound (1.18 ulp), both recomputed from `cert_frozen` this session. The certificate file passes.
 
 ## Decisions
 

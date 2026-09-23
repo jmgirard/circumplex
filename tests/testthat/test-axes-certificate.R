@@ -1062,9 +1062,9 @@ for (cert_case in cert_anchors()) {
 
 # THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11), one
 # test per anchor for the reason given above the bracket tests. Counterexample
-# B asserts the same in its own test (the same half-ulp bound for `v` and
-# `v_naive`, an absolute one for `u`). These tests never call the shipped
-# pricing, so they run whatever that pricing returns on this machine.
+# B asserts the route in its own test (identity with the committed `hi` for
+# `v` and `v_naive`, an absolute bound for `u`). These tests never call the
+# shipped pricing, so they run whatever that pricing returns on this machine.
 for (cert_case in cert_anchors()) {
   test_that(paste0("the reference route lands within half an ulp of the ",
                    "exact values -- ", cert_case$lbl), {
@@ -1175,12 +1175,25 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   #
   # TWO BOUNDS, because the two quantities fail differently.
   #
-  # `v` and `v_naive`: the bound is HALF a unit in the last place of the exact
-  # value, which is to say the reference route must deliver that value's
-  # correctly rounded double. Measured 2026-09-05 by `dd_ulp()` below,
-  # bit-identical on aarch64-apple-darwin23 and on
-  # aarch64-unknown-linux-gnu/OpenBLAS: 0.135 and 0.045 ulp for `v`, 0.387 and
-  # 0.234 for `v_naive`.
+  # `v` and `v_naive`: the route rounded to double must BE the committed `hi`,
+  # the exact value's correctly rounded double (M150). Until M150 this was
+  # `dd_ulp() < 0.5`, which means the same thing only where `hi` is not a
+  # power of two; identity needs no such premise. The distances `dd_ulp()`
+  # measured on 2026-09-05, on aarch64-apple-darwin23 and on
+  # aarch64-unknown-linux-gnu/OpenBLAS, were 0.135 and 0.045 ulp for `v` and
+  # 0.387 and 0.234 for `v_naive`. Those are |lo|/ulp(hi), the exact value's
+  # own distance from `hi`, so the route already returned `hi` there.
+  #
+  # WHY IDENTITY HOLDS HERE, which is not the anchors' reason. At the anchors
+  # the margin test asserts that each exact value sits farther from a rounding
+  # midpoint than a stated bound on the route's error. At B that bound, with
+  # p = 3 and kappa 6.65e6, is about 1.2 ulp, while `v_naive`'s first
+  # component sits 0.113 ulp from its midpoint, so no margin covers B.
+  # Identity rests instead on the inputs and the arithmetic: B's matrix and its
+  # `xi1` are both committed bytes (the latter since M150), and
+  # axes_dd_pricing() is R-level `+`, `-`, `*` and `/` on doubles, the same
+  # IEEE arithmetic on every platform. So every machine computes the same
+  # doubles as the machine that measured them.
   #
   # `u`: at B it is a difference of two quantities of size about one that
   # comes out 0.0555, so a rounding of either operand is amplified by about
@@ -1191,15 +1204,12 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   # 6.1 ulp, a figure with no derivation behind it.
   fz <- cert_frozen$cxb
   ref <- axes_dd_pricing(fx$S, d)
-  # dd_ulp() is at file scope since M149, which asserts the same half-ulp
-  # bound at the five anchors in their own reference-route tests; its note on
-  # what "ulp" means there is the one that used to stand here.
-  expect_lt(max(dd_ulp(dd_to_double(ref$v),
-                       as.numeric(fz$v_hi), as.numeric(fz$v_lo))), 0.5,
-            label = "cxb dd-vs-exact v (ulp)")
-  expect_lt(max(dd_ulp(dd_to_double(ref$v_naive),
-                       as.numeric(fz$vn_hi), as.numeric(fz$vn_lo))), 0.5,
-            label = "cxb dd-vs-exact v_naive (ulp)")
+  # as.numeric() drops any names, which identical() would otherwise compare.
+  expect_identical(as.numeric(dd_to_double(ref$v)), as.numeric(fz$v_hi),
+                   label = "cxb dd-vs-exact v, rounded to double")
+  expect_identical(as.numeric(dd_to_double(ref$v_naive)),
+                   as.numeric(fz$vn_hi),
+                   label = "cxb dd-vs-exact v_naive, rounded to double")
   expect_lt(abs((dd_to_double(ref$u) - as.numeric(fz$u_hi)) -
                   as.numeric(fz$u_lo)), 2^-53,
             label = "cxb dd-vs-exact u (absolute)")
