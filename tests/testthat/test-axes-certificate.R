@@ -60,8 +60,9 @@
 # WHAT RUNS ON CRAN (M149; D-063). Three classes run under CRAN's own check:
 #
 #   - the checks against exact truth and their detector: the five per-anchor
-#     bracket tests with their reference-route checks, counterexample B's
-#     test, the two closed-form oracle tests, and the case detector. The
+#     bracket tests, the five per-anchor reference-route tests,
+#     counterexample B's test, the two closed-form oracle tests, and the case
+#     detector. The
 #     brackets among them measure this machine's own error against exact
 #     values; the detector compares nothing with exact values itself, but
 #     fails the run when no anchor was priced, so the brackets cannot all
@@ -158,7 +159,8 @@ cert_derivs <- function(cs) {
 # values and redden the bracket rather than hide inside it. `xi1` is the one
 # member built from cos(), and cov2cor() can round a one-ulp cosine change out
 # of `sig`, so its upper triangle is committed beside `sig` and checked in
-# cert_dd_vs_exact(): a mismatch there skips the case, naming `xi1`.
+# cert_dd_vs_exact(): a mismatch there skips only the anchor's reference-route
+# test, naming `xi1`, and the anchor's brackets still run.
 #
 # What is still deliberately NOT pinned is the double-double reference route:
 # it is never a PRECONDITION. That route is the artifact under test, and an
@@ -621,7 +623,7 @@ dd_ulp <- function(hat, hi, lo) {
 }
 
 # The reference route against the committed exact values at one anchor (M149;
-# RR22 rec 11), called from cert_true_error() once `sig` has matched.
+# RR22 rec 11), called from that anchor's own test_that() below.
 #
 # WHAT IS ASSERTED, AND WHY IT IS NOT A PRECONDITION. The head of this file
 # records a decision not to PIN the double-double route -- not to use it as a
@@ -640,25 +642,38 @@ dd_ulp <- function(hat, hi, lo) {
 # neither BLAS nor LAPACK, so given the same inputs it is the same
 # arithmetic on every IEEE platform.
 #
-# THE SECOND INPUT. The route reads the derivative set as well as the matrix,
+# THE TWO INPUTS. The route reads the derivative set as well as the matrix,
 # and `xi1` is cos() at the item angles' differences -- built on this machine,
 # like the matrix. `sig` matching does not imply `xi1` does: `sig` passes
 # through cov2cor(), where a one-ulp change in a cosine can round away. The
-# exact values were priced from the oracle machine's `xi1`, so where this
-# machine's differs the committed values are not a yardstick at this bound,
-# and the case is recorded `skipped` and skipped, naming that input. Recorded
-# BEFORE skip() for the reason given at the matrix check above.
+# exact values were priced from the oracle machine's `sig` and `xi1`, so where
+# this machine's differs in either, the committed values are not a yardstick
+# at this bound and the test skips, naming which input differed.
+#
+# IT NEVER CALLS cert_record(). The case's disposition belongs to its bracket
+# test, which records `priced` or `refused`; cert_record() overwrites, so a
+# `skipped` written here would erase that and turn the detector red on a
+# machine whose brackets did run. That happened when this check was still
+# inside cert_true_error(): the windows-latest R-CMD-check job on the M149
+# pull request, 2026-09-22, built `xi1` differently at all five anchors and
+# `sig` at none, skipped every anchor case, and failed the detector. Skipping
+# here therefore leaves the case's brackets running (M149 amendment).
 cert_dd_vs_exact <- function(id, sigma, d, fz) {
+  if (!identical(sigma[upper.tri(sigma)], as.numeric(fz$sig))) {
+    testthat::skip(paste0(
+      "this machine does not build the matrix at case '", id, "' bit for ",
+      "bit, so the exact quadratic forms committed for that matrix are not a ",
+      "yardstick for this one"
+    ))
+  }
   x1 <- d$mats$xi1
   if (!identical(as.vector(x1[upper.tri(x1, diag = TRUE)]),
                  as.numeric(fz$xi1))) {
-    reason <- paste0(
+    testthat::skip(paste0(
       "this machine does not build the derivative set's xi1 at case '", id,
       "' bit for bit, so the exact quadratic forms committed for that ",
       "derivative set are not a yardstick for this one"
-    )
-    cert_record(id, cert_disp[["skipped"]], reason)
-    testthat::skip(reason)
+    ))
   }
   ref <- axes_dd_pricing(sigma, d)
   if (!is.list(ref)) {
@@ -733,13 +748,6 @@ cert_true_error <- function(id, sigma, d) {
     ))
     return(NULL)
   }
-  # THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11).
-  # Counterexample B asserts this in its own test (the same half-ulp bound for
-  # `v` and `v_naive`, an absolute one for `u`); the five anchors carry a
-  # committed `xi1` and are checked here, after the matrix check and BEFORE
-  # the shipped pricing, so the check runs on the priced and the refusing
-  # route alike.
-  if (!is.null(fz$xi1)) cert_dd_vs_exact(id, sigma, d, fz)
   v <- axes_v_pricing(sigma, d)
   u <- axes_u_pricing(sigma, d)
   # A REFUSAL from the shipped pricing IS A ROUTE, not a failure to reproduce
@@ -887,9 +895,9 @@ test_that("AC3: the anchor case list is not empty", {
     expect_length(fz$u_lo, 1L)
   }
   # ... and each anchor carries its `xi1` upper triangle, diagonal included
-  # (M149). cert_dd_vs_exact() runs only where that field is present, so an
-  # anchor whose regeneration dropped it would silently stop checking the
-  # reference route. Counterexample B has none: its test asserts the route
+  # (M149). cert_dd_vs_exact() skips where that field does not match this
+  # machine's, so an anchor whose regeneration dropped it would skip its
+  # reference-route test on every machine, and a skip does not redden. Counterexample B has none: its test asserts the route
   # itself, with an absolute bound for `u`, and with no `xi1` precondition.
   for (id in c("a4", "a5", "c4", "b9a", "b9b")) {
     p <- cert_shape[[id]][[1L]]
@@ -1016,6 +1024,20 @@ for (cert_case in cert_anchors()) {
     cert_bracket(cert$se, true_rel$se, paste0(cs$id, " se"))
     cert_bracket(cert$cval, true_rel$cval, paste0(cs$id, " cval"))
     cert_bracket(cert$fiml_ratio, true_rel$ratio, paste0(cs$id, " fiml_ratio"))
+  })
+}
+
+
+# THE ANCHORS' REFERENCE ROUTE AGAINST EXACT TRUTH (M149; RR22 rec 11), one
+# test per anchor for the reason given above the bracket tests. Counterexample
+# B asserts the same in its own test (the same half-ulp bound for `v` and
+# `v_naive`, an absolute one for `u`). These tests never call the shipped
+# pricing, so they run whatever that pricing returns on this machine.
+for (cert_case in cert_anchors()) {
+  test_that(paste0("the reference route lands within half an ulp of the ",
+                   "exact values -- ", cert_case$lbl), {
+    cs <- cert_case
+    cert_dd_vs_exact(cs$id, cs$r, cert_derivs(cs), cert_frozen[[cs$id]])
   })
 }
 

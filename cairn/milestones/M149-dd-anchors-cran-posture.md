@@ -47,7 +47,7 @@ The test file asserts the certificate's double-double reference route against th
 - [x] T6: Classify every `test_that()` in the file as CRAN-live or CRAN-skipped, with its ground. Draft and append the D-entry. Write the header posture block. Remove `skip_on_cran()` from the anchor-list test (~689). Run the file with `NOT_CRAN=false` and record its skip list.
 - [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
 - [x] T8: Rewrite the margin test's comment to state its bound as stated, not derived, and to name the three premises AC2 lists as unproven. Reword the `cert_dd_vs_exact()` comment (~627-633) so that its "property of the committed matrices" claim holds only under those premises. Rerun the certificate file.
-- [ ] T9: Move the reference-route check out of `cert_true_error()` into five per-anchor `test_that()` blocks. Each skips on a matrix or `xi1` mismatch, naming which, and never calls `cert_record()`. Update the header, the `cert_dd_vs_exact()` comment and D-063 in place, and reclassify the file's tests for AC5.
+- [x] T9: Move the reference-route check out of `cert_true_error()` into five per-anchor `test_that()` blocks. Each skips on a matrix or `xi1` mismatch, naming which, and never calls `cert_record()`. Update the header, the `cert_dd_vs_exact()` comment and D-063 in place, and reclassify the file's tests for AC5.
 - [ ] T10: Plant a mismatched `xi1` at all five anchors (the Windows state). Show all six cases priced, the brackets asserted, the detector green, and five reference-test skips naming `xi1`. Plant a non-list `axes_dd_pricing()` return and a `sig` mismatch, and rerun T3's plants (a) and (b).
 - [ ] T11: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
 
@@ -84,6 +84,7 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: mini gate: the maintainer chose N, which holds the check's reach, over W, which widens it. The rule for milestones with review returns recommended N. This supersedes the wording in the AC1 amendment-return line above. It is the same return, not a second one.
 - 2026-09-22: re-audit: AC1 (full) — ambiguous "a test" and "it", a second `cert_record()` writer that overwrites `priced`, and route wording for a test that runs no shipped pricing. All three were fixed. The stop is reached for AC1.
 - 2026-09-22: amendment applied (maintainer adopted the fixed text): AC1 now names five per-anchor tests that skip on `xi1` without recording. Scope Out names the all-five-differ blind spot. T9-T11 added, Coverage updated, and AC1 unticked. The reader's AC6 widening was declined.
+- 2026-09-22: T9 done. The reference-route check left `cert_true_error()` for five per-anchor tests that skip on a `sig` or `xi1` mismatch and never record. The header, the comments and D-063 now list those five tests, and D-063 was edited in place because it has not left this branch. The PR's Windows log was read: all five anchors skipped on `xi1`, and the detector failed. The file now has 28 tests. It passes with `NOT_CRAN=true`, and with `NOT_CRAN=false` it skips exactly the five CRAN-skipped tests, all six cases priced.
 
 ## Decisions
 

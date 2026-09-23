@@ -2277,8 +2277,8 @@ admits is an exact zero pivot (D-061, D-062).
 
 **Decision.** The current posture is kept. Three classes of test run on
 CRAN. The checks against exact truth and their detector: the five
-per-anchor bracket tests with their reference-route checks, counterexample
-B's test, the two closed-form oracle tests, and the case detector. The
+per-anchor bracket tests, the five per-anchor reference-route tests,
+counterexample B's test, the two closed-form oracle tests, and the case detector. The
 brackets among them measure the running machine's own error against exact
 values. The detector compares nothing with exact values itself, but it
 fails the run when no anchor was priced, so the brackets cannot all skip
