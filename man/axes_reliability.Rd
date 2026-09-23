@@ -246,8 +246,9 @@ not of the data alone: the numbers being checked are dominated by rounding
 there. That committed counterexample is the three-variable matrix saved in
 the package sources as \code{tests/testthat/fixtures/rb18-counterexample-b.rds}.
 On it, the check's worst estimate differed between macOS (arm64, R's
-reference LAPACK) and Linux (arm64, OpenBLAS). That estimate is the figure
-the warning prints, and both machines refused the fit as \code{"uncertified"}. The three are read as one because both
+reference BLAS and LAPACK) and Linux (arm64, OpenBLAS). That estimate is the
+figure the warning prints, and both machines refused the fit as
+\code{"uncertified"}. The three estimates are read as one because both
 surfaces refuse as a unit, so a fit on any path can be refused on the FIML
 ratio's estimate even where that ratio is not part of what it reports. That \code{1e-5} in the floor is not itself the tolerance: it is the
 accuracy target \code{1e-4}, the largest relative error a reported standard
