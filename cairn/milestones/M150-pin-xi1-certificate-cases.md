@@ -1,6 +1,6 @@
 # M150: Price every certificate case from its committed xi1
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -49,7 +49,7 @@ Every committed case in the certificate test file is priced from its committed `
 - [x] T4: Apply each plant alone, locate it by its text, and assert that `git diff --stat` is non-empty. (a) Change one large entry (about 0.707) of the builder's `xi1` output by one ulp at all six cases. Then none skips, all are priced, all pass, and the guard passes. (b) Change the builder's formula, for example `cos(2 * delta)`. The guard then fails, naming each case. (c) Return zero low words from `dd_two_sum()` and `dd_two_prod()`. The reference route then fails at all six cases. (d) Move B's returned `v` by one ulp, then `v_naive`. Identity then fails for that field. Summarize the results in the work log.
 - [x] T5: Measure B's estimate as AC5 states, on macOS arm64 and in the `tools/arm64` image. Record each machine and value in the work log. Rewrite the sentence at `R/axes_reliability.R` ~731-736 to match, and run `devtools::document()`.
 - [x] T6: Sweep the comments for `xi1` in both files: the header (~145-174), the `cert_dd_vs_exact()` block (~626-662), B's test and the oracle comment (~149-156). Record each hit's disposition in the work log.
-- [ ] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`. At review, read the PR's windows-latest log for AC7.
+- [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`. At review, read the PR's windows-latest log for AC7.
 
 ## Work log
 
@@ -68,6 +68,7 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: T3-T6 done. The full suite at the T3 code (`f9c8f373`) gave 0 failures, so T3 and T4 are ticked. `devtools::document()` changed only `man/axes_reliability.Rd`, which finishes T5. Correction to the T5 line above: the measurement scripts were scratchpad files, not `tools/` scripts.
 - 2026-09-22: claim audit: 31 claims read, 5 corrected — R/axes_reliability.R, man/axes_reliability.Rd, tests/testthat/test-axes-certificate.R. The help sentence now says the check's worst estimate (the figure the warning prints) differed, not that a fit printed it. The guard comment names only builder edits, because an angle edit already reddens `kappa`, and it no longer claims the Windows difference was one ulp. The header says "matches the committed bytes", because B's matrix is read, not built. B's comment says "is given the same input". The same reader's re-read is pending.
 - 2026-09-22: claim-audit re-read: the same reader confirmed all five corrections. One short header line was rewrapped. T7 is running (`devtools::test()`, then `devtools::check(manual = TRUE)`).
+- 2026-09-22: T7 done at `dc627e0e`. `devtools::test()` gave 0 failures. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings and 0 notes, "checking PDF version of manual ... OK", and `Status: OK`. The Windows reading for AC7 waits for the PR at review. Status set to review.
 
 ## Decisions
 

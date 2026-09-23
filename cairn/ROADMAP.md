@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-23 (M149 done: RR22 follow-ons row gained (vi); one
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M150 | Price every certificate case from its committed xi1 | in-progress | — | normal | milestones/M150-pin-xi1-certificate-cases.md |
+| M150 | Price every certificate case from its committed xi1 | review | — | normal | milestones/M150-pin-xi1-certificate-cases.md |
 | M149 | Reference-route checks at the anchors, and the certificate file's CRAN posture | done | — | normal | milestones/archive/M149-dd-anchors-cran-posture.md |
 | M147 | The certificate is the sole conditioning judge | done | — | normal | milestones/archive/M147-certificate-sole-conditioning-judge.md |
 | M148 | Close the five remaining accuracy-certificate validation-layer fragilities | done | M147 | normal | milestones/archive/M148-certificate-validation-fragilities.md |
