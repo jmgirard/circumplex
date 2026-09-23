@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-22 (M148 done: degeneracy row's Known-fragilities remainder closed and gained (iv); one LESSONS line added, the M75 line pruned for the byte budget; no RB/RR to archive; validate green.)_
+_Last hygiene check: 2026-09-23 (M149 done: RR22 follow-ons row gained (vi); one LESSONS line added, the M29 line pruned for the byte budget; M146 row pruned; no RB/RR to archive; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M149 | Reference-route checks at the anchors, and the certificate file's CRAN posture | review | — | normal | milestones/M149-dd-anchors-cran-posture.md |
+| M149 | Reference-route checks at the anchors, and the certificate file's CRAN posture | done | — | normal | milestones/archive/M149-dd-anchors-cran-posture.md |
 | M147 | The certificate is the sole conditioning judge | done | — | normal | milestones/archive/M147-certificate-sole-conditioning-judge.md |
 | M148 | Close the five remaining accuracy-certificate validation-layer fragilities | done | M147 | normal | milestones/archive/M148-certificate-validation-fragilities.md |
-| M146 | Printed text wraps at its edge cases, and the CPM table drops Communality | done | — | normal | milestones/archive/M146-printed-text-wrapping-edges.md |
 
 ## Candidates
 
