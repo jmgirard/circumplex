@@ -651,9 +651,11 @@ dd_ulp <- function(hat, hi, lo) {
 # at this bound and the test skips, naming which input differed.
 #
 # IT NEVER CALLS cert_record(). The case's disposition belongs to its bracket
-# test, which records `priced` or `refused`; cert_record() overwrites, so a
-# `skipped` written here would erase that and turn the detector red on a
-# machine whose brackets did run. That happened when this check was still
+# test, which records it (`priced`, `refused`, or `skipped` where `sig`
+# differs). cert_record() overwrites, and these tests run after the bracket
+# tests, so a `skipped` written here would erase the bracket test's record;
+# written at every anchor, it would turn the detector red on a machine whose
+# brackets did run. That happened when this check was still
 # inside cert_true_error(): the windows-latest R-CMD-check job on the M149
 # pull request, 2026-09-22, built `xi1` differently at all five anchors and
 # `sig` at none, skipped every anchor case, and failed the detector. Skipping
@@ -897,8 +899,9 @@ test_that("AC3: the anchor case list is not empty", {
   # ... and each anchor carries its `xi1` upper triangle, diagonal included
   # (M149). cert_dd_vs_exact() skips where that field does not match this
   # machine's, so an anchor whose regeneration dropped it would skip its
-  # reference-route test on every machine, and a skip does not redden. Counterexample B has none: its test asserts the route
-  # itself, with an absolute bound for `u`, and with no `xi1` precondition.
+  # reference-route test on every machine, and a skip does not redden.
+  # Counterexample B has none: its test asserts the route itself, with an
+  # absolute bound for `u`, and with no `xi1` precondition.
   for (id in c("a4", "a5", "c4", "b9a", "b9b")) {
     p <- cert_shape[[id]][[1L]]
     expect_length(cert_frozen[[id]]$xi1, p * (p + 1L) / 2L)
@@ -1120,8 +1123,8 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   fz <- cert_frozen$cxb
   ref <- axes_dd_pricing(fx$S, d)
   # dd_ulp() is at file scope since M149, which asserts the same half-ulp
-  # bound at the five anchors inside cert_true_error(); its note on what "ulp"
-  # means there is the one that used to stand here.
+  # bound at the five anchors in their own reference-route tests; its note on
+  # what "ulp" means there is the one that used to stand here.
   expect_lt(max(dd_ulp(dd_to_double(ref$v),
                        as.numeric(fz$v_hi), as.numeric(fz$v_lo))), 0.5,
             label = "cxb dd-vs-exact v (ulp)")

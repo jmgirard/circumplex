@@ -1,6 +1,6 @@
 # M149: Reference-route checks at the anchors, and the certificate file's CRAN posture
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -49,7 +49,7 @@ The test file asserts the certificate's double-double reference route against th
 - [x] T8: Rewrite the margin test's comment to state its bound as stated, not derived, and to name the three premises AC2 lists as unproven. Reword the `cert_dd_vs_exact()` comment (~627-633) so that its "property of the committed matrices" claim holds only under those premises. Rerun the certificate file.
 - [x] T9: Move the reference-route check out of `cert_true_error()` into five per-anchor `test_that()` blocks. Each skips on a matrix or `xi1` mismatch, naming which, and never calls `cert_record()`. Update the header, the `cert_dd_vs_exact()` comment and D-063 in place, and reclassify the file's tests for AC5.
 - [x] T10: Plant a mismatched `xi1` at all five anchors (the Windows state). Show all six cases priced, the brackets asserted, the detector green, and five reference-test skips naming `xi1`. Plant a non-list `axes_dd_pricing()` return and a `sig` mismatch, and rerun T3's plants (a) and (b).
-- [ ] T11: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
+- [x] T11: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
 
 ## Work log
 
@@ -86,6 +86,9 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: amendment applied (maintainer adopted the fixed text): AC1 now names five per-anchor tests that skip on `xi1` without recording. Scope Out names the all-five-differ blind spot. T9-T11 added, Coverage updated, and AC1 unticked. The reader's AC6 widening was declined.
 - 2026-09-22: T9 done. The reference-route check left `cert_true_error()` for five per-anchor tests that skip on a `sig` or `xi1` mismatch and never record. The header, the comments and D-063 now list those five tests, and D-063 was edited in place because it has not left this branch. The PR's Windows log was read: all five anchors skipped on `xi1`, and the detector failed. The file now has 28 tests. It passes with `NOT_CRAN=true`, and with `NOT_CRAN=false` it skips exactly the five CRAN-skipped tests, all six cases priced.
 - 2026-09-22: T10 done, each plant alone, in memory or in a deleted temporary copy of the test file. A one-ulp change to this machine's `xi1[1, 2]` at all five anchors (the Windows state) left all six cases priced, the brackets passing and the detector green, with five reference-test skips naming `xi1`. A `NULL` from `axes_dd_pricing()` failed all five reference tests, each naming its case. A one-ulp `sig` change at a4 skipped a4's bracket and reference tests, both naming the matrix, and recorded `a4 = skipped` once. Zero low words failed all 15 anchor reference expectations by label. The one-ulp high-word moves failed exactly the moved field at all five anchors, for `v` and `v_naive` first and last and for `u`.
+- 2026-09-22: T11 done at `224c5ff8`. `devtools::test()` gave `[ FAIL 0 | WARN 12 | SKIP 1 | PASS 14009 ]`. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings and 0 notes, "checking PDF version of manual ... OK", and `Status: OK`.
+- 2026-09-22: claim audit: 19 claims read, 2 corrected — tests/testthat/test-axes-certificate.R. The reader read only the lines added since `2b975b23`. The corrections name `skipped` among the bracket test's records and say the detector turns red only when every anchor's record is overwritten. The reader also flagged a stale counterexample-B comment and one long line, and both were fixed. Its re-read confirmed all four edits. These are comment-only edits after T11, and the certificate file passed again after them (28 tests, 0 failures).
+- 2026-09-22: completion. Status set to review.
 
 ## Decisions
 
