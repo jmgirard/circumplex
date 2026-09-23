@@ -1,6 +1,6 @@
 # M150: Price every certificate case from its committed xi1
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -22,13 +22,13 @@ Every committed case in the certificate test file is priced from its committed `
 ## Acceptance criteria
 
 - [x] AC1: In `tests/testthat/test-axes-certificate.R`, eleven tests compare against `cert_frozen`'s exact values: the five bracket tests, the five reference-route tests and counterexample B's test. Each passes the shipped pricing (`axes_v_pricing()`, `axes_u_pricing()`, `axes_accuracy_certificate()`) and the reference route (`axes_dd_pricing()`) a derivative set whose `xi1` is rebuilt from that case's committed upper triangle in `cert_frozen`. No `skip()` in the file is conditioned on `xi1`.
-- [ ] AC2: For each of the six cases, a test asserts that the `xi1` this machine builds has the committed length and is within `4 * .Machine$double.eps` of the committed one in every entry, and it fails by the case's name. The test skips on CRAN and nowhere else.
+- [x] AC2: For each of the six cases, a test asserts that the `xi1` this machine builds has the committed length and is within `4 * .Machine$double.eps` of the committed one in every entry, and it fails by the case's name. The test skips on CRAN and nowhere else.
 - [x] AC3: `cert_frozen$cxb` carries counterexample B's `xi1` upper triangle, diagonal included. It is emitted by `devel/degeneracy-oracle/exact_oracle.R` in a run whose output reproduces every other committed field of all six cases bit for bit. The anchor-list test asserts that its length is p(p + 1)/2 for B's three variables.
-- [ ] AC4: At counterexample B, the reference-route check for `v` and `v_naive` asserts that `dd_to_double()` of the route's value is identical to the committed `hi` in every component. `u` keeps its absolute bound of `2^-53`. The test's comment states that this identity rests on committed inputs and R-level IEEE arithmetic, not on a stated margin.
+- [x] AC4: At counterexample B, the reference-route check for `v` and `v_naive` asserts that `dd_to_double()` of the route's value is identical to the committed `hi` in every component. `u` keeps its absolute bound of `2^-53`. The test's comment states that this identity rests on committed inputs and R-level IEEE arithmetic, not on a stated margin.
 - [ ] AC5: B's certificate estimate is observed by calling `axes_accuracy_certificate()` on B's fixture matrix with `axes_se_derivs()` as the package builds it, not with the test's pinned `xi1`. It is observed on macOS arm64 and on linux-arm64 (the `tools/arm64` image). If the two machines print different estimates, the `?axes_reliability` sentence on machine-dependent estimates says so and names one ill-conditioned test matrix as its evidence. If they print the same estimate, the page makes no claim that the estimate depends on the machine. The roxygen is in `R/axes_reliability.R`, and `man/` is regenerated.
 - [x] AC6: A grep of `tests/testthat/test-axes-certificate.R` and `devel/degeneracy-oracle/exact_oracle.R` for `xi1`, with each hit read with five lines of context on each side, finds no comment stating that an `xi1` mismatch skips a test or that counterexample B's `xi1` is not pinned.
 - [ ] AC7: On the PR's windows-latest R-CMD-check job, the five anchor reference-route tests, counterexample B's test and the `xi1` guard test run and do not skip. The evidence is that none of their names appears in the skip list of the job's printed testthat output.
-- [ ] AC8: `devtools::test()` reports no failures, and `devtools::check(manual = TRUE)` reports 0 errors and 0 warnings.
+- [x] AC8: `devtools::test()` reports no failures, and `devtools::check(manual = TRUE)` reports 0 errors and 0 warnings.
 
 ## Coverage
 
@@ -74,6 +74,7 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: resumed by /milestone-implement. T8 added as a minor amendment (a discovered sub-task, and Coverage AC2 → T2, T4, T8). No question gate, because nothing was open.
 - 2026-09-22: T8 checkpoint (not ticked): both `xi1` length checks are now `expect_identical(length(...), (p * (p + 1L)) %/% 2L, label = "<id> xi1 length")`. A first draft without the outer parentheses gave 32 at p = 8, because `%/%` binds tighter than `*`, and the plant exposed it. With one entry cut from B's committed `xi1`, both checks failed as "Expected cxb xi1 length ..." and named no other case. After the plant was removed, the file with `NOT_CRAN=true` gave 29 tests, 0 failed, 0 skipped. The full suite and `check(manual = TRUE)` are running.
 - 2026-09-22: T8 done at `51043edd`. `devtools::test()` gave FAIL 0, WARN 12, SKIP 1 and PASS 14022. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings and 0 notes, "checking PDF version of manual ... OK", and `Status: OK`. The claim audit was not re-run, because T8 adds two test labels and no prose claim. Status set to review.
+- 2026-09-22: review return 2 (a defect return, count 2): AC5 fails as written, because the `?axes_reliability` sentence does not name the ill-conditioned test matrix it cites. The consistency gate also fails, because NEWS.md has no entry for that sentence. Pass-2 evidence ticks AC1-AC4, AC6 and AC8. If the implement gate amends AC5 instead of changing the text, that amendment is recorded on the amendment track and this line counts as a gate return for NEWS alone. Status set to in-progress.
 
 ## Decisions
 
@@ -113,4 +114,23 @@ Pass 2, 2026-09-22, at `5fdd7139`. Master has not moved since the branch was cut
 - AC5: measured again with `axes_se_derivs()` as built. macOS arm64, reference LAPACK: se 0.3355, cval 48.9, fiml_ratio 0.008708. `tools/arm64` image, OpenBLAS 0.3.33: se 2.534, cval 5.635, fiml_ratio 0.006238. Both refuse the fit as `"uncertified"`. The estimates differ, and `R/axes_reliability.R:734` and `man/axes_reliability.Rd:246` say so and cite one ill-conditioned matrix from the package's tests.
 - AC5 correction: the box is unticked again. The criterion says the sentence "names one ill-conditioned test matrix". The sentence says "one ill-conditioned matrix from the package's tests" and does not name it. The tick read "names" as "cites", and a review does not reinterpret a criterion. The pass-2 [O] reviewer raised this as finding 3. The measurements above stand.
 - The warning's figure: `axes_degeneracy_note()` on B's refusal, with `xi1` as built on macOS, printed "estimated relative error 49", and `refusal$cert` is `identical()` to `axes_accuracy_certificate()` on the same input. So "the figure the warning prints" is the worst estimate, rounded to two digits.
+- AC8: at `87d0be94`, `devtools::test()` gave FAIL 0, WARN 12, SKIP 1 and PASS 14022, with all six cases priced. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings, 0 notes, "checking PDF version of manual ... OK" and `Status: OK`.
+- AC2: the guard test (:1097) has `skip_on_cran()` and no other skip, and it passed in the AC8 suite. Two plants were applied together, and the file was then restored with `git checkout` (empty `git diff`). One plant cut one entry from B's committed `xi1`. The other moved a4's committed 0.7071 entry by 16 ulp (8 eps). The guard failed with "cxb xi1 length" (:1111) and "a4 xi1: largest distance from the committed copy" (:1115), and the anchor-list test failed with "cxb xi1 length" (:940).
+- AC4: B's test (:1215-1222) asserts that `dd_to_double()` of `v` and of `v_naive` is `identical()` to the committed `hi`, and that `u` is within `2^-53`. The comment (:1194-1203) rests identity on committed inputs and R-level IEEE arithmetic, and it says that no margin covers B. The test passed in the AC8 suite.
+- AC7: not read. The PR opens only after the approval gate, so pass 3 reads the windows-latest skip list during the step-8 CI wait, before the merge.
+
+Consistency gate, pass 2. `cairn_validate` passed (one advisory: 8 criteria, over the 7-criterion split tripwire). `document()` left no diff, with 0 `resolve link` lines. `pkgdown::check_pkgdown()` found no problems. The newest verdict on master is success for both `R-CMD-check.yaml` and `test-coverage.yaml` (2026-09-23T01:11Z). `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all exit 0. README.md is not touched. FAILED: NEWS.md has no entry for the changed `?axes_reliability` sentence. The entry at NEWS.md:48 is M147's.
+
+Reviewer findings, pass 2. The three lenses ran again. Each finding waits for triage at the next gate, unless its disposition is stated:
+- [O2] 1 (= pass-1 O3): CRAN no longer checks this machine's own `xi1`, and the header does not say so.
+- [O2] 2 (= O4): B's identity check assumes no FMA contraction and no extended precision.
+- [O2] 3 (= O7, made stronger): AC5 says "names" the matrix, and the sentence does not name it. Its disposition is this return.
+- [O2] 4 (new): the sentence names the OS (macOS, Linux), but the difference that matters is most likely the LAPACK/BLAS library.
+- [O2] 5 (new): "the figure the warning prints" was not observed. Refuted: the note prints "estimated relative error 49", which is the worst estimate (see above).
+- [O2] 6 (= O8), [O2] 7 (= O6), [O2] 9 (= O5), [O2] 10 (= O9): confirmed as in pass 1.
+- [O2] 8 (new): the guard joins the CRAN-skipped group, but D-063's list of that group does not name it.
+- [O2] 11: the T8 fix is correct (integer types, precedence, both labels, the guard's `next`). O2 is closed, O10 is older than M150, and O11 is confirmed.
+- [O2] 12: AC7 has no evidence until the PR exists.
+- [S-blame2] 1-3 repeat O3, O4 and O8. 4: T8 keeps M116's intent (the checks came from M149, `165af9d9`). 5: the M149 reversal is recorded. 6 repeats O7.
+- [S-prior2] 1: `expect_identical()` treats `0` and `-0` as equal (LESSONS, M147). Proposed rejection: B's committed `v_hi` and `vn_hi` are about 13 and 59, so no zero can occur.
 - AC6: 38 `xi1` hit lines in the test file and 9 in the oracle driver, read with 5 lines of context. No hit says that an `xi1` mismatch skips a test or that B is not pinned. :695 is history ("Until M150"), and :1094 is about the guard's own CRAN skip.
