@@ -214,9 +214,10 @@ cert_pinned_derivs <- function(d, id) {
 # SKIP instead of redden -- the defect hid inside the precondition meant to
 # protect the comparison. Asserting the route against the committed exact
 # values, failing and never skipping on its output, is a different thing and
-# is done at all six cases where this machine's matrix matches the committed
-# bytes: at counterexample B in its own test since M122, and at the five
-# anchors in cert_dd_vs_exact() since M149.
+# is done at all six cases. At counterexample B it is in B's own test since
+# M122, and B's matrix is read from committed bytes, so a mismatch there fails
+# rather than skips. At the five anchors it is in cert_dd_vs_exact() since
+# M149, which runs where this machine's matrix matches the committed bytes.
 #
 # This block does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
 # the precondition, so a builder edit that moved a geometry still REDDENS.
@@ -1280,9 +1281,10 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
     # ... and the predicate users depend on refuses here too, with the same
     # literal as on the refusing route (M149). The worst-of assertion above
     # the branches says the certificate reads past the target; this says what
-    # the user is told. `?axes_reliability` states that the estimate printed
-    # beside the refusal can differ between machines while the refusal does
-    # not, and the two branches of this test are what back the second half.
+    # the user is told. `?axes_reliability` cites this matrix as one measured
+    # case where the estimate printed beside the refusal differed between two
+    # machines while both refused it. The two branches of this test back the
+    # refusal half on whichever route this machine takes.
     expect_identical(axes_degeneracy_refusal(fx$S, d)$reason, "uncertified")
 
   } else {

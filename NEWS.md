@@ -65,13 +65,6 @@
   reported in `details$naive_reason`, keeps the default tolerance and can
   still differ across platforms at such a matrix.
 
-* `?axes_reliability` no longer says that the same ill-conditioned fit can
-  print an estimated error of 1 on one machine and a graded estimate on
-  another. It now reports one measured case, the committed counterexample
-  matrix. Its worst estimate differed between macOS with R's reference
-  BLAS and LAPACK and Linux with OpenBLAS, and both machines refused it as
-  `"uncertified"`.
-
 * `scales(x, items = TRUE)` no longer stops with "subscript out of bounds"
   on `iip32` and `iip64`. These licensed instruments ship a notice in place
   of their item text, and `scales()` now prints that notice once, after the
@@ -216,6 +209,12 @@
   can still cover a point.
 
 ## Documentation
+
+* `?axes_reliability` now says that at a severely ill-conditioned fit, the
+  error estimate printed with an `"uncertified"` refusal depends on the
+  machine as well as the data. It cites one test matrix whose estimate
+  differed between macOS with R's reference BLAS and LAPACK and Linux with
+  OpenBLAS, while both machines refused it.
 
 * The website's vignette menu is now built by pkgdown from the articles index
   rather than written out a second time by hand, so the menu is titled

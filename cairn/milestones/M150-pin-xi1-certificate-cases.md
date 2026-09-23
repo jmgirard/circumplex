@@ -171,4 +171,6 @@ Proposed dispositions for the open pass-1 and pass-2 findings:
 - O8 / [O2] 6: fix now. The header clause at :217-219 must not imply a skip at B.
 - O9 / [O2] 10, O10, O11, [O2] 8: reject. They were accepted at the plan gate or are older than M150. D-063's rule assigns a new test by its class.
 - [S-prior2] 1: reject. B's `v_hi` and `vn_hi` are about 13 and 59, so no zero can occur.
+
+Gate triage, 2026-09-22 (user's selections): apply every fix-now draft, keep the fixture's real filename, and accept every proposed rejection. So [O3] 1-6, [O3] 9, [S-prior3] 1, O6 and O8 are fix now, [S-prior3] 2 is kept, and the rest are rejected as proposed above. The fix-now commit rewrites the help sentence (the check ran through internal functions because B has too few scales, given the same matrix, with no "committed"). It names the three estimates, moves the NEWS bullet under Documentation and rewrites it against 2.0.1, and fixes the two test comments. The merge question is posed again after the suite and the release check.
 - AC6: 38 `xi1` hit lines in the test file and 9 in the oracle driver, read with 5 lines of context. No hit says that an `xi1` mismatch skips a test or that B is not pinned. :695 is history ("Until M150"), and :1094 is about the guard's own CRAN skip.
