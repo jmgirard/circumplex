@@ -62,11 +62,10 @@
 #   - the checks against exact truth and their detector: the five per-anchor
 #     bracket tests, the five per-anchor reference-route tests,
 #     counterexample B's test, the two closed-form oracle tests, and the case
-#     detector. The
-#     brackets among them measure this machine's own error against exact
-#     values; the detector compares nothing with exact values itself, but
-#     fails the run when no anchor was priced, so the brackets cannot all
-#     skip or refuse unseen. Together that is how the
+#     detector. The brackets among them measure this machine's own error
+#     against exact values; the detector compares nothing with exact values
+#     itself, but fails the run when no anchor was priced, so the brackets
+#     cannot all skip or refuse unseen. Together that is how the
 #     certificate UNDER-reporting is caught, and CRAN checks on platforms CI
 #     does not.
 #   - the committed-value checks: the anchor-list test, the rounding-midpoint
@@ -170,8 +169,9 @@ cert_derivs <- function(cs) {
 # SKIP instead of redden -- the defect hid inside the precondition meant to
 # protect the comparison. Asserting the route against the committed exact
 # values, failing and never skipping on its output, is a different thing and
-# is done at all six cases: at counterexample B in its own test since M122,
-# and at the five anchors in cert_dd_vs_exact() since M149.
+# is done at all six cases where this machine builds their inputs: at
+# counterexample B in its own test since M122, and at the five anchors in
+# cert_dd_vs_exact() since M149.
 #
 # This block does NOT replace the kappa fingerprint. kappa is asserted OUTSIDE
 # the precondition, so a builder edit that moved a geometry still REDDENS.
@@ -867,9 +867,10 @@ cert_bracket <- function(est, true_rel, lbl, at_floor = est <= cert_floor) {
 
 test_that("AC3: the anchor case list is not empty", {
   # CRAN-live since M149 (D-063): the CRAN-live brackets below are generated
-  # from the list this pins. Without this, emptying cert_anchors() would take every bracket assertion in
-  # this file with it -- the per-case tests below are GENERATED from that list,
-  # and a loop over nothing generates nothing and reports PASS. The count is
+  # from the list this pins. Without this, emptying cert_anchors() would take
+  # every bracket assertion in this file with it -- the per-case tests below
+  # are GENERATED from that list, and a loop over nothing generates nothing
+  # and reports PASS. The count is
   # written down rather than derived from the list it is checking.
   expect_length(cert_anchors(), 5L)
   expect_identical(vapply(cert_anchors(), `[[`, "", "id"),
@@ -1211,8 +1212,10 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
 
 
 test_that("AC1: every case reached an admitted disposition, and the anchors were priced", {
-  # THE DETECTOR (M118, rewritten at M122). Every bracket assertion above runs
-  # only for a case cert_true_error() actually priced; a case whose anchor
+  # THE DETECTOR (M118, rewritten at M122). Every bracket assertion above
+  # (the five per-anchor reference-route tests are not brackets and record
+  # nothing) runs only for a case cert_true_error() actually priced; a case
+  # whose anchor
   # matrix this machine builds differently skips instead, and each skip
   # abandons only its own test_that(). So a machine on which all of them skip
   # reports skips and zero failures -- a green file with nothing measured

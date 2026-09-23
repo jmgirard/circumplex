@@ -89,6 +89,8 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: T11 done at `224c5ff8`. `devtools::test()` gave `[ FAIL 0 | WARN 12 | SKIP 1 | PASS 14009 ]`. `devtools::check(manual = TRUE)` gave 0 errors, 0 warnings and 0 notes, "checking PDF version of manual ... OK", and `Status: OK`.
 - 2026-09-22: claim audit: 19 claims read, 2 corrected — tests/testthat/test-axes-certificate.R. The reader read only the lines added since `2b975b23`. The corrections name `skipped` among the bracket test's records and say the detector turns red only when every anchor's record is overwritten. The reader also flagged a stale counterexample-B comment and one long line, and both were fixed. Its re-read confirmed all four edits. These are comment-only edits after T11, and the certificate file passed again after them (28 tests, 0 failures).
 - 2026-09-22: completion. Status set to review.
+- 2026-09-22: re-review 2: all six criteria ticked against fresh evidence. The fix-now findings S4, S8 and S10 are fixed on the branch, and S2 went to the RR22 follow-ons row.
+- 2026-09-22: step-7 approval: m149-dd-anchors-cran-posture approved for merge
 
 ## Decisions
 
@@ -173,3 +175,5 @@ Re-review 2 findings. [S] blame-history: no findings. It confirmed the record-be
 - S8: the detector comment (:1214-1217) says "every bracket assertion above", which now sits below five non-bracket tests.
 - S9: the new test title has no `AC1:` prefix, unlike its neighbours.
 - S10: wraps: a D-063 line runs to 85 columns, the header (:64-66) leaves a short orphan line, and :869-870 run to 104 columns.
+
+Re-review 2 gate triage, 2026-09-22 (maintainer adopted the proposal). S4, S8 and S10 fixed now. The header now says "at all six cases where this machine builds their inputs". The detector comment says the reference-route tests are not brackets and record nothing. The D-063 paragraph and the header block are rewrapped, and no added line exceeds 81 columns. The certificate file passes after the fixes. S2 is a follow-up, added to the ROADMAP's RR22 follow-ons row (vi). S1 is noted, because the merge waits on PR #184's checks, Windows included. S3 is noted, because Scope Out and row (vi) already record it. S5 is rejected, because only cos-built anchors call the check. S6 is rejected, because the bracket test's kappa check fails on a moved geometry. S7 is rejected, because this re-review's evidence lines supersede the stale ones. S9 is rejected, because the file's AC labels belong to older milestones.

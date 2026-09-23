@@ -2278,19 +2278,20 @@ admits is an exact zero pivot (D-061, D-062).
 **Decision.** The current posture is kept. Three classes of test run on
 CRAN. The checks against exact truth and their detector: the five
 per-anchor bracket tests, the five per-anchor reference-route tests,
-counterexample B's test, the two closed-form oracle tests, and the case detector. The
-brackets among them measure the running machine's own error against exact
-values. The detector compares nothing with exact values itself, but it
-fails the run when no anchor was priced, so the brackets cannot all skip
-or refuse unseen. Together that is how the certificate under-reporting is
-caught, and CRAN checks on platforms that CI does not run. The
-committed-value checks: the anchor-list test, the rounding-midpoint margin
-test and the safety-factor test, none of which runs the shipped route. The
-contract and harness checks: the disposition vocabulary, the helper
-branches, the refusal predicate and warning reading the quotient, the two
-sentinel tests and the condition-inside-the-certificate test. One class
-skips on CRAN: the reachable-versus-B discrimination, the admitted-domain
-sweep, the sample-size independence check and the two planted-perturbation
+counterexample B's test, the two closed-form oracle tests, and the case
+detector. The brackets among them measure the running machine's own
+error against exact values. The detector compares nothing with exact
+values itself, but it fails the run when no anchor was priced, so the
+brackets cannot all skip or refuse unseen. Together that is how the
+certificate under-reporting is caught, and CRAN checks on platforms that
+CI does not run. The committed-value checks: the anchor-list test, the
+rounding-midpoint margin test and the safety-factor test, none of which
+runs the shipped route. The contract and harness checks: the disposition
+vocabulary, the helper branches, the refusal predicate and warning reading
+the quotient, the two sentinel tests and the
+condition-inside-the-certificate test. One class skips on CRAN: the
+reachable-versus-B discrimination, the admitted-domain sweep, the
+sample-size independence check and the two planted-perturbation
 invariants. M120 moved these off CRAN on cost. They stay off because none
 of them checks the estimate against exact truth: they test its response to
 a planted or known-large error, or basic properties of it. A
