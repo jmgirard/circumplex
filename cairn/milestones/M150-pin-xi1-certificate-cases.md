@@ -1,6 +1,6 @@
 # M150: Price every certificate case from its committed xi1
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -51,7 +51,7 @@ Every committed case in the certificate test file is priced from its committed `
 - [x] T6: Sweep the comments for `xi1` in both files: the header (~145-174), the `cert_dd_vs_exact()` block (~626-662), B's test and the oracle comment (~149-156). Record each hit's disposition in the work log.
 - [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`. At review, read the PR's windows-latest log for AC7.
 - [x] T8: Give the two `xi1` length checks a label that names the case: the guard test's check and the anchor-list test's check. Plant a truncated `xi1` and make sure that each failure names the case. Run T7's two commands again.
-- [ ] T9: Name the committed counterexample and its fixture file in the `?axes_reliability` sentence, and run `devtools::document()`. Add a NEWS.md bullet under "Minor improvements and fixes" for the changed sentence. Run the claim audit over the new lines, then T7's two commands again.
+- [x] T9: Name the committed counterexample and its fixture file in the `?axes_reliability` sentence, and run `devtools::document()`. Add a NEWS.md bullet under "Minor improvements and fixes" for the changed sentence. Run the claim audit over the new lines, then T7's two commands again.
 
 ## Work log
 
@@ -79,6 +79,7 @@ Every committed case in the certificate test file is priced from its committed `
 - 2026-09-22: resumed by /milestone-implement. At the question gate the user chose to name the matrix, not amend AC5, and to add the drafted NEWS bullet. T9 was added as a minor amendment (Coverage AC5 → T5, T9).
 - claim audit: 7 claims read, 2 corrected — R/axes_reliability.R, man/axes_reliability.Rd, NEWS.md
 - 2026-09-22: T9 checkpoint (not ticked). The help sentence now names the three-variable matrix at `tests/testthat/fixtures/rb18-counterexample-b.rds`, which `.Rbuildignore` does not exclude. NEWS.md has a new bullet. The audit's corrections: "The three" became "The three estimates", and the macOS machine is described as having R's reference BLAS and LAPACK. The same reader confirmed both on its re-read. The Linux side of the sentence rests on the pass-2 measurement in the Review section. The full suite and `check(manual = TRUE)` are running.
+- 2026-09-22: T9 done at `ebff2c5a`. `devtools::test()` gave FAIL 0, WARN 12, SKIP 1 and PASS 14022. `devtools::check(manual = TRUE)` built the final text and gave 0 errors, 0 warnings, 0 notes, "checking PDF version of manual ... OK" and `Status: OK`. `document()` gave 0 `resolve link` lines. Status set to review.
 
 ## Decisions
 
