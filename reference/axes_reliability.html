@@ -353,7 +353,12 @@ fit computes whenever the WORST of those three is within the accuracy target
 below the floor, all but one committed counterexample estimate around
 <code>1e-11</code> and compute. A fit whose worst estimate exceeds the target, or that
 the check cannot price at all, is refused as <code>"uncertified"</code>, and its warning
-names that same worst estimate. The three are read as one because both
+names that same worst estimate. At a severely ill-conditioned fit that
+estimate is a property of the fit as computed on the machine that ran it,
+not of the data alone: the numbers being checked are dominated by rounding
+there, so the same fitted matrix can print a graded estimate on one machine
+and 1 (no digits certified) on another, while both refuse the fit as
+<code>"uncertified"</code>. The three are read as one because both
 surfaces refuse as a unit, so a fit on any path can be refused on the FIML
 ratio's estimate even where that ratio is not part of what it reports. That <code>1e-5</code> in the floor is not itself the tolerance: it is the
 accuracy target <code>1e-4</code>, the largest relative error a reported standard

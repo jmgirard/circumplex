@@ -267,7 +267,12 @@ accuracy target `1e-4`. Of the reachable geometries measured below the
 floor, all but one committed counterexample estimate around `1e-11` and
 compute. A fit whose worst estimate exceeds the target, or that the
 check cannot price at all, is refused as `"uncertified"`, and its
-warning names that same worst estimate. The three are read as one
+warning names that same worst estimate. At a severely ill-conditioned
+fit that estimate is a property of the fit as computed on the machine
+that ran it, not of the data alone: the numbers being checked are
+dominated by rounding there, so the same fitted matrix can print a
+graded estimate on one machine and 1 (no digits certified) on another,
+while both refuse the fit as `"uncertified"`. The three are read as one
 because both surfaces refuse as a unit, so a fit on any path can be
 refused on the FIML ratio's estimate even where that ratio is not part
 of what it reports. That `1e-5` in the floor is not itself the
