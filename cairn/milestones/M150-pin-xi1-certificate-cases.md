@@ -146,4 +146,29 @@ Pass 3, 2026-09-22, at `aec5b81b`. Master has not moved. Since pass 2 (`87d0be94
 - AC7: not read yet. It is read from the PR's windows-latest job during the step-8 CI wait, before any merge.
 
 Consistency gate, pass 3: `cairn_validate` passed (the same one advisory). `document()` left no diff, with 0 `resolve link` lines. `check_pkgdown()` found no problems. NEWS.md has the entry (NEWS.md:68). The newest master verdicts are success for `R-CMD-check.yaml` and `test-coverage.yaml` (2026-09-23T01:11Z). The three audit scripts exit 0.
+- BLAS on macOS: the pass-1 and pass-2 runs of the measurement script printed `extSoftVersion()["BLAS"]` as `libRblas.0.dylib` and `La_library()` as `libRlapack.dylib`, R's reference libraries.
+
+Reviewer findings, pass 3, with proposed dispositions for the gate:
+- [O3] 1: B is a 3 × 3 matrix, and `axes_reliability()` stops below four scales (:1259). So "both machines refused the fit" describes internal helpers, not the function the page documents. Proposed: fix now.
+- [O3] 2: the old "1 on another" sentence came in with M149 (`165af9d9`) and was never released (`v2.0.1` lacks it). So the NEWS bullet reports a change to text no release had. Proposed: fix now, with a bullet that states the page's new note against 2.0.1.
+- [O3] 3: "committed" is git jargon in the help page and NEWS. Proposed: fix now in the sentence M150 touches.
+- [O3] 4, 5: "That committed counterexample" and "The three estimates" have distant antecedents. Proposed: fix now.
+- [O3] 6: nothing says the two machines had the same input, and OS and library are confounded. Proposed: fix now, with "given the same matrix".
+- [O3] 7: the evidence for reference BLAS was not recorded. Recorded above, so no change is needed.
+- [O3] 8: no magnitudes. Proposed: reject, because a figure in the help page would be a frozen single-machine measurement.
+- [O3] 9: "estimated error of 1" drops "no digits certified". Resolved by the NEWS rewrite in [O3] 2.
+- [S-prior3] 1: the bullet belongs under the dev section's Documentation heading (NEWS.md:218), per M77's precedent. Proposed: fix now.
+- [S-prior3] 2: the fixture filename carries "rb18", an internal review-brief number. Proposed: accept. The path is the file's real name and AC5 asks for the matrix to be named. Renaming the fixture touches every test that reads it.
+- [S-prior3] 3: repeats [O2] 4, addressed by [O3] 6.
+- [S-blame3] 1: the sentence reports the disposition, which RR22 measured as `"uncertified"` 300 of 300 times, and pass 2 saw it on both machines. Noted.
+- [S-blame3] 2-4: the BLAS correction, the fixture's identity and the rewrap were verified correct. Noted.
+
+Proposed dispositions for the open pass-1 and pass-2 findings:
+- O3 / [O2] 1: reject. The plan gate accepted that CRAN skips the guard, and the work log records the reason and its falsifier.
+- O4 / [O2] 2: reject. Each R-level `+`, `-`, `*` and `/` is a separate primitive call that stores a double, so no compiler can fuse across them. The platforms CRAN checks use SSE2 or arm64 floating point, not x87.
+- O5 / [O2] 9: reject. Those tests do not compare against exact values, so an unpinned `xi1` there is harmless.
+- O6 / [O2] 7: fix now. B's comment at :1282-1285 describes the help page as a general claim.
+- O8 / [O2] 6: fix now. The header clause at :217-219 must not imply a skip at B.
+- O9 / [O2] 10, O10, O11, [O2] 8: reject. They were accepted at the plan gate or are older than M150. D-063's rule assigns a new test by its class.
+- [S-prior2] 1: reject. B's `v_hi` and `vn_hi` are about 13 and 59, so no zero can occur.
 - AC6: 38 `xi1` hit lines in the test file and 9 in the oracle driver, read with 5 lines of context. No hit says that an `xi1` mismatch skips a test or that B is not pinned. :695 is history ("Until M150"), and :1094 is about the guard's own CRAN skip.
