@@ -157,3 +157,19 @@ Head `c8ce08b5`, which contains `origin/master` (`1f228e48`). PR #184 is open at
 - AC3 evidence: `R/` and `man/` are unchanged since `2b975b23`, so the first pass's evidence stands. The counterexample-B test changed only in a comment (:1126).
 - AC4 evidence: `R/`, `vignettes/` and `NEWS.md` are unchanged since `2b975b23`, so the first pass's dispositions stand.
 - AC5 evidence: D-063 (`cairn/DECISIONS.md:2267`) and the header (:60-74) now list the five reference-route tests in the first CRAN-live class. The file has 28 tests from 20 sites. Exact truth and detector (14): brackets (:1014, five), reference-route tests (:1040, five), B (:1048), the detector (:1213), and the oracles (:1627, :1757). Committed-value (3): :479, :868 and :931. Contract and harness (6): :1282, :1295, :1463, :1493, :1525 and :1890. CRAN-skipped (5): :1370, :1390, :1434, :1539 and :1585, each with `skip_on_cran()` on its next line. With `NOT_CRAN=false`, 28 tests ran with 0 failures, exactly those five skipped, and all six cases were priced.
+- AC6 evidence: `devtools::test()` at `c8ce08b5` gave `[ FAIL 0 | WARN 12 | SKIP 1 | PASS 14009 ]`. `devtools::check(manual = TRUE)` at `224c5ff8` gave 0 errors, 0 warnings, 0 notes, "checking PDF version of manual ... OK" and `Status: OK`. The only change after `224c5ff8` is comment wording in the test file and tracking records.
+
+Consistency gate, rerun: `cairn_validate.py` passed all checks, with one advisory (11 tasks against the split tripwire of 10). `devtools::document()` left no diff and printed 0 `resolve link` lines. `pkgdown::check_pkgdown()` found no problems. The newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master are `success` at `528ab24b`, and `origin/master` has not moved. `check-master-red-alert.R`, `master-red-alert-dryrun.R` and `check-branch-protection.R` all exit 0. README and NEWS are unchanged, and no NEWS entry is owed. PR #184 conversation: no reviews, no comments and no review threads.
+
+Re-review 2 findings. [S] blame-history: no findings. It confirmed the record-before-skip rule, the detector contract, the never-a-precondition rule and the doubles comparison are intact. [S] prior-review: one finding, the D-063 wrap regression of R5 (same as S10 below). The PR-comment probe returned none. [O] diff-bug: no correctness defect in the move, and AC1 and AC5 hold. Ten findings, ranked:
+
+- S1: the new design is unverified on Windows. The PR's only R-CMD-check run is at the old head, and the anchor brackets will run there for the first time since M149 with a `xi1` that differs from the committed one.
+- S2: the brackets measure this machine's true error against exact values priced from the committed `xi1`, a yardstick the reference test rejects at its own bound. A one-ulp cosine change can shift the result by about the size of the error being bracketed.
+- S3: the accepted blind spot is live on Windows: no anchor reference-route test runs there, and nothing reddens.
+- S4: the header (:172-174) says the route is asserted "at all six cases", but on a machine whose `xi1` differs it is asserted only at counterexample B.
+- S5: `cert_dd_vs_exact()`'s `sig` check skips without the committed-bytes fail branch that `cert_true_error()` has. Only cos-built anchors call it today.
+- S6: the reference tests carry no kappa check, so a moved geometry skips them. The bracket test's kappa check still fails on it.
+- S7: the Review section's AC5 evidence lists 23 tests and AC1's evidence describes the old call site.
+- S8: the detector comment (:1214-1217) says "every bracket assertion above", which now sits below five non-bracket tests.
+- S9: the new test title has no `AC1:` prefix, unlike its neighbours.
+- S10: wraps: a D-063 line runs to 85 columns, the header (:64-66) leaves a short orphan line, and :869-870 run to 104 columns.
