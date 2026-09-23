@@ -1,0 +1,11 @@
+# M150: Price every certificate case from its committed xi1
+
+**Status:** done (2026-09-23, PR #185 https://github.com/jmgirard/circumplex/pull/185)
+
+**Goal:** Every committed case in the certificate test file is priced from its committed `xi1`. A machine whose `cos()` builds a different `xi1` then still runs every reference-route check and bracket against exact values that describe its input.
+
+**Outcome:** In `tests/testthat/test-axes-certificate.R`, `cert_pinned_derivs()` rebuilds the full symmetric `xi1` from a case's committed upper triangle. The five bracket tests, the five anchor reference-route tests and counterexample B's test price from it, and no `skip()` depends on `xi1`. A guard test, skipped on CRAN only, asserts that the built `xi1` has the committed length and is within 4 eps of the committed copy at all six cases, and each failure names its case. `devel/degeneracy-oracle/exact_oracle.R` now emits B's `xi1` (`cert_record()` requires `d`), and a regeneration reproduces every other committed field. At B, `dd_to_double()` of the route's `v` and `v_naive` must be identical to the committed `hi`. `?axes_reliability` names the counterexample fixture and says the check ran on it through internal functions, because it has too few scales. It says the worst estimate differed between macOS (reference BLAS and LAPACK) and linux-arm64 (OpenBLAS), while both refused it. A NEWS entry is under Documentation. No shipped R code changed.
+
+**Decisions:** none. The plan gate chose pricing from the committed `xi1` over M149's skip on a mismatch, and identity with `hi` at B over a power-of-two premise.
+
+**Review:** Three passes, three lenses each. Defect returns 2: AC2 (the length checks did not name the case) and AC5 (the sentence did not name the matrix), plus a missing NEWS entry. Amendment returns 0. Fix-now at the pass-3 gate: the help sentence overstated what `axes_reliability()` can fit, and NEWS described an unreleased sentence. Two test comments were also fixed. The rejected findings include the CRAN skip of the guard, FMA risk at B's identity check and the 4-eps tolerance. The `rb18` fixture name was kept. On the PR's Windows job no certificate test skipped, and all six cases were priced. Hygiene: one LESSONS line added, and the M149 line was compressed for the byte budget.
