@@ -214,7 +214,8 @@ cert_pinned_derivs <- function(d, id) {
 # SKIP instead of redden -- the defect hid inside the precondition meant to
 # protect the comparison. Asserting the route against the committed exact
 # values, failing and never skipping on its output, is a different thing and
-# is done at all six cases where this machine builds their matrix: at
+# is done at all six cases where this machine's matrix matches the committed
+# bytes: at
 # counterexample B in its own test since M122, and at the five anchors in
 # cert_dd_vs_exact() since M149.
 #
@@ -1082,12 +1083,13 @@ for (cert_case in cert_anchors()) {
 
 # THE COMMITTED `xi1` IS STILL THE ONE THE PACKAGE BUILDS (M150). The tests
 # above price every case from the committed copy (cert_pinned_derivs()), so
-# none of them would notice an edit to the item angles or to the `xi1`
-# builder: they would go on pricing the old input. This test compares the two
-# directly, full matrices entry by entry, so the mirrored lower triangle is
-# checked too. The tolerance is 4 * eps absolute: the entries are cosines in
-# [-1, 1], where a libm one ulp away differs by at most eps, and the
-# windows-latest job on the M149 pull request differed by one ulp.
+# none of them would notice an edit to the `xi1` builder (the cos() term in
+# axes_se_derivs()): they would go on pricing the old input. This test
+# compares the two directly, full matrices entry by entry, so the mirrored
+# lower triangle is checked too. The tolerance is 4 * eps absolute: the
+# entries are cosines in [-1, 1], where a libm one ulp away differs by at
+# most eps. How far the windows-latest job on the M149 pull request was off
+# was not recorded, only that its `xi1` differed.
 #
 # Skipped on CRAN (D-063): it checks nothing against exact truth, and a libm
 # further off than this tolerance on a CRAN platform is a platform fact, not
@@ -1141,7 +1143,8 @@ test_that("AC2/AC3: counterexample B is refused on every route, and bracketed wh
   fx <- readRDS(test_path("fixtures", "rb18-counterexample-b.rds"))
   # The committed `xi1`, as at the five anchors (M150): B's matrix is read
   # from committed bytes, and now so is the one cos()-built input its exact
-  # values depend on, so every route below prices the same input everywhere.
+  # values depend on, so every route below is given the same input on every
+  # machine.
   d <- cert_pinned_derivs(cert_cxb_derivs(fx), "cxb")
 
   # ---- outside both routes -------------------------------------------------
