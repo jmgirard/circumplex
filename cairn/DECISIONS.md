@@ -2263,3 +2263,52 @@ The measurements are in RR24 and the M147 file.
 certificate exceeds the target: that reopens the floor's tau (D-048), not
 the selector. A structurally singular design the three grounds and the
 selector both miss.
+
+### D-063 (2026-09-22): the certificate test file keeps its checks against exact truth live on CRAN, and only tests that make no such check skip there (M149, RR22 rec 12)
+
+**Context.** `tests/testthat/test-axes-certificate.R` runs its exact-value
+brackets, counterexample B's test and the case detector under CRAN's own
+check. That exposure cost the 2.0.1 release a pre-test rejection at
+counterexample B (D-055). RR22 asked for the posture to be recorded as
+decided, and named the alternative it had not weighed: run the bracket suite
+in CI only and keep on CRAN only the claim that counterexample B is refused
+on every route. Since M147 the only platform-dependent refusal the file
+admits is an exact zero pivot (D-061, D-062).
+
+**Decision.** The current posture is kept. Three classes of test run on
+CRAN. The checks against exact truth and their detector: the five
+per-anchor bracket tests, the five per-anchor reference-route tests,
+counterexample B's test, the two closed-form oracle tests, and the case
+detector. The brackets among them measure the running machine's own
+error against exact values. The detector compares nothing with exact
+values itself, but it fails the run when no anchor was priced, so the
+brackets cannot all skip or refuse unseen. Together that is how the
+certificate under-reporting is caught, and CRAN checks on platforms that
+CI does not run. The committed-value checks: the anchor-list test, the
+rounding-midpoint margin test and the safety-factor test, none of which
+runs the shipped route. The contract and harness checks: the disposition
+vocabulary, the helper branches, the refusal predicate and warning reading
+the quotient, the two sentinel tests and the
+condition-inside-the-certificate test. One class skips on CRAN: the
+reachable-versus-B discrimination, the admitted-domain sweep, the
+sample-size independence check and the two planted-perturbation
+invariants. M120 moved these off CRAN on cost. They stay off because none
+of them checks the estimate against exact truth: they test its response to
+a planted or known-large error, or basic properties of it. A
+platform-specific failure in one risks a CRAN rejection with no exact
+yardstick to say whether the certificate was wrong. The anchor-list test
+moves to CRAN, because the CRAN-live brackets are generated from the list it
+pins.
+
+**Rejected.** RR22's CI-only reading. It lowers the rejection risk, but an
+under-report that appears only on a CRAN platform would then go unseen, and
+IP1 ranks that above release timing.
+
+**Consequences.** The file header states the posture and cites this entry.
+A new test in this file takes the class its claim belongs to: a test that
+checks the estimate against exact truth runs on CRAN, and one that does not
+is free to skip there.
+
+**Reopens.** A CRAN check failure in a CRAN-live test of this file that is a
+platform fact and not an under-report. A CRAN platform on which the anchors
+skip so often that the detector's priced-anchor clause fails.

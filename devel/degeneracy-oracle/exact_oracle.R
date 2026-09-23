@@ -146,25 +146,37 @@ local({
 # and printed as a paste-ready block by CERT_EMIT=1 (see the regeneration note
 # in tests/testthat/test-axes-certificate.R).
 cert_emit <- list()
-cert_record <- function(id, S, ex) {
-  cert_emit[[id]] <<- list(
-    sig = sprintf("%a", as.vector(S[upper.tri(S)])),
+# `d` is given for the five anchors only (M149). Their `xi1` is cos() at the
+# item angles' differences, and the exact values below were priced from THIS
+# machine's doubles of it, so the packaged file pins it beside `sig`: a
+# machine whose cos() rounds one entry differently has no yardstick at the
+# half-ulp dd-vs-exact bound even where `sig` still matches. Counterexample
+# B's `xi1` is cos() too but is not pinned; its test asserts the reference
+# route with no `xi1` precondition, so a cos() difference there fails rather
+# than skips.
+cert_record <- function(id, S, ex, d = NULL) {
+  rec <- list(sig = sprintf("%a", as.vector(S[upper.tri(S)])))
+  if (!is.null(d)) {
+    x1 <- d$mats$xi1
+    rec$xi1 <- sprintf("%a", as.vector(x1[upper.tri(x1, diag = TRUE)]))
+  }
+  cert_emit[[id]] <<- c(rec, list(
     v_hi = ex[["HEX_V_HI"]], v_lo = ex[["HEX_V_LO"]],
     vn_hi = ex[["HEX_VNAIVE_HI"]], vn_lo = ex[["HEX_VNAIVE_LO"]],
     u_hi = ex[["HEX_U_HI"]], u_lo = ex[["HEX_U_LO"]]
-  )
+  ))
 }
 
 # The matrix goes out from THIS script's own construction, beside the exact
 # values priced from it, so the two cannot describe different matrices. The
 # packaged file's own builder is tied to it by the `sig` comparison there.
 cert_emit_block <- function() {
-  fld <- c("sig", "v_hi", "v_lo", "vn_hi", "vn_lo", "u_hi", "u_lo")
   cat("\n# ---- cert_frozen, regenerated: paste into",
       "tests/testthat/test-axes-certificate.R ----\ncert_frozen <- list(\n")
   ids <- names(cert_emit)
   for (k in seq_along(ids)) {
     e <- cert_emit[[ids[[k]]]]
+    fld <- names(e)
     cat(sprintf("  %s = list(\n", ids[[k]]))
     for (j in seq_along(fld)) {
       body <- paste(deparse(e[[fld[[j]]]], width.cutoff = 60), collapse = "\n    ")
@@ -425,7 +437,7 @@ for (cs in reach_cases) {
   dr <- axes_se_derivs(g$ang, g$scale, NULL, zr, FALSE)
   dfr <- df_of(g$S, dr)
   exr <- exact(g$S, dr, dfr, baseline_df_of(g$S))
-  cert_record(cs$id, g$S, exr)
+  cert_record(cs$id, g$S, exr, dr)
   dtr <- axes_se_pricing(g$S, dr, N)$corrected
   exv <- vapply(seq_along(dtr), function(i) exr[[sprintf("EXACT_SE%d", i)]], 0)
   rel <- max(abs(exv - dtr) / abs(exv))
