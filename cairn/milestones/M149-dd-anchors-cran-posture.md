@@ -17,11 +17,11 @@ The test file asserts the certificate's double-double reference route against th
 
 **In:** RR22 recommendations 11 and 12. These are items (ii) and (iii) of the ROADMAP's RR22 follow-ons row. The work adds half-ulp dd-vs-exact assertions at the five anchors in `tests/testthat/test-axes-certificate.R`. A test over committed values backs the bound. One `?axes_reliability` sentence says that the estimate is a property of the fit on the running machine. Counterexample B's priced branch gains an `"uncertified"` assertion. A D-entry and a file-header block keep the file's current CRAN posture. The anchor-list test becomes CRAN-live.
 
-**Out:** Three items stay on the RR22 follow-ons row. They are (i) the `ubuntu-24.04-arm` CI job, (iv) the rcond sampling in [eps, 1e-10] and the once-priced core, and (v) the selector-route warning clause. Showing the estimate on computed fits stays on the degeneracy row as (iii). CRAN-dark invariants in other test files stay on the M120 remainders row as (i). The milestone changes no shipped R code and no number the package reports.
+**Out:** Three items stay on the RR22 follow-ons row. They are (i) the `ubuntu-24.04-arm` CI job, (iv) the rcond sampling in [eps, 1e-10] and the once-priced core, and (v) the selector-route warning clause. Showing the estimate on computed fits stays on the degeneracy row as (iii). CRAN-dark invariants in other test files stay on the M120 remainders row as (i). The milestone changes no shipped R code and no number the package reports. A machine that builds `xi1` differently at all five anchors runs the reference-route check at none of them, and nothing fails for that. This stays on the RR22 follow-ons row, under (vi).
 
 ## Acceptance criteria
 
-- [x] AC1: A test in `tests/testthat/test-axes-certificate.R` checks each of the five anchor cases. It converts `axes_dd_pricing()`'s `v`, `v_naive` and `u` with `dd_to_double()`. It asserts that each lies strictly within half a unit in the last place of the committed exact value (`cert_frozen`'s hi/lo pair). If `axes_dd_pricing()` returns anything other than its list, the test fails and names the case. The assertion runs on the priced route and on the refusing route. It runs whenever this machine builds the case's matrix and the derivative set's `xi1` matrix bit for bit as committed. Otherwise it records the case as `skipped` through `cert_record()` and skips, naming which input differed.
+- [ ] AC1: Five tests in `tests/testthat/test-axes-certificate.R`, one per anchor case, each convert `axes_dd_pricing()`'s `v`, `v_naive` and `u` with `dd_to_double()`. Each test asserts that each value lies strictly within half a unit in the last place of the committed exact value (`cert_frozen`'s hi/lo pair). If `axes_dd_pricing()` returns anything other than its list, the test fails and names the case. Each test runs whatever the shipped pricing returns, whenever this machine builds the case's matrix and the derivative set's `xi1` matrix bit for bit as committed. On an `xi1` mismatch the test skips naming `xi1`, without calling `cert_record()`, and the case's other assertions still run. On a matrix mismatch it skips naming the matrix, and the case's recording stays with its bracket test.
 - [x] AC2: A test reads only committed values. It checks every component of `v`, `v_naive` and `u` at the five anchors. For each, it asserts that the exact value lies farther from the rounding midpoint than a stated bound on the reference route's error. The test's comment states that bound and its basis in the anchor's conditioning. It names three premises as unproven. The first is that the floor's `p * kappa^2 * eps` bound with its factor 10 holds, because it was measured on the double route's corrected SE and not proven. The second is that it carries to the double-double route with 2^-104 in place of eps. The third is that it applies to `v_naive` and `u`, with the factor 2 for the squared SE covering all three. Both figures are in ulps of `hi`. Where `lo` is zero, the distance is half an ulp.
 - [x] AC3: `?axes_reliability` (roxygen in `R/axes_reliability.R`, `man/` regenerated) states a fact about a severely ill-conditioned fit. There, the certificate's estimate is a property of the fit as computed on the running machine. The same fitted matrix can print a graded estimate on one machine and 1 on another, and both refuse the fit as `"uncertified"`. The counterexample-B test asserts `"uncertified"` on both of its admitted routes, which backs the refusal half. The differing-estimates half rests on RR22 section 3's cross-machine measurements. The milestone record cites them, and the help page does not.
 - [x] AC4: A grep of `R/`, `vignettes/` and the development-version section of `NEWS.md` for `relative error` and `uncertified` finds hits. No hit presents the certificate's estimate as the same on every machine. The review evidence lists each hit with its disposition.
@@ -30,12 +30,12 @@ The test file asserts the certificate's double-double reference route against th
 
 ## Coverage
 
-- AC1 → T1, T2, T3
+- AC1 → T1, T2, T3, T9, T10
 - AC2 → T2, T8
 - AC3 → T4, T5
 - AC4 → T5
-- AC5 → T6
-- AC6 → T7
+- AC5 → T6, T9
+- AC6 → T7, T11
 
 ## Tasks
 
@@ -47,6 +47,9 @@ The test file asserts the certificate's double-double reference route against th
 - [x] T6: Classify every `test_that()` in the file as CRAN-live or CRAN-skipped, with its ground. Draft and append the D-entry. Write the header posture block. Remove `skip_on_cran()` from the anchor-list test (~689). Run the file with `NOT_CRAN=false` and record its skip list.
 - [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
 - [x] T8: Rewrite the margin test's comment to state its bound as stated, not derived, and to name the three premises AC2 lists as unproven. Reword the `cert_dd_vs_exact()` comment (~627-633) so that its "property of the committed matrices" claim holds only under those premises. Rerun the certificate file.
+- [ ] T9: Move the reference-route check out of `cert_true_error()` into five per-anchor `test_that()` blocks. Each skips on a matrix or `xi1` mismatch, naming which, and never calls `cert_record()`. Update the header, the `cert_dd_vs_exact()` comment and D-063 in place, and reclassify the file's tests for AC5.
+- [ ] T10: Plant a mismatched `xi1` at all five anchors (the Windows state). Show all six cases priced, the brackets asserted, the detector green, and five reference-test skips naming `xi1`. Plant a non-list `axes_dd_pricing()` return and a `sig` mismatch, and rerun T3's plants (a) and (b).
+- [ ] T11: Run `devtools::test()` and `devtools::check(manual = TRUE)`.
 
 ## Work log
 
@@ -77,6 +80,10 @@ The test file asserts the certificate's double-double reference route against th
 - 2026-09-22: resume. PR #184 is OPEN, and `windows-latest (release)` failed. Windows builds `xi1` one ulp differently at all five anchors, although `sig` matches. So `cert_dd_vs_exact()` skipped every anchor case whole, and the detector at test file :1252 failed with no anchor priced. macOS, ubuntu and the other checks passed. Master's last Windows run was green, so this branch caused the failure: it is finding O3 made real.
 - 2026-09-22: amendment return: AC1 — "It runs whenever this machine builds the case's matrix bit for bit as committed. It prices from the committed `xi1` in place of the one this machine builds, so a machine whose `xi1` differs still runs it and does not skip the case for that input. Otherwise it records the case as `skipped` through `cert_record()` and skips, naming the matrix."
 - 2026-09-22: status set to in-progress for the AC1 amendment. The maintainer chose to price from the committed `xi1` over skipping only the reference-route check. The step-7 approval above is void, because the merge is not approved on a red head. The approval marker was deleted, and re-review re-poses the merge gate.
+- 2026-09-22: re-audit: AC1 (full) — wording W (price from the committed `xi1`) was sound but needed a plant pair. Wording N (skip only the check) had no channel to record the skip, and it left the check running nowhere on Windows.
+- 2026-09-22: mini gate: the maintainer chose N, which holds the check's reach, over W, which widens it. The rule for milestones with review returns recommended N. This supersedes the wording in the AC1 amendment-return line above. It is the same return, not a second one.
+- 2026-09-22: re-audit: AC1 (full) — ambiguous "a test" and "it", a second `cert_record()` writer that overwrites `priced`, and route wording for a test that runs no shipped pricing. All three were fixed. The stop is reached for AC1.
+- 2026-09-22: amendment applied (maintainer adopted the fixed text): AC1 now names five per-anchor tests that skip on `xi1` without recording. Scope Out names the all-five-differ blind spot. T9-T11 added, Coverage updated, and AC1 unticked. The reader's AC6 widening was declined.
 
 ## Decisions
 
