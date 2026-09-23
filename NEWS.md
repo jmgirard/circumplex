@@ -68,8 +68,9 @@
 * `?axes_reliability` no longer says that the same ill-conditioned fit can
   print an estimated error of 1 on one machine and a graded estimate on
   another. It now reports one measured case, the committed counterexample
-  matrix. Its worst estimate differed between macOS with R's reference BLAS and
-  LAPACK and Linux with OpenBLAS, and both machines refused it as `"uncertified"`.
+  matrix. Its worst estimate differed between macOS with R's reference
+  BLAS and LAPACK and Linux with OpenBLAS, and both machines refused it as
+  `"uncertified"`.
 
 * `scales(x, items = TRUE)` no longer stops with "subscript out of bounds"
   on `iip32` and `iip64`. These licensed instruments ship a notice in place
