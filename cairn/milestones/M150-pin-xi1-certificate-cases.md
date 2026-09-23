@@ -36,7 +36,7 @@ Every committed case in the certificate test file is priced from its committed `
 - AC2 → T2, T4, T8
 - AC3 → T1
 - AC4 → T3, T4
-- AC5 → T5
+- AC5 → T5, T9
 - AC6 → T6
 - AC7 → T7
 - AC8 → T7
@@ -51,6 +51,7 @@ Every committed case in the certificate test file is priced from its committed `
 - [x] T6: Sweep the comments for `xi1` in both files: the header (~145-174), the `cert_dd_vs_exact()` block (~626-662), B's test and the oracle comment (~149-156). Record each hit's disposition in the work log.
 - [x] T7: Run `devtools::test()` and `devtools::check(manual = TRUE)`. At review, read the PR's windows-latest log for AC7.
 - [x] T8: Give the two `xi1` length checks a label that names the case: the guard test's check and the anchor-list test's check. Plant a truncated `xi1` and make sure that each failure names the case. Run T7's two commands again.
+- [ ] T9: Name the committed counterexample and its fixture file in the `?axes_reliability` sentence, and run `devtools::document()`. Add a NEWS.md bullet under "Minor improvements and fixes" for the changed sentence. Run the claim audit over the new lines, then T7's two commands again.
 
 ## Work log
 

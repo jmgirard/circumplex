@@ -243,10 +243,11 @@ the check cannot price at all, is refused as \code{"uncertified"}, and its warni
 names that same worst estimate. At a severely ill-conditioned fit that
 estimate is a property of the fit as computed on the machine that ran it,
 not of the data alone: the numbers being checked are dominated by rounding
-there. On one ill-conditioned matrix from the package's tests, the check's
-worst estimate (the figure the warning prints) differed between macOS
-(arm64, R's reference LAPACK) and Linux (arm64, OpenBLAS), and both refused
-it as \code{"uncertified"}. The three are read as one because both
+there. That committed counterexample is the three-variable matrix saved in
+the package sources as \code{tests/testthat/fixtures/rb18-counterexample-b.rds}.
+On it, the check's worst estimate differed between macOS (arm64, R's
+reference LAPACK) and Linux (arm64, OpenBLAS). That estimate is the figure
+the warning prints, and both machines refused the fit as \code{"uncertified"}. The three are read as one because both
 surfaces refuse as a unit, so a fit on any path can be refused on the FIML
 ratio's estimate even where that ratio is not part of what it reports. That \code{1e-5} in the floor is not itself the tolerance: it is the
 accuracy target \code{1e-4}, the largest relative error a reported standard
