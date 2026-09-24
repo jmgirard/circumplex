@@ -128,7 +128,10 @@
 <polygon points='279.75,444.34 325.39,440.92 371.03,286.85 416.67,311.48 462.31,312.47 462.31,318.49 416.67,322.38 371.03,482.76 325.39,451.22 279.75,450.22 ' style='stroke-width: 0.00; stroke: none; stroke-linecap: butt; fill: #000000; fill-opacity: 0.20;' />
 <polyline points='279.75,444.34 325.39,440.92 371.03,286.85 416.67,311.48 462.31,312.47 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <polyline points='462.31,318.49 416.67,322.38 371.03,482.76 325.39,451.22 279.75,450.22 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<polyline points='279.75,447.26 325.39,445.90 371.03,388.90 416.67,316.92 462.31,315.47 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='279.75' y1='447.26' x2='325.39' y2='445.90' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='325.39' y1='445.90' x2='371.03' y2='388.90' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<line x1='371.03' y1='388.90' x2='416.67' y2='316.92' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<line x1='416.67' y1='316.92' x2='462.31' y2='315.47' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <circle cx='279.75' cy='447.26' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
 <circle cx='325.39' cy='445.90' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
 <circle cx='371.03' cy='388.90' r='2.49' style='stroke-width: 0.71;' />
@@ -299,8 +302,10 @@
 <rect x='248.41' y='528.92' width='250.14' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <text x='253.89' y='546.82' style='font-size: 11.00px; font-family: sans;' textLength='130.86px' lengthAdjust='spacingAndGlyphs'>Displacement interpretable</text>
 <rect x='390.22' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='391.95' y1='543.04' x2='405.78' y2='543.04' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <circle cx='398.86' cy='543.04' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
 <rect x='442.42' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='444.15' y1='543.04' x2='457.98' y2='543.04' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
 <circle cx='451.06' cy='543.04' r='2.49' style='stroke-width: 0.71;' />
 <text x='412.98' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
 <text x='465.18' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>

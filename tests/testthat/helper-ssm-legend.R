@@ -29,7 +29,9 @@ grob_labels <- function(x) {
   labs[nzchar(labs)]
 }
 
-legend_key_glyphs <- function(plot, title) {
+# The keys of the legend titled `title`: each a gTree holding a
+# `legend.key.rect` and the glyph grobs the layers drew into it.
+legend_keys <- function(plot, title) {
   gt <- ggplot2::ggplotGrob(plot)
   boxes <- gt$grobs[grepl("^guide-box", gt$layout$name)]
   if (length(boxes) == 0L) return(list())
@@ -57,6 +59,11 @@ legend_key_glyphs <- function(plot, title) {
     },
     grob_descendants(legend)
   )
+  keys
+}
+
+legend_key_glyphs <- function(plot, title) {
+  keys <- legend_keys(plot, title)
   # Every points grob in the key, not just the first: two layers both claiming a
   # key overdraw identical glyphs, which is invisible by eye and in a baseline
   # but means the legend is being assembled twice.
@@ -67,5 +74,33 @@ legend_key_glyphs <- function(plot, title) {
     } else {
       as.numeric(unlist(lapply(pts, function(p) p$pch)))
     }
+  })
+}
+
+# The line grobs drawn into each key of the legend titled `title` (M154): one
+# element per key, each a list of `list(lty =, col =)` per line grob found, an
+# empty list for a key with no line. A path key is a segments grob under
+# draw_key_path(); a polyline is accepted too so the reader survives a geom
+# whose key draws that instead. `lty` is normalized to its name where ggplot2
+# handed grid a name, and to a character digit otherwise, so the assertions
+# can compare against "solid" / "dashed".
+legend_key_lines <- function(plot, title) {
+  keys <- legend_keys(plot, title)
+  lapply(keys, function(k) {
+    lines <- Filter(
+      function(ch) inherits(ch, c("segments", "polyline", "lines")),
+      as.list(k$children)
+    )
+    lapply(lines, function(l) {
+      col <- l$gp$col
+      # grid hands the colour over as "#000000FF" or as a name; normalize to
+      # the six-digit hex so "black" and its alpha-suffixed form compare equal.
+      col <- if (is.null(col) || is.na(col)) {
+        NA_character_
+      } else {
+        do.call(grDevices::rgb, as.list(grDevices::col2rgb(col)[, 1] / 255))
+      }
+      list(lty = as.character(l$gp$lty %||% "solid"), col = col)
+    })
   })
 }

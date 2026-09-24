@@ -1,13 +1,13 @@
 # M154: Dashed displacement segments at uncertified time points
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2
 - **Resolves:** —
 - **Surface tier:** user-facing — an exported plotting function's rendering and two vignettes
-- **Branch/PR:** —
+- **Branch/PR:** m154-dashed-uncertified-segments
 
 ## Goal
 
@@ -39,8 +39,8 @@ On the displacement panel of `ssm_plot_trajectory()`, draw each line segment tha
 
 ## Tasks
 
-- [ ] T1: Tests first, red before T2. In `tests/testthat/test-ssm_trajectory_table.R`, add the four verdict patterns of AC1. Read them through `layer_data()` on the segment layer: line type per segment, and y endpoints equal to unwrapped `est`. Add the no-verdict cases of AC2 (no column, and an all-`NA` column). Add the gap case reading segments rather than `p$data`. Add the `NA`-verdict hollow point of AC3 and the other-panel solid-line check with `drop_xy = FALSE`. In `tests/testthat/test-ssm_trajectory.R`, add occasion 2 and last-occasion uncertified, the grouped case (`traj_fit(grouping = )`), and the flat-occasion gap read through segments. Extend `legend_key_glyphs()` (`tests/testthat/helper-ssm-legend.R:32`) to return each key's line grobs with their `lty` and colour, and assert AC4 on the three fits.
-- [ ] T2: In `ssm_trajectory_ggplot()` (`R/ssm_trajectory.R`, from the `geom_line` call), build a segment frame for the displacement rows per group in time order. Pair each row with its successor in the ordered frame. An `NA` displacement row then pairs with nothing and the gap stays. Set `Interpretable = isTRUE(cert[i]) & isTRUE(cert[i+1])`. Draw the frame with `geom_segment(aes(linetype = Interpretable))` and `scale_linetype_manual(name = "Displacement interpretable", values = c("TRUE" = "solid", "FALSE" = "dashed"), limits = c("TRUE", "FALSE"), drop = FALSE)`, with `show.legend = TRUE`. Keep `geom_line` for the other panels' rows only. Map the point shape from `Certified %in% TRUE` so that an `NA` verdict is hollow. Remove `linetype = 0` from the shape guide's `override.aes` and give both guides the same title so that they merge into one legend with black keys. Under no verdict (all `NA`), draw the displacement rows with the plain `geom_line` and no line-type scale, as today.
+- [x] T1: Tests first, red before T2. In `tests/testthat/test-ssm_trajectory_table.R`, add the four verdict patterns of AC1. Read them through `layer_data()` on the segment layer: line type per segment, and y endpoints equal to unwrapped `est`. Add the no-verdict cases of AC2 (no column, and an all-`NA` column). Add the gap case reading segments rather than `p$data`. Add the `NA`-verdict hollow point of AC3 and the other-panel solid-line check with `drop_xy = FALSE`. In `tests/testthat/test-ssm_trajectory.R`, add occasion 2 and last-occasion uncertified, the grouped case (`traj_fit(grouping = )`), and the flat-occasion gap read through segments. Extend `legend_key_glyphs()` (`tests/testthat/helper-ssm-legend.R:32`) to return each key's line grobs with their `lty` and colour, and assert AC4 on the three fits.
+- [x] T2: In `ssm_trajectory_ggplot()` (`R/ssm_trajectory.R`, from the `geom_line` call), build a segment frame for the displacement rows per group in time order. Pair each row with its successor in the ordered frame. An `NA` displacement row then pairs with nothing and the gap stays. Set `Interpretable = isTRUE(cert[i]) & isTRUE(cert[i+1])`. Draw the frame with `geom_segment(aes(linetype = Interpretable))` and `scale_linetype_manual(name = "Displacement interpretable", values = c("TRUE" = "solid", "FALSE" = "dashed"), limits = c("TRUE", "FALSE"), drop = FALSE)`, with `show.legend = TRUE`. Keep `geom_line` for the other panels' rows only. Map the point shape from `Certified %in% TRUE` so that an `NA` verdict is hollow. Remove `linetype = 0` from the shape guide's `override.aes` and give both guides the same title so that they merge into one legend with black keys. Under no verdict (all `NA`), draw the displacement rows with the plain `geom_line` and no line-type scale, as today.
 - [ ] T3: Roxygen on `ssm_plot_trajectory()` (the hollow-point paragraph, `R/ssm_trajectory.R:428`), then `devtools::document()`. NEWS.md bullet under the development heading, with no milestone number.
 - [ ] T4: Prose in `vignettes/growth-ssm-analysis.Rmd.orig` Section 6 (the "Uncertified waves are drawn as hollow points" paragraph) and `vignettes/advanced-visualization.Rmd.orig:842`. Run `Rscript tools/precompute-vignettes.R growth-ssm-analysis` and the same for `advanced-visualization` with the package installed. Inspect the rendered figures by eye. LESSONS M33 records that data fences pass a figure that reads wrong.
 - [ ] T5: Regenerate the changed vdiffr baselines under `NOT_CRAN=true` by deleting them first (LESSONS M31). Read each SVG diff against AC6. Then run `devtools::test()` and `devtools::check()`.
@@ -52,6 +52,9 @@ On the displacement panel of `ssm_plot_trajectory()`, draw each line segment tha
 - 2026-09-24: plan gate chose dashed segments over a lighter (alpha) line. Dashed joins the point-shape legend as one key per verdict and opacity cannot. Falsified by a reader report that the dashed key reads as a second series.
 - 2026-09-24: plan gate chose fail-closed on an `NA` verdict (hollow point, dashed segments) over an undrawn point. A silently missing point hides a row (GP2). Falsified by a caller who relies on `NA` meaning "omit this point".
 - 2026-09-24: plan gate chose re-rendering both trajectory vignettes over the growth vignette alone. Every trajectory legend changes. Falsified by nothing. A stale figure is a defect.
+- 2026-09-24: implement started on `m154-dashed-uncertified-segments`. No question gate: the plan left nothing open.
+- 2026-09-24: T1 done. New helper `tests/testthat/helper-ssm-trajectory.R` reads the built segment layer, and `legend_key_lines()` reads each key's line grobs. Eleven new tests across the two files, all red against the old line layer.
+- 2026-09-24: T2 done. `ssm_trajectory_segments()` builds the per-pair frame. The displacement panel is always a segment layer, with a linetype scale only under a verdict, so the no-verdict baseline changed in form (four `<line>` elements for one `<polyline>`) with no visible change. A second `override.aes` on the merged guide warned and was dropped. Six vdiffr baselines regenerated under `NOT_CRAN=true`; the uncertified table baseline reads dashed, dashed, dashed, solid as AC1 predicts. Render inspected by eye.
 
 ## Decisions
 

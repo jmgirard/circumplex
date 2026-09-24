@@ -561,6 +561,52 @@ ssm_plot_trajectory.data.frame <- function(x,
   ssm_trajectory_ggplot(df, time, time, base_size, na.rm)
 }
 
+# One segment per pair of consecutive time points on the displacement panel.
+#
+# Rows are paired with their successor in the frame's own time order within a
+# group -- never with the next *defined* row -- so a time point with no
+# displacement (a flat profile) pairs with nothing on either side and the gap
+# it leaves is drawn as a gap, the same break geom_line() drew. `Interpretable`
+# is TRUE only when both endpoints carry a TRUE verdict: an NA verdict fails
+# closed (GP2) exactly as FALSE does, so a segment into a row with no verdict
+# is dashed too. Under no verdict at all (an all-NA column) the caller maps no
+# linetype, and the column is simply unused.
+ssm_trajectory_segments <- function(df, time_col) {
+  d <- df[df$Parameter == "d", , drop = FALSE]
+  d <- d[order(d$Group, d[[time_col]]), , drop = FALSE]
+  by_group <- split(seq_len(nrow(d)), d$Group, drop = TRUE)
+  pieces <- lapply(by_group, function(idx) {
+    if (length(idx) < 2L) return(NULL)
+    from <- idx[-length(idx)]
+    to <- idx[-1L]
+    keep <- !is.na(d$est[from]) & !is.na(d$est[to])
+    from <- from[keep]
+    to <- to[keep]
+    out <- data.frame(
+      Group = d$Group[from],
+      Parameter = "d",
+      x = d[[time_col]][from],
+      xend = d[[time_col]][to],
+      est = d$est[from],
+      yend = d$est[to],
+      Interpretable = (d$Certified[from] %in% TRUE) & (d$Certified[to] %in% TRUE),
+      Panel = d$Panel[from],
+      stringsAsFactors = FALSE
+    )
+    names(out)[names(out) == "x"] <- time_col
+    out
+  })
+  out <- do.call(rbind, pieces)
+  if (is.null(out)) {
+    out <- d[0, c("Group", "Parameter", time_col, "est", "Panel"), drop = FALSE]
+    out$xend <- out[[time_col]]
+    out$yend <- out$est
+    out$Interpretable <- logical(0)
+  }
+  rownames(out) <- NULL
+  out
+}
+
 # Draw the long per-panel frame. Shared by both methods: the time column's class
 # is what makes the axis discrete (occasions) or continuous (a table), so the
 # two paths need no branch here.
@@ -584,6 +630,14 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
   drawn <- df[!is.na(df$est), , drop = FALSE]
   d_rows <- drawn[drawn$Parameter == "d", , drop = FALSE]
   other_rows <- drawn[drawn$Parameter != "d", , drop = FALSE]
+  # An NA verdict on a defined displacement fails closed (GP2): it is drawn as
+  # not interpretable rather than left out. Under the shape scale an NA would
+  # otherwise map to no shape at all and the point would silently vanish.
+  d_rows$Certified <- d_rows$Certified %in% TRUE
+  # The displacement path is one segment per pair of consecutive time points,
+  # so a segment that touches an uninterpretable point can be dashed on its
+  # own while the rest of the unwrapped branch stays solid.
+  segments <- ssm_trajectory_segments(df, time_col)
 
   p <-
     ggplot2::ggplot(
@@ -602,7 +656,9 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
       color = NA,
       na.rm = TRUE
     ) +
-    ggplot2::geom_line(na.rm = TRUE) +
+    # The four non-displacement panels keep a plain line; the displacement
+    # panel gets its segments below, after the verdict decides their line type.
+    ggplot2::geom_line(data = df[df$Parameter != "d", , drop = FALSE], na.rm = TRUE) +
     # drop = FALSE keeps a requested parameter's panel visible even when every
     # one of its time points was dropped, rather than letting it vanish silently.
     ggplot2::facet_wrap(~Panel, scales = "free_y", drop = FALSE) +
@@ -630,6 +686,25 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
     # guardrail -- marks only where it applies, instead of implying every
     # parameter carries an interpretability verdict.
     p <- p +
+      # A segment is dashed when either endpoint is not interpretable: the
+      # path through such a point is an interpolation the data do not support.
+      ggplot2::geom_segment(
+        data = segments,
+        mapping = ggplot2::aes(
+          xend = .data$xend, yend = .data$yend,
+          linetype = .data$Interpretable
+        ),
+        na.rm = TRUE,
+        # As for the shape layer below: claim every break so the dashed key is
+        # drawn whether or not an uncertified time point exists.
+        show.legend = TRUE
+      ) +
+      ggplot2::scale_linetype_manual(
+        name = "Displacement interpretable",
+        values = c("TRUE" = "solid", "FALSE" = "dashed"),
+        limits = c("TRUE", "FALSE"),
+        drop = FALSE
+      ) +
       ggplot2::geom_point(data = other_rows, size = 2, na.rm = TRUE) +
       ggplot2::geom_point(
         data = d_rows,
@@ -652,16 +727,25 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
         limits = c("TRUE", "FALSE"),
         drop = FALSE
       ) +
-      # The shape keys carry no group identity, so pin them to black; inheriting
-      # the colour aesthetic leaves the hollow key effectively invisible once a
-      # grouping supplies pale series colours.
+      # The shape and linetype scales share a title and the same two breaks, so
+      # ggplot2 merges them into one legend: a filled point on a solid line for
+      # TRUE, a hollow point on a dashed line for FALSE. The keys carry no group
+      # identity, so pin them to black; inheriting the colour aesthetic leaves
+      # the hollow key effectively invisible once a grouping supplies pale
+      # series colours.
+      # One override only: ggplot2 ignores a second override.aes on a merged
+      # guide with a warning, and the merged legend carries the shape guide's.
       ggplot2::guides(
-        shape = ggplot2::guide_legend(
-          override.aes = list(color = "black", linetype = 0)
-        )
+        shape = ggplot2::guide_legend(override.aes = list(color = "black"))
       )
   } else {
-    p <- p + ggplot2::geom_point(data = drawn, size = 2, na.rm = TRUE)
+    p <- p +
+      ggplot2::geom_segment(
+        data = segments,
+        mapping = ggplot2::aes(xend = .data$xend, yend = .data$yend),
+        na.rm = TRUE
+      ) +
+      ggplot2::geom_point(data = drawn, size = 2, na.rm = TRUE)
   }
 
   if (!grouped) {

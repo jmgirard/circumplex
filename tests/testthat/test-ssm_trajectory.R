@@ -354,11 +354,13 @@ test_that("the plotted displacement path is continuous across the seam", {
   panels <- built$layout$layout
   d_panel <- panels$PANEL[panels$Panel == "Displacement"]
 
-  line <- traj_layer(p, "GeomLine")
-  d_line <- line[line$PANEL == d_panel, ]
-  d_line <- d_line[order(d_line$x), ]
-
-  expect_true(all(abs(diff(d_line$y)) < 90))
+  # The displacement panel is drawn as segments (M154); every step of the path
+  # is a segment, so the seam shows up as a segment's own rise.
+  s <- traj_segments(p)
+  expect_equal(as.character(unique(s$PANEL)), as.character(d_panel))
+  expect_equal(nrow(s), 3L)
+  expect_true(all(abs(s$yend - s$y) < 90))
+  expect_equal(s$y[-1], s$yend[-3]) # each segment starts where the last ended
 })
 
 test_that("uncertified occasions render hollow and certified ones filled", {
@@ -395,6 +397,72 @@ test_that("the certification legend draws both keys when nothing is uncertified"
   # overdraw identical symbols on the keys they can fill.
   expect_equal(unname(lengths(keys)), c(1L, 1L))
   expect_equal(sort(unname(unlist(keys))), c(1, 16))
+})
+
+# Dashed segments at uncertified occasions (M154) -----------------------------
+
+uncertify <- function(res, row) {
+  # Force a row below the D-007 ratio by widening its amplitude interval down
+  # toward zero; every other row keeps its signal.
+  res$results$a_lci[[row]] <- 0.001
+  res$results$a_uci[[row]] <- 1
+  res
+}
+
+test_that("segments touching an uncertified occasion are dashed", {
+  skip_on_cran()
+  # Occasion 2 of four: the two segments that meet there are dashed.
+  p <- ssm_plot_trajectory(uncertify(traj_fit(), 2))
+  expect_equal(traj_segment_lty(p), c("dashed", "dashed", "solid"))
+  # The last occasion: only the closing segment is dashed.
+  p <- ssm_plot_trajectory(uncertify(traj_fit(), 4))
+  expect_equal(traj_segment_lty(p), c("solid", "solid", "dashed"))
+
+  # On the discrete axis the segments still step one occasion at a time.
+  s <- traj_segments(p)
+  expect_equal(s$x, 1:3)
+  expect_equal(s$xend, 2:4)
+})
+
+test_that("one group's uncertified occasion leaves the other group solid", {
+  skip_on_cran()
+  res <- traj_fit(grouping = "Gender")
+  # results rows are ordered by group then occasion; row 2 is F at T2.
+  expect_equal(as.character(res$results$Group[[2]]), "F")
+  expect_equal(as.character(res$results$Occasion[[2]]), "T2")
+  p <- ssm_plot_trajectory(uncertify(res, 2))
+  s <- traj_segments(p)
+
+  expect_equal(nrow(s), 6L)
+  by_group <- split(as.character(s$linetype), s$group)
+  expect_length(by_group, 2L)
+  expect_equal(unname(by_group[[1]]), c("dashed", "dashed", "solid"))
+  expect_equal(unname(by_group[[2]]), c("solid", "solid", "solid"))
+})
+
+test_that("a flat occasion is spanned by no segment", {
+  skip_on_cran()
+  res <- traj_fit()
+  res$results$a_est[[2]] <- NA_real_ # flat occasion: no location
+  s <- traj_segments(ssm_plot_trajectory(res))
+
+  expect_equal(nrow(s), 1L)
+  expect_equal(s$x, 3)
+  expect_equal(s$xend, 4)
+})
+
+test_that("the merged legend keeps black keys under a grouping", {
+  skip_on_cran()
+  p <- ssm_plot_trajectory(traj_fit(grouping = "Gender"))
+  keys <- legend_key_glyphs(p, "Displacement interpretable")
+  lines <- legend_key_lines(p, "Displacement interpretable")
+
+  expect_length(keys, 2)
+  expect_equal(sort(unname(unlist(keys))), c(1, 16))
+  expect_equal(unname(lengths(lines)), c(1L, 1L))
+  expect_equal(unname(vapply(lines, function(l) l[[1]]$lty, character(1))), c("solid", "dashed"))
+  # The keys carry no group hue: both point and line are pinned to black.
+  expect_true(all(vapply(lines, function(l) l[[1]]$col == "#000000", logical(1))))
 })
 
 test_that("na.rm = FALSE names the dropped occasion count", {
