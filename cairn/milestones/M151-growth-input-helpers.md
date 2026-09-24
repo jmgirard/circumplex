@@ -108,3 +108,5 @@ Gate triage, 2026-09-24: the maintainer accepted every proposed disposition. Fix
 - O10: `TMB_version` 1.9.25 in the regenerated fixture, whose fits are identical to the prior one.
 - O14: NEWS lists the reserved-name and equal-name refusals and states the nlme parity as a behavior.
 - Follow-up: O8 and O9 filed as one ROADMAP candidate row. Rejected: O3, O12 and O13 for the reasons above. Noted: O11 and S1.
+
+After the fix-now batch: full suite 0 failures, 14137 passes, 1 skip, 12 pre-existing warnings. `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes in 11m11s. `devtools::document()` left the tree clean. `cairn_validate.py` passed after the M147 tombstone row was pruned to keep the ROADMAP under its line cap.
