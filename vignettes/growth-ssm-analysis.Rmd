@@ -21,16 +21,17 @@ summarizes draws with the same tools.
 
 This vignette fits a growth model to SSM parameters measured at several
 waves. Section 2, "The question growth modeling answers", states the
-question. Section 3, "From repeated measures to a coordinate table", builds
-the input with `ssm_parameters_id()`. Section 4, "One joint model, not three
-separate ones", fits the joint mixed model. Section 5, "From fixed effects to
-$(a(t), d(t))$ with intervals", carries the uncertainty through
-`ssm_draws()`. Section 6, "Certification: when $d(t)$ intervals are not
-interpretable", and Section 7, "A caution about REML intervals at small
-samples", state the limits. Section 8, "The unwrap alternative:
-`angle_unwrap()`", fits a second recipe. Section 9, "Caveats and upgrades",
-closes. The Wrap-up lists what the page covered and names the next page, and
-the References list the sources cited.
+question. Section 3, "From repeated measures to a long table", builds the
+input with `ssm_growth_data()`. Section 4, "One joint model, not three
+separate ones", writes the model with `ssm_growth_formula()` and fits it.
+Section 5, "From fixed effects to $(a(t), d(t))$ with intervals", carries the
+uncertainty through `ssm_trajectory()`. Section 6, "Certification: when
+$d(t)$ intervals are not interpretable", and Section 7, "A caution about REML
+intervals at small samples", state the limits. Section 8, "The unwrap
+alternative: `angle_unwrap()`", fits a second recipe. Section 9, "Caveats and
+upgrades", closes the recipe. Section 10, "The same model in nlme and brms",
+shows the two other engines. The Wrap-up lists what the page covered and
+says that no page follows, and the References list the sources cited.
 
 ## 2. The question growth modeling answers
 
@@ -56,23 +57,22 @@ amplitude and displacement at each time, $(a(t), d(t))$, with
 circular-correct summaries.
 
 The division of labor is deliberate and mirrors the package's Bayesian
-vignette: **circumplex does not fit mixed models**. It prepares the
-coordinate data on the way in (`ssm_parameters_id()`). It converts fitted
-model draws (draws that describe the uncertainty in the fitted model's
-estimates) on the way out
-(`ssm_draws()`). The growth model itself belongs
-to a dedicated mixed-modeling package. The reference recipe below uses
-**glmmTMB**. The same stacked-outcome formulation can also be fit with
-`nlme` (shipped with base R), using its `varIdent` and `corSymm` machinery.
+vignette: **circumplex does not fit mixed models**. It builds the input on
+the way in, with `ssm_growth_data()` and `ssm_growth_formula()`. It turns
+the fitted model's estimates into a trajectory on the way out, with
+`ssm_trajectory()`. The growth model itself belongs to a dedicated
+mixed-modeling package. The reference recipe below uses **glmmTMB**.
+Section 10 shows the same model in `nlme`, which ships with R, and in
+`brms`.
 
 
 
-## 3. From repeated measures to a coordinate table
+## 3. From repeated measures to a long table
 
-The input to the growth model is a person-by-wave table of SSM coordinates.
-`ssm_parameters_id()` computes $(e, x, y)$ (and $a$, $d$, fit) from
-circumplex scale scores. Applied to a table with one row per person per wave,
-it yields exactly the tidy input that a mixed model wants.
+The input to the growth model is a long table with one row per person,
+wave and coordinate. `ssm_growth_data()` builds it. It scores each input
+row as its own profile through `ssm_parameters_id()`. Then it
+stacks the three coordinates $(e, x, y)$ under an outcome indicator `dv`.
 
 The package ships a simulated data set, `simulated_growth`, with five waves
 (0 to 4) of octant scores for 150 persons. Octant scores are scores on eight
@@ -85,56 +85,85 @@ the 0°/360° boundary. The group-level amplitude stays near 0.6 throughout.
 
 ``` r
 data("simulated_growth")
-coord <- ssm_parameters_id(simulated_growth, scales = PANO())
-coord$person <- simulated_growth$person
-coord$wave <- simulated_growth$wave
-head(coord, 3)
-#>   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp
-#> 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608
-#> 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459
-#> 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495
-#>         Fit person wave
-#> 1 0.5912013      1    0
-#> 2 0.7171530      2    0
-#> 3 0.8516460      3    0
+long <- ssm_growth_data(
+  simulated_growth,
+  scales = PANO(),
+  id = "person",
+  time = "wave"
+)
+head(long, 6)
+#>   person wave dv      value
+#> 1      1    0  e  0.4595363
+#> 2      1    0  x  0.5697631
+#> 3      1    0  y -0.1920113
+#> 4      2    0  e  0.8644617
+#> 5      2    0  x  0.9896316
+#> 6      2    0  y  0.2426116
 ```
 
-With no `id` argument, `ssm_parameters_id()` treats each row as its own
-profile. So `coord` has one row per person per wave, and its `id` column is
-the row number. The two assignments copy each row's person and wave onto it.
-(Passing `id = "person"` would instead average each person's waves into one
-profile, which is not what a growth model needs.)
+The table has four columns. `person` is a factor and `wave` is numeric,
+both copied from the input. `dv` is a factor with levels `e`, `x` and `y`,
+and it names the coordinate each row holds. `value` is that coordinate's
+value. One input row gives three output rows, in that order, so the six rows
+above are the first two persons at wave 0. The table carries no amplitude
+and no displacement, because growth in displacement is modeled through $x$
+and $y$ and never through the angle itself.
 
 ## 4. One joint model, not three separate ones
 
 The growth model treats the three coordinates as a *multivariate* outcome.
-Stack them into long format with an outcome indicator `dv`, a column that
-names the coordinate each row holds. Give each outcome its own intercept and
-slope. The person-level random effects are each person's own deviations from
-the group intercepts. Let them be **correlated across outcomes**.
-
-The stacked data frame is `long`, with one row per person, wave and
-coordinate. Its columns are `person` (a factor), `wave`, `dv` (a factor with
-levels `e`, `x` and `y`) and `value`. The `value` of `e`, `x` and `y` comes from
-the `Elev`, `Xval` and `Yval` columns of `coord`. (The reshaping code is
-omitted.)
+Each coordinate gets its own intercept and its own slope on `wave`. Each
+person gets a random intercept per coordinate, and the three person
+intercepts are **correlated across outcomes**. Each coordinate keeps its own
+residual variance. `ssm_growth_formula()` writes this one model in the
+engine's dialect, and printing it shows the complete fit call:
 
 
+``` r
+f_glmmTMB <- ssm_growth_formula("glmmTMB", time = "wave", id = "person")
+f_glmmTMB
+#> Joint growth model on SSM coordinates, glmmTMB dialect.
+#> Fit on the long table from ssm_growth_data(), then keep the fixed effects:
+#> 
+#> fit <- glmmTMB::glmmTMB(
+#>   value ~ 0 + dv + dv:wave + us(0 + dv | person),
+#>   dispformula = ~ 0 + dv,
+#>   data = long,
+#>   REML = TRUE
+#> )
+#> coef <- glmmTMB::fixef(fit)$cond
+#> vcov <- as.matrix(vcov(fit)$cond)
+```
+
+The `time` and `id` arguments are the column names given to
+`ssm_growth_data()`. In `ssm_growth_formula()` they default to `"wave"`
+and `"person"`. The
+object holds the two formulas as `f_glmmTMB$formula` and
+`f_glmmTMB$dispformula`. The fit below is the printed call, with the two
+formulas read from the object. The model has no options, because a
+covariate or a quadratic time term changes the model whose interval
+coverage the package validated.
 
 
 ``` r
 fit <- glmmTMB::glmmTMB(
-  value ~ 0 + dv + dv:wave + us(0 + dv | person),
-  dispformula = ~ 0 + dv,
+  f_glmmTMB$formula,
+  dispformula = f_glmmTMB$dispformula,
   data = long,
   REML = TRUE
 )
-glmmTMB::fixef(fit)$cond
+coef <- glmmTMB::fixef(fit)$cond
+vcov <- as.matrix(vcov(fit)$cond)
+coef
 #>           dve           dvx           dvy      dve:wave      dvx:wave 
 #>  0.5249198595  0.6085429795 -0.1036244260 -0.0007414075 -0.0010567782 
 #>      dvy:wave 
 #>  0.0649480442
 ```
+
+The last two lines are the ones the printed call ends with. `coef` holds
+the fixed effects, the group intercepts and slopes, and `vcov` holds their
+covariance matrix. Both go to the next step.
 
 The person block of the variance components is one place where the fit shows
 that it is joint. Its
@@ -174,111 +203,74 @@ coverage drops from the nominal 95% to roughly 86%. Pointwise coverage is how
 often the interval at one wave contains the true direction. The joint recipe
 stays at nominal. Strongly correlated person effects are realistic, because
 profile tilts are rarely aligned with an axis.
-Do not fit the coordinates separately. Section 5 shows one check
-that detects a covariance matrix assembled from separate fits.
+Do not fit the coordinates separately. Section 5 shows how
+`ssm_trajectory()` refuses a covariance matrix assembled from separate fits.
 
 ## 5. From fixed effects to $(a(t), d(t))$ with intervals
 
-The fixed effects are the group intercepts and slopes. They define the mean
-trajectory $(\hat{e}(t), \hat{x}(t), \hat{y}(t))$. Three steps carry uncertainty
-through the nonlinear map from $(x, y)$ to $(a(t), d(t))$. First, draw
-coefficient vectors from the multivariate normal implied by the fixed-effect
-covariance matrix. That matrix holds the estimated sampling variances and
-covariances of the fixed effects. This is the same large-sample (asymptotic) step that the
-package's Monte Carlo engine takes. Second, evaluate each
-draw at each wave, which gives that draw's coordinates at that wave. Third, hand the per-wave draws to `ssm_draws()`. It
-applies the package's circular-statistics machinery (medians and circular
-means, equal-tailed intervals with correct wrapping at the boundary).
+`ssm_trajectory()` takes `coef`, `vcov` and the times at which to evaluate
+the trajectory. It returns one row per time:
 
 
 ``` r
-fe <- glmmTMB::fixef(fit)$cond
-V <- as.matrix(vcov(fit)$cond)
-```
-
-Before the first step, here is the check that Section 4 promised. Take the
-block of `V` that crosses the $x$ fixed effects with the $y$ fixed effects
-and ask whether any entry differs from zero.
-
-
-``` r
-any(V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")] != 0)
-#> [1] TRUE
-```
-
-A joint fit estimates this whole block, so nothing in it is structurally
-zero. Only the intercept covariance is appreciable here. The other three
-entries are floating-point residue near $10^{-20}$, numerically zero, which
-is why the check asks for any nonzero entry rather than for every entry.
-It is a structural test, not a test of size. Separate fits produce one
-covariance matrix per coordinate, and a full matrix assembled from them
-block by block holds exact zeros in every cross block. The check detects
-only that assembled structure, and it has no power outside that case: a
-matrix whose cross block holds any nonzero value, however small, passes.
-A nonzero block does not show that the model is right: a misspecified
-joint model passes it too. Carry this check to your own fits, and replace
-the four names with the intercept and slope terms of your own model, which
-this vignette's outcome factor `dv` and time variable `wave` produce.
-
-The first step draws 4000 coefficient vectors from the multivariate normal
-distribution with mean `fe` and covariance matrix `V`. The draws are stored in
-the matrix `B`, with one row per draw and one column per fixed effect. Its
-columns carry the names of `fe`, such as `dvx` and `dvx:wave`. (The code that
-draws them is omitted.)
-
-
-
-The second and third steps, at wave 2, look like this. Each draw's coordinate
-at wave 2 is its intercept plus 2 times its slope:
-
-
-``` r
-wave2 <- ssm_draws(cbind(
-  e = B[, "dve"] + 2 * B[, "dve:wave"],
-  x = B[, "dvx"] + 2 * B[, "dvx:wave"],
-  y = B[, "dvy"] + 2 * B[, "dvy:wave"]
-), type = "parameters")
-wave2
+trajectory <- ssm_trajectory(coef, vcov, times = 0:4)
+trajectory
 #> 
-#> # Posterior Summary:
+#> # SSM Trajectory:
 #> 
-#>                Estimate   Lower CrI   Upper CrI
-#> Elevation         0.524       0.475       0.573
-#> X-Value           0.607       0.576       0.638
-#> Y-Value           0.026      -0.005       0.055
-#> Amplitude         0.607       0.576       0.639
-#> Displacement      2.456     359.517       5.184
-#> Model Fit
+#>  wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci
+#>     0  0.53  0.47  0.58  0.61  0.57  0.65 -0.10 -0.14 -0.07  0.62  0.58
+#>     1  0.52  0.47  0.57  0.61  0.57  0.64 -0.04 -0.07 -0.01  0.61  0.58
+#>     2  0.52  0.47  0.57  0.61  0.58  0.64  0.03 -0.01  0.06  0.61  0.58
+#>     3  0.52  0.47  0.57  0.61  0.57  0.64  0.09  0.06  0.12  0.61  0.58
+#>     4  0.52  0.47  0.57  0.60  0.57  0.64  0.16  0.12  0.19  0.62  0.59
+#>  a_uci  d_est  d_lci  d_uci
+#>   0.66 350.30 346.93 353.69
+#>   0.64 356.33 353.24 359.28
+#>   0.64   2.46 359.52   5.18
+#>   0.64   8.55   5.48  11.48
+#>   0.66  14.48  11.14  17.80
+#>   Caution: intervals from a fitted model's fixed-effect covariance condition
+#>   on its estimated variance components, and are too narrow at small samples.
+#>   See vignette("growth-ssm-analysis"), Section 7.
 ```
 
-The same call at each of the waves 0 to 4 gives one result per wave. The table
-`trajectory` collects them, with one row per wave. Its columns are `wave`, the
-six columns `a_est`, `a_lci`, `a_uci`, `d_est`, `d_lci` and `d_uci` from each
-result's `$results`, and `certified` from its `$details`. (The loop that builds
-the table is omitted.) Rounded to two decimals, it reads:
+Three steps run inside the call. Together they carry uncertainty through
+the nonlinear map from $(x, y)$ to $(a(t), d(t))$. First, the call draws
+4000 coefficient vectors from the multivariate normal distribution with mean
+`coef` and covariance `vcov`. This is the same large-sample (asymptotic)
+step that the package's Monte Carlo engine takes. Second, it evaluates each
+draw at each time. A draw's coordinate at wave 2 is its intercept plus 2
+times its slope. Third, it hands each time's draws to `ssm_draws()`. That
+function applies the package's circular-statistics machinery (medians and
+circular means, equal-tailed intervals with correct wrapping at the
+boundary). The table holds the estimate and interval of $e$, $x$, $y$, $a$
+and $d$ at each time, plus the `certified` verdict that Section 6 explains.
+Printing rounds the table to two decimals, and it ends with the caution
+that Section 7 explains.
 
-
-```
-#>   wave a_est a_lci a_uci  d_est  d_lci  d_uci certified
-#> 1    0  0.62  0.58  0.66 350.30 346.93 353.69      TRUE
-#> 2    1  0.61  0.58  0.64 356.33 353.24 359.28      TRUE
-#> 3    2  0.61  0.58  0.64   2.46 359.52   5.18      TRUE
-#> 4    3  0.61  0.58  0.64   8.55   5.48  11.48      TRUE
-#> 5    4  0.62  0.59  0.66  14.48  11.14  17.80      TRUE
-```
+Before the second step, the call makes the check that Section 4 promised. It
+reads the covariance that `vcov` implies between $\hat{x}(t)$ and
+$\hat{y}(t)$ at each time in `times`. A joint fit estimates that covariance,
+and it is almost never exactly zero. Separate fits produce one covariance matrix per
+coordinate, and a full matrix assembled from them block by block implies
+exactly zero at every time. `ssm_trajectory()` refuses such a matrix with an
+error. The check is structural, not a test of size: a covariance that is
+nonzero, however small, passes. A nonzero covariance does not show that the
+model is right, because a misspecified joint model passes the check too.
 
 The displacement estimates hug the 0°/360° boundary by design. The estimate
 is near 350° at wave 0, crosses 0° between waves 1 and 2, and reaches about
 14° at wave 4. The intervals wrap
 correctly rather than spanning "the long way around."
 
-`ssm_plot_trajectory()` plots a table in this shape directly. The table has
-one row per time point, with `a_est`/`a_lci`/`a_uci`,
-`d_est`/`d_lci`/`d_uci`, and optionally `certified`:
+`ssm_plot_trajectory()` plots the object directly, and it reads the name of
+the time column from the object. A plain data frame with the same columns
+plots too, with `time = "wave"` named:
 
 
 ``` r
-ssm_plot_trajectory(trajectory, time = "wave")
+ssm_plot_trajectory(trajectory)
 ```
 
 <img src="figures/growth-ssm-analysis-plot-1.png" alt="plot of chunk plot"  />
@@ -306,87 +298,84 @@ origin of the $(x, y)$ plane. As $a(t) \to 0$, the draws of $d(t)$
 become diffuse or bimodal. A quantile interval of them is then not a
 trustworthy statement about direction.
 
-At each wave, `ssm_draws()` applies the package's certification rule to the
+At each time, `ssm_draws()` applies the package's certification rule to the
 amplitude interval. The rule requires the interval's lower bound to be at
 least 0.35 times the interval's width. The rule is scale-free: it does not
-depend on the units of the scores. `ssm_draws()` records the verdict in
-`$details$certified`, which is the `certified` column above. **At any
-uncertified wave, the $d(t)$ interval is not interpretable.** It should be
-reported as such, not narrated as a direction.
+depend on the units of the scores. `ssm_trajectory()` carries the verdict
+into its `certified` column. **At any uncertified time, the $d(t)$ interval
+is not interpretable.** It should be reported as such, not narrated as a
+direction.
 
 Every wave in our worked example is certified. Here is a trajectory where
 that fails: the group crosses near the origin mid-study (its $x$
 coordinate changes sign while $y$ stays near zero). The package ships these
 data too, as `simulated_growth_origin`. It has the same persons, waves and
-columns as `simulated_growth`, and `?simulated_growth` describes both. We
-compute its coordinates the same way:
+columns as `simulated_growth`, and `?simulated_growth` describes both. The
+calls are the same, and the fit reads the same two formulas:
 
 
 ``` r
 data("simulated_growth_origin")
-coord2 <- ssm_parameters_id(simulated_growth_origin, scales = PANO())
-coord2$person <- simulated_growth_origin$person
-coord2$wave <- simulated_growth_origin$wave
+long2 <- ssm_growth_data(
+  simulated_growth_origin,
+  scales = PANO(),
+  id = "person",
+  time = "wave"
+)
 ```
-
-As before, `coord2` is stacked into `long2`, with the same four columns as
-`long`. (The reshaping code is omitted.) The model is the same:
-
-
 
 
 ``` r
 fit2 <- glmmTMB::glmmTMB(
-  value ~ 0 + dv + dv:wave + us(0 + dv | person),
-  dispformula = ~ 0 + dv, data = long2, REML = TRUE
+  f_glmmTMB$formula,
+  dispformula = f_glmmTMB$dispformula,
+  data = long2,
+  REML = TRUE
 )
-fe2 <- glmmTMB::fixef(fit2)$cond
+coef2 <- glmmTMB::fixef(fit2)$cond
+vcov2 <- as.matrix(vcov(fit2)$cond)
 ```
-
-Its 4000 coefficient draws are stored in `B2`, drawn the same way as `B`.
-(That code is omitted.) The summary at wave 2 is:
-
-
 
 
 ``` r
-mid <- ssm_draws(cbind(
-  e = B2[, "dve"] + 2 * B2[, "dve:wave"],
-  x = B2[, "dvx"] + 2 * B2[, "dvx:wave"],
-  y = B2[, "dvy"] + 2 * B2[, "dvy:wave"]
-), type = "parameters")
-mid
+trajectory2 <- ssm_trajectory(coef2, vcov2, times = 0:4)
+trajectory2
 #> 
-#> # Posterior Summary:
+#> # SSM Trajectory:
 #> 
-#>                Estimate   Lower CrI   Upper CrI
-#> Elevation         0.512       0.463       0.562
-#> X-Value           0.003      -0.026       0.033
-#> Y-Value           0.017      -0.011       0.044
-#> Amplitude         0.023       0.005       0.049
-#> Displacement     80.714     322.335     214.098
-#> Model Fit                                      
-#>   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero;
-#>   the displacement is not interpretable.
+#>   wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci
+#>      0  0.51  0.45  0.56  0.50  0.46  0.53  0.02 -0.02  0.05  0.50  0.46
+#>      1  0.51  0.46  0.56  0.25  0.22  0.28  0.02 -0.01  0.04  0.25  0.22
+#> *    2  0.51  0.46  0.56  0.00 -0.03  0.03  0.02 -0.01  0.04  0.02  0.00
+#>      3  0.52  0.47  0.57 -0.24 -0.27 -0.21  0.02 -0.01  0.05  0.24  0.21
+#>      4  0.52  0.47  0.57 -0.49 -0.53 -0.45  0.02 -0.02  0.05  0.49  0.45
+#>   a_uci  d_est  d_lci  d_uci
+#>    0.53   1.83 357.91   5.68
+#>    0.28   3.72 357.01  10.26
+#> *  0.05  80.71 322.34 214.10
+#>    0.28 175.95 168.80 182.83
+#>    0.53 177.94 173.83 181.97
+#>   * Uncertified: the amplitude interval's lower bound is under 0.35
+#>   interval-widths above zero, so the displacement interval at that time is
+#>   not interpretable.
+#>   Caution: intervals from a fitted model's fixed-effect covariance condition
+#>   on its estimated variance components, and are too narrow at small samples.
+#>   See vignette("growth-ssm-analysis"), Section 7.
 ```
 
-The printed note is the certification rule firing. At this wave, the
-amplitude interval sits too close to zero. The displacement interval, which
-here spans more than half the circle, is not a statement about direction.
-In our validation simulations of this near-origin case, the caution fires
-at the degraded wave in essentially every replicate. Meanwhile, the waves far from the origin remain
+The asterisk marks the uncertified row, and the note under the table
+states the rule. At that wave, the amplitude interval sits too close to
+zero. The displacement interval, which here spans more than half the
+circle, is not a statement about direction. In our validation simulations
+of this near-origin case, the uncertified mark appears at the degraded wave
+in essentially every replicate. Meanwhile, the waves far from the origin remain
 certified, and their intervals keep their nominal coverage.
 
-Assembling this fit's full trajectory the same way, and carrying the
-`certified` verdict into the table, lets the plot mark the verdict itself.
-The table `trajectory2` has the same columns as `trajectory`. (The loop that
-builds it is omitted.)
-
-
+The plot marks the verdict itself:
 
 
 ``` r
-ssm_plot_trajectory(trajectory2, time = "wave")
+ssm_plot_trajectory(trajectory2)
 ```
 
 <img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"  />
@@ -399,10 +388,10 @@ passes the origin. The displacement interval at such a wave can cover most
 of the circle. The panel draws it at that full width rather than flattening
 it into something that looks precise.
 
-The `certified` column is optional. A table without it plots the same way,
-minus the hollow marking and its legend. The figure then makes no claim
-about interpretability either way. That is the honest default when the
-verdict was never computed.
+The `certified` column is optional for a plain data frame. A table without
+it plots the same way, minus the hollow marking and its legend. The figure
+then makes no claim about interpretability either way. That is the honest
+default when the verdict was never computed.
 
 ## 7. A caution about REML intervals at small samples
 
@@ -496,16 +485,129 @@ person-level structure and gives exact posterior inference for $d(t)$.
 circumplex has no function that fits it. But `ssm_draws()` will happily
 summarize posterior draws produced by any such model.
 
+## 10. The same model in nlme and brms
+
+`ssm_growth_formula()` writes the same joint model for two other engines.
+Each dialect fits the same three intercepts and slopes, the same correlated
+person intercepts and a separate residual variance for each coordinate.
+
+**nlme** ships with every R installation. Its call sets
+`na.action = na.omit`, because `nlme::lme()` otherwise stops on a row whose
+`value` is `NA`. glmmTMB drops such a row by default. The nlme fixed
+effects and their covariance go to `ssm_trajectory()` exactly as glmmTMB's
+do. On the data of Section 3, the two engines' fixed effects and covariance
+agree within the bounds the package's nlme parity test holds:
+
+
+``` r
+ssm_growth_formula("nlme", time = "wave", id = "person")
+#> Joint growth model on SSM coordinates, nlme dialect.
+#> Fit on the long table from ssm_growth_data(), then keep the fixed effects:
+#> 
+#> fit <- nlme::lme(
+#>   fixed = value ~ 0 + dv + dv:wave,
+#>   random = ~ 0 + dv | person,
+#>   weights = nlme::varIdent(form = ~ 1 | dv),
+#>   data = long,
+#>   na.action = na.omit,
+#>   method = "REML"
+#> )
+#> coef <- nlme::fixef(fit)
+#> vcov <- as.matrix(vcov(fit))
+```
+
+**brms** fits the same likelihood by Markov chain Monte Carlo (MCMC)
+sampling under its default priors. brms needs a Stan toolchain, so this
+page does not run it, and the fit chunk below is shown and not evaluated.
+The call is the one `ssm_growth_formula("brms")` prints, with the sampler
+settings added:
+
+
+``` r
+f_brms <- ssm_growth_formula("brms", time = "wave", id = "person")
+f_brms
+#> Joint growth model on SSM coordinates, brms dialect.
+#> Fit on the long table from ssm_growth_data(), then keep the draws:
+#> 
+#> fit <- brms::brm(
+#>   brms::bf(
+#>     value ~ 0 + dv + dv:wave + (0 + dv | person),
+#>     sigma ~ 0 + dv
+#>   ),
+#>   data = long
+#> )
+#> draws <- as.matrix(fit)
+```
+
+
+``` r
+bfit <- brms::brm(
+  brms::bf(f_brms$formula, f_brms$sigma),
+  data = long,
+  chains = 4, iter = 2000, cores = 4, seed = 20260716
+)
+draws <- as.matrix(bfit)
+```
+
+The vignette ships the six fixed-effect columns of those draws as
+`growth_brms_draws.rds`, written once by that call under that seed. The
+page reads the file, which has one row per posterior draw:
+
+
+``` r
+draws <- readRDS("growth_brms_draws.rds")
+dim(draws)
+#> [1] 4000    6
+```
+
+`ssm_trajectory()` takes the matrix as `draws` in place of `coef` and
+`vcov`. It drops the `b_` prefix from the column names, it ignores every
+other column a full `as.matrix(bfit)` carries, and it draws nothing new.
+Its second and third steps run on the posterior draws as given:
+
+
+``` r
+ssm_trajectory(times = 0:4, draws = draws)
+#> 
+#> # SSM Trajectory:
+#> 
+#>  wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci
+#>     0  0.53  0.48  0.58  0.61  0.57  0.65 -0.10 -0.14 -0.07  0.62  0.58
+#>     1  0.53  0.48  0.58  0.61  0.57  0.64 -0.04 -0.07 -0.01  0.61  0.58
+#>     2  0.53  0.48  0.57  0.61  0.58  0.64  0.03  0.00  0.06  0.61  0.58
+#>     3  0.52  0.48  0.57  0.61  0.57  0.64  0.09  0.06  0.12  0.61  0.58
+#>     4  0.52  0.48  0.57  0.60  0.57  0.64  0.16  0.12  0.19  0.62  0.59
+#>  a_uci  d_est  d_lci  d_uci
+#>   0.65 350.33 346.92 353.86
+#>   0.64 356.36 353.39 359.47
+#>   0.64   2.49 359.66   5.49
+#>   0.65   8.59   5.56  11.73
+#>   0.66  14.51  11.12  17.91
+#>   Caution: intervals from a fitted model's fixed-effect covariance condition
+#>   on its estimated variance components, and are too narrow at small samples.
+#>   See vignette("growth-ssm-analysis"), Section 7.
+```
+
+At each wave, the posterior medians of $x$ and $y$ sit within 0.01 of the
+glmmTMB table's estimates. The note under the table is written for the
+`coef` and `vcov` shape, and it does not apply here. Posterior draws
+average over the variance components rather than condition on their
+estimates. A posterior interval from brms depends on its priors instead,
+and the package's coverage validation ran the REML fit, not the brms fit. The `draws` shape is not checked for a joint fit, so the joint
+model is the user's responsibility there.
+
 ## Wrap-up
 
 A growth model on the $(e, x, y)$ coordinates describes how a group's mean
-profile moves over time. `ssm_parameters_id()` builds the person-by-wave
-input, and one joint mixed model fits the three coordinates. `ssm_draws()`
-turns the fixed effects into $a(t)$ and $d(t)$ with intervals. The
-certification step says when a direction interval is not interpretable.
-`angle_unwrap()` is the alternative when person-level directions are the
-target. No page follows this one. To draw the fitted trajectories across
-occasions on the circumplex canvas, read "Advanced Circumplex Visualization".
+profile moves over time. `ssm_growth_data()` builds the long input table,
+`ssm_growth_formula()` hands over the joint model's fit call, and one
+mixed-model engine fits the three coordinates together. `ssm_trajectory()`
+turns the fixed effects, or posterior draws, into $a(t)$ and $d(t)$ with
+intervals, and `ssm_plot_trajectory()` draws them. The certification step
+says when a direction interval is not interpretable. `angle_unwrap()` is
+the alternative when person-level directions are the target. No page
+follows this one. To draw the fitted trajectories across occasions on the
+circumplex canvas, read "Advanced Circumplex Visualization".
 
 ## References
 

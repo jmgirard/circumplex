@@ -24,9 +24,9 @@ simulated_growth_origin
 }
 \description{
 Two simulated datasets for demonstrating growth models on SSM parameters with
-\code{\link[=ssm_parameters_id]{ssm_parameters_id()}} and \code{\link[=ssm_draws]{ssm_draws()}}. The data are simulated, not collected
-from people. In both datasets, 150 persons have scores on the eight octant
-scales at waves 0 to 4.
+\code{\link[=ssm_growth_data]{ssm_growth_data()}}, \code{\link[=ssm_growth_formula]{ssm_growth_formula()}} and \code{\link[=ssm_trajectory]{ssm_trajectory()}}. The data
+are simulated, not collected from people. In both datasets, 150 persons have
+scores on the eight octant scales at waves 0 to 4.
 }
 \details{
 A person's score on a scale at a wave is the elevation 0.5, plus a person
@@ -51,5 +51,9 @@ and \eqn{y} stays at 0.02. The group passes near the origin at wave 2.
 Both datasets are written by one seeded script, \code{data-raw/simulated_growth.R},
 which is not in the installed package. Read it on GitHub:
 \url{https://github.com/jmgirard/circumplex/blob/master/data-raw/simulated_growth.R}.
+}
+\seealso{
+\code{vignette("growth-ssm-analysis")}, which fits a growth model to
+both datasets.
 }
 \keyword{datasets}
