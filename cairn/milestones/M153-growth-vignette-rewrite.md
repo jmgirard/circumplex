@@ -43,7 +43,7 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 
 - [x] T1: Rewrite Sections 3 to 6 on the five calls. Delete every hidden chunk except the two exceptions. Keep the joint-fit teaching, the VarCorr print and the cross-block check as prose around the helper's refusal.
 - [x] T2: Write `data-raw/growth-brms-draws.R`, run it locally, commit the `.rds`, and add the engines section (nlme call shown, brms chunk `eval = FALSE`, draws summarized).
-- [ ] T3: Prose pass under the plain-vignettes rules. Run `tools/prose-sweep.R`.
+- [x] T3: Prose pass under the plain-vignettes rules. Run `tools/prose-sweep.R`.
 - [x] T4: Commit, run `tools/precompute-vignettes.R`, then the staleness and width checks. Compare the rendered table to the baseline and record the result.
 - [x] T5: Switch `devel/m27-growth-recipe.R` to the helpers and run it.
 - [ ] T6: NEWS entry, the `@seealso` on `simulated_growth`, `devtools::document()`, `devtools::check()`.
@@ -60,6 +60,7 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - 2026-09-24: T2 done. `vignettes/growth_brms_draws.rds` holds 4000 draws by 6 `b_` columns (brms 2.23.0, seed 20260716, 168888 bytes). AC3 gaps against the glmmTMB table: `x_est` at most 3.3e-4 and `y_est` at most 5.0e-4 across the five waves; the `x`-`y` intercept-draw correlation is 0.0147 against the implied -0.0172, a gap of 0.032. `d_est` differs by at most 0.037 degrees. The nlme figures in Section 10 were measured in session: fixed effects within 1.3e-14 and covariance entries within 4.7e-9 of glmmTMB's.
 - 2026-09-24: T4 done. The render committed at dab22714 differed from the source only by the two T1 prose splits, re-rendered here; the width check reports 112 output lines, all fit. Against the master baseline the Section 5 table's `a_*` and `d_*` values are equal at two decimals at every wave, and the origin case's wave-2 amplitude 0.02 [0.00, 0.05] and displacement 80.71 [322.34, 214.10] equal the old `mid` print. The old page never printed the origin table.
 - 2026-09-24: T5 done. The recipe builds its fit call from `ssm_growth_formula()` and its table from `ssm_trajectory()`, the `stopifnot(any(V_xy != 0))` guard is gone, and the script runs to completion with every wave certified and every true `d(t)` inside its interval.
+- 2026-09-24: T3 done. The new prose was written to the rules (25 words, no dash, no semicolon, terms glossed at first use), and `tools/prose-sweep.R` on the whole `.Rmd.orig` exits 0 after two long sentences found on the first run were split. Sections 7 to 9 and the References are the pre-rewrite text, unchanged.
 
 ## Decisions
 
