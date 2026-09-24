@@ -1,6 +1,6 @@
 # M151: Growth input helpers, the long table and the formula builder
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -63,6 +63,7 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 - 2026-09-24: re-audit: AC4 (full) — the reader passed satisfiability, reachability, bounded promise and proportionality. It returned three findings. "near 1e-5" overstated the measured 6.9e-6 and 6.4e-6, fixed to "about 7e-6". "cross-coordinate intercept entries" misplaced the origin dataset's largest gap, which is the diagonal e-by-e entry, fixed to "intercept entries". Two pre-existing clauses, "writes it under a seed" and "gaps are recorded in the work log", bind an instrument and a process rather than the deliverable. They are outside the gated amendment and stay as written for review to weigh. The reader also noted the test runs on CRAN with no platform measurement behind the bound, with a factor of 14 headroom on this machine.
 - 2026-09-24: T5 done at the amended bound.
 - 2026-09-24: claim audit: 44 claims read, 10 corrected — R/ssm_growth_data.R, R/ssm_growth_formula.R, data-raw/growth-fixef.R, tests/testthat/test-ssm_growth_parity.R, tests/testthat/test-ssm_growth_formula.R, tests/testthat/test-ssm_growth_data.R, and the two man pages. The two incorrect claims were a help-page reference to `ssm_trajectory()`, which M152 has not shipped, and the fixture header's claim that the seed pins an optimizer start, where glmmTMB draws none and the fixture is identical under any seed. The corrections also added refusals to `ssm_growth_data()` for `id` or `time` equal to `dv`, `value` or each other, a named `scales`/`angles` length check, and a numeric `value` on zero rows. The reader re-read the ten once and found all corrected. It noted one new vague phrase, "coefficient draws" for brms, fixed to "posterior draws" without a further read under the one-pass rule.
+- 2026-09-24: all tasks checked. Full suite after the corrections: 0 failures, 14126 passes, 1 skip, 12 warnings from pre-existing lavaan tests. `devtools::document()` produces no diff. Status set to review.
 
 ## Decisions
 

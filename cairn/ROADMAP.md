@@ -7,7 +7,7 @@ _Last hygiene check: 2026-09-23 (M150 done: row (vi) marked done; one LESSONS li
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M151 | Growth input helpers, the long table and the formula builder | in-progress | — | high | milestones/M151-growth-input-helpers.md |
+| M151 | Growth input helpers, the long table and the formula builder | review | — | high | milestones/M151-growth-input-helpers.md |
 | M152 | Growth output helper, coefficients or draws to a trajectory | planned | M151 | high | milestones/M152-growth-trajectory-helper.md |
 | M153 | The growth vignette on the helper workflow | planned | M152 | high | milestones/M153-growth-vignette-rewrite.md |
 | M150 | Price every certificate case from its committed xi1 | done | — | normal | milestones/archive/M150-pin-xi1-certificate-cases.md |
