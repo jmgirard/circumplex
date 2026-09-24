@@ -57,4 +57,8 @@ long <- ssm_growth_data(
 )
 head(long, 6)
 }
+\seealso{
+Other growth functions:
+\code{\link[=ssm_growth_formula]{ssm_growth_formula()}}
+}
 \concept{growth functions}

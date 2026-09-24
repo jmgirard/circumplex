@@ -1,0 +1,96 @@
+# ssm_growth_formula(): the fixed joint model as engine formulas (M151) -------
+#
+# The expected strings are the model the coverage oracle validated
+# (devel/m27-coverage-oracle.R), stated here by hand with time = "t" and
+# id = "subject" so that a builder that ignored either argument would fail.
+# No engine is installed or called: the pieces are formula objects and text.
+
+dep <- function(f) paste(deparse(f, width.cutoff = 500L), collapse = "")
+
+test_that("ssm_growth_formula returns the glmmTMB pieces", {
+  gf <- ssm_growth_formula("glmmTMB", time = "t", id = "subject")
+  expect_s3_class(gf, "circumplex_growth_formula")
+  expect_type(gf, "list")
+  expect_identical(names(gf), c("formula", "dispformula"))
+  expect_true(all(vapply(gf, inherits, logical(1), "formula")))
+  expect_identical(dep(gf$formula),
+                   "value ~ 0 + dv + dv:t + us(0 + dv | subject)")
+  expect_identical(dep(gf$dispformula), "~0 + dv")
+  expect_identical(attr(gf, "engine"), "glmmTMB")
+})
+
+test_that("ssm_growth_formula returns the nlme pieces", {
+  gf <- ssm_growth_formula("nlme", time = "t", id = "subject")
+  expect_s3_class(gf, "circumplex_growth_formula")
+  expect_identical(names(gf), c("fixed", "random", "weights"))
+  expect_true(all(vapply(gf, inherits, logical(1), "formula")))
+  expect_identical(dep(gf$fixed), "value ~ 0 + dv + dv:t")
+  expect_identical(dep(gf$random), "~0 + dv | subject")
+  expect_identical(dep(gf$weights), "~1 | dv")
+})
+
+test_that("ssm_growth_formula returns the brms pieces", {
+  gf <- ssm_growth_formula("brms", time = "t", id = "subject")
+  expect_s3_class(gf, "circumplex_growth_formula")
+  expect_identical(names(gf), c("formula", "sigma"))
+  expect_true(all(vapply(gf, inherits, logical(1), "formula")))
+  expect_identical(dep(gf$formula),
+                   "value ~ 0 + dv + dv:t + (0 + dv | subject)")
+  expect_identical(dep(gf$sigma), "sigma ~ 0 + dv")
+})
+
+test_that("ssm_growth_formula defaults to wave and person, glmmTMB first", {
+  gf <- ssm_growth_formula()
+  expect_identical(attr(gf, "engine"), "glmmTMB")
+  expect_identical(dep(gf$formula),
+                   "value ~ 0 + dv + dv:wave + us(0 + dv | person)")
+})
+
+test_that("ssm_growth_formula formulas carry no environment-bound state", {
+  # A formula built from text at call time has the builder's frame as its
+  # environment; the fit call must not depend on it, so the environment is
+  # set to the global one and the pieces deparse identically across calls.
+  a <- ssm_growth_formula("nlme", time = "t", id = "s")
+  b <- ssm_growth_formula("nlme", time = "t", id = "s")
+  expect_identical(lapply(a, dep), lapply(b, dep))
+  for (f in a) expect_identical(environment(f), globalenv())
+})
+
+test_that("ssm_growth_formula refuses an engine outside the three", {
+  expect_error(ssm_growth_formula("lme4"), "`engine`")
+  expect_error(ssm_growth_formula(c("glmmTMB", "nlme")), "`engine`")
+  expect_error(ssm_growth_formula(1), "`engine`")
+})
+
+test_that("ssm_growth_formula refuses a time or id that is not one name", {
+  expect_error(ssm_growth_formula("glmmTMB", time = 1), "`time`")
+  expect_error(ssm_growth_formula("glmmTMB", time = c("a", "b")), "`time`")
+  expect_error(ssm_growth_formula("glmmTMB", id = 2), "`id`")
+  expect_error(ssm_growth_formula("glmmTMB", time = ""), "`time`")
+  expect_error(ssm_growth_formula("glmmTMB", time = NA_character_), "`time`")
+})
+
+test_that("ssm_growth_formula refuses time or id that collide with the model's own names", {
+  # `dv` and `value` are the long table's coordinate and outcome columns, and
+  # a time or id named after them would make the formula read the wrong
+  # column without error.
+  expect_error(ssm_growth_formula("glmmTMB", time = "dv"), "`time`")
+  expect_error(ssm_growth_formula("glmmTMB", id = "value"), "`id`")
+  expect_error(ssm_growth_formula("glmmTMB", time = "w", id = "w"), "`id`")
+})
+
+test_that("ssm_growth_formula pieces fit ssm_growth_data output by name", {
+  # The names the formula reads (`value`, `dv`, time, id) are the columns
+  # ssm_growth_data() writes under the same time and id, so a model.frame()
+  # on the fixed part succeeds with no engine. Six columns: three dv
+  # indicators and three dv:time slopes, in the order the M152 default
+  # contrast expects.
+  data("simulated_growth")
+  long <- ssm_growth_data(simulated_growth[1:30, ], PANO(),
+                          id = "person", time = "wave")
+  gf <- ssm_growth_formula("nlme", time = "wave", id = "person")
+  X <- model.matrix(gf$fixed, data = long)
+  expect_identical(colnames(X),
+                   c("dve", "dvx", "dvy", "dve:wave", "dvx:wave", "dvy:wave"))
+  expect_equal(nrow(X), nrow(long))
+})

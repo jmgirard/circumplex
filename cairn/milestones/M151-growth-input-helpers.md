@@ -38,7 +38,7 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 ## Tasks
 
 - [x] T1: Write `tests/testthat/test-ssm_growth_data.R` first, then `R/ssm_growth_data.R`. Reuse `ssm_parameters_id()` with `id = NULL` and build the long table with base `rep()` indexing, not `reshape()`. Validate with `stopifnot()` and the `is_*()` helpers in `R/utils.R`.
-- [ ] T2: Write `tests/testthat/test-ssm_growth_formula.R` first, then the builder in `R/ssm_growth_formula.R`. Build each formula with `stats::reformulate()` or `as.formula()` on pasted text, with `time` and `id` substituted.
+- [x] T2: Write `tests/testthat/test-ssm_growth_formula.R` first, then the builder in `R/ssm_growth_formula.R`. Build each formula with `stats::reformulate()` or `as.formula()` on pasted text, with `time` and `id` substituted.
 - [ ] T3: Add `print.circumplex_growth_formula()`. Each engine's print shows the fit call and the extraction line. Add the snapshot test and the whitespace-collapsed comparison against the vignette's glmmTMB chunk.
 - [ ] T4: Write `data-raw/growth-fixef.R`. It fits the vignette's glmmTMB model on both datasets under `set.seed(20260716)` and saves the fixture. Record the glmmTMB version in the fixture and in the work log.
 - [ ] T5: Add the nlme parity test. Record the measured fixed-effect and covariance gaps in the work log.
@@ -54,6 +54,7 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 - 2026-09-24: the maintainer chose three engines in the builder over glmmTMB and nlme alone. brms's fit is never run by package code or tests (D-015), so its dialect is text, tested as text.
 - 2026-09-24: implementation started on branch `m151-growth-input-helpers`. The question gate was skipped because the plan fixes every signature, element name and engine, and the nlme dependency was decided at D-064.
 - 2026-09-24: T1 done. `ssm_growth_data()` scores through `ssm_parameters_id(id = NULL)` and stacks with `rep()` indexing. It suppresses the scorer's undefined-displacement warning because the long table carries no displacement. Tests cover the row-then-dv order, the value identity, the angles pass-through, the five refusals of AC1 plus column-number refusals, a flat row, an all-missing row, and zero rows.
+- 2026-09-24: T2 done. `ssm_growth_formula()` builds each piece with `as.formula()` on pasted text, environment set to the global one. It carries `engine`, `time` and `id` as attributes for the print. It refuses `time` or `id` equal to `dv`, `value` or each other. With such a name the formula reads the wrong column without error. A test runs `model.matrix()` on the fixed part over `ssm_growth_data()` output. It gives the six coefficient names M152 reads.
 
 ## Decisions
 
