@@ -36,8 +36,9 @@
 #' are treated as independent, which is what fitting the coordinates in
 #' separate models does. So the `coef` and `vcov` shape refuses a `vcov`
 #' whose implied covariance between `x(t)` and `y(t)` is exactly zero at
-#' every time in `times`, unless `vcov` is zero everywhere. A `draws` matrix
-#' is not checked for a joint fit. The intervals from a REML fit condition on
+#' every time in `times`, unless `vcov` is zero everywhere. The check reads
+#' only the given `times`, so with a single time it sees only the covariance
+#' terms that time reaches. A `draws` matrix is not checked for a joint fit. The intervals from a REML fit condition on
 #' its estimated variance components and are too narrow at small samples;
 #' the "Growth Models on SSM Parameters" vignette states the remedies.
 #'
@@ -200,16 +201,25 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
         call. = FALSE
       )
     }
+    rn <- rownames(L)
+    if (!is.null(rn) && !identical(rn, c("e", "x", "y"))) {
+      stop(
+        "`contrast` must return its rows in the order e, x, y; the row names ",
+        "at time ", t, " are ", paste0("\"", rn, "\"", collapse = ", "), ".",
+        call. = FALSE
+      )
+    }
     unname(L)
   })
 
   # The joint-fit refusal (coef and vcov shape only): the covariance of x(t)
   # and y(t) implied by vcov through the contrast, exactly zero at every
   # time, is the signature of coordinates fit in separate models. An
-  # all-zero vcov is a degenerate input with nothing to refuse.
-  if (!has_draws && !all(vcov == 0)) {
-    V <- vcov
-    if (is.null(contrast)) V <- V[needed, needed, drop = FALSE]
+  # all-zero vcov, read over the coefficients the contrast uses, is a
+  # degenerate input with nothing to refuse.
+  V <- if (has_draws) NULL else if (is.null(contrast))
+    vcov[needed, needed, drop = FALSE] else vcov
+  if (!has_draws && !all(V == 0)) {
     cross <- vapply(L_list, function(L) {
       as.numeric(L[2, , drop = FALSE] %*% V %*% L[3, ])
     }, numeric(1))
@@ -283,6 +293,16 @@ trajectory_check_coef_vcov <- function(coef, vcov) {
     stop("The dimnames of `vcov` must equal `names(coef)`, in the same order.",
          call. = FALSE)
   }
+  # A covariance matrix is positive semidefinite. mvn_root() clamps a
+  # negative eigenvalue to zero, so an invalid matrix (a covariance larger
+  # than the product of its standard deviations) would draw without a
+  # word; floating-point residue from a fitted vcov is under the tolerance.
+  ev <- eigen(unname(vcov), symmetric = TRUE, only.values = TRUE)$values
+  if (min(ev) < -1e-8 * max(abs(ev), .Machine$double.eps)) {
+    stop("`vcov` is not a valid covariance matrix: its smallest eigenvalue ",
+         "is ", signif(min(ev), 3), ", so at least one covariance exceeds ",
+         "what its variances allow.", call. = FALSE)
+  }
   invisible(TRUE)
 }
 
@@ -291,10 +311,10 @@ trajectory_check_coef_vcov <- function(coef, vcov) {
 trajectory_check_draws <- function(draws) {
   if (is.data.frame(draws)) draws <- as.matrix(draws)
   if (!is.matrix(draws) || !is.numeric(draws) || nrow(draws) < 2 ||
-      anyNA(draws)) {
+      anyNA(draws) || any(!is.finite(draws))) {
     stop("`draws` must be a numeric matrix of at least two rows with no ",
-         "missing values, one row per draw and one column per coefficient.",
-         call. = FALSE)
+         "missing or infinite values, one row per draw and one column per ",
+         "coefficient.", call. = FALSE)
   }
   cn <- colnames(draws)
   if (is.null(cn) || any(is.na(cn)) || any(!nzchar(cn))) {
@@ -320,10 +340,11 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
   time <- attr(x, "time")
   tab <- as.data.frame(x)
   # A column subset of the object keeps its class and may have dropped
-  # `certified`; then no row is marked.
+  # `certified`; then no row is marked. An `NA` verdict is undecided, and
+  # an undecided row is marked as uncertified rather than passed.
   cert <- if (is.logical(tab$certified)) tab$certified else
     rep(TRUE, nrow(tab))
-  cert[is.na(cert)] <- TRUE
+  cert[is.na(cert)] <- FALSE
   tab$certified <- NULL
   num <- vapply(tab, is.numeric, logical(1))
   num[names(tab) == time] <- FALSE

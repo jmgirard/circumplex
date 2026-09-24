@@ -22,6 +22,9 @@ traj_cols <- c(
   paste0(rep(c("e", "x", "y", "a", "d"), each = 3), c("_est", "_lci", "_uci")),
   "certified"
 )
+# A printed table row is a mark or a space, the time, then a number; the
+# notes below the table never carry two leading numbers.
+row_re <- "^[ *]\\s+[0-9]+\\s+-?[0-9]"
 
 # The vignette's reference, verbatim ------------------------------------------
 
@@ -281,10 +284,13 @@ test_that("linear interval: x and y bounds match the normal-theory bounds", {
       L[slp] <- times[i]
       est <- sum(L * fx_growth$coef)
       se <- sqrt(as.numeric(t(L) %*% fx_growth$vcov %*% L))
-      expect_equal(out[[paste0(par, "_lci")]][i], est - z * se,
-                   tolerance = 0.01, info = paste(par, times[i]))
-      expect_equal(out[[paste0(par, "_uci")]][i], est + z * se,
-                   tolerance = 0.01, info = paste(par, times[i]))
+      # An absolute bound of 0.01, as the criterion states. Dropping one
+      # slope covariance from V moves a wave-4 bound by about 0.017, so the
+      # bound has power (measured 2026-09-24 on the fixture).
+      expect_lt(abs(out[[paste0(par, "_lci")]][i] - (est - z * se)), 0.01,
+                label = paste(par, times[i], "lci"))
+      expect_lt(abs(out[[paste0(par, "_uci")]][i] - (est + z * se)), 0.01,
+                label = paste(par, times[i], "uci"))
     }
   }
 })
@@ -292,13 +298,30 @@ test_that("linear interval: x and y bounds match the normal-theory bounds", {
 test_that("boundary cases: the seam, the origin and the flat profile", {
   set.seed(20260716)
   out <- ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4)
-  expect_true(all(out$d_est >= 0 & out$d_est < 360))
+  for (col in c("d_est", "d_lci", "d_uci")) {
+    expect_true(all(out[[col]] >= 0 & out[[col]] < 360), info = col)
+  }
+  # Which waves straddle the seam is decided independently of the storage
+  # convention under test: the delta-method interval of the direction, on
+  # the signed branch (-180, 180], contains 0 at exactly those waves. Under
+  # this seed the margins are over 0.4 degrees (wave 1's upper bound at
+  # -0.6, wave 2's lower bound at -0.4).
+  z <- stats::qnorm(0.975)
+  straddle_expected <- vapply(0:4, function(t) {
+    Lx <- setNames(numeric(6), coef_names)
+    Lx[c("dvx", "dvx:wave")] <- c(1, t)
+    Ly <- setNames(numeric(6), coef_names)
+    Ly[c("dvy", "dvy:wave")] <- c(1, t)
+    x <- sum(Lx * fx_growth$coef)
+    y <- sum(Ly * fx_growth$coef)
+    g <- (-y * Lx + x * Ly) / (x^2 + y^2)
+    se <- sqrt(as.numeric(t(g) %*% fx_growth$vcov %*% g)) * 180 / pi
+    d <- atan2(y, x) * 180 / pi
+    d - z * se < 0 && d + z * se > 0
+  }, logical(1))
+  expect_identical(straddle_expected, c(FALSE, FALSE, TRUE, FALSE, FALSE))
   straddles <- out$d_lci > out$d_uci
-  expect_true(any(straddles))
-  # A straddling interval contains the seam: the estimate sits on the arc
-  # from d_lci counterclockwise to d_uci, so it is above d_lci or below d_uci.
-  expect_true(all(out$d_est[straddles] >= out$d_lci[straddles] |
-                    out$d_est[straddles] <= out$d_uci[straddles]))
+  expect_identical(straddles, straddle_expected)
   expect_true(all(out$certified))
 
   set.seed(20260716)
@@ -480,9 +503,7 @@ test_that("print rounds to digits, marks uncertified rows, states the caution", 
   expect_identical(res, out2)
 
   # Every value on a table row prints with `digits` decimals; the time column
-  # is printed as given. A table row is a mark or a space, the time, then a
-  # number; the notes below the table never carry two leading numbers.
-  row_re <- "^[ *]\\s+[0-9]+\\s+-?[0-9]"
+  # is printed as given.
   body <- txt[grepl(row_re, txt)]
   expect_length(body, 5L)
   expect_true(all(grepl("[0-9]\\.[0-9]{2}( |$)", body)))
@@ -512,6 +533,68 @@ test_that("print rounds to digits, marks uncertified rows, states the caution", 
   txt_sub <- capture.output(print(out2[, 1:4]))
   expect_false(any(grepl("^\\*", txt_sub)))
   expect_length(txt_sub[grepl(row_re, txt_sub)], 5L)
+})
+
+test_that("an undecided certified verdict prints as uncertified", {
+  set.seed(20260716)
+  out <- ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4)
+  out$certified[4] <- NA
+  txt <- capture.output(print(out))
+  body <- txt[grepl(row_re, txt)]
+  expect_identical(grepl("^\\*", body), c(FALSE, FALSE, FALSE, TRUE, FALSE))
+  expect_match(txt, "Uncertified", all = FALSE)
+})
+
+test_that("a vcov that is not positive semidefinite is refused", {
+  V <- fx_growth$vcov
+  # A cross covariance ten times the product of the standard deviations.
+  V["dvx", "dvy"] <- V["dvy", "dvx"] <- 10 * sqrt(V["dvx", "dvx"] * V["dvy", "dvy"])
+  expect_error(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4),
+    "`vcov` is not a valid covariance matrix"
+  )
+  # The fitted fixture, whose smallest eigenvalue is positive, passes.
+  set.seed(1)
+  expect_no_error(ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4,
+                                 n_draws = 20))
+})
+
+test_that("an infinite draw is refused", {
+  B <- matrix(rnorm(60), 10, 6, dimnames = list(NULL, coef_names))
+  B[3, 2] <- Inf
+  expect_error(
+    ssm_trajectory(times = 0:4, draws = B),
+    "no missing or infinite values"
+  )
+})
+
+test_that("a contrast whose rows are named out of order is refused", {
+  swapped <- function(t) {
+    rbind(x = c(0, 1, 0, 0, t, 0), e = c(1, 0, 0, t, 0, 0),
+          y = c(0, 0, 1, 0, 0, t))
+  }
+  expect_error(
+    ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4,
+                   contrast = swapped),
+    "rows in the order e, x, y"
+  )
+  # Unnamed rows are taken in order.
+  unnamed <- function(t) unname(swapped(t))[c(2, 1, 3), ]
+  set.seed(4)
+  out <- ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4,
+                        contrast = unnamed, n_draws = 20)
+  set.seed(4)
+  ref <- ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4,
+                        n_draws = 20)
+  expect_identical(out, ref)
+})
+
+test_that("the all-zero exemption reads the coefficients the contrast uses", {
+  # The six-name block is zero; a seventh coefficient carries variance.
+  coef <- c(fx_growth$coef, age = 0.1)
+  V <- matrix(0, 7, 7, dimnames = list(names(coef), names(coef)))
+  V["age", "age"] <- 1e-3
+  expect_no_error(ssm_trajectory(coef, V, times = 0:4, n_draws = 20))
 })
 
 test_that("n_draws is not used, and not checked, on the draws path", {

@@ -99,8 +99,9 @@ The displacement interval at a time point is wrong when \code{x(t)} and \code{y(
 are treated as independent, which is what fitting the coordinates in
 separate models does. So the \code{coef} and \code{vcov} shape refuses a \code{vcov}
 whose implied covariance between \code{x(t)} and \code{y(t)} is exactly zero at
-every time in \code{times}, unless \code{vcov} is zero everywhere. A \code{draws} matrix
-is not checked for a joint fit. The intervals from a REML fit condition on
+every time in \code{times}, unless \code{vcov} is zero everywhere. The check reads
+only the given \code{times}, so with a single time it sees only the covariance
+terms that time reaches. A \code{draws} matrix is not checked for a joint fit. The intervals from a REML fit condition on
 its estimated variance components and are too narrow at small samples;
 the "Growth Models on SSM Parameters" vignette states the remedies.
 }
