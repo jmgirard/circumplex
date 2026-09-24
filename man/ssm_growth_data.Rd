@@ -66,6 +66,7 @@ head(long, 6)
 }
 \seealso{
 Other growth functions:
-\code{\link[=ssm_growth_formula]{ssm_growth_formula()}}
+\code{\link[=ssm_growth_formula]{ssm_growth_formula()}},
+\code{\link[=ssm_trajectory]{ssm_trajectory()}}
 }
 \concept{growth functions}

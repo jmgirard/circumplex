@@ -72,6 +72,7 @@ ssm_growth_formula("brms")
 }
 \seealso{
 Other growth functions:
-\code{\link[=ssm_growth_data]{ssm_growth_data()}}
+\code{\link[=ssm_growth_data]{ssm_growth_data()}},
+\code{\link[=ssm_trajectory]{ssm_trajectory()}}
 }
 \concept{growth functions}

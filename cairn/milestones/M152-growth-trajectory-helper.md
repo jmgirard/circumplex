@@ -1,13 +1,13 @@
 # M152: Growth output helper, coefficients or draws to a trajectory
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M151
 - **Driving RR:** —
 - **Principles touched:** IP3, GP2, GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — a new export with print and plot methods
-- **Branch/PR:** —
+- **Branch/PR:** m152-growth-trajectory-helper
 
 ## Goal
 
@@ -41,13 +41,13 @@ Ship `ssm_trajectory()`. It turns a fitted joint model's fixed effects and covar
 
 ## Tasks
 
-- [ ] T1: Copy the vignette's hidden draw function and per-wave loop verbatim into `tests/testthat/test-ssm_trajectory_helper.R` as the reference. Write the AC1 shape, class and refusal tests first.
-- [ ] T2: Write `R/ssm_trajectory_helper.R`. Draw once from the full `coef` in its given order with `mvn_draws()`. Build the default contrast from the six names. Evaluate each time through `ssm_draws(type = "parameters")`. Attach the `time` attribute and the class.
-- [ ] T3: Add the `draws` shape and its argument checks.
-- [ ] T4: Add the closed-form, linear-interval and boundary tests. Pin the seed in the test file.
-- [ ] T5: Add the per-time cross-covariance refusal, its exemptions, the plant matrix and the custom-contrast tests.
-- [ ] T6: Add `print.circumplex_ssm_trajectory()` and `ssm_plot_trajectory.circumplex_ssm_trajectory()`. Add the `layer_data()` identity test and one vdiffr snapshot.
-- [ ] T7: Roxygen with inline examples, `devtools::document()`, NEWS entry, `_pkgdown.yml` entry. Run the verify slot.
+- [x] T1: Copy the vignette's hidden draw function and per-wave loop verbatim into `tests/testthat/test-ssm_trajectory_helper.R` as the reference. Write the AC1 shape, class and refusal tests first.
+- [x] T2: Write `R/ssm_trajectory_helper.R`. Draw once from the full `coef` in its given order with `mvn_draws()`. Build the default contrast from the six names. Evaluate each time through `ssm_draws(type = "parameters")`. Attach the `time` attribute and the class.
+- [x] T3: Add the `draws` shape and its argument checks.
+- [x] T4: Add the closed-form, linear-interval and boundary tests. Pin the seed in the test file.
+- [x] T5: Add the per-time cross-covariance refusal, its exemptions, the plant matrix and the custom-contrast tests.
+- [x] T6: Add `print.circumplex_ssm_trajectory()` and `ssm_plot_trajectory.circumplex_ssm_trajectory()`. Add the `layer_data()` identity test and one vdiffr snapshot.
+- [x] T7: Roxygen with inline examples, `devtools::document()`, NEWS entry, `_pkgdown.yml` entry. Run the verify slot.
 
 ## Work log
 
@@ -55,6 +55,8 @@ Ship `ssm_trajectory()`. It turns a fitted joint model's fixed effects and covar
 - 2026-09-24: criteria audit ran in full mode on an [O] reader. Findings absorbed here: the zero-covariance oracle collided with the refusal (now exempt). The refusal is defined on the derived per-time cross covariance. A second interval oracle and the `time` attribute were added. The plant matrix varies position and triangle. `layer_data()` replaced a two-snapshot comparison.
 - 2026-09-24: a second audit pass on the changed criteria: `mvn_draws()` carries no column names, so AC2 now sets them. Partial argument combinations are each refused. The `draws` exemption gets a passing test and a help-page sentence. brms's `b_` prefix and extra columns are handled in AC5.
 - 2026-09-24: plan gate chose an engine-agnostic input (`coef` and `vcov`, or `draws`) over a glmmTMB fit-object method. A method needs tests that skip without glmmTMB, against D-016, and breaks on an accessor rename. Falsified by a user report that the two extraction calls are where readers stop.
+- 2026-09-24: /milestone-implement started; branch cut from the synced default branch. Question gate skipped: the plan fixes the signature, class, file names and dependency surface. Two routine calls made here: print `digits` defaults to 2 (the vignette's rounding), and `n_draws` is ignored when `draws` is given (documented on the argument).
+- 2026-09-24: T1 to T7 done in one sitting, tests written before each part of the code. The reference in the test file is the vignette's `mvn_draw()` and per-wave loop verbatim, on the fixture in place of a live fit. The plant matrix uses a diagonal base so each of the four cross positions is the only nonzero cross entry. The time attribute survives `[` subsetting in R 4.x, so the plot method's missing-attribute guard is tested by removing the attribute. Verify slot: `devtools::test()` 14283 pass, 0 fail; `document()` no diff and no link warning; `pkgdown::check_pkgdown()` clean; the help-page examples run on base R alone.
 
 ## Decisions
 
