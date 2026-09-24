@@ -38,7 +38,7 @@ intervals at small samples", state the limits. Section 8, "The unwrap
 alternative: `angle_unwrap()`", fits a second recipe. Section 9, "Caveats and
 upgrades", closes the recipe. Section 10, "The same model in nlme and brms",
 shows the two other engines. The Wrap-up lists what the page covered and
-names the next page, and the References list the sources cited.
+says that no page follows, and the References list the sources cited.
 
 ## 2. The question growth modeling answers
 
@@ -211,7 +211,7 @@ and $d$ at each time, plus the `certified` verdict that Section 6 explains.
 Printing rounds the table to two decimals, and it ends with the caution
 that Section 7 explains.
 
-Before the first step, the call makes the check that Section 4 promised. It
+Before the second step, the call makes the check that Section 4 promised. It
 reads the covariance that `vcov` implies between $\hat{x}(t)$ and
 $\hat{y}(t)$ at each time in `times`. A joint fit estimates that covariance,
 so it is not zero. Separate fits produce one covariance matrix per
