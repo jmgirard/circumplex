@@ -2,9 +2,10 @@
 
 Two simulated datasets for demonstrating growth models on SSM parameters
 with
-[`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md)
+[`ssm_growth_data()`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md),
+[`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
 and
-[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md).
+[`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md).
 The data are simulated, not collected from people. In both datasets, 150
 persons have scores on the eight octant scales at waves 0 to 4.
 
@@ -63,3 +64,8 @@ Both datasets are written by one seeded script,
 `data-raw/simulated_growth.R`, which is not in the installed package.
 Read it on GitHub:
 <https://github.com/jmgirard/circumplex/blob/master/data-raw/simulated_growth.R>.
+
+## See also
+
+[`vignette("growth-ssm-analysis")`](http://circumplex.jmgirard.com/articles/growth-ssm-analysis.md),
+which fits a growth model to both datasets.

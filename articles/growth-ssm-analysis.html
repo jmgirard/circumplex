@@ -126,20 +126,22 @@ because this page summarizes draws with the same tools.</p>
 </h2>
 <p>This vignette fits a growth model to SSM parameters measured at
 several waves. Section 2, “The question growth modeling answers”, states
-the question. Section 3, “From repeated measures to a coordinate table”,
-builds the input with <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>. Section 4, “One
-joint model, not three separate ones”, fits the joint mixed model.
-Section 5, “From fixed effects to
+the question. Section 3, “From repeated measures to a long table”,
+builds the input with <code><a href="../reference/ssm_growth_data.html">ssm_growth_data()</a></code>. Section 4, “One
+joint model, not three separate ones”, writes the model with
+<code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> and fits it. Section 5, “From fixed
+effects to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a(t), d(t))</annotation></semantics></math>
 with intervals”, carries the uncertainty through
-<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>. Section 6, “Certification: when
+<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code>. Section 6, “Certification: when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 intervals are not interpretable”, and Section 7, “A caution about REML
 intervals at small samples”, state the limits. Section 8, “The unwrap
 alternative: <code><a href="../reference/angle_unwrap.html">angle_unwrap()</a></code>”, fits a second recipe. Section
-9, “Caveats and upgrades”, closes. The Wrap-up lists what the page
-covered and names the next page, and the References list the sources
-cited.</p>
+9, “Caveats and upgrades”, closes the recipe. Section 10, “The same
+model in nlme and brms”, shows the two other engines. The Wrap-up lists
+what the page covered and says that no page follows, and the References
+list the sources cited.</p>
 </div>
 <div class="section level2">
 <h2 id="the-question-growth-modeling-answers">2. The question growth modeling answers<a class="anchor" aria-label="anchor" href="#the-question-growth-modeling-answers"></a>
@@ -176,27 +178,23 @@ fitted trajectories back to amplitude and displacement at each time,
 with circular-correct summaries.</p>
 <p>The division of labor is deliberate and mirrors the package’s
 Bayesian vignette: <strong>circumplex does not fit mixed
-models</strong>. It prepares the coordinate data on the way in
-(<code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>). It converts fitted model draws
-(draws that describe the uncertainty in the fitted model’s estimates) on
-the way out (<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>). The growth model itself belongs
-to a dedicated mixed-modeling package. The reference recipe below uses
-<strong>glmmTMB</strong>. The same stacked-outcome formulation can also
-be fit with <code>nlme</code> (shipped with base R), using its
-<code>varIdent</code> and <code>corSymm</code> machinery.</p>
+models</strong>. It builds the input on the way in, with
+<code><a href="../reference/ssm_growth_data.html">ssm_growth_data()</a></code> and <code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code>. It
+turns the fitted model’s estimates into a trajectory on the way out,
+with <code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code>. The growth model itself belongs to a
+dedicated mixed-modeling package. The reference recipe below uses
+<strong>glmmTMB</strong>. Section 10 shows the same model in
+<code>nlme</code>, which ships with R, and in <code>brms</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="from-repeated-measures-to-a-coordinate-table">3. From repeated measures to a coordinate table<a class="anchor" aria-label="anchor" href="#from-repeated-measures-to-a-coordinate-table"></a>
+<h2 id="from-repeated-measures-to-a-long-table">3. From repeated measures to a long table<a class="anchor" aria-label="anchor" href="#from-repeated-measures-to-a-long-table"></a>
 </h2>
-<p>The input to the growth model is a person-by-wave table of SSM
-coordinates. <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code> computes
+<p>The input to the growth model is a long table with one row per
+person, wave and coordinate. <code><a href="../reference/ssm_growth_data.html">ssm_growth_data()</a></code> builds it.
+It scores each input row as its own profile through
+<code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>. Then it stacks the three coordinates
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>e</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(e, x, y)</annotation></semantics></math>
-(and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
-fit) from circumplex scale scores. Applied to a table with one row per
-person per wave, it yields exactly the tidy input that a mixed model
-wants.</p>
+under an outcome indicator <code>dv</code>.</p>
 <p>The package ships a simulated data set,
 <code>simulated_growth</code>, with five waves (0 to 4) of octant scores
 for 150 persons. Octant scores are scores on eight scales placed 45°
@@ -208,55 +206,85 @@ amplitude stays near 0.6 throughout. <code><a href="../reference/simulated_growt
 states how the data were simulated.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_growth"</span><span class="op">)</span></span>
-<span><span class="va">coord</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="va">simulated_growth</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">coord</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="va">simulated_growth</span><span class="op">$</span><span class="va">person</span></span>
-<span><span class="va">coord</span><span class="op">$</span><span class="va">wave</span> <span class="op">&lt;-</span> <span class="va">simulated_growth</span><span class="op">$</span><span class="va">wave</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">coord</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   id n_obs na_rate      Elev      Xval       Yval      Ampl      Disp</span></span>
-<span><span class="co">#&gt; 1  1     1       0 0.4595363 0.5697631 -0.1920113 0.6012474 341.37608</span></span>
-<span><span class="co">#&gt; 2  2     1       0 0.8644617 0.9896316  0.2426116 1.0189363  13.77459</span></span>
-<span><span class="co">#&gt; 3  3     1       0 0.5354376 0.6640467 -0.2164674 0.6984384 341.94495</span></span>
-<span><span class="co">#&gt;         Fit person wave</span></span>
-<span><span class="co">#&gt; 1 0.5912013      1    0</span></span>
-<span><span class="co">#&gt; 2 0.7171530      2    0</span></span>
-<span><span class="co">#&gt; 3 0.8516460      3    0</span></span></code></pre></div>
-<p>With no <code>id</code> argument, <code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code>
-treats each row as its own profile. So <code>coord</code> has one row
-per person per wave, and its <code>id</code> column is the row number.
-The two assignments copy each row’s person and wave onto it. (Passing
-<code>id = "person"</code> would instead average each person’s waves
-into one profile, which is not what a growth model needs.)</p>
+<span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_growth_data.html">ssm_growth_data</a></span><span class="op">(</span></span>
+<span>  <span class="va">simulated_growth</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"person"</span>,</span>
+<span>  time <span class="op">=</span> <span class="st">"wave"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">long</span>, <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   person wave dv      value</span></span>
+<span><span class="co">#&gt; 1      1    0  e  0.4595363</span></span>
+<span><span class="co">#&gt; 2      1    0  x  0.5697631</span></span>
+<span><span class="co">#&gt; 3      1    0  y -0.1920113</span></span>
+<span><span class="co">#&gt; 4      2    0  e  0.8644617</span></span>
+<span><span class="co">#&gt; 5      2    0  x  0.9896316</span></span>
+<span><span class="co">#&gt; 6      2    0  y  0.2426116</span></span></code></pre></div>
+<p>The table has four columns. <code>person</code> is a factor and
+<code>wave</code> is numeric, both copied from the input.
+<code>dv</code> is a factor with levels <code>e</code>, <code>x</code>
+and <code>y</code>, and it names the coordinate each row holds.
+<code>value</code> is that coordinate’s value. One input row gives three
+output rows, in that order, so the six rows above are the first two
+persons at wave 0. The table carries no amplitude and no displacement,
+because growth in displacement is modeled through
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+and never through the angle itself.</p>
 </div>
 <div class="section level2">
 <h2 id="one-joint-model-not-three-separate-ones">4. One joint model, not three separate ones<a class="anchor" aria-label="anchor" href="#one-joint-model-not-three-separate-ones"></a>
 </h2>
 <p>The growth model treats the three coordinates as a
-<em>multivariate</em> outcome. Stack them into long format with an
-outcome indicator <code>dv</code>, a column that names the coordinate
-each row holds. Give each outcome its own intercept and slope. The
-person-level random effects are each person’s own deviations from the
-group intercepts. Let them be <strong>correlated across
-outcomes</strong>.</p>
-<p>The stacked data frame is <code>long</code>, with one row per person,
-wave and coordinate. Its columns are <code>person</code> (a factor),
-<code>wave</code>, <code>dv</code> (a factor with levels <code>e</code>,
-<code>x</code> and <code>y</code>) and <code>value</code>. The
-<code>value</code> of <code>e</code>, <code>x</code> and <code>y</code>
-comes from the <code>Elev</code>, <code>Xval</code> and
-<code>Yval</code> columns of <code>coord</code>. (The reshaping code is
-omitted.)</p>
+<em>multivariate</em> outcome. Each coordinate gets its own intercept
+and its own slope on <code>wave</code>. Each person gets a random
+intercept per coordinate, and the three person intercepts are
+<strong>correlated across outcomes</strong>. Each coordinate keeps its
+own residual variance. <code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> writes this one
+model in the engine’s dialect, and printing it shows the complete fit
+call:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f_glmmTMB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_growth_formula.html">ssm_growth_formula</a></span><span class="op">(</span><span class="st">"glmmTMB"</span>, time <span class="op">=</span> <span class="st">"wave"</span>, id <span class="op">=</span> <span class="st">"person"</span><span class="op">)</span></span>
+<span><span class="va">f_glmmTMB</span></span>
+<span><span class="co">#&gt; Joint growth model on SSM coordinates, glmmTMB dialect.</span></span>
+<span><span class="co">#&gt; Fit on the long table from ssm_growth_data(), then keep the fixed effects:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; fit &lt;- glmmTMB::glmmTMB(</span></span>
+<span><span class="co">#&gt;   value ~ 0 + dv + dv:wave + us(0 + dv | person),</span></span>
+<span><span class="co">#&gt;   dispformula = ~ 0 + dv,</span></span>
+<span><span class="co">#&gt;   data = long,</span></span>
+<span><span class="co">#&gt;   REML = TRUE</span></span>
+<span><span class="co">#&gt; )</span></span>
+<span><span class="co">#&gt; coef &lt;- glmmTMB::fixef(fit)$cond</span></span>
+<span><span class="co">#&gt; vcov &lt;- as.matrix(vcov(fit)$cond)</span></span></code></pre></div>
+<p>The <code>time</code> and <code>id</code> arguments are the column
+names given to <code><a href="../reference/ssm_growth_data.html">ssm_growth_data()</a></code>. In
+<code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> they default to <code>"wave"</code>
+and <code>"person"</code>. The object holds the two formulas as
+<code>f_glmmTMB$formula</code> and <code>f_glmmTMB$dispformula</code>.
+The fit below is the printed call, with the two formulas read from the
+object. The model has no options, because a covariate or a quadratic
+time term changes the model whose interval coverage the package
+validated.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
-<span>  <span class="va">value</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">+</span> <span class="va">dv</span><span class="op">:</span><span class="va">wave</span> <span class="op">+</span> <span class="fu">us</span><span class="op">(</span><span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">|</span> <span class="va">person</span><span class="op">)</span>,</span>
-<span>  dispformula <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span>,</span>
+<span>  <span class="va">f_glmmTMB</span><span class="op">$</span><span class="va">formula</span>,</span>
+<span>  dispformula <span class="op">=</span> <span class="va">f_glmmTMB</span><span class="op">$</span><span class="va">dispformula</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">long</span>,</span>
 <span>  REML <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
+<span><span class="va">coef</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
+<span><span class="va">vcov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span></span>
+<span><span class="va">coef</span></span>
 <span><span class="co">#&gt;           dve           dvx           dvy      dve:wave      dvx:wave </span></span>
 <span><span class="co">#&gt;  0.5249198595  0.6085429795 -0.1036244260 -0.0007414075 -0.0010567782 </span></span>
 <span><span class="co">#&gt;      dvy:wave </span></span>
 <span><span class="co">#&gt;  0.0649480442</span></span></code></pre></div>
+<p>The last two lines are the ones the printed call ends with.
+<code>coef</code> holds the fixed effects, the group intercepts and
+slopes, and <code>vcov</code> holds their covariance matrix. Both go to
+the next step.</p>
 <p>The person block of the variance components is one place where the
 fit shows that it is joint. Its three standard deviations say how much
 the persons’ stable shifts in
@@ -268,7 +296,7 @@ vary. Its three correlations tie those shifts together across the
 coordinates, and three separate fits could not estimate them. The
 residual row shows <code>NA</code> because the per-coordinate residual
 variances live in the dispersion model, not in this table.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/VarCorr.html" class="external-link">VarCorr</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
@@ -313,107 +341,86 @@ coverage drops from the nominal 95% to roughly 86%. Pointwise coverage
 is how often the interval at one wave contains the true direction. The
 joint recipe stays at nominal. Strongly correlated person effects are
 realistic, because profile tilts are rarely aligned with an axis. Do not
-fit the coordinates separately. Section 5 shows one check that detects a
-covariance matrix assembled from separate fits.</p>
+fit the coordinates separately. Section 5 shows how
+<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> refuses a covariance matrix assembled from
+separate fits.</p>
 </div>
 <div class="section level2">
 <h2 id="from-fixed-effects-to-at-dt-with-intervals">5. From fixed effects to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a(t), d(t))</annotation></semantics></math>
 with intervals<a class="anchor" aria-label="anchor" href="#from-fixed-effects-to-at-dt-with-intervals"></a>
 </h2>
-<p>The fixed effects are the group intercepts and slopes. They define
-the mean trajectory
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mover><mi>e</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mover><mi>x</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mover><mi>y</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\hat{e}(t), \hat{x}(t), \hat{y}(t))</annotation></semantics></math>.
-Three steps carry uncertainty through the nonlinear map from
+<p><code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> takes <code>coef</code>,
+<code>vcov</code> and the times at which to evaluate the trajectory. It
+returns one row per time:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trajectory</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_trajectory.html">ssm_trajectory</a></span><span class="op">(</span><span class="va">coef</span>, <span class="va">vcov</span>, times <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">trajectory</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # SSM Trajectory:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci</span></span>
+<span><span class="co">#&gt;     0  0.53  0.47  0.58  0.61  0.57  0.65 -0.10 -0.14 -0.07  0.62  0.58</span></span>
+<span><span class="co">#&gt;     1  0.52  0.47  0.57  0.61  0.57  0.64 -0.04 -0.07 -0.01  0.61  0.58</span></span>
+<span><span class="co">#&gt;     2  0.52  0.47  0.57  0.61  0.58  0.64  0.03 -0.01  0.06  0.61  0.58</span></span>
+<span><span class="co">#&gt;     3  0.52  0.47  0.57  0.61  0.57  0.64  0.09  0.06  0.12  0.61  0.58</span></span>
+<span><span class="co">#&gt;     4  0.52  0.47  0.57  0.60  0.57  0.64  0.16  0.12  0.19  0.62  0.59</span></span>
+<span><span class="co">#&gt;  a_uci  d_est  d_lci  d_uci</span></span>
+<span><span class="co">#&gt;   0.66 350.30 346.93 353.69</span></span>
+<span><span class="co">#&gt;   0.64 356.33 353.24 359.28</span></span>
+<span><span class="co">#&gt;   0.64   2.46 359.52   5.18</span></span>
+<span><span class="co">#&gt;   0.64   8.55   5.48  11.48</span></span>
+<span><span class="co">#&gt;   0.66  14.48  11.14  17.80</span></span>
+<span><span class="co">#&gt;   Caution: intervals from a fitted model's fixed-effect covariance condition</span></span>
+<span><span class="co">#&gt;   on its estimated variance components, and are too narrow at small samples.</span></span>
+<span><span class="co">#&gt;   See vignette("growth-ssm-analysis"), Section 7.</span></span></code></pre></div>
+<p>Three steps run inside the call. Together they carry uncertainty
+through the nonlinear map from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(x, y)</annotation></semantics></math>
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a(t), d(t))</annotation></semantics></math>.
-First, draw coefficient vectors from the multivariate normal implied by
-the fixed-effect covariance matrix. That matrix holds the estimated
-sampling variances and covariances of the fixed effects. This is the
-same large-sample (asymptotic) step that the package’s Monte Carlo
-engine takes. Second, evaluate each draw at each wave, which gives that
-draw’s coordinates at that wave. Third, hand the per-wave draws to
-<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>. It applies the package’s circular-statistics
-machinery (medians and circular means, equal-tailed intervals with
-correct wrapping at the boundary).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fe</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
-<span><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span></span></code></pre></div>
-<p>Before the first step, here is the check that Section 4 promised.
-Take the block of <code>V</code> that crosses the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
-fixed effects with the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-fixed effects and ask whether any entry differs from zero.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">V</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dvx"</span>, <span class="st">"dvx:wave"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dvy"</span>, <span class="st">"dvy:wave"</span><span class="op">)</span><span class="op">]</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>A joint fit estimates this whole block, so nothing in it is
-structurally zero. Only the intercept covariance is appreciable here.
-The other three entries are floating-point residue near
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>20</mn></mrow></msup><annotation encoding="application/x-tex">10^{-20}</annotation></semantics></math>,
-numerically zero, which is why the check asks for any nonzero entry
-rather than for every entry. It is a structural test, not a test of
-size. Separate fits produce one covariance matrix per coordinate, and a
-full matrix assembled from them block by block holds exact zeros in
-every cross block. The check detects only that assembled structure, and
-it has no power outside that case: a matrix whose cross block holds any
-nonzero value, however small, passes. A nonzero block does not show that
-the model is right: a misspecified joint model passes it too. Carry this
-check to your own fits, and replace the four names with the intercept
-and slope terms of your own model, which this vignette’s outcome factor
-<code>dv</code> and time variable <code>wave</code> produce.</p>
-<p>The first step draws 4000 coefficient vectors from the multivariate
-normal distribution with mean <code>fe</code> and covariance matrix
-<code>V</code>. The draws are stored in the matrix <code>B</code>, with
-one row per draw and one column per fixed effect. Its columns carry the
-names of <code>fe</code>, such as <code>dvx</code> and
-<code>dvx:wave</code>. (The code that draws them is omitted.)</p>
-<p>The second and third steps, at wave 2, look like this. Each draw’s
-coordinate at wave 2 is its intercept plus 2 times its slope:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wave2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
-<span>  e <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
-<span>  x <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
-<span>  y <span class="op">=</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
-<span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
-<span><span class="va">wave2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Posterior Summary:</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                Estimate   Lower CrI   Upper CrI</span></span>
-<span><span class="co">#&gt; Elevation         0.524       0.475       0.573</span></span>
-<span><span class="co">#&gt; X-Value           0.607       0.576       0.638</span></span>
-<span><span class="co">#&gt; Y-Value           0.026      -0.005       0.055</span></span>
-<span><span class="co">#&gt; Amplitude         0.607       0.576       0.639</span></span>
-<span><span class="co">#&gt; Displacement      2.456     359.517       5.184</span></span>
-<span><span class="co">#&gt; Model Fit</span></span></code></pre></div>
-<p>The same call at each of the waves 0 to 4 gives one result per wave.
-The table <code>trajectory</code> collects them, with one row per wave.
-Its columns are <code>wave</code>, the six columns <code>a_est</code>,
-<code>a_lci</code>, <code>a_uci</code>, <code>d_est</code>,
-<code>d_lci</code> and <code>d_uci</code> from each result’s
-<code>$results</code>, and <code>certified</code> from its
-<code>$details</code>. (The loop that builds the table is omitted.)
-Rounded to two decimals, it reads:</p>
-<pre><code><span><span class="co">#&gt;   wave a_est a_lci a_uci  d_est  d_lci  d_uci certified</span></span>
-<span><span class="co">#&gt; 1    0  0.62  0.58  0.66 350.30 346.93 353.69      TRUE</span></span>
-<span><span class="co">#&gt; 2    1  0.61  0.58  0.64 356.33 353.24 359.28      TRUE</span></span>
-<span><span class="co">#&gt; 3    2  0.61  0.58  0.64   2.46 359.52   5.18      TRUE</span></span>
-<span><span class="co">#&gt; 4    3  0.61  0.58  0.64   8.55   5.48  11.48      TRUE</span></span>
-<span><span class="co">#&gt; 5    4  0.62  0.59  0.66  14.48  11.14  17.80      TRUE</span></span></code></pre>
+First, the call draws 4000 coefficient vectors from the multivariate
+normal distribution with mean <code>coef</code> and covariance
+<code>vcov</code>. This is the same large-sample (asymptotic) step that
+the package’s Monte Carlo engine takes. Second, it evaluates each draw
+at each time. A draw’s coordinate at wave 2 is its intercept plus 2
+times its slope. Third, it hands each time’s draws to
+<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code>. That function applies the package’s
+circular-statistics machinery (medians and circular means, equal-tailed
+intervals with correct wrapping at the boundary). The table holds the
+estimate and interval of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
+at each time, plus the <code>certified</code> verdict that Section 6
+explains. Printing rounds the table to two decimals, and it ends with
+the caution that Section 7 explains.</p>
+<p>Before the second step, the call makes the check that Section 4
+promised. It reads the covariance that <code>vcov</code> implies between
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>x</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\hat{x}(t)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>y</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\hat{y}(t)</annotation></semantics></math>
+at each time in <code>times</code>. A joint fit estimates that
+covariance, and it is almost never exactly zero. Separate fits produce
+one covariance matrix per coordinate, and a full matrix assembled from
+them block by block implies exactly zero at every time.
+<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> refuses such a matrix with an error. The
+check is structural, not a test of size: a covariance that is nonzero,
+however small, passes. A nonzero covariance does not show that the model
+is right, because a misspecified joint model passes the check too.</p>
 <p>The displacement estimates hug the 0°/360° boundary by design. The
 estimate is near 350° at wave 0, crosses 0° between waves 1 and 2, and
 reaches about 14° at wave 4. The intervals wrap correctly rather than
 spanning “the long way around.”</p>
-<p><code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> plots a table in this shape
-directly. The table has one row per time point, with
-<code>a_est</code>/<code>a_lci</code>/<code>a_uci</code>,
-<code>d_est</code>/<code>d_lci</code>/<code>d_uci</code>, and optionally
-<code>certified</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> plots the object directly, and it
+reads the name of the time column from the object. A plain data frame
+with the same columns plots too, with <code>time = "wave"</code>
+named:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/growth-ssm-analysis-plot-1.png" alt="plot of chunk plot"></p>
 <p>The displacement panel is drawn on an <em>unwrapped</em> branch. An
 unwrapped branch lets angles go past 360° (or below 0°) so that the line
@@ -448,13 +455,12 @@ the draws of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 become diffuse or bimodal. A quantile interval of them is then not a
 trustworthy statement about direction.</p>
-<p>At each wave, <code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> applies the package’s
+<p>At each time, <code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> applies the package’s
 certification rule to the amplitude interval. The rule requires the
 interval’s lower bound to be at least 0.35 times the interval’s width.
 The rule is scale-free: it does not depend on the units of the scores.
-<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> records the verdict in
-<code>$details$certified</code>, which is the <code>certified</code>
-column above. <strong>At any uncertified wave, the
+<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> carries the verdict into its
+<code>certified</code> column. <strong>At any uncertified time, the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 interval is not interpretable.</strong> It should be reported as such,
 not narrated as a direction.</p>
@@ -466,57 +472,60 @@ coordinate changes sign while
 stays near zero). The package ships these data too, as
 <code>simulated_growth_origin</code>. It has the same persons, waves and
 columns as <code>simulated_growth</code>, and
-<code><a href="../reference/simulated_growth.html">?simulated_growth</a></code> describes both. We compute its
-coordinates the same way:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code><a href="../reference/simulated_growth.html">?simulated_growth</a></code> describes both. The calls are the same,
+and the fit reads the same two formulas:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"simulated_growth_origin"</span><span class="op">)</span></span>
-<span><span class="va">coord2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_parameters_id.html">ssm_parameters_id</a></span><span class="op">(</span><span class="va">simulated_growth_origin</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">coord2</span><span class="op">$</span><span class="va">person</span> <span class="op">&lt;-</span> <span class="va">simulated_growth_origin</span><span class="op">$</span><span class="va">person</span></span>
-<span><span class="va">coord2</span><span class="op">$</span><span class="va">wave</span> <span class="op">&lt;-</span> <span class="va">simulated_growth_origin</span><span class="op">$</span><span class="va">wave</span></span></code></pre></div>
-<p>As before, <code>coord2</code> is stacked into <code>long2</code>,
-with the same four columns as <code>long</code>. (The reshaping code is
-omitted.) The model is the same:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<span><span class="va">long2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_growth_data.html">ssm_growth_data</a></span><span class="op">(</span></span>
+<span>  <span class="va">simulated_growth_origin</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"person"</span>,</span>
+<span>  time <span class="op">=</span> <span class="st">"wave"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
-<span>  <span class="va">value</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">+</span> <span class="va">dv</span><span class="op">:</span><span class="va">wave</span> <span class="op">+</span> <span class="fu">us</span><span class="op">(</span><span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span> <span class="op">|</span> <span class="va">person</span><span class="op">)</span>,</span>
-<span>  dispformula <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">dv</span>, data <span class="op">=</span> <span class="va">long2</span>, REML <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="va">f_glmmTMB</span><span class="op">$</span><span class="va">formula</span>,</span>
+<span>  dispformula <span class="op">=</span> <span class="va">f_glmmTMB</span><span class="op">$</span><span class="va">dispformula</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">long2</span>,</span>
+<span>  REML <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">fe2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span></code></pre></div>
-<p>Its 4000 coefficient draws are stored in <code>B2</code>, drawn the
-same way as <code>B</code>. (That code is omitted.) The summary at wave
-2 is:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
-<span>  e <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
-<span>  x <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
-<span>  y <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
-<span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
-<span><span class="va">mid</span></span>
+<span><span class="va">coef2</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span></span>
+<span><span class="va">vcov2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">$</span><span class="va">cond</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trajectory2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_trajectory.html">ssm_trajectory</a></span><span class="op">(</span><span class="va">coef2</span>, <span class="va">vcov2</span>, times <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">trajectory2</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Posterior Summary:</span></span>
+<span><span class="co">#&gt; # SSM Trajectory:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                Estimate   Lower CrI   Upper CrI</span></span>
-<span><span class="co">#&gt; Elevation         0.512       0.463       0.562</span></span>
-<span><span class="co">#&gt; X-Value           0.003      -0.026       0.033</span></span>
-<span><span class="co">#&gt; Y-Value           0.017      -0.011       0.044</span></span>
-<span><span class="co">#&gt; Amplitude         0.023       0.005       0.049</span></span>
-<span><span class="co">#&gt; Displacement     80.714     322.335     214.098</span></span>
-<span><span class="co">#&gt; Model Fit                                      </span></span>
-<span><span class="co">#&gt;   Note: the amplitude CrI lower bound is under 0.35 CrI-widths above zero;</span></span>
-<span><span class="co">#&gt;   the displacement is not interpretable.</span></span></code></pre></div>
-<p>The printed note is the certification rule firing. At this wave, the
-amplitude interval sits too close to zero. The displacement interval,
-which here spans more than half the circle, is not a statement about
-direction. In our validation simulations of this near-origin case, the
-caution fires at the degraded wave in essentially every replicate.
-Meanwhile, the waves far from the origin remain certified, and their
-intervals keep their nominal coverage.</p>
-<p>Assembling this fit’s full trajectory the same way, and carrying the
-<code>certified</code> verdict into the table, lets the plot mark the
-verdict itself. The table <code>trajectory2</code> has the same columns
-as <code>trajectory</code>. (The loop that builds it is omitted.)</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt;   wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci</span></span>
+<span><span class="co">#&gt;      0  0.51  0.45  0.56  0.50  0.46  0.53  0.02 -0.02  0.05  0.50  0.46</span></span>
+<span><span class="co">#&gt;      1  0.51  0.46  0.56  0.25  0.22  0.28  0.02 -0.01  0.04  0.25  0.22</span></span>
+<span><span class="co">#&gt; *    2  0.51  0.46  0.56  0.00 -0.03  0.03  0.02 -0.01  0.04  0.02  0.00</span></span>
+<span><span class="co">#&gt;      3  0.52  0.47  0.57 -0.24 -0.27 -0.21  0.02 -0.01  0.05  0.24  0.21</span></span>
+<span><span class="co">#&gt;      4  0.52  0.47  0.57 -0.49 -0.53 -0.45  0.02 -0.02  0.05  0.49  0.45</span></span>
+<span><span class="co">#&gt;   a_uci  d_est  d_lci  d_uci</span></span>
+<span><span class="co">#&gt;    0.53   1.83 357.91   5.68</span></span>
+<span><span class="co">#&gt;    0.28   3.72 357.01  10.26</span></span>
+<span><span class="co">#&gt; *  0.05  80.71 322.34 214.10</span></span>
+<span><span class="co">#&gt;    0.28 175.95 168.80 182.83</span></span>
+<span><span class="co">#&gt;    0.53 177.94 173.83 181.97</span></span>
+<span><span class="co">#&gt;   * Uncertified: the amplitude interval's lower bound is under 0.35</span></span>
+<span><span class="co">#&gt;   interval-widths above zero, so the displacement interval at that time is</span></span>
+<span><span class="co">#&gt;   not interpretable.</span></span>
+<span><span class="co">#&gt;   Caution: intervals from a fitted model's fixed-effect covariance condition</span></span>
+<span><span class="co">#&gt;   on its estimated variance components, and are too narrow at small samples.</span></span>
+<span><span class="co">#&gt;   See vignette("growth-ssm-analysis"), Section 7.</span></span></code></pre></div>
+<p>The asterisk marks the uncertified row, and the note under the table
+states the rule. At that wave, the amplitude interval sits too close to
+zero. The displacement interval, which here spans more than half the
+circle, is not a statement about direction. In our validation
+simulations of this near-origin case, the uncertified mark appears at
+the degraded wave in essentially every replicate. Meanwhile, the waves
+far from the origin remain certified, and their intervals keep their
+nominal coverage.</p>
+<p>The plot marks the verdict itself:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/growth-ssm-analysis-lowamp-plot-1.png" alt="plot of chunk lowamp-plot"></p>
 <p>Uncertified waves are drawn as <strong>hollow</strong> points on the
 displacement panel. Read them as gaps in the argument, not as estimates
@@ -525,10 +534,10 @@ collapses toward zero as the group passes the origin. The displacement
 interval at such a wave can cover most of the circle. The panel draws it
 at that full width rather than flattening it into something that looks
 precise.</p>
-<p>The <code>certified</code> column is optional. A table without it
-plots the same way, minus the hollow marking and its legend. The figure
-then makes no claim about interpretability either way. That is the
-honest default when the verdict was never computed.</p>
+<p>The <code>certified</code> column is optional for a plain data frame.
+A table without it plots the same way, minus the hollow marking and its
+legend. The figure then makes no claim about interpretability either
+way. That is the honest default when the verdict was never computed.</p>
 </div>
 <div class="section level2">
 <h2 id="a-caution-about-reml-intervals-at-small-samples">7. A caution about REML intervals at small samples<a class="anchor" aria-label="anchor" href="#a-caution-about-reml-intervals-at-small-samples"></a>
@@ -558,7 +567,7 @@ intervals.</p>
 displacement at each wave. <strong>Unwrap</strong> each person’s
 sequence onto a continuous branch. Then fit an ordinary univariate
 growth model to the unwrapped angles.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One person's displacement over five waves, drifting across the boundary</span></span>
 <span><span class="va">d_person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">350</span>, <span class="fl">355</span>, <span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/angle_unwrap.html">angle_unwrap</a></span><span class="op">(</span><span class="va">d_person</span><span class="op">)</span></span>
@@ -643,22 +652,126 @@ circumplex has no function that fits it. But <code><a href="../reference/ssm_dra
 will happily summarize posterior draws produced by any such model.</p>
 </div>
 <div class="section level2">
+<h2 id="the-same-model-in-nlme-and-brms">10. The same model in nlme and brms<a class="anchor" aria-label="anchor" href="#the-same-model-in-nlme-and-brms"></a>
+</h2>
+<p><code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> writes the same joint model for two
+other engines. Each dialect fits the same three intercepts and slopes,
+the same correlated person intercepts and a separate residual variance
+for each coordinate.</p>
+<p><strong>nlme</strong> ships with every R installation. Its call sets
+<code>na.action = na.omit</code>, because <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">nlme::lme()</a></code>
+otherwise stops on a row whose <code>value</code> is <code>NA</code>.
+glmmTMB drops such a row by default. The nlme fixed effects and their
+covariance go to <code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> exactly as glmmTMB’s do.
+On the data of Section 3, the two engines’ fixed effects and covariance
+agree within the bounds the package’s nlme parity test holds:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_growth_formula.html">ssm_growth_formula</a></span><span class="op">(</span><span class="st">"nlme"</span>, time <span class="op">=</span> <span class="st">"wave"</span>, id <span class="op">=</span> <span class="st">"person"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Joint growth model on SSM coordinates, nlme dialect.</span></span>
+<span><span class="co">#&gt; Fit on the long table from ssm_growth_data(), then keep the fixed effects:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; fit &lt;- nlme::lme(</span></span>
+<span><span class="co">#&gt;   fixed = value ~ 0 + dv + dv:wave,</span></span>
+<span><span class="co">#&gt;   random = ~ 0 + dv | person,</span></span>
+<span><span class="co">#&gt;   weights = nlme::varIdent(form = ~ 1 | dv),</span></span>
+<span><span class="co">#&gt;   data = long,</span></span>
+<span><span class="co">#&gt;   na.action = na.omit,</span></span>
+<span><span class="co">#&gt;   method = "REML"</span></span>
+<span><span class="co">#&gt; )</span></span>
+<span><span class="co">#&gt; coef &lt;- nlme::fixef(fit)</span></span>
+<span><span class="co">#&gt; vcov &lt;- as.matrix(vcov(fit))</span></span></code></pre></div>
+<p><strong>brms</strong> fits the same likelihood by Markov chain Monte
+Carlo (MCMC) sampling under its default priors. brms needs a Stan
+toolchain, so this page does not run it, and the fit chunk below is
+shown and not evaluated. The call is the one
+<code>ssm_growth_formula("brms")</code> prints, with the sampler
+settings added:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f_brms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_growth_formula.html">ssm_growth_formula</a></span><span class="op">(</span><span class="st">"brms"</span>, time <span class="op">=</span> <span class="st">"wave"</span>, id <span class="op">=</span> <span class="st">"person"</span><span class="op">)</span></span>
+<span><span class="va">f_brms</span></span>
+<span><span class="co">#&gt; Joint growth model on SSM coordinates, brms dialect.</span></span>
+<span><span class="co">#&gt; Fit on the long table from ssm_growth_data(), then keep the draws:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; fit &lt;- brms::brm(</span></span>
+<span><span class="co">#&gt;   brms::bf(</span></span>
+<span><span class="co">#&gt;     value ~ 0 + dv + dv:wave + (0 + dv | person),</span></span>
+<span><span class="co">#&gt;     sigma ~ 0 + dv</span></span>
+<span><span class="co">#&gt;   ),</span></span>
+<span><span class="co">#&gt;   data = long</span></span>
+<span><span class="co">#&gt; )</span></span>
+<span><span class="co">#&gt; draws &lt;- as.matrix(fit)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bfit</span> <span class="op">&lt;-</span> <span class="fu">brms</span><span class="fu">::</span><span class="fu">brm</span><span class="op">(</span></span>
+<span>  <span class="fu">brms</span><span class="fu">::</span><span class="fu">bf</span><span class="op">(</span><span class="va">f_brms</span><span class="op">$</span><span class="va">formula</span>, <span class="va">f_brms</span><span class="op">$</span><span class="va">sigma</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">long</span>,</span>
+<span>  chains <span class="op">=</span> <span class="fl">4</span>, iter <span class="op">=</span> <span class="fl">2000</span>, cores <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">20260716</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bfit</span><span class="op">)</span></span></code></pre></div>
+<p>The vignette ships the six fixed-effect columns of those draws as
+<code>growth_brms_draws.rds</code>, written once by that call under that
+seed. The page reads the file, which has one row per posterior draw:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"growth_brms_draws.rds"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 4000    6</span></span></code></pre></div>
+<p><code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> takes the matrix as <code>draws</code>
+in place of <code>coef</code> and <code>vcov</code>. It drops the
+<code>b_</code> prefix from the column names, it ignores every other
+column a full <code>as.matrix(bfit)</code> carries, and it draws nothing
+new. Its second and third steps run on the posterior draws as given:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_trajectory.html">ssm_trajectory</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, draws <span class="op">=</span> <span class="va">draws</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # SSM Trajectory:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci</span></span>
+<span><span class="co">#&gt;     0  0.53  0.48  0.58  0.61  0.57  0.65 -0.10 -0.14 -0.07  0.62  0.58</span></span>
+<span><span class="co">#&gt;     1  0.53  0.48  0.58  0.61  0.57  0.64 -0.04 -0.07 -0.01  0.61  0.58</span></span>
+<span><span class="co">#&gt;     2  0.53  0.48  0.57  0.61  0.58  0.64  0.03  0.00  0.06  0.61  0.58</span></span>
+<span><span class="co">#&gt;     3  0.52  0.48  0.57  0.61  0.57  0.64  0.09  0.06  0.12  0.61  0.58</span></span>
+<span><span class="co">#&gt;     4  0.52  0.48  0.57  0.60  0.57  0.64  0.16  0.12  0.19  0.62  0.59</span></span>
+<span><span class="co">#&gt;  a_uci  d_est  d_lci  d_uci</span></span>
+<span><span class="co">#&gt;   0.65 350.33 346.92 353.86</span></span>
+<span><span class="co">#&gt;   0.64 356.36 353.39 359.47</span></span>
+<span><span class="co">#&gt;   0.64   2.49 359.66   5.49</span></span>
+<span><span class="co">#&gt;   0.65   8.59   5.56  11.73</span></span>
+<span><span class="co">#&gt;   0.66  14.51  11.12  17.91</span></span>
+<span><span class="co">#&gt;   Caution: intervals from a fitted model's fixed-effect covariance condition</span></span>
+<span><span class="co">#&gt;   on its estimated variance components, and are too narrow at small samples.</span></span>
+<span><span class="co">#&gt;   See vignette("growth-ssm-analysis"), Section 7.</span></span></code></pre></div>
+<p>At each wave, the posterior medians of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+sit within 0.01 of the glmmTMB table’s estimates. The note under the
+table is written for the <code>coef</code> and <code>vcov</code> shape,
+and it does not apply here. Posterior draws average over the variance
+components rather than condition on their estimates. A posterior
+interval from brms depends on its priors instead, and the package’s
+coverage validation ran the REML fit, not the brms fit. The
+<code>draws</code> shape is not checked for a joint fit, so the joint
+model is the user’s responsibility there.</p>
+</div>
+<div class="section level2">
 <h2 id="wrap-up">Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
 <p>A growth model on the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>e</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(e, x, y)</annotation></semantics></math>
 coordinates describes how a group’s mean profile moves over time.
-<code><a href="../reference/ssm_parameters_id.html">ssm_parameters_id()</a></code> builds the person-by-wave input, and
-one joint mixed model fits the three coordinates.
-<code><a href="../reference/ssm_draws.html">ssm_draws()</a></code> turns the fixed effects into
+<code><a href="../reference/ssm_growth_data.html">ssm_growth_data()</a></code> builds the long input table,
+<code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> hands over the joint model’s fit call,
+and one mixed-model engine fits the three coordinates together.
+<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> turns the fixed effects, or posterior
+draws, into
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">a(t)</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
-with intervals. The certification step says when a direction interval is
-not interpretable. <code><a href="../reference/angle_unwrap.html">angle_unwrap()</a></code> is the alternative when
-person-level directions are the target. No page follows this one. To
-draw the fitted trajectories across occasions on the circumplex canvas,
-read “Advanced Circumplex Visualization”.</p>
+with intervals, and <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> draws them. The
+certification step says when a direction interval is not interpretable.
+<code><a href="../reference/angle_unwrap.html">angle_unwrap()</a></code> is the alternative when person-level
+directions are the target. No page follows this one. To draw the fitted
+trajectories across occasions on the circumplex canvas, read “Advanced
+Circumplex Visualization”.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
