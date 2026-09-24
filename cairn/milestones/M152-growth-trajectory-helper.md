@@ -59,6 +59,8 @@ Ship `ssm_trajectory()`. It turns a fitted joint model's fixed effects and covar
 - 2026-09-24: T1 to T7 done in one sitting, tests written before each part of the code. The reference in the test file is the vignette's `mvn_draw()` and per-wave loop verbatim, on the fixture in place of a live fit. The plant matrix uses a diagonal base so each of the four cross positions is the only nonzero cross entry. The time attribute survives `[` subsetting in R 4.x, so the plot method's missing-attribute guard is tested by removing the attribute. Verify slot: `devtools::test()` 14283 pass, 0 fail; `document()` no diff and no link warning; `pkgdown::check_pkgdown()` clean; the help-page examples run on base R alone.
 - 2026-09-24: claim audit: 52 claims read, 3 corrected — NEWS.md (the all-zero `vcov` exemption was missing), R/ssm_trajectory_helper.R (`n_draws` is now unchecked on the draws path, as its text says), tests/testthat/test-ssm_trajectory_helper.R (the header names the function wrapping as a third difference from the vignette). The reader re-read all three once: each holds. Found in passing and fixed: a column subset that drops `certified` crashed print; it now prints unmarked, with a test. Noted, not changed: the caution names a fitted model's fixed-effect covariance, which does not describe draws-shape input; AC6 binds the line as unconditional.
 - 2026-09-24: all tasks checked; `devtools::test()` after the corrections 14286 pass, 0 fail. Status set to review.
+- 2026-09-24: /milestone-review: seven criteria verified, three-lens review, seven fix-now findings landed on the branch (140bf794), one candidate row (O8), four rejected.
+- 2026-09-24: step-7 approval: m152-growth-trajectory-helper approved for merge.
 
 ## Decisions
 
