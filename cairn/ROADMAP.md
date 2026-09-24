@@ -1,18 +1,17 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-23 (M150 done: row (vi) marked done; one LESSONS line added, the M149 line compressed for the byte budget; M147 row pruned; no RB/RR to archive; validate green.)_
+_Last hygiene check: 2026-09-24 (M151 done: one candidate row added for its deferred input guards, the M147 tombstone and the M148 row pruned, no LESSONS line since the allowlist guard already enforces the one lesson, no RB/RR to archive, validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M151 | Growth input helpers, the long table and the formula builder | review | — | high | milestones/M151-growth-input-helpers.md |
 | M152 | Growth output helper, coefficients or draws to a trajectory | planned | M151 | high | milestones/M152-growth-trajectory-helper.md |
 | M153 | The growth vignette on the helper workflow | planned | M152 | high | milestones/M153-growth-vignette-rewrite.md |
+| M151 | Growth input helpers, the long table and the formula builder | done | — | high | milestones/archive/M151-growth-input-helpers.md |
 | M150 | Price every certificate case from its committed xi1 | done | — | normal | milestones/archive/M150-pin-xi1-certificate-cases.md |
 | M149 | Reference-route checks at the anchors, and the certificate file's CRAN posture | done | — | normal | milestones/archive/M149-dd-anchors-cran-posture.md |
-| M148 | Close the five remaining accuracy-certificate validation-layer fragilities | done | M147 | normal | milestones/archive/M148-certificate-validation-fragilities.md |
 
 ## Candidates
 
