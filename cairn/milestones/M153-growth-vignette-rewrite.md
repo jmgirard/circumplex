@@ -1,6 +1,6 @@
 # M153: The growth vignette on the helper workflow
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M152
 - **Driving RR:** —
@@ -46,7 +46,7 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - [x] T3: Prose pass under the plain-vignettes rules. Run `tools/prose-sweep.R`.
 - [x] T4: Commit, run `tools/precompute-vignettes.R`, then the staleness and width checks. Compare the rendered table to the baseline and record the result.
 - [x] T5: Switch `devel/m27-growth-recipe.R` to the helpers and run it.
-- [ ] T6: NEWS entry, the `@seealso` on `simulated_growth`, `devtools::document()`, `devtools::check()`.
+- [x] T6: NEWS entry, the `@seealso` on `simulated_growth`, `devtools::document()`, `devtools::check()`.
 
 ## Work log
 
@@ -63,6 +63,7 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - 2026-09-24: T3 done. The new prose was written to the rules (25 words, no dash, no semicolon, terms glossed at first use), and `tools/prose-sweep.R` on the whole `.Rmd.orig` exits 0 after two long sentences found on the first run were split. Sections 7 to 9 and the References are the pre-rewrite text, unchanged.
 - 2026-09-24: claim audit: 52 claims read, 5 corrected — NEWS.md (hidden-chunk count, "five calls" for the second example, "links" for a plain `\code{}` See also), vignettes/growth-ssm-analysis.Rmd.orig (the Overview's "names the next page" against the Wrap-up's "no page follows", and the refusal's place in the call order, which runs after the draws, not before). No numeric claim was wrong. The reader's one re-read of the corrected lines is recorded below.
 - 2026-09-24: the reader's re-read found four of five corrections right and the NEWS hidden-chunk sentence still wrong, since the hidden options chunk does compute (the seed, the width, the glmmTMB flag). Reworded to name the two hidden chunks without that claim. No further pass, per the stopping rule.
+- 2026-09-24: T6 done. NEWS has a Documentation bullet for the rewrite and the earlier dev-version bullet on the cross-block check now describes the helper's refusal. `document()` regenerated `man/simulated_growth.Rd` with the `\seealso` and no unresolved link. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes, run on the tree at d26a62d5, before the two prose-only correction commits. Status set to review.
 
 ## Decisions
 

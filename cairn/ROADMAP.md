@@ -8,7 +8,7 @@ _Last hygiene check: 2026-09-24 (M152 done: one candidate row added at review fo
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M152 | Growth output helper, coefficients or draws to a trajectory | done | M151 | high | milestones/archive/M152-growth-trajectory-helper.md |
-| M153 | The growth vignette on the helper workflow | in-progress | M152 | high | milestones/M153-growth-vignette-rewrite.md |
+| M153 | The growth vignette on the helper workflow | review | M152 | high | milestones/M153-growth-vignette-rewrite.md |
 | M151 | Growth input helpers, the long table and the formula builder | done | — | high | milestones/archive/M151-growth-input-helpers.md |
 | M150 | Price every certificate case from its committed xi1 | done | — | normal | milestones/archive/M150-pin-xi1-certificate-cases.md |
 
