@@ -6,8 +6,10 @@
 # tests start from them. Regenerate from scratch (from the package root,
 # requires glmmTMB) with:
 #   Rscript data-raw/growth-fixef.R
-# Seeded with 20260716, the growth vignette's seed. The fit is deterministic
-# given the data; the seed pins glmmTMB's optimizer start where it draws one.
+# The fit is deterministic given the data: glmmTMB draws no random start,
+# and the fixture regenerates identically under any seed (measured
+# 2026-09-24, glmmTMB 1.1.15). set.seed(20260716), the growth vignette's
+# seed, is kept so that a stochastic step added here later is pinned.
 
 devtools::load_all(".", quiet = TRUE)
 stopifnot(requireNamespace("glmmTMB", quietly = TRUE))
@@ -38,7 +40,8 @@ fixture <- list(
   simulated_growth_origin = fit_one("simulated_growth_origin"),
   glmmTMB_version = as.character(utils::packageVersion("glmmTMB")),
   provenance = paste(
-    "data-raw/growth-fixef.R (seed 20260716) on simulated_growth and",
+    "data-raw/growth-fixef.R (seed 20260716, unused by the deterministic",
+    "fit) on simulated_growth and",
     "simulated_growth_origin; joint model from ssm_growth_formula('glmmTMB')",
     "fit by REML; glmmTMB", as.character(utils::packageVersion("glmmTMB"))
   )

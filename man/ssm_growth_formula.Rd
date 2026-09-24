@@ -21,16 +21,18 @@ ssm_growth_formula(
 (default \code{"wave"}), the same \code{time} given to \code{\link[=ssm_growth_data]{ssm_growth_data()}}.}
 
 \item{id}{Optional. The name of the person column in the long table
-(default \code{"person"}), the same \code{id} given to \code{\link[=ssm_growth_data]{ssm_growth_data()}}.}
+(default \code{"person"}), the same \code{id} given to \code{\link[=ssm_growth_data]{ssm_growth_data()}}.
+\code{time} and \code{id} must each be one non-empty name, different from each
+other and from \code{dv} and \code{value}, the columns the long table reserves.}
 
 \item{x}{An object of class \code{"circumplex_growth_formula"}.}
 
 \item{...}{Ignored (S3 consistency).}
 }
 \value{
-A list of class \code{"circumplex_growth_formula"} with attribute
-\code{engine}. Its elements are formula objects, named as the engine's fit
-function names its arguments. For \code{"glmmTMB"}: \code{formula},
+A list of class \code{"circumplex_growth_formula"} with attributes
+\code{engine}, \code{time} and \code{id}. Its elements are formula objects, one per
+argument or formula part the engine's fit call takes. For \code{"glmmTMB"}: \code{formula},
 \verb{value ~ 0 + dv + dv:<time> + us(0 + dv | <id>)}, and \code{dispformula},
 \code{~ 0 + dv}. For \code{"nlme"}: \code{fixed}, \verb{value ~ 0 + dv + dv:<time>},
 \code{random}, \verb{~ 0 + dv | <id>}, and \code{weights}, \code{~ 1 | dv}, the form that
@@ -45,8 +47,9 @@ mixed-model engine takes. The model reads the long table
 coordinate (\code{e}, \code{x}, \code{y}), a person-level random intercept per
 coordinate with the three intercepts free to correlate, and a separate
 residual variance per coordinate. Printing the object shows the complete
-fit call for the engine and the line that extracts what
-\code{ssm_trajectory()} takes from the fit.
+fit call for the engine and, below it, the lines that keep the fixed
+effects and their covariance from the fit, or the posterior draws for
+brms. Those are the inputs of the recipe's next step, the trajectory.
 }
 \details{
 The model has no options. Adding a covariate, a quadratic time term or

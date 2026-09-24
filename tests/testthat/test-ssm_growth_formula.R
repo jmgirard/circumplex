@@ -81,10 +81,10 @@ test_that("ssm_growth_formula refuses time or id that collide with the model's o
 
 test_that("ssm_growth_formula pieces fit ssm_growth_data output by name", {
   # The names the formula reads (`value`, `dv`, time, id) are the columns
-  # ssm_growth_data() writes under the same time and id, so a model.frame()
+  # ssm_growth_data() writes under the same time and id, so model.matrix()
   # on the fixed part succeeds with no engine. Six columns: three dv
-  # indicators and three dv:time slopes, in the order the M152 default
-  # contrast expects.
+  # indicators and three dv:time slopes, the coefficient names the fixture
+  # in tests/testthat/fixtures/growth-fixef.rds carries.
   data("simulated_growth")
   long <- ssm_growth_data(simulated_growth[1:30, ], PANO(),
                           id = "person", time = "wave")

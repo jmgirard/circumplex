@@ -14,8 +14,9 @@
 #' coordinate (`e`, `x`, `y`), a person-level random intercept per
 #' coordinate with the three intercepts free to correlate, and a separate
 #' residual variance per coordinate. Printing the object shows the complete
-#' fit call for the engine and the line that extracts what
-#' `ssm_trajectory()` takes from the fit.
+#' fit call for the engine and, below it, the lines that keep the fixed
+#' effects and their covariance from the fit, or the posterior draws for
+#' brms. Those are the inputs of the recipe's next step, the trajectory.
 #'
 #' The model has no options. Adding a covariate, a quadratic time term or
 #' another random-effects structure changes the model whose interval
@@ -28,9 +29,11 @@
 #'   (default `"wave"`), the same `time` given to [ssm_growth_data()].
 #' @param id Optional. The name of the person column in the long table
 #'   (default `"person"`), the same `id` given to [ssm_growth_data()].
-#' @return A list of class `"circumplex_growth_formula"` with attribute
-#'   `engine`. Its elements are formula objects, named as the engine's fit
-#'   function names its arguments. For `"glmmTMB"`: `formula`,
+#'   `time` and `id` must each be one non-empty name, different from each
+#'   other and from `dv` and `value`, the columns the long table reserves.
+#' @return A list of class `"circumplex_growth_formula"` with attributes
+#'   `engine`, `time` and `id`. Its elements are formula objects, one per
+#'   argument or formula part the engine's fit call takes. For `"glmmTMB"`: `formula`,
 #'   `value ~ 0 + dv + dv:<time> + us(0 + dv | <id>)`, and `dispformula`,
 #'   `~ 0 + dv`. For `"nlme"`: `fixed`, `value ~ 0 + dv + dv:<time>`,
 #'   `random`, `~ 0 + dv | <id>`, and `weights`, `~ 1 | dv`, the form that
@@ -106,7 +109,8 @@ print.circumplex_growth_formula <- function(x, ...) {
 }
 
 # The printed text: a two-line header, the engine's complete fit call on the
-# long table `long`, and the line(s) that pull what ssm_trajectory() takes.
+# long table `long`, and the line(s) that keep the fixed effects and their
+# covariance, or the draws, for the trajectory step.
 # Formulas are deparsed so the text and the objects cannot disagree; the
 # deparser writes a one-sided formula as `~0 + dv`, respaced here to the
 # `~ 0 + dv` the vignette and the engines' own documentation write.

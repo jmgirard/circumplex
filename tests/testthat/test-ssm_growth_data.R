@@ -65,6 +65,31 @@ test_that("ssm_growth_data takes id and time as column names only", {
                                time = "wave"), "`id`")
 })
 
+test_that("ssm_growth_data refuses reserved and duplicate id or time names", {
+  # `dv` and `value` are output columns; a time or id under either name, or
+  # the same name for both, would give a table with a duplicated column that
+  # the formula reads without error.
+  data("simulated_growth")
+  d <- simulated_growth[1:3, ]
+  d$dv <- d$wave
+  d$value <- d$wave
+  expect_error(ssm_growth_data(d, PANO(), id = "person", time = "dv"),
+               "`time`.*reserves")
+  expect_error(ssm_growth_data(d, PANO(), id = "value", time = "wave"),
+               "`id`.*reserves")
+  expect_error(ssm_growth_data(d, PANO(), id = "wave", time = "wave"),
+               "`id` and `time`")
+  expect_error(ssm_growth_data(d, PANO(), id = "person", time = ""), "`time`")
+})
+
+test_that("ssm_growth_data refuses a scales and angles length mismatch", {
+  data("simulated_growth")
+  expect_error(ssm_growth_data(simulated_growth[1:3, ], PANO(),
+                               angles = octants()[1:7],
+                               id = "person", time = "wave"),
+               "`scales` and `angles`")
+})
+
 test_that("ssm_growth_data refuses an id or time name absent from data", {
   data("simulated_growth")
   d <- simulated_growth[1:3, ]
@@ -123,4 +148,6 @@ test_that("ssm_growth_data returns an empty long table for zero rows", {
   expect_identical(names(long), c("person", "wave", "dv", "value"))
   expect_equal(nrow(long), 0)
   expect_identical(levels(long$dv), c("e", "x", "y"))
+  expect_type(long$value, "double")
+  expect_type(long$wave, "double")
 })

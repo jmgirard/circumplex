@@ -15,8 +15,9 @@
 #'
 #' Growth in displacement is modeled through `x` and `y`, never through the
 #' angle itself, so the table carries no amplitude or displacement. A flat
-#' profile has `x = y = 0` and a defined `e`, and a profile with a scale
-#' entirely missing has `NA` on all three coordinates. Both keep their rows.
+#' profile has `x` and `y` at zero to floating-point precision and a
+#' defined `e`, and a profile with a scale entirely missing has `NA` on all
+#' three coordinates. Both keep their rows.
 #'
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
@@ -29,9 +30,12 @@
 #' @param id Required. The name of the column in `data` identifying persons.
 #'   A column name, not a number. Missing values are an error.
 #' @param time Required. The name of the numeric column in `data` holding
-#'   each row's time point. A column name, not a number. A `Date`, factor or
-#'   character column is an error, as are missing values: the growth model
-#'   fits time as a number, so the caller chooses its origin and unit.
+#'   each row's time point. A column name, not a number. A column that is
+#'   not numeric (a `Date`, factor or character column, among others) is an
+#'   error, as are missing values: the growth model fits time as a number,
+#'   so the caller chooses its origin and unit. `id` and `time` must differ
+#'   from each other and from `dv` and `value`, the two column names the
+#'   output reserves.
 #' @return A data frame with `3 * nrow(data)` rows and four columns, named
 #'   `<id>` (a factor), `<time>` (numeric), `dv` (a factor with levels `e`,
 #'   `x` and `y`) and `value`. Rows are ordered by input row, then by `dv`.
@@ -54,12 +58,14 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   if (is.matrix(data)) data <- as.data.frame(data)
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
-
-  if (!is_char(id, n = 1)) {
-    stop("`id` must be a single column name.", call. = FALSE)
+  if (length(scales) != length(angles)) {
+    stop("`scales` and `angles` must have the same length.", call. = FALSE)
   }
-  if (!is_char(time, n = 1)) {
-    stop("`time` must be a single column name.", call. = FALSE)
+
+  check_growth_name(id, "id")
+  check_growth_name(time, "time")
+  if (identical(time, id)) {
+    stop("`id` and `time` must name different columns.", call. = FALSE)
   }
   if (!id %in% names(data)) {
     stop("`id` names a column not in `data`: \"", id, "\".", call. = FALSE)
@@ -73,7 +79,7 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   if (!is.numeric(time_col) || inherits(time_col, "Date")) {
     stop("`time` must name a numeric column (class ",
          paste(class(time_col), collapse = "/"),
-         "); convert dates to a number first.", call. = FALSE)
+         "); convert it to a number first.", call. = FALSE)
   }
   if (anyNA(id_col)) {
     stop("`id` column has missing values; persons cannot be silently dropped.",
@@ -98,7 +104,7 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     factor(id_col)[each3],
     as.numeric(time_col)[each3],
     factor(rep(c("e", "x", "y"), times = n), levels = c("e", "x", "y")),
-    as.vector(t(as.matrix(coord[c("Elev", "Xval", "Yval")]))),
+    as.numeric(t(as.matrix(coord[c("Elev", "Xval", "Yval")]))),
     stringsAsFactors = FALSE, row.names = NULL
   )
   colnames(out) <- c(id, time, "dv", "value")

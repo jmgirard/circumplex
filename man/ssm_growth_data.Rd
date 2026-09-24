@@ -22,9 +22,12 @@ displacement of each circumplex scale included in \code{scales}, in degrees
 A column name, not a number. Missing values are an error.}
 
 \item{time}{Required. The name of the numeric column in \code{data} holding
-each row's time point. A column name, not a number. A \code{Date}, factor or
-character column is an error, as are missing values: the growth model
-fits time as a number, so the caller chooses its origin and unit.}
+each row's time point. A column name, not a number. A column that is
+not numeric (a \code{Date}, factor or character column, among others) is an
+error, as are missing values: the growth model fits time as a number,
+so the caller chooses its origin and unit. \code{id} and \code{time} must differ
+from each other and from \code{dv} and \code{value}, the two column names the
+output reserves.}
 }
 \value{
 A data frame with \code{3 * nrow(data)} rows and four columns, named
@@ -44,8 +47,9 @@ fit call that takes this table.
 \details{
 Growth in displacement is modeled through \code{x} and \code{y}, never through the
 angle itself, so the table carries no amplitude or displacement. A flat
-profile has \code{x = y = 0} and a defined \code{e}, and a profile with a scale
-entirely missing has \code{NA} on all three coordinates. Both keep their rows.
+profile has \code{x} and \code{y} at zero to floating-point precision and a
+defined \code{e}, and a profile with a scale entirely missing has \code{NA} on all
+three coordinates. Both keep their rows.
 }
 \examples{
 data("simulated_growth")

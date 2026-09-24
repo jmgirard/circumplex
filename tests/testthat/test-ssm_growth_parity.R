@@ -2,8 +2,8 @@
 #
 # The fixture tests/testthat/fixtures/growth-fixef.rds holds the glmmTMB fit
 # of the joint model on both growth datasets (generator: data-raw/growth-
-# fixef.R, seed 20260716). nlme's dialect of the same model is fit here and
-# its fixed effects and their covariance compared. The two engines maximize
+# fixef.R). nlme's dialect of the same model is fit here on simulated_growth
+# only, and its fixed effects and their covariance compared. The two engines maximize
 # the same REML criterion, so the fixed effects agree to optimizer precision
 # and the structural-zero covariance entries differ only by rounding noise
 # in both; the covariance tolerance is therefore absolute, scaled by the
@@ -51,7 +51,9 @@ test_that("nlme's fit of the pieces matches the glmmTMB fixture", {
   expect_lt(gap_coef, 1e-6)
 
   # Covariance: absolute agreement within 1e-4 times the largest entry. Two
-  # things set the bound. The x-by-y slope entries are structural zeros that
+  # things set the bound. The cross-coordinate slope entries, and the
+  # cross-coordinate intercept-by-slope entries of this balanced design, are
+  # structural zeros that
   # each engine reports as rounding noise of a different sign and size, so a
   # relative tolerance would fail on nothing. And the cross-coordinate
   # intercept entries sit where the REML criterion is flat: measured
