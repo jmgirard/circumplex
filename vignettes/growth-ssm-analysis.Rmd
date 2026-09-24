@@ -392,8 +392,9 @@ The line segments on either side of the hollow point are drawn **dashed**.
 A dashed segment touches a wave whose displacement is not interpretable, so
 the direction of change along it is not to be read. Here the solid line
 would have shown the group rotating smoothly through about 80° at wave 2.
-The group did no such thing: it passed through the origin, where direction
-is undefined. The dashed segments are kept rather than cut, so the reader
+The data cannot support that reading: at wave 2 the group sits so close to
+the origin that its amplitude interval reaches zero, and the direction there
+is not established. The dashed segments are kept rather than cut, so the reader
 can still see that the unwrapped branch carries 0° across to 180° rather
 than back to −180°. The legend shows the two marks together: a filled point
 on a solid line where the displacement is interpretable, and a hollow point

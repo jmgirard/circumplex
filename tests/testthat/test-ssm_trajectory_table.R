@@ -278,7 +278,6 @@ test_that("an NA verdict on a defined displacement draws a hollow point", {
     transform(traj_table(), certified = c(TRUE, NA, TRUE, TRUE, TRUE)),
     time = "wave"
   )
-  shape_layers <- Filter(function(l) "shape" %in% names(l$mapping), p$layers)
   idx <- which(vapply(
     p$layers, function(l) "shape" %in% names(l$mapping), logical(1)
   ))
@@ -325,6 +324,31 @@ test_that("no segment spans a time point with undefined displacement", {
   expect_equal(s$xend, c(1, 4))
 })
 
+test_that("a series with no drawable pair still draws its points", {
+  # M154 review O1: with every pair touching a gap the segment frame is empty,
+  # and building it errored ("arguments imply differing number of rows") where
+  # master drew the points with no line.
+  two_gaps <- traj_table()
+  two_gaps[c(2, 4), c("d_est", "d_lci", "d_uci")] <- NA
+  p <- ssm_plot_trajectory(two_gaps, time = "wave")
+  built <- expect_no_error(ggplot2::ggplot_build(p))
+  expect_equal(nrow(traj_segments(p)), 0L)
+  idx <- which(vapply(
+    p$layers, function(l) "shape" %in% names(l$mapping), logical(1)
+  ))
+  expect_equal(nrow(built$data[[idx[[1]]]]), 3L)
+
+  # The smallest case: two rows, one of them undefined.
+  pair <- traj_table()[1:2, ]
+  pair[2, c("d_est", "d_lci", "d_uci")] <- NA
+  expect_no_error(ggplot2::ggplot_build(ssm_plot_trajectory(pair, time = "wave")))
+
+  # And no verdict at all takes the plain-segment branch through the same frame.
+  expect_no_error(ggplot2::ggplot_build(
+    ssm_plot_trajectory(transform(two_gaps, certified = NULL), time = "wave")
+  ))
+})
+
 test_that("the other panels keep one solid line each", {
   tbl <- traj_table()
   tbl$e_est <- c(0.5, 0.5, 0.6, 0.6, 0.7)
@@ -369,6 +393,19 @@ test_that("the merged legend shows a line type beside each point shape", {
   # One line grob per key: the TRUE key solid, the FALSE key dashed, both
   # black, drawn even though nothing in the data is uncertified.
   expect_length(lines, 2)
+  expect_equal(unname(lengths(lines)), c(1L, 1L))
+  expect_equal(unname(vapply(lines, function(l) l[[1]]$lty, character(1))), c("solid", "dashed"))
+  expect_true(all(vapply(lines, function(l) l[[1]]$col == "#000000", logical(1))))
+
+  # The same two keys on the uncertified fixture, where dashed segments are
+  # actually drawn (AC4's second fit; M154 review O4).
+  uncertified <- ssm_plot_trajectory(
+    transform(traj_table(), certified = c(TRUE, FALSE, FALSE, TRUE, TRUE)),
+    time = "wave"
+  )
+  keys <- legend_key_glyphs(uncertified, "Displacement interpretable")
+  lines <- legend_key_lines(uncertified, "Displacement interpretable")
+  expect_equal(sort(unname(unlist(keys))), c(1, 16))
   expect_equal(unname(lengths(lines)), c(1L, 1L))
   expect_equal(unname(vapply(lines, function(l) l[[1]]$lty, character(1))), c("solid", "dashed"))
   expect_true(all(vapply(lines, function(l) l[[1]]$col == "#000000", logical(1))))
@@ -544,6 +581,18 @@ test_that("a time column naming a parameter column is refused, not clobbered", {
   for (nm in c("a_est", "a_lci", "d_uci", "certified")) {
     expect_error(
       ssm_plot_trajectory(tbl, time = nm),
+      "collides with a name",
+      info = nm
+    )
+  }
+  # `xend`, `yend` and `Interpretable` are the segment frame's own columns
+  # (M154 review O2): a time column so named built a duplicate-named frame
+  # that failed at draw time instead of being refused here.
+  for (nm in c("xend", "yend", "Interpretable")) {
+    named <- tbl
+    named[[nm]] <- tbl$wave
+    expect_error(
+      ssm_plot_trajectory(named, time = nm),
       "collides with a name",
       info = nm
     )

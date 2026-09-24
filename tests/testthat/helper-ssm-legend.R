@@ -100,7 +100,9 @@ legend_key_lines <- function(plot, title) {
       } else {
         do.call(grDevices::rgb, as.list(grDevices::col2rgb(col)[, 1] / 255))
       }
-      list(lty = as.character(l$gp$lty %||% "solid"), col = col)
+      # No `%||%`: base R has it only from 4.4 and DESCRIPTION admits 4.1.
+      lty <- if (is.null(l$gp$lty)) "solid" else as.character(l$gp$lty)
+      list(lty = lty, col = col)
     })
   })
 }

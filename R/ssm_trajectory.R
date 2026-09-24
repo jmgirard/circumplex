@@ -180,6 +180,9 @@ ssm_trajectory_reserved <- function() {
   suffixes <- c("_est", "_lci", "_uci")
   c(
     "Group", "Parameter", "est", "lci", "uci", "Certified", "Panel",
+    # The displacement segment frame's own columns (ssm_trajectory_segments):
+    # a time column so named would duplicate one of them and fail at draw time.
+    "xend", "yend", "Interpretable",
     as.vector(t(outer(names(ssm_trajectory_panels()), suffixes, paste0))),
     "certified"
   )
@@ -590,9 +593,11 @@ ssm_trajectory_segments <- function(df, time_col) {
     keep <- !is.na(d$est[from]) & !is.na(d$est[to])
     from <- from[keep]
     to <- to[keep]
+    # rep(), not a bare "d": with every pair touching a gap `from` is empty,
+    # and a length-one constant cannot recycle to zero rows (M154 review O1).
     out <- data.frame(
       Group = d$Group[from],
-      Parameter = "d",
+      Parameter = rep("d", length(from)),
       x = d[[time_col]][from],
       xend = d[[time_col]][to],
       est = d$est[from],

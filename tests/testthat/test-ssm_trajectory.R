@@ -451,6 +451,19 @@ test_that("a flat occasion is spanned by no segment", {
   expect_equal(s$xend, 4)
 })
 
+test_that("a group with no drawable pair does not take down the plot", {
+  skip_on_cran()
+  # M154 review O1: rows 2 and 4 are F at T2 and T4, so every F pair touches
+  # a flat occasion and F contributes no segment; M keeps its three.
+  res <- traj_fit(grouping = "Gender")
+  res$results$a_est[c(2, 4)] <- NA_real_
+  p <- ssm_plot_trajectory(res)
+  expect_no_error(ggplot2::ggplot_build(p))
+  s <- traj_segments(p)
+  expect_equal(nrow(s), 3L)
+  expect_length(unique(s$group), 1L)
+})
+
 test_that("the merged legend keeps black keys under a grouping", {
   skip_on_cran()
   p <- ssm_plot_trajectory(traj_fit(grouping = "Gender"))

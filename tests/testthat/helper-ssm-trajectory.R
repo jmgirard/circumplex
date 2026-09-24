@@ -16,6 +16,9 @@ traj_segments <- function(p) {
     p$layers, function(l) inherits(l$geom, "GeomSegment"), logical(1)
   ))
   out <- do.call(rbind, built$data[idx])
+  # A layer with nothing to draw is built as a zero-row frame with no
+  # positional columns, so there is nothing to order.
+  if (nrow(out) == 0L) return(out)
   out[order(out$group, out$x), , drop = FALSE]
 }
 
