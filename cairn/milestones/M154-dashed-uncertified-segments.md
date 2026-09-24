@@ -61,6 +61,7 @@ On the displacement panel of `ssm_plot_trajectory()`, draw each line segment tha
 - 2026-09-24: T5 done. Full `devtools::test()` under `NOT_CRAN=true`: 0 failures, 14348 passes; the 12 warnings come from five test files this branch does not touch. `devtools::check(args = "--no-manual")` on the final tree: 0 errors, 0 warnings, 0 notes. `document()` no diff, no link warning. Status set to review.
 - 2026-09-24: review gate chose fix-now for O1, O2, O3, O4, O6, O7 and O9, and rejected O5, O8 and O10 (dispositions in the Review section). Fixes landed with regression tests first, the two trajectory test files green. Checkpoint: the full suite and check on the fixed tree are still running, and the merge chip is re-posed once they report.
 - 2026-09-24: full suite and check on the fixed tree both clean (Review section). Merge chip re-posed.
+- 2026-09-24: step-7 approval: m154-dashed-uncertified-segments approved for merge.
 
 ## Decisions
 
