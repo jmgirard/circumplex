@@ -299,16 +299,16 @@
 <polyline points='29.69,410.31 32.43,410.31 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='29.69,336.19 32.43,336.19 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='373.48' y='515.68' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='25.69px' lengthAdjust='spacingAndGlyphs'>wave</text>
-<rect x='248.41' y='528.92' width='250.14' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='253.89' y='546.82' style='font-size: 11.00px; font-family: sans;' textLength='130.86px' lengthAdjust='spacingAndGlyphs'>Displacement interpretable</text>
-<rect x='390.22' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<line x1='391.95' y1='543.04' x2='405.78' y2='543.04' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<circle cx='398.86' cy='543.04' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
-<rect x='442.42' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<line x1='444.15' y1='543.04' x2='457.98' y2='543.04' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
-<circle cx='451.06' cy='543.04' r='2.49' style='stroke-width: 0.71;' />
+<rect x='231.13' y='528.92' width='284.70' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='236.61' y='546.82' style='font-size: 11.00px; font-family: sans;' textLength='130.86px' lengthAdjust='spacingAndGlyphs'>Displacement interpretable</text>
+<rect x='372.94' y='534.40' width='34.56' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='376.40' y1='543.04' x2='404.05' y2='543.04' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<circle cx='390.22' cy='543.04' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<rect x='442.42' y='534.40' width='34.56' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='445.88' y1='543.04' x2='473.53' y2='543.04' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<circle cx='459.70' cy='543.04' r='2.49' style='stroke-width: 0.71;' />
 <text x='412.98' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
-<text x='465.18' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
+<text x='482.46' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
 <text x='32.43' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='124.74px' lengthAdjust='spacingAndGlyphs'>ssm_trajectory object</text>
 <text x='714.52' y='568.69' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='305.28px' lengthAdjust='spacingAndGlyphs'>Displacement is shown on an unwrapped branch and may fall outside [0, 360).</text>
 </g>

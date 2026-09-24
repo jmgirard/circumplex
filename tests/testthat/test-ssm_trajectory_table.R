@@ -250,8 +250,8 @@ test_that("a segment touching an uncertified time point is dashed", {
 
 test_that("the dashing follows the verdict at every position", {
   lty_for <- function(verdict) {
-    # Assigned by name: transform() would resolve a `certified` argument
-    # against the fixture's own certified column first.
+    # Assigned by name: with transform(), an argument named `certified` would
+    # resolve to the fixture's own column instead of the caller's vector.
     tbl <- traj_table()
     tbl$certified <- verdict
     traj_segment_lty(ssm_plot_trajectory(tbl, time = "wave"))

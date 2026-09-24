@@ -686,7 +686,11 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
       # Amplitude and Displacement panels' tick labels sit in the gutter to
       # their left and crowd the neighbouring panel at vignette width. Widen
       # the horizontal panel gap so the labels clear it (M50).
-      panel.spacing.x = grid::unit(1.2, "lines")
+      panel.spacing.x = grid::unit(1.2, "lines"),
+      # The merged legend key holds a point on a line. At the default key width
+      # the dash pattern's only gap falls under the point, so the dashed key
+      # reads as solid (M154 claim audit); widen the key until the dash shows.
+      legend.key.width = grid::unit(2.4, "lines")
     )
 
   if (show_cert) {
