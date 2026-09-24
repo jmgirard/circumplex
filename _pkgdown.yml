@@ -47,6 +47,7 @@ reference:
   contents:
   - ssm_growth_data
   - ssm_growth_formula
+  - ssm_trajectory
 - title: SEM-Based SSM Functions
   desc: Latent-variable (disattenuated) SSM via structural equation modeling
   contents:

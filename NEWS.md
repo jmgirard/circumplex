@@ -19,6 +19,25 @@
   new suggested package, and its dialect fits the same model: its fixed
   effects match glmmTMB's to 1e-6 on the bundled growth data.
 
+* `ssm_trajectory()` is the output side of the same recipe. It takes the
+  fitted joint model's fixed effects and their covariance, or a matrix of
+  posterior coefficient draws such as `as.matrix(fit)` from brms, and
+  returns one row per time point with the estimate and interval of `e`,
+  `x`, `y`, `a` and `d` and the displacement certification. From
+  coefficients and covariance it draws `n_draws` coefficient vectors; a
+  draws matrix is summarized as given. The default contrast reads the six
+  coefficient names the model from `ssm_growth_formula()` produces, drops a
+  `b_` prefix and ignores other columns, and a `contrast` function replaces
+  it for a model with other terms. A covariance matrix whose implied
+  covariance between `x(t)` and `y(t)` is exactly zero at every time is
+  refused, unless it is zero everywhere, since coordinates fit in separate
+  models give wrong displacement intervals. A draws matrix is not checked.
+  The object prints rounded, with
+  each uncertified row marked and the small-sample caution stated, and
+  `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
+  and displacement columns match the hand-built per-wave loop the growth
+  vignette used before, to 1e-12 under the same seed.
+
 * `geom_ssm_ellipse()` is a new ggplot2 layer for the circumplex canvas. For
   each row it draws the confidence ellipse of a bivariate normal region on
   the Cartesian `(x, y)` SSM coordinates, from a centre `(x0, y0)` and the

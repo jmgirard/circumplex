@@ -438,7 +438,9 @@ ssm_trajectory_table_frame <- function(x, time, drop_xy = FALSE) {
 #'   `occasions` argument or by [ssm_analyze_long()], or a trajectory table
 #'   (a data frame) as described above.
 #' @param time A string naming the numeric time column of a trajectory table.
-#'   Required for the data frame method; unused for SSM objects.
+#'   Required for the data frame method; unused for SSM objects. An object
+#'   from [ssm_trajectory()] carries the name as its `time` attribute, which
+#'   its method reads by default.
 #' @param drop_xy A logical determining whether the X-value and Y-value panels
 #'   should be omitted (default = `FALSE`), leaving elevation, amplitude, and
 #'   displacement.
