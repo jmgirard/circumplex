@@ -64,6 +64,8 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - 2026-09-24: claim audit: 52 claims read, 5 corrected — NEWS.md (hidden-chunk count, "five calls" for the second example, "links" for a plain `\code{}` See also), vignettes/growth-ssm-analysis.Rmd.orig (the Overview's "names the next page" against the Wrap-up's "no page follows", and the refusal's place in the call order, which runs after the draws, not before). No numeric claim was wrong. The reader's one re-read of the corrected lines is recorded below.
 - 2026-09-24: the reader's re-read found four of five corrections right and the NEWS hidden-chunk sentence still wrong, since the hidden options chunk does compute (the seed, the width, the glmmTMB flag). Reworded to name the two hidden chunks without that claim. No further pass, per the stopping rule.
 - 2026-09-24: T6 done. NEWS has a Documentation bullet for the rewrite and the earlier dev-version bullet on the cross-block check now describes the helper's refusal. `document()` regenerated `man/simulated_growth.Rd` with the `\seealso` and no unresolved link. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes, run on the tree at d26a62d5, before the two prose-only correction commits. Status set to review.
+- 2026-09-24: review: seven criteria passed on fresh evidence, gate green, three-lens review logged (0 prior-review, 3 history notes, 22 diff-bug findings, 11 fixed at the gate, 1 follow-up, 9 rejected, 1 resolved).
+- 2026-09-24: step-7 approval: m153-growth-vignette-rewrite approved for merge
 
 ## Decisions
 
@@ -106,3 +108,5 @@ Independent review, 2026-09-24, three lenses. Prior-review lens: no prior-review
 - O20 prose source lines over 80 columns. Reject as cosmetic; line 426 is rewrapped under O6.
 - O21 `library(ggplot2)` in the hidden chunk is unused. Reject: unmodified line.
 - O22 "each row of the wide table". Fix now: "each row of `simulated_growth`".
+
+Gate, 2026-09-24: the user chose the recommended option, the eleven fixes then the merge. Fixed on the branch: O1, O2, O4, O6, O7, O8, O16, O17 and O22 in the vignette source (O22 as "each input row", since the dataset is introduced in the next paragraph; O7 as a procedural claim naming `tests/testthat/test-ssm_growth_parity.R`), O9 in the generator comment, O18 in the recipe (circular containment, "interval"). After the fixes: the page re-rendered, the prose sweep exits 0 after one 26-word sentence was shortened, the width check 112 lines all fit, the recipe to completion with the circular containment TRUE. Follow-up: O5 becomes a candidate row at hygiene. Rejected with reasons as listed: O10, O11, O12, O13, O14, O15, O19, O20, O21. Resolved: O3. Noted: H1, H2, H3.

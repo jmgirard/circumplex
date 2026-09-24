@@ -20,6 +20,8 @@ long <- ssm_growth_data(
 f_brms <- ssm_growth_formula("brms", time = "wave", id = "person")
 
 # The call the vignette shows, with the sampler settings the vignette states.
+# refresh = 0 is the one addition: it silences the sampler's progress output
+# and does not change the draws.
 fit <- brms::brm(
   brms::bf(f_brms$formula, f_brms$sigma),
   data = long,

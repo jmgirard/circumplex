@@ -70,8 +70,8 @@ Section 10 shows the same model in `nlme`, which ships with R, and in
 ## 3. From repeated measures to a long table
 
 The input to the growth model is a long table with one row per person,
-wave and coordinate. `ssm_growth_data()` builds it. It scores each row of
-the wide table as its own profile through `ssm_parameters_id()`. Then it
+wave and coordinate. `ssm_growth_data()` builds it. It scores each input
+row as its own profile through `ssm_parameters_id()`. Then it
 stacks the three coordinates $(e, x, y)$ under an outcome indicator `dv`.
 
 The package ships a simulated data set, `simulated_growth`, with five waves
@@ -136,7 +136,8 @@ f_glmmTMB
 ```
 
 The `time` and `id` arguments are the column names given to
-`ssm_growth_data()`, and `"wave"` and `"person"` are their defaults. The
+`ssm_growth_data()`. In `ssm_growth_formula()` they default to `"wave"`
+and `"person"`. The
 object holds the two formulas as `f_glmmTMB$formula` and
 `f_glmmTMB$dispformula`. The fit below is the printed call, with the two
 formulas read from the object. The model has no options, because a
@@ -251,7 +252,7 @@ that Section 7 explains.
 Before the second step, the call makes the check that Section 4 promised. It
 reads the covariance that `vcov` implies between $\hat{x}(t)$ and
 $\hat{y}(t)$ at each time in `times`. A joint fit estimates that covariance,
-so it is not zero. Separate fits produce one covariance matrix per
+and it is almost never exactly zero. Separate fits produce one covariance matrix per
 coordinate, and a full matrix assembled from them block by block implies
 exactly zero at every time. `ssm_trajectory()` refuses such a matrix with an
 error. The check is structural, not a test of size: a covariance that is
@@ -310,7 +311,7 @@ that fails: the group crosses near the origin mid-study (its $x$
 coordinate changes sign while $y$ stays near zero). The package ships these
 data too, as `simulated_growth_origin`. It has the same persons, waves and
 columns as `simulated_growth`, and `?simulated_growth` describes both. The
-three calls are the same, and the fit reads the same two formulas:
+calls are the same, and the fit reads the same two formulas:
 
 
 ``` r
@@ -366,8 +367,8 @@ The asterisk marks the uncertified row, and the note under the table
 states the rule. At that wave, the amplitude interval sits too close to
 zero. The displacement interval, which here spans more than half the
 circle, is not a statement about direction. In our validation simulations
-of this near-origin case, the caution fires at the degraded wave in
-essentially every replicate. Meanwhile, the waves far from the origin remain
+of this near-origin case, the uncertified mark appears at the degraded wave
+in essentially every replicate. Meanwhile, the waves far from the origin remain
 certified, and their intervals keep their nominal coverage.
 
 The plot marks the verdict itself:
@@ -488,14 +489,14 @@ summarize posterior draws produced by any such model.
 
 `ssm_growth_formula()` writes the same joint model for two other engines.
 Each dialect fits the same three intercepts and slopes, the same correlated
-person intercepts and the same residual variance per coordinate.
+person intercepts and a separate residual variance for each coordinate.
 
 **nlme** ships with every R installation. Its call sets
 `na.action = na.omit`, because `nlme::lme()` otherwise stops on a row whose
-`value` is `NA`. glmmTMB drops such a row by default. Its fixed effects and their covariance go to
-`ssm_trajectory()` exactly as glmmTMB's do. On the data of Section 3, its
-fixed effects match glmmTMB's to within $10^{-13}$, and their covariance
-matrix matches to within $10^{-8}$:
+`value` is `NA`. glmmTMB drops such a row by default. The nlme fixed
+effects and their covariance go to `ssm_trajectory()` exactly as glmmTMB's
+do. On the data of Section 3, the two engines' fixed effects and covariance
+agree within the bounds the package's nlme parity test holds:
 
 
 ``` r
@@ -588,10 +589,11 @@ ssm_trajectory(times = 0:4, draws = draws)
 ```
 
 At each wave, the posterior medians of $x$ and $y$ sit within 0.01 of the
-glmmTMB table's estimates. The printed caution is written for the `coef`
-and `vcov` shape. A posterior interval from brms depends on its priors
-instead, and the package's coverage validation ran the REML fit, not the
-brms fit. The `draws` shape is not checked for a joint fit, so the joint
+glmmTMB table's estimates. The note under the table is written for the
+`coef` and `vcov` shape, and it does not apply here. Posterior draws
+average over the variance components rather than condition on their
+estimates. A posterior interval from brms depends on its priors instead,
+and the package's coverage validation ran the REML fit, not the brms fit. The `draws` shape is not checked for a joint fit, so the joint
 model is the user's responsibility there.
 
 ## Wrap-up

@@ -114,8 +114,11 @@ d_true <- (atan2(b1["y"] * waves + b0["y"], b1["x"] * waves + b0["x"]) *
 cat("true d(t):", format(d_true, digits = 4), "\n")
 
 # Sanity: every wave certified in this comfortably-away-from-origin design,
-# and every true d(t) inside its credible interval (loose smoke check, not
-# the oracle -- coverage is measured properly in devel/m27-coverage-oracle.R)
+# and every true d(t) inside its interval (loose smoke check, not the
+# oracle -- coverage is measured properly in devel/m27-coverage-oracle.R).
+# Containment is read on the circle, so an interval that wraps past 0/360
+# (d_lci > d_uci) is handled like any other.
 stopifnot(all(trajectory$certified))
-inside <- d_true >= trajectory$d_lci & d_true <= trajectory$d_uci
-cat("true d(t) inside CrI:", all(inside), "\n")
+inside <- ((d_true - trajectory$d_lci) %% 360) <=
+  ((trajectory$d_uci - trajectory$d_lci) %% 360)
+cat("true d(t) inside interval:", all(inside), "\n")
