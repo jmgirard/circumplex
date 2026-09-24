@@ -1,13 +1,13 @@
 # M151: Growth input helpers, the long table and the formula builder
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP3, GP4, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — two new exports that every growth-vignette reader calls
-- **Branch/PR:** —
+- **Branch/PR:** `m151-growth-input-helpers`
 
 ## Goal
 
@@ -37,7 +37,7 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 
 ## Tasks
 
-- [ ] T1: Write `tests/testthat/test-ssm_growth_data.R` first, then `R/ssm_growth_data.R`. Reuse `ssm_parameters_id()` with `id = NULL` and build the long table with base `rep()` indexing, not `reshape()`. Validate with `stopifnot()` and the `is_*()` helpers in `R/utils.R`.
+- [x] T1: Write `tests/testthat/test-ssm_growth_data.R` first, then `R/ssm_growth_data.R`. Reuse `ssm_parameters_id()` with `id = NULL` and build the long table with base `rep()` indexing, not `reshape()`. Validate with `stopifnot()` and the `is_*()` helpers in `R/utils.R`.
 - [ ] T2: Write `tests/testthat/test-ssm_growth_formula.R` first, then the builder in `R/ssm_growth_formula.R`. Build each formula with `stats::reformulate()` or `as.formula()` on pasted text, with `time` and `id` substituted.
 - [ ] T3: Add `print.circumplex_growth_formula()`. Each engine's print shows the fit call and the extraction line. Add the snapshot test and the whitespace-collapsed comparison against the vignette's glmmTMB chunk.
 - [ ] T4: Write `data-raw/growth-fixef.R`. It fits the vignette's glmmTMB model on both datasets under `set.seed(20260716)` and saves the fixture. Record the glmmTMB version in the fixture and in the work log.
@@ -52,6 +52,8 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 - 2026-09-24: plan gate chose a fixed model with no design options over a flexible builder because each option is a model the coverage oracle never ran. Falsified by a user design the fixed model cannot express that the oracle later validates.
 - 2026-09-24: a second audit pass on the changed criteria returned 12 findings. It tightened AC1's refusals, made AC3 compare a pinned literal, and made AC5 grep the examples. It set AC4's tolerances from a measured run: fixed effects agree to 1e-14, the REML log-likelihood is identical, and structural zeros differ only as rounding noise. Its measurement also showed D-016's nlme rationale was wrong, which D-064 records.
 - 2026-09-24: the maintainer chose three engines in the builder over glmmTMB and nlme alone. brms's fit is never run by package code or tests (D-015), so its dialect is text, tested as text.
+- 2026-09-24: implementation started on branch `m151-growth-input-helpers`. The question gate was skipped because the plan fixes every signature, element name and engine, and the nlme dependency was decided at D-064.
+- 2026-09-24: T1 done. `ssm_growth_data()` scores through `ssm_parameters_id(id = NULL)` and stacks with `rep()` indexing. It suppresses the scorer's undefined-displacement warning because the long table carries no displacement. Tests cover the row-then-dv order, the value identity, the angles pass-through, the five refusals of AC1 plus column-number refusals, a flat row, an all-missing row, and zero rows.
 
 ## Decisions
 
