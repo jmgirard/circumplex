@@ -1,21 +1,20 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-24 (M152 done: one candidate row added at review for the caution wording under draws input, the M149 row pruned for terminal-row retention, no LESSONS line since the file sits at its byte budget and nothing was retired, no RB/RR to archive, validate green.)_
+_Last hygiene check: 2026-09-24 (M153 done: the caution-wording candidate row extended with the Section 7 remedies finding, the M150 row pruned for terminal-row retention, no LESSONS line since the file sits at its byte budget and nothing was retired, no RB/RR to archive, validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M152 | Growth output helper, coefficients or draws to a trajectory | done | M151 | high | milestones/archive/M152-growth-trajectory-helper.md |
-| M153 | The growth vignette on the helper workflow | review | M152 | high | milestones/M153-growth-vignette-rewrite.md |
+| M153 | The growth vignette on the helper workflow | done | M152 | high | milestones/archive/M153-growth-vignette-rewrite.md |
 | M151 | Growth input helpers, the long table and the formula builder | done | — | high | milestones/archive/M151-growth-input-helpers.md |
-| M150 | Price every certificate case from its committed xi1 | done | — | normal | milestones/archive/M150-pin-xi1-certificate-cases.md |
 
 ## Candidates
 
 _Candidates carry no milestone ID — an `M<NN>` is assigned at planning time. Legacy IDs (≤ M6) remain valid citations into `cairn/legacy/`; M7 is the first cairn-era ID. Struck rows are tombstones; their histories live in the named archives and git._
-- **`ssm_trajectory()`'s printed caution names a fixed-effect covariance under draws input** (M152 review, finding O8). The line is unconditional by its acceptance criterion, and under a brms draws matrix it does not describe how the intervals were made. Promote with M153, which rewrites the page the line cites, or when a print-side branch on the input shape is decided.
+- **`ssm_trajectory()`'s printed caution under draws input, and the Section 7 remedies' path back into the helper** (M152 review O8; M153 review O5). The caution is unconditional by its acceptance criterion and under a brms draws matrix does not describe how the intervals were made; the vignette now says so in prose. Section 7 names lme4 and nlme remedies while the engines are glmmTMB and nlme, and does not say that parametric-bootstrap coefficient replicates go in as `draws =`. Promote when a print-side branch on the input shape is decided, or with the next milestone opening that page.
 - **`ssm_growth_data()` input guards not shipped** (M151 review, findings O8 and O9). Duplicate column names in `data` resolve silently to the first match, in the id, time and scale columns alike. No refusal covers an `id` or `time` that is also a scale, scale numbers that point at the id or time column, `Inf` in `time`, or duplicate person-by-time rows. Promote on a user report, or when a milestone next opens `R/ssm_growth_data.R`.
 - ~~Vignette output lines past the website's code-box width~~ **graduated 2026-09-15 → M131 + M132**. M146 closed items (ii)-(viii), and (iii)'s premise was false: `strwrap()` already counts columns. **Open:** (i) no width guard reads the two pages not pre-rendered (`bayesian-ssm-analysis`, `using-instruments`). (ix) The width guard does not read output under another `comment` prefix, `results = "asis"` or indented output. (x) The CPM `Fit:` line is not wrapped: 89-90 columns at width 77 (M146 review O10). Promote (ix) when such a line reaches the site. Promote (x) with the next milestone opening `R/cpm_oop.R`. The M134 exemption gaps (no width cap, whole-vignette scope) were closed 2026-09-20 by stating them in the guard's header. Hardening them widens an internal checker's promise, and they affect only the two 86-column `cx`/`cy` lines.
 - **Ladder print test gaps and edge cases** (M130 review; findings in its archive). Test side: `test_stat()` derives the expected Δχ² string from the code's own `format(round())`, no test requires a wrapped line, none covers `comparable = NULL`. Print side: under `LC_ALL=C`, Δ prints as `<U+0394>` and block lines reach 84 characters where the width tests skip; the vacuous metric rung is guessed from any metric-row note; the no-`required` fallback drops `Also:` and the "latent metric" qualifier; a strict-tier fit at a configural gate calls metric invariance untested where it holds by construction. Promote on a user report, a second rung-note kind, or when those tests next open.
