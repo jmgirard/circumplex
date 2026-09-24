@@ -65,6 +65,7 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 - 2026-09-24: claim audit: 44 claims read, 10 corrected — R/ssm_growth_data.R, R/ssm_growth_formula.R, data-raw/growth-fixef.R, tests/testthat/test-ssm_growth_parity.R, tests/testthat/test-ssm_growth_formula.R, tests/testthat/test-ssm_growth_data.R, and the two man pages. The two incorrect claims were a help-page reference to `ssm_trajectory()`, which M152 has not shipped, and the fixture header's claim that the seed pins an optimizer start, where glmmTMB draws none and the fixture is identical under any seed. The corrections also added refusals to `ssm_growth_data()` for `id` or `time` equal to `dv`, `value` or each other, a named `scales`/`angles` length check, and a numeric `value` on zero rows. The reader re-read the ten once and found all corrected. It noted one new vague phrase, "coefficient draws" for brms, fixed to "posterior draws" without a further read under the one-pass rule.
 - 2026-09-24: all tasks checked. Full suite after the corrections: 0 failures, 14126 passes, 1 skip, 12 warnings from pre-existing lavaan tests. `devtools::document()` produces no diff. Status set to review.
 - 2026-09-24: step-7 approval: m151-growth-input-helpers approved for merge.
+- 2026-09-24: PR #186 CI red on the allowlist guard: nlme entered Suggests and the four workflow install allowlists did not list it. Added `any::nlme` to each; `tools/check-ci-deps.R` clean; pushed for a rerun.
 
 ## Decisions
 

@@ -82,6 +82,7 @@ jobs:
             any::kableExtra
             any::knitr
             any::lavaan
+            any::nlme
             any::OpenMx
             any::psych
             any::RColorBrewer
