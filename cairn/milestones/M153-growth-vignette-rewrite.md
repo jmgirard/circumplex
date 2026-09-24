@@ -26,8 +26,8 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - [x] AC3: The brms section fits `simulated_growth` in a chunk marked `eval = FALSE`. Its draws come from `vignettes/growth_brms_draws.rds`, which `data-raw/growth-brms-draws.R` writes under a seed and which holds only the six `b_` columns. `ssm_trajectory(draws = )` summarizes them. At each wave, `x_est` and `y_est` lie within 0.01 of the glmmTMB table's. The correlation of the `x` and `y` intercept draws lies within 0.1 of the value the glmmTMB covariance implies. The work log records the measured gaps.
 - [x] AC4: After the rewrite is committed, `tools/precompute-vignettes.R` regenerates the shipped `.Rmd`, and `tools/check-vignette-staleness.R` and `tools/check-vignette-width.R` pass on it. The baseline is the `.Rmd` at the commit the branch was cut from. The comparison runs on the precompute machine with chunk order and draw count unchanged. There, the rendered glmmTMB trajectory table's `a_*` and `d_*` values equal the baseline's to two decimals.
 - [x] AC5: `tools/prose-sweep.R` reports no sentence over 25 words on the whole page.
-- [ ] AC6: `devel/m27-growth-recipe.R` builds its trajectory through `ssm_trajectory()`. Its guard `stopifnot(any(V_xy != 0))` is removed in favour of the helper's refusal. The script runs to completion under glmmTMB.
-- [ ] AC7: The verify slot is clean. `devtools::check()` is clean. NEWS.md has an entry for the vignette. `man/simulated_growth.Rd` carries a `\seealso` link to the vignette.
+- [x] AC6: `devel/m27-growth-recipe.R` builds its trajectory through `ssm_trajectory()`. Its guard `stopifnot(any(V_xy != 0))` is removed in favour of the helper's refusal. The script runs to completion under glmmTMB.
+- [x] AC7: The verify slot is clean. `devtools::check()` is clean. NEWS.md has an entry for the vignette. `man/simulated_growth.Rd` carries a `\seealso` link to the vignette.
 
 ## Coverage
 
@@ -79,3 +79,30 @@ Evidence gathered 2026-09-24 at branch head f4a91f8d, master at 6e78a9fc (not mo
 - AC6: `grep -c 'stopifnot(any(V_xy'` returns 0; the trajectory comes from `ssm_trajectory(coef, vcov, times = waves, n_draws = 4000)` at line 108; the script's run to completion is recorded under AC7's background run. Pass pending that run.
 
 Consistency gate, 2026-09-24: `cairn_validate.py` all checks passed (exit 0), no principle changed so `cairn_impact` was skipped. `devtools::document()` at `cli.width = 500` produced no diff and 0 `resolve link` lines. `pkgdown::check_pkgdown()` no problems; the articles index, level map and `vignettes/` agree on 14 pages. CI dependency allowlists in sync with the 15 Suggests. `check-master-red-alert.R` and the dry run both clean; branch protection matches the committed rulesets. Master watches: the newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master (d1823eac, 2026-09-24) both concluded success. README.md is knitted from a README.Rmd it postdates and neither is in the diff. NEWS has the entry (AC7). New files: `data-raw/` and `tools/` are build-ignored, and the `.rds` ships beside `bayesian_ssm_draws.rds` in `vignettes/`.
+
+- AC6 (completed): `Rscript devel/m27-growth-recipe.R` on the head tree ran to completion under glmmTMB, every wave certified and every true `d(t)` inside its interval. Pass.
+- AC7: on the head tree (08e56c7c, identical to f4a91f8d outside `cairn/`): `devtools::test()` 0 failures, 12 warnings in unrelated files (`test-pole-values.R`, `test-print-width.R`, `test-ssm_sem.R`), 1 skip, 14298 passes; `devtools::check(args = "--no-manual")` Status: OK; `document()` no diff; NEWS has the Documentation bullet at line 250; `man/simulated_growth.Rd` carries the `\seealso` naming `vignette("growth-ssm-analysis")`. Pass.
+
+Independent review, 2026-09-24, three lenses. Prior-review lens: no prior-review evidence contradicted (archives M123 to M152 and the plain-vignettes ledger read; the PR-comments probe returned an empty list). History lens: no undone intent and no decision contradicted; H1 the printed `any(V != 0)` chunk and its 1e-20 residue figure are gone with the check moved into the helper (intentional, D-064); H2 the "carry this check to your own fits" guidance is gone for the same reason (intentional); H3 the brms intercept-draw correlation 0.0147 has the opposite sign to the implied -0.0172, both within 0.02 of zero and the gap 0.032 inside AC3's 0.1 bound (noted, no text change). Diff-bug lens, 22 findings, none a criterion failure, dispositions proposed at the gate:
+- O1 "the caution fires at the degraded wave" now collides with "the caution" naming the REML note. Fix now: "the uncertified mark appears".
+- O2 the brms table prints the REML note, which does not describe posterior draws, and the prose only says the note is written for the other shape. Fix now in prose: say the note does not apply to posterior draws and why; the print-side branch is the existing candidate row (M152 O8), extended at hygiene.
+- O3 the implement-phase check ran before the last two commits. Resolved: the check above ran on the head tree.
+- O4 "a joint fit estimates that covariance, so it is not zero" overstates. Fix now: "and it is almost never exactly zero".
+- O5 Section 7's remedies name lme4 and nlme and do not say how a remedy feeds `ssm_trajectory()`. Pre-existing text; follow-up candidate row (a parametric-bootstrap path through `draws =`).
+- O6 "Its fixed effects" reads as glmmTMB's after the sentence about glmmTMB, and the line is over 80 columns. Fix now.
+- O7 the nlme agreement figures are free-standing on the page (the derived-figures rule). Fix now: a procedural claim pointing at the package's parity test.
+- O8 "the same residual variance per coordinate" can read as one shared variance. Fix now.
+- O9 the generator adds `refresh = 0` to the shown call, and the provenance names no Stan backend version. Fix now: the generator comment says so; the backend version is not added, since the attribute is written by the fit and a refit is not owed.
+- O10 the 168,888-byte `.rds` ships in the tarball although the precomputed `.Rmd` never reads it. Reject: deliberate parity with `bayesian_ssm_draws.rds`, so a reader who runs the page's chunk has the file.
+- O11 the echo sweep's search mode flags the echoed `readRDS()`. Reject: not in the verify slot, and the same precedent stands in `advanced-visualization`.
+- O12 "No page follows this one" then a pointer to the visualization vignette. Reject: pre-existing Wrap-up text, and the Overview's new wording is accurate.
+- O13 "fits a second recipe" for a section that fits nothing. Reject: pre-existing text, unmodified line.
+- O14 "exact posterior inference". Reject: pre-existing text, and a claim change is out of scope.
+- O15 "will happily summarize" and which helper takes which draws. Reject: pre-existing text.
+- O16 "their defaults" is ambiguous since `ssm_growth_data()` has none. Fix now.
+- O17 the page says "three calls" where NEWS says four. Fix now: the page drops the count.
+- O18 the recipe's containment check ignores a wrapped interval and labels it "CrI". Fix now: circular containment and "interval".
+- O19 two NEWS bullets describe the vignette and one cites `data-raw/`. Reject: the earlier bullet records a different, earlier change, and NEWS elsewhere cites `data-raw/` scripts.
+- O20 prose source lines over 80 columns. Reject as cosmetic; line 426 is rewrapped under O6.
+- O21 `library(ggplot2)` in the hidden chunk is unused. Reject: unmodified line.
+- O22 "each row of the wide table". Fix now: "each row of `simulated_growth`".
