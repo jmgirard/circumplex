@@ -240,6 +240,17 @@ Functions for implementing the Structural Summary Method
 - [`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md)
   : Calculate SSM parameters by row and add results as new columns
 
+## Growth Model Functions
+
+Helpers for a growth model on SSM coordinates fit by a mixed-model
+engine
+
+- [`ssm_growth_data()`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md)
+  : Build the long table for a growth model on SSM coordinates
+- [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
+  [`print(`*`<circumplex_growth_formula>`*`)`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
+  : The joint growth model on SSM coordinates as an engine's formulas
+
 ## SEM-Based SSM Functions
 
 Latent-variable (disattenuated) SSM via structural equation modeling
