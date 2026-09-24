@@ -134,11 +134,6 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
     stop("`interval` must be a single number strictly between 0 and 1.",
          call. = FALSE)
   }
-  if (!is_num(n_draws, n = 1) || is.na(n_draws) || n_draws < 2 ||
-      n_draws != round(n_draws)) {
-    stop("`n_draws` must be a single whole number of at least 2.",
-         call. = FALSE)
-  }
   if (!is.null(contrast) && !is.function(contrast)) {
     stop("`contrast` must be NULL or a function of one time value.",
          call. = FALSE)
@@ -148,6 +143,11 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
     B <- trajectory_check_draws(draws)
   } else {
     trajectory_check_coef_vcov(coef, vcov)
+    if (!is_num(n_draws, n = 1) || is.na(n_draws) || n_draws < 2 ||
+        n_draws != round(n_draws)) {
+      stop("`n_draws` must be a single whole number of at least 2.",
+           call. = FALSE)
+    }
     B <- mvn_draws(as.integer(n_draws), as.numeric(coef), vcov)
     colnames(B) <- names(coef)
   }
@@ -319,7 +319,11 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
   stopifnot(is_num(digits, n = 1))
   time <- attr(x, "time")
   tab <- as.data.frame(x)
-  cert <- tab$certified
+  # A column subset of the object keeps its class and may have dropped
+  # `certified`; then no row is marked.
+  cert <- if (is.logical(tab$certified)) tab$certified else
+    rep(TRUE, nrow(tab))
+  cert[is.na(cert)] <- TRUE
   tab$certified <- NULL
   num <- vapply(tab, is.numeric, logical(1))
   num[names(tab) == time] <- FALSE

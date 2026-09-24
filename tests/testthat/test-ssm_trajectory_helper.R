@@ -3,10 +3,13 @@
 # The reference below is the growth vignette's hidden draw function and
 # per-wave loop as they stood before the vignette was rewritten on the
 # helper (vignettes/growth-ssm-analysis.Rmd.orig at the M151 merge, chunks
-# `draws` and `trajectory`), copied verbatim except for the seed and the
-# fixture: the vignette drew from a live glmmTMB fit, and these tests draw
-# from the fixed effects that tests/testthat/fixtures/growth-fixef.rds
-# holds (generator data-raw/growth-fixef.R), so they need no glmmTMB.
+# `draws` and `trajectory`). The statements are copied verbatim; three things
+# differ. The per-wave loop is wrapped in a function of the draws matrix and
+# the waves, in place of the vignette's `waves <- 0:4` and `trajectory <-`
+# assignments. The seed is set by each test. The draws come from the fixed
+# effects that tests/testthat/fixtures/growth-fixef.rds holds (generator
+# data-raw/growth-fixef.R) in place of a live glmmTMB fit, so the tests need
+# no glmmTMB.
 #
 # Seeds are pinned in this file. The seed 20260716 is the growth vignette's.
 
@@ -503,6 +506,17 @@ test_that("print rounds to digits, marks uncertified rows, states the caution", 
   expect_false(any(grepl("^\\*", txt_ok)))
   expect_false(any(grepl("Uncertified", txt_ok)))
   expect_match(txt_ok, "Caution: intervals", all = FALSE)
+
+  # A column subset keeps the class and may drop `certified`; it prints with
+  # no mark.
+  txt_sub <- capture.output(print(out2[, 1:4]))
+  expect_false(any(grepl("^\\*", txt_sub)))
+  expect_length(txt_sub[grepl(row_re, txt_sub)], 5L)
+})
+
+test_that("n_draws is not used, and not checked, on the draws path", {
+  B <- matrix(rnorm(60), 10, 6, dimnames = list(NULL, coef_names))
+  expect_no_error(ssm_trajectory(times = 0:4, draws = B, n_draws = 1))
 })
 
 test_that("the plot method reads the time attribute and matches the table method", {

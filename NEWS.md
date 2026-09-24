@@ -30,8 +30,9 @@
   `b_` prefix and ignores other columns, and a `contrast` function replaces
   it for a model with other terms. A covariance matrix whose implied
   covariance between `x(t)` and `y(t)` is exactly zero at every time is
-  refused, since coordinates fit in separate models give wrong displacement
-  intervals. A draws matrix is not checked. The object prints rounded, with
+  refused, unless it is zero everywhere, since coordinates fit in separate
+  models give wrong displacement intervals. A draws matrix is not checked.
+  The object prints rounded, with
   each uncertified row marked and the small-sample caution stated, and
   `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
   and displacement columns match the hand-built per-wave loop the growth
