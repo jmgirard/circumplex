@@ -1,6 +1,6 @@
 # M154: Dashed displacement segments at uncertified time points
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -43,7 +43,7 @@ On the displacement panel of `ssm_plot_trajectory()`, draw each line segment tha
 - [x] T2: In `ssm_trajectory_ggplot()` (`R/ssm_trajectory.R`, from the `geom_line` call), build a segment frame for the displacement rows per group in time order. Pair each row with its successor in the ordered frame. An `NA` displacement row then pairs with nothing and the gap stays. Set `Interpretable = isTRUE(cert[i]) & isTRUE(cert[i+1])`. Draw the frame with `geom_segment(aes(linetype = Interpretable))` and `scale_linetype_manual(name = "Displacement interpretable", values = c("TRUE" = "solid", "FALSE" = "dashed"), limits = c("TRUE", "FALSE"), drop = FALSE)`, with `show.legend = TRUE`. Keep `geom_line` for the other panels' rows only. Map the point shape from `Certified %in% TRUE` so that an `NA` verdict is hollow. Remove `linetype = 0` from the shape guide's `override.aes` and give both guides the same title so that they merge into one legend with black keys. Under no verdict (all `NA`), draw the displacement rows with the plain `geom_line` and no line-type scale, as today.
 - [x] T3: Roxygen on `ssm_plot_trajectory()` (the hollow-point paragraph, `R/ssm_trajectory.R:428`), then `devtools::document()`. NEWS.md bullet under the development heading, with no milestone number.
 - [x] T4: Prose in `vignettes/growth-ssm-analysis.Rmd.orig` Section 6 (the "Uncertified waves are drawn as hollow points" paragraph) and `vignettes/advanced-visualization.Rmd.orig:842`. Run `Rscript tools/precompute-vignettes.R growth-ssm-analysis` and the same for `advanced-visualization` with the package installed. Inspect the rendered figures by eye. LESSONS M33 records that data fences pass a figure that reads wrong.
-- [ ] T5: Regenerate the changed vdiffr baselines under `NOT_CRAN=true` by deleting them first (LESSONS M31). Read each SVG diff against AC6. Then run `devtools::test()` and `devtools::check()`.
+- [x] T5: Regenerate the changed vdiffr baselines under `NOT_CRAN=true` by deleting them first (LESSONS M31). Read each SVG diff against AC6. Then run `devtools::test()` and `devtools::check()`.
 
 ## Work log
 
@@ -58,6 +58,7 @@ On the displacement panel of `ssm_plot_trajectory()`, draw each line segment tha
 - 2026-09-24: T3 done. Help-page paragraph extended, `document()` clean with no link warning, NEWS bullet under Minor improvements and fixes.
 - 2026-09-24: T4 done. Both vignettes re-rendered against the installed tree. Rendered text differs only in the new paragraphs. Three trajectory figures changed and were inspected: the growth Section 6 figure shows dashed segments either side of wave 2, and both legends show the line types. Four advanced-visualization figures that draw no trajectory changed bytes in the re-render (LESSONS M112) and were restored from HEAD.
 - 2026-09-24: claim audit: 22 claims read, 2 corrected — R/ssm_trajectory.R, tests/testthat/test-ssm_trajectory_table.R. The dashed legend key read as solid at the default key width because the dash gap fell under the point, so the theme now widens `legend.key.width` to 2.4 lines. A test comment named the wrong reason for assigning the verdict by name. Baselines regenerated and both vignettes re-rendered again after the width change.
+- 2026-09-24: T5 done. Full `devtools::test()` under `NOT_CRAN=true`: 0 failures, 14348 passes; the 12 warnings come from five test files this branch does not touch. `devtools::check(args = "--no-manual")` on the final tree: 0 errors, 0 warnings, 0 notes. `document()` no diff, no link warning. Status set to review.
 
 ## Decisions
 
