@@ -7,7 +7,7 @@
 - **Principles touched:** GP3, GP4, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — two new exports that every growth-vignette reader calls
-- **Branch/PR:** `m151-growth-input-helpers`
+- **Branch/PR:** `m151-growth-input-helpers` — https://github.com/jmgirard/circumplex/pull/186
 
 ## Goal
 
