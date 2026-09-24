@@ -1,13 +1,13 @@
 # M153: The growth vignette on the helper workflow
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M152
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — a shipped vignette and the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** `m153-growth-vignette-rewrite`
 
 ## Goal
 
@@ -54,6 +54,8 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - 2026-09-24: criteria audit ran in full mode on an [O] reader. Findings absorbed here: hidden chunks are defined by the echo sweep with the two exceptions named. The staleness check runs after the commit with the baseline named. The prose check is page-wide. The recipe guard is named by its code. The `\seealso` link is added rather than assumed.
 - 2026-09-24: a second audit pass on the changed criteria: AC2 now requires the fit to read the builder's elements. AC3 names the dataset and keeps the draws file to six columns. It compares `x_est`, `y_est` and the intercept-draw correlation instead of amplitude.
 - 2026-09-24: plan gate chose a precomputed brms demonstration inside this vignette over a fourth milestone. brms is never run on CI (D-015), so the demonstration is a committed draws file, the same pattern as the Bayesian vignette.
+- 2026-09-24: implement gate chose the engines section as Section 10 after Caveats, since the trajectory print cites Section 7 by number, and the nlme demonstration as the printed call only, with no nlme fit on the page.
+- 2026-09-24: checkpoint, half done. T1, T2 and T5 work is on disk (vignette rewritten, `data-raw/growth-brms-draws.R` run, `.rds` written, recipe switched and run to completion), and the T6 NEWS and `@seealso` edits are drafted. Nothing is ticked because `devtools::test()` is still running and `document()` has not run. The first generator run failed its own column check, since `^b_` also matched the three `b_sigma_` columns, and the fix selects the six names exactly.
 
 ## Decisions
 

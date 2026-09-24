@@ -127,11 +127,12 @@
 
 * The "Growth Models on SSM Parameters" vignette prints the variance
   components of the joint model after the first fit, so the reader sees the
-  correlated person block that separate fits cannot estimate. It also shows
-  one check on the fixed-effect covariance matrix: the block that crosses
-  the `x` and `y` fixed effects holds exact zeros throughout when the matrix
-  was assembled from separate fits, and the check detects that structure
-  only. A nonzero block does not show that the model is right.
+  correlated person block that separate fits cannot estimate. It also
+  explains the check `ssm_trajectory()` makes on the fixed-effect covariance
+  matrix: a matrix assembled from separate fits implies a covariance of
+  exactly zero between `x(t)` and `y(t)` at every time, and the helper
+  refuses that structure only. A nonzero covariance does not show that the
+  model is right.
 
 * The "Advanced Circumplex Visualization" vignette has a new section, "The
   latent circumplex from a CPM fit". Its circle figures follow Nagy, Etzel
@@ -245,6 +246,21 @@
   can still cover a point.
 
 ## Documentation
+
+* The "Growth Models on SSM Parameters" vignette is rewritten on the growth
+  helpers, and every code chunk on the page is shown. Each worked example is
+  five calls. `ssm_growth_data()` builds the long table, and
+  `ssm_growth_formula()` prints the glmmTMB fit call. That call is pasted
+  with its two formulas read from the object. `ssm_trajectory()` turns the
+  fixed effects and their covariance into the trajectory table, and
+  `ssm_plot_trajectory()` draws it. The reshape, the draw function and the
+  per-wave loop the page used to hide are gone. A new Section 10 shows the
+  same model's nlme call and its brms call. The brms fit is shown and not
+  run. Its six fixed-effect draw columns ship as
+  `vignettes/growth_brms_draws.rds`, written by the seeded
+  `data-raw/growth-brms-draws.R`. So the page summarizes posterior draws
+  through `ssm_trajectory(draws = )` without a Stan toolchain.
+  `?simulated_growth` now links the vignette.
 
 * `?axes_reliability` now says that at a severely ill-conditioned fit, the
   error estimate printed with an `"uncertified"` refusal depends on the

@@ -109,9 +109,9 @@
 #' Simulated octant scores for growth models
 #'
 #' Two simulated datasets for demonstrating growth models on SSM parameters with
-#' [ssm_parameters_id()] and [ssm_draws()]. The data are simulated, not collected
-#' from people. In both datasets, 150 persons have scores on the eight octant
-#' scales at waves 0 to 4.
+#' [ssm_growth_data()], [ssm_growth_formula()] and [ssm_trajectory()]. The data
+#' are simulated, not collected from people. In both datasets, 150 persons have
+#' scores on the eight octant scales at waves 0 to 4.
 #'
 #' A person's score on a scale at a wave is the elevation 0.5, plus a person
 #' elevation effect, plus
@@ -142,6 +142,8 @@
 #'   \item{PA, BC, DE, FG, HI, JK, LM, NO}{Scores on the eight octant scales,
 #'     at the angles given by [octants()].}
 #' }
+#' @seealso `vignette("growth-ssm-analysis")`, which fits a growth model to
+#'   both datasets.
 "simulated_growth"
 
 #' @rdname simulated_growth

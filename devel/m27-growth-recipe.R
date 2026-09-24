@@ -2,23 +2,27 @@
 #
 # Prototype for the growth-ssm-analysis vignette (spec sec. 4.1, as amended
 # at the M27 gates: reference engine glmmTMB, nlme named as the base-R
-# alternative; D-016). Demonstrates the full pipeline:
+# alternative; D-016). Since M151 to M153 the recipe runs on the package's
+# growth helpers. Demonstrates the full pipeline:
 #
-#   per-person-per-wave (e, x, y) coordinates
-#     -> ONE joint mixed model on the stacked outcomes (glmmTMB)
-#     -> MVN draws from the joint fixed-effect vcov (the MC engine's own
-#        asymptotic move)
-#     -> per-t (e, x, y) draws -> ssm_draws(type = "parameters")
+#   per-person-per-wave (e, x, y) coordinates, stacked long
+#     -> ONE joint mixed model on the stacked outcomes (glmmTMB), its call
+#        from ssm_growth_formula()
+#     -> ssm_trajectory(): MVN draws from the joint fixed-effect vcov (the MC
+#        engine's own asymptotic move), per-t (e, x, y) draws, and
+#        ssm_draws(type = "parameters") at each t
 #     -> circular-correct a(t), d(t) summaries + D-007 certification per t
 #
 # HARD REQUIREMENT (spec sec. 4.1 / RR06 R4): the model is fit *jointly* on
 # (x, y). Two univariate LMMs have independent vcovs, zero Cov(x_hat, y_hat),
 # and produce wrong d(t) intervals; the M27 coverage oracle includes a cell
 # where that shortcut demonstrably fails (devel/m27-coverage-oracle.R).
+# ssm_trajectory() refuses a vcov whose implied Cov(x(t), y(t)) is exactly
+# zero at every time, which is that shortcut's signature.
 #
 # Run: Rscript devel/m27-growth-recipe.R   (requires glmmTMB; ~seconds)
 
-# Load the source tree (the installed release may predate ssm_draws)
+# Load the source tree (the installed release may predate the helpers)
 devtools::load_all(".", quiet = TRUE)
 stopifnot(requireNamespace("glmmTMB", quietly = TRUE))
 
@@ -27,6 +31,9 @@ set.seed(20260716)
 # --- 1. Simulate person-level coordinate trajectories -------------------------
 # Same family the model fits (well-specified): per-dv fixed intercept + slope,
 # correlated person random intercepts across (e, x, y), independent residuals.
+# The coordinates are simulated directly, so the long table is built here
+# rather than by ssm_growth_data(), which scores scale scores; the columns
+# are the ones that helper produces (person, wave, dv, value).
 n_person <- 120
 waves <- 0:4
 
@@ -70,56 +77,35 @@ long$dv <- factor(long$dv, levels = dvs)
 long$person <- factor(long$person)
 
 # --- 2. ONE joint mixed model on the stacked outcomes -------------------------
+# The fit call is the one ssm_growth_formula() prints for glmmTMB:
 # 0 + dv + dv:wave = per-outcome intercepts and slopes;
 # us(0 + dv | person) = correlated person intercepts across outcomes;
 # dispformula = ~ 0 + dv = per-outcome residual variances.
+f_glmmTMB <- ssm_growth_formula("glmmTMB", time = "wave", id = "person")
+print(f_glmmTMB)
 fit <- glmmTMB::glmmTMB(
-  value ~ 0 + dv + dv:wave + us(0 + dv | person),
-  dispformula = ~ 0 + dv,
+  f_glmmTMB$formula,
+  dispformula = f_glmmTMB$dispformula,
   data = long,
   REML = TRUE
 )
 
-fe <- glmmTMB::fixef(fit)$cond
-V <- as.matrix(vcov(fit)$cond)
-stopifnot(identical(names(fe), colnames(V)))
+coef <- glmmTMB::fixef(fit)$cond
+vcov <- as.matrix(vcov(fit)$cond)
+stopifnot(identical(names(coef), colnames(vcov)))
 
-# The x/y cross block of V (intercept and slope terms) is not structurally
+# The x/y cross block of vcov (intercept and slope terms) is not structurally
 # zero in a joint fit. Independent univariate fits assembled block by block
-# put exact zeros throughout it; this guard detects that structure only, and
-# says nothing about whether the joint model is right.
-V_xy <- V[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")]
-cat("x/y cross block of V (intercept and slope terms):\n")
-print(V_xy)
-stopifnot(any(V_xy != 0))
+# put exact zeros throughout it. ssm_trajectory() below refuses that
+# structure itself, and says nothing about whether the joint model is right.
+cat("x/y cross block of vcov (intercept and slope terms):\n")
+print(vcov[c("dvx", "dvx:wave"), c("dvy", "dvy:wave")])
 
-# --- 3. Fixed-effect draws -> per-t (e, x, y) draws -> SSM summaries ----------
-n_draws <- 4000
-B <- mvn(n_draws, fe, V)
-colnames(B) <- names(fe)
-
-# Contrast matrix per t: mu_dv(t) = b_dv + b_dv:wave * t
-per_t <- lapply(waves, function(t) {
-  Ct <- matrix(0, nrow = 3, ncol = length(fe),
-               dimnames = list(dvs, names(fe)))
-  for (dv in dvs) {
-    Ct[dv, paste0("dv", dv)] <- 1
-    Ct[dv, paste0("dv", dv, ":wave")] <- t
-  }
-  draws_t <- B %*% t(Ct) # n_draws x 3, columns (e, x, y)
-  ssm_draws(draws_t, type = "parameters")
-})
-
-trajectory <- data.frame(
-  wave = waves,
-  a_est = sapply(per_t, function(s) s$results$a_est),
-  a_lci = sapply(per_t, function(s) s$results$a_lci),
-  a_uci = sapply(per_t, function(s) s$results$a_uci),
-  d_est = sapply(per_t, function(s) as.numeric(s$results$d_est)),
-  d_lci = sapply(per_t, function(s) as.numeric(s$results$d_lci)),
-  d_uci = sapply(per_t, function(s) as.numeric(s$results$d_uci)),
-  certified = sapply(per_t, function(s) s$details$certified)
-)
+# --- 3. Fixed effects -> per-t (e, x, y) draws -> SSM summaries --------------
+# ssm_trajectory() draws 4000 coefficient vectors from MVN(coef, vcov),
+# forms mu_dv(t) = b_dv + b_dv:wave * t for each draw and each t, and hands
+# each t's draws to ssm_draws(type = "parameters").
+trajectory <- ssm_trajectory(coef, vcov, times = waves, n_draws = 4000)
 print(trajectory, digits = 3)
 
 # Truth for eyeballing: d(t) of the true fixed-effect trajectory
