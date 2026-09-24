@@ -103,11 +103,19 @@ alphabetical order.
 
 On the displacement panel, a time point whose amplitude confidence interval
 is too close to zero for its displacement to be interpretable is drawn as a
-hollow point; see \code{\link[=ssm_analyze]{ssm_analyze()}} for the certification rule. For an SSM
+hollow point; see \code{\link[=ssm_analyze]{ssm_analyze()}} for the certification rule. The line
+segment on either side of such a point is drawn dashed: it touches a time
+point whose displacement is not interpretable, so the direction of change
+along it is not to be read. The segment is still drawn, so the unwrapped
+branch stays visible across the point. The legend shows the two marks
+together, a filled point on a solid line for an interpretable time point
+and a hollow point on a dashed line otherwise. For an SSM
 object the verdict is computed from the amplitude interval; for a trajectory
-table it is read from the optional \code{certified} column, and when that column
-is absent no interpretability claim is made or shown. A profile with no
-defined displacement at all (a flat profile) leaves a gap in that panel.
+table it is read from the optional \code{certified} column. An \code{NA} in that
+column is drawn as not interpretable. When the column is absent, or holds
+no verdict at all, no interpretability claim is made or shown. A profile
+with no defined displacement at all (a flat profile) leaves a gap in that
+panel, and no segment spans the gap.
 
 A contrast row is never plotted as a time point -- it is a difference, not a
 time point. Use \code{\link[=ssm_plot_contrast]{ssm_plot_contrast()}} for it.
