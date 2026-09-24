@@ -62,6 +62,7 @@ Rewrite the growth vignette so that every code chunk is shown and the workflow i
 - 2026-09-24: T5 done. The recipe builds its fit call from `ssm_growth_formula()` and its table from `ssm_trajectory()`, the `stopifnot(any(V_xy != 0))` guard is gone, and the script runs to completion with every wave certified and every true `d(t)` inside its interval.
 - 2026-09-24: T3 done. The new prose was written to the rules (25 words, no dash, no semicolon, terms glossed at first use), and `tools/prose-sweep.R` on the whole `.Rmd.orig` exits 0 after two long sentences found on the first run were split. Sections 7 to 9 and the References are the pre-rewrite text, unchanged.
 - 2026-09-24: claim audit: 52 claims read, 5 corrected — NEWS.md (hidden-chunk count, "five calls" for the second example, "links" for a plain `\code{}` See also), vignettes/growth-ssm-analysis.Rmd.orig (the Overview's "names the next page" against the Wrap-up's "no page follows", and the refusal's place in the call order, which runs after the draws, not before). No numeric claim was wrong. The reader's one re-read of the corrected lines is recorded below.
+- 2026-09-24: the reader's re-read found four of five corrections right and the NEWS hidden-chunk sentence still wrong, since the hidden options chunk does compute (the seed, the width, the glmmTMB flag). Reworded to name the two hidden chunks without that claim. No further pass, per the stopping rule.
 
 ## Decisions
 

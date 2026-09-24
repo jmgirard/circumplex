@@ -248,8 +248,8 @@
 ## Documentation
 
 * The "Growth Models on SSM Parameters" vignette is rewritten on the growth
-  helpers, and every chunk that computes something is shown. Only the setup
-  chunk and the note for a missing glmmTMB stay hidden. The first worked
+  helpers, and every chunk is shown except the unlabeled options chunk at
+  the top and the note for a missing glmmTMB. The first worked
   example is five calls. `ssm_growth_data()` builds the long table, and
   `ssm_growth_formula()` prints the glmmTMB fit call. That call is pasted
   with its two formulas read from the object. `ssm_trajectory()` turns the
