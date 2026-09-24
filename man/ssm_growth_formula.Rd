@@ -23,7 +23,10 @@ ssm_growth_formula(
 \item{id}{Optional. The name of the person column in the long table
 (default \code{"person"}), the same \code{id} given to \code{\link[=ssm_growth_data]{ssm_growth_data()}}.
 \code{time} and \code{id} must each be one non-empty name, different from each
-other and from \code{dv} and \code{value}, the columns the long table reserves.}
+other and from \code{dv} and \code{value}, the columns the long table reserves.
+A name that is not syntactic, such as \code{"my wave"}, is backticked in the
+formulas, so every name reads as one column and never as formula
+syntax.}
 
 \item{x}{An object of class \code{"circumplex_growth_formula"}.}
 
@@ -55,7 +58,12 @@ brms. Those are the inputs of the recipe's next step, the trajectory.
 The model has no options. Adding a covariate, a quadratic time term or
 another random-effects structure changes the model whose interval
 coverage the package validated, so the pieces are built for the user to
-paste and, if they choose, to edit by hand with that in mind.
+paste and, if they choose, to edit by hand with that in mind. That
+validation ran the frequentist REML fit. The brms dialect fits the same
+likelihood under brms's default priors, and its posterior intervals were
+not part of it. The nlme call sets \code{na.action = na.omit}, since
+\code{nlme::lme()} otherwise stops on a row whose \code{value} is \code{NA}; glmmTMB and
+brms drop such rows by default.
 }
 \examples{
 ssm_growth_formula("glmmTMB", time = "wave", id = "person")

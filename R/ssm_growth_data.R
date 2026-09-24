@@ -17,7 +17,10 @@
 #' angle itself, so the table carries no amplitude or displacement. A flat
 #' profile has `x` and `y` at zero to floating-point precision and a
 #' defined `e`, and a profile with a scale entirely missing has `NA` on all
-#' three coordinates. Both keep their rows.
+#' three coordinates. Both keep their rows. Each engine's fit call then drops
+#' a row whose `value` is `NA`: glmmTMB and brms do so by default, and the
+#' nlme call that [ssm_growth_formula()] prints sets `na.action = na.omit`
+#' for the same effect.
 #'
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
@@ -76,7 +79,7 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   }
   id_col <- data[[id]]
   time_col <- data[[time]]
-  if (!is.numeric(time_col) || inherits(time_col, "Date")) {
+  if (!is.numeric(time_col)) {
     stop("`time` must name a numeric column (class ",
          paste(class(time_col), collapse = "/"),
          "); convert it to a number first.", call. = FALSE)
@@ -92,10 +95,16 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
 
   # One profile per row. ssm_parameters_id() warns when a row's displacement
   # is undefined (flat, zero amplitude or missing); the long table carries
-  # e, x and y only, all of which are defined for a flat row, so that warning
-  # concerns nothing this table holds.
-  coord <- suppressWarnings(
-    ssm_parameters_id(data, scales = scales, angles = angles, id = NULL)
+  # e, x and y only, all of which are defined for a flat row, so that one
+  # warning concerns nothing this table holds and is muffled. Any other
+  # warning the scorer raises passes through.
+  coord <- withCallingHandlers(
+    ssm_parameters_id(data, scales = scales, angles = angles, id = NULL),
+    warning = function(w) {
+      if (grepl("undefined displacement", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
   )
 
   n <- nrow(data)

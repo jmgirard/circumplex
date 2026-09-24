@@ -82,6 +82,31 @@ test_that("ssm_growth_data refuses reserved and duplicate id or time names", {
   expect_error(ssm_growth_data(d, PANO(), id = "person", time = ""), "`time`")
 })
 
+test_that("ssm_growth_data refuses a non-tabular data, a bad scales and a bad angles", {
+  data("simulated_growth")
+  d <- simulated_growth[1:3, ]
+  expect_error(ssm_growth_data(list(d), PANO(), id = "person", time = "wave"),
+               "data")
+  expect_error(ssm_growth_data(d, scales = TRUE, id = "person", time = "wave"),
+               "scales")
+  expect_error(ssm_growth_data(d, PANO(), angles = as.character(octants()),
+                               id = "person", time = "wave"),
+               "angles")
+})
+
+test_that("ssm_growth_data passes a scorer warning other than undefined displacement through", {
+  # Only the undefined-displacement warning is muffled. A different warning
+  # raised inside the scorer must surface, shown here by raising one from
+  # the scales argument's evaluation.
+  data("simulated_growth")
+  d <- simulated_growth[1:3, ]
+  expect_warning(
+    ssm_growth_data(d, scales = { warning("other"); PANO() },
+                    id = "person", time = "wave"),
+    "other"
+  )
+})
+
 test_that("ssm_growth_data refuses a scales and angles length mismatch", {
   data("simulated_growth")
   expect_error(ssm_growth_data(simulated_growth[1:3, ], PANO(),

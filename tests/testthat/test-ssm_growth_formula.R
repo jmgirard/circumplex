@@ -105,8 +105,34 @@ test_that("print shows the fit call and the extraction line for each engine", {
 
 test_that("print returns its object invisibly", {
   gf <- ssm_growth_formula("nlme")
-  expect_invisible(out <- print(gf))
-  expect_identical(out, gf)
+  res <- NULL
+  capture.output(res <- withVisible(print(gf)))
+  expect_false(res$visible)
+  expect_identical(res$value, gf)
+})
+
+test_that("a non-syntactic time or id is backticked, never read as formula syntax", {
+  # "wave + age" is one column name, not a covariate; "my wave" parses.
+  gf <- ssm_growth_formula("glmmTMB", time = "wave + age", id = "my id")
+  expect_identical(dep(gf$formula),
+                   "value ~ 0 + dv + dv:`wave + age` + us(0 + dv | `my id`)")
+  expect_identical(all.vars(gf$formula), c("value", "dv", "wave + age", "my id"))
+  nl <- ssm_growth_formula("nlme", time = "my wave", id = "sub id")
+  expect_identical(dep(nl$fixed), "value ~ 0 + dv + dv:`my wave`")
+  expect_identical(dep(nl$random), "~0 + dv | `sub id`")
+  # The backticked fixed part reads the long table built under the same names.
+  data("simulated_growth")
+  d <- simulated_growth[1:9, ]
+  names(d)[names(d) == "wave"] <- "my wave"
+  long <- ssm_growth_data(d, PANO(), id = "person", time = "my wave")
+  X <- model.matrix(ssm_growth_formula("nlme", time = "my wave")$fixed,
+                    data = long)
+  expect_identical(colnames(X),
+                   c("dve", "dvx", "dvy", "dve:`my wave`", "dvx:`my wave`",
+                     "dvy:`my wave`"))
+  # A syntactic name is left bare.
+  expect_identical(dep(ssm_growth_formula("nlme", time = "t")$fixed),
+                   "value ~ 0 + dv + dv:t")
 })
 
 test_that("the printed glmmTMB call equals the vignette's fit chunk", {

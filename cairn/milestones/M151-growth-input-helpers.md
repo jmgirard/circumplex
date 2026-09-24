@@ -97,3 +97,14 @@ Independent review, three fresh-context lenses. The blame-history lens found no 
 - O14: the NEWS entry lists fewer refusals than the code has and describes a test's internals. Proposed: fix now, list the refusals and narrow the test sentence to the behavior it enforces.
 - O15: AC5 was unticked at the reviewer's read. Not a finding: its evidence is recorded above.
 - S1 (blame-history lens): the NEWS entry describes a workflow the vignette shows only after M153. Proposed: noted, the deferral is the milestone's stated scope.
+
+Gate triage, 2026-09-24: the maintainer accepted every proposed disposition. Fix-now landed on the branch as follows.
+- O1: the printed nlme call sets `na.action = na.omit` and the snapshot is updated. The help pages say each engine drops `NA` rows. The call was run on a table with an `NA` row and used 2247 of 2250 rows.
+- O2: `backtick_name()` wraps a non-syntactic `time` or `id`. Tests show `"wave + age"` is one column and `"my wave"` parses and reads the long table.
+- O4: one help-page sentence on brms priors and intervals.
+- O5: `withVisible()` under `capture.output()`.
+- O6: three refusal tests, and the dead `Date` clause removed.
+- O7: `withCallingHandlers()` muffles only the undefined-displacement message, with a pass-through test.
+- O10: `TMB_version` 1.9.25 in the regenerated fixture, whose fits are identical to the prior one.
+- O14: NEWS lists the reserved-name and equal-name refusals and states the nlme parity as a behavior.
+- Follow-up: O8 and O9 filed as one ROADMAP candidate row. Rejected: O3, O12 and O13 for the reasons above. Noted: O11 and S1.

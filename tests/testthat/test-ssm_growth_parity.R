@@ -14,7 +14,7 @@ fixture_names <- c("dve", "dvx", "dvy", "dve:wave", "dvx:wave", "dvy:wave")
 test_that("the glmmTMB fixture carries both datasets and its provenance", {
   fx <- readRDS(test_path("fixtures", "growth-fixef.rds"))
   expect_setequal(names(fx), c("simulated_growth", "simulated_growth_origin",
-                               "glmmTMB_version", "provenance"))
+                               "glmmTMB_version", "TMB_version", "provenance"))
   for (d in c("simulated_growth", "simulated_growth_origin")) {
     expect_identical(names(fx[[d]]$coef), fixture_names)
     expect_identical(dimnames(fx[[d]]$vcov), list(fixture_names, fixture_names))
@@ -23,6 +23,7 @@ test_that("the glmmTMB fixture carries both datasets and its provenance", {
   expect_match(fx$provenance, "data-raw/growth-fixef.R")
   expect_match(fx$provenance, "20260716")
   expect_match(fx$glmmTMB_version, "^[0-9]+\\.[0-9]+")
+  expect_match(fx$TMB_version, "^[0-9]+\\.[0-9]+")
 })
 
 test_that("nlme's fit of the pieces matches the glmmTMB fixture", {

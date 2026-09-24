@@ -21,7 +21,12 @@
 #' The model has no options. Adding a covariate, a quadratic time term or
 #' another random-effects structure changes the model whose interval
 #' coverage the package validated, so the pieces are built for the user to
-#' paste and, if they choose, to edit by hand with that in mind.
+#' paste and, if they choose, to edit by hand with that in mind. That
+#' validation ran the frequentist REML fit. The brms dialect fits the same
+#' likelihood under brms's default priors, and its posterior intervals were
+#' not part of it. The nlme call sets `na.action = na.omit`, since
+#' `nlme::lme()` otherwise stops on a row whose `value` is `NA`; glmmTMB and
+#' brms drop such rows by default.
 #'
 #' @param engine Optional. One of `"glmmTMB"` (default), `"nlme"` or
 #'   `"brms"`. The engine is named only; it is not loaded or called.
@@ -31,6 +36,9 @@
 #'   (default `"person"`), the same `id` given to [ssm_growth_data()].
 #'   `time` and `id` must each be one non-empty name, different from each
 #'   other and from `dv` and `value`, the columns the long table reserves.
+#'   A name that is not syntactic, such as `"my wave"`, is backticked in the
+#'   formulas, so every name reads as one column and never as formula
+#'   syntax.
 #' @return A list of class `"circumplex_growth_formula"` with attributes
 #'   `engine`, `time` and `id`. Its elements are formula objects, one per
 #'   argument or formula part the engine's fit call takes. For `"glmmTMB"`: `formula`,
@@ -63,26 +71,36 @@ ssm_growth_formula <- function(engine = c("glmmTMB", "nlme", "brms"),
     stop("`id` and `time` must name different columns.", call. = FALSE)
   }
 
-  fixed <- paste0("value ~ 0 + dv + dv:", time)
+  # A non-syntactic name is backticked so that it reads as one column, never
+  # as formula syntax: `time = "wave + age"` names the column "wave + age",
+  # and "my wave" parses.
+  time_term <- backtick_name(time)
+  id_term <- backtick_name(id)
+
+  fixed <- paste0("value ~ 0 + dv + dv:", time_term)
   pieces <- switch(
     engine,
     glmmTMB = list(
-      formula = paste0(fixed, " + us(0 + dv | ", id, ")"),
+      formula = paste0(fixed, " + us(0 + dv | ", id_term, ")"),
       dispformula = "~ 0 + dv"
     ),
     nlme = list(
       fixed = fixed,
-      random = paste0("~ 0 + dv | ", id),
+      random = paste0("~ 0 + dv | ", id_term),
       weights = "~ 1 | dv"
     ),
     brms = list(
-      formula = paste0(fixed, " + (0 + dv | ", id, ")"),
+      formula = paste0(fixed, " + (0 + dv | ", id_term, ")"),
       sigma = "sigma ~ 0 + dv"
     )
   )
   out <- lapply(pieces, function(txt) stats::as.formula(txt, env = globalenv()))
   structure(out, engine = engine, time = time, id = id,
             class = "circumplex_growth_formula")
+}
+
+backtick_name <- function(x) {
+  if (identical(make.names(x), x)) x else paste0("`", x, "`")
 }
 
 # A column name for the formula: one non-empty string that is not one of the
@@ -136,6 +154,7 @@ growth_formula_text <- function(x) {
       paste0("  random = ", f[["random"]], ","),
       paste0("  weights = nlme::varIdent(form = ", f[["weights"]], "),"),
       "  data = long,",
+      "  na.action = na.omit,",
       "  method = \"REML\"",
       ")"
     ),

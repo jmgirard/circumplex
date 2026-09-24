@@ -39,11 +39,13 @@ fixture <- list(
   simulated_growth = fit_one("simulated_growth"),
   simulated_growth_origin = fit_one("simulated_growth_origin"),
   glmmTMB_version = as.character(utils::packageVersion("glmmTMB")),
+  TMB_version = as.character(utils::packageVersion("TMB")),
   provenance = paste(
     "data-raw/growth-fixef.R (seed 20260716, unused by the deterministic",
     "fit) on simulated_growth and",
     "simulated_growth_origin; joint model from ssm_growth_formula('glmmTMB')",
-    "fit by REML; glmmTMB", as.character(utils::packageVersion("glmmTMB"))
+    "fit by REML; glmmTMB", as.character(utils::packageVersion("glmmTMB")),
+    "with TMB", as.character(utils::packageVersion("TMB"))
   )
 )
 

@@ -9,14 +9,15 @@
   coordinates `e`, `x` and `y` into a long table with columns `<id>`,
   `<time>`, `dv` and `value`, one row per input row per coordinate. It
   refuses an `id` or `time` name absent from the data, a non-numeric `time`
-  column, and missing values in either. `ssm_growth_formula()` returns the
+  column, missing values in either, and an `id` or `time` named `dv` or
+  `value` or equal to each other. `ssm_growth_formula()` returns the
   package's one joint growth model as formula objects for glmmTMB, nlme or
   brms, with the `time` and `id` names substituted. Printing it shows the
   engine's complete fit call on the long table. Below the call it shows the
   line that extracts the fixed effects and their covariance, or the draws
   for brms. The package still fits nothing and calls no engine. nlme is a
-  new suggested package. A test fits its dialect of the model and matches
-  the committed glmmTMB fit's fixed effects to 1e-6.
+  new suggested package, and its dialect fits the same model: its fixed
+  effects match glmmTMB's to 1e-6 on the bundled growth data.
 
 * `geom_ssm_ellipse()` is a new ggplot2 layer for the circumplex canvas. For
   each row it draws the confidence ellipse of a bivariate normal region on

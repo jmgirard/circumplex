@@ -49,7 +49,10 @@ Growth in displacement is modeled through \code{x} and \code{y}, never through t
 angle itself, so the table carries no amplitude or displacement. A flat
 profile has \code{x} and \code{y} at zero to floating-point precision and a
 defined \code{e}, and a profile with a scale entirely missing has \code{NA} on all
-three coordinates. Both keep their rows.
+three coordinates. Both keep their rows. Each engine's fit call then drops
+a row whose \code{value} is \code{NA}: glmmTMB and brms do so by default, and the
+nlme call that \code{\link[=ssm_growth_formula]{ssm_growth_formula()}} prints sets \code{na.action = na.omit}
+for the same effect.
 }
 \examples{
 data("simulated_growth")

@@ -28,6 +28,7 @@
         random = ~ 0 + dv | person,
         weights = nlme::varIdent(form = ~ 1 | dv),
         data = long,
+        na.action = na.omit,
         method = "REML"
       )
       coef <- nlme::fixef(fit)
