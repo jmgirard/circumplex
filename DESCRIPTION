@@ -47,6 +47,7 @@ Suggests:
     kableExtra (>= 1.1.0),
     knitr (>= 1.28),
     lavaan,
+    nlme,
     OpenMx,
     psych,
     RColorBrewer,

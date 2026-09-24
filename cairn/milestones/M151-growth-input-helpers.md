@@ -42,7 +42,7 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 - [x] T3: Add `print.circumplex_growth_formula()`. Each engine's print shows the fit call and the extraction line. Add the snapshot test and the whitespace-collapsed comparison against the vignette's glmmTMB chunk.
 - [x] T4: Write `data-raw/growth-fixef.R`. It fits the vignette's glmmTMB model on both datasets under `set.seed(20260716)` and saves the fixture. Record the glmmTMB version in the fixture and in the work log.
 - [ ] T5: Add the nlme parity test. Record the measured fixed-effect and covariance gaps in the work log.
-- [ ] T6: Add nlme to Suggests. Roxygen, `devtools::document()`, NEWS entry, `_pkgdown.yml` reference entries under the growth group. Run the verify slot.
+- [x] T6: Add nlme to Suggests. Roxygen, `devtools::document()`, NEWS entry, `_pkgdown.yml` reference entries under the growth group. Run the verify slot.
 
 ## Work log
 
@@ -57,6 +57,8 @@ Ship `ssm_growth_data()` and `ssm_growth_formula()`. A reader then builds the st
 - 2026-09-24: T2 done. `ssm_growth_formula()` builds each piece with `as.formula()` on pasted text, environment set to the global one. It carries `engine`, `time` and `id` as attributes for the print. It refuses `time` or `id` equal to `dv`, `value` or each other. With such a name the formula reads the wrong column without error. A test runs `model.matrix()` on the fixed part over `ssm_growth_data()` output. It gives the six coefficient names M152 reads.
 - 2026-09-24: T3 done. The print deparses the stored formulas, so text and objects cannot disagree. The fit call binds `data = long`. The three prints are snapshotted, and the glmmTMB call matches the vignette chunk literal after whitespace removal. The two R files in T2 and T3 were appended by shell heredoc, against the tracking rule that repo edits go through Write and Edit. Later edits use those tools.
 - 2026-09-24: T4 done. `data-raw/growth-fixef.R` fits the joint model through the two new helpers on both datasets under seed 20260716 and writes `tests/testthat/fixtures/growth-fixef.rds`. The fixture holds `coef`, `vcov` with dimnames and the REML log-likelihood per dataset, the glmmTMB version and a provenance string. glmmTMB version at generation: 1.1.15.
+- 2026-09-24: T5 measured (nlme 3.1-171 against the glmmTMB 1.1.15 fixture). Fixed effects: largest gap 1.3e-14 on `simulated_growth` and 4.2e-15 on `simulated_growth_origin`. REML log-likelihood: gaps 3.5e-8 and 6.7e-9. Covariance: largest gap 4.7e-9 against a largest entry of 6.9e-4 on `simulated_growth`, at the e-by-x intercept entry, a ratio of 6.9e-6; on the origin dataset 6.4e-6 at the e-by-e entry. AC4's bound of 1e-6 times the largest entry fails by a factor of seven. Refitting nlme at tighter tolerances moves the same entry by 8.6e-9, and a tightened glmmTMB refit reports false convergence, so the gap is optimizer precision where the REML criterion is flat, not a model difference. The person-level standard deviations and correlations from the two engines agree to about 1e-6 relative. The test is written at a proposed bound of 1e-4 times the largest entry and T5 stays open pending the AC4 amendment gate.
+- 2026-09-24: T6 done. nlme added to Suggests. NEWS entry, pkgdown group "Growth Model Functions" with both exports, `pkgdown::check_pkgdown()` clean, `devtools::document()` with no unresolved link. Full suite: 0 failures, 14119 passes, the 12 warnings all from pre-existing lavaan tests. Neither help page's examples name an engine.
 
 ## Decisions
 

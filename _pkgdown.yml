@@ -42,6 +42,11 @@ reference:
   - summary.circumplex_ssm_id
   - ssm_draws
   - ssm_score
+- title: Growth Model Functions
+  desc: Helpers for a growth model on SSM coordinates fit by a mixed-model engine
+  contents:
+  - ssm_growth_data
+  - ssm_growth_formula
 - title: SEM-Based SSM Functions
   desc: Latent-variable (disattenuated) SSM via structural equation modeling
   contents:
