@@ -71,7 +71,7 @@ Section 10 shows the same model in `nlme`, which ships with R, and in
 
 The input to the growth model is a long table with one row per person,
 wave and coordinate. `ssm_growth_data()` builds it. It scores each row of
-the wide table as its own profile through `ssm_parameters_id()`, and it
+the wide table as its own profile through `ssm_parameters_id()`. Then it
 stacks the three coordinates $(e, x, y)$ under an outcome indicator `dv`.
 
 The package ships a simulated data set, `simulated_growth`, with five waves
@@ -490,9 +490,9 @@ summarize posterior draws produced by any such model.
 Each dialect fits the same three intercepts and slopes, the same correlated
 person intercepts and the same residual variance per coordinate.
 
-**nlme** ships with R. Its call sets `na.action = na.omit`, because
-`nlme::lme()` otherwise stops on a row whose `value` is `NA`, while glmmTMB
-drops such a row by default. Its fixed effects and their covariance go to
+**nlme** ships with every R installation. Its call sets
+`na.action = na.omit`, because `nlme::lme()` otherwise stops on a row whose
+`value` is `NA`. glmmTMB drops such a row by default. Its fixed effects and their covariance go to
 `ssm_trajectory()` exactly as glmmTMB's do. On the data of Section 3, its
 fixed effects match glmmTMB's to within $10^{-13}$, and their covariance
 matrix matches to within $10^{-8}$:
