@@ -25,6 +25,16 @@ ssm_plot_trajectory(
   na.rm = TRUE,
   ...
 )
+
+# S3 method for class 'circumplex_ssm_trajectory'
+ssm_plot_trajectory(
+  x,
+  time = attr(x, "time"),
+  drop_xy = FALSE,
+  base_size = 11,
+  na.rm = TRUE,
+  ...
+)
 ```
 
 ## Arguments
@@ -61,7 +71,11 @@ ssm_plot_trajectory(
 - time:
 
   A string naming the numeric time column of a trajectory table.
-  Required for the data frame method; unused for SSM objects.
+  Required for the data frame method; unused for SSM objects. An object
+  from
+  [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
+  carries the name as its `time` attribute, which its method reads by
+  default.
 
 ## Value
 

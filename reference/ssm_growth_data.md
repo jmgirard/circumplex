@@ -72,7 +72,8 @@ prints sets `na.action = na.omit` for the same effect.
 ## See also
 
 Other growth functions:
-[`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
+[`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md),
+[`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
 
 ## Examples
 

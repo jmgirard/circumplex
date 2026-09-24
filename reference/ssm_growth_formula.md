@@ -84,7 +84,8 @@ default.
 ## See also
 
 Other growth functions:
-[`ssm_growth_data()`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md)
+[`ssm_growth_data()`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md),
+[`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
 
 ## Examples
 

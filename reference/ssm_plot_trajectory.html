@@ -82,7 +82,7 @@ angle."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.p
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Create a Trajectory Plot of SSM Results Over Time</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/ssm_trajectory.R" class="external-link"><code>R/ssm_trajectory.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/ssm_trajectory.R" class="external-link"><code>R/ssm_trajectory.R</code></a>, <a href="https://github.com/jmgirard/circumplex/blob/master/R/ssm_trajectory_helper.R" class="external-link"><code>R/ssm_trajectory_helper.R</code></a></small>
       <div class="d-none name"><code>ssm_plot_trajectory.Rd</code></div>
     </div>
 
@@ -107,6 +107,16 @@ angle.</p>
 <span><span class="fu">ssm_plot_trajectory</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">time</span>,</span>
+<span>  drop_xy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'circumplex_ssm_trajectory'</span></span>
+<span><span class="fu">ssm_plot_trajectory</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"time"</span><span class="op">)</span>,</span>
 <span>  drop_xy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -147,7 +157,9 @@ warning naming how many were removed (<code>FALSE</code>).</p></dd>
 
 <dt id="arg-time">time<a class="anchor" aria-label="anchor" href="#arg-time"></a></dt>
 <dd><p>A string naming the numeric time column of a trajectory table.
-Required for the data frame method; unused for SSM objects.</p></dd>
+Required for the data frame method; unused for SSM objects. An object
+from <code><a href="ssm_trajectory.html">ssm_trajectory()</a></code> carries the name as its <code>time</code> attribute, which
+its method reads by default.</p></dd>
 
 </dl></div>
     <div class="section level2">
