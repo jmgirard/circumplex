@@ -94,3 +94,75 @@ check_growth_name <- function(x, arg) {
   }
   invisible(x)
 }
+
+#' @rdname ssm_growth_formula
+#' @param x An object of class `"circumplex_growth_formula"`.
+#' @param ... Ignored (S3 consistency).
+#' @method print circumplex_growth_formula
+#' @export
+print.circumplex_growth_formula <- function(x, ...) {
+  cat(growth_formula_text(x), sep = "\n")
+  invisible(x)
+}
+
+# The printed text: a two-line header, the engine's complete fit call on the
+# long table `long`, and the line(s) that pull what ssm_trajectory() takes.
+# Formulas are deparsed so the text and the objects cannot disagree; the
+# deparser writes a one-sided formula as `~0 + dv`, respaced here to the
+# `~ 0 + dv` the vignette and the engines' own documentation write.
+growth_formula_text <- function(x) {
+  engine <- attr(x, "engine")
+  f <- vapply(x, function(f) {
+    txt <- paste(deparse(f, width.cutoff = 500L), collapse = "")
+    sub("^~", "~ ", txt)
+  }, character(1))
+  call_lines <- switch(
+    engine,
+    glmmTMB = c(
+      "fit <- glmmTMB::glmmTMB(",
+      paste0("  ", f[["formula"]], ","),
+      paste0("  dispformula = ", f[["dispformula"]], ","),
+      "  data = long,",
+      "  REML = TRUE",
+      ")"
+    ),
+    nlme = c(
+      "fit <- nlme::lme(",
+      paste0("  fixed = ", f[["fixed"]], ","),
+      paste0("  random = ", f[["random"]], ","),
+      paste0("  weights = nlme::varIdent(form = ", f[["weights"]], "),"),
+      "  data = long,",
+      "  method = \"REML\"",
+      ")"
+    ),
+    brms = c(
+      "fit <- brms::brm(",
+      "  brms::bf(",
+      paste0("    ", f[["formula"]], ","),
+      paste0("    ", f[["sigma"]]),
+      "  ),",
+      "  data = long",
+      ")"
+    )
+  )
+  extract_lines <- switch(
+    engine,
+    glmmTMB = c(
+      "coef <- glmmTMB::fixef(fit)$cond",
+      "vcov <- as.matrix(vcov(fit)$cond)"
+    ),
+    nlme = c(
+      "coef <- nlme::fixef(fit)",
+      "vcov <- as.matrix(vcov(fit))"
+    ),
+    brms = "draws <- as.matrix(fit)"
+  )
+  c(
+    paste0("Joint growth model on SSM coordinates, ", engine, " dialect."),
+    paste0("Fit on the long table from ssm_growth_data(), then keep ",
+           if (engine == "brms") "the draws" else "the fixed effects", ":"),
+    "",
+    call_lines,
+    extract_lines
+  )
+}

@@ -94,3 +94,47 @@ test_that("ssm_growth_formula pieces fit ssm_growth_data output by name", {
                    c("dve", "dvx", "dvy", "dve:wave", "dvx:wave", "dvy:wave"))
   expect_equal(nrow(X), nrow(long))
 })
+
+# ---- print(): the fit call to paste (AC3) -----------------------------------
+
+test_that("print shows the fit call and the extraction line for each engine", {
+  expect_snapshot(print(ssm_growth_formula("glmmTMB")))
+  expect_snapshot(print(ssm_growth_formula("nlme")))
+  expect_snapshot(print(ssm_growth_formula("brms")))
+})
+
+test_that("print returns its object invisibly", {
+  gf <- ssm_growth_formula("nlme")
+  expect_invisible(out <- print(gf))
+  expect_identical(out, gf)
+})
+
+test_that("the printed glmmTMB call equals the vignette's fit chunk", {
+  # Copied once, verbatim, from the base commit's
+  # vignettes/growth-ssm-analysis.Rmd.orig `fit` chunk (M151 AC3). The print
+  # is the paste-ready form of this call; the chunk is the reference.
+  vignette_chunk <- "fit <- glmmTMB::glmmTMB(
+  value ~ 0 + dv + dv:wave + us(0 + dv | person),
+  dispformula = ~ 0 + dv,
+  data = long,
+  REML = TRUE
+)"
+  lines <- capture.output(print(ssm_growth_formula("glmmTMB")))
+  from <- which(startsWith(lines, "fit <- "))
+  to <- which(lines == ")")
+  expect_length(from, 1)
+  expect_length(to, 1)
+  printed_call <- paste(lines[from:to], collapse = "\n")
+  strip <- function(s) gsub("[[:space:]]+", "", s)
+  expect_identical(strip(printed_call), strip(vignette_chunk))
+})
+
+test_that("the printed call uses the given time and id", {
+  lines <- capture.output(print(ssm_growth_formula("nlme", time = "t",
+                                                   id = "subject")))
+  expect_true(any(grepl("dv:t,", lines, fixed = TRUE)))
+  expect_true(any(grepl("| subject,", lines, fixed = TRUE)))
+  expect_true(any(lines == "coef <- nlme::fixef(fit)"))
+  lines <- capture.output(print(ssm_growth_formula("brms")))
+  expect_true(any(lines == "draws <- as.matrix(fit)"))
+})

@@ -2,6 +2,7 @@
 % Please edit documentation in R/ssm_growth_formula.R
 \name{ssm_growth_formula}
 \alias{ssm_growth_formula}
+\alias{print.circumplex_growth_formula}
 \title{The joint growth model on SSM coordinates as an engine's formulas}
 \usage{
 ssm_growth_formula(
@@ -9,6 +10,8 @@ ssm_growth_formula(
   time = "wave",
   id = "person"
 )
+
+\method{print}{circumplex_growth_formula}(x, ...)
 }
 \arguments{
 \item{engine}{Optional. One of \code{"glmmTMB"} (default), \code{"nlme"} or
@@ -19,6 +22,10 @@ ssm_growth_formula(
 
 \item{id}{Optional. The name of the person column in the long table
 (default \code{"person"}), the same \code{id} given to \code{\link[=ssm_growth_data]{ssm_growth_data()}}.}
+
+\item{x}{An object of class \code{"circumplex_growth_formula"}.}
+
+\item{...}{Ignored (S3 consistency).}
 }
 \value{
 A list of class \code{"circumplex_growth_formula"} with attribute
