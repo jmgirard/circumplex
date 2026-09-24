@@ -2312,3 +2312,46 @@ is free to skip there.
 **Reopens.** A CRAN check failure in a CRAN-live test of this file that is a
 platform fact and not an under-report. A CRAN platform on which the anchors
 skip so often that the detector's priced-anchor clause fails.
+
+### D-064 (2026-09-24): three growth helpers ship, and the model specification is handed to the user as engine formulas, while no fitter ships — annotates D-060's export clause and its formula-builder rejection, corrects D-016's nlme rationale, adds nlme to Suggests (M151 to M153 plan gate)
+
+**Context.** The maintainer judged the growth vignette unusable as it
+stands. Six of its eleven chunks are hidden, and the reader must write a
+reshape, a glmmTMB formula, a draw function and a per-wave loop by hand.
+D-060 kept the package out of the fit and named `ssm_parameters_id()` and
+`ssm_draws()` as the only growth-facing exports. It rejected a fitter behind
+an `engine` argument, and it said a flexible fitter "becomes a formula
+builder for an engine the package does not own". The maintainer asked how
+to make the workflow usable and proposed a formula builder that selects an
+engine. The plan gate settled the shape.
+
+**Decision.** Three exports ship. `ssm_growth_data()` builds the stacked
+long table. `ssm_growth_formula(engine)` returns the one validated joint
+model as the engine's formula objects for glmmTMB, nlme or brms, and prints
+the complete fit call to paste. `ssm_trajectory()` turns fixed effects and
+their covariance, or a matrix of coefficient draws, into a certified
+trajectory table with print and plot. The package still fits nothing and
+calls no engine. The builder is not the flexible builder D-060 rejected: it
+holds one fixed model with no design options, and every extension is a
+candidate row until the coverage oracle runs it. nlme enters Suggests as a
+second frequentist engine that ships with R. The audit's measured run showed
+D-016's nlme rationale was wrong: `random = ~ 0 + dv | person` with
+`varIdent(~ 1 | dv)` is the same model as glmmTMB's, with no `corSymm`, and
+the two agree in fixed effects to 1e-14. D-016's engine choice for the
+vignette stands. D-015's rule that brms is never run by package code, tests
+or the vignette build stands, so the brms dialect is text and the brms
+demonstration is a committed draws file.
+
+**Rejected.** A one-call fitter `ssm_analyze_growth()`, on D-060's grounds
+restated at the gate. A glmmTMB fit-object method on `ssm_trajectory()`,
+because its tests must skip without glmmTMB, against D-016, and it breaks on
+an accessor rename. A builder with covariates or polynomial time.
+
+**Consequences.** The parked draws-to-trajectory candidate row graduates to
+M152. D-060's rejected list stands except as this entry narrows it. The
+growth vignette is rewritten on the three exports in M153.
+
+**Reopens.** Three independent fitter requests, or one public misuse
+traceable to the pasted call, reopen the fitter. A user design the fixed
+model cannot express that the coverage oracle later validates reopens the
+builder's options.
