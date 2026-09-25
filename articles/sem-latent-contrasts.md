@@ -9,6 +9,11 @@ scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
 **Level:** Advanced. Read “SEM-Based SSM Analysis” first.
 
+**Not yet peer reviewed.** The invariance-gated latent contrast this
+page teaches is the package’s own proposal. Its authors have not yet
+published it in a peer-reviewed venue. Read it as a research tool, and
+state that status when you report results from it.
+
 ## 1. Overview
 
 This page continues “SEM-Based SSM Analysis”, which fits the latent

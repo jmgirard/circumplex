@@ -7,6 +7,11 @@ library(circumplex)
 
 **Level:** Advanced. Read “Structure Tests and Ipsatization” first.
 
+**Not yet peer reviewed.** The latent Structural Summary Method this
+page teaches is the package’s own proposal. Its authors have not yet
+published it in a peer-reviewed venue. Read it as a research tool, and
+state that status when you report results from it.
+
 ## 1. Overview
 
 The other vignettes model *observed* circumplex scores. These are the

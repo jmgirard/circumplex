@@ -7,6 +7,11 @@ library(circumplex)
 
 **Level:** Advanced. Read “Intermediate SSM Analysis” first.
 
+**Not yet peer reviewed.** The Bayesian SSM recipe this page teaches is
+the package’s own proposal. Its authors have not yet published it in a
+peer-reviewed venue. Read it as a research tool, and state that status
+when you report results from it.
+
 ## 1. Overview
 
 This vignette estimates the SSM parameters with a Bayesian model and
