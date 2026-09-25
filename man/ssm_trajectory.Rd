@@ -19,7 +19,7 @@ ssm_trajectory(
 
 \method{print}{circumplex_ssm_trajectory}(x, digits = 2, ...)
 
-\method{rbind}{circumplex_ssm_trajectory}(...)
+\method{rbind}{circumplex_ssm_trajectory}(..., deparse.level = 1, make.row.names = TRUE, stringsAsFactors = FALSE)
 }
 \arguments{
 \item{coef}{The fixed effects: a named numeric vector. Required with
@@ -56,7 +56,11 @@ or of the columns of \code{draws}.}
 
 \item{digits}{The number of decimal places to print (default = 2).}
 
-\item{...}{For \code{rbind()}, trajectory tables to stack.}
+\item{...}{For \code{print()}, ignored (S3 consistency). For \code{rbind()}, the
+trajectory tables to stack.}
+
+\item{deparse.level, make.row.names, stringsAsFactors}{For \code{rbind()},
+passed to \code{\link[=rbind.data.frame]{rbind.data.frame()}}.}
 }
 \value{
 A data frame of class \code{"circumplex_ssm_trajectory"} with

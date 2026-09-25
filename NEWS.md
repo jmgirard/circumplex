@@ -36,11 +36,14 @@
   rounded, with each uncertified row marked and a closing caution for that
   shape: under `coef` and `vcov`, that intervals from a fitted model's
   fixed-effect covariance condition on its estimated variance components
-  and are too narrow at small samples; under `draws`,
-  that the intervals summarize the draws as given and the joint fit was
-  not checked. `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
-  and displacement columns match the hand-built per-wave loop the growth
-  vignette used before, to 1e-12 under the same seed.
+  and are too narrow at small samples; under `draws`, that the intervals
+  summarize the draws as given and the joint fit was not checked. An
+  object that no longer carries the attribute prints a caution that says
+  the shape is not recorded. `rbind()` of trajectory tables keeps a shared
+  shape and drops a mixed one. `ssm_plot_trajectory()` plots the object
+  with no `time` argument. Its amplitude and displacement columns match
+  the hand-built per-wave loop the growth vignette used before, to 1e-12
+  under the same seed.
 
 * `geom_ssm_ellipse()` is a new ggplot2 layer for the circumplex canvas. For
   each row it draws the confidence ellipse of a bivariate normal region on

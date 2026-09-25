@@ -342,7 +342,8 @@ trajectory_check_draws <- function(draws) {
 #' @rdname ssm_trajectory
 #' @param x An object of class `"circumplex_ssm_trajectory"`.
 #' @param digits The number of decimal places to print (default = 2).
-#' @param ... Ignored (S3 consistency).
+#' @param ... For `print()`, ignored (S3 consistency). For `rbind()`, the
+#'   trajectory tables to stack.
 #' @method print circumplex_ssm_trajectory
 #' @export
 print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
@@ -406,23 +407,35 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
 }
 
 #' @rdname ssm_trajectory
-#' @param ... For `rbind()`, trajectory tables to stack.
+#' @param deparse.level,make.row.names,stringsAsFactors For `rbind()`,
+#'   passed to [rbind.data.frame()].
 #' @method rbind circumplex_ssm_trajectory
 #' @export
-rbind.circumplex_ssm_trajectory <- function(...) {
+rbind.circumplex_ssm_trajectory <- function(..., deparse.level = 1,
+                                            make.row.names = TRUE,
+                                            stringsAsFactors = FALSE) {
   # Stacking keeps a shape only when every table has the same one; a mixed
   # stack carries no `input`, so it prints the shape-neutral caution rather
-  # than the first table's. This method runs only when every argument is a
-  # trajectory table: a plain data frame in the stack sends dispatch to
-  # rbind.data.frame, which keeps the first table's attributes.
-  parts <- list(...)
-  out <- do.call(rbind, lapply(parts, as.data.frame))
+  # than the first table's. rbind() dispatches on the first argument that
+  # has a method, so this method also runs when a plain data frame sits
+  # later in the stack; that part carries no `input`, and the stack prints
+  # the shape-neutral caution. A plain data frame first sends the whole
+  # call to rbind.data.frame, which returns a plain data frame.
+  parts <- Filter(Negate(is.null), list(...))
+  frames <- lapply(parts, function(p) {
+    p <- as.data.frame(p)
+    attr(p, "input") <- NULL
+    attr(p, "time") <- NULL
+    p
+  })
+  out <- do.call(rbind.data.frame, c(frames, list(
+    deparse.level = deparse.level, make.row.names = make.row.names,
+    stringsAsFactors = stringsAsFactors
+  )))
   shapes <- unique(vapply(parts, function(p) {
     s <- attr(p, "input")
     if (is.null(s)) NA_character_ else s
   }, character(1)))
-  # rbind.data.frame copies the first part's attributes, so the mixed case
-  # removes `input` rather than leaving it.
   attr(out, "input") <- if (length(shapes) == 1L && !is.na(shapes)) shapes
   attr(out, "time") <- attr(parts[[1L]], "time")
   class(out) <- class(parts[[1L]])

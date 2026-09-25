@@ -613,6 +613,30 @@ test_that("the object records its input shape and print branches on it", {
   expect_identical(attr(mixed, "time"), "wave")
   expect_match(caution_of(capture.output(print(mixed))),
                "input shape is not recorded")
+  # The draws-first order, a single table, and rbind()'s own arguments.
+  expect_identical(attr(rbind(out_dr, out_cv), "input"), NULL)
+  expect_identical(attr(rbind(out_dr, out_dr), "input"), "draws")
+  one <- rbind(out_dr)
+  expect_identical(attr(one, "input"), "draws")
+  expect_identical(nrow(one), 5L)
+  expect_identical(attr(rbind(out_cv, out_cv, deparse.level = 0), "input"),
+                   "coef_vcov")
+  expect_identical(attr(rbind(out_cv, NULL, out_cv), "input"), "coef_vcov")
+  no_names <- rbind(out_cv, out_cv, make.row.names = FALSE)
+  expect_identical(attr(no_names, "input"), "coef_vcov")
+  expect_identical(nrow(no_names), 10L)
+  # A plain data frame later in the stack: the method still runs (R
+  # dispatches on the first argument with a method), and the stack has no
+  # recorded shape. A plain data frame first is rbind.data.frame's call.
+  plain <- as.data.frame(out_cv)
+  attr(plain, "input") <- NULL
+  attr(plain, "time") <- NULL
+  class(plain) <- "data.frame"
+  with_plain <- rbind(out_cv, plain)
+  expect_s3_class(with_plain, "circumplex_ssm_trajectory")
+  expect_null(attr(with_plain, "input"))
+  expect_identical(nrow(with_plain), 10L)
+  expect_false(inherits(rbind(plain, out_cv), "circumplex_ssm_trajectory"))
 })
 
 test_that("an undecided certified verdict prints as uncertified", {

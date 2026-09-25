@@ -355,7 +355,8 @@ The package's coverage oracle ran this model with the glmmTMB REML fit at
 coverage was .854, which is the case the certification of Section 6
 flags. This page's sample has 150 persons. The oracle record is
 `devel/m27-coverage-oracle.md`, with its per-wave results in
-`devel/m27-coverage-results.rds`, in the package source.
+`devel/m27-coverage-results.rds`, in the package's GitHub repository. The
+`devel` directory is not part of the CRAN build.
 
 The package ships no small-sample correction. A percentile parametric
 bootstrap of the fixed effects is not one on complete balanced data such
