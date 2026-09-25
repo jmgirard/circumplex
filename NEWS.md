@@ -280,16 +280,14 @@
   through `ssm_trajectory(draws = )` without a Stan toolchain.
   `?simulated_growth` now names the vignette under See also.
 
-* The same vignette's Section 7 now shows the small-sample remedy that
-  enters the helper: a parametric bootstrap of the glmmTMB fixed effects by
-  `simulate()` and `refit()`, whose replicates go into
-  `ssm_trajectory(draws = )`. One thousand replicates ship as
-  `vignettes/growth_bootstrap_draws.rds`, written by the seeded
-  `data-raw/growth-bootstrap-draws.R`, and the page summarizes them and
-  states their largest gap from the Section 5 REML estimates. The section
-  no longer names lme4 remedies, and it says that nlme's `simulate()`
-  refuses this model, so an nlme user runs the bootstrap through the
-  glmmTMB call.
+* The same vignette's Section 7 now states what the package measured about
+  the REML intervals rather than naming remedies for engines the package
+  does not write. It reports the coverage oracle's result at 200 persons
+  per cell, says that the package ships no small-sample correction, and
+  explains why a percentile parametric bootstrap of the fixed effects is
+  not one on complete balanced data. It also says that a matrix of
+  coefficient draws from any source enters `ssm_trajectory()` as `draws =`.
+  The lme4 remedies it named before are gone.
 
 * `?axes_reliability` now says that at a severely ill-conditioned fit, the
   error estimate printed with an `"uncertified"` refusal depends on the

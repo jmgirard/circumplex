@@ -41,8 +41,8 @@
 #' terms that time reaches. A `draws` matrix is not checked for a joint fit.
 #' The intervals from a REML fit's `coef` and `vcov` condition on its
 #' estimated variance components and are too narrow at small samples; the
-#' "Growth Models on SSM Parameters" vignette, Section 7, shows the
-#' parametric bootstrap whose replicates enter this function as `draws`.
+#' "Growth Models on SSM Parameters" vignette, Section 7, states what the
+#' package's coverage oracle measured and that no shipped correction exists.
 #' Intervals from `draws` summarize those draws as given.
 #'
 #' @param coef The fixed effects: a named numeric vector. Required with

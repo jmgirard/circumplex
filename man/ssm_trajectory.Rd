@@ -113,8 +113,8 @@ only the given \code{times}, so with a single time it sees only the covariance
 terms that time reaches. A \code{draws} matrix is not checked for a joint fit.
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples; the
-"Growth Models on SSM Parameters" vignette, Section 7, shows the
-parametric bootstrap whose replicates enter this function as \code{draws}.
+"Growth Models on SSM Parameters" vignette, Section 7, states what the
+package's coverage oracle measured and that no shipped correction exists.
 Intervals from \code{draws} summarize those draws as given.
 }
 \examples{
