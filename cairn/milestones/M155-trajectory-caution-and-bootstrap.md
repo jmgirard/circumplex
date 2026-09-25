@@ -1,6 +1,6 @@
 # M155: The trajectory caution by input shape, and the bootstrap path into the helper
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -44,7 +44,7 @@
 - [x] T2: Write `data-raw/growth-bootstrap-draws.R` on the model of `data-raw/growth-brms-draws.R`. It runs the Section 5 glmmTMB fit, `set.seed`, `simulate(nsim = 1000)` and `refit()` per column. It drops a failed or `NA` refit and continues until 1000 rows, adds the provenance attribute, and calls `saveRDS` on `vignettes/growth_bootstrap_draws.rds`. Run it once (about 190 s) and commit the file.
 - [x] T3: Rewrite Section 7 (lines 341 to 357) and retitle it. The REML conditioning paragraph stays, and the remedy is the bootstrap. Show the loop chunk echoed with `eval = FALSE`, and evaluate the `readRDS` chunk plus `ssm_trajectory(draws = )`. Add the inline largest-gap expression against the Section 5 table and the nlme sentence. Before writing the nlme sentence, run `simulate()` on the Section 10 nlme fit once and make sure that the refusal message appears. Re-render with `tools/precompute-vignettes.R`, look at the rendered section, and record the echo sweep's accepted hits (the two `readRDS` lines) in the work log.
 - [x] T4: Sweep the seven AC6 sites. Then run `grep -n -i "caution\|note under\|Section 7" R/ssm_trajectory_helper.R NEWS.md vignettes/growth-ssm-analysis.Rmd.orig` for any further stranded sentence. Edit the NEWS bullet in the unreleased M152 entry and add a Documentation line for Section 7.
-- [ ] T5: Run `devtools::test()`, `devtools::check(args = "--no-manual")` and the three vignette tools. Make sure that `git status` is clean of any stray re-render before the gate.
+- [x] T5: Run `devtools::test()`, `devtools::check(args = "--no-manual")` and the three vignette tools. Make sure that `git status` is clean of any stray re-render before the gate.
 
 ## Work log
 
@@ -62,6 +62,7 @@
 - 2026-09-24: T1 done. Full `devtools::test()` green (no failures; skips are the on-CRAN and vdiffr ones). The AC2 identity test at line 190 now strips the `input` attribute before comparing the two shapes and asserts each value.
 - 2026-09-24: T5 in progress. Re-render of the growth vignette is byte-identical to the committed copy; `check-vignette-staleness.R` and `check-vignette-width.R` exit 0 (131 output lines, all fit). `devtools::check(args = "--no-manual")` and the [O] claim audit are running.
 - 2026-09-24: claim audit: 52 claims read, 5 corrected — tests/testthat/test-ssm_trajectory_helper.R (M154 → M152 for the caution text's origin), NEWS.md (the bootstrap table is not beside the REML table; it states the gap), vignettes/growth-ssm-analysis.Rmd.orig (the file is written by the generator, which runs the loop with drop-and-replace; the small-sample sentence stated as an expectation), data-raw/growth-bootstrap-draws.R (set.seed precedes unseeded simulate() batches). Re-rendered; width check green.
+- 2026-09-24: T5 done. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes, run on the tree at 3cf60b5c; the later commit d2d007d2 changed prose only (NEWS, a test comment, a generator comment, vignette text) and its re-render passed the staleness and width checks. Status → review.
 
 ## Decisions
 
