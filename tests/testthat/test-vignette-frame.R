@@ -146,3 +146,48 @@ test_that("every Wrap-up names the next page, and the reading order is followed"
     }
   }
 })
+
+# The peer-review notice: a fenced div under the Level paragraph of each page
+# in frame_notice, and no notice line on any other page. The opener is matched
+# whole, so a notice under another spelling is not a notice on a listed page,
+# and on an unlisted page any line naming the class or the phrase is one.
+notice_opener <- '::: {.alert .alert-warning role="alert"}'
+
+test_that("each package-original page carries the peer-review notice under its Level paragraph, and no other page does", {
+  for (name in names(frame_levels)) {
+    lines <- frame_lines(name)
+    opener <- which(lines == notice_opener)
+    if (name %in% frame_notice) {
+      expect_identical(length(opener), 1L, label = paste(name, "notice openers"))
+      # A page with no single notice has no position to check, so the loop
+      # moves on and the other pages still report.
+      if (length(opener) != 1L) next
+      level <- which(grepl("^\\*\\*Level:\\*\\* ", lines))
+      after <- if (length(level)) seq_len(length(lines) - level[[1]]) + level[[1]] else integer(0)
+      blank <- after[!nzchar(trimws(lines[after]))]
+      overview <- which(lines == "## 1. Overview")
+      rest <- seq_len(length(lines) - opener) + opener
+      closer <- rest[lines[rest] == ":::"]
+      # A page missing a landmark (its Level line, the blank line after it,
+      # its Overview heading, or the notice's closer) fails here, and the
+      # loop moves on rather than erroring out before the other pages report.
+      landmarks <- c(level = length(level), blank = length(blank), overview = length(overview), closer = length(closer))
+      expect_true(all(landmarks >= 1L), info = paste(name, "notice landmarks missing:", paste(names(landmarks)[landmarks < 1L], collapse = ", ")))
+      if (!all(landmarks >= 1L)) next
+      blank <- blank[[1]]
+      overview <- overview[[1]]
+      closer <- closer[[1]]
+      expect_true(opener > blank, info = paste(name, "notice before the Level paragraph ends"))
+      expect_true(opener < overview, info = paste(name, "notice after the Overview heading"))
+      expect_true(closer < overview, info = paste(name, "notice not closed before Overview"))
+      body <- lines[seq_len(closer - opener - 1L) + opener]
+      prose <- body[nzchar(trimws(body))]
+      expect_true(length(prose) >= 1L, info = paste(name, "notice body empty"))
+      if (!length(prose)) next
+      expect_match(prose[[1]], "^\\*\\*Not yet peer reviewed\\.\\*\\* ", info = name)
+    } else {
+      hits <- which(grepl("alert-warning|peer[- ]reviewed", lines, ignore.case = TRUE))
+      expect_identical(hits, integer(0), label = paste(name, "notice lines"))
+    }
+  }
+})

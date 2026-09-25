@@ -17,6 +17,13 @@ library(circumplex)
 **Level:** Advanced. Read "Bayesian SSM Analysis" first, because this page
 summarizes draws with the same tools.
 
+::: {.alert .alert-warning role="alert"}
+**Not yet peer reviewed.** The growth-model recipe on SSM coordinates this
+page teaches is the package's own proposal. Its authors have not yet
+published it in a peer-reviewed venue. Read it as a research tool, and state
+that status when you report results from it.
+:::
+
 ## 1. Overview
 
 This vignette fits a growth model to SSM parameters measured at several
