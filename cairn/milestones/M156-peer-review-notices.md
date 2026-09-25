@@ -25,12 +25,12 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 
 ## Acceptance criteria
 
-- [ ] AC1: Each page in `frame_notice` carries exactly one fenced div that opens with `::: {.alert .alert-warning role="alert"}`, placed after the blank line that ends the Level paragraph and before `## 1. Overview`, and its first prose line begins `**Not yet peer reviewed.**`. Every other page in `names(frame_levels)` has no line that matches `alert-warning` or `peer reviewed` (case-insensitive). `tests/testthat/test-vignette-frame.R` asserts both over every name in `names(frame_levels)`, reading the source as `frame_path()` resolves it.
-- [ ] AC2: On each `frame_notice` page, the lines between the notice's opener and its closing `:::`, piped to `Rscript tools/prose-sweep.R -`, exit 0. The first sentence after the bold lead names the page's method as the Scope lists it. One sentence states that the authors have not yet published the method in a peer-reviewed venue.
-- [ ] AC3: `rmarkdown::render()` of each `frame_notice` page's shipped `vignettes/<name>.Rmd` produces HTML in which a `<div class="alert alert-warning" role="alert">` element occurs before the `<div id="overview"` element.
-- [ ] AC4: With lavaan and glmmTMB installed, after `Rscript tools/precompute-vignettes.R <name>` runs for each of the three pre-computed `frame_notice` pages and the regenerated `.Rmd` files are committed, `Rscript tools/check-vignette-staleness.R` exits 0 on a clean tree.
+- [x] AC1: Each page in `frame_notice` carries exactly one fenced div that opens with `::: {.alert .alert-warning role="alert"}`, placed after the blank line that ends the Level paragraph and before `## 1. Overview`, and its first prose line begins `**Not yet peer reviewed.**`. Every other page in `names(frame_levels)` has no line that matches `alert-warning` or `peer reviewed` (case-insensitive). `tests/testthat/test-vignette-frame.R` asserts both over every name in `names(frame_levels)`, reading the source as `frame_path()` resolves it.
+- [x] AC2: On each `frame_notice` page, the lines between the notice's opener and its closing `:::`, piped to `Rscript tools/prose-sweep.R -`, exit 0. The first sentence after the bold lead names the page's method as the Scope lists it. One sentence states that the authors have not yet published the method in a peer-reviewed venue.
+- [x] AC3: `rmarkdown::render()` of each `frame_notice` page's shipped `vignettes/<name>.Rmd` produces HTML in which a `<div class="alert alert-warning" role="alert">` element occurs before the `<div id="overview"` element.
+- [x] AC4: With lavaan and glmmTMB installed, after `Rscript tools/precompute-vignettes.R <name>` runs for each of the three pre-computed `frame_notice` pages and the regenerated `.Rmd` files are committed, `Rscript tools/check-vignette-staleness.R` exits 0 on a clean tree.
 - [ ] AC5: `Rscript -e 'devtools::test()'` is clean. `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors, 0 warnings, and no note that the same command does not report on the default branch.
-- [ ] AC6: `NEWS.md` carries, under the development-version heading, a Documentation entry that names the four pages that gained the notice.
+- [x] AC6: `NEWS.md` carries, under the development-version heading, a Documentation entry that names the four pages that gained the notice.
 
 ## Coverage
 
@@ -69,3 +69,10 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 ## Decisions
 
 ## Review
+
+- 2026-09-25 AC1: fresh grep over all 14 `vignettes/*.Rmd`: the four `frame_notice` pages each carry exactly one `::: {.alert .alert-warning role="alert"}` opener at lines 19/21/20/25, each after the Level paragraph's blank line and before `## 1. Overview` at lines 28/30/27/32; the other ten pages have zero lines matching `alert-warning` or `peer reviewed` case-insensitively. `test-vignette-frame.R` run on its own via `testthat::test_file()`: all expectations pass, no failure, no skip.
+- 2026-09-25 AC2: the notice body of each of the four pages, cut between the opener and its closing `:::` and piped to `Rscript tools/prose-sweep.R -`, exits 0 (four of four). Each first sentence after the bold lead names the Scope's method verbatim (latent Structural Summary Method; invariance-gated latent contrast; growth-model recipe on SSM coordinates; Bayesian SSM recipe), and each carries the sentence "Its authors have not yet published it in a peer-reviewed venue."
+- 2026-09-25 AC3: `rmarkdown::render()` of the four shipped `.Rmd` files in a scratch copy: one `<div class="alert alert-warning" role="alert">` each, at HTML line 347/349/347/347, before `<div id="overview"` at 353/356/354/353.
+- 2026-09-25 AC4: `Rscript tools/check-vignette-staleness.R` on the clean tree (git status empty): all 11 pre-computed vignettes up to date, exit 0; the three regenerated `.Rmd` files are committed on the branch (diffstat: 7 lines added each, nothing else).
+- 2026-09-25 AC6: `NEWS.md` development-version heading carries a Documentation entry naming the four pages by title.
+- 2026-09-25 consistency gate: `cairn_validate` all checks passed; `devtools::document()` no diff, 0 `resolve link` lines; `pkgdown::check_pkgdown()` no problems; README.md newer than README.Rmd; master watches: newest push runs with a verdict on `R-CMD-check.yaml` and `test-coverage.yaml` both `success` (715a34e3; the current tip 7a21d997 is a cairn-only commit, path-skipped); master-red alert check and dry run exit 0; branch-protection check exit 0; no new top-level files.
