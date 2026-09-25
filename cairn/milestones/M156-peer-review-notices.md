@@ -45,7 +45,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 
 - [x] T1: Add `frame_notice` to `tests/testthat/helper-vignette-frame.R` and the AC1 test to `tests/testthat/test-vignette-frame.R`. Run the test on the unchanged tree and record in the work log that it is red for the four pages.
 - [x] T2: Write the notice into `vignettes/sem-based-ssm-analysis.Rmd.orig`, `vignettes/sem-latent-contrasts.Rmd.orig`, `vignettes/growth-ssm-analysis.Rmd.orig` and `vignettes/bayesian-ssm-analysis.Rmd`, after the Level paragraph. Pipe each notice to the prose sweep. Read each notice against the Scope's method list and the AC2 claim.
-- [ ] T3: Run `devtools::install()`, re-render the three pre-computed pages with `tools/precompute-vignettes.R`, and commit the regenerated `.Rmd` files. Then run the staleness check on the clean tree. Make sure that `git diff --stat` against the default branch touches only the intended files (M112: stage by path, no figure churn).
+- [x] T3: Run `devtools::install()`, re-render the three pre-computed pages with `tools/precompute-vignettes.R`, and commit the regenerated `.Rmd` files. Then run the staleness check on the clean tree. Make sure that `git diff --stat` against the default branch touches only the intended files (M112: stage by path, no figure churn).
 - [ ] T4: Render each shipped `.Rmd` to the scratchpad and grep for the div before the overview section. Build one page with `pkgdown::build_article()` and look at it once (M33).
 - [ ] T5: Plant checks, each reverted after its red run: remove one page's notice; add a second notice to one page; change one page's bold lead; move one notice below `## 1. Overview`; add a notice under a different opener form (`<div class="alert alert-warning">`) to a page outside `frame_notice`.
 - [ ] T6: Write the NEWS entry. Run `devtools::test()` and `devtools::check(args = "--no-manual")`, and compare the notes with a run on the default branch.
@@ -60,6 +60,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 - 2026-09-25: T1 done. `frame_notice` added, the notice test appended to `test-vignette-frame.R`; on the unchanged tree it fails for exactly the four listed pages (zero openers) and passes the other ten. A `skip_if` inside the loop first hid three of the four, replaced by `next` (M146).
 - 2026-09-25: plan gate chose vignettes only over adding the help pages now, because the help-page change roughly doubles the milestone; falsified by a user reaching a package-original method from its help page with no status shown.
 - 2026-09-25: T2 done. The notice is in the three `.Rmd.orig` sources and in `bayesian-ssm-analysis.Rmd`, each body exits 0 from the prose sweep on stdin, each first sentence after the lead names the Scope's method, and the frame test file is green.
+- 2026-09-25: T3 done. After `devtools::install(upgrade = FALSE)` the three pre-computed pages re-rendered with a diff of the seven notice lines each and nothing else (no figure churn, no glmmTMB warning in the output); the renders are committed and the staleness check runs on the clean tree in the same commit's log line below.
 
 ## Decisions
 
