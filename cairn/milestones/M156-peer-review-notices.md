@@ -47,7 +47,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 - [x] T2: Write the notice into `vignettes/sem-based-ssm-analysis.Rmd.orig`, `vignettes/sem-latent-contrasts.Rmd.orig`, `vignettes/growth-ssm-analysis.Rmd.orig` and `vignettes/bayesian-ssm-analysis.Rmd`, after the Level paragraph. Pipe each notice to the prose sweep. Read each notice against the Scope's method list and the AC2 claim.
 - [x] T3: Run `devtools::install()`, re-render the three pre-computed pages with `tools/precompute-vignettes.R`, and commit the regenerated `.Rmd` files. Then run the staleness check on the clean tree. Make sure that `git diff --stat` against the default branch touches only the intended files (M112: stage by path, no figure churn).
 - [x] T4: Render each shipped `.Rmd` to the scratchpad and grep for the div before the overview section. Build one page with `pkgdown::build_article()` and look at it once (M33).
-- [ ] T5: Plant checks, each reverted after its red run: remove one page's notice; add a second notice to one page; change one page's bold lead; move one notice below `## 1. Overview`; add a notice under a different opener form (`<div class="alert alert-warning">`) to a page outside `frame_notice`.
+- [x] T5: Plant checks, each reverted after its red run: remove one page's notice; add a second notice to one page; change one page's bold lead; move one notice below `## 1. Overview`; add a notice under a different opener form (`<div class="alert alert-warning">`) to a page outside `frame_notice`.
 - [ ] T6: Write the NEWS entry. Run `devtools::test()` and `devtools::check(args = "--no-manual")`, and compare the notes with a run on the default branch.
 
 ## Work log
@@ -62,6 +62,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 - 2026-09-25: T2 done. The notice is in the three `.Rmd.orig` sources and in `bayesian-ssm-analysis.Rmd`, each body exits 0 from the prose sweep on stdin, each first sentence after the lead names the Scope's method, and the frame test file is green.
 - 2026-09-25: T3 done. After `devtools::install(upgrade = FALSE)` the three pre-computed pages re-rendered with a diff of the seven notice lines each and nothing else (no figure churn, no glmmTMB warning in the output); the renders are committed and the staleness check runs on the clean tree in the same commit's log line below.
 - 2026-09-25: staleness check on the clean tree after the T3 commit: all 11 pre-computed vignettes up to date, exit 0. T4 done: the four shipped `.Rmd` files rendered to scratch each put the `alert alert-warning` div before the `id="overview"` section (line 347 vs 353, 349 vs 356, 347 vs 353, 347 vs 354); `pkgdown::build_article("sem-based-ssm-analysis")` served locally shows a styled warning box between the Level line and the Overview heading.
+- 2026-09-25: T5 done. Five plants, each with a non-empty `git diff --stat` before its run and reverted after: a removed notice (sem-based) fails at the opener count; a doubled notice (sem-latent-contrasts) fails at the opener count; a changed lead (bayesian) fails at the lead match; a notice moved below Overview (growth) fails at `opener < overview`; a `<div class="alert alert-warning">` notice on ci-accuracy fails at the unlisted-page line check. The clean tree is green.
 
 ## Decisions
 
