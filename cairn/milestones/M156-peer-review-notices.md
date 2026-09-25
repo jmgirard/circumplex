@@ -1,13 +1,13 @@
 # M156: Peer-review status notices on the four package-original vignettes
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — vignette text that ships inside the package and on the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** m156-peer-review-notices
 
 ## Goal
 
@@ -43,7 +43,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 
 ## Tasks
 
-- [ ] T1: Add `frame_notice` to `tests/testthat/helper-vignette-frame.R` and the AC1 test to `tests/testthat/test-vignette-frame.R`. Run the test on the unchanged tree and record in the work log that it is red for the four pages.
+- [x] T1: Add `frame_notice` to `tests/testthat/helper-vignette-frame.R` and the AC1 test to `tests/testthat/test-vignette-frame.R`. Run the test on the unchanged tree and record in the work log that it is red for the four pages.
 - [ ] T2: Write the notice into `vignettes/sem-based-ssm-analysis.Rmd.orig`, `vignettes/sem-latent-contrasts.Rmd.orig`, `vignettes/growth-ssm-analysis.Rmd.orig` and `vignettes/bayesian-ssm-analysis.Rmd`, after the Level paragraph. Pipe each notice to the prose sweep. Read each notice against the Scope's method list and the AC2 claim.
 - [ ] T3: Run `devtools::install()`, re-render the three pre-computed pages with `tools/precompute-vignettes.R`, and commit the regenerated `.Rmd` files. Then run the staleness check on the clean tree. Make sure that `git diff --stat` against the default branch touches only the intended files (M112: stage by path, no figure churn).
 - [ ] T4: Render each shipped `.Rmd` to the scratchpad and grep for the div before the overview section. Build one page with `pkgdown::build_article()` and look at it once (M33).
@@ -56,6 +56,8 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 - 2026-09-25: criteria audit ran in full mode ([O] reader). It returned findings on AC1 (instrument-bound wording, an opener-spelling proxy for "no other page carries a notice", a two-line Level paragraph), AC2 (the bold lead is the first sentence, an unbounded literature claim, an unnamed method), AC4 (the staleness check reads the committed copy) and T5 (plants varied neither form nor location). All were fixed in the wording above.
 - 2026-09-25: plan gate chose a warning box after the Level paragraph over a box above it or a plain bold paragraph, because the frame test stays untouched and the site styles it; falsified by a reader report that the notice goes unseen below the Level line, or that the unstyled installed copy misleads.
 - 2026-09-25: plan gate chose the four package-original pages over adding the three pages that extend a published method, because those apply a peer-reviewed method and already state what the package measured; falsified by a reader citing one of those pages as a validated method as a whole.
+- 2026-09-25: implement started on `m156-peer-review-notices`; the question gate was skipped, since the plan gate settled form, place, wording and the test shape. glmmTMB loads with a TMB version-mismatch warning on this machine, watched at T3.
+- 2026-09-25: T1 done. `frame_notice` added, the notice test appended to `test-vignette-frame.R`; on the unchanged tree it fails for exactly the four listed pages (zero openers) and passes the other ten. A `skip_if` inside the loop first hid three of the four, replaced by `next` (M146).
 - 2026-09-25: plan gate chose vignettes only over adding the help pages now, because the help-page change roughly doubles the milestone; falsified by a user reaching a package-original method from its help page with no status shown.
 
 ## Decisions

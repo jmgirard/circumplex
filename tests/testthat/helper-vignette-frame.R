@@ -22,6 +22,16 @@ frame_levels <- c(
   "growth-ssm-analysis" = "Advanced"
 )
 
+# Pages that teach a method the package proposes with no peer-reviewed source.
+# Each opens with a "Not yet peer reviewed" notice under its Level paragraph,
+# and no other page carries one (test-vignette-frame.R).
+frame_notice <- c(
+  "sem-based-ssm-analysis",
+  "sem-latent-contrasts",
+  "bayesian-ssm-analysis",
+  "growth-ssm-analysis"
+)
+
 # Reading order: each row is one page and the page that follows it.
 frame_next <- rbind(
   c("using-instruments", "introduction-to-ssm-analysis"),
