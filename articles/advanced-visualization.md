@@ -991,7 +991,10 @@ rotation regardless. So read widely spaced occasions with that in mind.
 
 A time point’s amplitude interval can be too close to zero for its
 displacement to be interpretable. Such a time point is drawn as a hollow
-point. The hollow point marks an interpretability precondition, not a
+point, and the line segments on either side of it are drawn dashed. A
+dashed segment touches a time point whose displacement is not
+interpretable, so the direction of change along it is not to be read.
+The hollow point marks an interpretability precondition, not a
 significance test.
 
 `drop_xy = TRUE` above omits the X-value and Y-value panels (the $`x`$
