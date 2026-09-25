@@ -32,6 +32,9 @@ ssm_trajectory(
 
 # S3 method for class 'circumplex_ssm_trajectory'
 print(x, digits = 2, ...)
+
+# S3 method for class 'circumplex_ssm_trajectory'
+rbind(..., deparse.level = 1, make.row.names = TRUE, stringsAsFactors = FALSE)
 ```
 
 ## Arguments
@@ -94,22 +97,35 @@ print(x, digits = 2, ...)
 
 - ...:
 
-  Ignored (S3 consistency).
+  For [`print()`](https://rdrr.io/r/base/print.html), ignored (S3
+  consistency). For [`rbind()`](https://rdrr.io/r/base/cbind.html), the
+  trajectory tables to stack.
+
+- deparse.level, make.row.names, stringsAsFactors:
+
+  For [`rbind()`](https://rdrr.io/r/base/cbind.html), passed to
+  [`rbind.data.frame()`](https://rdrr.io/r/base/cbind.html).
 
 ## Value
 
 A data frame of class `"circumplex_ssm_trajectory"` with attribute
-`time` naming its time column, one row per value of `times`. Its columns
-are `<time>`; `e_est`, `e_lci`, `e_uci`, and the same three for `x`,
-`y`, `a` and `d`; and `certified`. The estimates and bounds are those
+`time` naming its time column and attribute `input` recording the input
+shape, `"coef_vcov"` or `"draws"`, one row per value of `times`. Its
+columns are `<time>`; `e_est`, `e_lci`, `e_uci`, and the same three for
+`x`, `y`, `a` and `d`; and `certified`. The estimates and bounds are
+those
 [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
 reports: medians and equal-tailed interval bounds for `e`, `x`, `y` and
 `a`, and the circular mean with circular quantile bounds in degrees for
 `d`. A `d` interval that straddles 0/360 degrees has `d_lci > d_uci`.
 `certified` is the displacement certification at that time, and at an
 uncertified time the `d` interval is not interpretable. Printing shows
-the table rounded, marks each uncertified row, and states the
-small-sample caution.
+the table rounded, marks each uncertified row, and ends with the caution
+for the input shape: the small-sample caution under `coef` and `vcov`,
+and under `draws` that the intervals summarize the draws as given. A
+subset that drops the attribute, or an
+[`rbind()`](https://rdrr.io/r/base/cbind.html) of trajectory tables of
+different shapes, prints a caution that says the shape is not recorded.
 [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
 plots the object with no `time` argument.
 
@@ -135,9 +151,12 @@ whose implied covariance between `x(t)` and `y(t)` is exactly zero at
 every time in `times`, unless `vcov` is zero everywhere. The check reads
 only the given `times`, so with a single time it sees only the
 covariance terms that time reaches. A `draws` matrix is not checked for
-a joint fit. The intervals from a REML fit condition on its estimated
-variance components and are too narrow at small samples; the "Growth
-Models on SSM Parameters" vignette states the remedies.
+a joint fit. The intervals from a REML fit's `coef` and `vcov` condition
+on its estimated variance components and are too narrow at small
+samples; the "Growth Models on SSM Parameters" vignette, Section 7,
+states what the package's coverage oracle measured and that no shipped
+correction exists. Intervals from `draws` summarize those draws as
+given.
 
 ## See also
 
@@ -203,8 +222,8 @@ ssm_trajectory(times = 0:4, draws = draws)
 #>    2.82 359.32   6.68
 #>    8.87   4.99  13.00
 #>   14.72  10.27  19.40
-#>   Caution: intervals from a fitted model's fixed-effect covariance condition on
-#>   its estimated variance components, and are too narrow at small samples. See
-#>   vignette("growth-ssm-analysis"), Section 7.
+#>   Caution: these intervals summarize the supplied draws as given. Their coverage
+#>   depends on how the draws were produced, and the joint fit was not checked. See
+#>   vignette("growth-ssm-analysis"), Sections 7 and 10.
 #> 
 ```

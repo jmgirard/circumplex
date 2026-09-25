@@ -252,6 +252,7 @@ engine
   : The joint growth model on SSM coordinates as an engine's formulas
 - [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
   [`print(`*`<circumplex_ssm_trajectory>`*`)`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
+  [`rbind(`*`<circumplex_ssm_trajectory>`*`)`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
   : Trajectory of SSM parameters from a fitted growth model
 
 ## SEM-Based SSM Functions

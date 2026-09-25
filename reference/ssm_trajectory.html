@@ -131,7 +131,10 @@ time go through <code><a href="ssm_draws.html">ssm_draws()</a></code> with <code
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'circumplex_ssm_trajectory'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'circumplex_ssm_trajectory'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">...</span>, deparse.level <span class="op">=</span> <span class="fl">1</span>, make.row.names <span class="op">=</span> <span class="cn">TRUE</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -193,13 +196,21 @@ or of the columns of <code>draws</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Ignored (S3 consistency).</p></dd>
+<dd><p>For <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, ignored (S3 consistency). For <code><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind()</a></code>, the
+trajectory tables to stack.</p></dd>
+
+
+<dt id="arg-deparse-level-make-row-names-stringsasfactors">deparse.level, make.row.names, stringsAsFactors<a class="anchor" aria-label="anchor" href="#arg-deparse-level-make-row-names-stringsasfactors"></a></dt>
+<dd><p>For <code><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind()</a></code>,
+passed to <code><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind.data.frame()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame of class <code>"circumplex_ssm_trajectory"</code> with
-attribute <code>time</code> naming its time column, one row per value of <code>times</code>.
+attribute <code>time</code> naming its time column and attribute <code>input</code> recording
+the input shape, <code>"coef_vcov"</code> or <code>"draws"</code>, one row per value of
+<code>times</code>.
 Its columns are <code>&lt;time&gt;</code>; <code>e_est</code>, <code>e_lci</code>, <code>e_uci</code>, and the same three
 for <code>x</code>, <code>y</code>, <code>a</code> and <code>d</code>; and <code>certified</code>. The estimates and bounds
 are those <code><a href="ssm_draws.html">ssm_draws()</a></code> reports: medians and equal-tailed interval
@@ -208,7 +219,11 @@ quantile bounds in degrees for <code>d</code>. A <code>d</code> interval that st
 degrees has <code>d_lci &gt; d_uci</code>. <code>certified</code> is the displacement
 certification at that time, and at an uncertified time the <code>d</code> interval
 is not interpretable. Printing shows the table rounded, marks each
-uncertified row, and states the small-sample caution.
+uncertified row, and ends with the caution for the input shape: the
+small-sample caution under <code>coef</code> and <code>vcov</code>, and under <code>draws</code> that the
+intervals summarize the draws as given. A subset that drops the
+attribute, or an <code><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind()</a></code> of trajectory tables of different shapes,
+prints a caution that says the shape is not recorded.
 <code><a href="ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> plots the object with no <code>time</code> argument.</p>
     </div>
     <div class="section level2">
@@ -229,9 +244,12 @@ separate models does. So the <code>coef</code> and <code>vcov</code> shape refus
 whose implied covariance between <code>x(t)</code> and <code>y(t)</code> is exactly zero at
 every time in <code>times</code>, unless <code>vcov</code> is zero everywhere. The check reads
 only the given <code>times</code>, so with a single time it sees only the covariance
-terms that time reaches. A <code>draws</code> matrix is not checked for a joint fit. The intervals from a REML fit condition on
-its estimated variance components and are too narrow at small samples;
-the "Growth Models on SSM Parameters" vignette states the remedies.</p>
+terms that time reaches. A <code>draws</code> matrix is not checked for a joint fit.
+The intervals from a REML fit's <code>coef</code> and <code>vcov</code> condition on its
+estimated variance components and are too narrow at small samples; the
+"Growth Models on SSM Parameters" vignette, Section 7, states what the
+package's coverage oracle measured and that no shipped correction exists.
+Intervals from <code>draws</code> summarize those draws as given.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -297,9 +315,9 @@ the "Growth Models on SSM Parameters" vignette states the remedies.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2.82 359.32   6.68</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    8.87   4.99  13.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   14.72  10.27  19.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Caution: intervals from a fitted model's fixed-effect covariance condition on</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   its estimated variance components, and are too narrow at small samples. See</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   vignette("growth-ssm-analysis"), Section 7.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Caution: these intervals summarize the supplied draws as given. Their coverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   depends on how the draws were produced, and the joint fit was not checked. See</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   vignette("growth-ssm-analysis"), Sections 7 and 10.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

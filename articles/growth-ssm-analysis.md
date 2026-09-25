@@ -264,7 +264,8 @@ That function applies the package’s circular-statistics machinery
 wrapping at the boundary). The table holds the estimate and interval of
 $`e`$, $`x`$, $`y`$, $`a`$ and $`d`$ at each time, plus the `certified`
 verdict that Section 6 explains. Printing rounds the table to two
-decimals, and it ends with the caution that Section 7 explains.
+decimals, and it ends with the caution for the `coef` and `vcov` shape,
+which Section 7 explains.
 
 Before the second step, the call makes the check that Section 4
 promised. It reads the covariance that `vcov` implies between
@@ -444,16 +445,33 @@ the residuals. The fixed-effect covariance matrix used for the draws
 conditions on the estimated variance components. That is, it ignores
 their uncertainty. At small sample sizes, this makes the resulting
 intervals anticonservative (too narrow). This is a property of the
-mixed-model machinery, not of the SSM transform, so the user must apply
-the remedy.
+mixed-model machinery, not of the SSM transform. The caution under the
+Section 5 table states this for the `coef` and `vcov` shape.
 
-With modest N, prefer degrees-of-freedom-adjusted inference or a
-parametric bootstrap of the fixed effects over raw normal-approximation
-draws. A parametric bootstrap refits the model to data simulated from
-the fitted model. Degrees-of-freedom-adjusted inference includes the
-Kenward–Roger adjustment for `lme4` fits via **pbkrtest**, the
-approximate denominator degrees of freedom `nlme` supplies, or
-$`t`$-quantile-based intervals.
+The package’s coverage oracle ran this model with the glmmTMB REML fit
+at 200 persons in each coverage cell. The $`d(t)`$ intervals held
+coverage between .93 and .97 at every certified wave. At the uncertified
+low-amplitude wave the coverage was .854, which is the case the
+certification of Section 6 flags. This page’s sample has 150 persons.
+The oracle record is `devel/m27-coverage-oracle.md`, with its per-wave
+results in `devel/m27-coverage-results.rds`, in the package’s GitHub
+repository. The `devel` directory is not part of the CRAN build.
+
+The package ships no small-sample correction. A percentile parametric
+bootstrap of the fixed effects is not one on complete balanced data such
+as this page’s. There every refit’s fixed effects equal ordinary least
+squares, whatever variance components the refit estimates. So the
+replicates follow the same normal distribution the helper draws from, up
+to simulation error. Under `coef` and `vcov` the helper draws from a
+normal distribution on the covariance matrix alone. So no $`t`$ quantile
+or denominator degrees of freedom enters it. At samples much smaller
+than the oracle’s, read the intervals as approximate.
+
+A matrix of coefficient draws from any source enters the helper as
+`draws =`, one row per draw, with columns named for the six
+coefficients. A `b_` prefix is dropped. The caution printed under
+`draws` says that the intervals summarize those draws as given. Section
+10 shows this with posterior draws from brms.
 
 ## 8. The unwrap alternative: `angle_unwrap()`
 
@@ -638,16 +656,17 @@ ssm_trajectory(times = 0:4, draws = draws)
 #>   0.64   2.49 359.66   5.49
 #>   0.65   8.59   5.56  11.73
 #>   0.66  14.51  11.12  17.91
-#>   Caution: intervals from a fitted model's fixed-effect covariance condition
-#>   on its estimated variance components, and are too narrow at small samples.
-#>   See vignette("growth-ssm-analysis"), Section 7.
+#>   Caution: these intervals summarize the supplied draws as given. Their
+#>   coverage depends on how the draws were produced, and the joint fit was not
+#>   checked. See vignette("growth-ssm-analysis"), Sections 7 and 10.
 ```
 
 At each wave, the posterior medians of $`x`$ and $`y`$ sit within 0.01
-of the glmmTMB table’s estimates. The note under the table is written
-for the `coef` and `vcov` shape, and it does not apply here. Posterior
-draws average over the variance components rather than condition on
-their estimates. A posterior interval from brms depends on its priors
+of the glmmTMB table’s estimates. The caution under the table is the one
+for the `draws` shape: the intervals summarize the draws as given.
+Posterior draws average over the variance components rather than
+condition on their estimates, so the REML caution of Section 7 does not
+apply to them. A posterior interval from brms depends on its priors
 instead, and the package’s coverage validation ran the REML fit, not the
 brms fit. The `draws` shape is not checked for a joint fit, so the joint
 model is the user’s responsibility there.
