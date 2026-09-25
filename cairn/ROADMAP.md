@@ -1,15 +1,14 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-25 (M155 done: the M152 row pruned for terminal-row retention and the M155 tombstone candidate row pruned for the byte budget, one LESSONS line added with the M23/M63 line pruned as stalest, no RB/RR to archive, no candidate row extended, validate green.)_
+_Last hygiene check: 2026-09-25 (M156 done: the M153 row pruned for terminal-row retention, one LESSONS line added, no RB/RR to archive, no candidate row extended, doctrine modules within budget, validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M156 | Peer-review status notices on the four package-original vignettes | review | — | normal | milestones/M156-peer-review-notices.md |
+| M156 | Peer-review status notices on the four package-original vignettes | done | — | normal | milestones/archive/M156-peer-review-notices.md |
 | M154 | Dashed displacement segments at uncertified time points | done | — | normal | milestones/archive/M154-dashed-uncertified-segments.md |
-| M153 | The growth vignette on the helper workflow | done | M152 | high | milestones/archive/M153-growth-vignette-rewrite.md |
 | M155 | The trajectory caution by input shape, and the bootstrap path into the helper | done | — | normal | milestones/archive/M155-trajectory-caution-and-bootstrap.md |
 
 ## Candidates
