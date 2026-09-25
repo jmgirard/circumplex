@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-24 (M153 done: the caution-wording candidate row extended with the Section 7 remedies finding, the M150 row pruned for terminal-row retention, no LESSONS line since the file sits at its byte budget and nothing was retired, no RB/RR to archive, validate green.)_
+_Last hygiene check: 2026-09-24 (M154 done: the M151 row pruned for terminal-row retention, one LESSONS line added with the stalest dated line pruned to stay under the byte budget, no RB/RR to archive, no candidate row touched, validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M152 | Growth output helper, coefficients or draws to a trajectory | done | M151 | high | milestones/archive/M152-growth-trajectory-helper.md |
-| M154 | Dashed displacement segments at uncertified time points | review | — | normal | milestones/M154-dashed-uncertified-segments.md |
+| M154 | Dashed displacement segments at uncertified time points | done | — | normal | milestones/archive/M154-dashed-uncertified-segments.md |
 | M153 | The growth vignette on the helper workflow | done | M152 | high | milestones/archive/M153-growth-vignette-rewrite.md |
-| M151 | Growth input helpers, the long table and the formula builder | done | — | high | milestones/archive/M151-growth-input-helpers.md |
 
 ## Candidates
 
