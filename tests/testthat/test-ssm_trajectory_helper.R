@@ -194,6 +194,10 @@ test_that("a draws matrix skips the drawing step and matches shape one", {
   B <- circumplex:::mvn_draws(4000, fx_growth$coef, fx_growth$vcov)
   colnames(B) <- names(fx_growth$coef)
   out2 <- ssm_trajectory(times = 0:4, draws = B)
+  # The two shapes differ only in the recorded input shape (M155).
+  expect_identical(attr(out1, "input"), "coef_vcov")
+  expect_identical(attr(out2, "input"), "draws")
+  attr(out1, "input") <- attr(out2, "input") <- NULL
   expect_identical(out1, out2)
 
   # No random number is drawn on the draws path.
@@ -533,6 +537,66 @@ test_that("print rounds to digits, marks uncertified rows, states the caution", 
   txt_sub <- capture.output(print(out2[, 1:4]))
   expect_false(any(grepl("^\\*", txt_sub)))
   expect_length(txt_sub[grepl(row_re, txt_sub)], 5L)
+})
+
+test_that("the object records its input shape and print branches on it", {
+  # M155 AC1 and AC2. The REML caution is the M154 text, pinned here so a
+  # wording change under `coef`/`vcov` reddens.
+  reml <- paste0(
+    "Caution: intervals from a fitted model's fixed-effect covariance ",
+    "condition on its estimated variance components, and are too narrow ",
+    "at small samples. See vignette(\"growth-ssm-analysis\"), Section 7."
+  )
+  caution_of <- function(txt) {
+    i <- grep("^  Caution:", txt)
+    expect_length(i, 1L)
+    j <- i
+    while (j < length(txt) && nzchar(txt[j + 1])) j <- j + 1
+    paste(trimws(txt[i:j]), collapse = " ")
+  }
+
+  set.seed(20260716)
+  out_cv <- ssm_trajectory(fx_origin$coef, fx_origin$vcov, times = 0:4)
+  expect_identical(attr(out_cv, "input"), "coef_vcov")
+  expect_identical(names(out_cv), traj_cols)
+  txt_cv <- capture.output(print(out_cv))
+  expect_identical(caution_of(txt_cv), reml)
+  expect_false(any(grepl("supplied draws", txt_cv)))
+
+  # The draws twin: the same origin fixture drawn by the reference, so its
+  # wave-2 row is uncertified too.
+  set.seed(20260716)
+  B <- mvn_draw(4000, fx_origin$coef, fx_origin$vcov)
+  colnames(B) <- coef_names
+  out_dr <- ssm_trajectory(times = 0:4, draws = B)
+  expect_identical(attr(out_dr, "input"), "draws")
+  expect_identical(names(out_dr), traj_cols)
+  txt_dr <- capture.output(print(out_dr))
+  body <- txt_dr[grepl(row_re, txt_dr)]
+  expect_identical(grepl("^\\*", body), c(FALSE, FALSE, TRUE, FALSE, FALSE))
+  expect_match(txt_dr, "Uncertified", all = FALSE)
+  cd <- caution_of(txt_dr)
+  expect_match(cd, "summarize the supplied draws as given")
+  expect_match(cd, "coverage depends on how the draws were produced")
+  expect_match(cd, "joint fit was not checked")
+  expect_match(cd, "Sections 7 and 10")
+  expect_false(any(grepl("fixed-effect covariance", txt_dr)))
+  # The table lines are the same under both shapes' print paths: the same
+  # object printed with the attribute swapped gives identical rows.
+  swapped <- out_dr
+  attr(swapped, "input") <- "coef_vcov"
+  txt_sw <- capture.output(print(swapped))
+  expect_identical(txt_sw[grepl(row_re, txt_sw)], body)
+  expect_identical(caution_of(txt_sw), reml)
+
+  # A column subset drops the attribute: the shape-neutral caution.
+  sub <- out_dr[, 1:4]
+  expect_null(attr(sub, "input"))
+  cs <- caution_of(capture.output(print(sub)))
+  expect_match(cs, "input shape is not recorded")
+  expect_match(cs, "Sections 7 and 10")
+  expect_false(grepl("fixed-effect covariance", cs))
+  expect_false(grepl("supplied draws", cs))
 })
 
 test_that("an undecided certified verdict prints as uncertified", {

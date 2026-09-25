@@ -1,6 +1,6 @@
 # M155: The trajectory caution by input shape, and the bootstrap path into the helper
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -53,6 +53,9 @@
 - 2026-09-24: plan gate chose a committed 1000-replicate file over `eval = FALSE` code alone and over running the loop at each render, because the reader sees the bootstrap table and the staleness guard stays byte-stable. The M120 lesson applies: optimizer digits move across BLAS builds. Falsified by a staleness failure on the committed table, or by a file whose replicates cannot be regenerated near its values.
 - 2026-09-24: plan gate chose dropping the lme4, pbkrtest and Kenward-Roger remedies over keeping an aside, because the builder writes no lme4 model and the aside is untested prose. Falsified by a user request for an lme4 dialect.
 - 2026-09-24: plan gate chose stating nlme's `simulate()` refusal and routing through glmmTMB over a hand-written nlme simulator, because the simulator is a new correctness surface in a teaching page. The parity test holds the engines equal. Falsified by a user who cannot install glmmTMB and needs the bootstrap on nlme.
+
+- 2026-09-24: /milestone-implement started; branch m155-trajectory-caution-and-bootstrap cut from master e01c1dc5. Question gate skipped: the plan fixed the attribute name, the caution wording and the demonstration form, and no dependency changes.
+- 2026-09-24: checkpoint, half-done and marked so. T1 code, roxygen and tests written; the helper test file is green and the full suite is still running, so T1 stays unticked. The T2 generator is written and running (1000 refits); no replicate file yet. Section 7, the three sibling vignette sentences and the two NEWS edits are drafted, unrendered.
 
 ## Decisions
 

@@ -32,9 +32,12 @@
   covariance between `x(t)` and `y(t)` is exactly zero at every time is
   refused, unless it is zero everywhere, since coordinates fit in separate
   models give wrong displacement intervals. A draws matrix is not checked.
-  The object prints rounded, with
-  each uncertified row marked and the small-sample caution stated, and
-  `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
+  The object records its input shape in an `input` attribute and prints
+  rounded, with each uncertified row marked and a closing caution for that
+  shape: under `coef` and `vcov`, that REML intervals condition on the
+  variance components and are too narrow at small samples; under `draws`,
+  that the intervals summarize the draws as given and the joint fit was
+  not checked. `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
   and displacement columns match the hand-built per-wave loop the growth
   vignette used before, to 1e-12 under the same seed.
 
@@ -275,6 +278,16 @@
   `data-raw/growth-brms-draws.R`. So the page summarizes posterior draws
   through `ssm_trajectory(draws = )` without a Stan toolchain.
   `?simulated_growth` now names the vignette under See also.
+
+* The same vignette's Section 7 now shows the small-sample remedy that
+  enters the helper: a parametric bootstrap of the glmmTMB fixed effects by
+  `simulate()` and `refit()`, whose replicates go into
+  `ssm_trajectory(draws = )`. One thousand replicates ship as
+  `vignettes/growth_bootstrap_draws.rds`, written by the seeded
+  `data-raw/growth-bootstrap-draws.R`, and the page summarizes them beside
+  the REML table. The section no longer names lme4 remedies, and it says
+  that nlme's `simulate()` refuses this model, so an nlme user runs the
+  bootstrap through the glmmTMB call.
 
 * `?axes_reliability` now says that at a severely ill-conditioned fit, the
   error estimate printed with an `"uncertified"` refusal depends on the
