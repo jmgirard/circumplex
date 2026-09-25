@@ -26,8 +26,8 @@ input with `ssm_growth_data()`. Section 4, "One joint model, not three
 separate ones", writes the model with `ssm_growth_formula()` and fits it.
 Section 5, "From fixed effects to $(a(t), d(t))$ with intervals", carries the
 uncertainty through `ssm_trajectory()`. Section 6, "Certification: when
-$d(t)$ intervals are not interpretable", and Section 7, "A caution about REML
-intervals at small samples", state the limits. Section 8, "The unwrap
+$d(t)$ intervals are not interpretable", and Section 7, "Small samples: the
+REML caution and the bootstrap remedy", state the limits. Section 8, "The unwrap
 alternative: `angle_unwrap()`", fits a second recipe. Section 9, "Caveats and
 upgrades", closes the recipe. Section 10, "The same model in nlme and brms",
 shows the two other engines. The Wrap-up lists what the page covered and
@@ -247,7 +247,7 @@ circular means, equal-tailed intervals with correct wrapping at the
 boundary). The table holds the estimate and interval of $e$, $x$, $y$, $a$
 and $d$ at each time, plus the `certified` verdict that Section 6 explains.
 Printing rounds the table to two decimals, and it ends with the caution
-that Section 7 explains.
+for the `coef` and `vcov` shape, which Section 7 explains.
 
 Before the second step, the call makes the check that Section 4 promised. It
 reads the covariance that `vcov` implies between $\hat{x}(t)$ and
@@ -405,7 +405,7 @@ it plots the same way, minus the hollow marking, the dashed segments and
 their legend. The figure then makes no claim about interpretability either
 way. That is the honest default when the verdict was never computed.
 
-## 7. A caution about REML intervals at small samples
+## 7. Small samples: the REML caution and the bootstrap remedy
 
 The model is fit by REML (restricted maximum likelihood). Its variance
 components are the variances and covariances of the random effects and the
@@ -414,14 +414,75 @@ on the estimated variance components. That is, it ignores their
 uncertainty. At small sample sizes, this makes the resulting intervals
 anticonservative (too narrow). This is a property of the mixed-model
 machinery, not of the SSM transform, so the user must apply the remedy.
+The caution under the Section 5 table states this for the `coef` and
+`vcov` shape.
 
-With modest N, prefer degrees-of-freedom-adjusted inference or a parametric
-bootstrap of the fixed effects over raw normal-approximation draws. A
-parametric bootstrap refits the model to data simulated from the fitted
-model.
-Degrees-of-freedom-adjusted inference includes the Kenward–Roger adjustment for
-`lme4` fits via **pbkrtest**, the approximate denominator degrees of freedom
-`nlme` supplies, or $t$-quantile-based intervals.
+The remedy that enters the helper is a parametric bootstrap of the fixed
+effects. Each replicate simulates a new response vector from the fitted
+model, with the person effects and the residuals both redrawn, and refits
+the model to it. The replicate is that refit's fixed effects. The
+replicates go into `ssm_trajectory()` as `draws =`, in place of `coef` and
+`vcov`, and the intervals then come from the spread of the refits rather
+than from the normal approximation. For glmmTMB the loop is
+`simulate()` and `refit()`:
+
+
+``` r
+ys <- simulate(fit, nsim = 1000, seed = 20260716)
+boot <- t(sapply(ys, function(y) glmmTMB::fixef(glmmTMB::refit(fit, y))$cond))
+```
+
+A thousand refits of this model take about three minutes, so the page
+does not run the loop. The replicates it made ship as
+`growth_bootstrap_draws.rds`, written by the loop above under that seed
+and a rule that drops a refit whose fixed effects are not all finite. The
+file has one row per replicate and one column per coefficient:
+
+
+``` r
+boot <- readRDS("growth_bootstrap_draws.rds")
+dim(boot)
+#> [1] 1000    6
+```
+
+
+``` r
+ssm_trajectory(times = 0:4, draws = boot)
+#> 
+#> # SSM Trajectory:
+#> 
+#>  wave e_est e_lci e_uci x_est x_lci x_uci y_est y_lci y_uci a_est a_lci
+#>     0  0.53  0.47  0.58  0.61  0.58  0.64 -0.10 -0.14 -0.07  0.62  0.58
+#>     1  0.52  0.48  0.57  0.61  0.58  0.64 -0.04 -0.07 -0.01  0.61  0.58
+#>     2  0.52  0.48  0.57  0.61  0.58  0.64  0.03  0.00  0.06  0.61  0.58
+#>     3  0.52  0.47  0.57  0.61  0.58  0.64  0.09  0.06  0.12  0.61  0.58
+#>     4  0.52  0.47  0.58  0.60  0.57  0.64  0.16  0.12  0.19  0.62  0.59
+#>  a_uci  d_est  d_lci  d_uci
+#>   0.65 350.28 346.84 353.47
+#>   0.64 356.32 353.24 359.12
+#>   0.64   2.47 359.58   5.32
+#>   0.64   8.59   5.57  11.60
+#>   0.66  14.53  11.17  17.81
+#>   Caution: these intervals summarize the supplied draws as given. Their
+#>   coverage depends on how the draws were produced, and the joint fit was not
+#>   checked. See vignette("growth-ssm-analysis"), Sections 7 and 10.
+```
+
+The caution under this table is the one for the `draws` shape. The
+intervals summarize the replicates as given, and the helper does not check
+that they came from a joint fit. Here they did, because every refit used
+the Section 4 model. On this sample the bootstrap medians of $x$ and $y$
+sit close to the REML estimates of Section 5: the largest gap across the
+five waves is 0.001.
+The bootstrap earns its cost at smaller samples than this one of 150
+persons, where the REML intervals narrow the most.
+
+The loop needs an engine whose `simulate()` returns new responses for the
+model. glmmTMB does. nlme's `simulate()` refuses a model with a `varIdent`
+weight, which the Section 10 nlme call carries, so a user on nlme runs the
+bootstrap through the glmmTMB call of Section 4. The two engines fit the
+same model, and their fixed effects agree within the bounds the package's
+parity test holds.
 
 ## 8. The unwrap alternative: `angle_unwrap()`
 
@@ -595,16 +656,16 @@ ssm_trajectory(times = 0:4, draws = draws)
 #>   0.64   2.49 359.66   5.49
 #>   0.65   8.59   5.56  11.73
 #>   0.66  14.51  11.12  17.91
-#>   Caution: intervals from a fitted model's fixed-effect covariance condition
-#>   on its estimated variance components, and are too narrow at small samples.
-#>   See vignette("growth-ssm-analysis"), Section 7.
+#>   Caution: these intervals summarize the supplied draws as given. Their
+#>   coverage depends on how the draws were produced, and the joint fit was not
+#>   checked. See vignette("growth-ssm-analysis"), Sections 7 and 10.
 ```
 
 At each wave, the posterior medians of $x$ and $y$ sit within 0.01 of the
-glmmTMB table's estimates. The note under the table is written for the
-`coef` and `vcov` shape, and it does not apply here. Posterior draws
+glmmTMB table's estimates. The caution under the table is the one for the
+`draws` shape: the intervals summarize the draws as given. Posterior draws
 average over the variance components rather than condition on their
-estimates. A posterior interval from brms depends on its priors instead,
+estimates, so the REML caution of Section 7 does not apply to them. A posterior interval from brms depends on its priors instead,
 and the package's coverage validation ran the REML fit, not the brms fit. The `draws` shape is not checked for a joint fit, so the joint
 model is the user's responsibility there.
 
