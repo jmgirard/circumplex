@@ -266,6 +266,13 @@
 
 ## Documentation
 
+* Four vignettes now open with a "Not yet peer reviewed" notice under their
+  Level line: "SEM-Based SSM Analysis", "Latent Group Contrasts", "Bayesian
+  SSM Analysis" and "Growth Models on SSM Parameters". Each teaches a method
+  that is the package's own proposal, and the notice says that its authors
+  have not yet published it in a peer-reviewed venue. The package website
+  shows the notice as a warning box.
+
 * The "Growth Models on SSM Parameters" vignette is rewritten on the growth
   helpers, and every chunk is shown except the unlabeled options chunk at
   the top and the note for a missing glmmTMB. The first worked
