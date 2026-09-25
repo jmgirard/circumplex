@@ -350,20 +350,22 @@ machinery, not of the SSM transform. The caution under the Section 5 table
 states this for the `coef` and `vcov` shape.
 
 The package's coverage oracle ran this model with the glmmTMB REML fit at
-200 persons per cell. The $d(t)$ intervals held coverage between .93 and
+200 persons in each coverage cell. The $d(t)$ intervals held coverage between .93 and
 .97 at every certified wave. At the uncertified low-amplitude wave the
 coverage was .854, which is the case the certification of Section 6
 flags. This page's sample has 150 persons. The oracle record is
-`devel/m27-coverage-oracle.md` in the package source.
+`devel/m27-coverage-oracle.md`, with its per-wave results in
+`devel/m27-coverage-results.rds`, in the package source.
 
 The package ships no small-sample correction. A percentile parametric
 bootstrap of the fixed effects is not one on complete balanced data such
 as this page's. There every refit's fixed effects equal ordinary least
 squares, whatever variance components the refit estimates. So the
 replicates follow the same normal distribution the helper draws from, up
-to simulation error. The helper takes only a covariance matrix, so no $t$
-quantile or denominator degrees of freedom enters it. At samples much
-smaller than the oracle's, read the intervals as approximate.
+to simulation error. Under `coef` and `vcov` the helper draws from a
+normal distribution on the covariance matrix alone. So no $t$ quantile or
+denominator degrees of freedom enters it. At samples much smaller than the
+oracle's, read the intervals as approximate.
 
 A matrix of coefficient draws from any source enters the helper as
 `draws =`, one row per draw, with columns named for the six coefficients.
