@@ -69,7 +69,10 @@
 <polygon points='401.92,275.80 476.35,226.76 550.78,158.11 625.21,99.26 699.63,60.03 699.63,256.19 625.21,295.42 550.78,354.26 476.35,422.92 401.92,471.96 ' style='stroke-width: 0.00; stroke: none; stroke-linecap: butt; fill: #000000; fill-opacity: 0.20;' />
 <polyline points='401.92,275.80 476.35,226.76 550.78,158.11 625.21,99.26 699.63,60.03 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <polyline points='699.63,256.19 625.21,295.42 550.78,354.26 476.35,422.92 401.92,471.96 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<polyline points='401.92,373.88 476.35,324.84 550.78,256.19 625.21,197.34 699.63,158.11 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='401.92' y1='373.88' x2='476.35' y2='324.84' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='476.35' y1='324.84' x2='550.78' y2='256.19' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<line x1='550.78' y1='256.19' x2='625.21' y2='197.34' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<line x1='625.21' y1='197.34' x2='699.63' y2='158.11' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <circle cx='401.92' cy='373.88' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
 <circle cx='476.35' cy='324.84' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
 <circle cx='550.78' cy='256.19' r='2.49' style='stroke-width: 0.71;' />
@@ -139,14 +142,16 @@
 <polyline points='19.90,236.57 22.64,236.57 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='19.90,118.88 22.64,118.88 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='368.58' y='515.68' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='25.69px' lengthAdjust='spacingAndGlyphs'>wave</text>
-<rect x='243.51' y='528.92' width='250.14' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='248.99' y='546.82' style='font-size: 11.00px; font-family: sans;' textLength='130.86px' lengthAdjust='spacingAndGlyphs'>Displacement interpretable</text>
-<rect x='385.33' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='393.97' cy='543.04' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
-<rect x='437.53' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='446.17' cy='543.04' r='2.49' style='stroke-width: 0.71;' />
+<rect x='226.23' y='528.92' width='284.70' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='231.71' y='546.82' style='font-size: 11.00px; font-family: sans;' textLength='130.86px' lengthAdjust='spacingAndGlyphs'>Displacement interpretable</text>
+<rect x='368.05' y='534.40' width='34.56' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='371.51' y1='543.04' x2='399.15' y2='543.04' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<circle cx='385.33' cy='543.04' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<rect x='437.53' y='534.40' width='34.56' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='440.99' y1='543.04' x2='468.63' y2='543.04' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<circle cx='454.81' cy='543.04' r='2.49' style='stroke-width: 0.71;' />
 <text x='408.09' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
-<text x='460.29' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
+<text x='477.57' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
 <text x='22.64' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='86.58px' lengthAdjust='spacingAndGlyphs'>trajectory table</text>
 <text x='714.52' y='568.69' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='305.28px' lengthAdjust='spacingAndGlyphs'>Displacement is shown on an unwrapped branch and may fall outside [0, 360).</text>
 </g>

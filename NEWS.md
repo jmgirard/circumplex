@@ -81,6 +81,18 @@
 
 ## Minor improvements and fixes
 
+* On the displacement panel of `ssm_plot_trajectory()`, the line segments on
+  either side of a time point whose displacement is not interpretable are now
+  drawn dashed, and the "Displacement interpretable" legend shows the line
+  type beside the point shape. A dashed segment touches a time point with no
+  interpretable direction, so the direction of change along it is not to be
+  read; the segment is kept so the unwrapped branch stays visible. A
+  trajectory table row whose `certified` value is `NA` is now drawn as a
+  hollow point on dashed segments when another row carries a verdict, where
+  before its point was silently left out of the panel. The "Growth Models on
+  SSM Parameters" and "Advanced Circumplex Visualization" vignettes describe
+  the dashed segments.
+
 * `axes_reliability()` no longer refuses a fit as `"unidentified"` on the
   conditioning of its information matrix. That refusal came from the default
   tolerance of `solve()`, and at a fitted matrix near machine precision it

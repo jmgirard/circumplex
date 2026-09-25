@@ -388,10 +388,22 @@ passes the origin. The displacement interval at such a wave can cover most
 of the circle. The panel draws it at that full width rather than flattening
 it into something that looks precise.
 
+The line segments on either side of the hollow point are drawn **dashed**.
+A dashed segment touches a wave whose displacement is not interpretable, so
+the direction of change along it is not to be read. Here the solid line
+would have shown the group rotating smoothly through about 80° at wave 2.
+The data cannot support that reading: at wave 2 the group sits so close to
+the origin that its amplitude interval reaches zero, and the direction there
+is not established. The dashed segments are kept rather than cut, so the reader
+can still see that the unwrapped branch carries 0° across to 180° rather
+than back to −180°. The legend shows the two marks together: a filled point
+on a solid line where the displacement is interpretable, and a hollow point
+on a dashed line where it is not.
+
 The `certified` column is optional for a plain data frame. A table without
-it plots the same way, minus the hollow marking and its legend. The figure
-then makes no claim about interpretability either way. That is the honest
-default when the verdict was never computed.
+it plots the same way, minus the hollow marking, the dashed segments and
+their legend. The figure then makes no claim about interpretability either
+way. That is the honest default when the verdict was never computed.
 
 ## 7. A caution about REML intervals at small samples
 
