@@ -38,9 +38,12 @@
 #' whose implied covariance between `x(t)` and `y(t)` is exactly zero at
 #' every time in `times`, unless `vcov` is zero everywhere. The check reads
 #' only the given `times`, so with a single time it sees only the covariance
-#' terms that time reaches. A `draws` matrix is not checked for a joint fit. The intervals from a REML fit condition on
-#' its estimated variance components and are too narrow at small samples;
-#' the "Growth Models on SSM Parameters" vignette states the remedies.
+#' terms that time reaches. A `draws` matrix is not checked for a joint fit.
+#' The intervals from a REML fit's `coef` and `vcov` condition on its
+#' estimated variance components and are too narrow at small samples; the
+#' "Growth Models on SSM Parameters" vignette, Section 7, states what the
+#' package's coverage oracle measured and that no shipped correction exists.
+#' Intervals from `draws` summarize those draws as given.
 #'
 #' @param coef The fixed effects: a named numeric vector. Required with
 #'   `vcov`, and absent with `draws`.
@@ -65,7 +68,9 @@
 #'   rows are `e`, `x` and `y` and whose columns follow the order of `coef`
 #'   or of the columns of `draws`.
 #' @return A data frame of class `"circumplex_ssm_trajectory"` with
-#'   attribute `time` naming its time column, one row per value of `times`.
+#'   attribute `time` naming its time column and attribute `input` recording
+#'   the input shape, `"coef_vcov"` or `"draws"`, one row per value of
+#'   `times`.
 #'   Its columns are `<time>`; `e_est`, `e_lci`, `e_uci`, and the same three
 #'   for `x`, `y`, `a` and `d`; and `certified`. The estimates and bounds
 #'   are those [ssm_draws()] reports: medians and equal-tailed interval
@@ -74,7 +79,11 @@
 #'   degrees has `d_lci > d_uci`. `certified` is the displacement
 #'   certification at that time, and at an uncertified time the `d` interval
 #'   is not interpretable. Printing shows the table rounded, marks each
-#'   uncertified row, and states the small-sample caution.
+#'   uncertified row, and ends with the caution for the input shape: the
+#'   small-sample caution under `coef` and `vcov`, and under `draws` that the
+#'   intervals summarize the draws as given. A subset that drops the
+#'   attribute, or an `rbind()` of trajectory tables of different shapes,
+#'   prints a caution that says the shape is not recorded.
 #'   [ssm_plot_trajectory()] plots the object with no `time` argument.
 #' @family growth functions
 #' @export
@@ -253,6 +262,7 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   out$certified <- vapply(per_time, function(r) r$details$certified,
                           logical(1))
   structure(out, time = time,
+            input = if (has_draws) "draws" else "coef_vcov",
             class = c("circumplex_ssm_trajectory", "data.frame"))
 }
 
@@ -332,7 +342,8 @@ trajectory_check_draws <- function(draws) {
 #' @rdname ssm_trajectory
 #' @param x An object of class `"circumplex_ssm_trajectory"`.
 #' @param digits The number of decimal places to print (default = 2).
-#' @param ... Ignored (S3 consistency).
+#' @param ... For `print()`, ignored (S3 consistency). For `rbind()`, the
+#'   trajectory tables to stack.
 #' @method print circumplex_ssm_trajectory
 #' @export
 print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
@@ -366,16 +377,69 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
       prefix = "  "
     )
   }
-  cat_prose(
+  # The caution follows the input shape the object records. A subset that
+  # rebuilds the frame (a column subset, `subset()`, `transform()`) drops the
+  # attribute, and then neither shape's caution is known to hold.
+  input <- attr(x, "input")
+  caution <- if (identical(input, "coef_vcov")) {
     paste0(
       "Caution: intervals from a fitted model's fixed-effect covariance ",
       "condition on its estimated variance components, and are too narrow ",
       "at small samples. See vignette(\"growth-ssm-analysis\"), Section 7."
-    ),
-    prefix = "  "
-  )
+    )
+  } else if (identical(input, "draws")) {
+    paste0(
+      "Caution: these intervals summarize the supplied draws as given. ",
+      "Their coverage depends on how the draws were produced, and the ",
+      "joint fit was not checked. See vignette(\"growth-ssm-analysis\"), ",
+      "Sections 7 and 10."
+    )
+  } else {
+    paste0(
+      "Caution: the input shape is not recorded on this object, so the ",
+      "caution for its intervals is not known. See ",
+      "vignette(\"growth-ssm-analysis\"), Sections 7 and 10."
+    )
+  }
+  cat_prose(caution, prefix = "  ")
   cat("\n")
   invisible(x)
+}
+
+#' @rdname ssm_trajectory
+#' @param deparse.level,make.row.names,stringsAsFactors For `rbind()`,
+#'   passed to [rbind.data.frame()].
+#' @method rbind circumplex_ssm_trajectory
+#' @export
+rbind.circumplex_ssm_trajectory <- function(..., deparse.level = 1,
+                                            make.row.names = TRUE,
+                                            stringsAsFactors = FALSE) {
+  # Stacking keeps a shape only when every table has the same one; a mixed
+  # stack carries no `input`, so it prints the shape-neutral caution rather
+  # than the first table's. rbind() dispatches on the first argument that
+  # has a method, so this method also runs when a plain data frame sits
+  # later in the stack; that part carries no `input`, and the stack prints
+  # the shape-neutral caution. A plain data frame first sends the whole
+  # call to rbind.data.frame, which returns a plain data frame.
+  parts <- Filter(Negate(is.null), list(...))
+  frames <- lapply(parts, function(p) {
+    p <- as.data.frame(p)
+    attr(p, "input") <- NULL
+    attr(p, "time") <- NULL
+    p
+  })
+  out <- do.call(rbind.data.frame, c(frames, list(
+    deparse.level = deparse.level, make.row.names = make.row.names,
+    stringsAsFactors = stringsAsFactors
+  )))
+  shapes <- unique(vapply(parts, function(p) {
+    s <- attr(p, "input")
+    if (is.null(s)) NA_character_ else s
+  }, character(1)))
+  attr(out, "input") <- if (length(shapes) == 1L && !is.na(shapes)) shapes
+  attr(out, "time") <- attr(parts[[1L]], "time")
+  class(out) <- class(parts[[1L]])
+  out
 }
 
 #' @rdname ssm_plot_trajectory

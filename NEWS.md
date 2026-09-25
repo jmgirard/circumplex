@@ -32,11 +32,18 @@
   covariance between `x(t)` and `y(t)` is exactly zero at every time is
   refused, unless it is zero everywhere, since coordinates fit in separate
   models give wrong displacement intervals. A draws matrix is not checked.
-  The object prints rounded, with
-  each uncertified row marked and the small-sample caution stated, and
-  `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
-  and displacement columns match the hand-built per-wave loop the growth
-  vignette used before, to 1e-12 under the same seed.
+  The object records its input shape in an `input` attribute and prints
+  rounded, with each uncertified row marked and a closing caution for that
+  shape: under `coef` and `vcov`, that intervals from a fitted model's
+  fixed-effect covariance condition on its estimated variance components
+  and are too narrow at small samples; under `draws`, that the intervals
+  summarize the draws as given and the joint fit was not checked. An
+  object that no longer carries the attribute prints a caution that says
+  the shape is not recorded. `rbind()` of trajectory tables keeps a shared
+  shape and drops a mixed one. `ssm_plot_trajectory()` plots the object
+  with no `time` argument. Its amplitude and displacement columns match
+  the hand-built per-wave loop the growth vignette used before, to 1e-12
+  under the same seed.
 
 * `geom_ssm_ellipse()` is a new ggplot2 layer for the circumplex canvas. For
   each row it draws the confidence ellipse of a bivariate normal region on
@@ -275,6 +282,15 @@
   `data-raw/growth-brms-draws.R`. So the page summarizes posterior draws
   through `ssm_trajectory(draws = )` without a Stan toolchain.
   `?simulated_growth` now names the vignette under See also.
+
+* The same vignette's Section 7 now states what the package measured about
+  the REML intervals rather than naming remedies for engines the package
+  does not write. It reports the coverage oracle's result at 200 persons
+  per cell, says that the package ships no small-sample correction, and
+  explains why a percentile parametric bootstrap of the fixed effects is
+  not one on complete balanced data. It also says that a matrix of
+  coefficient draws from any source enters `ssm_trajectory()` as `draws =`.
+  The lme4 remedies it named before are gone.
 
 * `?axes_reliability` now says that at a severely ill-conditioned fit, the
   error estimate printed with an `"uncertified"` refusal depends on the

@@ -3,6 +3,7 @@
 \name{ssm_trajectory}
 \alias{ssm_trajectory}
 \alias{print.circumplex_ssm_trajectory}
+\alias{rbind.circumplex_ssm_trajectory}
 \title{Trajectory of SSM parameters from a fitted growth model}
 \usage{
 ssm_trajectory(
@@ -17,6 +18,8 @@ ssm_trajectory(
 )
 
 \method{print}{circumplex_ssm_trajectory}(x, digits = 2, ...)
+
+\method{rbind}{circumplex_ssm_trajectory}(..., deparse.level = 1, make.row.names = TRUE, stringsAsFactors = FALSE)
 }
 \arguments{
 \item{coef}{The fixed effects: a named numeric vector. Required with
@@ -53,11 +56,17 @@ or of the columns of \code{draws}.}
 
 \item{digits}{The number of decimal places to print (default = 2).}
 
-\item{...}{Ignored (S3 consistency).}
+\item{...}{For \code{print()}, ignored (S3 consistency). For \code{rbind()}, the
+trajectory tables to stack.}
+
+\item{deparse.level, make.row.names, stringsAsFactors}{For \code{rbind()},
+passed to \code{\link[=rbind.data.frame]{rbind.data.frame()}}.}
 }
 \value{
 A data frame of class \code{"circumplex_ssm_trajectory"} with
-attribute \code{time} naming its time column, one row per value of \code{times}.
+attribute \code{time} naming its time column and attribute \code{input} recording
+the input shape, \code{"coef_vcov"} or \code{"draws"}, one row per value of
+\code{times}.
 Its columns are \verb{<time>}; \code{e_est}, \code{e_lci}, \code{e_uci}, and the same three
 for \code{x}, \code{y}, \code{a} and \code{d}; and \code{certified}. The estimates and bounds
 are those \code{\link[=ssm_draws]{ssm_draws()}} reports: medians and equal-tailed interval
@@ -66,7 +75,11 @@ quantile bounds in degrees for \code{d}. A \code{d} interval that straddles 0/36
 degrees has \code{d_lci > d_uci}. \code{certified} is the displacement
 certification at that time, and at an uncertified time the \code{d} interval
 is not interpretable. Printing shows the table rounded, marks each
-uncertified row, and states the small-sample caution.
+uncertified row, and ends with the caution for the input shape: the
+small-sample caution under \code{coef} and \code{vcov}, and under \code{draws} that the
+intervals summarize the draws as given. A subset that drops the
+attribute, or an \code{rbind()} of trajectory tables of different shapes,
+prints a caution that says the shape is not recorded.
 \code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}} plots the object with no \code{time} argument.
 }
 \description{
@@ -101,9 +114,12 @@ separate models does. So the \code{coef} and \code{vcov} shape refuses a \code{v
 whose implied covariance between \code{x(t)} and \code{y(t)} is exactly zero at
 every time in \code{times}, unless \code{vcov} is zero everywhere. The check reads
 only the given \code{times}, so with a single time it sees only the covariance
-terms that time reaches. A \code{draws} matrix is not checked for a joint fit. The intervals from a REML fit condition on
-its estimated variance components and are too narrow at small samples;
-the "Growth Models on SSM Parameters" vignette states the remedies.
+terms that time reaches. A \code{draws} matrix is not checked for a joint fit.
+The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
+estimated variance components and are too narrow at small samples; the
+"Growth Models on SSM Parameters" vignette, Section 7, states what the
+package's coverage oracle measured and that no shipped correction exists.
+Intervals from \code{draws} summarize those draws as given.
 }
 \examples{
 # Fixed effects and covariance in the shape a joint fit returns
