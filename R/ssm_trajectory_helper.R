@@ -82,8 +82,8 @@
 #'   uncertified row, and ends with the caution for the input shape: the
 #'   small-sample caution under `coef` and `vcov`, and under `draws` that the
 #'   intervals summarize the draws as given. A subset that drops the
-#'   attribute, or an `rbind()` of tables of different shapes, prints a
-#'   caution that says the shape is not recorded.
+#'   attribute, or an `rbind()` of trajectory tables of different shapes,
+#'   prints a caution that says the shape is not recorded.
 #'   [ssm_plot_trajectory()] plots the object with no `time` argument.
 #' @family growth functions
 #' @export
@@ -412,7 +412,9 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
 rbind.circumplex_ssm_trajectory <- function(...) {
   # Stacking keeps a shape only when every table has the same one; a mixed
   # stack carries no `input`, so it prints the shape-neutral caution rather
-  # than the first table's.
+  # than the first table's. This method runs only when every argument is a
+  # trajectory table: a plain data frame in the stack sends dispatch to
+  # rbind.data.frame, which keeps the first table's attributes.
   parts <- list(...)
   out <- do.call(rbind, lapply(parts, as.data.frame))
   shapes <- unique(vapply(parts, function(p) {

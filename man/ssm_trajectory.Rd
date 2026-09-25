@@ -74,8 +74,8 @@ is not interpretable. Printing shows the table rounded, marks each
 uncertified row, and ends with the caution for the input shape: the
 small-sample caution under \code{coef} and \code{vcov}, and under \code{draws} that the
 intervals summarize the draws as given. A subset that drops the
-attribute, or an \code{rbind()} of tables of different shapes, prints a
-caution that says the shape is not recorded.
+attribute, or an \code{rbind()} of trajectory tables of different shapes,
+prints a caution that says the shape is not recorded.
 \code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}} plots the object with no \code{time} argument.
 }
 \description{
