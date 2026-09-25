@@ -1,6 +1,6 @@
 # M156: Peer-review status notices on the four package-original vignettes
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -48,7 +48,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 - [x] T3: Run `devtools::install()`, re-render the three pre-computed pages with `tools/precompute-vignettes.R`, and commit the regenerated `.Rmd` files. Then run the staleness check on the clean tree. Make sure that `git diff --stat` against the default branch touches only the intended files (M112: stage by path, no figure churn).
 - [x] T4: Render each shipped `.Rmd` to the scratchpad and grep for the div before the overview section. Build one page with `pkgdown::build_article()` and look at it once (M33).
 - [x] T5: Plant checks, each reverted after its red run: remove one page's notice; add a second notice to one page; change one page's bold lead; move one notice below `## 1. Overview`; add a notice under a different opener form (`<div class="alert alert-warning">`) to a page outside `frame_notice`.
-- [ ] T6: Write the NEWS entry. Run `devtools::test()` and `devtools::check(args = "--no-manual")`, and compare the notes with a run on the default branch.
+- [x] T6: Write the NEWS entry. Run `devtools::test()` and `devtools::check(args = "--no-manual")`, and compare the notes with a run on the default branch.
 
 ## Work log
 
@@ -64,6 +64,7 @@ The method names: the latent Structural Summary Method (SEM-Based SSM Analysis),
 - 2026-09-25: staleness check on the clean tree after the T3 commit: all 11 pre-computed vignettes up to date, exit 0. T4 done: the four shipped `.Rmd` files rendered to scratch each put the `alert alert-warning` div before the `id="overview"` section (line 347 vs 353, 349 vs 356, 347 vs 353, 347 vs 354); `pkgdown::build_article("sem-based-ssm-analysis")` served locally shows a styled warning box between the Level line and the Overview heading.
 - 2026-09-25: T5 done. Five plants, each with a non-empty `git diff --stat` before its run and reverted after: a removed notice (sem-based) fails at the opener count; a doubled notice (sem-latent-contrasts) fails at the opener count; a changed lead (bayesian) fails at the lead match; a notice moved below Overview (growth) fails at `opener < overview`; a `<div class="alert alert-warning">` notice on ci-accuracy fails at the unlisted-page line check. The clean tree is green.
 - 2026-09-25: claim audit: 17 claims read, 0 corrected — tests/testthat/helper-vignette-frame.R, tests/testthat/test-vignette-frame.R, the four notice sources, the three re-rendered `.Rmd`, NEWS.md. Qualified, not corrected: the Bayesian and growth pages carry no provenance text of their own, and Nagy, Etzel & Lüdtke (2019), a covariate extension of Browne's free-angle model, is a published relative the SEM pages do not cite; neither bears on the notice's claims of package authorship and non-publication by its authors.
+- 2026-09-25: T6 done. `devtools::test()` exit 0 with no failure; `devtools::check(args = "--no-manual")` on the branch: 0 errors, 0 warnings, 0 notes; the same check in a master worktree: 0 errors, 0 warnings, 1 note (hidden files, the worktree's own `.git` file), so the branch adds no note. Status set to review.
 
 ## Decisions
 
