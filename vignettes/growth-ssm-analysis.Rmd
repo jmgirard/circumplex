@@ -419,11 +419,11 @@ The caution under the Section 5 table states this for the `coef` and
 
 The remedy that enters the helper is a parametric bootstrap of the fixed
 effects. Each replicate simulates a new response vector from the fitted
-model, with the person effects and the residuals both redrawn, and refits
-the model to it. The replicate is that refit's fixed effects. The
-replicates go into `ssm_trajectory()` as `draws =`, in place of `coef` and
-`vcov`, and the intervals then come from the spread of the refits rather
-than from the normal approximation. For glmmTMB the loop is
+model, with the person effects and the residuals both redrawn. It then
+refits the model to that vector. The replicate is that refit's fixed
+effects. The replicates go into `ssm_trajectory()` as `draws =`, in place
+of `coef` and `vcov`. The intervals then come from the spread of the
+refits rather than from the normal approximation. For glmmTMB the loop is
 `simulate()` and `refit()`:
 
 
@@ -434,10 +434,10 @@ boot <- t(sapply(ys, function(y) glmmTMB::fixef(glmmTMB::refit(fit, y))$cond))
 
 A thousand refits of this model take about three minutes, so the page
 does not run the loop. The replicates ship as
-`growth_bootstrap_draws.rds`, written by `data-raw/growth-bootstrap-draws.R`,
-which runs that loop under that seed with a rule that drops and replaces a
-refit whose fixed effects are not all finite (none were dropped). The
-file has one row per replicate and one column per coefficient:
+`growth_bootstrap_draws.rds`, written by `data-raw/growth-bootstrap-draws.R`.
+That script runs the loop under that seed. It drops and replaces a refit
+whose fixed effects are not all finite, and none were dropped. The file
+has one row per replicate and one column per coefficient:
 
 
 ``` r
@@ -473,15 +473,15 @@ The caution under this table is the one for the `draws` shape. The
 intervals summarize the replicates as given, and the helper does not check
 that they came from a joint fit. Here they did, because every refit used
 the Section 4 model. On this sample the bootstrap medians of $x$ and $y$
-sit close to the REML estimates of Section 5: the largest gap across the
+sit close to the REML estimates of Section 5. The largest gap across the
 five waves is 0.001.
 The bootstrap matters more at samples smaller than these 150 persons,
 where the REML intervals are expected to understate uncertainty most.
 
 The loop needs an engine whose `simulate()` returns new responses for the
 model. glmmTMB does. nlme's `simulate()` refuses a model with a `varIdent`
-weight, which the Section 10 nlme call carries, so a user on nlme runs the
-bootstrap through the glmmTMB call of Section 4. The two engines fit the
+weight, and the Section 10 nlme call carries one. So a user on nlme runs
+the bootstrap through the glmmTMB call of Section 4. The two engines fit the
 same model, and their fixed effects agree within the bounds the package's
 parity test holds.
 
