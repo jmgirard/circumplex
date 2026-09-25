@@ -10,7 +10,7 @@ _Last hygiene check: 2026-09-24 (M154 done: the M151 row pruned for terminal-row
 | M152 | Growth output helper, coefficients or draws to a trajectory | done | M151 | high | milestones/archive/M152-growth-trajectory-helper.md |
 | M154 | Dashed displacement segments at uncertified time points | done | — | normal | milestones/archive/M154-dashed-uncertified-segments.md |
 | M153 | The growth vignette on the helper workflow | done | M152 | high | milestones/archive/M153-growth-vignette-rewrite.md |
-| M155 | The trajectory caution by input shape, and the bootstrap path into the helper | review | — | normal | milestones/M155-trajectory-caution-and-bootstrap.md |
+| M155 | The trajectory caution by input shape, and the bootstrap path into the helper | in-progress | — | normal | milestones/M155-trajectory-caution-and-bootstrap.md |
 
 ## Candidates
 
