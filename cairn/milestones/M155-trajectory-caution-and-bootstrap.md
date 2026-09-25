@@ -1,6 +1,6 @@
 # M155: The trajectory caution by input shape, and the bootstrap path into the helper
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -66,6 +66,7 @@
 - 2026-09-24: re-audit: AC3 (full) — three findings on the mandated facts ("reproduces" overstated and conditioned on the wrong property; "nominal coverage at 200 persons" overstates an oracle that measured d(t) only and reported .854 at the uncertified wave; the nlme sentence implied a correction), plus name the rendered file, the grep, and inline R code; all adopted in a reword. re-audit: AC4 (full) — "from any source" unbounded over column naming; bounded by the six-name rule. The reworded pair is with its one re-entry reader. Section 7 rewritten to the reworded text, its title restored to "A caution about REML intervals at small samples" (which un-strands the line 36 echo), the roxygen details sentence and the NEWS Documentation bullet rewritten; prose sweep clean of new findings, echo sweep back to the one pre-existing brms `readRDS` hit, width check green, Section 7 render holds no chunk, no inline code and none of the three names.
 - 2026-09-24: re-audit: AC3 (full) — re-entry: three findings (the helper also takes `draws`; the bootstrap reasoning made vignette content under (c); the inline-code check moved to the source, the consistency cell excluded from the cell size, the results file cited), all adopted; the OLS-equality claim confirmed by Zyskind's condition and the oracle figures by the results file. re-audit: AC4 (full) — re-entry: nothing. The third round went to the user, who adopted the final wording. Amendment written: AC3 and AC4 replaced, AC5 removed, AC6 and AC7 renumbered to AC5 and AC6, Coverage and T2/T3 rewritten, Scope narrowed; every criterion box cleared for the next review pass. Section 7's helper sentence, cell-size phrase and oracle citation updated to match.
 - 2026-09-24: claim audit: 35 claims read, 1 corrected — R/ssm_trajectory_helper.R (the `rbind` comment and `@return` now say the method runs only when every argument is a trajectory table; a plain data frame in the stack dispatches to `rbind.data.frame`). The reader confirmed the oracle figures from `devel/m27-coverage-results.rds` (.932 to .966 certified, .854 uncertified, n = 200, REML), the 150-person complete sample, and refit fixed effects equal to OLS at 1e-15 with variance components differing.
+- 2026-09-24: return complete. `devtools::check()` (full) on the final tree ebf7869a: 0 errors, 0 warnings, 0 notes; staleness and width checks green against the committed render; helper test file green. Status → review.
 
 ## Decisions
 
