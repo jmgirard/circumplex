@@ -284,10 +284,11 @@
   `simulate()` and `refit()`, whose replicates go into
   `ssm_trajectory(draws = )`. One thousand replicates ship as
   `vignettes/growth_bootstrap_draws.rds`, written by the seeded
-  `data-raw/growth-bootstrap-draws.R`, and the page summarizes them beside
-  the REML table. The section no longer names lme4 remedies, and it says
-  that nlme's `simulate()` refuses this model, so an nlme user runs the
-  bootstrap through the glmmTMB call.
+  `data-raw/growth-bootstrap-draws.R`, and the page summarizes them and
+  states their largest gap from the Section 5 REML estimates. The section
+  no longer names lme4 remedies, and it says that nlme's `simulate()`
+  refuses this model, so an nlme user runs the bootstrap through the
+  glmmTMB call.
 
 * `?axes_reliability` now says that at a severely ill-conditioned fit, the
   error estimate printed with an `"uncertified"` refusal depends on the

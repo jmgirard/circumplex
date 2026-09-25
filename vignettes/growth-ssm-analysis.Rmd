@@ -433,9 +433,10 @@ boot <- t(sapply(ys, function(y) glmmTMB::fixef(glmmTMB::refit(fit, y))$cond))
 ```
 
 A thousand refits of this model take about three minutes, so the page
-does not run the loop. The replicates it made ship as
-`growth_bootstrap_draws.rds`, written by the loop above under that seed
-and a rule that drops a refit whose fixed effects are not all finite. The
+does not run the loop. The replicates ship as
+`growth_bootstrap_draws.rds`, written by `data-raw/growth-bootstrap-draws.R`,
+which runs that loop under that seed with a rule that drops and replaces a
+refit whose fixed effects are not all finite (none were dropped). The
 file has one row per replicate and one column per coefficient:
 
 
@@ -474,8 +475,8 @@ that they came from a joint fit. Here they did, because every refit used
 the Section 4 model. On this sample the bootstrap medians of $x$ and $y$
 sit close to the REML estimates of Section 5: the largest gap across the
 five waves is 0.001.
-The bootstrap earns its cost at smaller samples than this one of 150
-persons, where the REML intervals narrow the most.
+The bootstrap matters more at samples smaller than these 150 persons,
+where the REML intervals are expected to understate uncertainty most.
 
 The loop needs an engine whose `simulate()` returns new responses for the
 model. glmmTMB does. nlme's `simulate()` refuses a model with a `varIdent`

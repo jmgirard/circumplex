@@ -540,7 +540,7 @@ test_that("print rounds to digits, marks uncertified rows, states the caution", 
 })
 
 test_that("the object records its input shape and print branches on it", {
-  # M155 AC1 and AC2. The REML caution is the M154 text, pinned here so a
+  # M155 AC1 and AC2. The REML caution is the M152 text, pinned here so a
   # wording change under `coef`/`vcov` reddens.
   reml <- paste0(
     "Caution: intervals from a fitted model's fixed-effect covariance ",

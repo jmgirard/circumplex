@@ -9,7 +9,8 @@
 # minutes, so the vignette reads this file rather than running the loop.
 # Regenerate from scratch (from the package root, requires glmmTMB) with:
 #   Rscript data-raw/growth-bootstrap-draws.R
-# Seeded: simulate() takes seed 20260716, the growth vignette's seed. A refit
+# Seeded: set.seed(20260716), the growth vignette's seed, runs before the
+# unseeded simulate() batches. A refit
 # that errors, or whose fixed effects are not all finite, is dropped and
 # replaced: the loop simulates in batches until 1000 replicates are kept, and
 # the count dropped is printed and recorded in the provenance attribute.

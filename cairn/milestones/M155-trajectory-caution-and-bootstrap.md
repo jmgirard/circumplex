@@ -61,6 +61,7 @@
 - 2026-09-24: T4 done. The seven AC6 sites rewritten; the grep sweep over the three surfaces found no further stranded sentence; NEWS: the M152 bullet edited and a Documentation bullet added.
 - 2026-09-24: T1 done. Full `devtools::test()` green (no failures; skips are the on-CRAN and vdiffr ones). The AC2 identity test at line 190 now strips the `input` attribute before comparing the two shapes and asserts each value.
 - 2026-09-24: T5 in progress. Re-render of the growth vignette is byte-identical to the committed copy; `check-vignette-staleness.R` and `check-vignette-width.R` exit 0 (131 output lines, all fit). `devtools::check(args = "--no-manual")` and the [O] claim audit are running.
+- 2026-09-24: claim audit: 52 claims read, 5 corrected — tests/testthat/test-ssm_trajectory_helper.R (M154 → M152 for the caution text's origin), NEWS.md (the bootstrap table is not beside the REML table; it states the gap), vignettes/growth-ssm-analysis.Rmd.orig (the file is written by the generator, which runs the loop with drop-and-replace; the small-sample sentence stated as an expectation), data-raw/growth-bootstrap-draws.R (set.seed precedes unseeded simulate() batches). Re-rendered; width check green.
 
 ## Decisions
 
