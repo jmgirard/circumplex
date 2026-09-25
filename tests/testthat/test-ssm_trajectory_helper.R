@@ -547,11 +547,13 @@ test_that("the object records its input shape and print branches on it", {
     "condition on its estimated variance components, and are too narrow ",
     "at small samples. See vignette(\"growth-ssm-analysis\"), Section 7."
   )
+  # The caution is the last text printed: nothing but blank lines follows it.
   caution_of <- function(txt) {
     i <- grep("^  Caution:", txt)
     expect_length(i, 1L)
     j <- i
     while (j < length(txt) && nzchar(txt[j + 1])) j <- j + 1
+    expect_false(any(nzchar(txt[-seq_len(j)])))
     paste(trimws(txt[i:j]), collapse = " ")
   }
 
@@ -589,14 +591,28 @@ test_that("the object records its input shape and print branches on it", {
   expect_identical(txt_sw[grepl(row_re, txt_sw)], body)
   expect_identical(caution_of(txt_sw), reml)
 
-  # A column subset drops the attribute: the shape-neutral caution.
-  sub <- out_dr[, 1:4]
-  expect_null(attr(sub, "input"))
-  cs <- caution_of(capture.output(print(sub)))
-  expect_match(cs, "input shape is not recorded")
-  expect_match(cs, "Sections 7 and 10")
-  expect_false(grepl("fixed-effect covariance", cs))
-  expect_false(grepl("supplied draws", cs))
+  # A column subset drops the attribute: the shape-neutral caution, from
+  # either shape.
+  for (obj in list(out_dr, out_cv)) {
+    sub <- obj[, 1:4]
+    expect_null(attr(sub, "input"))
+    cs <- caution_of(capture.output(print(sub)))
+    expect_match(cs, "input shape is not recorded")
+    expect_match(cs, "Sections 7 and 10")
+    expect_false(grepl("fixed-effect covariance", cs))
+    expect_false(grepl("supplied draws", cs))
+  }
+
+  # rbind keeps a shared shape and drops a mixed one.
+  same <- rbind(out_cv, out_cv)
+  expect_s3_class(same, "circumplex_ssm_trajectory")
+  expect_identical(attr(same, "input"), "coef_vcov")
+  expect_identical(nrow(same), 10L)
+  mixed <- rbind(out_cv, out_dr)
+  expect_null(attr(mixed, "input"))
+  expect_identical(attr(mixed, "time"), "wave")
+  expect_match(caution_of(capture.output(print(mixed))),
+               "input shape is not recorded")
 })
 
 test_that("an undecided certified verdict prints as uncertified", {

@@ -3,6 +3,7 @@
 \name{ssm_trajectory}
 \alias{ssm_trajectory}
 \alias{print.circumplex_ssm_trajectory}
+\alias{rbind.circumplex_ssm_trajectory}
 \title{Trajectory of SSM parameters from a fitted growth model}
 \usage{
 ssm_trajectory(
@@ -17,6 +18,8 @@ ssm_trajectory(
 )
 
 \method{print}{circumplex_ssm_trajectory}(x, digits = 2, ...)
+
+\method{rbind}{circumplex_ssm_trajectory}(...)
 }
 \arguments{
 \item{coef}{The fixed effects: a named numeric vector. Required with
@@ -53,7 +56,7 @@ or of the columns of \code{draws}.}
 
 \item{digits}{The number of decimal places to print (default = 2).}
 
-\item{...}{Ignored (S3 consistency).}
+\item{...}{For \code{rbind()}, trajectory tables to stack.}
 }
 \value{
 A data frame of class \code{"circumplex_ssm_trajectory"} with
@@ -70,7 +73,9 @@ certification at that time, and at an uncertified time the \code{d} interval
 is not interpretable. Printing shows the table rounded, marks each
 uncertified row, and ends with the caution for the input shape: the
 small-sample caution under \code{coef} and \code{vcov}, and under \code{draws} that the
-intervals summarize the draws as given.
+intervals summarize the draws as given. A subset that drops the
+attribute, or an \code{rbind()} of tables of different shapes, prints a
+caution that says the shape is not recorded.
 \code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}} plots the object with no \code{time} argument.
 }
 \description{

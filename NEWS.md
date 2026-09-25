@@ -34,8 +34,9 @@
   models give wrong displacement intervals. A draws matrix is not checked.
   The object records its input shape in an `input` attribute and prints
   rounded, with each uncertified row marked and a closing caution for that
-  shape: under `coef` and `vcov`, that REML intervals condition on the
-  variance components and are too narrow at small samples; under `draws`,
+  shape: under `coef` and `vcov`, that intervals from a fitted model's
+  fixed-effect covariance condition on its estimated variance components
+  and are too narrow at small samples; under `draws`,
   that the intervals summarize the draws as given and the joint fit was
   not checked. `ssm_plot_trajectory()` plots it with no `time` argument. Its amplitude
   and displacement columns match the hand-built per-wave loop the growth

@@ -81,7 +81,9 @@
 #'   is not interpretable. Printing shows the table rounded, marks each
 #'   uncertified row, and ends with the caution for the input shape: the
 #'   small-sample caution under `coef` and `vcov`, and under `draws` that the
-#'   intervals summarize the draws as given.
+#'   intervals summarize the draws as given. A subset that drops the
+#'   attribute, or an `rbind()` of tables of different shapes, prints a
+#'   caution that says the shape is not recorded.
 #'   [ssm_plot_trajectory()] plots the object with no `time` argument.
 #' @family growth functions
 #' @export
@@ -374,8 +376,9 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
       prefix = "  "
     )
   }
-  # The caution follows the input shape the object records. A column subset
-  # drops the attribute, and then neither shape's caution is known to hold.
+  # The caution follows the input shape the object records. A subset that
+  # rebuilds the frame (a column subset, `subset()`, `transform()`) drops the
+  # attribute, and then neither shape's caution is known to hold.
   input <- attr(x, "input")
   caution <- if (identical(input, "coef_vcov")) {
     paste0(
@@ -400,6 +403,28 @@ print.circumplex_ssm_trajectory <- function(x, digits = 2, ...) {
   cat_prose(caution, prefix = "  ")
   cat("\n")
   invisible(x)
+}
+
+#' @rdname ssm_trajectory
+#' @param ... For `rbind()`, trajectory tables to stack.
+#' @method rbind circumplex_ssm_trajectory
+#' @export
+rbind.circumplex_ssm_trajectory <- function(...) {
+  # Stacking keeps a shape only when every table has the same one; a mixed
+  # stack carries no `input`, so it prints the shape-neutral caution rather
+  # than the first table's.
+  parts <- list(...)
+  out <- do.call(rbind, lapply(parts, as.data.frame))
+  shapes <- unique(vapply(parts, function(p) {
+    s <- attr(p, "input")
+    if (is.null(s)) NA_character_ else s
+  }, character(1)))
+  # rbind.data.frame copies the first part's attributes, so the mixed case
+  # removes `input` rather than leaving it.
+  attr(out, "input") <- if (length(shapes) == 1L && !is.na(shapes)) shapes
+  attr(out, "time") <- attr(parts[[1L]], "time")
+  class(out) <- class(parts[[1L]])
+  out
 }
 
 #' @rdname ssm_plot_trajectory
