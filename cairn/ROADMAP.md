@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-09-25 (M156 done: the M153 row pruned for terminal-row retention, one LESSONS line added, no RB/RR to archive, no candidate row extended, doctrine modules within budget, validate green.)_
+_Last hygiene check: 2026-10-16 (lessons triage: 2026-07-18 (M31) merged into 2026-07-19 (M7 family); M120, M39, M146, M148 compressed of text other records hold; no drops, no decision entry; validate green.)_
 
 ## Milestones
 
