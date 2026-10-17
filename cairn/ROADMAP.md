@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-17 (triage: dropped the test-craft size row, already shipped as its header budget at M122; merged the Algolia key row into the Codecov token row, trigger kept; split the peer-review notices, RR22 follow-ons and M120 remainders rows; compressed the vignette-width, degeneracy, longitudinal and axes-reliability rows; retitled 25 rows whose titles ran past 60 characters (an arrow removed from two), old and new titles in the commit message; transcription-files row promoted; no decision entry; validate green.)_
+_Last hygiene check: 2026-10-17 (lessons triage: dropped the 2026-08-22 (M104) "never worked vs spent" lesson, ownership exit, its content held in DECISIONS.md D-046's Context; merged the 2026-07-18 (M34) occasion-order lesson into the 2026-07-18 (M33) Occasion lesson; compressed 15 lessons near the caps (the M21, M7, M40, M56, M65 and M108 families; M32/M35, M27/M33, M37, M58 paths-ignore, M106, M120, M147, M148, M155); LESSONS.md now 45 lines, 17,322 bytes; no decision entry; validate green.)_
 
 ## Milestones
 
