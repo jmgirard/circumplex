@@ -1,5 +1,8 @@
 # Zimmermann & Wright (2017) transcription record (M4/W1)
 
+> Superseded as the citable source by `cairn/references/zimmermann2017.md` (M40). This file stays as
+> the transcription-protocol record: the two-channel protocol history and the O5 bridge re-scope.
+
 **Source:** Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in
 interpersonal construct validation: Methodological advances in the circumplex
 Structural Summary Approach. *Assessment, 24*(1), 3–23.

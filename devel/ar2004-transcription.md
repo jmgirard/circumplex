@@ -1,5 +1,8 @@
 # Acton & Revelle (2004) transcription record (M4.5/T2)
 
+> Superseded as the citable source by `cairn/references/acton2004.md` (M43). This file stays as the
+> transcription-protocol record: the two-channel diffs and the paper-internal inconsistencies found.
+
 **Source:** Acton, G. S., & Revelle, W. (2004). Evaluation of ten psychometric
 criteria for circumplex structure. *Methods of Psychological Research Online,
 9*(1), 1–27. Transcribed from the author-hosted PDF

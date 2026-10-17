@@ -1,5 +1,8 @@
 # Transcription: Cheung & Rensvold (2002) ΔGFI invariance criteria
 
+> Superseded as the citable source by `cairn/references/cheung2002.md` (M57). This file stays as the
+> transcription-protocol record: the first-channel read of the article.
+
 **Purpose:** resolves the M5 spec's TBT item for T4 (spec §6.2/§12.2: ΔCFI
 cutoffs "offered only once transcribed... candidate source Cheung & Rensvold
 2002"). Transcribed 2026-07-07 from the published article (read in full from
