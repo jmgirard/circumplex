@@ -91,6 +91,7 @@
 - 2026-10-17: T1 done: three new test blocks plus the replaced same-time assertion; red as expected (5 failures: the two-times pair and three repeated-scale cases pass silently, the same-time pair hits the old "more than one row" message, which aborts the block before the complex case).
 - 2026-10-17: T2 done: the scales check sits before the id/time selection checks, and the id check after the infinite-time check; the id message gives positional row numbers rather than row names, because a subset's row names are not ones the user set; growth tests 92 pass, 0 fail.
 - 2026-10-17: T3 done: `@param data` and `@param scales` rewritten, `man/ssm_growth_data.Rd` regenerated, DESCRIPTION unchanged by document(); NEWS refusal list names both refusals; AC4 grep hit 12 lines, none saying distinct ids count as one person (the growth hits are the new comment and test text). The simple-english hook flagged 429 issues in NEWS.md, all but the one sentence split here in older entries, which are out of scope.
+- 2026-10-17: claim audit: 27 claims read, 2 corrected — R/ssm_growth_data.R, man/ssm_growth_data.Rd (the "15 significant digits" text now says "for most numbers, though a large whole number can keep more", since `as.character(1234567890123456)` keeps 16 digits; the same reader re-read both fixes as correct). LESSONS.md's M157 line states the same 15-digit rule unqualified; correct it in place at review hygiene.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote

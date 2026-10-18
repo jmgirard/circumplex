@@ -12,7 +12,8 @@ time point, containing the circumplex scales, an id column and a time
 column. Two rows with the same id and the same time are an error. Time
 values are compared exactly, with no rounding. The output's id is a
 factor, which labels each value by \code{as.character()} (15 significant
-digits for a number). Two distinct ids that share a label, such as
+digits for most numbers, though a large whole number can keep more).
+Two distinct ids that share a label, such as
 \code{0.1 + 0.2} and \code{0.3}, are an error. A column name that occurs more
 than once is an error when \code{id}, \code{time} or a name in \code{scales} refers
 to it.}

@@ -27,7 +27,8 @@
 #'   column. Two rows with the same id and the same time are an error. Time
 #'   values are compared exactly, with no rounding. The output's id is a
 #'   factor, which labels each value by `as.character()` (15 significant
-#'   digits for a number). Two distinct ids that share a label, such as
+#'   digits for most numbers, though a large whole number can keep more).
+#'   Two distinct ids that share a label, such as
 #'   `0.1 + 0.2` and `0.3`, are an error. A column name that occurs more
 #'   than once is an error when `id`, `time` or a name in `scales` refers
 #'   to it.
@@ -165,8 +166,9 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   }
 
   # The output's id is factor(id_col), which labels values by as.character()
-  # (15 significant digits for doubles), so two distinct values can share a
-  # level and two persons would become one. Refuse that before judging rows.
+  # (15 significant digits for most doubles; a large whole number can keep
+  # more), so two distinct values can share a level and two persons would
+  # become one. Refuse that before judging rows.
   id_out <- factor(id_col)
   id_values <- unique(id_col)
   if (nlevels(id_out) < length(id_values)) {
