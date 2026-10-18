@@ -20,7 +20,10 @@ circumplex scales.}
 
 \item{items}{Required. The variable names or column numbers for the variables
 in \code{.data} that contain all the circumplex items from a single
-circumplex measure, in ascending order from item 1 to item N.}
+circumplex measure, in ascending order from item 1 to item N. Because the
+scoring key reads the items by position, they must not select one column
+twice, hold a number below 1, or name a column whose name occurs more than
+once in \code{data}.}
 
 \item{instrument}{Required. An instrument object from the package. To see the
 available circumplex instruments, use \code{instruments()}.}

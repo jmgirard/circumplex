@@ -19,7 +19,9 @@ scales.}
 
 \item{scales}{Required. A character vector containing the column names, or a
 numeric vector containing the column indexes, for the variables (scale
-scores) to be standardized.}
+scores) to be standardized. They must not select one column twice, hold a
+number below 1, or name a column whose name occurs more than once in
+\code{data}.}
 
 \item{na.rm}{Optional. A logical that determines whether to remove missing
 values from scales when calculating the means and SDs used for

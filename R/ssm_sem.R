@@ -1277,7 +1277,8 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   path). With `grouping` and `measures = NULL`, the latent MEAN path is
 #'   analyzed instead: each group's model-implied latent mean profile, on the
 #'   raw-score metric. (A single-group latent mean profile is not a product:
-#'   factor means are not identified in one group.)
+#'   factor means are not identified in one group.) A measure must not carry
+#'   the name of one of the `scales`, since lavaan reaches variables by name.
 #' @param grouping Optional. A string naming the column of `data` indicating
 #'   group membership. With `grouping`, the fixed-angle measurement model is
 #'   fitted as a multi-group model under an invariance ladder
@@ -1682,7 +1683,8 @@ sem_health_gate <- function(fit) {
 #'   covariance stays valid when the fixed-angle model is an approximation;
 #'   see the `se` argument of [ssm_sem()].
 #' @param scales Required. A character vector with the scale (indicator)
-#'   names, in the same order as `angles`. Each name must appear only once.
+#'   names, in the same order as `angles`. Each name must appear only once,
+#'   and `NA` at most once.
 #' @param angles Optional. A numeric vector of the scales' theoretical angles
 #'   in degrees (default = `octants()`). Must be the angles the model was
 #'   generated with.

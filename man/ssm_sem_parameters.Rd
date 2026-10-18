@@ -27,7 +27,8 @@ covariance stays valid when the fixed-angle model is an approximation;
 see the \code{se} argument of \code{\link[=ssm_sem]{ssm_sem()}}.}
 
 \item{scales}{Required. A character vector with the scale (indicator)
-names, in the same order as \code{angles}. Each name must appear only once.}
+names, in the same order as \code{angles}. Each name must appear only once,
+and \code{NA} at most once.}
 
 \item{angles}{Optional. A numeric vector of the scales' theoretical angles
 in degrees (default = \code{octants()}). Must be the angles the model was

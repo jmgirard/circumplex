@@ -16,6 +16,21 @@
   `ssm_sem_syntax()` and the `cormat` path of `cpm_fit()` refuse a label
   listed twice.
 
+* The `items` argument of `score()`, `ipsatize()` and `axes_reliability()`,
+  and the `scales` argument of `self_standardize()`, now refuse the same
+  three selections. In `score()` a repeated item moved every later item one
+  place on. Each scale was then scored from the wrong items with no message.
+  In `ipsatize()` a repeated item counted twice in each row's mean.
+  `axes_reliability()` also refuses one column listed under two scales. It
+  also refuses a number that reaches a column whose name occurs more than
+  once in `data` or `cormat`, because it used the first column of that name.
+* `ssm_analyze_long()` refuses numbers in `scales` that reach two columns
+  with one name, and the message names that name. Before, the error spoke
+  of overlapping `occasions` blocks. `ssm_sem_syntax()`,
+  `ssm_sem_parameters()` and the `cormat` path of `cpm_fit()` refuse `NA`
+  listed twice as a label. `ssm_sem()` and `ssm_sem_syntax()` refuse a
+  `measures` entry that carries the name of a scale.
+
 ## New features
 
 * Two new helpers build the input to a growth model on SSM coordinates, so

@@ -23,7 +23,11 @@ exactly one of \code{data} or \code{cormat}.}
 \item{items}{Item selection. With \code{instrument}, a character vector of column
 names (or numeric indices) giving \strong{all} items in item-number order, as in
 \code{\link[=score]{score()}}. Without \code{instrument}, a list with one element per scale, each a
-character vector (or numeric indices) of that scale's item columns.}
+character vector (or numeric indices) of that scale's item columns. In
+either form, \code{items} must not select one column twice (in the list form,
+within a scale or across two scales), hold a number below 1, or name a
+column whose name occurs more than once in \code{data} (or in \code{cormat}). Items
+are matched by name, so a number must not reach such a column either.}
 
 \item{angles}{A numeric vector of the scales' angles in degrees (one per
 scale), required for the explicit map and forbidden with \code{instrument}

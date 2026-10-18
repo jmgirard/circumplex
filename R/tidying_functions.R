@@ -9,7 +9,8 @@
 #'   scales.
 #' @param items Required. A character vector containing the column names, or a
 #'   numeric vector containing column indexes, of item variables in `data` to be
-#'   ipsatized.
+#'   ipsatized. They must not select one column twice, hold a number below 1,
+#'   or name a column whose name occurs more than once in `data`.
 #' @param na.rm Optional. A logical that determines whether missing values
 #'   should be ignored during the calculation of the mean during ipsatization
 #'   (default = TRUE).
@@ -63,7 +64,10 @@ ipsatize <- function(data, items, na.rm = TRUE,
 #'   circumplex scales.
 #' @param items Required. The variable names or column numbers for the variables
 #'   in \code{.data} that contain all the circumplex items from a single
-#'   circumplex measure, in ascending order from item 1 to item N.
+#'   circumplex measure, in ascending order from item 1 to item N. Because the
+#'   scoring key reads the items by position, they must not select one column
+#'   twice, hold a number below 1, or name a column whose name occurs more than
+#'   once in `data`.
 #' @param instrument Required. An instrument object from the package. To see the
 #'   available circumplex instruments, use \code{instruments()}.
 #' @param na.rm Optional. A logical that determines if missing values should be
@@ -383,7 +387,9 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
 #'   scales.
 #' @param scales Required. A character vector containing the column names, or a
 #'   numeric vector containing the column indexes, for the variables (scale
-#'   scores) to be standardized.
+#'   scores) to be standardized. They must not select one column twice, hold a
+#'   number below 1, or name a column whose name occurs more than once in
+#'   `data`.
 #' @param na.rm Optional. A logical that determines whether to remove missing
 #'   values from scales when calculating the means and SDs used for
 #'   standardization (default = TRUE).

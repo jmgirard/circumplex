@@ -45,7 +45,8 @@ related to the latent circumplex content (the disattenuated correlation
 path). With \code{grouping} and \code{measures = NULL}, the latent MEAN path is
 analyzed instead: each group's model-implied latent mean profile, on the
 raw-score metric. (A single-group latent mean profile is not a product:
-factor means are not identified in one group.)}
+factor means are not identified in one group.) A measure must not carry
+the name of one of the \code{scales}, since lavaan reaches variables by name.}
 
 \item{grouping}{Optional. A string naming the column of \code{data} indicating
 group membership. With \code{grouping}, the fixed-angle measurement model is
