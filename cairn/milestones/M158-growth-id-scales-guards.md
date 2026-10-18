@@ -62,7 +62,7 @@
      Coverage lines together. -->
 
 - [x] T1: Tests first in `tests/testthat/test-ssm_growth_data.R`: the AC1 refusals (replace the same-time assertion and its comment at lines 339-346), the AC2 accepted cases, the AC3 refusals and the two scorer-error cases. Each refusal asserts its message, naming argument, rows or column. Run and see the new refusal tests red for the reason that the guard is missing.
-- [ ] T2: Add both guards in `R/ssm_growth_data.R`. The scales check judges a character `scales` by name (non-`NA` entries) and a numeric `scales` by `seq_along(data)[scales]` (non-`NA` positions), and sits beside the id/time selection checks. The id check compares `length(unique(id_col))` with `nlevels(factor(id_col))` after the `anyNA(id_col)` check and before the repeated-row check. Rewrite the comment at lines 150-152. Tests green.
+- [x] T2: Add both guards in `R/ssm_growth_data.R`. The scales check judges a character `scales` by name (non-`NA` entries) and a numeric `scales` by `seq_along(data)[scales]` (non-`NA` positions), and sits beside the id/time selection checks. The id check compares `length(unique(id_col))` with `nlevels(factor(id_col))` after the `anyNA(id_col)` check and before the repeated-row check. Rewrite the comment at lines 150-152. Tests green.
 - [ ] T3: Rewrite `@param data` (drop the 15-digit merge text, state the refusal) and `@param scales`; run `devtools::document()` and revert any `Config/roxygen2/version` change in `DESCRIPTION`; add both refusals to the NEWS refusal list; run the AC4 grep.
 - [ ] T4: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
@@ -89,6 +89,7 @@
 - 2026-10-17: model tier advice: Opus (input-guard code and tests, no estimator change).
 - 2026-10-17: implement started on branch m158-growth-id-scales-guards, cut from master at 1583e8c2.
 - 2026-10-17: T1 done: three new test blocks plus the replaced same-time assertion; red as expected (5 failures: the two-times pair and three repeated-scale cases pass silently, the same-time pair hits the old "more than one row" message, which aborts the block before the complex case).
+- 2026-10-17: T2 done: the scales check sits before the id/time selection checks, and the id check after the infinite-time check; the id message gives positional row numbers rather than row names, because a subset's row names are not ones the user set; growth tests 92 pass, 0 fail.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote

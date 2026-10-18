@@ -120,6 +120,22 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   } else {
     names(data)[seq_along(data)[scales]]
   }
+  # One column selected twice would enter the profile at two angles. Names
+  # are judged as given and numbers by the position they reach; an NA name
+  # or a number that reaches no column is left to the scorer's error.
+  scale_keys <- if (is.character(scales)) {
+    scales[!is.na(scales)]
+  } else {
+    pos <- seq_along(data)[scales]
+    pos[!is.na(pos)]
+  }
+  repeated_scale <- anyDuplicated(scale_keys)
+  if (repeated_scale > 0) {
+    col <- scale_keys[[repeated_scale]]
+    if (is.numeric(col)) col <- data_names[[col]]
+    stop("`scales` selects the column \"", col, "\" more than once.",
+         call. = FALSE)
+  }
   if (id %in% scale_cols) {
     stop("`scales` selects the `id` column: \"", id, "\".", call. = FALSE)
   }
@@ -147,10 +163,24 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
          "finite time for every row.", call. = FALSE)
   }
 
-  # One row per person per time point, judged on the id and time as the
-  # output holds them: factor() maps ids through as.character(), so two
-  # doubles equal to 15 significant digits are one person in the table.
+  # The output's id is factor(id_col), which labels values by as.character()
+  # (15 significant digits for doubles), so two distinct values can share a
+  # level and two persons would become one. Refuse that before judging rows.
   id_out <- factor(id_col)
+  id_values <- unique(id_col)
+  if (nlevels(id_out) < length(id_values)) {
+    first_rows <- match(id_values, id_col)
+    labels <- as.character(id_out)[first_rows]
+    clash <- which(duplicated(labels))[[1]]
+    rows <- sort(first_rows[labels == labels[[clash]]])[1:2]
+    stop("`id` values in rows ", rows[[1]], " and ", rows[[2]],
+         " differ but share the label \"", labels[[clash]],
+         "\" in the output, so two persons would become one; give each ",
+         "person an id that stays distinct as text.", call. = FALSE)
+  }
+
+  # One row per person per time point, judged on the id and time as the
+  # output holds them.
   time_out <- as.numeric(time_col)
   repeated <- duplicated(data.frame(id_out, time_out))
   if (any(repeated)) {
