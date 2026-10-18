@@ -39,6 +39,8 @@ ipsatize <- function(data, items, na.rm = TRUE,
   stopifnot(is_flag(append))
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  # A repeated item would count twice in each row's mean
+  check_scales_selection(data, items, "items")
   item_data <- data[items]
   item_names <- colnames(item_data)
   rmean <- rowMeans(item_data, na.rm = na.rm)
@@ -95,6 +97,9 @@ score <- function(data, items, instrument, na.rm = TRUE,
   stopifnot(is_flag(append))
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  # The key reads items by position, so a repeated item would shift every
+  # later item onto the wrong scale
+  check_scales_selection(data, items, "items")
   item_data <- data[items]
   n_items <- length(items)
   key <- instrument$Scales
@@ -408,6 +413,7 @@ self_standardize <- function(data, scales, na.rm = TRUE,
   stopifnot(is_flag(append))
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  check_scales_selection(data, scales)
   scale_data <- data[scales]
   scale_names <- colnames(scale_data)
 

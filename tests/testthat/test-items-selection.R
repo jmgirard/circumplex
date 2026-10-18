@@ -110,3 +110,221 @@ test_that("check_scales_selection names the argument and source it is given", {
   expect_error(check_scales_positions(-1, "items"),
                "`items` holds the position -1,", fixed = TRUE)
 })
+
+# The refusals: score(), ipsatize(), self_standardize() -----------------------
+
+it_tidy_cases <- function() it_cases()[c("score", "ipsatize", "self_standardize")]
+
+test_that("score refuses a repeated item instead of shifting the scales", {
+  # Before the guard, items = c(1, 1:32) moved every item one place on, so
+  # each octant was scored from the next octant's items with no message
+  expect_error(score(raw_iipsc, c(1, 1:32), instrument = iipsc),
+               "`items` selects the column \"IIP01\" more than once.",
+               fixed = TRUE)
+})
+
+test_that("the tidying functions refuse a column selected twice", {
+  for (name in names(it_tidy_cases())) {
+    case <- it_tidy_cases()[[name]]
+    d <- case$data
+    pos <- case$pos
+    first <- names(d)[pos[[1]]]
+    msg <- paste0("`", case$arg, "` selects the column \"", first,
+                  "\" more than once.")
+    rep_name <- names(d)[pos]
+    rep_name[2] <- first
+    forms <- list(
+      name = list(d, rep_name),
+      number = list(d, c(pos[1], pos[1], pos[-(1:2)])),
+      truncated = list(d, c(pos[1], pos[1] + 0.5, pos[-(1:2)])),
+      matrix = list(as.matrix(d), c(pos[1], pos[1], pos[-(1:2)]))
+    )
+    for (form in names(forms)) {
+      args <- forms[[form]]
+      expect_error(it_run(case, args[[1]], args[[2]]), msg, fixed = TRUE,
+                   label = paste(name, form))
+    }
+  }
+})
+
+test_that("the tidying functions refuse a position below 1", {
+  for (name in names(it_tidy_cases())) {
+    case <- it_tidy_cases()[[name]]
+    d <- case$data
+    pos <- case$pos
+    for (bad in c(0, 0.5, -1)) {
+      expect_error(it_run(case, d, c(pos[1], bad, pos[-(1:2)])),
+                   paste0("`", case$arg, "` holds the position ", format(bad),
+                          ", below 1 once truncated"),
+                   fixed = TRUE, label = paste(name, format(bad)))
+    }
+    expect_error(it_run(case, as.matrix(d), c(pos[1], 0, pos[-(1:2)])),
+                 paste0("`", case$arg, "` holds the position 0,"),
+                 fixed = TRUE, label = paste(name, "matrix"))
+  }
+})
+
+test_that("the tidying functions refuse a name that occurs twice", {
+  for (name in names(it_tidy_cases())) {
+    case <- it_tidy_cases()[[name]]
+    d <- case$data
+    pos <- case$pos
+    first <- names(d)[pos[[1]]]
+    d2 <- cbind(d, d[first])
+    names(d2) <- c(names(d), first)
+    msg <- paste0("`", case$arg, "` names a column that occurs more than ",
+                  "once in `data`: \"", first, "\".")
+    expect_error(it_run(case, d2, names(d)[pos]), msg, fixed = TRUE,
+                 label = name)
+    expect_error(it_run(case, as.matrix(d2), names(d)[pos]), msg,
+                 fixed = TRUE, label = paste(name, "matrix"))
+  }
+})
+
+test_that("the tidying functions accept a number reaching a repeated name", {
+  for (name in names(it_tidy_cases())) {
+    case <- it_tidy_cases()[[name]]
+    d <- case$data
+    pos <- case$pos
+    first <- names(d)[pos[[1]]]
+    # The extra column comes first, so the selection by number skips it and
+    # the scores equal those from the data without it
+    d2 <- cbind(d[first], d)
+    names(d2) <- c(first, names(d))
+    expect_true(anyDuplicated(names(d2)) > 0)
+    with_extra <- it_run(case, d2, pos + 1)
+    without <- it_run(case, d, pos)
+    added <- setdiff(names(without), names(d))
+    expect_gt(length(added), 0)
+    expect_equal(with_extra[added], without[added], label = name)
+  }
+})
+
+# The refusals: axes_reliability() --------------------------------------------
+
+# The four ways in: the flat `items` vector with `instrument`, and the
+# per-scale list, each on the data path and the `cormat` path. `first` stands
+# for the first scale's four items: the flat form puts it before items 5 to
+# 32, and the list form puts it under the first scale.
+it_axes_call <- function(form, path, first) {
+  d <- simulated_items
+  src <- if (path == "data") list(data = d) else
+    list(cormat = stats::cor(d), n = nrow(d))
+  if (form == "flat") {
+    rest <- seq_len(32)[-seq_along(first)]
+    items <- c(first, if (is.character(first)) names(d)[rest] else rest)
+    do.call(axes_reliability, c(src, list(items = items, instrument = iipsc)))
+  } else {
+    do.call(axes_reliability, c(src, list(items = it_axes_map(first),
+                                          angles = octants())))
+  }
+}
+
+it_axes_ways <- expand.grid(form = c("flat", "list"), path = c("data", "cormat"),
+                            stringsAsFactors = FALSE)
+
+test_that("axes_reliability refuses the three forms on every way in", {
+  skip_if_not_installed("lavaan")
+  for (i in seq_len(nrow(it_axes_ways))) {
+    form <- it_axes_ways$form[[i]]
+    path <- it_axes_ways$path[[i]]
+    lab <- paste(form, path)
+    run <- function(first) suppressMessages(it_axes_call(form, path, first))
+    expect_error(run(c(1, 1, 3, 4)),
+                 "`items` selects the column \"PA_1\" more than once.",
+                 fixed = TRUE, label = paste(lab, "number"))
+    expect_error(run(c(1, 1.5, 3, 4)),
+                 "`items` selects the column \"PA_1\" more than once.",
+                 fixed = TRUE, label = paste(lab, "truncated"))
+    expect_error(run(c("PA_1", "PA_1", "PA_3", "PA_4")),
+                 "`items` selects the column \"PA_1\" more than once.",
+                 fixed = TRUE, label = paste(lab, "name"))
+    for (bad in c(0, 0.5, -1)) {
+      expect_error(run(c(1, bad, 3, 4)),
+                   paste0("`items` holds the position ", format(bad),
+                          ", below 1 once truncated"),
+                   fixed = TRUE, label = paste(lab, format(bad)))
+    }
+  }
+})
+
+test_that("axes_reliability refuses a repeated name in data or cormat", {
+  skip_if_not_installed("lavaan")
+  d <- simulated_items
+  d2 <- cbind(d, PA_1 = rev(d$PA_1))
+  map_names <- unname(split(names(d), rep(1:8, each = 4)))
+  expect_error(
+    suppressMessages(axes_reliability(d2, map_names, angles = octants())),
+    "`items` names a column that occurs more than once in `data`: \"PA_1\".",
+    fixed = TRUE
+  )
+  expect_error(
+    suppressMessages(axes_reliability(as.matrix(d2), map_names,
+                                      angles = octants())),
+    "`items` names a column that occurs more than once in `data`: \"PA_1\".",
+    fixed = TRUE
+  )
+  expect_error(
+    suppressMessages(axes_reliability(d2, names(d), instrument = iipsc)),
+    "occurs more than once in `data`: \"PA_1\".", fixed = TRUE
+  )
+  R2 <- stats::cor(d2)
+  expect_identical(anyDuplicated(colnames(R2)), 33L)
+  expect_error(
+    axes_reliability(cormat = R2, n = 500, items = map_names,
+                     angles = octants()),
+    "`items` names a column that occurs more than once in `cormat`: \"PA_1\".",
+    fixed = TRUE
+  )
+})
+
+test_that("axes_reliability refuses a number reaching a repeated name", {
+  skip_if_not_installed("lavaan")
+  # Column 33 is PA_1 reversed. Before the guard, the number 33 was turned
+  # into the name PA_1 and the fit used column 1 instead, with no message.
+  d <- simulated_items
+  d2 <- cbind(d, PA_1 = rev(d$PA_1))
+  map <- unname(split(seq_len(32), rep(1:8, each = 4)))
+  map[[1]][1] <- 33L
+  msg <- paste0("`items` selects position 33, whose name \"PA_1\" occurs ",
+                "more than once in `data`")
+  expect_error(suppressMessages(axes_reliability(d2, map, angles = octants())),
+               msg, fixed = TRUE)
+  expect_error(
+    suppressMessages(axes_reliability(d2, c(33, 2:32), instrument = iipsc)),
+    msg, fixed = TRUE
+  )
+  R2 <- stats::cor(d2)
+  expect_error(
+    axes_reliability(cormat = R2, n = 500, items = map, angles = octants()),
+    "`items` selects position 33, whose name \"PA_1\" occurs more than once in `cormat`",
+    fixed = TRUE
+  )
+  # A number reaching column 1, the first PA_1, is refused too: the name is
+  # what the fit reads, and it does not say which column was meant
+  map1 <- unname(split(seq_len(32), rep(1:8, each = 4)))
+  expect_error(suppressMessages(axes_reliability(d2, map1, angles = octants())),
+               "`items` selects position 1, whose name \"PA_1\"", fixed = TRUE)
+})
+
+test_that("axes_reliability refuses one column under two scales", {
+  skip_if_not_installed("lavaan")
+  map <- unname(split(names(simulated_items), rep(1:8, each = 4)))
+  map[[2]][1] <- "PA_1"
+  expect_error(
+    suppressMessages(axes_reliability(simulated_items, map,
+                                      angles = octants())),
+    "`items` lists the column \"PA_1\" under more than one scale.",
+    fixed = TRUE
+  )
+  # A name in one scale and a number in another that reach one column
+  map2 <- unname(split(seq_len(32), rep(1:8, each = 4)))
+  map2[[1]] <- c("PA_1", "PA_2", "PA_3", "PA_4")
+  map2[[2]][1] <- 1L
+  expect_error(
+    axes_reliability(cormat = stats::cor(simulated_items), n = 500,
+                     items = map2, angles = octants()),
+    "`items` lists the column \"PA_1\" under more than one scale.",
+    fixed = TRUE
+  )
+})
