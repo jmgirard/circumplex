@@ -167,6 +167,10 @@ test_that("check_scales_selection refuses a position below 1", {
                         ", below 1 once truncated"),
                  fixed = TRUE, label = format(bad))
   }
+  # A value just under 1 prints as itself, not rounded to 1
+  expect_error(check_scales_selection(d, c(0.99999999, 2, 3)),
+               "`scales` holds the position 0.99999999, below 1",
+               fixed = TRUE)
   # The position check comes before the repeat check, so c(-1, -1) names
   # the position, not a repeat
   expect_error(check_scales_selection(d, c(-1, -1)), "holds the position -1",
@@ -305,11 +309,38 @@ test_that("ssm_analyze refuses a character occasions block naming a repeated col
     ssm_analyze(wide, occasions = unname(occ), boots = 20),
     "`occasions` block \"T2\" names a column", fixed = TRUE
   )
+  skip_on_cran()
   # Without the repeated name the same call runs
   expect_s3_class(
     suppressMessages(ssm_analyze(base, occasions = occ, boots = 20)),
     "circumplex_ssm"
   )
+  # Two NA column names are not a repeated name, so a block ending in NA
+  # runs as it did before the guard (match() reaches the first NA column)
+  na_names <- cbind(base, a = 1, b = 2)
+  names(na_names)[17:18] <- NA
+  occ_na <- list(T1 = paste0(PANO(), "_1"),
+                 T2 = c(paste0(PANO()[1:7], "_2"), NA))
+  expect_s3_class(
+    suppressMessages(ssm_analyze(na_names, occasions = occ_na, boots = 20)),
+    "circumplex_ssm"
+  )
+})
+
+test_that("a numeric matrix with a valid selection gives the data frame's result", {
+  skip_on_cran()
+  d <- sel_frame()[PANO()]
+  m <- as.matrix(d)
+  # as.matrix() turns the row names into strings, which no selection reads
+  expect_equal(ssm_score(m, 1:8), ssm_score(d, 1:8),
+               ignore_attr = "row.names")
+  expect_equal(ssm_parameters_id(m, 1:8), ssm_parameters_id(d, 1:8),
+               ignore_attr = "row.names")
+  set.seed(1)
+  a <- ssm_analyze(m, 1:8, boots = 20)
+  set.seed(1)
+  b <- ssm_analyze(d, 1:8, boots = 20)
+  expect_equal(a$results, b$results)
 })
 
 test_that("the label-only paths refuse a repeated label", {
@@ -324,7 +355,9 @@ test_that("the label-only paths refuse a repeated label", {
   R2 <- R
   dimnames(R2) <- list(rep_name, rep_name)
   expect_error(cpm_fit(cormat = R2, n = 300),
-               "`colnames(cormat)` lists \"PA\" more than once.", fixed = TRUE)
+               paste0("`colnames(cormat)` lists \"PA\" more than once. ",
+                      "Supply unique labels through `scales`."),
+               fixed = TRUE)
   skip_if_not_installed("lavaan")
   fit <- suppressWarnings(lavaan::cfa("f =~ PA + BC + DE + FG",
                                       data = sel_frame()))
@@ -339,6 +372,14 @@ test_that("ssm_growth_data refuses a list-column id", {
     ssm_growth_data(d, PANO(), id = "person", time = "wave"),
     "`id` names a list column: \"person\"", fixed = TRUE
   )
+  # A POSIXlt date-time is stored as a list, but it is an atomic id per row
+  dt <- simulated_growth[1:6, ]
+  # (arithmetic on a POSIXlt returns POSIXct, so convert after it)
+  dt$person <- as.POSIXlt(as.POSIXct("2026-01-01", tz = "UTC") +
+                            86400 * dt$person)
+  expect_true(inherits(dt$person, "POSIXlt") && is.list(dt$person))
+  long <- ssm_growth_data(dt, PANO(), id = "person", time = "wave")
+  expect_identical(nlevels(long$person), length(unique(dt$person)))
 })
 
 test_that("every export with a scales argument is guarded or named as exempt", {

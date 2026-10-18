@@ -41,7 +41,8 @@
 #'   displacement of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`).
 #' @param id Required. The name of the column in `data` identifying persons.
-#'   A column name, not a number. Missing values are an error.
+#'   A column name, not a number. Missing values are an error, and so is a
+#'   list column.
 #' @param time Required. The name of the numeric column in `data` holding
 #'   each row's time point. A column name, not a number. A column that is
 #'   not numeric (a `Date`, factor or character column, among others) is an
@@ -128,7 +129,9 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   check_scales_selection(data, scales)
 
   id_col <- data[[id]]
-  if (is.list(id_col)) {
+  # A POSIXlt date-time is stored as a list but holds one value per row, so
+  # it is an id like any other.
+  if (is.list(id_col) && !inherits(id_col, "POSIXlt")) {
     stop("`id` names a list column: \"", id, "\"; each id must be a single ",
          "number, string or factor level.", call. = FALSE)
   }

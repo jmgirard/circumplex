@@ -29,7 +29,8 @@ displacement of each circumplex scale included in \code{scales}, in degrees
 (default = \code{octants()}).}
 
 \item{id}{Required. The name of the column in \code{data} identifying persons.
-A column name, not a number. Missing values are an error.}
+A column name, not a number. Missing values are an error, and so is a
+list column.}
 
 \item{time}{Required. The name of the numeric column in \code{data} holding
 each row's time point. A column name, not a number. A column that is

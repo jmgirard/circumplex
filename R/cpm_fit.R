@@ -1635,7 +1635,8 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     N <- as.integer(n)
     if (is.null(scales)) {
       scales <- if (!is.null(colnames(R))) colnames(R) else paste0("V", seq_len(p))
-      check_scales_labels(scales, "`colnames(cormat)`")
+      check_scales_labels(scales, "`colnames(cormat)`",
+                          " Supply unique labels through `scales`.")
     } else {
       check_scales_labels(scales)
     }

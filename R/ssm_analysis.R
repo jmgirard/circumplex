@@ -408,7 +408,7 @@ ssm_analyze <- function(data, scales = NULL, angles = octants(),
     # A name that occurs twice in `data` would match() its first column only,
     # so a character block may not name one. Numeric blocks reach each column
     # by position, which keeps bound waves with repeated names usable.
-    dup_cn <- cn[duplicated(cn)]
+    dup_cn <- cn[!is.na(cn) & duplicated(cn)]
     for (k in seq_along(occasions)) {
       x <- occasions[[k]]
       if (is.character(x) && any(x %in% dup_cn)) {
@@ -1298,7 +1298,7 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 #' @param data Required. A data frame or matrix containing at least
 #'   circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
-#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#'   variables in \code{data} that contain circumplex scales to be analyzed.
 #'   They must not select one column twice, hold a number below 1, or name a
 #'   column whose name occurs more than once in \code{data}.
 #' @param angles Required. A numeric vector containing the angular displacement

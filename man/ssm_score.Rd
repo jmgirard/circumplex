@@ -11,7 +11,7 @@ ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 circumplex scales.}
 
 \item{scales}{Required. The variable names or column numbers for the
-variables in \code{.data} that contain circumplex scales to be analyzed.
+variables in \code{data} that contain circumplex scales to be analyzed.
 They must not select one column twice, hold a number below 1, or name a
 column whose name occurs more than once in \code{data}.}
 

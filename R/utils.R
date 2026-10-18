@@ -271,7 +271,9 @@ check_scales_positions <- function(scales) {
   if (is.numeric(scales)) {
     low <- which(!is.na(scales) & trunc(scales) < 1)
     if (length(low) > 0) {
-      stop("`scales` holds the position ", format(scales[[low[[1]]]]),
+      # 15 digits, so a value just under 1 never prints as 1
+      stop("`scales` holds the position ",
+           format(scales[[low[[1]]]], digits = 15),
            ", below 1 once truncated to a whole number; select columns by ",
            "name or by a position of 1 or more.", call. = FALSE)
     }
@@ -282,12 +284,13 @@ check_scales_positions <- function(scales) {
 # Refuse a repeated entry where `scales` labels variables rather than
 # selecting columns of `data`: lavaan variable names, or the rows of a
 # correlation matrix. One variable listed twice would enter the profile at
-# two angles. `what` names the source in the message.
-check_scales_labels <- function(scales, what = "`scales`") {
+# two angles. `what` names the source in the message, and `hint`, when
+# given, is appended to it.
+check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
   labels <- scales[!is.na(scales)]
   repeated <- anyDuplicated(labels)
   if (repeated > 0) {
-    stop(what, " lists \"", labels[[repeated]], "\" more than once.",
+    stop(what, " lists \"", labels[[repeated]], "\" more than once.", hint,
          call. = FALSE)
   }
   invisible(scales)
