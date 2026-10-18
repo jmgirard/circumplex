@@ -24,9 +24,13 @@
 #'
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
-#'   column.
+#'   column. Two rows with the same id and the same time are an error. Ids
+#'   are compared after conversion to a factor, so two numeric ids that
+#'   print alike count as one person. A column name that occurs more than
+#'   once is an error when `id`, `time` or a name in `scales` refers to it.
 #' @param scales Required. The variable names or column numbers for the
-#'   variables in `data` that contain circumplex scales.
+#'   variables in `data` that contain circumplex scales. They may not select
+#'   the `id` or `time` column.
 #' @param angles Optional. A numeric vector containing the angular
 #'   displacement of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`).
@@ -35,7 +39,8 @@
 #' @param time Required. The name of the numeric column in `data` holding
 #'   each row's time point. A column name, not a number. A column that is
 #'   not numeric (a `Date`, factor or character column, among others) is an
-#'   error, as are missing values: the growth model fits time as a number,
+#'   error, as are missing and infinite values: the growth model fits time
+#'   as a number,
 #'   so the caller chooses its origin and unit. `id` and `time` must differ
 #'   from each other and from `dv` and `value`, the two column names the
 #'   output reserves.
@@ -58,6 +63,9 @@
 ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
 
   stopifnot(is.data.frame(data) || is.matrix(data))
+  # Column names are read before a matrix is converted, so a duplicated name
+  # is judged as the caller wrote it.
+  data_names <- colnames(data)
   if (is.matrix(data)) data <- as.data.frame(data)
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
@@ -77,6 +85,38 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     stop("`time` names a column not in `data`: \"", time, "\".",
          call. = FALSE)
   }
+
+  # A name that occurs twice resolves silently to its first column, so each
+  # name an argument selects by must be unique. Numeric scales select by
+  # position and are judged below by the column they reach.
+  dup_names <- unique(data_names[duplicated(data_names)])
+  if (id %in% dup_names) {
+    stop("`id` names a column that occurs more than once in `data`: \"",
+         id, "\".", call. = FALSE)
+  }
+  if (time %in% dup_names) {
+    stop("`time` names a column that occurs more than once in `data`: \"",
+         time, "\".", call. = FALSE)
+  }
+  if (is.character(scales) && any(scales %in% dup_names)) {
+    stop("`scales` names a column that occurs more than once in `data`: \"",
+         scales[scales %in% dup_names][[1]], "\".", call. = FALSE)
+  }
+
+  # The column each scale reaches, by name or by position; indexing
+  # seq_along(data) applies R's own rules, truncating a non-integer number.
+  scale_cols <- if (is.character(scales)) {
+    scales
+  } else {
+    names(data)[seq_along(data)[scales]]
+  }
+  if (id %in% scale_cols) {
+    stop("`scales` selects the `id` column: \"", id, "\".", call. = FALSE)
+  }
+  if (time %in% scale_cols) {
+    stop("`scales` selects the `time` column: \"", time, "\".", call. = FALSE)
+  }
+
   id_col <- data[[id]]
   time_col <- data[[time]]
   if (!is.numeric(time_col)) {
@@ -91,6 +131,23 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   if (anyNA(time_col)) {
     stop("`time` column has missing values; rows cannot be silently dropped.",
          call. = FALSE)
+  }
+  if (any(is.infinite(time_col))) {
+    stop("`time` column has infinite values; the growth model needs a ",
+         "finite time for every row.", call. = FALSE)
+  }
+
+  # One row per person per time point, judged on the id and time as the
+  # output holds them: factor() maps ids through as.character(), so two
+  # doubles that print alike are one person in the table.
+  id_out <- factor(id_col)
+  time_out <- as.numeric(time_col)
+  repeated <- duplicated(data.frame(id_out, time_out))
+  if (any(repeated)) {
+    first <- which(repeated)[[1]]
+    stop("`data` has more than one row for `id` \"", id_out[[first]],
+         "\" at `time` ", format(time_out[[first]], digits = 15),
+         "; it must hold one row per person per time point.", call. = FALSE)
   }
 
   # One profile per row. ssm_parameters_id() warns when a row's displacement
