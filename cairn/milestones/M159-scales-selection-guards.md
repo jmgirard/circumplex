@@ -76,3 +76,29 @@ The exported functions that take `scales` refuse a selection that reaches one co
 - 2026-10-18: T2 to T6 verified: full suite clean with all changes (0 failures; the same 1 skip and 11 warnings as before). No pre-existing expectation was edited: the helper reuses M158's growth messages. T6 sweep: no vignette or help text claimed a now-refused selection was accepted.
 - 2026-10-18: claim audit: 40 claims read, 1 corrected — NEWS.md (ssm_growth_data() is new and already refused two of the three selections, so it left the Breaking changes list and its New features entry gained the below-1 refusal); one comment in R/ssm_growth_data.R made precise (0 and 0.5 drop an entry); files: NEWS.md, R/*.R guard sites, man/*.Rd, tests/testthat/test-scales-selection.R.
 - 2026-10-18: T7 verified: devtools::check(args = "--no-manual") Status OK, 0 errors, 0 warnings, 0 notes (built at 3a229b96; 56da892b after it changes only NEWS text and one comment); devtools::test() clean at 41a0f2bb. Status set to review.
+- 2026-10-18: review started; default branch had not moved; Copilot round off. The first evidence run was stopped once review fixes changed code; evidence is gathered at 6691381f. M156's terminal row pruned early so the new follow-up row fits the ROADMAP line cap.
+
+## Review
+
+**Independent review.** spawned: diff-bug, blame-history, prior-review.
+
+- diff-bug #1: the below-1 message rounds with `format()`, so 0.99999999 printed as "position 1" — fix now, fixed 6691381f (15 digits; helper test at 0.99999999).
+- diff-bug #2: the list-column `id` check also refused a POSIXlt date-time id, which master accepted — fix now, fixed 6691381f (POSIXlt exempt; acceptance test).
+- diff-bug #3: the `occasions` duplicate-name check counted two NA column names as a repeat — fix now, fixed 6691381f (NA names skipped; test that the call runs as before).
+- diff-bug #4: the `cormat` path refuses duplicated dimnames on a valid matrix — the refusal is a planned change (AC1); its message now says to supply unique labels through `scales`, fix now, fixed 6691381f.
+- diff-bug #5: `ssm_growth_data()` now gives the id message before the duplicate-name message for an input hitting both — reject, planned change (the duplicate-name check moved after the id/time checks; both messages are accurate).
+- diff-bug #6: a repeat of a column whose name has a twin does not say which one — reject, false: `c(1, 1)` selects one column twice, and the message names it.
+- diff-bug #7: the `ssm_score()` `scales` paragraph mixed `.data` and `data` after the added sentence — fix now, fixed 6691381f.
+- diff-bug #8: the matrix test forms use character matrices, and no test shows a numeric matrix with a valid selection is accepted — fix now, fixed 6691381f (numeric-matrix test for `ssm_score()`, `ssm_parameters_id()`, `ssm_analyze()`).
+- diff-bug #9: on CRAN only the helper, label, occasions-refusal and growth tests run — reject, planned change (per-export loops skip on CRAN for check time, as M119 set).
+- diff-bug #10: repeated NA labels pass `check_scales_labels()`, and a `measures` entry named like a scale reaches `ssm_sem()`/`ssm_sem_syntax()` — follow-up, row "Selection guard follow-ons" (ii)-(iii); pre-existing.
+- blame-history #1: numeric `scales` reaching a duplicate-named column collapse onto the first copy downstream — reject, false: a probe over the 11 exports, selecting one or both same-named columns by number, matched the result with the column renamed in 10 (`[.data.frame` renames the second copy `PA.1`); `ssm_analyze_long()` refuses that input with a misleading pre-existing message — follow-up, row "Selection guard follow-ons" (i).
+- blame-history #2: the help text "name a column whose name occurs more than once" reads as covering numbers — reject, false: selection by number does not name a column, and NEWS states that numbers are accepted.
+- blame-history #3: `cpm_fit()`'s data path keeps duplicate labels in `dimnames` — reject, false: the probe shows `data[scales]` names the second copy `PA.1`.
+- blame-history #4: `cpm_fit()` with duplicated `colnames(cormat)` now errors — reject, planned change (AC1); message hint added under diff-bug #4.
+- blame-history #5: `ssm_growth_data()` runs the position check before the id/time checks, so `c(1, 0)` gets the position message — reject, planned change (positions must be judged before columns are resolved; both messages are accurate).
+- blame-history #6: `ssm_analyze_long()` could report internal block names — follow-up, row "Selection guard follow-ons" (i).
+- prior-review #1: the `ssm_growth_data()` help page did not name the list-column `id` refusal, unlike M157/M158's parity — fix now, fixed 6691381f.
+- prior-review #2: the occasions success-path bootstrap ran without `skip_on_cran()` — fix now, fixed 6691381f.
+
+Plant check for the fixes: with only the R changes of 6691381f reverted, the four matching tests failed (0.99999999 message, NA names, `cormat` hint, POSIXlt id); restored.
