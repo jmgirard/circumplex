@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-18 (candidates triage: compressed eight rows that r
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M160 | Selection guards for items and the remaining column arguments | in-progress | — | normal | milestones/M160-items-selection-guards.md |
+| M160 | Selection guards for items and the remaining column arguments | review | — | normal | milestones/M160-items-selection-guards.md |
 | M159 | Selection guards for the scales argument | done | — | normal | milestones/archive/M159-scales-selection-guards.md |
 | M158 | Merged-id and repeated-scale guards for ssm_growth_data() | done | — | normal | milestones/archive/M158-growth-id-scales-guards.md |
 

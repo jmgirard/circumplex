@@ -1,6 +1,6 @@
 # M160: Selection guards for items and the remaining column arguments
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -58,7 +58,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - [x] T6: Update the help text named in AC6, run `devtools::document()` twice to confirm no diff, add the NEWS entry, check that a test from T1 to T5 backs each NEWS claim, and sweep the vignettes and help pages for text that says a now-refused selection is accepted.
 - [x] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
 - [x] T8: Review return 1: add `axes_reliability()` matrix-`data` cases for every AC1 form and flat-form `cormat` cases for the repeated-name and number-to-repeated-name refusals; build `ssm_sem()`'s scale names from `scales` when they are names, and from `names(data)[scales]` when they are numbers; make the lavaan-less export-listing branch check both directions; fix the NEWS `score()` sentence and bullet spacing; rerun T7's commands.
-- [ ] T9: Review return 2: a matrix-`data` test for the cross-scale refusal; every AC1 form and value on data-frame and matrix `data` for the three tidying functions; factor list elements in `axes_reliability()` judged as names; the measures message names a shared name; NEWS `score()` and `axes_reliability()` wording and the `score()` help reason; pass-1 follow-ups into "Selection guard remainders"; rerun T7's commands.
+- [x] T9: Review return 2: a matrix-`data` test for the cross-scale refusal; every AC1 form and value on data-frame and matrix `data` for the three tidying functions; factor list elements in `axes_reliability()` judged as names; the measures message names a shared name; NEWS `score()` and `axes_reliability()` wording and the `score()` help reason; pass-1 follow-ups into "Selection guard remainders"; rerun T7's commands.
 
 ## Work log
 
@@ -92,6 +92,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: T8 done at 12ec3db6: `devtools::test()` 0 failures, 14848 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 - 2026-10-18: review return 2: AC1 fails as written: the cross-scale refusal (part of AC1's third form for the list form) has no matrix-`data` test (diff-bug pass 2 #2). Fix-now items ride the return: factor list elements, the two pass-1 follow-ups into "Selection guard remainders", NEWS `score()` and `axes_reliability()` wording, the measures message, full matrix cases for the tidying functions, T8's task text, the `score()` help reason (pass 2 diff-bug #1, #3 to #9).
 - 2026-10-18: T9 in progress (checkpoint): T9 added and T8's task text corrected (minor amendments); Coverage for AC1, AC5, AC6, AC7 extended to T9. Matrix cross-scale test; the tidying refusal tests loop every form and value over data-frame and matrix `data`; `axes_check_items()` judges a factor as its labels (the new test fails without it); measures message reworded to "which is the name of one of the scales; each measure must have a name of its own"; NEWS and the `score()` help reworded; follow-ups (v) and (vi) added to "Selection guard remainders". Both selection files: 0 failures (131 and 223 passes, NOT_CRAN). Full suite and check running.
+- 2026-10-18: T9 done at 41358fad: `devtools::test()` 0 failures, 14865 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 
 ## Decisions
 
