@@ -20,12 +20,19 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
 
   Required. A data frame or matrix with one row per person per time
   point, containing the circumplex scales, an id column and a time
-  column.
+  column. Two rows with the same id and the same time are an error. Time
+  values are compared exactly, with no rounding. Ids are compared after
+  conversion to a factor, which matches them by
+  [`as.character()`](https://rdrr.io/r/base/character.html) (15
+  significant digits), so two numeric ids that differ only beyond that
+  precision count as one person. A column name that occurs more than
+  once is an error when `id`, `time` or a name in `scales` refers to it.
 
 - scales:
 
   Required. The variable names or column numbers for the variables in
-  `data` that contain circumplex scales.
+  `data` that contain circumplex scales. They may not select the `id` or
+  `time` column.
 
 - angles:
 
@@ -43,10 +50,10 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
   Required. The name of the numeric column in `data` holding each row's
   time point. A column name, not a number. A column that is not numeric
   (a `Date`, factor or character column, among others) is an error, as
-  are missing values: the growth model fits time as a number, so the
-  caller chooses its origin and unit. `id` and `time` must differ from
-  each other and from `dv` and `value`, the two column names the output
-  reserves.
+  are missing and infinite values: the growth model fits time as a
+  number, so the caller chooses its origin and unit. `id` and `time`
+  must differ from each other and from `dv` and `value`, the two column
+  names the output reserves.
 
 ## Value
 

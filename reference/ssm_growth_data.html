@@ -111,12 +111,19 @@ fit call that takes this table.</p>
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>Required. A data frame or matrix with one row per person per
 time point, containing the circumplex scales, an id column and a time
-column.</p></dd>
+column. Two rows with the same id and the same time are an error. Time
+values are compared exactly, with no rounding. Ids
+are compared after conversion to a factor, which matches them by
+<code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> (15 significant digits), so two numeric ids that
+differ only beyond that precision count as one person. A column name
+that occurs more than once is an error when <code>id</code>, <code>time</code> or a name in
+<code>scales</code> refers to it.</p></dd>
 
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
 <dd><p>Required. The variable names or column numbers for the
-variables in <code>data</code> that contain circumplex scales.</p></dd>
+variables in <code>data</code> that contain circumplex scales. They may not select
+the <code>id</code> or <code>time</code> column.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
@@ -134,10 +141,10 @@ A column name, not a number. Missing values are an error.</p></dd>
 <dd><p>Required. The name of the numeric column in <code>data</code> holding
 each row's time point. A column name, not a number. A column that is
 not numeric (a <code>Date</code>, factor or character column, among others) is an
-error, as are missing values: the growth model fits time as a number,
-so the caller chooses its origin and unit. <code>id</code> and <code>time</code> must differ
-from each other and from <code>dv</code> and <code>value</code>, the two column names the
-output reserves.</p></dd>
+error, as are missing and infinite values: the growth model fits time
+as a number, so the caller chooses its origin and unit. <code>id</code> and <code>time</code>
+must differ from each other and from <code>dv</code> and <code>value</code>, the two column
+names the output reserves.</p></dd>
 
 </dl></div>
     <div class="section level2">
