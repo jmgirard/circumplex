@@ -102,8 +102,8 @@ score <- function(data, items, instrument, na.rm = TRUE,
   stopifnot(is_flag(append))
 
   if (is.matrix(data)) data <- as.data.frame(data)
-  # The key reads items by position, so a repeated item would shift every
-  # later item onto the wrong scale
+  # The key reads items by position, so a repeated item would put a column in
+  # another item's place (an inserted one shifts every item after it)
   check_scales_selection(data, items, "items")
   item_data <- data[items]
   n_items <- length(items)

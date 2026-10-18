@@ -524,8 +524,8 @@ axes_check_items <- function(data, sel, where) {
     if (length(hit) > 0) {
       stop("`items` selects position ", keys[[hit[[1]]]], ", whose name \"",
            data_names[[keys[[hit[[1]]]]]], "\" occurs more than once in ",
-           where, "; axes_reliability() reaches items by name, so it would ",
-           "use the first column with that name.", call. = FALSE)
+           where, "; axes_reliability() reaches items by name, and the name ",
+           "does not say which of those columns is meant.", call. = FALSE)
     }
   }
   invisible(sel)

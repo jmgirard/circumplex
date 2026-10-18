@@ -18,8 +18,9 @@
 
 * The `items` argument of `score()`, `ipsatize()` and `axes_reliability()`,
   and the `scales` argument of `self_standardize()`, now refuse the same
-  three selections. The `score()` key reads items by position. A repeated
-  item that took another item's position made each scale that uses that
+  three selections. The `score()` key reads items by position. A repeat
+  inserted in the list moved every later item one place on, and a repeat in
+  place of an item took that item's position. Each scale that uses such a
   position read the wrong column, with no message. In `ipsatize()` a
   repeated item counted twice in each row's mean. `axes_reliability()` also
   refuses one column listed under two scales. It reads items by name, so it
