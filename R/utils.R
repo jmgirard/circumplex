@@ -220,6 +220,82 @@ is_null_or_num <- function(x, n = NULL) {
   is.null(x) || is_num(x, n)
 }
 
+# Column selection by `scales` --------------------------------------------
+
+# Refuse a `scales` selection that the caller cannot score correctly, before
+# the caller indexes `data` with it. Three selections are refused: a number
+# that truncates below 1 (zero drops a column and a negative selects by
+# exclusion), a name that occurs more than once in the column names (it
+# resolves to the first such column with no message), and one column selected
+# twice (it would enter the profile at two angles). `data` is what the caller
+# indexes: a data frame, or the matrix that fit_structure() indexes as it is.
+# Names are judged by name and numbers by the position they reach, which
+# seq_len(ncol(data))[scales] gives by R's own truncation rule, so 3 and 3.5
+# reach one column. An NA, an absent name and a number past the last column
+# pass through to the caller's own error.
+check_scales_selection <- function(data, scales) {
+  check_scales_positions(scales)
+  data_names <- colnames(data)
+  if (is.null(data_names)) data_names <- rep(NA_character_, ncol(data))
+  if (is.character(scales)) {
+    dup_names <- data_names[!is.na(data_names) & duplicated(data_names)]
+    dup <- scales[!is.na(scales) & scales %in% dup_names]
+    if (length(dup) > 0) {
+      stop("`scales` names a column that occurs more than once in `data`: \"",
+           dup[[1]], "\".", call. = FALSE)
+    }
+    keys <- scales[!is.na(scales) & scales %in% data_names]
+  } else {
+    keys <- seq_len(ncol(data))[scales]
+    keys <- keys[!is.na(keys)]
+  }
+  repeated <- anyDuplicated(keys)
+  if (repeated > 0) {
+    col <- keys[[repeated]]
+    label <- if (is.character(col)) {
+      paste0("\"", col, "\"")
+    } else if (is.na(data_names[[col]])) {
+      paste("at position", col)
+    } else {
+      paste0("\"", data_names[[col]], "\"")
+    }
+    stop("`scales` selects the column ", label, " more than once.",
+         call. = FALSE)
+  }
+  invisible(scales)
+}
+
+# The position half of check_scales_selection(), for a caller that must judge
+# positions before it can resolve the columns `scales` reaches.
+check_scales_positions <- function(scales) {
+  if (is.numeric(scales)) {
+    low <- which(!is.na(scales) & trunc(scales) < 1)
+    if (length(low) > 0) {
+      # 15 digits, so a value just under 1 never prints as 1
+      stop("`scales` holds the position ",
+           format(scales[[low[[1]]]], digits = 15),
+           ", below 1 once truncated to a whole number; select columns by ",
+           "name or by a position of 1 or more.", call. = FALSE)
+    }
+  }
+  invisible(scales)
+}
+
+# Refuse a repeated entry where `scales` labels variables rather than
+# selecting columns of `data`: lavaan variable names, or the rows of a
+# correlation matrix. One variable listed twice would enter the profile at
+# two angles. `what` names the source in the message, and `hint`, when
+# given, is appended to it.
+check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
+  labels <- scales[!is.na(scales)]
+  repeated <- anyDuplicated(labels)
+  if (repeated > 0) {
+    stop(what, " lists \"", labels[[repeated]], "\" more than once.", hint,
+         call. = FALSE)
+  }
+  invisible(scales)
+}
+
 # Display columns, which is what a console line budget is spent in. Every
 # width comparison below goes through this one function.
 #

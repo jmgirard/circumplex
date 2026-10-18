@@ -21,7 +21,7 @@ abbreviations and angles are used. Supply this or both \code{scales} and
 \code{angles}.}
 
 \item{scales}{Optional. A character vector of circumplex scale (column)
-names. Ignored when \code{instrument} is supplied.}
+names, each appearing only once. Ignored when \code{instrument} is supplied.}
 
 \item{angles}{Optional. A numeric vector of scale angles in degrees, the same
 length as \code{scales}. Ignored when \code{instrument} is supplied.}

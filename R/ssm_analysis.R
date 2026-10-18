@@ -12,7 +12,8 @@
 #' @param scales Required unless `occasions` is supplied (the two are mutually
 #'   exclusive). A character vector of column names, or a numeric vector of
 #'   column indexes, from `data` that contains the circumplex scale scores to
-#'   be analyzed.
+#'   be analyzed. It must not select one column twice, hold a number below 1,
+#'   or name a column whose name occurs more than once in `data`.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees). (default =
 #'   `octants()`). The closed-form SSM estimator used here equals the
@@ -75,7 +76,9 @@
 #'   one occasion, in the same scale order, all of length `length(angles)`
 #'   (e.g., `occasions = list(T1 = c("PA_1", ..., "NO_1"), T2 = c("PA_2", ...,
 #'   "NO_2"))`). Mutually exclusive with `scales` (and not combinable with
-#'   `measures`). Data must be wide -- one row per person -- so persons remain
+#'   `measures`). A character block must not name a column whose name occurs
+#'   more than once in `data`. Data must be wide -- one row per person -- so
+#'   persons remain
 #'   the resampling unit and within-person dependence across occasions is
 #'   preserved in both engines. Results gain an `Occasion` column (labels are
 #'   `names(occasions)`, defaulting to `T1..Tk`); this column is present only
@@ -351,6 +354,7 @@ ssm_analyze <- function(data, scales = NULL, angles = octants(),
 
   # Coerce matrix input to a data frame so column indexing behaves uniformly
   if (is.matrix(data)) data <- as.data.frame(data)
+  if (!is.null(scales)) check_scales_selection(data, scales)
 
   # Drop observations with missing grouping values (unusable in any group).
   # Done here, on the user's actual grouping column, so both analysis paths
@@ -401,6 +405,18 @@ ssm_analyze <- function(data, scales = NULL, angles = octants(),
     # resolve via match() with unknown names errored. Names are derived from
     # the positions afterwards, for stem validation and display only.
     cn <- colnames(data)
+    # A name that occurs twice in `data` would match() its first column only,
+    # so a character block may not name one. Numeric blocks reach each column
+    # by position, which keeps bound waves with repeated names usable.
+    dup_cn <- cn[!is.na(cn) & duplicated(cn)]
+    for (k in seq_along(occasions)) {
+      x <- occasions[[k]]
+      if (is.character(x) && any(x %in% dup_cn)) {
+        stop("`occasions` block \"", occ_labels[[k]], "\" names a column ",
+             "that occurs more than once in `data`: \"",
+             x[x %in% dup_cn][[1]], "\".", call. = FALSE)
+      }
+    }
     occ_idx <- lapply(occasions, function(x) {
       if (is.numeric(x)) {
         ix <- as.integer(x)
@@ -1282,7 +1298,9 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 #' @param data Required. A data frame or matrix containing at least
 #'   circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
-#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#'   variables in \code{data} that contain circumplex scales to be analyzed.
+#'   They must not select one column twice, hold a number below 1, or name a
+#'   column whose name occurs more than once in \code{data}.
 #' @param angles Required. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in \code{scales} (in degrees). The
 #'   closed-form SSM estimator used here equals the ordinary-least-squares
@@ -1319,6 +1337,7 @@ ssm_score <- function(data, scales, angles = octants(), append = TRUE, ...) {
   stopifnot(length(scales) == length(angles))
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  check_scales_selection(data, scales)
   scales_mat <- as.matrix(data[scales])
   angles_rad <- as_radian(as_degree(angles))
 

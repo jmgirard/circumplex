@@ -33,14 +33,16 @@
 #'   than once is an error when `id`, `time` or a name in `scales` refers
 #'   to it.
 #' @param scales Required. The variable names or column numbers for the
-#'   variables in `data` that contain circumplex scales. They may not select
-#'   the `id` or `time` column, and they may not select one column more
-#'   than once.
+#'   variables in `data` that contain circumplex scales. They must not select
+#'   the `id` or `time` column, select one column more than once, hold a
+#'   number below 1, or name a column whose name occurs more than once in
+#'   `data`.
 #' @param angles Optional. A numeric vector containing the angular
 #'   displacement of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`).
 #' @param id Required. The name of the column in `data` identifying persons.
-#'   A column name, not a number. Missing values are an error.
+#'   A column name, not a number. Missing values are an error, and so is a
+#'   list column.
 #' @param time Required. The name of the numeric column in `data` holding
 #'   each row's time point. A column name, not a number. A column that is
 #'   not numeric (a `Date`, factor or character column, among others) is an
@@ -103,17 +105,10 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     stop("`time` names a column that occurs more than once in `data`: \"",
          time, "\".", call. = FALSE)
   }
-  # An NA scale name is left to the scorer, which refuses it as an undefined
-  # column.
-  dup_scales <- if (is.character(scales)) {
-    scales[!is.na(scales) & scales %in% dup_names]
-  } else {
-    character(0)
-  }
-  if (length(dup_scales) > 0) {
-    stop("`scales` names a column that occurs more than once in `data`: \"",
-         dup_scales[[1]], "\".", call. = FALSE)
-  }
+  # A position below 1 would drop an entry (0, 0.5) or select by exclusion
+  # (a negative) below, so it is refused before the columns that `scales`
+  # reaches are resolved.
+  check_scales_positions(scales)
 
   # The column each scale reaches, by name or by position; indexing
   # seq_along(data) applies R's own rules, truncating a non-integer number.
@@ -128,24 +123,18 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   if (time %in% scale_cols) {
     stop("`scales` selects the `time` column: \"", time, "\".", call. = FALSE)
   }
-  # One column selected twice would enter the profile at two angles. Names
-  # are judged by name and numbers by the position they reach; a name or a
-  # number that reaches no column (NA included) is left to the scorer's error.
-  scale_keys <- if (is.character(scales)) {
-    scales[!is.na(scales) & scales %in% data_names]
-  } else {
-    pos <- seq_along(data)[scales]
-    pos[!is.na(pos)]
-  }
-  repeated_scale <- anyDuplicated(scale_keys)
-  if (repeated_scale > 0) {
-    col <- scale_keys[[repeated_scale]]
-    if (is.numeric(col)) col <- data_names[[col]]
-    stop("`scales` selects the column \"", col, "\" more than once.",
-         call. = FALSE)
-  }
+  # A scale name that occurs twice in `data`, and one column selected twice,
+  # are refused after the id and time checks, so that `scales` naming the id
+  # column twice keeps the id message.
+  check_scales_selection(data, scales)
 
   id_col <- data[[id]]
+  # A POSIXlt date-time is stored as a list but holds one value per row, so
+  # it is an id like any other.
+  if (is.list(id_col) && !inherits(id_col, "POSIXlt")) {
+    stop("`id` names a list column: \"", id, "\"; each id must be a single ",
+         "number, string or factor level.", call. = FALSE)
+  }
   time_col <- data[[time]]
   if (!is.numeric(time_col)) {
     stop("`time` must name a numeric column (class ",

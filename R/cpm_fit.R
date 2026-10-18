@@ -1462,9 +1462,11 @@ cpm_boundary_proximity <- function(object) {
 #' @param data A data frame or matrix containing the circumplex scales (raw-data
 #'   path). Supply exactly one of `data` or `cormat`.
 #' @param scales For the raw-data path, a character vector of column names (or a
-#'   numeric vector of column indexes) selecting the circumplex scales. For the
-#'   `cormat` path, optional labels for the variables (defaults to the matrix
-#'   dimnames, or `V1`, `V2`, ...).
+#'   numeric vector of column indexes) selecting the circumplex scales; it must
+#'   not select one column twice, hold a number below 1, or name a column whose
+#'   name occurs more than once in `data`. For the `cormat` path, optional
+#'   labels for the variables (defaults to the matrix dimnames, or `V1`, `V2`,
+#'   ...); each label, given or taken from the dimnames, must appear only once.
 #' @param angles A numeric vector of the theoretical angular displacement of
 #'   each scale, in degrees, used both as the reference/identifying angle and as
 #'   optimization start values (default = [octants()]). Its length must match
@@ -1633,6 +1635,10 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     N <- as.integer(n)
     if (is.null(scales)) {
       scales <- if (!is.null(colnames(R))) colnames(R) else paste0("V", seq_len(p))
+      check_scales_labels(scales, "`colnames(cormat)`",
+                          " Supply unique labels through `scales`.")
+    } else {
+      check_scales_labels(scales)
     }
     stopifnot(length(scales) == p)
     if (ci_missing) {
@@ -1646,6 +1652,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     stopifnot(is.data.frame(data) || is.matrix(data))
     if (is.matrix(data)) data <- as.data.frame(data)
     stopifnot(is_var(scales))
+    check_scales_selection(data, scales)
     sdata <- data[scales]
     p <- ncol(sdata)
     sdata <- stats::na.omit(sdata)            # listwise (only option; design sec. 4)

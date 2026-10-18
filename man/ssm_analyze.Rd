@@ -28,7 +28,8 @@ circumplex scales.}
 \item{scales}{Required unless \code{occasions} is supplied (the two are mutually
 exclusive). A character vector of column names, or a numeric vector of
 column indexes, from \code{data} that contains the circumplex scale scores to
-be analyzed.}
+be analyzed. It must not select one column twice, hold a number below 1,
+or name a column whose name occurs more than once in \code{data}.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). (default =
@@ -114,7 +115,9 @@ within each group on the Fisher z scale and back-transformed. The
 numeric vectors, each selecting the same circumplex scales measured at
 one occasion, in the same scale order, all of length \code{length(angles)}
 (e.g., \code{occasions = list(T1 = c("PA_1", ..., "NO_1"), T2 = c("PA_2", ..., "NO_2"))}). Mutually exclusive with \code{scales} (and not combinable with
-\code{measures}). Data must be wide -- one row per person -- so persons remain
+\code{measures}). A character block must not name a column whose name occurs
+more than once in \code{data}. Data must be wide -- one row per person -- so
+persons remain
 the resampling unit and within-person dependence across occasions is
 preserved in both engines. Results gain an \code{Occasion} column (labels are
 \code{names(occasions)}, defaulting to \code{T1..Tk}); this column is present only
