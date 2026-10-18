@@ -1,13 +1,13 @@
 # M160: Selection guards for items and the remaining column arguments
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, GP2, GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — exported functions of the released package refuse inputs they accept today
-- **Branch/PR:** —
+- **Branch/PR:** m160-items-selection-guards
 
 ## Goal
 
@@ -50,7 +50,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 
 ## Tasks
 
-- [ ] T1: Before any code change, record in a test file the result or error of the four AC2 probes for each AC1 function at 71d44034, asserting each error's message, and a test that reproduces the `score()` shift (`items = c(1, 1:32)` on `raw_iipsc`) and the `axes_reliability()` first-name pick. Then give the helper an argument for the name it reports, keeping every M159 message the same, and unit-test it on `items`.
+- [x] T1: Before any code change, record in a test file the result or error of the four AC2 probes for each AC1 function at 71d44034, asserting each error's message, and a test that reproduces the `score()` shift (`items = c(1, 1:32)` on `raw_iipsc`) and the `axes_reliability()` first-name pick. Then give the helper an argument for the name it reports, keeping every M159 message the same, and unit-test it on `items`.
 - [ ] T2: Call the helper from `score()`, `ipsatize()` and `self_standardize()` (`R/tidying_functions.R`), after a matrix becomes a data frame. Per function, a test fires each AC1 form and asserts its message, and a test shows the AC2 repeated-name number accepted.
 - [ ] T3: Guard `axes_reliability()` in `axes_resolve_map()` (`R/axes_reliability.R:515`): the flat vector, each per-scale vector, the union across scales, and numbers that reach a repeated name, on the data and `cormat` paths. Tests as in T2, with `skip_if_not_installed("lavaan")`, since `axes_reliability()` needs lavaan.
 - [ ] T4: Extend the export-listing test in `tests/testthat/test-scales-selection.R:388` to `items`: it fires a refusal through each export found by `formals()` and asserts the found set equals the guarded set plus the one exemption, `scales()`. Remove its `self_standardize()` exemption.
@@ -75,3 +75,5 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: ROADMAP: pruned M157's terminal row so the line cap holds, and added the candidate row "Selection guard remainders".
 - 2026-10-18: lessons harvested: M157 (judge names after matrix conversion), M159 (probe data-frame and matrix shapes; `format(digits = 15)` in messages), M56 (sweep help pages and vignettes both ways), M146 (assert that a guarded case occurs).
 - 2026-10-18: model tier: Opus for implementation (guard code, no estimator change, no oracle needed because no number changes).
+- 2026-10-18: implement started on branch m160-items-selection-guards, cut from 9a8e71cd.
+- 2026-10-18: T1 done: `check_scales_selection()` and `check_scales_positions()` take `arg` (default "scales") and `where` (default "`data`"), M159 messages unchanged (test-scales-selection.R 0 failures); `tests/testthat/test-items-selection.R` records the four probes at 71d44034 (22 passes under NOT_CRAN). The two regression tests (`score()` shift, `axes_reliability()` first-name pick) fail on unfixed code, shown in a scratch run; they land with T2 and T3.
