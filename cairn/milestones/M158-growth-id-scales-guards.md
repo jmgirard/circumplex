@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M158: Merged-id and repeated-scale guards for ssm_growth_data()
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -64,7 +64,7 @@
 - [x] T1: Tests first in `tests/testthat/test-ssm_growth_data.R`: the AC1 refusals (replace the same-time assertion and its comment at lines 339-346), the AC2 accepted cases, the AC3 refusals and the two scorer-error cases. Each refusal asserts its message, naming argument, rows or column. Run and see the new refusal tests red for the reason that the guard is missing.
 - [x] T2: Add both guards in `R/ssm_growth_data.R`. The scales check judges a character `scales` by name (non-`NA` entries) and a numeric `scales` by `seq_along(data)[scales]` (non-`NA` positions), and sits beside the id/time selection checks. The id check compares `length(unique(id_col))` with `nlevels(factor(id_col))` after the `anyNA(id_col)` check and before the repeated-row check. Rewrite the comment at lines 150-152. Tests green.
 - [x] T3: Rewrite `@param data` (drop the 15-digit merge text, state the refusal) and `@param scales`; run `devtools::document()` and revert any `Config/roxygen2/version` change in `DESCRIPTION`; add both refusals to the NEWS refusal list; run the AC4 grep.
-- [ ] T4: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T4: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates.
@@ -92,6 +92,7 @@
 - 2026-10-17: T2 done: the scales check sits before the id/time selection checks, and the id check after the infinite-time check; the id message gives positional row numbers rather than row names, because a subset's row names are not ones the user set; growth tests 92 pass, 0 fail.
 - 2026-10-17: T3 done: `@param data` and `@param scales` rewritten, `man/ssm_growth_data.Rd` regenerated, DESCRIPTION unchanged by document(); NEWS refusal list names both refusals; AC4 grep hit 12 lines, none saying distinct ids count as one person (the growth hits are the new comment and test text). The simple-english hook flagged 429 issues in NEWS.md, all but the one sentence split here in older entries, which are out of scope.
 - 2026-10-17: claim audit: 27 claims read, 2 corrected — R/ssm_growth_data.R, man/ssm_growth_data.Rd (the "15 significant digits" text now says "for most numbers, though a large whole number can keep more", since `as.character(1234567890123456)` keeps 16 digits; the same reader re-read both fixes as correct). LESSONS.md's M157 line states the same 15-digit rule unqualified; correct it in place at review hygiene.
+- 2026-10-17: T4 done: devtools::test() FAIL 0, WARN 11, SKIP 1, PASS 14507 (the growth file alone: WARN 0); devtools::check(--no-manual) 0 errors, 0 warnings, 0 notes, built after the claim-audit fix. Status set to review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
