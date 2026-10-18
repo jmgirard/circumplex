@@ -16,7 +16,8 @@
 #'   vector of column indexes, giving the circumplex scale scores in `data`
 #'   (the same scales measured at every occasion). It must not select one
 #'   column twice, hold a number below 1, or name a column whose name occurs
-#'   more than once in `data`.
+#'   more than once in `data`. The scores are reshaped by scale name, so
+#'   numbers must not reach two columns that share a name either.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees) (default =
 #'   `octants()`).
@@ -82,6 +83,18 @@ ssm_analyze_long <- function(data, scales, angles = octants(),
   stopifnot(is_var(scales))
   stopifnot(length(scales) == length(angles))
   check_scales_selection(data, scales)
+  # Numbers may reach two columns with one name, but the wide layout below
+  # names each scale's columns after it, so two such scales would collide
+  if (is.numeric(scales)) {
+    reached <- names(data)[scales]
+    reached <- reached[!is.na(reached)]
+    shared <- anyDuplicated(reached)
+    if (shared > 0) {
+      stop("`scales` selects two columns named \"", reached[[shared]],
+           "\"; ssm_analyze_long() reshapes the scores by scale name, so ",
+           "each scale needs its own name.", call. = FALSE)
+    }
+  }
   stopifnot(is_var(id, n = 1))
   stopifnot(is_var(occasion, n = 1))
   stopifnot(is_null_or_var(grouping, n = 1))

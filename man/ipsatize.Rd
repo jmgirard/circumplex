@@ -12,7 +12,8 @@ scales.}
 
 \item{items}{Required. A character vector containing the column names, or a
 numeric vector containing column indexes, of item variables in \code{data} to be
-ipsatized.}
+ipsatized. They must not select one column twice, hold a number below 1,
+or name a column whose name occurs more than once in \code{data}.}
 
 \item{na.rm}{Optional. A logical that determines whether missing values
 should be ignored during the calculation of the mean during ipsatization

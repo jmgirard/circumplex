@@ -21,13 +21,16 @@ abbreviations and angles are used. Supply this or both \code{scales} and
 \code{angles}.}
 
 \item{scales}{Optional. A character vector of circumplex scale (column)
-names, each appearing only once. Ignored when \code{instrument} is supplied.}
+names, each appearing only once, and \code{NA} at most once. Ignored when
+\code{instrument} is supplied.}
 
 \item{angles}{Optional. A numeric vector of scale angles in degrees, the same
 length as \code{scales}. Ignored when \code{instrument} is supplied.}
 
 \item{measures}{Optional. Either \code{NULL} or a character vector of external
-measure (column) names to relate to the circumplex factors.}
+measure (column) names to relate to the circumplex factors. None may be
+one of the scale names, whether those come from \code{scales} or from
+\code{instrument}.}
 
 \item{model}{Optional. The measurement-model tier: \code{"scaled"} (default) or
 \code{"strict"}. See Details.}

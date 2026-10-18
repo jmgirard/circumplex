@@ -201,11 +201,14 @@ snap_trig <- function(x, tol = 1e-9) {
 #'   abbreviations and angles are used. Supply this or both `scales` and
 #'   `angles`.
 #' @param scales Optional. A character vector of circumplex scale (column)
-#'   names, each appearing only once. Ignored when `instrument` is supplied.
+#'   names, each appearing only once, and `NA` at most once. Ignored when
+#'   `instrument` is supplied.
 #' @param angles Optional. A numeric vector of scale angles in degrees, the same
 #'   length as `scales`. Ignored when `instrument` is supplied.
 #' @param measures Optional. Either `NULL` or a character vector of external
-#'   measure (column) names to relate to the circumplex factors.
+#'   measure (column) names to relate to the circumplex factors. None may be
+#'   one of the scale names, whether those come from `scales` or from
+#'   `instrument`.
 #' @param model Optional. The measurement-model tier: `"scaled"` (default) or
 #'   `"strict"`. See Details.
 #' @param n_groups Optional. A single positive whole number: the number of
@@ -274,6 +277,7 @@ ssm_sem_syntax <- function(instrument = NULL, scales = NULL, angles = NULL,
   ra <- sem_resolve_scales_angles(instrument, scales, angles)
   scales <- ra$scales
   angles_deg <- ra$angles
+  check_measures_not_scales(measures, scales)
   p <- length(scales)
   m <- length(measures)
   th <- as.numeric(as_radian(as_degree(angles_deg)))

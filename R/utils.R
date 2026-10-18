@@ -232,17 +232,20 @@ is_null_or_num <- function(x, n = NULL) {
 # Names are judged by name and numbers by the position they reach, which
 # seq_len(ncol(data))[scales] gives by R's own truncation rule, so 3 and 3.5
 # reach one column. An NA, an absent name and a number past the last column
-# pass through to the caller's own error.
-check_scales_selection <- function(data, scales) {
-  check_scales_positions(scales)
+# pass through to the caller's own error. `arg` names the argument in the
+# messages (the `items` argument takes the same rule), and `where` names what
+# `data` is to the user.
+check_scales_selection <- function(data, scales, arg = "scales",
+                                   where = "`data`") {
+  check_scales_positions(scales, arg)
   data_names <- colnames(data)
   if (is.null(data_names)) data_names <- rep(NA_character_, ncol(data))
   if (is.character(scales)) {
     dup_names <- data_names[!is.na(data_names) & duplicated(data_names)]
     dup <- scales[!is.na(scales) & scales %in% dup_names]
     if (length(dup) > 0) {
-      stop("`scales` names a column that occurs more than once in `data`: \"",
-           dup[[1]], "\".", call. = FALSE)
+      stop("`", arg, "` names a column that occurs more than once in ",
+           where, ": \"", dup[[1]], "\".", call. = FALSE)
     }
     keys <- scales[!is.na(scales) & scales %in% data_names]
   } else {
@@ -259,7 +262,7 @@ check_scales_selection <- function(data, scales) {
     } else {
       paste0("\"", data_names[[col]], "\"")
     }
-    stop("`scales` selects the column ", label, " more than once.",
+    stop("`", arg, "` selects the column ", label, " more than once.",
          call. = FALSE)
   }
   invisible(scales)
@@ -267,12 +270,12 @@ check_scales_selection <- function(data, scales) {
 
 # The position half of check_scales_selection(), for a caller that must judge
 # positions before it can resolve the columns `scales` reaches.
-check_scales_positions <- function(scales) {
+check_scales_positions <- function(scales, arg = "scales") {
   if (is.numeric(scales)) {
     low <- which(!is.na(scales) & trunc(scales) < 1)
     if (length(low) > 0) {
       # 15 digits, so a value just under 1 never prints as 1
-      stop("`scales` holds the position ",
+      stop("`", arg, "` holds the position ",
            format(scales[[low[[1]]]], digits = 15),
            ", below 1 once truncated to a whole number; select columns by ",
            "name or by a position of 1 or more.", call. = FALSE)
@@ -287,6 +290,9 @@ check_scales_positions <- function(scales) {
 # two angles. `what` names the source in the message, and `hint`, when
 # given, is appended to it.
 check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
+  if (sum(is.na(scales)) > 1) {
+    stop(what, " lists NA more than once.", hint, call. = FALSE)
+  }
   labels <- scales[!is.na(scales)]
   repeated <- anyDuplicated(labels)
   if (repeated > 0) {
@@ -294,6 +300,21 @@ check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
          call. = FALSE)
   }
   invisible(scales)
+}
+
+# Refuse a `measures` entry that carries the name of a scale, for the SEM
+# functions, where lavaan reaches every variable by name. The data would hold
+# two columns with that name, and the syntax would give the one variable
+# lavaan reads two roles: indicator of the scale factors and outside measure.
+# `measures` and `scale_names` are names; NA entries pass through.
+check_measures_not_scales <- function(measures, scale_names) {
+  hit <- measures[!is.na(measures) & measures %in% scale_names]
+  if (length(hit) > 0) {
+    stop("`measures` names \"", hit[[1]], "\", which is the name of one of ",
+         "the scales; each measure must have a name of its own.",
+         call. = FALSE)
+  }
+  invisible(measures)
 }
 
 # Display columns, which is what a console line budget is spent in. Every

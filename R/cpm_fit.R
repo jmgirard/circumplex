@@ -1466,7 +1466,8 @@ cpm_boundary_proximity <- function(object) {
 #'   not select one column twice, hold a number below 1, or name a column whose
 #'   name occurs more than once in `data`. For the `cormat` path, optional
 #'   labels for the variables (defaults to the matrix dimnames, or `V1`, `V2`,
-#'   ...); each label, given or taken from the dimnames, must appear only once.
+#'   ...); each label, given or taken from the dimnames, must appear only once,
+#'   and `NA` at most once.
 #' @param angles A numeric vector of the theoretical angular displacement of
 #'   each scale, in degrees, used both as the reference/identifying angle and as
 #'   optimization start values (default = [octants()]). Its length must match

@@ -506,19 +506,48 @@ axes_colnames <- function(sel, data) {
   if (is.numeric(sel)) colnames(data)[sel] else as.character(sel)
 }
 
+# Refuse an `items` selection that axes_colnames() would resolve to the wrong
+# columns: the three forms check_scales_selection() refuses, and a number that
+# reaches a column whose name repeats. axes_colnames() turns that number into
+# the name, and every later step selects by name, so it would use the first
+# column with that name.
+axes_check_items <- function(data, sel, where) {
+  # axes_colnames() reads a factor as its labels, so judge it as names, not
+  # by its integer codes
+  if (is.factor(sel)) sel <- as.character(sel)
+  check_scales_selection(data, sel, "items", where)
+  if (is.numeric(sel)) {
+    data_names <- colnames(data)
+    dup_names <- data_names[!is.na(data_names) & duplicated(data_names)]
+    keys <- seq_len(ncol(data))[sel]
+    hit <- which(!is.na(keys) & data_names[keys] %in% dup_names)
+    if (length(hit) > 0) {
+      stop("`items` selects position ", keys[[hit[[1]]]], ", whose name \"",
+           data_names[[keys[[hit[[1]]]]]], "\" occurs more than once in ",
+           where, "; axes_reliability() reaches items by name, and the name ",
+           "does not say which of those columns is meant.", call. = FALSE)
+    }
+  }
+  invisible(sel)
+}
+
 # Normalize the two input forms to one internal map: a list of per-scale item
 # column-name vectors, the matching per-scale angles (degrees), and scale labels.
 # Instrument form (parallel to score()): `items` is ALL item columns in
 # item-number order and the instrument's Scales$Items are 1-based indices into
 # it. Explicit form: `items` is a list of per-scale item-column vectors and
 # `angles` the per-scale angles.
-axes_resolve_map <- function(data, items, angles, instrument) {
+#
+# `where` names `data` to the user: "`data`", or "`cormat`" on the matrix path.
+axes_resolve_map <- function(data, items, angles, instrument,
+                             where = "`data`") {
   if (!is.null(instrument)) {
     stopifnot(inherits(instrument, "circumplex_instrument"))
     stopifnot(is_var(items))
     if (!is.null(angles)) {
       stop("Supply either `instrument` or `angles`, not both.", call. = FALSE)
     }
+    axes_check_items(data, items, where)
     all_cols <- axes_colnames(items, data)
     key <- instrument$Scales
     item_list <- lapply(seq_len(nrow(key)), function(i) {
@@ -546,6 +575,18 @@ axes_resolve_map <- function(data, items, angles, instrument) {
       )
     }
     stopifnot(is.numeric(angles), length(angles) == length(items))
+    for (sel in items) axes_check_items(data, sel, where)
+    # Each scale's own repeats are refused above, so a name reached twice
+    # here sits under two scales. The duplicated column makes the item
+    # correlation matrix singular, which used to stop the fit with a
+    # positive-definiteness error that did not name the item.
+    reached <- unlist(lapply(items, axes_colnames, data = data))
+    reached <- reached[!is.na(reached) & reached %in% colnames(data)]
+    across <- anyDuplicated(reached)
+    if (across > 0) {
+      stop("`items` lists the column \"", reached[[across]],
+           "\" under more than one scale.", call. = FALSE)
+    }
     labels <- names(items)
     if (is.null(labels)) labels <- sprintf("Scale%d", seq_along(items))
     list(
@@ -1032,7 +1073,11 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' @param items Item selection. With `instrument`, a character vector of column
 #'   names (or numeric indices) giving **all** items in item-number order, as in
 #'   [score()]. Without `instrument`, a list with one element per scale, each a
-#'   character vector (or numeric indices) of that scale's item columns.
+#'   character vector (or numeric indices) of that scale's item columns. In
+#'   either form, `items` must not select one column twice (in the list form,
+#'   within a scale or across two scales), hold a number below 1, or name a
+#'   column whose name occurs more than once in `data` (or in `cormat`). Items
+#'   are matched by name, so a number must not reach such a column either.
 #' @param angles A numeric vector of the scales' angles in degrees (one per
 #'   scale), required for the explicit map and forbidden with `instrument`
 #'   (which supplies its own). Must be equally spaced around the circle, at any
@@ -1230,7 +1275,8 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # axes_resolve_map() reads only colnames(), so the correlation matrix serves
   # as the column source on the cormat path exactly as the data frame does.
   map <- axes_resolve_map(if (has_data) data else cormat, items, angles,
-                          instrument)
+                          instrument,
+                          where = if (has_data) "`data`" else "`cormat`")
   item_cols <- map$items
   angles_deg <- map$angles
   n_scales <- length(item_cols)
