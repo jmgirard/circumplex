@@ -155,3 +155,4 @@ Findings:
 - blame-history #3: `check_scales_labels()` now refuses NA twice where M159 skipped NA — reject (planned change, AC5).
 - prior-review #1: `+Inf` in `items` passes the guard — reject (planned change: numbers past the last column pass through to each function's own error, as in M159; Scope Out).
 - prior-review #2: negative `measures` message — already follow-up (v) in "Selection guard remainders".
+- Pass 3 fix-now items (diff-bug #1 to #3) fixed in the commit after 6193487d; verify slot rerun there: `devtools::test()` 0 failures, 14865 passes; `devtools::document()` no change.
