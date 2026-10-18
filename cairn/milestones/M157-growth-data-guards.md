@@ -80,14 +80,15 @@ Consistency gate (2026-10-17): `cairn_validate` all checks passed; no principle 
 
 spawned: diff-bug, blame-history, prior-review
 
-- diff-bug #1: a matrix column named `""` becomes `V<n>` in `as.data.frame()`, so a duplicate created by conversion escapes the check read from the pre-conversion names and `id = "V1"` binds to the unnamed column with no error — fix now (read names after conversion; regression test). Not a floor return: AC1 reads the column names of `data` as passed, where `V1` occurs once, and a blank matrix column name is a narrow input.
-- diff-bug #2: the same mismatch gives a false "`scales` selects the `id` column" refusal — fix now (same change).
-- diff-bug #3: an `NA` in character `scales` with two `NA` column names gets the duplicate-name message — fix now (drop `NA` before the test; the scorer's existing error then refuses it).
-- diff-bug #4: the repeated-pair test pattern "`time` 1" also matches "`time` 10" — fix now (anchor on "`time` 1;").
-- diff-bug #5: "must differ" left on its own roxygen line — fix now, rides the blame-history #2 edit.
+- diff-bug #1: a matrix column named `""` becomes `V<n>` in `as.data.frame()`, so a duplicate created by conversion escapes the check read from the pre-conversion names and `id = "V1"` binds to the unnamed column with no error — fix now (read names after conversion; regression test), fixed 46967fc9. Not a floor return: AC1 reads the column names of `data` as passed, where `V1` occurs once, and a blank matrix column name is a narrow input.
+- diff-bug #2: the same mismatch gives a false "`scales` selects the `id` column" refusal — fix now (same change), fixed 46967fc9.
+- diff-bug #3: an `NA` in character `scales` with two `NA` column names gets the duplicate-name message — fix now (drop `NA` before the test; the scorer's existing error then refuses it), fixed 46967fc9.
+- diff-bug #4: the repeated-pair test pattern "`time` 1" also matches "`time` 10" — fix now (anchor on "`time` 1;"), fixed 46967fc9.
+- diff-bug #5: "must differ" left on its own roxygen line — fix now, rides the blame-history #2 edit, fixed 46967fc9.
 - diff-bug #6: names repeated inside `scales` and merged double ids at different times stay accepted — reject, planned change (Out list; held by the "Growth id and scales edge inputs" row).
 - blame-history #1: the help page states that ids equal to 15 digits count as one person, while the new candidate row calls that merge open — follow-up, absorbed into "Growth id and scales edge inputs" (a guard there would rewrite that help text). The help text states current behavior, as the claim audit required.
-- blame-history #2: the help page does not say time values are compared exactly — fix now (`@param data`).
+- blame-history #2: the help page does not say time values are compared exactly — fix now (`@param data`), fixed 46967fc9.
+- Fix verification: the three new regression inputs run against the pre-fix function give no error, a false "selects the `id` column", and the duplicate-name message for `NA`, so each new expectation fails before the fix; growth tests 148 pass after it; `document()` 0 `resolve link` lines.
 - blame-history #3: the code uses `is.infinite()` after `anyNA()` where T2 named `!is.finite()` — reject, false: together they refuse exactly the non-finite set.
 - blame-history #4: NEWS line break after the refusal list — reject, style.
 - prior-review #1: the bundled-dataset test derives its expected values from `ssm_parameters_id()`, the scorer the function wraps — reject, planned change (AC5 names this evidence; the scorer has its own oracle tests).
