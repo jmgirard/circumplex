@@ -35,7 +35,9 @@ fit_structure(
   A character vector of column names (or a numeric vector of column
   indexes) selecting the circumplex scales, **in hypothesised circular
   order** (the order is RANDALL's order hypothesis). At least four
-  scales are required.
+  scales are required. They must not select one column twice, hold a
+  number below 1, or name a column whose name occurs more than once in
+  `data`.
 
 - scoring:
 

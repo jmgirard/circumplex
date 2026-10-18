@@ -52,6 +52,8 @@ ssm_sem(
 
   Required. A character vector of column names, or a numeric vector of
   column indexes, from `data` that contains the circumplex scale scores.
+  It must not select one column twice, hold a number below 1, or name a
+  column whose name occurs more than once in `data`.
 
 - angles:
 

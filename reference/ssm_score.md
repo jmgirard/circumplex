@@ -21,7 +21,9 @@ ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 - scales:
 
   Required. The variable names or column numbers for the variables in
-  `.data` that contain circumplex scales to be analyzed.
+  `data` that contain circumplex scales to be analyzed. They must not
+  select one column twice, hold a number below 1, or name a column whose
+  name occurs more than once in `data`.
 
 - angles:
 

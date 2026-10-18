@@ -31,8 +31,8 @@ ssm_sem_syntax(
 
 - scales:
 
-  Optional. A character vector of circumplex scale (column) names.
-  Ignored when `instrument` is supplied.
+  Optional. A character vector of circumplex scale (column) names, each
+  appearing only once. Ignored when `instrument` is supplied.
 
 - angles:
 

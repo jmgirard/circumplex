@@ -123,7 +123,9 @@ scales.</p></dd>
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
 <dd><p>Required. A character vector containing the column names, or a
 numeric vector containing the column indexes, for the variables (scale
-scores) to be standardized.</p></dd>
+scores) to be standardized. They must not select one column twice, hold a
+number below 1, or name a column whose name occurs more than once in
+<code>data</code>.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>

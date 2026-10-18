@@ -38,9 +38,12 @@ cpm_fit(
 - scales:
 
   For the raw-data path, a character vector of column names (or a
-  numeric vector of column indexes) selecting the circumplex scales. For
-  the `cormat` path, optional labels for the variables (defaults to the
-  matrix dimnames, or `V1`, `V2`, ...).
+  numeric vector of column indexes) selecting the circumplex scales; it
+  must not select one column twice, hold a number below 1, or name a
+  column whose name occurs more than once in `data`. For the `cormat`
+  path, optional labels for the variables (defaults to the matrix
+  dimnames, or `V1`, `V2`, ...); each label, given or taken from the
+  dimnames, must appear only once.
 
 - angles:
 

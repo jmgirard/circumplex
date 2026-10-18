@@ -123,9 +123,10 @@ to it.</p></dd>
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
 <dd><p>Required. The variable names or column numbers for the
-variables in <code>data</code> that contain circumplex scales. They may not select
-the <code>id</code> or <code>time</code> column, and they may not select one column more
-than once.</p></dd>
+variables in <code>data</code> that contain circumplex scales. They must not select
+the <code>id</code> or <code>time</code> column, select one column more than once, hold a
+number below 1, or name a column whose name occurs more than once in
+<code>data</code>.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
@@ -136,7 +137,8 @@ displacement of each circumplex scale included in <code>scales</code>, in degree
 
 <dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
 <dd><p>Required. The name of the column in <code>data</code> identifying persons.
-A column name, not a number. Missing values are an error.</p></dd>
+A column name, not a number. Missing values are an error, and so is a
+list column.</p></dd>
 
 
 <dt id="arg-time">time<a class="anchor" aria-label="anchor" href="#arg-time"></a></dt>

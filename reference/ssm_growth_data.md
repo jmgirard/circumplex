@@ -32,8 +32,9 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
 - scales:
 
   Required. The variable names or column numbers for the variables in
-  `data` that contain circumplex scales. They may not select the `id` or
-  `time` column, and they may not select one column more than once.
+  `data` that contain circumplex scales. They must not select the `id`
+  or `time` column, select one column more than once, hold a number
+  below 1, or name a column whose name occurs more than once in `data`.
 
 - angles:
 
@@ -44,7 +45,8 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
 - id:
 
   Required. The name of the column in `data` identifying persons. A
-  column name, not a number. Missing values are an error.
+  column name, not a number. Missing values are an error, and so is a
+  list column.
 
 - time:
 

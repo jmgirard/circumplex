@@ -2,6 +2,34 @@
 
 ## circumplex (development version)
 
+### Breaking changes
+
+- The functions that select columns with `scales` now refuse three
+  selections that gave a wrong result or an unclear error. One column
+  selected twice entered the profile at two angles. A number below 1
+  once truncated to a whole number, such as `0`, `0.5` or `-1`, dropped
+  a column or selected columns by exclusion. A name that occurs more
+  than once in `data` used the first column with that name. The refusals
+  apply to
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md),
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md),
+  [`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md),
+  [`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md),
+  [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md),
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md),
+  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
+  and
+  [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md).
+  A character `occasions` block in
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
+  must not name a column whose name repeats either. A number that
+  selects such a column is still accepted.
+  [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md),
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
+  and the `cormat` path of
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  refuse a label listed twice.
+
 ### New features
 
 - Two new helpers build the input to a growth model on SSM coordinates,
@@ -17,9 +45,10 @@
   other. It refuses two rows with the same id and time. It refuses two
   distinct ids that share one text label in the output, such as
   `0.1 + 0.2` and `0.3`. It refuses `scales` that select the `id` or
-  `time` column by name or number, or that select one column more than
-  once. It also refuses a column name that occurs more than once in the
-  data when `id`, `time` or a name in `scales` refers to it.
+  `time` column by name or number, that select one column more than
+  once, or that hold a number below 1. It also refuses a column name
+  that occurs more than once in the data when `id`, `time` or a name in
+  `scales` refers to it. It refuses an `id` that names a list column.
   [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
   returns the package’s one joint growth model as formula objects for
   glmmTMB, nlme or brms, with the `time` and `id` names substituted.

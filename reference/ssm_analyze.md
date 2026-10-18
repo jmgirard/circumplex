@@ -40,7 +40,8 @@ ssm_analyze(
   Required unless `occasions` is supplied (the two are mutually
   exclusive). A character vector of column names, or a numeric vector of
   column indexes, from `data` that contains the circumplex scale scores
-  to be analyzed.
+  to be analyzed. It must not select one column twice, hold a number
+  below 1, or name a column whose name occurs more than once in `data`.
 
 - angles:
 
@@ -156,14 +157,16 @@ ssm_analyze(
   (e.g.,
   `occasions = list(T1 = c("PA_1", ..., "NO_1"), T2 = c("PA_2", ..., "NO_2"))`).
   Mutually exclusive with `scales` (and not combinable with `measures`).
-  Data must be wide – one row per person – so persons remain the
-  resampling unit and within-person dependence across occasions is
-  preserved in both engines. Results gain an `Occasion` column (labels
-  are `names(occasions)`, defaulting to `T1..Tk`); this column is
-  present only for occasions analyses. Grouping is time-invariant by
-  construction (one group per person-row). Cross-occasion column
-  alignment is validated by stem matching; when the columns have no
-  common stem structure, positional alignment is assumed and messaged.
+  A character block must not name a column whose name occurs more than
+  once in `data`. Data must be wide – one row per person – so persons
+  remain the resampling unit and within-person dependence across
+  occasions is preserved in both engines. Results gain an `Occasion`
+  column (labels are `names(occasions)`, defaulting to `T1..Tk`); this
+  column is present only for occasions analyses. Grouping is
+  time-invariant by construction (one group per person-row).
+  Cross-occasion column alignment is validated by stem matching; when
+  the columns have no common stem structure, positional alignment is
+  assumed and messaged.
 
 ## Value
 

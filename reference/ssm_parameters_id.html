@@ -122,7 +122,9 @@ person-occasion.</p></dd>
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
 <dd><p>Required. The variable names or column numbers for the
-variables in <code>data</code> that contain circumplex scales to be analyzed.</p></dd>
+variables in <code>data</code> that contain circumplex scales to be analyzed. They
+must not select one column twice, hold a number below 1, or name a column
+whose name occurs more than once in <code>data</code>.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>

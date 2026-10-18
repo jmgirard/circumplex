@@ -45,7 +45,9 @@ ssm_analyze_long(
 
   Required. A character vector of column names, or a numeric vector of
   column indexes, giving the circumplex scale scores in `data` (the same
-  scales measured at every occasion).
+  scales measured at every occasion). It must not select one column
+  twice, hold a number below 1, or name a column whose name occurs more
+  than once in `data`.
 
 - angles:
 
