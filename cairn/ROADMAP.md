@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-17 (M157 done: archived; graduated the "Growth data
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M158 | Merged-id and repeated-scale guards for ssm_growth_data() | planned | — | normal | milestones/M158-growth-id-scales-guards.md |
+| M158 | Merged-id and repeated-scale guards for ssm_growth_data() | in-progress | — | normal | milestones/M158-growth-id-scales-guards.md |
 | M157 | Input guards for ssm_growth_data() | done | — | normal | milestones/archive/M157-growth-data-guards.md |
 | M156 | Peer-review status notices on the four package-original vignettes | done | — | normal | milestones/archive/M156-peer-review-notices.md |
 | M155 | The trajectory caution by input shape, and the bootstrap path into the helper | done | — | normal | milestones/archive/M155-trajectory-caution-and-bootstrap.md |

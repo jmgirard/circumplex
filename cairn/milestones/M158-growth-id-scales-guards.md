@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M158: Merged-id and repeated-scale guards for ssm_growth_data()
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
 - **Principles touched:** GP2   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
 - **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
 - **Surface tier:** user-facing — changes what an exported function refuses and what its help page says   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
+- **Branch/PR:** m158-growth-id-scales-guards   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -61,7 +61,7 @@
      cites; an insertion, removal, or reorder renumbers the labels and the
      Coverage lines together. -->
 
-- [ ] T1: Tests first in `tests/testthat/test-ssm_growth_data.R`: the AC1 refusals (replace the same-time assertion and its comment at lines 339-346), the AC2 accepted cases, the AC3 refusals and the two scorer-error cases. Each refusal asserts its message, naming argument, rows or column. Run and see the new refusal tests red for the reason that the guard is missing.
+- [x] T1: Tests first in `tests/testthat/test-ssm_growth_data.R`: the AC1 refusals (replace the same-time assertion and its comment at lines 339-346), the AC2 accepted cases, the AC3 refusals and the two scorer-error cases. Each refusal asserts its message, naming argument, rows or column. Run and see the new refusal tests red for the reason that the guard is missing.
 - [ ] T2: Add both guards in `R/ssm_growth_data.R`. The scales check judges a character `scales` by name (non-`NA` entries) and a numeric `scales` by `seq_along(data)[scales]` (non-`NA` positions), and sits beside the id/time selection checks. The id check compares `length(unique(id_col))` with `nlevels(factor(id_col))` after the `anyNA(id_col)` check and before the repeated-row check. Rewrite the comment at lines 150-152. Tests green.
 - [ ] T3: Rewrite `@param data` (drop the 15-digit merge text, state the refusal) and `@param scales`; run `devtools::document()` and revert any `Config/roxygen2/version` change in `DESCRIPTION`; add both refusals to the NEWS refusal list; run the AC4 grep.
 - [ ] T4: Run `devtools::test()` and `devtools::check(args = "--no-manual")`.
@@ -87,6 +87,8 @@
 - 2026-10-17: plan gate chose an error over a warning for merged ids because the table would hold the wrong persons (GP2 wrong object, as M157's repeated-row refusal); falsified by a user design that relies on ids merging at 15 digits.
 - 2026-10-17: plan chose a guard in `ssm_growth_data()` only over a shared helper in every scorer because the selection named this function and the scorers include `ssm_analyze()`; falsified by a repeated scale giving a wrong result through another scorer.
 - 2026-10-17: model tier advice: Opus (input-guard code and tests, no estimator change).
+- 2026-10-17: implement started on branch m158-growth-id-scales-guards, cut from master at 1583e8c2.
+- 2026-10-17: T1 done: three new test blocks plus the replaced same-time assertion; red as expected (5 failures: the two-times pair and three repeated-scale cases pass silently, the same-time pair hits the old "more than one row" message, which aborts the block before the complex case).
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
