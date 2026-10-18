@@ -25,15 +25,17 @@
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
 #'   column. Two rows with the same id and the same time are an error. Time
-#'   values are compared exactly, with no rounding. Ids
-#'   are compared after conversion to a factor, which matches them by
-#'   `as.character()` (15 significant digits), so two numeric ids that
-#'   differ only beyond that precision count as one person. A column name
-#'   that occurs more than once is an error when `id`, `time` or a name in
-#'   `scales` refers to it.
+#'   values are compared exactly, with no rounding. The output's id is a
+#'   factor, which labels each value by `as.character()` (15 significant
+#'   digits for most numbers, though a large whole number can keep more).
+#'   Two distinct ids that share a label, such as
+#'   `0.1 + 0.2` and `0.3`, are an error. A column name that occurs more
+#'   than once is an error when `id`, `time` or a name in `scales` refers
+#'   to it.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in `data` that contain circumplex scales. They may not select
-#'   the `id` or `time` column.
+#'   the `id` or `time` column, and they may not select one column more
+#'   than once.
 #' @param angles Optional. A numeric vector containing the angular
 #'   displacement of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`).
@@ -126,6 +128,22 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   if (time %in% scale_cols) {
     stop("`scales` selects the `time` column: \"", time, "\".", call. = FALSE)
   }
+  # One column selected twice would enter the profile at two angles. Names
+  # are judged by name and numbers by the position they reach; a name or a
+  # number that reaches no column (NA included) is left to the scorer's error.
+  scale_keys <- if (is.character(scales)) {
+    scales[!is.na(scales) & scales %in% data_names]
+  } else {
+    pos <- seq_along(data)[scales]
+    pos[!is.na(pos)]
+  }
+  repeated_scale <- anyDuplicated(scale_keys)
+  if (repeated_scale > 0) {
+    col <- scale_keys[[repeated_scale]]
+    if (is.numeric(col)) col <- data_names[[col]]
+    stop("`scales` selects the column \"", col, "\" more than once.",
+         call. = FALSE)
+  }
 
   id_col <- data[[id]]
   time_col <- data[[time]]
@@ -147,10 +165,25 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
          "finite time for every row.", call. = FALSE)
   }
 
-  # One row per person per time point, judged on the id and time as the
-  # output holds them: factor() maps ids through as.character(), so two
-  # doubles equal to 15 significant digits are one person in the table.
+  # The output's id is factor(id_col), which labels values by as.character()
+  # (15 significant digits for most doubles; a large whole number can keep
+  # more), so two distinct values can share a level and two persons would
+  # become one. Refuse that before judging rows.
   id_out <- factor(id_col)
+  id_values <- unique(id_col)
+  if (nlevels(id_out) < length(id_values)) {
+    first_rows <- match(id_values, id_col)
+    labels <- as.character(id_out)[first_rows]
+    clash <- which(duplicated(labels))[[1]]
+    rows <- sort(first_rows[labels == labels[[clash]]])[1:2]
+    stop("`id` values in rows ", rows[[1]], " and ", rows[[2]],
+         " of `data` (by position, not row name) differ but share the label \"", labels[[clash]],
+         "\" in the output, so two persons would become one; give each ",
+         "person an id that stays distinct as text.", call. = FALSE)
+  }
+
+  # One row per person per time point, judged on the id and time as the
+  # output holds them.
   time_out <- as.numeric(time_col)
   repeated <- duplicated(data.frame(id_out, time_out))
   if (any(repeated)) {

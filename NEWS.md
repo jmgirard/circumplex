@@ -11,8 +11,10 @@
   refuses an `id` or `time` name absent from the data, a non-numeric `time`
   column, missing values in either, infinite `time` values, and an `id` or
   `time` named `dv` or `value` or equal to each other. It refuses two rows
-  with the same id and time. It refuses `scales` that select the `id` or
-  `time` column by name or number. It also refuses a column name that
+  with the same id and time. It refuses two distinct ids that share one
+  text label in the output, such as `0.1 + 0.2` and `0.3`. It refuses `scales`
+  that select the `id` or `time` column by name or number, or that select
+  one column more than once. It also refuses a column name that
   occurs more than once in the data when `id`, `time` or a name in `scales`
   refers to it.
   `ssm_growth_formula()` returns the

@@ -10,16 +10,18 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
 \item{data}{Required. A data frame or matrix with one row per person per
 time point, containing the circumplex scales, an id column and a time
 column. Two rows with the same id and the same time are an error. Time
-values are compared exactly, with no rounding. Ids
-are compared after conversion to a factor, which matches them by
-\code{as.character()} (15 significant digits), so two numeric ids that
-differ only beyond that precision count as one person. A column name
-that occurs more than once is an error when \code{id}, \code{time} or a name in
-\code{scales} refers to it.}
+values are compared exactly, with no rounding. The output's id is a
+factor, which labels each value by \code{as.character()} (15 significant
+digits for most numbers, though a large whole number can keep more).
+Two distinct ids that share a label, such as
+\code{0.1 + 0.2} and \code{0.3}, are an error. A column name that occurs more
+than once is an error when \code{id}, \code{time} or a name in \code{scales} refers
+to it.}
 
 \item{scales}{Required. The variable names or column numbers for the
 variables in \code{data} that contain circumplex scales. They may not select
-the \code{id} or \code{time} column.}
+the \code{id} or \code{time} column, and they may not select one column more
+than once.}
 
 \item{angles}{Optional. A numeric vector containing the angular
 displacement of each circumplex scale included in \code{scales}, in degrees

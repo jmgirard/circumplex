@@ -336,14 +336,100 @@ test_that("ssm_growth_data refuses two rows for one person at one time", {
       label = kind
     )
   }
+})
+
+test_that("ssm_growth_data refuses distinct ids that become one output level", {
+  data("simulated_growth")
+  # Row names 10, 20 and 30 differ from the positions the message reports.
+  base <- simulated_growth[c(10, 20, 30), ]
+  expect_identical(rownames(base), c("10", "20", "30"))
+  rows <- "`id` values in rows 2 and 3 of `data` (by position, not row name)"
+  pattern <- paste0(rows, " differ but share the label \"0.3\"")
   # Double ids that differ in the last bits but share one as.character() form
-  # become one factor level in the output, so they are one person there and
-  # are refused.
+  # would become one factor level in the output. The check runs before the
+  # repeated-row check, so the same-time pair gets this message too.
+  dbl <- c(1, 0.1 + 0.2, 0.3)
+  expect_false(identical(dbl[2], dbl[3]))
+  for (waves in list(two_times = c(0, 0, 1), same_time = c(0, 1, 1))) {
+    d <- base
+    d$person <- dbl
+    d$wave <- waves
+    expect_error(ssm_growth_data(d, PANO(), id = "person", time = "wave"),
+                 pattern, fixed = TRUE)
+  }
   d <- base
-  d$person <- c(1, 0.1 + 0.2, 0.3)
+  d$person <- complex(real = dbl)
+  d$wave <- c(0, 0, 1)
   expect_false(identical(d$person[2], d$person[3]))
   expect_error(ssm_growth_data(d, PANO(), id = "person", time = "wave"),
-               "more than one row.*`id` \"0.3\".*`time` 1;")
+               paste0(rows, " differ but share the label \"0.3+0i\""),
+               fixed = TRUE)
+})
+
+test_that("ssm_growth_data accepts ids that keep one level per distinct value", {
+  data("simulated_growth")
+  d <- simulated_growth
+  n_persons <- length(unique(d$person))
+  ids <- list(
+    integer = d$person,
+    double = as.numeric(d$person),
+    character = paste0("p", d$person),
+    factor = factor(d$person)
+  )
+  for (kind in names(ids)) {
+    d$person <- ids[[kind]]
+    long <- ssm_growth_data(d, PANO(), id = "person", time = "wave")
+    expect_identical(nlevels(long$person), n_persons, label = kind)
+  }
+  # Two doubles that differ at the 15th significant digit stay two levels, and
+  # 0 and -0 are one value, so they are one level and no error.
+  base <- simulated_growth[1:3, ]
+  base$wave <- c(0, 0, 1)
+  pairs <- list(
+    distinct = list(ids = c(1, 0.3, 0.300000000000001), levels = 3L),
+    signed_zero = list(ids = c(1, 0, -0), levels = 2L)
+  )
+  for (kind in names(pairs)) {
+    d <- base
+    d$person <- pairs[[kind]]$ids
+    long <- ssm_growth_data(d, PANO(), id = "person", time = "wave")
+    expect_identical(nlevels(long$person), pairs[[kind]]$levels, label = kind)
+  }
+})
+
+test_that("ssm_growth_data refuses scales that select one column twice", {
+  data("simulated_growth")
+  d <- simulated_growth[1:3, ]
+  # Columns 3 to 10 hold the scales, so column 3 is PA.
+  expect_identical(names(d)[3], "PA")
+  rep_name <- PANO()
+  rep_name[2] <- "PA"
+  scales <- list(name = rep_name, number = c(3, 3, 5:10),
+                 truncated = c(3, 3.5, 5:10))
+  for (kind in names(scales)) {
+    expect_error(
+      ssm_growth_data(d, scales[[kind]], id = "person", time = "wave"),
+      "`scales` selects the column \"PA\" more than once",
+      label = kind
+    )
+  }
+  # The id column selected twice gets the more specific id message.
+  expect_error(
+    ssm_growth_data(d, c("person", "person", PANO()[3:8]), id = "person",
+                    time = "wave"),
+    "`scales` selects the `id` column: \"person\"."
+  )
+  # Scales that reach no column are left to the scorer.
+  no_col <- list(na_name = c(NA_character_, NA_character_, PANO()[3:8]),
+                 absent_name = c("zzz", "zzz", PANO()[3:8]),
+                 beyond = c(99, 99, 5:10))
+  for (kind in names(no_col)) {
+    expect_error(
+      ssm_growth_data(d, no_col[[kind]], id = "person", time = "wave"),
+      "undefined columns selected",
+      label = kind
+    )
+  }
 })
 
 test_that("ssm_growth_data accepts one id at two times and two ids at one time", {
