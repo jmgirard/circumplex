@@ -1,6 +1,6 @@
 # M159: Selection guards for the scales argument
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -52,7 +52,7 @@ The exported functions that take `scales` refuse a selection that reaches one co
 - [x] T4: Move the repeated-scale guard of `ssm_growth_data()` (`R/ssm_growth_data.R:133-146`) onto the helper, and update the reworded expectations in `tests/testthat/test-ssm_growth_data.R`. Add the list-column `id` refusal with its test.
 - [x] T5: Add a test that lists the exports with a `scales` argument by `formals()` over `getNamespaceExports("circumplex")`, and fails when that list differs from the guarded set plus `self_standardize()`.
 - [x] T6: Update each `@param scales` (and `@param occasions` in `ssm_analyze()`), run `devtools::document()`, and add the NEWS entry. Sweep the vignettes and help pages for text that says a selection is accepted which is now refused.
-- [ ] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
+- [x] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
 
 ## Work log
 
@@ -75,3 +75,4 @@ The exported functions that take `scales` refuse a selection that reaches one co
 - 2026-10-18: refusal tests for AC1 to AC3 and AC5 and the export-enumeration test (T5) added to test-scales-selection.R; man/ regenerated (11 Rd files). Plants: guard removed from ssm_score() reddened its AC1 forms; label check removed from the cpm_fit() cormat path reddened the label test; ssm_sem_syntax dropped from the guarded list reddened the enumeration test; all restored. Checkpoint before the full-suite run.
 - 2026-10-18: T2 to T6 verified: full suite clean with all changes (0 failures; the same 1 skip and 11 warnings as before). No pre-existing expectation was edited: the helper reuses M158's growth messages. T6 sweep: no vignette or help text claimed a now-refused selection was accepted.
 - 2026-10-18: claim audit: 40 claims read, 1 corrected — NEWS.md (ssm_growth_data() is new and already refused two of the three selections, so it left the Breaking changes list and its New features entry gained the below-1 refusal); one comment in R/ssm_growth_data.R made precise (0 and 0.5 drop an entry); files: NEWS.md, R/*.R guard sites, man/*.Rd, tests/testthat/test-scales-selection.R.
+- 2026-10-18: T7 verified: devtools::check(args = "--no-manual") Status OK, 0 errors, 0 warnings, 0 notes (built at 3a229b96; 56da892b after it changes only NEWS text and one comment); devtools::test() clean at 41a0f2bb. Status set to review.
