@@ -41,7 +41,7 @@
 
 - [x] T1: Write the failing tests in `tests/testthat/test-ssm_growth_data.R` for AC1 to AC4, each asserting the message pattern that names its argument and the offending column or value; add the no-error cases, the `scales = 3:10` equivalence test, and the two bundled-dataset value tests (AC5). Run them and confirm the refusal tests fail for the missing guard, not another error.
 - [x] T2: Add the guards in `R/ssm_growth_data.R` before scoring (current lines 60-94): duplicate-name check on the column names of `data` before matrix conversion; numeric `scales` resolved as `seq_along(data)[scales]` for the overlap check; `!is.finite()` on time after the NA check; repeated pairs via `duplicated()` on `factor(id_col)` and `as.numeric(time_col)`. `devtools::test()` clean.
-- [ ] T3: Update the roxygen text and NEWS.md bullet (AC6); `devtools::document()`, reverting any `Config/roxygen2/version` rewrite in DESCRIPTION; `devtools::check(args = "--no-manual")` clean.
+- [x] T3: Update the roxygen text and NEWS.md bullet (AC6); `devtools::document()`, reverting any `Config/roxygen2/version` rewrite in DESCRIPTION; `devtools::check(args = "--no-manual")` clean.
 
 ## Work log
 
@@ -58,6 +58,7 @@
 - 2026-10-17: implement started on branch m157-growth-data-guards, cut from master at 02f052d5.
 - 2026-10-17: T1 done: 9 test blocks appended; before the guards, 17 expectations fail, each as "expected to throw an error" with no error raised (missing guard, not another failure); the no-error, by-number and dataset tests pass. Message wording chosen here: "more than once", "selects the `id`/`time` column", "infinite", "more than one row ... `id` ... `time`".
 - 2026-10-17: T2 done: guards added before scoring; the output-building lines are byte-unchanged (the repeated-pair check builds its own `factor()`/`as.numeric()` copies). Growth tests 144 pass; full `devtools::test()` FAIL 0, WARN 11 (lavaan), SKIP 1, PASS 14489. Plants (in memory, four): raw-id pair check, untruncated scale numbers, make-unique names, no Inf check; each stops refusing its test's input.
+- 2026-10-17: T3 done: roxygen `@param data`/`scales`/`time` (committed with T2) and the NEWS bullet's refusal list name the four new refusals; `document()` changed only `man/ssm_growth_data.Rd` (DESCRIPTION untouched); `devtools::check(args = "--no-manual")` Status OK, 0/0/0. The simple-english lint hook reports 429 hits over the whole of NEWS.md, unchanged by this edit; older entries left as they are.
 
 ## Decisions
 

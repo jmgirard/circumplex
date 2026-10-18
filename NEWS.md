@@ -9,8 +9,13 @@
   coordinates `e`, `x` and `y` into a long table with columns `<id>`,
   `<time>`, `dv` and `value`, one row per input row per coordinate. It
   refuses an `id` or `time` name absent from the data, a non-numeric `time`
-  column, missing values in either, and an `id` or `time` named `dv` or
-  `value` or equal to each other. `ssm_growth_formula()` returns the
+  column, missing values in either, infinite `time` values, and an `id` or
+  `time` named `dv` or `value` or equal to each other. It refuses two rows
+  with the same id and time. It refuses `scales` that select the `id` or
+  `time` column by name or number. It also refuses a column name that
+  occurs more than once in the data when `id`, `time` or a name in `scales`
+  refers to it.
+  `ssm_growth_formula()` returns the
   package's one joint growth model as formula objects for glmmTMB, nlme or
   brms, with the `time` and `id` names substituted. Printing it shows the
   engine's complete fit call on the long table. Below the call it shows the
