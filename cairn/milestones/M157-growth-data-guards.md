@@ -59,6 +59,7 @@
 - 2026-10-17: T1 done: 9 test blocks appended; before the guards, 17 expectations fail, each as "expected to throw an error" with no error raised (missing guard, not another failure); the no-error, by-number and dataset tests pass. Message wording chosen here: "more than once", "selects the `id`/`time` column", "infinite", "more than one row ... `id` ... `time`".
 - 2026-10-17: T2 done: guards added before scoring; the output-building lines are byte-unchanged (the repeated-pair check builds its own `factor()`/`as.numeric()` copies). Growth tests 144 pass; full `devtools::test()` FAIL 0, WARN 11 (lavaan), SKIP 1, PASS 14489. Plants (in memory, four): raw-id pair check, untruncated scale numbers, make-unique names, no Inf check; each stops refusing its test's input.
 - 2026-10-17: T3 done: roxygen `@param data`/`scales`/`time` (committed with T2) and the NEWS bullet's refusal list name the four new refusals; `document()` changed only `man/ssm_growth_data.Rd` (DESCRIPTION untouched); `devtools::check(args = "--no-manual")` Status OK, 0/0/0. The simple-english lint hook reports 429 hits over the whole of NEWS.md, unchanged by this edit; older entries left as they are.
+- 2026-10-17: claim audit pass: 25 claims read, 3 corrected (ids merge by `as.character()` at 15 digits, not by printing; matrix-names comment; test header "where there is one"); the ROADMAP candidate row's "print alike" corrected in place; growth tests 144 pass after `document()`; same reader's one re-read pending.
 
 ## Decisions
 

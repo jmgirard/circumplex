@@ -25,9 +25,11 @@
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
 #'   column. Two rows with the same id and the same time are an error. Ids
-#'   are compared after conversion to a factor, so two numeric ids that
-#'   print alike count as one person. A column name that occurs more than
-#'   once is an error when `id`, `time` or a name in `scales` refers to it.
+#'   are compared after conversion to a factor, which matches them by
+#'   `as.character()` (15 significant digits), so two numeric ids that
+#'   differ only beyond that precision count as one person. A column name
+#'   that occurs more than once is an error when `id`, `time` or a name in
+#'   `scales` refers to it.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in `data` that contain circumplex scales. They may not select
 #'   the `id` or `time` column.
@@ -40,8 +42,8 @@
 #'   each row's time point. A column name, not a number. A column that is
 #'   not numeric (a `Date`, factor or character column, among others) is an
 #'   error, as are missing and infinite values: the growth model fits time
-#'   as a number,
-#'   so the caller chooses its origin and unit. `id` and `time` must differ
+#'   as a number, so the caller chooses its origin and unit. `id` and `time`
+#'   must differ
 #'   from each other and from `dv` and `value`, the two column names the
 #'   output reserves.
 #' @return A data frame with `3 * nrow(data)` rows and four columns, named
@@ -63,8 +65,8 @@
 ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
 
   stopifnot(is.data.frame(data) || is.matrix(data))
-  # Column names are read before a matrix is converted, so a duplicated name
-  # is judged as the caller wrote it.
+  # as.data.frame() keeps a matrix's column names as written, duplicates
+  # included, so these are the names the checks below judge.
   data_names <- colnames(data)
   if (is.matrix(data)) data <- as.data.frame(data)
   stopifnot(is_var(scales))
@@ -139,7 +141,7 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
 
   # One row per person per time point, judged on the id and time as the
   # output holds them: factor() maps ids through as.character(), so two
-  # doubles that print alike are one person in the table.
+  # doubles equal to 15 significant digits are one person in the table.
   id_out <- factor(id_col)
   time_out <- as.numeric(time_col)
   repeated <- duplicated(data.frame(id_out, time_out))

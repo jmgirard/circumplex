@@ -178,8 +178,9 @@ test_that("ssm_growth_data returns an empty long table for zero rows", {
 })
 
 # Input guards (M157) ---------------------------------------------------------
-# Each refusal's message names its argument and the offending column or value;
-# the tests assert that text, so a refusal from elsewhere cannot pass for it.
+# Each refusal's message names its argument and, where there is one, the
+# offending column or value; the tests assert that text, so a refusal from
+# elsewhere cannot pass for it.
 
 test_that("ssm_growth_data refuses a referenced column name that occurs twice", {
   data("simulated_growth")
@@ -309,8 +310,9 @@ test_that("ssm_growth_data refuses two rows for one person at one time", {
       label = kind
     )
   }
-  # Double ids that differ in the last bits but print alike become one factor
-  # level in the output, so they are one person there and are refused.
+  # Double ids that differ in the last bits but share one as.character() form
+  # become one factor level in the output, so they are one person there and
+  # are refused.
   d <- base
   d$person <- c(1, 0.1 + 0.2, 0.3)
   expect_false(identical(d$person[2], d$person[3]))
