@@ -78,8 +78,9 @@ test_that("check_scales_selection names the argument and source it is given", {
 it_tidy_cases <- function() it_cases()[c("score", "ipsatize", "self_standardize")]
 
 test_that("score refuses a repeated item instead of shifting the scales", {
-  # Before the guard, items = c(1, 1:32) moved every item one place on, so
-  # each octant was scored from the next octant's items with no message
+  # Before the guard, items = c(1, 1:32) moved every later item one place on,
+  # so BC to NO were each scored from the previous octant's items (and PA
+  # from IIP01 and three NO items), with no message
   expect_error(score(raw_iipsc, c(1, 1:32), instrument = iipsc),
                "`items` selects the column \"IIP01\" more than once.",
                fixed = TRUE)

@@ -2,8 +2,9 @@
 # test-scales-selection.R (M159), test-items-selection.R (M160) and the
 # export-listing test there.
 
-# One case per data-selecting export with a `scales` argument: its data, the
-# positions of PA..NO in that data, and a call taking (data, scales). `key`
+# One case per data-selecting export with a `scales` argument, except
+# self_standardize(), which is in it_cases() below: its data, the positions
+# of PA..NO in that data, and a call taking (data, scales). `key`
 # extracts the part of the result that a probe compares, leaving out the
 # stored call.
 sel_frame <- function() jz2017[1:300, c("Gender", PANO())]

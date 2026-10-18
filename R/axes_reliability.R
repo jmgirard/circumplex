@@ -574,7 +574,9 @@ axes_resolve_map <- function(data, items, angles, instrument,
     stopifnot(is.numeric(angles), length(angles) == length(items))
     for (sel in items) axes_check_items(data, sel, where)
     # Each scale's own repeats are refused above, so a name reached twice
-    # here sits under two scales, where the model would give it two loadings
+    # here sits under two scales. The duplicated column makes the item
+    # correlation matrix singular, which used to stop the fit with a
+    # positive-definiteness error that did not name the item.
     reached <- unlist(lapply(items, axes_colnames, data = data))
     reached <- reached[!is.na(reached) & reached %in% colnames(data)]
     across <- anyDuplicated(reached)
