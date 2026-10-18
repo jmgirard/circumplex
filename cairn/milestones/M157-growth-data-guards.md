@@ -89,6 +89,7 @@ spawned: diff-bug, blame-history, prior-review
 - blame-history #1: the help page states that ids equal to 15 digits count as one person, while the new candidate row calls that merge open — follow-up, absorbed into "Growth id and scales edge inputs" (a guard there would rewrite that help text). The help text states current behavior, as the claim audit required.
 - blame-history #2: the help page does not say time values are compared exactly — fix now (`@param data`), fixed 46967fc9.
 - Fix verification: the three new regression inputs run against the pre-fix function give no error, a false "selects the `id` column", and the duplicate-name message for `NA`, so each new expectation fails before the fix; growth tests 148 pass after it; `document()` 0 `resolve link` lines.
+- Full check at review on `46967fc9` (after the fixes): `devtools::check()` Status OK, 0 errors, 0 warnings, 0 notes (the run started before the fixes was stopped and not read).
 - blame-history #3: the code uses `is.infinite()` after `anyNA()` where T2 named `!is.finite()` — reject, false: together they refuse exactly the non-finite set.
 - blame-history #4: NEWS line break after the refusal list — reject, style.
 - prior-review #1: the bundled-dataset test derives its expected values from `ssm_parameters_id()`, the scorer the function wraps — reject, planned change (AC5 names this evidence; the scorer has its own oracle tests).
