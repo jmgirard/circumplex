@@ -340,8 +340,11 @@ test_that("ssm_growth_data refuses two rows for one person at one time", {
 
 test_that("ssm_growth_data refuses distinct ids that become one output level", {
   data("simulated_growth")
-  base <- simulated_growth[c(1, 2, 3), ]
-  pattern <- "`id` values in rows 2 and 3 differ but share the label \"0.3\""
+  # Row names 10, 20 and 30 differ from the positions the message reports.
+  base <- simulated_growth[c(10, 20, 30), ]
+  expect_identical(rownames(base), c("10", "20", "30"))
+  rows <- "`id` values in rows 2 and 3 of `data` (by position, not row name)"
+  pattern <- paste0(rows, " differ but share the label \"0.3\"")
   # Double ids that differ in the last bits but share one as.character() form
   # would become one factor level in the output. The check runs before the
   # repeated-row check, so the same-time pair gets this message too.
@@ -352,14 +355,15 @@ test_that("ssm_growth_data refuses distinct ids that become one output level", {
     d$person <- dbl
     d$wave <- waves
     expect_error(ssm_growth_data(d, PANO(), id = "person", time = "wave"),
-                 pattern)
+                 pattern, fixed = TRUE)
   }
   d <- base
   d$person <- complex(real = dbl)
   d$wave <- c(0, 0, 1)
   expect_false(identical(d$person[2], d$person[3]))
   expect_error(ssm_growth_data(d, PANO(), id = "person", time = "wave"),
-               "`id` values in rows 2 and 3 differ but share the label \"0.3\\+0i\"")
+               paste0(rows, " differ but share the label \"0.3+0i\""),
+               fixed = TRUE)
 })
 
 test_that("ssm_growth_data accepts ids that keep one level per distinct value", {
@@ -368,6 +372,7 @@ test_that("ssm_growth_data accepts ids that keep one level per distinct value", 
   n_persons <- length(unique(d$person))
   ids <- list(
     integer = d$person,
+    double = as.numeric(d$person),
     character = paste0("p", d$person),
     factor = factor(d$person)
   )
@@ -376,7 +381,7 @@ test_that("ssm_growth_data accepts ids that keep one level per distinct value", 
     long <- ssm_growth_data(d, PANO(), id = "person", time = "wave")
     expect_identical(nlevels(long$person), n_persons, label = kind)
   }
-  # Two doubles that differ within 15 significant digits stay two levels, and
+  # Two doubles that differ at the 15th significant digit stay two levels, and
   # 0 and -0 are one value, so they are one level and no error.
   base <- simulated_growth[1:3, ]
   base$wave <- c(0, 0, 1)
@@ -408,8 +413,15 @@ test_that("ssm_growth_data refuses scales that select one column twice", {
       label = kind
     )
   }
+  # The id column selected twice gets the more specific id message.
+  expect_error(
+    ssm_growth_data(d, c("person", "person", PANO()[3:8]), id = "person",
+                    time = "wave"),
+    "`scales` selects the `id` column: \"person\"."
+  )
   # Scales that reach no column are left to the scorer.
   no_col <- list(na_name = c(NA_character_, NA_character_, PANO()[3:8]),
+                 absent_name = c("zzz", "zzz", PANO()[3:8]),
                  beyond = c(99, 99, 5:10))
   for (kind in names(no_col)) {
     expect_error(

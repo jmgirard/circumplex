@@ -122,11 +122,17 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
   } else {
     names(data)[seq_along(data)[scales]]
   }
+  if (id %in% scale_cols) {
+    stop("`scales` selects the `id` column: \"", id, "\".", call. = FALSE)
+  }
+  if (time %in% scale_cols) {
+    stop("`scales` selects the `time` column: \"", time, "\".", call. = FALSE)
+  }
   # One column selected twice would enter the profile at two angles. Names
-  # are judged as given and numbers by the position they reach; an NA name
-  # or a number that reaches no column is left to the scorer's error.
+  # are judged by name and numbers by the position they reach; a name or a
+  # number that reaches no column (NA included) is left to the scorer's error.
   scale_keys <- if (is.character(scales)) {
-    scales[!is.na(scales)]
+    scales[!is.na(scales) & scales %in% data_names]
   } else {
     pos <- seq_along(data)[scales]
     pos[!is.na(pos)]
@@ -137,12 +143,6 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     if (is.numeric(col)) col <- data_names[[col]]
     stop("`scales` selects the column \"", col, "\" more than once.",
          call. = FALSE)
-  }
-  if (id %in% scale_cols) {
-    stop("`scales` selects the `id` column: \"", id, "\".", call. = FALSE)
-  }
-  if (time %in% scale_cols) {
-    stop("`scales` selects the `time` column: \"", time, "\".", call. = FALSE)
   }
 
   id_col <- data[[id]]
@@ -177,7 +177,7 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     clash <- which(duplicated(labels))[[1]]
     rows <- sort(first_rows[labels == labels[[clash]]])[1:2]
     stop("`id` values in rows ", rows[[1]], " and ", rows[[2]],
-         " differ but share the label \"", labels[[clash]],
+         " of `data` (by position, not row name) differ but share the label \"", labels[[clash]],
          "\" in the output, so two persons would become one; give each ",
          "person an id that stays distinct as text.", call. = FALSE)
   }
