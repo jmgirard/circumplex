@@ -91,10 +91,13 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: T8 in progress (checkpoint): T8 added for review return 1, Coverage lines for AC1, AC3, AC5, AC6, AC7 extended to it (minor amendment). Code and tests written: `axes_reliability()` refusals now run over six ways in (flat and list, by data frame, matrix and `cormat`); `ssm_sem()` takes scale names from `scales` itself when they are names, with a test that fails before the fix (no grouping-drop message before the refusal); the lavaan-less listing branch names the three lavaan exports and asserts set equality; NEWS `score()` sentence corrected (checked against master: a repeat at the end changes nothing, at item 32 only NO) and the bullets spaced. Both selection files: 0 failures (114 and 223 passes, NOT_CRAN). Full suite and check running.
 - 2026-10-18: T8 done at 12ec3db6: `devtools::test()` 0 failures, 14848 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 - 2026-10-18: review return 2: AC1 fails as written: the cross-scale refusal (part of AC1's third form for the list form) has no matrix-`data` test (diff-bug pass 2 #2). Fix-now items ride the return: factor list elements, the two pass-1 follow-ups into "Selection guard remainders", NEWS `score()` and `axes_reliability()` wording, the measures message, full matrix cases for the tidying functions, T8's task text, the `score()` help reason (pass 2 diff-bug #1, #3 to #9).
+- 2026-10-18: step-7 approval: m160-items-selection-guards approved for merge, with the option "Merge, record decision"; D-065 written before the push.
 - 2026-10-18: T9 in progress (checkpoint): T9 added and T8's task text corrected (minor amendments); Coverage for AC1, AC5, AC6, AC7 extended to T9. Matrix cross-scale test; the tidying refusal tests loop every form and value over data-frame and matrix `data`; `axes_check_items()` judges a factor as its labels (the new test fails without it); measures message reworded to "which is the name of one of the scales; each measure must have a name of its own"; NEWS and the `score()` help reworded; follow-ups (v) and (vi) added to "Selection guard remainders". Both selection files: 0 failures (131 and 223 passes, NOT_CRAN). Full suite and check running.
 - 2026-10-18: T9 done at 41358fad: `devtools::test()` 0 failures, 14865 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 
 ## Decisions
+
+- 2026-10-18: at the merge question the user chose to record the no-warning refusal of forms with a defined result (`score()` with `0`, `ipsatize()` with `-1`, a repeated column in `self_standardize()`) as a decision entry: promoted to D-065 in cairn/DECISIONS.md.
 
 ## Review
 

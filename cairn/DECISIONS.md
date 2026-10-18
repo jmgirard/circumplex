@@ -2355,3 +2355,40 @@ growth vignette is rewritten on the three exports in M153.
 traceable to the pasted call, reopen the fitter. A user design the fixed
 model cannot express that the coverage oracle later validates reopens the
 builder's options.
+
+### D-065 (2026-10-18): a column selection that repeats a column, holds a position below 1, or names a duplicated column is a wrong-object input, refused at once with no deprecation cycle, also where it gives a defined result today — a GP4 reading under GP2, covering M159 and M160 (M160 merge gate)
+
+**Context.** M159 refused three selection forms in every export's `scales`
+argument, and M160 extends the refusal to `items` in `score()`, `ipsatize()`
+and `axes_reliability()` and to `scales` in `self_standardize()`. Most refused
+inputs give a wrong result today: a repeated item shifts `score()`'s
+positional key, counts twice in `ipsatize()`'s row mean, or makes
+`axes_reliability()` read another column. Some give a defined result: a `0`
+that R drops, a negative number that selects by exclusion, and a repeated
+column in `self_standardize()`, which returns two z-score columns. GP4 binds
+after v2.0.0. It allows a break only with a statistical cause or a gated
+decision, with a deprecation cycle. M159 left `self_standardize()` out on GP2
+grounds for that reason, and neither milestone recorded a decision entry.
+
+**Decision.** The three forms are wrong-object inputs under GP2, whatever
+result they happen to give. A selection argument names columns. A position
+below 1 is not a column, and a repeat or a duplicated name does not say which
+column is meant. The exports refuse them with an error that names the cause,
+with no deprecation cycle. Each refusal ships in NEWS.md under "Breaking
+changes". This is a GP4 reading, not a change to GP4: other breaks still
+need their own statistical cause or gate.
+
+**Rejected.** A one-release deprecation warning for the forms with a defined
+result. It would keep the selection by exclusion and the double column
+working for a release, and split one rule across two behaviors, for inputs
+no documented analysis uses. Leaving the choice in the milestone work logs
+alone, as M159 did, was also rejected: past GP4 readings (D-039, D-040,
+D-056) each have an entry.
+
+**Consequences.** The M159 and M160 refusals stand under this entry. A later
+selection guard of the same three forms on another argument inherits it.
+A guard that refuses any other input, such as a number past the last column
+or an `NA`, does not inherit it and needs its own gate.
+
+**Reopens.** A user report of a defensible analysis that relies on one of the
+three forms.
