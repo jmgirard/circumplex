@@ -1487,6 +1487,10 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
 
   if (is.matrix(data)) data <- as.data.frame(data)
   check_scales_selection(data, scales)
+  check_measures_not_scales(
+    if (is.numeric(measures)) names(data)[measures] else measures,
+    names(data)[seq_len(ncol(data))[scales]]
+  )
 
   # Drop observations with missing grouping values (mirrors ssm_analyze())
   if (!is.null(grouping)) {

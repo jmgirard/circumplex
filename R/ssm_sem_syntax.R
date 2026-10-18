@@ -274,6 +274,7 @@ ssm_sem_syntax <- function(instrument = NULL, scales = NULL, angles = NULL,
   ra <- sem_resolve_scales_angles(instrument, scales, angles)
   scales <- ra$scales
   angles_deg <- ra$angles
+  check_measures_not_scales(measures, scales)
   p <- length(scales)
   m <- length(measures)
   th <- as.numeric(as_radian(as_degree(angles_deg)))

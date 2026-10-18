@@ -290,6 +290,9 @@ check_scales_positions <- function(scales, arg = "scales") {
 # two angles. `what` names the source in the message, and `hint`, when
 # given, is appended to it.
 check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
+  if (sum(is.na(scales)) > 1) {
+    stop(what, " lists NA more than once.", hint, call. = FALSE)
+  }
   labels <- scales[!is.na(scales)]
   repeated <- anyDuplicated(labels)
   if (repeated > 0) {
@@ -297,6 +300,21 @@ check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
          call. = FALSE)
   }
   invisible(scales)
+}
+
+# Refuse a `measures` entry that carries the name of a scale, for the SEM
+# functions, where lavaan reaches every variable by name. The data would hold
+# two columns with that name, and the syntax would give the one variable
+# lavaan reads two roles: indicator of the scale factors and outside measure.
+# `measures` and `scale_names` are names; NA entries pass through.
+check_measures_not_scales <- function(measures, scale_names) {
+  hit <- measures[!is.na(measures) & measures %in% scale_names]
+  if (length(hit) > 0) {
+    stop("`measures` names \"", hit[[1]], "\", which is also one of the ",
+         "scales; a measure must be a variable other than the scales.",
+         call. = FALSE)
+  }
+  invisible(measures)
 }
 
 # Display columns, which is what a console line budget is spent in. Every

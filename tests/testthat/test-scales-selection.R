@@ -354,3 +354,80 @@ test_that("every export with a scales or items argument refuses a repeat", {
     expect_true(all(names(fired) %in% found))
   }
 })
+
+# Loose ends from the M159 review (M160) ---------------------------------------
+
+test_that("ssm_analyze_long refuses numbers reaching two same-named columns", {
+  d <- sel_long()
+  d2 <- cbind(d, PA = d$PA)
+  expect_identical(sum(names(d2) == "PA"), 2L)
+  # Columns 3 and 11 are both named PA. Before the guard, the wide reshape
+  # named both blocks PA__T1, and the error spoke of overlapping occasions.
+  err <- expect_error(
+    ssm_analyze_long(d2, c(3, 11, 5:10), id = "id", occasion = "occasion",
+                     boots = 20),
+    paste0("`scales` selects two columns named \"PA\"; ssm_analyze_long() ",
+           "reshapes the scores by scale name"),
+    fixed = TRUE
+  )
+  expect_no_match(conditionMessage(err), "overlapping")
+  # One number reaching the second PA column alone is still accepted
+  skip_on_cran()
+  set.seed(1)
+  a <- suppressMessages(ssm_analyze_long(d2, c(11, 4:10), id = "id",
+                                         occasion = "occasion", boots = 20))
+  set.seed(1)
+  b <- suppressMessages(ssm_analyze_long(d, 3:10, id = "id",
+                                         occasion = "occasion", boots = 20))
+  expect_equal(a$results, b$results)
+})
+
+test_that("the label paths refuse NA listed more than once", {
+  na_labels <- c(PANO()[1:6], NA, NA)
+  expect_error(check_scales_labels(na_labels),
+               "`scales` lists NA more than once.", fixed = TRUE)
+  # One NA is not a repeat, and passes to the caller as before
+  expect_invisible(check_scales_labels(c(PANO()[1:7], NA)))
+  expect_error(ssm_sem_syntax(scales = na_labels, angles = octants()),
+               "`scales` lists NA more than once.", fixed = TRUE)
+  R <- stats::cor(sel_frame()[PANO()])
+  R2 <- R
+  dimnames(R2) <- list(na_labels, na_labels)
+  expect_error(cpm_fit(cormat = R2, n = 300),
+               paste0("`colnames(cormat)` lists NA more than once. ",
+                      "Supply unique labels through `scales`."),
+               fixed = TRUE)
+  expect_error(cpm_fit(cormat = R, n = 300, scales = na_labels),
+               "`scales` lists NA more than once.", fixed = TRUE)
+  skip_if_not_installed("lavaan")
+  fit <- suppressWarnings(lavaan::cfa("f =~ PA + BC + DE + FG",
+                                      data = sel_frame()))
+  expect_error(ssm_sem_parameters(fit, scales = na_labels, measures = "PA"),
+               "`scales` lists NA more than once.", fixed = TRUE)
+})
+
+test_that("ssm_sem_syntax refuses a measure that is also a scale", {
+  msg <- paste0("`measures` names \"PA\", which is also one of the scales; ",
+                "a measure must be a variable other than the scales.")
+  expect_error(ssm_sem_syntax(scales = PANO(), angles = octants(),
+                              measures = "PA"), msg, fixed = TRUE)
+  # The scale labels may come from an instrument
+  expect_error(ssm_sem_syntax(instrument = iipsc, measures = c("NARPD", "PA")),
+               msg, fixed = TRUE)
+  # A measure with its own name is accepted
+  expect_type(ssm_sem_syntax(scales = PANO(), angles = octants(),
+                             measures = "NARPD"), "character")
+})
+
+test_that("ssm_sem refuses a measure that is also a scale", {
+  skip_if_not_installed("lavaan")
+  d <- jz2017[1:300, ]
+  msg <- "`measures` names \"PA\", which is also one of the scales"
+  # By name, and by a number that selects the scale's own column
+  expect_error(ssm_sem(d, PANO(), measures = c("PA", "NARPD")), msg,
+               fixed = TRUE)
+  expect_error(ssm_sem(d, 2:9, measures = 2), msg, fixed = TRUE)
+  # By a number reaching another column that carries a scale's name
+  d2 <- cbind(d, PA = d$NARPD)
+  expect_error(ssm_sem(d2, 2:9, measures = ncol(d2)), msg, fixed = TRUE)
+})
