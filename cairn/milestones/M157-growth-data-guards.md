@@ -1,13 +1,13 @@
 # M157: Input guards for ssm_growth_data()
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2
 - **Resolves:** —
 - **Surface tier:** user-facing — new refusals in an exported function
-- **Branch/PR:** —
+- **Branch/PR:** m157-growth-data-guards
 
 ## Goal
 
@@ -39,7 +39,7 @@
 
 ## Tasks
 
-- [ ] T1: Write the failing tests in `tests/testthat/test-ssm_growth_data.R` for AC1 to AC4, each asserting the message pattern that names its argument and the offending column or value; add the no-error cases, the `scales = 3:10` equivalence test, and the two bundled-dataset value tests (AC5). Run them and confirm the refusal tests fail for the missing guard, not another error.
+- [x] T1: Write the failing tests in `tests/testthat/test-ssm_growth_data.R` for AC1 to AC4, each asserting the message pattern that names its argument and the offending column or value; add the no-error cases, the `scales = 3:10` equivalence test, and the two bundled-dataset value tests (AC5). Run them and confirm the refusal tests fail for the missing guard, not another error.
 - [ ] T2: Add the guards in `R/ssm_growth_data.R` before scoring (current lines 60-94): duplicate-name check on the column names of `data` before matrix conversion; numeric `scales` resolved as `seq_along(data)[scales]` for the overlap check; `!is.finite()` on time after the NA check; repeated pairs via `duplicated()` on `factor(id_col)` and `as.numeric(time_col)`. `devtools::test()` clean.
 - [ ] T3: Update the roxygen text and NEWS.md bullet (AC6); `devtools::document()`, reverting any `Config/roxygen2/version` rewrite in DESCRIPTION; `devtools::check(args = "--no-manual")` clean.
 
@@ -55,6 +55,8 @@
 - 2026-10-17: criteria audit (full mode, fresh Opus reader) returned 8 findings, all taken: AC4 equality now as the output holds it, with id types varied (F1); GP2 basis written into Scope (F2); AC2 adds double and truncated numbers and a positive by-number test (F3); AC1 matrix premise corrected, numeric-scales case stated (F4, F5); AC5 restated as a code property with tests as evidence (F6); AC3 no finding (F7); AC6 names the `scales` param text (F8). Double-id merging and names repeated inside `scales` went to a new candidate row.
 - 2026-10-17: ROADMAP line cap: the M154 terminal row was pruned (archive file kept) so the M157 row and the new candidate row fit under 60 lines.
 - 2026-10-17: no oracle needed: the guards change no computed value; AC5's value tests derive from `ssm_parameters_id()`. No issue in Resolves, so no assignment option.
+- 2026-10-17: implement started on branch m157-growth-data-guards, cut from master at 02f052d5.
+- 2026-10-17: T1 done: 9 test blocks appended; before the guards, 17 expectations fail, each as "expected to throw an error" with no error raised (missing guard, not another failure); the no-error, by-number and dataset tests pass. Message wording chosen here: "more than once", "selects the `id`/`time` column", "infinite", "more than one row ... `id` ... `time`".
 
 ## Decisions
 

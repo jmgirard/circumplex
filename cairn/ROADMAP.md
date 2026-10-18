@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-17 (lessons triage: dropped the 2026-08-22 (M104) "
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M157 | Input guards for ssm_growth_data() | planned | — | normal | milestones/M157-growth-data-guards.md |
+| M157 | Input guards for ssm_growth_data() | in-progress | — | normal | milestones/M157-growth-data-guards.md |
 | M156 | Peer-review status notices on the four package-original vignettes | done | — | normal | milestones/archive/M156-peer-review-notices.md |
 | M155 | The trajectory caution by input shape, and the bootstrap path into the helper | done | — | normal | milestones/archive/M155-trajectory-caution-and-bootstrap.md |
 
