@@ -1,6 +1,6 @@
 # M160: Selection guards for items and the remaining column arguments
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -89,6 +89,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: review return 1: AC1 fails as written. It requires matrix `data` for every form and both paths for each form, but `test-items-selection.R` tests matrix `data` for `axes_reliability()` only in the repeated-name form, and has no flat-form `cormat` case for the repeated-name and number-to-repeated-name refusals (diff-bug #2). Fix-now items ride the same return: `ssm_sem()`'s measures check reads all-NA scale names for character `scales` (diff-bug #1, prior-review #1, blame-history #3); the lavaan-less branch of the export-listing test checks one direction only (blame-history #2); NEWS says each scale was scored from the wrong items, which holds only for scales after the repeat (diff-bug #3); NEWS bullets lack a blank line (diff-bug #7).
 - 2026-10-18: T8 in progress (checkpoint): T8 added for review return 1, Coverage lines for AC1, AC3, AC5, AC6, AC7 extended to it (minor amendment). Code and tests written: `axes_reliability()` refusals now run over six ways in (flat and list, by data frame, matrix and `cormat`); `ssm_sem()` takes scale names from `scales` itself when they are names, with a test that fails before the fix (no grouping-drop message before the refusal); the lavaan-less listing branch names the three lavaan exports and asserts set equality; NEWS `score()` sentence corrected (checked against master: a repeat at the end changes nothing, at item 32 only NO) and the bullets spaced. Both selection files: 0 failures (114 and 223 passes, NOT_CRAN). Full suite and check running.
 - 2026-10-18: T8 done at 12ec3db6: `devtools::test()` 0 failures, 14848 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
+- 2026-10-18: review return 2: AC1 fails as written: the cross-scale refusal (part of AC1's third form for the list form) has no matrix-`data` test (diff-bug pass 2 #2). Fix-now items ride the return: factor list elements, the two pass-1 follow-ups into "Selection guard remainders", NEWS `score()` and `axes_reliability()` wording, the measures message, full matrix cases for the tidying functions, T8's task text, the `score()` help reason (pass 2 diff-bug #1, #3 to #9).
 
 ## Decisions
 
@@ -109,3 +110,20 @@ Pass 1 (2026-10-18, branch head 4866c2ce). spawned: diff-bug, blame-history, pri
 - blame-history #4: one NA label passes while two are refused — reject (planned change; single NA is in Out).
 - blame-history #5: a number reaching a repeated name is accepted in three functions and refused in `axes_reliability()` — reject (planned change, recorded at the plan gate).
 - prior-review #1: same as diff-bug #1 — fix now. The lens found no past review point reintroduced; the PR-comment probe returned no comments.
+- Pass 1 fix-now items fixed 12ec3db6 (diff-bug #1, #2 in part, #3, #7; blame-history #2, #3; prior-review #1).
+
+Pass 2 (2026-10-18, branch head 11306c63). spawned: diff-bug, blame-history, prior-review. The evidence run was stopped for return 2, so no criterion is ticked in this pass.
+
+- diff-bug #1: a factor element in `axes_reliability()`'s list form is judged by its integer codes, so the new message can name the wrong column, and a factor reaching a repeated name passes — fix now (judge factors as names, as `axes_colnames()` already resolves them).
+- diff-bug #2: the cross-scale refusal has no matrix-`data` test, which AC1's third form requires — fix now via review return 2 (AC1 fails as written).
+- diff-bug #3: pass-1 follow-ups #4 and #5 not yet in the row "Selection guard remainders" — fix now (written on the branch).
+- diff-bug #4: the NEWS `score()` sentence describes an inserted repeat only, not one that replaces an entry — fix now.
+- diff-bug #5: the NEWS reason for the `axes_reliability()` number refusal does not cover a number reaching the first same-named column — fix now.
+- diff-bug #6: the measures message says the entry "is also one of the scales" when it is a different column with a scale's name — fix now.
+- diff-bug #7: matrix cases for the three tidying functions fire one value per form — fix now (every form and value on both shapes).
+- diff-bug #8: T8's task line names `names(data[scales])`, which the code does not use — fix now (task text).
+- diff-bug #9: the `score()` help gives a by-position reason for all three refusals — fix now.
+- blame-history #1: GP4 binds after v2.0.0, and past GP4 readings (D-039, D-040, D-056) each have a decision entry; M160 refuses forms with a defined result with no entry and no warning period — put to the user at the merge question (record a decision entry, or warn first for those forms).
+- blame-history #2: M160 reverses M159's GP2 exclusion of `self_standardize()` without answering its reason — same disposition as blame-history #1 (one decision covers both).
+- blame-history #3: the plan's falsifier (a defensible analysis that repeats an item) is not checked for `ipsatize()` — reject (false): a repeat changes every row mean and gives two output columns with one name, so no analysis relies on it; the merge question names this.
+- prior-review: nothing reintroduced (probe returned no PR comments; M59, M119, M142, M148, M157, M25 points checked intact). Weak analog on check order in `ssm_analyze_long()` — reject (false): the order is inherited from master's `check_scales_selection()` call.
