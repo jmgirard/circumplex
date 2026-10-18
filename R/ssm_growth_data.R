@@ -25,15 +25,16 @@
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
 #'   column. Two rows with the same id and the same time are an error. Time
-#'   values are compared exactly, with no rounding. Ids
-#'   are compared after conversion to a factor, which matches them by
-#'   `as.character()` (15 significant digits), so two numeric ids that
-#'   differ only beyond that precision count as one person. A column name
-#'   that occurs more than once is an error when `id`, `time` or a name in
-#'   `scales` refers to it.
+#'   values are compared exactly, with no rounding. The output's id is a
+#'   factor, which labels each value by `as.character()` (15 significant
+#'   digits for a number). Two distinct ids that share a label, such as
+#'   `0.1 + 0.2` and `0.3`, are an error. A column name that occurs more
+#'   than once is an error when `id`, `time` or a name in `scales` refers
+#'   to it.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in `data` that contain circumplex scales. They may not select
-#'   the `id` or `time` column.
+#'   the `id` or `time` column, and they may not select one column more
+#'   than once.
 #' @param angles Optional. A numeric vector containing the angular
 #'   displacement of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`).
