@@ -94,6 +94,7 @@
 - 2026-10-17: claim audit: 27 claims read, 2 corrected — R/ssm_growth_data.R, man/ssm_growth_data.Rd (the "15 significant digits" text now says "for most numbers, though a large whole number can keep more", since `as.character(1234567890123456)` keeps 16 digits; the same reader re-read both fixes as correct). LESSONS.md's M157 line states the same 15-digit rule unqualified; correct it in place at review hygiene.
 - 2026-10-17: T4 done: devtools::test() FAIL 0, WARN 11, SKIP 1, PASS 14507 (the growth file alone: WARN 0); devtools::check(--no-manual) 0 errors, 0 warnings, 0 notes, built after the claim-audit fix. Status set to review.
 - 2026-10-17: review pass 1: AC1-AC4 evidenced and ticked, gate clean; 18 findings settled (8 fixed in caa3020c, 3 to a new candidate row, 7 rejected); AC5's fresh test and check run in progress (checkpoint, AC5 not yet verified).
+- 2026-10-17: step-7 approval: m158-growth-id-scales-guards approved for merge
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
