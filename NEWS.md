@@ -9,8 +9,8 @@
   or selected columns by exclusion. A name that occurs more than once in
   `data` used the first column with that name. The refusals apply to
   `ssm_analyze()`, `ssm_analyze_long()`, `ssm_score()`,
-  `ssm_parameters_id()`, `ssm_sem()`, `cpm_fit()`, `fit_structure()`,
-  `norm_standardize()` and `ssm_growth_data()`. A character `occasions` block
+  `ssm_parameters_id()`, `ssm_sem()`, `cpm_fit()`, `fit_structure()` and
+  `norm_standardize()`. A character `occasions` block
   in `ssm_analyze()` must not name a column whose name repeats either. A
   number that selects such a column is still accepted. `ssm_sem_parameters()`,
   `ssm_sem_syntax()` and the `cormat` path of `cpm_fit()` refuse a label
@@ -29,8 +29,8 @@
   `time` named `dv` or `value` or equal to each other. It refuses two rows
   with the same id and time. It refuses two distinct ids that share one
   text label in the output, such as `0.1 + 0.2` and `0.3`. It refuses `scales`
-  that select the `id` or `time` column by name or number, or that select
-  one column more than once. It also refuses a column name that
+  that select the `id` or `time` column by name or number, that select
+  one column more than once, or that hold a number below 1. It also refuses a column name that
   occurs more than once in the data when `id`, `time` or a name in `scales`
   refers to it. It refuses an `id` that names a list column.
   `ssm_growth_formula()` returns the

@@ -104,8 +104,9 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     stop("`time` names a column that occurs more than once in `data`: \"",
          time, "\".", call. = FALSE)
   }
-  # A position below 1 would select by exclusion below, so it is refused
-  # before the columns that `scales` reaches are resolved.
+  # A position below 1 would drop an entry (0, 0.5) or select by exclusion
+  # (a negative) below, so it is refused before the columns that `scales`
+  # reaches are resolved.
   check_scales_positions(scales)
 
   # The column each scale reaches, by name or by position; indexing
