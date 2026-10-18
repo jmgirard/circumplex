@@ -8,45 +8,7 @@
 # the last column) keep the result or error they gave before the guards
 # (71d44034); each expected message below was recorded at that commit.
 
-# One case per function: its data, a valid numeric selection, its argument
-# name, and a call taking (data, selection). axes_reliability() is probed on
-# its list form here, with the selection standing for the first scale's items.
-it_axes_map <- function(first) {
-  map <- split(seq_len(32), rep(1:8, each = 4))
-  map[[1]] <- first
-  unname(map)
-}
-
-it_cases <- function() {
-  list(
-    score = list(
-      data = raw_iipsc, pos = 1:32, arg = "items",
-      call = function(d, s) score(d, s, instrument = iipsc)
-    ),
-    ipsatize = list(
-      data = raw_iipsc, pos = 1:32, arg = "items",
-      call = function(d, s) ipsatize(d, s)
-    ),
-    self_standardize = list(
-      data = aw2009, pos = 1:8, arg = "scales",
-      call = function(d, s) self_standardize(d, s)
-    ),
-    axes_reliability = list(
-      data = simulated_items, pos = 1:4, arg = "items", lavaan = TRUE,
-      call = function(d, s) {
-        axes_reliability(d, it_axes_map(s), angles = octants())
-      }
-    )
-  )
-}
-
-it_run <- function(case, d, s) {
-  suppressWarnings(suppressMessages(case$call(d, s)))
-}
-
-it_skip_lavaan <- function(case) {
-  if (isTRUE(case$lavaan)) skip_if_not_installed("lavaan")
-}
+# The case tables (it_cases() and friends) are in helper-selection.R.
 
 # The comparable part of a result: axes_reliability() stores its call
 it_key <- function(x) if (is.data.frame(x)) x else x$results

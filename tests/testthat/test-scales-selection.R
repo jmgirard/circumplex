@@ -7,87 +7,7 @@
 # last column) keep the result or error they gave before the guards
 # (447a74dd); each expected message below was recorded at that commit.
 
-# One case per data-selecting export: its data, the positions of PA..NO in
-# that data, and a call taking (data, scales). `key` extracts the part of the
-# result that a probe compares, leaving out the stored call.
-sel_frame <- function() jz2017[1:300, c("Gender", PANO())]
-
-sel_long <- function() {
-  set.seed(159)
-  out <- data.frame(id = rep(1:60, each = 2),
-                    occasion = rep(c("T1", "T2"), 60))
-  cbind(out, as.data.frame(matrix(rnorm(960), 120, 8,
-                                  dimnames = list(NULL, PANO()))))
-}
-
-# The columns an appending export adds, leaving out the input columns, so a
-# comparison is not thrown off by an extra input column
-sel_new_columns <- function(x) x[!(names(x) %in% c("Gender", PANO()))]
-
-sel_cases <- function() {
-  list(
-    ssm_analyze = list(
-      data = sel_frame(), pos = 2:9,
-      call = function(d, s) ssm_analyze(d, s, boots = 20),
-      key = function(x) x$results
-    ),
-    ssm_analyze_long = list(
-      data = sel_long(), pos = 3:10,
-      call = function(d, s) ssm_analyze_long(d, s, id = "id",
-                                             occasion = "occasion",
-                                             boots = 20),
-      key = function(x) x$results
-    ),
-    ssm_score = list(
-      data = sel_frame(), pos = 2:9,
-      call = function(d, s) ssm_score(d, s),
-      key = sel_new_columns
-    ),
-    ssm_parameters_id = list(
-      data = sel_frame(), pos = 2:9,
-      call = function(d, s) ssm_parameters_id(d, s),
-      key = function(x) x
-    ),
-    ssm_growth_data = list(
-      data = simulated_growth, pos = 3:10,
-      call = function(d, s) ssm_growth_data(d, s, id = "person",
-                                            time = "wave"),
-      key = function(x) x
-    ),
-    ssm_sem = list(
-      data = sel_frame(), pos = 2:9, lavaan = TRUE,
-      call = function(d, s) ssm_sem(d, s, grouping = "Gender", boots = 5),
-      key = function(x) x$results
-    ),
-    cpm_fit = list(
-      data = sel_frame(), pos = 2:9,
-      call = function(d, s) cpm_fit(d, s, ci_method = "analytic"),
-      key = function(x) x$results
-    ),
-    fit_structure = list(
-      data = sel_frame(), pos = 2:9,
-      call = function(d, s) fit_structure(d, s),
-      key = function(x) x$results
-    ),
-    norm_standardize = list(
-      data = sel_frame(), pos = 2:9,
-      call = function(d, s) norm_standardize(d, s, instrument = csip,
-                                             sample = 1),
-      key = sel_new_columns
-    )
-  )
-}
-
-# Run a case quietly with a fixed seed, so two calls with the same selection
-# give the same bootstrap draws
-sel_run <- function(case, d, s) {
-  set.seed(1)
-  suppressWarnings(suppressMessages(case$call(d, s)))
-}
-
-sel_skip_lavaan <- function(case) {
-  if (isTRUE(case$lavaan)) skip_if_not_installed("lavaan")
-}
+# The case tables (sel_cases() and friends) are in helper-selection.R.
 
 # The message each probe gave at 447a74dd. ssm_analyze_long() checks names
 # itself; every other export reaches `[.data.frame`.
@@ -385,16 +305,52 @@ test_that("ssm_growth_data refuses a list-column id", {
   expect_identical(nlevels(long$person), length(unique(dt$person)))
 })
 
-test_that("every export with a scales argument is guarded or named as exempt", {
+test_that("every export with a scales or items argument refuses a repeat", {
   ns <- asNamespace("circumplex")
   exports <- getNamespaceExports("circumplex")
-  has_scales <- vapply(exports, function(n) {
+  found <- exports[vapply(exports, function(n) {
     f <- get(n, envir = ns)
-    is.function(f) && "scales" %in% names(formals(f))
-  }, logical(1))
-  guarded <- c(names(sel_cases()), "ssm_sem_parameters", "ssm_sem_syntax")
-  # self_standardize() takes no angles, and a repeated column there gives a
-  # defined result, so it is out of scope
-  exempt <- "self_standardize"
-  expect_setequal(exports[has_scales], c(guarded, exempt))
+    is.function(f) && any(c("scales", "items") %in% names(formals(f)))
+  }, logical(1))]
+  # scales() lists an instrument's scales; its `items` is a logical flag
+  exempt <- "scales"
+
+  # A repeated selection fired through each export, with the error it gives.
+  # Every refusal comes before any estimation, so these calls are quick.
+  fired <- list()
+  for (cases in list(sel_cases(), it_cases())) {
+    for (name in names(cases)) {
+      case <- cases[[name]]
+      if (isTRUE(case$lavaan) && !requireNamespace("lavaan", quietly = TRUE)) {
+        next
+      }
+      pos <- case$pos
+      arg <- if (is.null(case$arg)) "scales" else case$arg
+      first <- names(case$data)[pos[[1]]]
+      expect_error(
+        suppressMessages(case$call(case$data, c(pos[1], pos[1], pos[-(1:2)]))),
+        paste0("`", arg, "` selects the column \"", first,
+               "\" more than once."),
+        fixed = TRUE, label = name
+      )
+      fired[[name]] <- TRUE
+    }
+  }
+  rep_name <- PANO()
+  rep_name[2] <- "PA"
+  label_msg <- "`scales` lists \"PA\" more than once."
+  expect_error(ssm_sem_syntax(scales = rep_name, angles = octants()),
+               label_msg, fixed = TRUE)
+  fired$ssm_sem_syntax <- TRUE
+  if (requireNamespace("lavaan", quietly = TRUE)) {
+    fit <- suppressWarnings(lavaan::cfa("f =~ PA + BC + DE + FG",
+                                        data = sel_frame()))
+    expect_error(ssm_sem_parameters(fit, scales = rep_name, measures = "PA"),
+                 label_msg, fixed = TRUE)
+    fired$ssm_sem_parameters <- TRUE
+    expect_setequal(found, c(names(fired), exempt))
+  } else {
+    # Without lavaan the lavaan cases cannot fire, so check the rest only
+    expect_true(all(names(fired) %in% found))
+  }
 })
