@@ -331,10 +331,13 @@ test_that("a numeric matrix with a valid selection gives the data frame's result
   skip_on_cran()
   d <- sel_frame()[PANO()]
   m <- as.matrix(d)
-  # as.matrix() turns the row names into strings, which no selection reads
-  expect_equal(ssm_score(m, 1:8), ssm_score(d, 1:8),
+  # as.matrix() turns the row names into strings, which no selection reads.
+  # Five rows of these data are flat, so both calls give the same
+  # undefined-displacement warning, which is not under test here.
+  q <- function(e) suppressWarnings(e)
+  expect_equal(q(ssm_score(m, 1:8)), q(ssm_score(d, 1:8)),
                ignore_attr = "row.names")
-  expect_equal(ssm_parameters_id(m, 1:8), ssm_parameters_id(d, 1:8),
+  expect_equal(q(ssm_parameters_id(m, 1:8)), q(ssm_parameters_id(d, 1:8)),
                ignore_attr = "row.names")
   set.seed(1)
   a <- ssm_analyze(m, 1:8, boots = 20)
