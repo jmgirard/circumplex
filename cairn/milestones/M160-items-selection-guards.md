@@ -1,6 +1,6 @@
 # M160: Selection guards for items and the remaining column arguments
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -85,3 +85,24 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: T6 done: the nine help params of AC6 updated, `devtools::document()` rewrote nine `man/` pages and a second run left no diff; two NEWS "Breaking changes" bullets added, each claim backed by a test in `test-items-selection.R` or `test-scales-selection.R`. Sweep (grep of vignettes, R/ and README for below-1 or repeated selections and "twice"/"repeated item" wording): no stale text. The simple-english hook reports 432 hits over the whole NEWS file; the new bullets were split to its sentence limit, and the older entries are left as they are.
 - 2026-10-18: claim audit: 41 claims read, 3 corrected — tests/testthat/test-items-selection.R (direction of the `score()` shift), R/axes_reliability.R (the old cross-scale outcome was a positive-definiteness error, not two loadings), tests/testthat/helper-selection.R (`self_standardize()` sits in `it_cases()`); the same reader re-read all three: hold.
 - 2026-10-18: T7 done at d7924dc7: `devtools::test()` 0 failures, 14827 passes (11 lavaan warnings, as before the branch); `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
+- 2026-10-18: review return 1: AC1 fails as written. It requires matrix `data` for every form and both paths for each form, but `test-items-selection.R` tests matrix `data` for `axes_reliability()` only in the repeated-name form, and has no flat-form `cormat` case for the repeated-name and number-to-repeated-name refusals (diff-bug #2). Fix-now items ride the same return: `ssm_sem()`'s measures check reads all-NA scale names for character `scales` (diff-bug #1, prior-review #1, blame-history #3); the lavaan-less branch of the export-listing test checks one direction only (blame-history #2); NEWS says each scale was scored from the wrong items, which holds only for scales after the repeat (diff-bug #3); NEWS bullets lack a blank line (diff-bug #7).
+
+## Decisions
+
+## Review
+
+Pass 1 (2026-10-18, branch head 4866c2ce). spawned: diff-bug, blame-history, prior-review. Consistency gate before the return: `cairn_validate.py` all checks passed; `pkgdown::check_pkgdown()` no problems; master watches: newest `R-CMD-check.yaml` and `test-coverage.yaml` push runs on master `success` at df998375; `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`, `tools/check-branch-protection.R` exit 0; README.Rmd untouched. The test and check run was stopped for the return, so no criterion is ticked in this pass.
+
+- diff-bug #1: `ssm_sem()` measures check is dead for character `scales` (the refusal still comes from `ssm_sem_syntax()`) — fix now.
+- diff-bug #2: AC1 test gaps for `axes_reliability()` matrix data and flat-form `cormat` — fix now via review return 1 (AC1 fails as written).
+- diff-bug #3: NEWS overstates the old `score()` failure for a late repeat — fix now.
+- diff-bug #4: a negative `measures` entry gets a message naming a column the user did not type — follow-up, row "Selection guard remainders" (below-1 `measures` positions are out of scope).
+- diff-bug #5: a repeated `measures` entry still reaches lavaan's positive-definiteness error — follow-up, row "Selection guard remainders".
+- diff-bug #6: the AC2 `1.5` probe compares with the branch's own whole-number result — reject (false as a defect): no number changed on the branch, and pass 2 records a direct comparison with master as AC2 evidence.
+- diff-bug #7: no blank line between the two new NEWS bullets — fix now (rides the NEWS edit).
+- blame-history #1: refusing forms with a defined result (`score()` with `0`, `ipsatize()` with `-1`, `self_standardize()` with a repeat) without a deprecation cycle or a decision entry — reject (planned change): the user chose these forms and errors at once at the question set; the merge question restates it.
+- blame-history #2: without lavaan the export-listing test checks one direction only — fix now.
+- blame-history #3: same as diff-bug #1 — fix now.
+- blame-history #4: one NA label passes while two are refused — reject (planned change; single NA is in Out).
+- blame-history #5: a number reaching a repeated name is accepted in three functions and refused in `axes_reliability()` — reject (planned change, recorded at the plan gate).
+- prior-review #1: same as diff-bug #1 — fix now. The lens found no past review point reintroduced; the PR-comment probe returned no comments.
