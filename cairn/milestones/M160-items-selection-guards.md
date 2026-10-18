@@ -1,6 +1,6 @@
 # M160: Selection guards for items and the remaining column arguments
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -56,7 +56,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - [x] T4: Extend the export-listing test in `tests/testthat/test-scales-selection.R:388` to `items`: it fires a refusal through each export found by `formals()` and asserts the found set equals the guarded set plus the one exemption, `scales()`. Remove its `self_standardize()` exemption.
 - [x] T5: The three M159 review loose ends: the `ssm_analyze_long()` refusal before the reshape, the repeated-`NA` refusal in `check_scales_labels()` (`R/utils.R:289`), and the `measures` check in `ssm_sem()` and `ssm_sem_syntax()`, each with a test that asserts its message, with `skip_if_not_installed("lavaan")` where a fit is needed.
 - [x] T6: Update the help text named in AC6, run `devtools::document()` twice to confirm no diff, add the NEWS entry, check that a test from T1 to T5 backs each NEWS claim, and sweep the vignettes and help pages for text that says a now-refused selection is accepted.
-- [ ] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
+- [x] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
 
 ## Work log
 
@@ -84,3 +84,4 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: implement chose to compare names in the `ssm_sem()` measures check, over comparing column positions, because lavaan reaches variables by name, so a measure column that only shares a scale's name collides as well.
 - 2026-10-18: T6 done: the nine help params of AC6 updated, `devtools::document()` rewrote nine `man/` pages and a second run left no diff; two NEWS "Breaking changes" bullets added, each claim backed by a test in `test-items-selection.R` or `test-scales-selection.R`. Sweep (grep of vignettes, R/ and README for below-1 or repeated selections and "twice"/"repeated item" wording): no stale text. The simple-english hook reports 432 hits over the whole NEWS file; the new bullets were split to its sentence limit, and the older entries are left as they are.
 - 2026-10-18: claim audit: 41 claims read, 3 corrected — tests/testthat/test-items-selection.R (direction of the `score()` shift), R/axes_reliability.R (the old cross-scale outcome was a positive-definiteness error, not two loadings), tests/testthat/helper-selection.R (`self_standardize()` sits in `it_cases()`); the same reader re-read all three: hold.
+- 2026-10-18: T7 done at d7924dc7: `devtools::test()` 0 failures, 14827 passes (11 lavaan warnings, as before the branch); `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
