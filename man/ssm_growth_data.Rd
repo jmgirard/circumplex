@@ -9,10 +9,17 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
 \arguments{
 \item{data}{Required. A data frame or matrix with one row per person per
 time point, containing the circumplex scales, an id column and a time
-column.}
+column. Two rows with the same id and the same time are an error. Time
+values are compared exactly, with no rounding. Ids
+are compared after conversion to a factor, which matches them by
+\code{as.character()} (15 significant digits), so two numeric ids that
+differ only beyond that precision count as one person. A column name
+that occurs more than once is an error when \code{id}, \code{time} or a name in
+\code{scales} refers to it.}
 
 \item{scales}{Required. The variable names or column numbers for the
-variables in \code{data} that contain circumplex scales.}
+variables in \code{data} that contain circumplex scales. They may not select
+the \code{id} or \code{time} column.}
 
 \item{angles}{Optional. A numeric vector containing the angular
 displacement of each circumplex scale included in \code{scales}, in degrees
@@ -24,10 +31,10 @@ A column name, not a number. Missing values are an error.}
 \item{time}{Required. The name of the numeric column in \code{data} holding
 each row's time point. A column name, not a number. A column that is
 not numeric (a \code{Date}, factor or character column, among others) is an
-error, as are missing values: the growth model fits time as a number,
-so the caller chooses its origin and unit. \code{id} and \code{time} must differ
-from each other and from \code{dv} and \code{value}, the two column names the
-output reserves.}
+error, as are missing and infinite values: the growth model fits time
+as a number, so the caller chooses its origin and unit. \code{id} and \code{time}
+must differ from each other and from \code{dv} and \code{value}, the two column
+names the output reserves.}
 }
 \value{
 A data frame with \code{3 * nrow(data)} rows and four columns, named
