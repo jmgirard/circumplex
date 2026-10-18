@@ -31,7 +31,8 @@ circumplex scales and measures.}
 
 \item{scales}{Required. A character vector of column names, or a numeric
 vector of column indexes, from \code{data} that contains the circumplex scale
-scores.}
+scores. It must not select one column twice, hold a number below 1, or
+name a column whose name occurs more than once in \code{data}.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales}, in degrees

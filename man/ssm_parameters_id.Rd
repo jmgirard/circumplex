@@ -12,7 +12,9 @@ circumplex scales, with one row per person or (with \code{id}) per
 person-occasion.}
 
 \item{scales}{Required. The variable names or column numbers for the
-variables in \code{data} that contain circumplex scales to be analyzed.}
+variables in \code{data} that contain circumplex scales to be analyzed. They
+must not select one column twice, hold a number below 1, or name a column
+whose name occurs more than once in \code{data}.}
 
 \item{angles}{Optional. A numeric vector containing the angular
 displacement of each circumplex scale included in \code{scales}, in degrees

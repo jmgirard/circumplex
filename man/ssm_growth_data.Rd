@@ -19,9 +19,10 @@ than once is an error when \code{id}, \code{time} or a name in \code{scales} ref
 to it.}
 
 \item{scales}{Required. The variable names or column numbers for the
-variables in \code{data} that contain circumplex scales. They may not select
-the \code{id} or \code{time} column, and they may not select one column more
-than once.}
+variables in \code{data} that contain circumplex scales. They must not select
+the \code{id} or \code{time} column, select one column more than once, hold a
+number below 1, or name a column whose name occurs more than once in
+\code{data}.}
 
 \item{angles}{Optional. A numeric vector containing the angular
 displacement of each circumplex scale included in \code{scales}, in degrees

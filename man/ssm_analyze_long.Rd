@@ -26,7 +26,9 @@ identifier column, an occasion column, and the circumplex scale scores
 
 \item{scales}{Required. A character vector of column names, or a numeric
 vector of column indexes, giving the circumplex scale scores in \code{data}
-(the same scales measured at every occasion).}
+(the same scales measured at every occasion). It must not select one
+column twice, hold a number below 1, or name a column whose name occurs
+more than once in \code{data}.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees) (default =

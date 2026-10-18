@@ -20,6 +20,10 @@ sel_long <- function() {
                                   dimnames = list(NULL, PANO()))))
 }
 
+# The columns an appending export adds, leaving out the input columns, so a
+# comparison is not thrown off by an extra input column
+sel_new_columns <- function(x) x[!(names(x) %in% c("Gender", PANO()))]
+
 sel_cases <- function() {
   list(
     ssm_analyze = list(
@@ -37,7 +41,7 @@ sel_cases <- function() {
     ssm_score = list(
       data = sel_frame(), pos = 2:9,
       call = function(d, s) ssm_score(d, s),
-      key = function(x) x
+      key = sel_new_columns
     ),
     ssm_parameters_id = list(
       data = sel_frame(), pos = 2:9,
@@ -69,7 +73,7 @@ sel_cases <- function() {
       data = sel_frame(), pos = 2:9,
       call = function(d, s) norm_standardize(d, s, instrument = csip,
                                              sample = 1),
-      key = function(x) x
+      key = sel_new_columns
     )
   )
 }
@@ -201,4 +205,152 @@ test_that("check_scales_labels refuses a repeated label", {
   expect_error(check_scales_labels(c("PA", "PA"), "`colnames(cormat)`"),
                "`colnames(cormat)` lists \"PA\" more than once.", fixed = TRUE)
   expect_invisible(check_scales_labels(c("PA", "BC")))
+})
+
+# The refusals, per export ----------------------------------------------------
+
+test_that("each data-selecting export refuses a column selected twice", {
+  skip_on_cran()
+  msg <- "`scales` selects the column \"PA\" more than once."
+  for (name in names(sel_cases())) {
+    case <- sel_cases()[[name]]
+    sel_skip_lavaan(case)
+    d <- case$data
+    pos <- case$pos
+    rep_name <- PANO()
+    rep_name[2] <- "PA"
+    forms <- list(
+      name = list(d, rep_name),
+      number = list(d, c(pos[1], pos[1], pos[3:8])),
+      truncated = list(d, c(pos[1], pos[1] + 0.5, pos[3:8])),
+      matrix = list(as.matrix(d), c(pos[1], pos[1], pos[3:8]))
+    )
+    for (form in names(forms)) {
+      args <- forms[[form]]
+      expect_error(sel_run(case, args[[1]], args[[2]]), msg, fixed = TRUE,
+                   label = paste(name, form))
+    }
+  }
+})
+
+test_that("each data-selecting export refuses a position below 1", {
+  skip_on_cran()
+  for (name in names(sel_cases())) {
+    case <- sel_cases()[[name]]
+    sel_skip_lavaan(case)
+    d <- case$data
+    pos <- case$pos
+    for (bad in c(0, 0.5, -0.5, -1)) {
+      expect_error(sel_run(case, d, c(pos[1], bad, pos[3:8])),
+                   paste0("`scales` holds the position ", format(bad),
+                          ", below 1 once truncated"),
+                   fixed = TRUE, label = paste(name, format(bad)))
+    }
+    # A matrix is refused the same way
+    expect_error(sel_run(case, as.matrix(d), c(pos[1], 0, pos[3:8])),
+                 "`scales` holds the position 0,", fixed = TRUE,
+                 label = paste(name, "matrix"))
+  }
+})
+
+test_that("each data-selecting export refuses a name that occurs twice", {
+  skip_on_cran()
+  msg <- paste0("`scales` names a column that occurs more than once in ",
+                "`data`: \"PA\".")
+  for (name in names(sel_cases())) {
+    case <- sel_cases()[[name]]
+    sel_skip_lavaan(case)
+    d <- case$data
+    pos <- case$pos
+    d2 <- cbind(d, d["PA"])
+    names(d2) <- c(names(d), "PA")
+    expect_error(sel_run(case, d2, PANO()), msg, fixed = TRUE, label = name)
+    expect_error(sel_run(case, as.matrix(d2), PANO()), msg, fixed = TRUE,
+                 label = paste(name, "matrix"))
+    # Numbers reach one column each, so the repeated name is no obstacle and
+    # the result equals the one without the extra column
+    expect_equal(case$key(sel_run(case, d2, pos)),
+                 case$key(sel_run(case, d, pos)), label = paste(name, "pos"))
+  }
+})
+
+test_that("fit_structure judges a matrix by the names it indexes", {
+  m <- as.matrix(sel_frame()[PANO()])
+  m2 <- cbind(m, PA = m[, "PA"])
+  expect_error(fit_structure(m2, PANO()),
+               "occurs more than once in `data`: \"PA\".", fixed = TRUE)
+  # A matrix with no column names names the repeated position
+  m0 <- unname(m)
+  expect_error(fit_structure(m0, c(1, 1, 3:8)),
+               "`scales` selects the column at position 1 more than once.",
+               fixed = TRUE)
+})
+
+test_that("ssm_analyze refuses a character occasions block naming a repeated column", {
+  set.seed(159)
+  base <- as.data.frame(matrix(rnorm(16 * 40), 40, 16, dimnames = list(
+    NULL, c(paste0(PANO(), "_1"), paste0(PANO(), "_2"))
+  )))
+  wide <- cbind(base, base["PA_2"])
+  names(wide) <- c(names(base), "PA_2")
+  occ <- list(T1 = paste0(PANO(), "_1"), T2 = paste0(PANO(), "_2"))
+  expect_error(
+    ssm_analyze(wide, occasions = occ, boots = 20),
+    paste0("`occasions` block \"T2\" names a column that occurs more than ",
+           "once in `data`: \"PA_2\"."),
+    fixed = TRUE
+  )
+  # Unnamed blocks are labelled T1, T2, ... in the message
+  expect_error(
+    ssm_analyze(wide, occasions = unname(occ), boots = 20),
+    "`occasions` block \"T2\" names a column", fixed = TRUE
+  )
+  # Without the repeated name the same call runs
+  expect_s3_class(
+    suppressMessages(ssm_analyze(base, occasions = occ, boots = 20)),
+    "circumplex_ssm"
+  )
+})
+
+test_that("the label-only paths refuse a repeated label", {
+  rep_name <- PANO()
+  rep_name[2] <- "PA"
+  msg <- "`scales` lists \"PA\" more than once."
+  expect_error(ssm_sem_syntax(scales = rep_name, angles = octants()), msg,
+               fixed = TRUE)
+  R <- stats::cor(sel_frame()[PANO()])
+  expect_error(cpm_fit(cormat = R, n = 300, scales = rep_name), msg,
+               fixed = TRUE)
+  R2 <- R
+  dimnames(R2) <- list(rep_name, rep_name)
+  expect_error(cpm_fit(cormat = R2, n = 300),
+               "`colnames(cormat)` lists \"PA\" more than once.", fixed = TRUE)
+  skip_if_not_installed("lavaan")
+  fit <- suppressWarnings(lavaan::cfa("f =~ PA + BC + DE + FG",
+                                      data = sel_frame()))
+  expect_error(ssm_sem_parameters(fit, scales = rep_name, measures = "PA"),
+               msg, fixed = TRUE)
+})
+
+test_that("ssm_growth_data refuses a list-column id", {
+  d <- simulated_growth[1:3, ]
+  d$person <- as.list(d$person)
+  expect_error(
+    ssm_growth_data(d, PANO(), id = "person", time = "wave"),
+    "`id` names a list column: \"person\"", fixed = TRUE
+  )
+})
+
+test_that("every export with a scales argument is guarded or named as exempt", {
+  ns <- asNamespace("circumplex")
+  exports <- getNamespaceExports("circumplex")
+  has_scales <- vapply(exports, function(n) {
+    f <- get(n, envir = ns)
+    is.function(f) && "scales" %in% names(formals(f))
+  }, logical(1))
+  guarded <- c(names(sel_cases()), "ssm_sem_parameters", "ssm_sem_syntax")
+  # self_standardize() takes no angles, and a repeated column there gives a
+  # defined result, so it is out of scope
+  exempt <- "self_standardize"
+  expect_setequal(exports[has_scales], c(guarded, exempt))
 })

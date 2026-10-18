@@ -25,9 +25,11 @@ cpm_fit(
 path). Supply exactly one of \code{data} or \code{cormat}.}
 
 \item{scales}{For the raw-data path, a character vector of column names (or a
-numeric vector of column indexes) selecting the circumplex scales. For the
-\code{cormat} path, optional labels for the variables (defaults to the matrix
-dimnames, or \code{V1}, \code{V2}, ...).}
+numeric vector of column indexes) selecting the circumplex scales; it must
+not select one column twice, hold a number below 1, or name a column whose
+name occurs more than once in \code{data}. For the \code{cormat} path, optional
+labels for the variables (defaults to the matrix dimnames, or \code{V1}, \code{V2},
+...); each label, given or taken from the dimnames, must appear only once.}
 
 \item{angles}{A numeric vector of the theoretical angular displacement of
 each scale, in degrees, used both as the reference/identifying angle and as

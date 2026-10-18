@@ -19,7 +19,8 @@ fit_structure(
 \item{scales}{A character vector of column names (or a numeric vector of
 column indexes) selecting the circumplex scales, \strong{in hypothesised circular
 order} (the order is RANDALL's order hypothesis). At least four scales are
-required.}
+required. They must not select one column twice, hold a number below 1, or
+name a column whose name occurs more than once in \code{data}.}
 
 \item{scoring}{Either \code{"deviation"} (the default; row-mean-center the scales
 before analysis) or \code{"raw"} (analyze the scores as given). Selects the

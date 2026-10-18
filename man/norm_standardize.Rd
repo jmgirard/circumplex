@@ -22,7 +22,9 @@ scales.}
 
 \item{scales}{Required. A character vector containing the column names, or a
 numeric vector containing the column indexes, for the variables (scale
-scores) to be standardized.}
+scores) to be standardized. They must not select one column twice, hold a
+number below 1, or name a column whose name occurs more than once in
+\code{data}.}
 
 \item{angles}{Required. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). Can use the
