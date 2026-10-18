@@ -77,6 +77,7 @@ The exported functions that take `scales` refuse a selection that reaches one co
 - 2026-10-18: claim audit: 40 claims read, 1 corrected — NEWS.md (ssm_growth_data() is new and already refused two of the three selections, so it left the Breaking changes list and its New features entry gained the below-1 refusal); one comment in R/ssm_growth_data.R made precise (0 and 0.5 drop an entry); files: NEWS.md, R/*.R guard sites, man/*.Rd, tests/testthat/test-scales-selection.R.
 - 2026-10-18: T7 verified: devtools::check(args = "--no-manual") Status OK, 0 errors, 0 warnings, 0 notes (built at 3a229b96; 56da892b after it changes only NEWS text and one comment); devtools::test() clean at 41a0f2bb. Status set to review.
 - 2026-10-18: review started; default branch had not moved; Copilot round off. The first evidence run was stopped once review fixes changed code; evidence is gathered at 6691381f. M156's terminal row pruned early so the new follow-up row fits the ROADMAP line cap.
+- 2026-10-18: step-7 approval: m159-scales-selection-guards approved for merge
 
 ## Review
 
