@@ -62,6 +62,7 @@
 - 2026-10-17: claim audit pass: 25 claims read, 3 corrected (ids merge by `as.character()` at 15 digits, not by printing; matrix-names comment; test header "where there is one"); the ROADMAP candidate row's "print alike" corrected in place; growth tests 144 pass after `document()`; same reader's one re-read pending.
 - 2026-10-17: claim audit: 25 claims read, 3 corrected — R/ssm_growth_data.R, man/ssm_growth_data.Rd, tests/testthat/test-ssm_growth_data.R (re-read once by the same reader: all three now match the code).
 - 2026-10-17: implement complete; status → review. The edits after `check()` change only comments and Rd prose; growth tests 144 pass on them.
+- 2026-10-17: step-7 approval: m157-growth-data-guards approved for merge
 
 ## Decisions
 
