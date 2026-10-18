@@ -23,7 +23,9 @@
 #'   circumplex scales, with one row per person or (with `id`) per
 #'   person-occasion.
 #' @param scales Required. The variable names or column numbers for the
-#'   variables in `data` that contain circumplex scales to be analyzed.
+#'   variables in `data` that contain circumplex scales to be analyzed. They
+#'   must not select one column twice, hold a number below 1, or name a column
+#'   whose name occurs more than once in `data`.
 #' @param angles Optional. A numeric vector containing the angular
 #'   displacement of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`). The closed-form SSM estimator used here equals
@@ -61,6 +63,7 @@ ssm_parameters_id <- function(data, scales, angles = octants(), id = NULL) {
   stopifnot(is_null_or_var(id, n = 1))
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  check_scales_selection(data, scales)
   scales_mat <- as.matrix(data[scales])
   # as.matrix() on a zero-row data frame yields logical mode; coerce so the
   # 0-row edge returns an empty table instead of tripping the numeric check

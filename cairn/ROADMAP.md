@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-17 (M158 done: archived; narrowed the "Growth id an
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M159 | Selection guards for the scales argument | planned | — | normal | milestones/M159-scales-selection-guards.md |
+| M159 | Selection guards for the scales argument | in-progress | — | normal | milestones/M159-scales-selection-guards.md |
 | M158 | Merged-id and repeated-scale guards for ssm_growth_data() | done | — | normal | milestones/archive/M158-growth-id-scales-guards.md |
 | M157 | Input guards for ssm_growth_data() | done | — | normal | milestones/archive/M157-growth-data-guards.md |
 | M156 | Peer-review status notices on the four package-original vignettes | done | — | normal | milestones/archive/M156-peer-review-notices.md |

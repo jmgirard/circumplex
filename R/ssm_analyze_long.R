@@ -14,7 +14,9 @@
 #'   (one set of score columns, repeated across occasions in different rows).
 #' @param scales Required. A character vector of column names, or a numeric
 #'   vector of column indexes, giving the circumplex scale scores in `data`
-#'   (the same scales measured at every occasion).
+#'   (the same scales measured at every occasion). It must not select one
+#'   column twice, hold a number below 1, or name a column whose name occurs
+#'   more than once in `data`.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees) (default =
 #'   `octants()`).
@@ -79,6 +81,7 @@ ssm_analyze_long <- function(data, scales, angles = octants(),
   stopifnot(is.numeric(angles))
   stopifnot(is_var(scales))
   stopifnot(length(scales) == length(angles))
+  check_scales_selection(data, scales)
   stopifnot(is_var(id, n = 1))
   stopifnot(is_var(occasion, n = 1))
   stopifnot(is_null_or_var(grouping, n = 1))

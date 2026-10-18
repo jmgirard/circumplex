@@ -1265,7 +1265,8 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   circumplex scales and measures.
 #' @param scales Required. A character vector of column names, or a numeric
 #'   vector of column indexes, from `data` that contains the circumplex scale
-#'   scores.
+#'   scores. It must not select one column twice, hold a number below 1, or
+#'   name a column whose name occurs more than once in `data`.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales`, in degrees
 #'   (default = `octants()`). The angles are fixed theoretical constants in the
@@ -1485,6 +1486,7 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
   }
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  check_scales_selection(data, scales)
 
   # Drop observations with missing grouping values (mirrors ssm_analyze())
   if (!is.null(grouping)) {
@@ -1676,7 +1678,7 @@ sem_health_gate <- function(fit) {
 #'   covariance stays valid when the fixed-angle model is an approximation;
 #'   see the `se` argument of [ssm_sem()].
 #' @param scales Required. A character vector with the scale (indicator)
-#'   names, in the same order as `angles`.
+#'   names, in the same order as `angles`. Each name must appear only once.
 #' @param angles Optional. A numeric vector of the scales' theoretical angles
 #'   in degrees (default = `octants()`). Must be the angles the model was
 #'   generated with.
@@ -1716,6 +1718,7 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
   ci_method <- match.arg(ci_method)
   stopifnot(inherits(fit, "lavaan"))
   stopifnot(is_char(scales))
+  check_scales_labels(scales)
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
   stopifnot(is_null_or_char(measures))

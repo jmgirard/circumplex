@@ -1,13 +1,13 @@
 # M159: Selection guards for the scales argument
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, GP2, GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — exported functions of the released package refuse inputs they accept today
-- **Branch/PR:** —
+- **Branch/PR:** m159-scales-selection-guards
 
 ## Goal
 
@@ -67,3 +67,7 @@ The exported functions that take `scales` refuse a selection that reaches one co
 - 2026-10-18: criteria audit (full mode, fresh Opus reader): 12 findings, all fixed toward the narrower promise — label-only paths split from data paths (1); `self_standardize()` moved out on GP2 (2); probe forms named per export (3); the drift test moved from AC1 to T5 (4); occasions dropped from AC2, it already refuses (5); `0.5`/`-0.5` and matrix `fit_structure()` added (6); names judged against what each export indexes (7); character `occasions` blocks added to AC3 (8); AC4 narrowed to four listed probes (9) and its allowed changes named in the criterion (10); AC5 wording (11); Goal narrowed to the three refusals (12).
 - 2026-10-18: lessons harvested: M157 (judge names after matrix conversion), M158 (positions by `seq_along`), M56 (sweep help pages and vignettes both ways), M146 (assert that a guarded case occurs).
 - 2026-10-18: model tier: Opus for implementation (guard and validation code, no estimator change, no oracle needed because no number changes).
+- 2026-10-18: implement started on branch m159-scales-selection-guards; baseline probes for AC4 recorded in tests/testthat/test-scales-selection.R and passing on unchanged code (only the five helper tests failed before the helper existed).
+- 2026-10-18: implementation choice: refusals use stop(call. = FALSE) as the surrounding code and M157/M158 do, not cli::cli_abort() as the profile's test-doctrine says, because cli is not a dependency and adding it is a dependency change the plan did not grant.
+- 2026-10-18: implementation choice: three internal helpers in R/utils.R: check_scales_selection(), check_scales_positions() (its position half, which ssm_growth_data() runs before resolving columns so its id/time messages keep their order) and check_scales_labels() for the label-only paths; the messages reuse M158's wording, so no growth expectation changed.
+- 2026-10-18: checkpoint (work in progress, tasks unchecked): helper and calls in all eleven exports, list-column id refusal, roxygen text and NEWS written; full suite running; refusal tests drafted, man/ not yet regenerated. Three call-site edits went through a script instead of the Edit tool (ssm_analyze_long, ssm_score, ssm_parameters_id).

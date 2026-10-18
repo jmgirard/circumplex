@@ -156,7 +156,9 @@ norm_sample_usable <- function(instrument, sample) {
 #'   scales.
 #' @param scales Required. A character vector containing the column names, or a
 #'   numeric vector containing the column indexes, for the variables (scale
-#'   scores) to be standardized.
+#'   scores) to be standardized. They must not select one column twice, hold a
+#'   number below 1, or name a column whose name occurs more than once in
+#'   `data`.
 #' @param angles Required. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees). Can use the
 #'   `octants()`, `poles()`, or `quadrants()` convenience functions. Each angle
@@ -219,6 +221,7 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   stopifnot(is_flag(quiet))
 
   if (is.matrix(data)) data <- as.data.frame(data)
+  check_scales_selection(data, scales)
   key <- instrument$Norms[[1]]
   # which() rather than a bare logical index: `key$Sample == NA` is NA rather
   # than FALSE, and indexing a data frame by NA returns a row of NAs instead of

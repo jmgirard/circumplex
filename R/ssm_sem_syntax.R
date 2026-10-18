@@ -68,6 +68,7 @@ sem_resolve_scales_angles <- function(instrument, scales, angles) {
       )
     }
     stopifnot(is_char(scales), is_num(angles))
+    check_scales_labels(scales)
     if (length(scales) != length(angles)) {
       stop("`scales` and `angles` must have the same length.", call. = FALSE)
     }
@@ -200,7 +201,7 @@ snap_trig <- function(x, tol = 1e-9) {
 #'   abbreviations and angles are used. Supply this or both `scales` and
 #'   `angles`.
 #' @param scales Optional. A character vector of circumplex scale (column)
-#'   names. Ignored when `instrument` is supplied.
+#'   names, each appearing only once. Ignored when `instrument` is supplied.
 #' @param angles Optional. A numeric vector of scale angles in degrees, the same
 #'   length as `scales`. Ignored when `instrument` is supplied.
 #' @param measures Optional. Either `NULL` or a character vector of external
