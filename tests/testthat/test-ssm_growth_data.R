@@ -212,6 +212,32 @@ test_that("ssm_growth_data refuses a referenced column name that occurs twice", 
   )
 })
 
+test_that("ssm_growth_data judges a matrix's names after conversion", {
+  # as.data.frame() names a blank matrix column "V<n>", which here duplicates
+  # column 11's name; `id = "V1"` would resolve to the blank column 1.
+  data("simulated_growth")
+  m <- cbind(as.matrix(simulated_growth[1:3, ]), V1 = 7)
+  colnames(m)[1] <- ""
+  expect_identical(sum(names(as.data.frame(m)) == "V1"), 2L)
+  expect_error(ssm_growth_data(m, PANO(), id = "V1", time = "wave"),
+               "`id`.*more than once.*\"V1\"")
+  # With column 4 named "V1" instead, scales = 3:10 reaches column 4; the
+  # refusal is the duplicated id, not a false "selects the `id` column".
+  m4 <- as.matrix(simulated_growth[1:3, ])
+  colnames(m4)[c(1, 4)] <- c("", "V1")
+  expect_error(ssm_growth_data(m4, 3:10, id = "V1", time = "wave"),
+               "`id`.*more than once.*\"V1\"")
+  # An NA scale name with two NA column names reaches the scorer's own
+  # refusal, not the duplicate-name message.
+  m_na <- as.matrix(simulated_growth[1:3, ])
+  colnames(m_na)[4:5] <- NA
+  expect_error(
+    ssm_growth_data(m_na, c("PA", NA, NA, PANO()[4:8]),
+                    id = "person", time = "wave"),
+    "undefined columns"
+  )
+})
+
 test_that("ssm_growth_data accepts duplicated column names no argument references by name", {
   data("simulated_growth")
   d <- simulated_growth[1:3, ]
@@ -293,7 +319,7 @@ test_that("ssm_growth_data refuses two rows for one person at one time", {
   data("simulated_growth")
   base <- simulated_growth[c(1, 2, 3), ]
   base$wave <- c(0, 1, 1)
-  pattern <- "more than one row.*`id` \"B\".*`time` 1"
+  pattern <- "more than one row.*`id` \"B\".*`time` 1;"
   ids <- list(
     character = c("A", "B", "B"),
     factor = factor(c("A", "B", "B")),
@@ -317,7 +343,7 @@ test_that("ssm_growth_data refuses two rows for one person at one time", {
   d$person <- c(1, 0.1 + 0.2, 0.3)
   expect_false(identical(d$person[2], d$person[3]))
   expect_error(ssm_growth_data(d, PANO(), id = "person", time = "wave"),
-               "more than one row.*`id` \"0.3\".*`time` 1")
+               "more than one row.*`id` \"0.3\".*`time` 1;")
 })
 
 test_that("ssm_growth_data accepts one id at two times and two ids at one time", {

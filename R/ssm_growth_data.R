@@ -24,7 +24,8 @@
 #'
 #' @param data Required. A data frame or matrix with one row per person per
 #'   time point, containing the circumplex scales, an id column and a time
-#'   column. Two rows with the same id and the same time are an error. Ids
+#'   column. Two rows with the same id and the same time are an error. Time
+#'   values are compared exactly, with no rounding. Ids
 #'   are compared after conversion to a factor, which matches them by
 #'   `as.character()` (15 significant digits), so two numeric ids that
 #'   differ only beyond that precision count as one person. A column name
@@ -43,9 +44,8 @@
 #'   not numeric (a `Date`, factor or character column, among others) is an
 #'   error, as are missing and infinite values: the growth model fits time
 #'   as a number, so the caller chooses its origin and unit. `id` and `time`
-#'   must differ
-#'   from each other and from `dv` and `value`, the two column names the
-#'   output reserves.
+#'   must differ from each other and from `dv` and `value`, the two column
+#'   names the output reserves.
 #' @return A data frame with `3 * nrow(data)` rows and four columns, named
 #'   `<id>` (a factor), `<time>` (numeric), `dv` (a factor with levels `e`,
 #'   `x` and `y`) and `value`. Rows are ordered by input row, then by `dv`.
@@ -65,10 +65,11 @@
 ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
 
   stopifnot(is.data.frame(data) || is.matrix(data))
-  # as.data.frame() keeps a matrix's column names as written, duplicates
-  # included, so these are the names the checks below judge.
-  data_names <- colnames(data)
   if (is.matrix(data)) data <- as.data.frame(data)
+  # The names after conversion are the ones `[[` resolves against: duplicates
+  # survive as.data.frame(), and a blank matrix name becomes "V<n>", which can
+  # itself duplicate another column's name.
+  data_names <- names(data)
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
   if (length(scales) != length(angles)) {
@@ -100,9 +101,16 @@ ssm_growth_data <- function(data, scales, angles = octants(), id, time) {
     stop("`time` names a column that occurs more than once in `data`: \"",
          time, "\".", call. = FALSE)
   }
-  if (is.character(scales) && any(scales %in% dup_names)) {
+  # An NA scale name is left to the scorer, which refuses it as an undefined
+  # column.
+  dup_scales <- if (is.character(scales)) {
+    scales[!is.na(scales) & scales %in% dup_names]
+  } else {
+    character(0)
+  }
+  if (length(dup_scales) > 0) {
     stop("`scales` names a column that occurs more than once in `data`: \"",
-         scales[scales %in% dup_names][[1]], "\".", call. = FALSE)
+         dup_scales[[1]], "\".", call. = FALSE)
   }
 
   # The column each scale reaches, by name or by position; indexing

@@ -9,7 +9,8 @@ ssm_growth_data(data, scales, angles = octants(), id, time)
 \arguments{
 \item{data}{Required. A data frame or matrix with one row per person per
 time point, containing the circumplex scales, an id column and a time
-column. Two rows with the same id and the same time are an error. Ids
+column. Two rows with the same id and the same time are an error. Time
+values are compared exactly, with no rounding. Ids
 are compared after conversion to a factor, which matches them by
 \code{as.character()} (15 significant digits), so two numeric ids that
 differ only beyond that precision count as one person. A column name
@@ -32,9 +33,8 @@ each row's time point. A column name, not a number. A column that is
 not numeric (a \code{Date}, factor or character column, among others) is an
 error, as are missing and infinite values: the growth model fits time
 as a number, so the caller chooses its origin and unit. \code{id} and \code{time}
-must differ
-from each other and from \code{dv} and \code{value}, the two column names the
-output reserves.}
+must differ from each other and from \code{dv} and \code{value}, the two column
+names the output reserves.}
 }
 \value{
 A data frame with \code{3 * nrow(data)} rows and four columns, named
