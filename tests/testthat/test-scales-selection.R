@@ -350,8 +350,10 @@ test_that("every export with a scales or items argument refuses a repeat", {
     fired$ssm_sem_parameters <- TRUE
     expect_setequal(found, c(names(fired), exempt))
   } else {
-    # Without lavaan the lavaan cases cannot fire, so check the rest only
-    expect_true(all(names(fired) %in% found))
+    # Without lavaan the lavaan cases cannot fire. They are named here, so a
+    # new export with `scales` or `items` still fails the check.
+    needs_lavaan <- c("ssm_sem", "axes_reliability", "ssm_sem_parameters")
+    expect_setequal(found, c(names(fired), needs_lavaan, exempt))
   }
 })
 
@@ -430,4 +432,15 @@ test_that("ssm_sem refuses a measure that is also a scale", {
   # By a number reaching another column that carries a scale's name
   d2 <- cbind(d, PA = d$NARPD)
   expect_error(ssm_sem(d2, 2:9, measures = ncol(d2)), msg, fixed = TRUE)
+  # The refusal comes from ssm_sem()'s own argument check, before any data
+  # work, for names as for numbers: no row is dropped for a missing group
+  # first (ssm_sem_syntax() would refuse later, after that message)
+  dn <- d
+  dn$Gender[1] <- NA
+  for (s in list(PANO(), 2:9)) {
+    expect_no_message(expect_error(
+      ssm_sem(dn, s, grouping = "Gender", measures = c("NARPD", "PA")),
+      msg, fixed = TRUE
+    ))
+  }
 })
