@@ -1,6 +1,6 @@
 # M160: Selection guards for items and the remaining column arguments
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -57,7 +57,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - [x] T5: The three M159 review loose ends: the `ssm_analyze_long()` refusal before the reshape, the repeated-`NA` refusal in `check_scales_labels()` (`R/utils.R:289`), and the `measures` check in `ssm_sem()` and `ssm_sem_syntax()`, each with a test that asserts its message, with `skip_if_not_installed("lavaan")` where a fit is needed.
 - [x] T6: Update the help text named in AC6, run `devtools::document()` twice to confirm no diff, add the NEWS entry, check that a test from T1 to T5 backs each NEWS claim, and sweep the vignettes and help pages for text that says a now-refused selection is accepted.
 - [x] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
-- [ ] T8: Review return 1: add `axes_reliability()` matrix-`data` cases for every AC1 form and flat-form `cormat` cases for the repeated-name and number-to-repeated-name refusals; build `ssm_sem()`'s scale names with `names(data[scales])`; make the lavaan-less export-listing branch check both directions; fix the NEWS `score()` sentence and bullet spacing; rerun T7's commands.
+- [x] T8: Review return 1: add `axes_reliability()` matrix-`data` cases for every AC1 form and flat-form `cormat` cases for the repeated-name and number-to-repeated-name refusals; build `ssm_sem()`'s scale names with `names(data[scales])`; make the lavaan-less export-listing branch check both directions; fix the NEWS `score()` sentence and bullet spacing; rerun T7's commands.
 
 ## Work log
 
@@ -88,6 +88,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: T7 done at d7924dc7: `devtools::test()` 0 failures, 14827 passes (11 lavaan warnings, as before the branch); `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 - 2026-10-18: review return 1: AC1 fails as written. It requires matrix `data` for every form and both paths for each form, but `test-items-selection.R` tests matrix `data` for `axes_reliability()` only in the repeated-name form, and has no flat-form `cormat` case for the repeated-name and number-to-repeated-name refusals (diff-bug #2). Fix-now items ride the same return: `ssm_sem()`'s measures check reads all-NA scale names for character `scales` (diff-bug #1, prior-review #1, blame-history #3); the lavaan-less branch of the export-listing test checks one direction only (blame-history #2); NEWS says each scale was scored from the wrong items, which holds only for scales after the repeat (diff-bug #3); NEWS bullets lack a blank line (diff-bug #7).
 - 2026-10-18: T8 in progress (checkpoint): T8 added for review return 1, Coverage lines for AC1, AC3, AC5, AC6, AC7 extended to it (minor amendment). Code and tests written: `axes_reliability()` refusals now run over six ways in (flat and list, by data frame, matrix and `cormat`); `ssm_sem()` takes scale names from `scales` itself when they are names, with a test that fails before the fix (no grouping-drop message before the refusal); the lavaan-less listing branch names the three lavaan exports and asserts set equality; NEWS `score()` sentence corrected (checked against master: a repeat at the end changes nothing, at item 32 only NO) and the bullets spaced. Both selection files: 0 failures (114 and 223 passes, NOT_CRAN). Full suite and check running.
+- 2026-10-18: T8 done at 12ec3db6: `devtools::test()` 0 failures, 14848 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 
 ## Decisions
 
