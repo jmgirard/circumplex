@@ -97,15 +97,16 @@ test_that("the tidying functions refuse a column selected twice", {
     rep_name <- names(d)[pos]
     rep_name[2] <- first
     forms <- list(
-      name = list(d, rep_name),
-      number = list(d, c(pos[1], pos[1], pos[-(1:2)])),
-      truncated = list(d, c(pos[1], pos[1] + 0.5, pos[-(1:2)])),
-      matrix = list(as.matrix(d), c(pos[1], pos[1], pos[-(1:2)]))
+      name = rep_name,
+      number = c(pos[1], pos[1], pos[-(1:2)]),
+      truncated = c(pos[1], pos[1] + 0.5, pos[-(1:2)])
     )
-    for (form in names(forms)) {
-      args <- forms[[form]]
-      expect_error(it_run(case, args[[1]], args[[2]]), msg, fixed = TRUE,
-                   label = paste(name, form))
+    shapes <- list(frame = d, matrix = as.matrix(d))
+    for (shape in names(shapes)) {
+      for (form in names(forms)) {
+        expect_error(it_run(case, shapes[[shape]], forms[[form]]), msg,
+                     fixed = TRUE, label = paste(name, shape, form))
+      }
     }
   }
 })
@@ -115,15 +116,15 @@ test_that("the tidying functions refuse a position below 1", {
     case <- it_tidy_cases()[[name]]
     d <- case$data
     pos <- case$pos
-    for (bad in c(0, 0.5, -1)) {
-      expect_error(it_run(case, d, c(pos[1], bad, pos[-(1:2)])),
-                   paste0("`", case$arg, "` holds the position ", format(bad),
-                          ", below 1 once truncated"),
-                   fixed = TRUE, label = paste(name, format(bad)))
+    shapes <- list(frame = d, matrix = as.matrix(d))
+    for (shape in names(shapes)) {
+      for (bad in c(0, 0.5, -1)) {
+        expect_error(it_run(case, shapes[[shape]], c(pos[1], bad, pos[-(1:2)])),
+                     paste0("`", case$arg, "` holds the position ",
+                            format(bad), ", below 1 once truncated"),
+                     fixed = TRUE, label = paste(name, shape, format(bad)))
+      }
     }
-    expect_error(it_run(case, as.matrix(d), c(pos[1], 0, pos[-(1:2)])),
-                 paste0("`", case$arg, "` holds the position 0,"),
-                 fixed = TRUE, label = paste(name, "matrix"))
   }
 })
 
@@ -279,4 +280,44 @@ test_that("axes_reliability refuses one column under two scales", {
     "`items` lists the column \"PA_1\" under more than one scale.",
     fixed = TRUE
   )
+  # Matrix `data`, by name and by number
+  m <- as.matrix(simulated_items)
+  for (sel in list(map, map2)) {
+    expect_error(
+      suppressMessages(axes_reliability(m, sel, angles = octants())),
+      "`items` lists the column \"PA_1\" under more than one scale.",
+      fixed = TRUE
+    )
+  }
+})
+
+test_that("axes_reliability judges a factor in the list form by its labels", {
+  skip_if_not_installed("lavaan")
+  # A factor's integer codes follow its sorted levels, so judging the codes
+  # would name PA_2 here, a column listed once
+  map <- unname(split(names(simulated_items), rep(1:8, each = 4)))
+  map[[1]] <- factor(c("PA_3", "PA_3", "PA_2", "PA_4"))
+  expect_error(
+    suppressMessages(axes_reliability(simulated_items, map,
+                                      angles = octants())),
+    "`items` selects the column \"PA_3\" more than once.", fixed = TRUE
+  )
+  # A factor naming a column whose name repeats is refused like a name
+  d2 <- cbind(simulated_items, PA_1 = rev(simulated_items$PA_1))
+  map2 <- unname(split(names(simulated_items), rep(1:8, each = 4)))
+  map2[[1]] <- factor(map2[[1]])
+  expect_error(
+    suppressMessages(axes_reliability(d2, map2, angles = octants())),
+    "`items` names a column that occurs more than once in `data`: \"PA_1\".",
+    fixed = TRUE
+  )
+  # A factor with distinct labels runs as the same names do
+  skip_on_cran()
+  map3 <- unname(split(names(simulated_items), rep(1:8, each = 4)))
+  ref <- suppressMessages(axes_reliability(simulated_items, map3,
+                                           angles = octants()))
+  map3[[1]] <- factor(map3[[1]])
+  fac <- suppressMessages(axes_reliability(simulated_items, map3,
+                                           angles = octants()))
+  expect_equal(fac$results, ref$results)
 })

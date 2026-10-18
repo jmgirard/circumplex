@@ -18,13 +18,14 @@
 
 * The `items` argument of `score()`, `ipsatize()` and `axes_reliability()`,
   and the `scales` argument of `self_standardize()`, now refuse the same
-  three selections. In `score()` a repeated item moved the items after it
-  one place on. Each item from that position on was then read from the
-  wrong column, with no message. In `ipsatize()` a repeated item
-  counted twice in each row's mean. `axes_reliability()` also refuses one
-  column listed under two scales. It also refuses a number that reaches a
-  column whose name occurs more than once in `data` or `cormat`, because it
-  used the first column of that name.
+  three selections. The `score()` key reads items by position. A repeated
+  item that took another item's position made each scale that uses that
+  position read the wrong column, with no message. In `ipsatize()` a
+  repeated item counted twice in each row's mean. `axes_reliability()` also
+  refuses one column listed under two scales. It reads items by name, so it
+  also refuses a number that reaches a column whose name occurs more than
+  once in `data` or `cormat`. Such a number used to get the first column
+  with that name.
 
 * `ssm_analyze_long()` refuses numbers in `scales` that reach two columns
   with one name, and the message names that name. Before, the error spoke

@@ -310,8 +310,8 @@ check_scales_labels <- function(scales, what = "`scales`", hint = NULL) {
 check_measures_not_scales <- function(measures, scale_names) {
   hit <- measures[!is.na(measures) & measures %in% scale_names]
   if (length(hit) > 0) {
-    stop("`measures` names \"", hit[[1]], "\", which is also one of the ",
-         "scales; a measure must be a variable other than the scales.",
+    stop("`measures` names \"", hit[[1]], "\", which is the name of one of ",
+         "the scales; each measure must have a name of its own.",
          call. = FALSE)
   }
   invisible(measures)

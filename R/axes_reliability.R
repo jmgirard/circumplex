@@ -512,6 +512,9 @@ axes_colnames <- function(sel, data) {
 # the name, and every later step selects by name, so it would use the first
 # column with that name.
 axes_check_items <- function(data, sel, where) {
+  # axes_colnames() reads a factor as its labels, so judge it as names, not
+  # by its integer codes
+  if (is.factor(sel)) sel <- as.character(sel)
   check_scales_selection(data, sel, "items", where)
   if (is.numeric(sel)) {
     data_names <- colnames(data)

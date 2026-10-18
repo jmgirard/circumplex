@@ -40,13 +40,13 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 
 ## Coverage
 
-- AC1 → T1, T2, T3, T8
+- AC1 → T1, T2, T3, T8, T9
 - AC2 → T1, T2, T3
 - AC3 → T2, T3, T4, T5, T8
 - AC4 → T5
-- AC5 → T5, T8
-- AC6 → T6, T8
-- AC7 → T7, T8
+- AC5 → T5, T8, T9
+- AC6 → T6, T8, T9
+- AC7 → T7, T8, T9
 
 ## Tasks
 
@@ -57,7 +57,8 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - [x] T5: The three M159 review loose ends: the `ssm_analyze_long()` refusal before the reshape, the repeated-`NA` refusal in `check_scales_labels()` (`R/utils.R:289`), and the `measures` check in `ssm_sem()` and `ssm_sem_syntax()`, each with a test that asserts its message, with `skip_if_not_installed("lavaan")` where a fit is needed.
 - [x] T6: Update the help text named in AC6, run `devtools::document()` twice to confirm no diff, add the NEWS entry, check that a test from T1 to T5 backs each NEWS claim, and sweep the vignettes and help pages for text that says a now-refused selection is accepted.
 - [x] T7: Run `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check(args = "--no-manual")'`.
-- [x] T8: Review return 1: add `axes_reliability()` matrix-`data` cases for every AC1 form and flat-form `cormat` cases for the repeated-name and number-to-repeated-name refusals; build `ssm_sem()`'s scale names with `names(data[scales])`; make the lavaan-less export-listing branch check both directions; fix the NEWS `score()` sentence and bullet spacing; rerun T7's commands.
+- [x] T8: Review return 1: add `axes_reliability()` matrix-`data` cases for every AC1 form and flat-form `cormat` cases for the repeated-name and number-to-repeated-name refusals; build `ssm_sem()`'s scale names from `scales` when they are names, and from `names(data)[scales]` when they are numbers; make the lavaan-less export-listing branch check both directions; fix the NEWS `score()` sentence and bullet spacing; rerun T7's commands.
+- [ ] T9: Review return 2: a matrix-`data` test for the cross-scale refusal; every AC1 form and value on data-frame and matrix `data` for the three tidying functions; factor list elements in `axes_reliability()` judged as names; the measures message names a shared name; NEWS `score()` and `axes_reliability()` wording and the `score()` help reason; pass-1 follow-ups into "Selection guard remainders"; rerun T7's commands.
 
 ## Work log
 
@@ -90,6 +91,7 @@ The column-selection arguments that M159 left unguarded refuse the selections th
 - 2026-10-18: T8 in progress (checkpoint): T8 added for review return 1, Coverage lines for AC1, AC3, AC5, AC6, AC7 extended to it (minor amendment). Code and tests written: `axes_reliability()` refusals now run over six ways in (flat and list, by data frame, matrix and `cormat`); `ssm_sem()` takes scale names from `scales` itself when they are names, with a test that fails before the fix (no grouping-drop message before the refusal); the lavaan-less listing branch names the three lavaan exports and asserts set equality; NEWS `score()` sentence corrected (checked against master: a repeat at the end changes nothing, at item 32 only NO) and the bullets spaced. Both selection files: 0 failures (114 and 223 passes, NOT_CRAN). Full suite and check running.
 - 2026-10-18: T8 done at 12ec3db6: `devtools::test()` 0 failures, 14848 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 - 2026-10-18: review return 2: AC1 fails as written: the cross-scale refusal (part of AC1's third form for the list form) has no matrix-`data` test (diff-bug pass 2 #2). Fix-now items ride the return: factor list elements, the two pass-1 follow-ups into "Selection guard remainders", NEWS `score()` and `axes_reliability()` wording, the measures message, full matrix cases for the tidying functions, T8's task text, the `score()` help reason (pass 2 diff-bug #1, #3 to #9).
+- 2026-10-18: T9 in progress (checkpoint): T9 added and T8's task text corrected (minor amendments); Coverage for AC1, AC5, AC6, AC7 extended to T9. Matrix cross-scale test; the tidying refusal tests loop every form and value over data-frame and matrix `data`; `axes_check_items()` judges a factor as its labels (the new test fails without it); measures message reworded to "which is the name of one of the scales; each measure must have a name of its own"; NEWS and the `score()` help reworded; follow-ups (v) and (vi) added to "Selection guard remainders". Both selection files: 0 failures (131 and 223 passes, NOT_CRAN). Full suite and check running.
 
 ## Decisions
 

@@ -409,8 +409,8 @@ test_that("the label paths refuse NA listed more than once", {
 })
 
 test_that("ssm_sem_syntax refuses a measure that is also a scale", {
-  msg <- paste0("`measures` names \"PA\", which is also one of the scales; ",
-                "a measure must be a variable other than the scales.")
+  msg <- paste0("`measures` names \"PA\", which is the name of one of the ",
+                "scales; each measure must have a name of its own.")
   expect_error(ssm_sem_syntax(scales = PANO(), angles = octants(),
                               measures = "PA"), msg, fixed = TRUE)
   # The scale labels may come from an instrument
@@ -424,7 +424,7 @@ test_that("ssm_sem_syntax refuses a measure that is also a scale", {
 test_that("ssm_sem refuses a measure that is also a scale", {
   skip_if_not_installed("lavaan")
   d <- jz2017[1:300, ]
-  msg <- "`measures` names \"PA\", which is also one of the scales"
+  msg <- "`measures` names \"PA\", which is the name of one of the scales"
   # By name, and by a number that selects the scale's own column
   expect_error(ssm_sem(d, PANO(), measures = c("PA", "NARPD")), msg,
                fixed = TRUE)
