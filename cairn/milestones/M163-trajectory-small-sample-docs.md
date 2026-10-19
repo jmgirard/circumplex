@@ -1,6 +1,6 @@
 # M163: Small-sample coverage in the trajectory docs
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -48,7 +48,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - [x] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
 - [x] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
 - [x] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
-- [ ] T5: Review return 1: name the `ssm_growth_formula()` model in Section 7's design fact, re-render, run the staleness check, and re-run the test suite and the check.
+- [x] T5: Review return 1: name the `ssm_growth_formula()` model in Section 7's design fact, re-render, run the staleness check, and re-run the test suite and the check.
 
 ## Work log
 
@@ -68,6 +68,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - 2026-10-19: claim audit: 38 claims read, 3 corrected — vignettes/growth-ssm-analysis.Rmd.orig (and .Rmd), NEWS.md. The five-balanced-waves sentence now covers only the reported figures, since M161 also ran missing-wave cells. The 10-person non-PD coverage now says normal draws on those fits' `vcov`, since the oracle passed its own draws as `draws =` and the helper refuses an asymmetric or invalid `vcov` (`R/ssm_trajectory_helper.R:301-318`); the auditor's spot check found one such fit in 123. NEWS names the non-PD rate at 10 and 20 persons only, as Section 7 states it.
 - 2026-10-19: T4: `devtools::check(args = "--no-manual")` on the final tree: Status OK, 0 errors, 0 warnings, 0 notes, vignette re-build OK; a first run started before the claim-audit fixes was stopped unfinished. Test suite as at T3. Status set to review.
 - 2026-10-19: review return 1: AC1 — Section 7 does not name the `ssm_growth_formula()` model in its design fact ("this model" only); every figure and the other design facts were found. Status back to in-progress.
+- 2026-10-19: T5 added for review return 1 (minor amendment; Coverage AC1 and AC5 now also cite T5). Section 7 now says the oracles fit "the one `ssm_growth_formula()` writes"; checked for M27 too, whose `glmmTMB()` call (`devel/m27-coverage-oracle.R:118-120`) has the same formula and dispformula that `ssm_growth_formula("glmmTMB")` returns. NEWS line re-wrapped. Staleness check: all 11 up to date. `devtools::check(args = "--no-manual")` at 0acf2a3c: Status OK, 0 errors, 0 warnings, 0 notes, tests OK, vignette re-build OK. Status set to review.
 
 ## Decisions
 
