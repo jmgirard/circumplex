@@ -63,10 +63,12 @@ jobs:
           # Same allowlist discipline as the other three workflows: a Suggest
           # missing here is never installed, its vignette chunks skip, and the
           # re-render would then match a committed copy built from LESS output
-          # than the source asks for. tools/check-ci-deps.R enforces the mirror.
+          # than the source asks for. The width guard also knits the live
+          # vignettes here, so a missing Suggest would shorten what it reads
+          # too. tools/check-ci-deps.R enforces the mirror.
           # brms alone is excluded — the Bayesian vignette's brm() chunk is
-          # eval = FALSE against a committed .rds fixture (cairn D-015), and
-          # that vignette is not pre-computed anyway.
+          # eval = FALSE against a committed .rds fixture (cairn D-015), so
+          # the guard knits that vignette without it.
           dependencies: '"hard"'
           extra-packages: |
             local::.
@@ -100,7 +102,7 @@ jobs:
 
       # Plants one wide line of each kind the width guard reads in a copy of
       # vignettes/ and fails unless the guard fails on every plant and passes
-      # on the controls.
+      # on the controls. It runs only when every step before it passed: after
+      # a red guard its unchanged-tree control would only repeat that red.
       - name: Fail if the width guard misses a planted wide line
-        if: ${{ !cancelled() }}
         run: Rscript tools/check-vignette-width-plants.R

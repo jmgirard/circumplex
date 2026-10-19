@@ -239,8 +239,8 @@ norms <- function(x) {
 instruments <- function() {
   insts <- instrument_names()
 
-  cat(sprintf(
-    "The circumplex package currently includes %d instruments:\n",
+  cat_prose(sprintf(
+    "The circumplex package currently includes %d instruments:",
     length(insts)
   ))
   # Each entry wraps to the console width under its own text (M164). Each

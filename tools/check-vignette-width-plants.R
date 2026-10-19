@@ -1,9 +1,10 @@
 #!/usr/bin/env Rscript
 
 # Shows that tools/check-vignette-width.R fails on each kind of line it
-# claims to read (M164). Each plant adds one wide line to a fresh copy of
-# vignettes/, runs the guard on the copy, and requires the guard to fail and
-# to name that line: its width and its text, or the fence that never closes.
+# claims to read (M164). Each plant adds one wide line, an unclosed fence or a
+# chunk error to a fresh copy of vignettes/, runs the guard on the copy, and
+# requires the guard to fail and to name the plant in the planted file: the
+# line's width and text, the fence that never closes, or the error message.
 # Each control adds nothing the guard measures, and requires the guard to
 # pass.
 #
@@ -91,6 +92,11 @@ plants <- list(
     add = chunk('echo = FALSE', 'cat(strrep("k", 85), "\\n", sep = "")'),
     expect = paste0("(88 columns): #> ", strrep("k", 85))
   ),
+  `chunk error in a knitted live vignette` = list(
+    file = LIVE_B,
+    add = chunk('echo = FALSE', 'stop("planted knit error")'),
+    expect = "planted knit error"
+  ),
   `control: wide prose line outside a fence` = list(
     file = PRE, add = c("", strrep("l", 120), ""), expect = NULL
   ),
@@ -99,11 +105,16 @@ plants <- list(
   )
 )
 
+# The Rscript of the R that runs this script, so the guard runs under the same
+# R and library.
+RSCRIPT <- file.path(R.home("bin"), "Rscript")
+
 # Copies vignettes/ to a fresh directory, applies one plant, and returns the
-# guard's exit status and report.
+# guard's exit status and report. The copy is deleted afterwards.
 run_plant <- function(p) {
   copy <- tempfile("width-plant-")
   dir.create(copy)
+  on.exit(unlink(copy, recursive = TRUE), add = TRUE)
   file.copy(list.files("vignettes", full.names = TRUE, all.files = TRUE, no.. = TRUE),
             copy, recursive = TRUE)
   if (!is.null(p$file)) {
@@ -113,13 +124,34 @@ run_plant <- function(p) {
     writeLines(p$add, con)
     close(con)
   }
-  out <- suppressWarnings(system2("Rscript", c(GUARD, copy), stdout = TRUE, stderr = TRUE))
+  out <- suppressWarnings(system2(RSCRIPT, c(GUARD, copy), stdout = TRUE, stderr = TRUE))
   status <- attr(out, "status")
   list(status = if (is.null(status)) 0L else status, out = out)
 }
 
 n_vignettes <- length(list.files("vignettes", pattern = "\\.Rmd$"))
 if (n_vignettes == 0L) stop("no vignette to plant in", call. = FALSE)
+
+# TRUE when the report ties `expect` to `file`. Where the guard printed a
+# summary line for the file, that line must say TOO WIDE and `expect` must sit
+# in the file's own block, before the next summary line: every report names
+# every file, so the file name alone would prove nothing. Where the guard
+# stopped before any summary (a fence that never closes, a knit error), a
+# line that is not a summary line must name the file, and `expect` must appear.
+names_in_file <- function(out, file, expect) {
+  label <- paste0(file, ".Rmd")
+  summaries <- grep("^[^ ].* code-box lines, ", out)
+  own <- summaries[startsWith(out[summaries], label)]
+  if (length(own) == 1L) {
+    stop_at <- c(summaries[summaries > own], length(out) + 1L)[[1]] - 1L
+    grepl("TOO WIDE", out[[own]], fixed = TRUE) &&
+      any(grepl(expect, out[own:stop_at], fixed = TRUE))
+  } else {
+    others <- setdiff(seq_along(out), summaries)
+    any(grepl(label, out[others], fixed = TRUE)) &&
+      any(grepl(expect, out, fixed = TRUE))
+  }
+}
 
 bad <- character(0)
 for (nm in names(plants)) {
@@ -131,10 +163,9 @@ for (nm in names(plants)) {
     res$status == 0L &&
       grepl(paste("all", n_vignettes, "vignettes print within"), report, fixed = TRUE)
   } else {
-    # A plant fails, and the report names the planted line or fence, in the
-    # planted file.
-    res$status != 0L && grepl(p$expect, report, fixed = TRUE) &&
-      grepl(paste0(p$file, ".Rmd"), report, fixed = TRUE)
+    # A plant fails, and the report names the planted line, fence or error in
+    # the planted file.
+    res$status != 0L && names_in_file(res$out, p$file, p$expect)
   }
   cat(sprintf("%-52s %s\n", nm,
               if (ok) (if (is.null(p$expect)) "passed, as required" else "failed, as required")

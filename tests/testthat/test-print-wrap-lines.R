@@ -117,7 +117,8 @@ test_that("instruments() wraps each entry to the console width", {
   expect_gt(length(codes), 0)
   wrapped_somewhere <- FALSE
 
-  for (width in c(60, 80, 120)) {
+  # Width 40 is below the header's 57 columns, so the header must wrap too.
+  for (width in c(40, 60, 80, 120)) {
     lines <- instruments_lines(width)
     expect_true(
       all(nchar(lines, type = "width") <= width),
@@ -188,6 +189,9 @@ test_that("norm_standardize()'s message wraps to the console width", {
           all(nchar(lines, type = "width") <= width),
           label = paste(label, "fits width", width)
         )
+        # The word check below collapses whitespace, so it cannot see a blank
+        # line added by the wrap.
+        expect_true(all(nzchar(trimws(lines))), label = paste(label, "has no blank line"))
         expect_identical(
           squash_words(lines), squash_words(one_line),
           label = paste(label, "keeps its words at width", width)

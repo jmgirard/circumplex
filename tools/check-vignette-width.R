@@ -15,7 +15,10 @@
 # without output, so the guard knits it into a temporary copy of the directory
 # and reads the knitted markdown. The knit runs library(circumplex), so it
 # reads the INSTALLED package. Install the branch first (R CMD INSTALL .), or
-# the guard measures the output of whatever build is installed.
+# the guard measures the output of whatever build is installed. A chunk error
+# in a live vignette stops the guard. A chunk that a vignette skips when a
+# Suggests package is missing is skipped here too, so a run without lavaan
+# reads less of axes-reliability-caveats; the CI job installs them all.
 #
 # The guard measures every line inside a code fence, because every such line
 # is drawn in a code box. That is echoed source and printed output alike,
@@ -128,10 +131,20 @@ knit_live <- function(names) {
             copy, recursive = TRUE)
   owd <- setwd(copy)
   on.exit(setwd(owd), add = TRUE)
+  # knitr::knit() keeps going past a chunk error by default and writes the
+  # error into the output, which would let a broken vignette pass with short
+  # error lines in place of its real output. error = FALSE makes it stop.
+  old_error <- knitr::opts_chunk$get("error")
+  on.exit(knitr::opts_chunk$set(error = old_error), add = TRUE)
+  knitr::opts_chunk$set(error = FALSE)
   out <- character(0)
   for (name in names) {
     md <- paste0(name, ".md")
+    # Each knit starts from the same R options, so a vignette that sets
+    # options(width = ) cannot change the width a later one is knitted at.
+    op <- options()
     knitr::knit(paste0(name, ".Rmd"), md, quiet = TRUE, envir = new.env(parent = globalenv()))
+    options(op)
     out[[name]] <- file.path(copy, md)
   }
   out
