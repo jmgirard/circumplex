@@ -94,3 +94,34 @@ Pass 1 (2026-10-18), branch `m161-small-n-trajectory-oracle` at 8407c38c; `origi
 - AC5 evidence: R0 mean d(t) coverage over waves 0 to 4, all-replicates basis, is .9530 in `pole_n200` and .9456 in `xycor_n200`, both in [.93, .97]; every fit in both cells is "ok".
 - AC6 evidence: D-066 (`cairn/DECISIONS.md:2396`) cites `devel/m161-small-n-oracle.md` and the `.rds` (line 2405), states that R1 did not pass the band (line 2408), states that neither R0 nor R3a passed, so the set of passing rules is empty, and says M161 names no rule for M162 to ship (line 2412). The R1-passes branch, with the derivation and its four conditions, did not arise; the entry restates the derivation with RR25 section 1 as context.
 - Projection-vs-outcome (RR25, advisory): measured against projected — R0 at the centre wave, pole N = 20, e: .933 against .935; paired R1 minus R0 at N = 20: .0148 against .0148. N = 20 boundary-fit rate measured 3.2% (pole) and 1.0% (xycor) against RR25's 1.2% (3 of 250) and 0% (0 of 250); N = 10 measured 27.4% and 17.7% against 14% to 34%. RR25 stated no tolerances; the boundary rate at pole N = 20 is the shortfall that decided AC2.
+- Gate: `cairn_validate` all checks passed; no DESIGN principle changed, so `cairn_impact` skipped. Master watches: newest push verdicts on `R-CMD-check.yaml` and `test-coverage.yaml` are success at 48730633. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit 0. The diff touches no `R/`, `man/`, NEWS, README or top-level file; `devtools::check()` result below.
+- spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: on the converged-fit basis R0 and R3a also pass the band in all six gated cells (verified: R0 lowest outcome mean .935, lowest wave .924), so D-066's proposed replan cannot choose R1 — fix now (D-066 Decision and Consequences, record Reading, M162 work log).
+- diff-bug #2: AC3 reads converged fits only, and dropping non-PD fits raises coverage above the unconditional target (verified at N = 10, wave 2, pole: R0 .926 to .944 against .918, R1 .957 to .963 against .95); the record put R1's N = 10 overcoverage at the outer waves only — fix now (record Reading, D-066 Context).
+- diff-bug #3: "R0 sits at ... and R1 at .95" overclaims AC3 (i), whose N = 20 tolerance cannot separate the rules — fix now (record: AC3 (i) agrees with both, AC3 (ii) separates).
+- diff-bug #4: the boundary mechanism is not in the `.rds`, which stores Hessian status only — fix now (record and D-066 say non-PD Hessian and cite RR25 section 8 for the mechanism).
+- diff-bug #5: "every figure comes from that file" is false for the RR25 figures and commit facts — fix now (record sentence narrowed).
+- diff-bug #6: "their intervals cover about as well as the others" is not supported (R1 d .925 over 32 fits) — fix now (comparison dropped).
+- diff-bug #7: the width figures are means over waves of per-wave medians — fix now (record wording).
+- diff-bug #8: d is scored at uncertified rows — fix now (record note; measured 7 uncertified scores, all pole N = 10, moving d coverage by under .001, not the 0.4 points the reviewer estimated).
+- diff-bug #9: `glmmTMB::fixef()` sits outside `tryCatch`, so an error there would stop the grid — follow-up (M162 replan input in its work log; the script stays as the run that produced the results).
+- diff-bug #10: the smoke check matches the formula string only, not `dispformula` or `REML = TRUE` — follow-up (M162 replan input).
+- diff-bug #11: R1 keeps nu = N - 1 where deletion removes all of a person's waves — fix now (record note; those cells are ungated).
+- diff-bug #12: the header's seed note gives M27's offsets without its base seed — reject, false: the disjointness it states holds (M27 near 170e6, M161 above 540e6).
+- blame-history #1: M162's criteria still require the rule the M161 D-entry names — reject, planned change: T4 and D-066 route M162 to `/milestone-plan`, its criteria are plan-owned, and its work log records D-066.
+- blame-history #2: the routed RR25 rec 6 line in M162 presumes a selected rule — fix now (new M162 work-log line marks recs 6, 7 and 9 as replan inputs).
+- blame-history #3: this oracle's band basis differs from M27 and M21, which report converged-only coverage — fix now (record states it; the frozen header is left unchanged).
+- blame-history #4: `fixef()` and `ssm_trajectory()` are not wrapped in error handling — follow-up (same as diff-bug #9).
+- blame-history #5: N_DRAWS 4000 differs from M27's 2000 and is not in the header — fix now (record states both values).
+- blame-history #6: D-066 could cite the measured 3.2% — reject, planned change: D-entries carry no derived measurements, and the record holds the rate.
+- prior-review #1: the converged-fit clause of RR25 rec 4 was overridden, not only its ceiling — fix now (D-066 Rejected says the ingest declined rec 4 as a whole).
+- prior-review #2: d is in the gated set, which RR25 section 8 names as a second route for a correct rule to fail — follow-up (M162 replan input).
+- prior-review #3: selection rests on the band, not on calibration — reject, planned change: the user chose this design at the amendment stop; calibration is listed as a replan input.
+- prior-review #4: N = 10 is ungated — reject, planned change: the question-set answer and the adopted amendment.
+- prior-review #5: a non-PD fit with a non-finite `vcov` is counted as non-PD — reject, planned change: AC4 orders the disjoint counts failed, non-PD, non-finite `vcov`.
+- prior-review #6: blanket `suppressWarnings()` hides convergence warnings — follow-up (M162 replan input).
+- ripple #1: the M162 ROADMAP row still reads `planned` — reject, false as a defect: only `/milestone-plan` moves a planned row, and M162's work log records D-066.
+- ripple #2: the "Small-sample correction for trajectory draws" row ends "— started M161" — fix now at post-merge hygiene (records-hygiene §1 narrows the row and drops the token).
+- ripple #3: Section 7 of the growth vignette states only the 200-person result — follow-up (M162 replan input; M161 scope excludes the vignettes).
+- ripple #4: "keep their nominal coverage" and "stays at nominal" do not name the 200-person sample — follow-up (M162 replan input; pre-existing text).
+- ripple #5: `R/ssm_trajectory_helper.R:43-45` says Section 7 states what the oracle measured — follow-up (M162 replan input; M161 scope excludes `R/`).
