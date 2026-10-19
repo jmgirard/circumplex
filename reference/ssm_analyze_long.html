@@ -138,7 +138,8 @@ identifier column, an occasion column, and the circumplex scale scores
 vector of column indexes, giving the circumplex scale scores in <code>data</code>
 (the same scales measured at every occasion). It must not select one
 column twice, hold a number below 1, or name a column whose name occurs
-more than once in <code>data</code>.</p></dd>
+more than once in <code>data</code>. The scores are reshaped by scale name, so
+numbers must not reach two columns that share a name either.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>

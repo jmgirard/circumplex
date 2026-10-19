@@ -45,7 +45,8 @@ ssm_sem_parameters(
 - scales:
 
   Required. A character vector with the scale (indicator) names, in the
-  same order as `angles`. Each name must appear only once.
+  same order as `angles`. Each name must appear only once, and `NA` at
+  most once.
 
 - angles:
 

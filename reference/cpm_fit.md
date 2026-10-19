@@ -43,7 +43,7 @@ cpm_fit(
   column whose name occurs more than once in `data`. For the `cormat`
   path, optional labels for the variables (defaults to the matrix
   dimnames, or `V1`, `V2`, ...); each label, given or taken from the
-  dimnames, must appear only once.
+  dimnames, must appear only once, and `NA` at most once.
 
 - angles:
 

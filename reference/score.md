@@ -29,7 +29,10 @@ score(
 
   Required. The variable names or column numbers for the variables in
   `.data` that contain all the circumplex items from a single circumplex
-  measure, in ascending order from item 1 to item N.
+  measure, in ascending order from item 1 to item N. They must not
+  select one column twice (the scoring key reads the items by position,
+  so a repeat would put a column in another item's place), hold a number
+  below 1, or name a column whose name occurs more than once in `data`.
 
 - instrument:
 

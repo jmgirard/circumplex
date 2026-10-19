@@ -71,7 +71,9 @@ ssm_sem(
   `grouping` and `measures = NULL`, the latent MEAN path is analyzed
   instead: each group's model-implied latent mean profile, on the
   raw-score metric. (A single-group latent mean profile is not a
-  product: factor means are not identified in one group.)
+  product: factor means are not identified in one group.) A measure must
+  not carry the name of one of the `scales`, since lavaan reaches
+  variables by name.
 
 - grouping:
 

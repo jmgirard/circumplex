@@ -22,7 +22,8 @@ ipsatize(data, items, na.rm = TRUE, prefix = "", suffix = "_i", append = TRUE)
 
   Required. A character vector containing the column names, or a numeric
   vector containing column indexes, of item variables in `data` to be
-  ipsatized.
+  ipsatized. They must not select one column twice, hold a number below
+  1, or name a column whose name occurs more than once in `data`.
 
 - na.rm:
 

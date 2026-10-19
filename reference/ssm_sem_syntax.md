@@ -32,7 +32,8 @@ ssm_sem_syntax(
 - scales:
 
   Optional. A character vector of circumplex scale (column) names, each
-  appearing only once. Ignored when `instrument` is supplied.
+  appearing only once, and `NA` at most once. Ignored when `instrument`
+  is supplied.
 
 - angles:
 
@@ -42,7 +43,9 @@ ssm_sem_syntax(
 - measures:
 
   Optional. Either `NULL` or a character vector of external measure
-  (column) names to relate to the circumplex factors.
+  (column) names to relate to the circumplex factors. None may be one of
+  the scale names, whether those come from `scales` or from
+  `instrument`.
 
 - model:
 

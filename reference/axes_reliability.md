@@ -40,7 +40,12 @@ axes_reliability(
   (or numeric indices) giving **all** items in item-number order, as in
   [`score()`](http://circumplex.jmgirard.com/reference/score.md).
   Without `instrument`, a list with one element per scale, each a
-  character vector (or numeric indices) of that scale's item columns.
+  character vector (or numeric indices) of that scale's item columns. In
+  either form, `items` must not select one column twice (in the list
+  form, within a scale or across two scales), hold a number below 1, or
+  name a column whose name occurs more than once in `data` (or in
+  `cormat`). Items are matched by name, so a number must not reach such
+  a column either.
 
 - angles:
 

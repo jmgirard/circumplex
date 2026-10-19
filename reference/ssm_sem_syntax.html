@@ -125,7 +125,8 @@ abbreviations and angles are used. Supply this or both <code>scales</code> and
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
 <dd><p>Optional. A character vector of circumplex scale (column)
-names, each appearing only once. Ignored when <code>instrument</code> is supplied.</p></dd>
+names, each appearing only once, and <code>NA</code> at most once. Ignored when
+<code>instrument</code> is supplied.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
@@ -135,7 +136,9 @@ length as <code>scales</code>. Ignored when <code>instrument</code> is supplied.
 
 <dt id="arg-measures">measures<a class="anchor" aria-label="anchor" href="#arg-measures"></a></dt>
 <dd><p>Optional. Either <code>NULL</code> or a character vector of external
-measure (column) names to relate to the circumplex factors.</p></dd>
+measure (column) names to relate to the circumplex factors. None may be
+one of the scale names, whether those come from <code>scales</code> or from
+<code>instrument</code>.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>

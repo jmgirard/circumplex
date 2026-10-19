@@ -171,7 +171,8 @@ related to the latent circumplex content (the disattenuated correlation
 path). With <code>grouping</code> and <code>measures = NULL</code>, the latent MEAN path is
 analyzed instead: each group's model-implied latent mean profile, on the
 raw-score metric. (A single-group latent mean profile is not a product:
-factor means are not identified in one group.)</p></dd>
+factor means are not identified in one group.) A measure must not carry
+the name of one of the <code>scales</code>, since lavaan reaches variables by name.</p></dd>
 
 
 <dt id="arg-grouping">grouping<a class="anchor" aria-label="anchor" href="#arg-grouping"></a></dt>

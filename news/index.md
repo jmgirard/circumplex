@@ -30,6 +30,40 @@
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
   refuse a label listed twice.
 
+- The `items` argument of
+  [`score()`](http://circumplex.jmgirard.com/reference/score.md),
+  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md)
+  and
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md),
+  and the `scales` argument of
+  [`self_standardize()`](http://circumplex.jmgirard.com/reference/self_standardize.md),
+  now refuse the same three selections. The
+  [`score()`](http://circumplex.jmgirard.com/reference/score.md) key
+  reads items by position. A repeat inserted in the list moved every
+  later item one place on, and a repeat in place of an item took that
+  item’s position. Each scale that uses such a position read the wrong
+  column, with no message. In
+  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md) a
+  repeated item counted twice in each row’s mean.
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  also refuses one column listed under two scales. It reads items by
+  name, so it also refuses a number that reaches a column whose name
+  occurs more than once in `data` or `cormat`. Such a number used to get
+  the first column with that name.
+
+- [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md)
+  refuses numbers in `scales` that reach two columns with one name, and
+  the message names that name. Before, the error spoke of overlapping
+  `occasions` blocks.
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md),
+  [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md)
+  and the `cormat` path of
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  refuse `NA` listed twice as a label.
+  [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) and
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
+  refuse a `measures` entry that carries the name of a scale.
+
 ### New features
 
 - Two new helpers build the input to a growth model on SSM coordinates,

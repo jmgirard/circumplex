@@ -47,7 +47,8 @@ ssm_analyze_long(
   column indexes, giving the circumplex scale scores in `data` (the same
   scales measured at every occasion). It must not select one column
   twice, hold a number below 1, or name a column whose name occurs more
-  than once in `data`.
+  than once in `data`. The scores are reshaped by scale name, so numbers
+  must not reach two columns that share a name either.
 
 - angles:
 

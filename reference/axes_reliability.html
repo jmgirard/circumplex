@@ -136,7 +136,11 @@ exactly one of <code>data</code> or <code>cormat</code>.</p></dd>
 <dd><p>Item selection. With <code>instrument</code>, a character vector of column
 names (or numeric indices) giving <strong>all</strong> items in item-number order, as in
 <code><a href="score.html">score()</a></code>. Without <code>instrument</code>, a list with one element per scale, each a
-character vector (or numeric indices) of that scale's item columns.</p></dd>
+character vector (or numeric indices) of that scale's item columns. In
+either form, <code>items</code> must not select one column twice (in the list form,
+within a scale or across two scales), hold a number below 1, or name a
+column whose name occurs more than once in <code>data</code> (or in <code>cormat</code>). Items
+are matched by name, so a number must not reach such a column either.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>

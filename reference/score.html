@@ -112,7 +112,11 @@ circumplex scales.</p></dd>
 <dt id="arg-items">items<a class="anchor" aria-label="anchor" href="#arg-items"></a></dt>
 <dd><p>Required. The variable names or column numbers for the variables
 in <code>.data</code> that contain all the circumplex items from a single
-circumplex measure, in ascending order from item 1 to item N.</p></dd>
+circumplex measure, in ascending order from item 1 to item N. They must
+not select one column twice (the scoring key reads the items by
+position, so a repeat would put a column in another item's place), hold
+a number below 1, or name a column whose name occurs more than once in
+<code>data</code>.</p></dd>
 
 
 <dt id="arg-instrument">instrument<a class="anchor" aria-label="anchor" href="#arg-instrument"></a></dt>
