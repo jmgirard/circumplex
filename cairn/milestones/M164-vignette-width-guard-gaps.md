@@ -1,0 +1,85 @@
+<!-- Section ownership + write-modes: see tracking-rules.md "Milestone-file
+     section ownership". A phase skill never rewrites another phase's section.
+     Per-section owners are tagged below. The one size check that can fail is
+     cairn_validate's <150 over the plan-owned body. -->
+# M164: Vignette width guard gaps
+
+- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
+- **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
+- **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
+- **Principles touched:** GP4   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
+- **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
+- **Surface tier:** user-facing — it changes printed output, a message that users see, and the website's vignettes   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
+- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
+
+## Goal
+<!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
+
+Every line in a column-1 code fence of every vignette fits the website's code box, as a guard that reads all of them checks, and the CPM fit line wraps to the console width.
+
+## Scope
+<!-- owner: plan · create/amend-via-gate -->
+
+**In:** Candidate item (i): the width guard reads the three live vignettes (`axes-reliability-caveats`, `bayesian-ssm-analysis`, `using-instruments`) by knitting them. Item (ix): the guard measures every line inside a code fence. It then reads output under another comment prefix, indented output, a fence that a `results = "asis"` chunk writes, and echoed source. The lines that this finds too wide are fixed. These are the `instruments()` list (82 columns on `using-instruments`), the `norm_standardize()` disclosure message (173 columns there), and two echoed source lines (81 and 83 columns in `sem-based-ssm-analysis` and `advanced-visualization`). Item (x): the CPM `Fit:` line wraps at its `;` separators.
+
+**Out:** Table and data-frame output is never wrapped (the user's limit at the plan gate). If the guard finds such a line too wide, it goes to `EXEMPT` with its reason. Text that a `results = "asis"` chunk writes outside a code fence renders as prose or a table, not in a code box. Fences indented by 1 to 3 spaces and 4-space-indented code blocks: no vignette has them (grep on 2026-10-19). Both stay a candidate row. The other wide console lines in the width ledger of `tests/testthat/test-print-width.R` (test-statistic lines and headings) stay in that ledger.
+
+## Acceptance criteria
+<!-- owner: plan · create/amend-via-gate; review reads, never reinterprets. -->
+
+- [ ] AC1: Run as `Rscript tools/check-vignette-width.R`, the guard reads every file that `list.files("vignettes", pattern = "\\.Rmd$")` returns. It reads `vignettes/<name>.Rmd` as it stands on disk for each name in `VIGNETTES` of `tools/precompute-vignettes.R`. It knits any other vignette with the installed package into a temporary copy of `vignettes/`. It prints one summary line per file, starting with the file name, so the number of summary lines equals the length of that call's result (14 on 2026-10-19).
+- [ ] AC2: In each file read, the guard measures the display width of every line inside a code fence. A fence opens at a line that starts at column 1 with three or more backticks or tildes. It closes at the next line that starts at column 1 with the same character, at least as many of them, and nothing else. A fence that never closes makes the guard exit non-zero. The guard measures echoed source and printed output alike, whatever comment prefix or indent the output carries. This includes a fence that a `results = "asis"` chunk writes. The guard exits non-zero for each measured line wider than 80 columns that no `EXEMPT` entry matches, and names its file, line number and width. It does not measure a line outside a fence.
+- [ ] AC3: With the branch's package installed (`R CMD INSTALL .`) and the pre-computed vignettes re-rendered, `Rscript tools/check-vignette-width.R` exits 0 on the branch. `EXEMPT` then holds only the two loading-line entries of `sem-based-ssm-analysis`. The width step of the `vignette-precompute` workflow passes on the PR head.
+- [ ] AC4: `instruments()` prints to `getOption("width")`. At widths 60, 80 and 120, every printed line fits the width. The continuation lines of each entry are indented under the entry's text. No line opens with a space before an entry number. Every instrument that `instrument_names()` returns appears with its abbreviation, name and code, words in order. A `tests/testthat` test asserts each of these.
+- [ ] AC5: The disclosure message of `norm_standardize()` wraps to `getOption("width")`. The cases are every instrument, every normative sample that `norm_sample_usable()` accepts for it, and widths 60 and 120. In each case, every line of the message fits the width. The words of the message, in order, equal those of the one-line message. A `tests/testthat` test asserts both.
+- [ ] AC6: The CPM fit line that `print()` of a `cpm_fit()` result prints wraps to `getOption("width")`. It breaks only after a `;` and indents each continuation line by five spaces. The cases are the saturated-model line, the 89-column fit line that the width ledger records (`tests/testthat/test-print-width.R`), and one constructed fit whose one-line form exceeds 100 columns, at widths 60, 77 and 120. In each case, every line fits the width and every break follows a `;`. The lines, with the indent removed and joined by a space, equal the one-line text. A `tests/testthat` test asserts each of these.
+- [ ] AC7: The development section of NEWS.md has an entry that names the three printed-text changes: the CPM fit line, the `instruments()` list, and the `norm_standardize()` message. `devtools::test()` and `devtools::check(args = "--no-manual")` report 0 failures, 0 errors and 0 warnings.
+
+## Coverage
+<!-- owner: plan · create/amend-via-gate -->
+
+- AC1 → T5
+- AC2 → T5, T6
+- AC3 → T3, T4, T5, T7
+- AC4 → T1, T3
+- AC5 → T1, T4
+- AC6 → T1, T2
+- AC7 → T8
+
+## Tasks
+<!-- owner: plan (create) / implement (check-off, minor edits) -->
+
+- [ ] T1: Write the regression tests for AC4 to AC6 first, and see each fail before its fix.
+- [ ] T2: Make `cpm_fit_line()` (R/cpm_oop.R:31) wrap through `wrap_prose(atomic = TRUE)`, with one unit per `;` clause and a five-space continuation. Remove the `fit line` entry and kind from the width ledger in `tests/testthat/test-print-width.R`. Update the CPM snapshots.
+- [ ] T3: Make `instruments()` (R/instrument_oop.R:240) print each entry with `cat_item()`. Stop the separator space of `cat()` from opening lines 2 and later. Update snapshots.
+- [ ] T4: Send the `norm_standardize()` message (R/tidying_functions.R:358) through `wrap_prose()`. Tests that match message text across a break match it with whitespace tolerance.
+- [ ] T5: Rewrite the guard to the `list.files()` domain, the knit of live vignettes into a temporary copy, and the fence rule of AC2. Rewrite its header comment, which says "two live vignettes" and reads only `#>` lines. Update the comment in `.github/workflows/vignette-precompute.yaml` that says the same.
+- [ ] T6: Write a plant script under `tools/` and run it in the vignette-precompute workflow. Each plant must fail the guard. The plants are: a wide line in a backtick fence and in a tilde fence, a 4-backtick fence that holds an inner 3-backtick line, a fence that never closes, wide output under `comment = "##"` and `comment = ""`, an indented `#>` line, a line wide only after tab expansion, a line of double-width characters, a wide line first and last in a block, a wide echoed source line, a fence that an asis chunk writes, and a wide line in a knitted live vignette. Each control must pass: a wide prose line outside a fence, and the unchanged tree.
+- [ ] T7: Reflow the two wide echoed source lines in the `.Rmd.orig` sources. Re-render every pre-computed vignette that the staleness check reports stale. Install the branch and run the guard to exit 0.
+- [ ] T8: Add the NEWS entry. Run the tests and the check.
+
+## Work log
+<!-- owner: any skill · append-only; one line per entry; absolute dates. -->
+
+- 2026-10-19: created by /milestone-plan.
+- 2026-10-19: tier check: milestone — it changes the printed output and a message of exported functions and rewrites a CI guard, over more than one sitting.
+- 2026-10-19: collision: candidate row "Vignette width guard gaps" absorbed in full (items i, ix, x); its started token appended. Item (ix)'s trigger (a line reaching the site) and item (x)'s trigger (the next milestone opening `R/cpm_oop.R`) had not fired; the user chose to include both.
+- 2026-10-19: collision: M131, M132 and M146 are done; this extends them. M132's reason for no live-vignette guard (one needs brms to render) no longer holds: the `brm()` chunk is `eval = FALSE` against a committed `.rds`, and the live set is now three vignettes, not two.
+- 2026-10-19: collision: rows "Ladder print test gaps and edge cases", "M120 instrument strength" and "Vignette prose follow-ons" checked; distinct scopes, not absorbed. D-056 and D-057 read: a layout change that keeps every word and number needs no deprecation cycle, so this works under GP4.
+- 2026-10-19: checker-regress shape not hit: the guard checks the shipped vignettes, which are user-facing, not repo-internal artifacts.
+- 2026-10-19: inbox sweep: 1 open issue (#180, master-red alert) and 0 open PRs; no overlap.
+- 2026-10-19: lessons harvested: M21 family (a knit outside `load_all()` reads the installed package, so AC3 names the install), M120 (the staleness guard diffs against HEAD, so commit the re-render), test-craft M13 family (prove the guard by plants).
+- 2026-10-19: criteria audit (full mode, fresh Opus reader): 10 findings. Fixed: AC4 dropped width 40 (the 57-column header cannot fit); AC6 named its cases (no procedure listed "each fixture"); AC3 names the branch install; AC2 and the Goal narrowed to column-1 fences, the closing rule and the unclosed-fence exit stated; T6 plants now vary fence form, comment prefix, width source and position; AC1 says "summary line" and "on disk"; T5 adds the workflow comment and Coverage maps AC3 to T5; AC6 states the five-space indent; AC5 names `norm_sample_usable()`. Answered, no change: AC1 and AC2 bind the guard, which Scope makes a deliverable; D-056 covers the message change.
+- 2026-10-19: question set: the norms message — the user wants no data-frame-style output broken by wrapping; the message is prose, so it wraps, and the Out item keeps every table and data-frame line unwrapped.
+- 2026-10-19: question set: scope — include items (ix) and (x) (user choice).
+- 2026-10-19: plan gate chose knitting the live vignettes inside the guard over pre-computing them, because it adds no `.Rmd.orig` files or staleness surface for pages that fit no models; falsified by a live vignette whose site render differs from the guard's knit.
+- 2026-10-19: plan gate chose measuring every fenced line over adding more `#>` prefix patterns, because one rule covers every output form and echoed code; falsified by a code-box line on the site that knitr writes outside a column-1 fence.
+- 2026-10-19: plan gate chose wrapping the fit line at its `;` clauses over a fixed two-line layout, because the line stays unchanged where it fits; falsified by a reader report that the wrapped line reads worse.
+- 2026-10-19: the fence rule's narrowing leaves indented fences unread; recorded as a candidate row ("Indented code fences in the width guard").
+
+## Decisions
+<!-- owner: implement / review · append-only; milestone-local. -->
+
+## Review
+<!-- owner: review · exclusive -->
