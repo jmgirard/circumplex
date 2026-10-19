@@ -2401,28 +2401,33 @@ multivariate t draws with one shared chi-square divisor and nu = N - 1; and
 R3a, a `vcov` inflation by N / (N - 1). The band counts a fit with a
 non-positive-definite Hessian as a miss. RR25 section 1 derives R1 as exact at
 the mean design time for the `ssm_growth_formula()` model on complete balanced
-data with no person-level covariate and an interior REML estimate, and as
-conservative at other times. The record is `devel/m161-small-n-oracle.md`,
+data with no person-level covariate, where REML equals the ANOVA fit in every
+sample, and as conservative at other times. Coverage read among converged fits
+only runs above that target at small N, because the dropped fits are mostly
+samples with narrow intervals. The record is `devel/m161-small-n-oracle.md`,
 with results in `devel/m161-small-n-results.rds`.
 
 **Decision.** R1 did not pass the band, and neither did R0 or R3a. R1 failed
-in one cell, `pole` at 20 persons, where the REML fit reached the boundary of
-the random-effect covariance often enough that the misses it counts pulled the
-mean below the band. Among converged fits R1 met the band there and in every
-other gated cell, and the closed-form checks passed. M161 names no rule for
-M162 to ship. M162's goal, as planned, is wrong, and its next step is
-`/milestone-plan`.
+in one cell, `pole` at 20 persons, where enough fits had a non-PD Hessian that
+the misses the band counts pulled the mean below it. Among converged fits R1
+met the band there and in every other gated cell, and the closed-form checks
+passed. M161 names no rule for M162 to ship. M162's goal, as planned, is
+wrong, and its next step is `/milestone-plan`.
 
 **Rejected.** Moving the band to the converged-fit basis after the results.
-That is the RR25 rec 4 design, which the ingest did not apply on the
-boundary-rate estimate RR25 measured, but adopting it now would be a gate
-chosen after the data. Shipping R1 on the closed-form result alone was also
-rejected: the plan made the band the condition for shipping.
+That basis, with a ceiling on the boundary rate, is RR25 rec 4, which the
+ingest declined as a whole on RR25's estimate of the boundary rate; adopting
+it now would be a gate chosen after the data. Shipping R1 on the closed-form
+result alone was also rejected: the plan made the band the condition for
+shipping.
 
-**Consequences.** A replan of M162 can adopt a converged-fit band with a
-ceiling on the boundary rate, pre-registered with new seeds. The record
-reports the boundary rates such a ceiling would read. The derivation in
-RR25 section 1 stands, and the record's closed-form checks agree with it.
+**Consequences.** A converged-fit band alone cannot choose R1: on that basis
+R0 and R3a also meet the band in every gated cell (the record gives the
+figures). A replan of M162 that must choose R1 over the shipped draws needs a
+criterion that separates them, such as the paired R1 minus R0 check at the
+design centre or calibration to .95, pre-registered with new seeds, beside
+any band and boundary-rate ceiling. The derivation in RR25 section 1 stands,
+and the record's closed-form checks agree with it.
 
 **Reopens.** A pre-registered run in which R1 passes a band that the plan
 fixed before the run.
