@@ -359,8 +359,9 @@ machinery, not of the SSM transform. The caution under the Section 5 table
 states this for the `coef` and `vcov` shape.
 
 The package's coverage oracles fit this model with glmmTMB and REML to
-simulated data. Each simulated sample has five balanced waves and no
-missing values. The first oracle used 200 persons in each coverage cell.
+simulated data. The figures below come from samples with five balanced
+waves and no missing values. The first oracle used 200 persons in each
+coverage cell.
 The $d(t)$ intervals held coverage between .93 and .97 at every certified
 wave. At the uncertified low-amplitude wave the coverage was .854, which
 is the case the certification of Section 6 flags. Its record is
@@ -382,10 +383,11 @@ glmmTMB reports a non-positive-definite Hessian, which means that the fit
 did not converge cleanly. At 20 persons this happened in 3.2% of the
 samples under the crossing truth and 1.0% under the correlated truth. At
 10 persons it happened in 27.4% and 17.7%, in the same order. Such a fit
-still returns `coef` and `vcov`, so the helper still gives intervals from
-it. At 10 persons, the intervals from those fits covered .906 and .903 on
-average, in the same order. The intervals from the converged fits covered
-.939 and .920. The record is
+still returns a finite `coef` and `vcov`. The helper refuses a `vcov` that
+is not symmetric or has a negative eigenvalue larger than rounding error,
+and otherwise draws from it. At 10 persons, normal draws on those fits' `vcov` covered .906 and
+.903 on average, in the same order. The intervals from the converged fits
+covered .939 and .920. The record is
 `devel/m161-small-n-oracle.md`, with its results in
 `devel/m161-small-n-results.rds`. These figures describe this model and
 these two truths only. This page's sample has 150 persons. Both records
