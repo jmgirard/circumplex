@@ -287,7 +287,7 @@ acc
 summary(acc)
 #> 
 #> Mean scores; bootstrap, 100 replicates, level 0.95; 25 reps per condition.
-#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.4s.
+#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.3s.
 #> Ladder c = 1, 0.25; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
