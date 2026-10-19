@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M164: Vignette width guard gaps
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
 - **Principles touched:** GP4   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
 - **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
 - **Surface tier:** user-facing — it changes printed output, a message that users see, and the website's vignettes   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
+- **Branch/PR:** m164-vignette-width-guard-gaps   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -50,7 +50,7 @@ Every line in a column-1 code fence of every vignette fits the website's code bo
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
-- [ ] T1: Write the regression tests for AC4 to AC6 first, and see each fail before its fix.
+- [x] T1: Write the regression tests for AC4 to AC6 first, and see each fail before its fix.
 - [ ] T2: Make `cpm_fit_line()` (R/cpm_oop.R:31) wrap through `wrap_prose(atomic = TRUE)`, with one unit per `;` clause and a five-space continuation. Remove the `fit line` entry and kind from the width ledger in `tests/testthat/test-print-width.R`. Update the CPM snapshots.
 - [ ] T3: Make `instruments()` (R/instrument_oop.R:240) print each entry with `cat_item()`. Stop the separator space of `cat()` from opening lines 2 and later. Update snapshots.
 - [ ] T4: Send the `norm_standardize()` message (R/tidying_functions.R:358) through `wrap_prose()`. Tests that match message text across a break match it with whitespace tolerance.
@@ -77,6 +77,7 @@ Every line in a column-1 code fence of every vignette fits the website's code bo
 - 2026-10-19: plan gate chose measuring every fenced line over adding more `#>` prefix patterns, because one rule covers every output form and echoed code; falsified by a code-box line on the site that knitr writes outside a column-1 fence.
 - 2026-10-19: plan gate chose wrapping the fit line at its `;` clauses over a fixed two-line layout, because the line stays unchanged where it fits; falsified by a reader report that the wrapped line reads worse.
 - 2026-10-19: the fence rule's narrowing leaves indented fences unread; recorded as a candidate row ("Indented code fences in the width guard").
+- 2026-10-19: T1: `tests/testthat/test-print-wrap-lines.R` written; before any fix it fails 4 of 6 blocks (fit line 4+2 failures, instruments() 3, norms message 46+1); the other two blocks are guards that pass by design. Width set by a base-R helper, since withr is not in Suggests.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
