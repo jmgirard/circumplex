@@ -1,0 +1,65 @@
+# M163: Small-sample coverage in the trajectory docs
+
+- **Status:** planned
+- **Priority:** normal
+- **Depends on:** —
+- **Driving RR:** —
+- **Principles touched:** IP1, GP2, GP5
+- **Resolves:** —
+- **Surface tier:** user-facing — the growth vignette, the `ssm_trajectory()` help page and NEWS.md
+- **Branch/PR:** —
+
+## Goal
+
+The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the M161 oracle measured about the shipped intervals at 10 to 50 persons.
+
+## Scope
+
+**In:** Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig` and its re-rendered `.Rmd`. The small-sample paragraph of the `ssm_trajectory()` roxygen in `R/ssm_trajectory_helper.R`, and the regenerated `man/ssm_trajectory.Rd`. The two measured coverage results outside Section 7 in that vignette. The existing development-version NEWS entry on Section 7.
+
+**Out:** any change to how `ssm_trajectory()` draws or prints. There is no code change, and the printed caution text stays. A small-sample draw rule, which stays the parked candidate row "Small-sample correction for trajectory draws" because D-066 names no rule. Advice on a minimum number of persons, declined at the plan gate. The parked peer-review status row.
+
+## Acceptance criteria
+
+- [ ] AC1: Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig` and the re-rendered `vignettes/growth-ssm-analysis.Rmd` state five facts from the M161 record.
+  - The simulated design: the `ssm_growth_formula()` model, five balanced waves, the two truths and 1000 replicates per cell.
+  - The range of the shipped (R0) mean coverage among converged fits over the six complete-data cells at 20, 30 and 50 persons. Each mean is over the five waves and over e, x, y and d.
+  - The share of fits with a non-positive-definite Hessian in the complete-data cells at 10 and at 20 persons, for each truth.
+  - That such a fit still yields intervals. With it, the R0 mean coverage at 10 persons for each truth, on the same averaging basis, among converged fits and among non-positive-definite fits.
+  - The record path `devel/m161-small-n-oracle.md`.
+
+  Each figure equals, at its printed precision, the value computed from `devel/m161-small-n-results.rds`. No sentence of Section 7 contradicts a stated figure.
+- [ ] AC2: The small-sample paragraph of the `ssm_trajectory()` help page states two facts. They are the R0 converged-fit coverage range at 20 to 50 persons, and the non-positive-definite share at 10 persons for each truth. This holds in the roxygen of `R/ssm_trajectory_helper.R` and in the regenerated `man/ssm_trajectory.Rd`. Each figure equals the one that Section 7 states. The paragraph keeps its pointer to Section 7, and no sentence of it contradicts a stated figure.
+- [ ] AC3: Two paragraphs of `vignettes/growth-ssm-analysis.Rmd.orig` report a measured coverage result outside Section 7. They hold the roughly 86% result of Section 4 and the near-origin result of Section 6. Each names the persons per cell and the record that measured its result.
+- [ ] AC4: Take the development-version NEWS.md entry that opens "The same vignette's Section 7 now states". It also says that Section 7 and `?ssm_trajectory` report the coverage at 10 to 50 persons. NEWS.md gains no other entry from this milestone, and the entry names no milestone.
+- [ ] AC5: `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and 0 notes. `tools/precompute-vignettes.R` renders the growth vignette, and `Rscript tools/check-vignette-staleness.R` passes after the render.
+
+## Coverage
+
+- AC1 → T1, T2
+- AC2 → T1, T3
+- AC3 → T2
+- AC4 → T3
+- AC5 → T4
+
+## Tasks
+
+- [ ] T1: Compute the Section 7 figures from `devel/m161-small-n-results.rds` with a short script run in the session. Record each figure and its source element in a work-log line.
+- [ ] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
+- [ ] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
+- [ ] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
+
+## Work log
+
+- 2026-10-19: created by /milestone-plan. tier check: milestone — the request named M162's replan or drop, a design decision, and the replacement restates oracle figures on three user-facing surfaces.
+- 2026-10-19: question set: drop M162 or replan — drop it and fix the docs. Minimum-N advice — figures only. Peer-review status line — keep it parked. No outward action or dependency change was asked or granted.
+- 2026-10-19: plan gate chose docs only over a replan with a fresh pre-registered oracle run, because the shipped converged-fit coverage at 20 to 50 persons is .938 to .944, a t rule can only be opt-in, and no draw rule repairs the 10-person boundary fits; falsified by a pre-registered run in which the t rule passes a band fixed before the run (D-066), or by evidence that the documented coverage misleads users at the sample sizes they fit.
+- 2026-10-19: plan gate chose figures only over a minimum-N threshold, because the record covers one model and two truths; falsified by an oracle over more designs that places a threshold.
+- 2026-10-19: criteria audit (full mode, fresh Opus reader): nine findings, all fixed. AC1 now names the six complete-data cells, the R0 rule, the averaging basis and the simulated design. Its 10-person fact reports coverage among converged and non-PD fits, because a non-PD fit still yields intervals, and the .68 to .78 all-replicate figure is the band's scoring, not what a user sees. AC1 and AC2 forbid contradicting sentences, and AC2 counts per-truth shares. AC3 names its two paragraphs and drops the grep and the ledger (proxy domain, instrument clause). AC5 adds the staleness check. AC4, reachability, probe and proportionality returned nothing.
+- 2026-10-19: collision sweep: M162 (planned) dropped at the user's choice and archived. The "Small-sample correction for trajectory draws" row is parked under D-066's reopen condition, and D-066 holds. The peer-review row stays parked at the user's choice, its "next opens those roxygen blocks" condition removed.
+- 2026-10-19: inbox sweep: one open issue (#180, a master-red alert) and no open PRs. Neither overlaps.
+- 2026-10-19: lessons harvested: M56 family (sweep the prose that cites Section 7, in both directions), M94 (state what the study covered, not a general threshold), M90 (compute each figure from the committed `.rds`).
+
+## Decisions
+
+## Review
