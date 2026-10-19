@@ -13,8 +13,11 @@
 # rather than a byte-exact `git diff`: one chunk's printed numbers are not
 # reproducible across machines and the guard's header explains what that script
 # masks and what it still holds byte-exact. tools/check-vignette-width.R then
-# fails if any "#>" output line of the fresh render is wider than 80 columns,
-# other than the lines its EXEMPT list names. The figures under vignettes/figures/
+# fails if any line inside a code fence is wider than 80 columns, other than
+# the lines its EXEMPT list names. It reads the fresh render of each
+# pre-computed vignette and knits each live vignette with the package this job
+# installed. tools/check-vignette-width-plants.R then shows that the guard
+# fails on each kind of line it reads. The figures under vignettes/figures/
 # are PNGs whose bytes depend on the graphics device, so they are not
 # reproducible across machines either and are not compared at all.
 #
@@ -88,9 +91,16 @@ jobs:
       - name: Fail if a committed vignette is stale
         run: Rscript tools/check-vignette-staleness.R
 
-      # Reads the fresh render. It runs even when the staleness step failed,
-      # so a code change that both stales a vignette and widens its output
-      # reports both.
+      # Reads the fresh render, and knits the live vignettes. It runs even
+      # when the staleness step failed, so a code change that both stales a
+      # vignette and widens its output reports both.
       - name: Fail if vignette output is wider than the site's code box
         if: ${{ !cancelled() }}
         run: Rscript tools/check-vignette-width.R
+
+      # Plants one wide line of each kind the width guard reads in a copy of
+      # vignettes/ and fails unless the guard fails on every plant and passes
+      # on the controls.
+      - name: Fail if the width guard misses a planted wide line
+        if: ${{ !cancelled() }}
+        run: Rscript tools/check-vignette-width-plants.R

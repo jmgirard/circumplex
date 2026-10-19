@@ -341,7 +341,9 @@ Boundary" vignette reads both the note and the warning in full.
      ill-conditioned, so the condition number in the warning and the later
      digits of the estimates move across BLAS implementations. -->
 ```{r latent-fit}
-cpm <- cpm_fit(jz2017, scales = PANO(), angles = octants(), ci_method = "analytic")
+cpm <- cpm_fit(
+  jz2017, scales = PANO(), angles = octants(), ci_method = "analytic"
+)
 cpm$results[, c("Scale", "Angle_theory", "Angle", "Zeta")]
 ```
 <!-- precompute:volatile-numbers end -->
