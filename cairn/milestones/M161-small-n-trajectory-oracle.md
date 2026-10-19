@@ -58,6 +58,15 @@ Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` 
 - 2026-10-18: blocked on RB25.
 - 2026-10-18: RR25 returned by a Fable subagent (user-approved spawn) and ingested; recorded as M161-D1 to M161-D3 below. Triage: apply recs 1, 2, 5, 8 in M161, and rec 4's non-finite `vcov` check in `fit_joint()`; rec 3 (calibration selection with N = 10 in the domain) goes to the user at the amendment stop, beside a derivation-selects alternative; rec 4's boundary-rate ceiling is not applied while N = 10 stays ungated (measured N = 20 rate 0% to 1.2%); recs 6, 7 (help and vignette part) and 9 are routed to M162's work log; recs 10 to 12 rejected for the reasons RR25 gives. The `tbar` agreement check from "Beyond the brief" is a candidate row. No standing D-entry is contradicted (rec 12 upholds the plan gate's opt-in).
 - 2026-10-18: unblocked; status back to in-progress.
+- 2026-10-18: re-audit: AC2 (reduced) — the header-timing promise bound a recording act, now a commit-order fact; the header list named a renamed "gate", now the band plus AC3's targets and tolerance.
+- 2026-10-18: re-audit: AC3 (reduced) — the closed-form check could not tell R1 from R0 at N of 20 or more (miss .015 against a .024 tolerance), so a paired R1 minus R0 check was added; R0 and R1 targets, the 3.5 SE tolerance and conditioning on converged fits were confirmed; a target miss made the AC6 fallback unreachable, so AC6 no longer conditions on AC3.
+- 2026-10-18: re-audit: AC4 (reduced) — converged-fit coverage was required only at gated N while AC3 needs N = 200 and a finite `vcov`; the failure counts are now disjoint and ordered, and the paired-difference domain is named.
+- 2026-10-18: re-audit: AC6 (reduced) — "no rule passed" was false when R0 or R3a passes the band; the df = N - 1 derivation omitted its no-covariate and interior-estimate conditions and the first-order caveat for d(t); all fixed in the draft.
+- 2026-10-18: re-audit: AC2 (reduced) — the commit-order fact did not show the header unchanged at the results commit; a no-diff condition on the header block was added.
+- 2026-10-18: re-audit: AC3 (reduced) — nothing; the paired-difference target and its standard error were confirmed.
+- 2026-10-18: re-audit: AC4 (reduced) — a non-finite `vcov` counted as a failed fit left the third failure count always zero, so T2 now gives it a distinct status; paired differences now name both bases and their standard errors.
+- 2026-10-18: re-audit: AC6 (reduced) — the R1-fails branch still required a shipping rule, so the entry now names none then, and T4's fallback follows; the derivation's conditions now name the random-intercept, single-linear-time model.
+- 2026-10-18: second re-audit on AC2, AC4 and AC6 reached the repeated-churn stop; the amendment (draft in the session scratchpad, quoted at the chip) goes to the user with the RR25 rec 3 alternative.
 
 ## Decisions
 
