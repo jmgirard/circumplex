@@ -1,21 +1,19 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-19 (M163 done and archived: small-sample coverage in the trajectory docs; M160 row pruned for retention; M90 lesson extended; validate green.)_
+_Last hygiene check: 2026-10-19 (M164 done and archived: the width guard reads every vignette code box; its candidate row graduated; M161 row pruned for retention; M7-family lesson extended; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M164 | Vignette width guard gaps | review | — | normal | milestones/M164-vignette-width-guard-gaps.md |
+| M164 | Vignette width guard gaps | done | — | normal | milestones/archive/M164-vignette-width-guard-gaps.md |
 | M163 | Small-sample coverage in the trajectory docs | done | — | normal | milestones/archive/M163-trajectory-small-sample-docs.md |
 | M162 | Small-sample draws in ssm_trajectory() | dropped | M161 | normal | milestones/archive/M162-trajectory-small-sample-draws.md |
-| M161 | Small-N coverage oracle for trajectory intervals | done | — | normal | milestones/archive/M161-small-n-trajectory-oracle.md |
 
 ## Candidates
 
 _Candidates carry no milestone ID — an `M<NN>` is assigned at planning time. Legacy IDs (≤ M6) remain valid citations into `cairn/legacy/`; M7 is the first cairn-era ID. Struck rows are tombstones; their histories live in the named archives and git._
-- Vignette width guard gaps: (i) no width guard reads the two pages not pre-rendered (`bayesian-ssm-analysis`, `using-instruments`). (ix) The guard does not read output under another `comment` prefix, `results = "asis"` or indented output; promote when such a line reaches the site. (x) The CPM `Fit:` line is not wrapped, 89-90 columns at width 77 (M146 review O10); promote with the next milestone opening `R/cpm_oop.R`. The rest graduated 2026-09-15 to M131 + M132; M146 closed (ii)-(viii). — started M164
 - Certificate selector follow-ons: (iv) M147 review: sample floor-admitted designs with four or more scales whose `rcond(info)` sits in [eps, 1e-10] before D-062's Reopens clause is read closed (in-domain routed rows all sit above 1e-9); thread the once-priced core into `axes_accuracy_certificate()`, which re-prices it twice for a routed fit. (v) M147 second pass: on the selector route the `"uncertified"` warning names a condition number the floor accepted, since `axes_degeneracy_hint()` reads sigma alone; a clause naming the derivative structure would say what was refused. Undated — RR22 follow-ons, split 2026-10-17.
 - Vignette prose follow-ons: (rules in `cairn/references/plain-vignettes.md`). (i) Plain-English pass over `introduction-to-ssm-analysis`, `intermediate-ssm-analysis` and `using-instruments` (8, 15 and 30 sentences over 25 words at `125b76db`); the ebook row applies. (ii) The prose sweep as a merge gate: CI and testthat run `tools/prose-sweep.R` (nestedtune M088 shape), review-only until its two parser fixes land. (iii) `axes-reliability-caveats` prose after the split (M137 review O3-O5): rules only in the Wrap-up, "Sections 2 to 5" sited inside Section 2 and skipping 6, bold lead-ins repeating headings 3 to 5; needs split-guard pairs. The after-M125 trigger for (i) and (ii) has fired; also promote on a reader finding a vignette hard to follow, or a vignette regressing past the sweep.
 - Degeneracy criterion remainders: (i) the relocated exemplar-B fixture has no generator or seed; promote on a provenance decision for artifacts with no reproducible origin. (ii) Nothing detects the silent skip recurring if lavaan renames again. (iii) RR21 rec 5 (show the certificate's estimate on computed fits) wants its own GP4 gate. (iv) M148 review: `exact_parse()` in `devel/degeneracy-oracle/exact_oracle.R` checks each `HEX_*` key is present but not that its value has two hex words, so an empty value reaches `cert_record()` as an empty literal; promote with the milestone that next opens the oracle driver. The rest graduated to M108-M111, M113-M118.
