@@ -125,3 +125,4 @@ Pass 1 (2026-10-18), branch `m161-small-n-trajectory-oracle` at 8407c38c; `origi
 - ripple #3: Section 7 of the growth vignette states only the 200-person result — follow-up (M162 replan input; M161 scope excludes the vignettes).
 - ripple #4: "keep their nominal coverage" and "stays at nominal" do not name the 200-person sample — follow-up (M162 replan input; pre-existing text).
 - ripple #5: `R/ssm_trajectory_helper.R:43-45` says Section 7 states what the oracle measured — follow-up (M162 replan input; M161 scope excludes `R/`).
+- Fix-now items fixed ac6f1aca: diff-bug #1 to #8 and #11, blame-history #2, #3 and #5, prior-review #1. Ripple #2 lands at post-merge hygiene. The follow-ups are recorded as replan inputs in M162's work log, the home for the work they name. None of the findings shows an acceptance criterion failing, so no return.
