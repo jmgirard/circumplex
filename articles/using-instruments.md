@@ -66,21 +66,22 @@ the code in the next section.
 
 instruments()
 #> The circumplex package currently includes 15 instruments:
-#>  1. CAIS: Child and Adolescent Interpersonal Survey (cais)
-#>  2. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)
-#>  3. CSIG: Circumplex Scales of Intergroup Goals (csig)
-#>  4. CSIP: Circumplex Scales of Interpersonal Problems (csip)
-#>  5. CSIV: Circumplex Scales of Interpersonal Values (csiv)
-#>  6. IEI: Interpersonal Emotion Inventory (iei)
-#>  7. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)
-#>  8. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)
-#>  9. IIP-64: Inventory of Interpersonal Problems (iip64)
-#>  10. IIP-SC: Inventory of Interpersonal Problems Short Circumplex (iipsc)
-#>  11. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)
-#>  12. IIS-64: Inventory of Interpersonal Strengths (iis64)
-#>  13. IIT-C: Inventory of Influence Tactics Circumplex (iitc)
-#>  14. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)
-#>  15. ISC: Interpersonal Sensitivities Circumplex (isc)
+#> 1. CAIS: Child and Adolescent Interpersonal Survey (cais)
+#> 2. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)
+#> 3. CSIG: Circumplex Scales of Intergroup Goals (csig)
+#> 4. CSIP: Circumplex Scales of Interpersonal Problems (csip)
+#> 5. CSIV: Circumplex Scales of Interpersonal Values (csiv)
+#> 6. IEI: Interpersonal Emotion Inventory (iei)
+#> 7. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version
+#>    (igicr)
+#> 8. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)
+#> 9. IIP-64: Inventory of Interpersonal Problems (iip64)
+#> 10. IIP-SC: Inventory of Interpersonal Problems Short Circumplex (iipsc)
+#> 11. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)
+#> 12. IIS-64: Inventory of Interpersonal Strengths (iis64)
+#> 13. IIT-C: Inventory of Influence Tactics Circumplex (iitc)
+#> 14. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)
+#> 15. ISC: Interpersonal Sensitivities Circumplex (isc)
 ```
 
 If there are additional circumplex instruments you would like to have
@@ -629,7 +630,9 @@ z_scales <- norm_standardize(
   sample = 1,
   append = FALSE
 )
-#> Standardized against IIP-SC normative sample 1: N = 872, American college students. Reference kind: identified published source. 1 other sample is available; see norms().
+#> Standardized against IIP-SC normative sample 1: N = 872, American college
+#> students. Reference kind: identified published source. 1 other sample is
+#> available; see norms().
 print(z_scales)
 #>           PA_z       BC_z       DE_z        FG_z       HI_z       JK_z
 #> 1   1.50000000  1.7500000  0.4093567 -1.10554090 -1.0054645 -1.3313783

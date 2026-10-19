@@ -127,7 +127,9 @@ Other tidying functions:
 ``` r
 data("jz2017")
 norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
-#> Standardized against IIP-SC normative sample 1: N = 872, American college students. Reference kind: identified published source. 1 other sample is available; see norms().
+#> Standardized against IIP-SC normative sample 1: N = 872, American college
+#> students. Reference kind: identified published source. 1 other sample is
+#> available; see norms().
 #>      Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD
 #> 1    Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7
 #> 2    Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0
@@ -3633,7 +3635,9 @@ norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
 # The IIP-SC carries more than one normative sample. Omitting `sample` takes
 # the first, and the message says which one that was.
 z <- norm_standardize(jz2017, scales = 2:9, instrument = iipsc)
-#> Standardized against IIP-SC normative sample 1: N = 872, American college students. Reference kind: identified published source. 1 other sample is available; see norms().
+#> Standardized against IIP-SC normative sample 1: N = 872, American college
+#> students. Reference kind: identified published source. 1 other sample is
+#> available; see norms().
 attr(z, "norm_sample")
 #> $Instrument
 #> [1] "IIP-SC"

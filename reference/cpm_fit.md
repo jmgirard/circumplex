@@ -232,7 +232,8 @@ fit
 #>     LM    360 294.230 285.726 302.375 0.806 0.757 0.854
 #>     NO     45  11.305   1.719  21.025 1.000 1.000 1.000
 #> 
-#> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
+#> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042;
+#>      CFI = 0.984
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a
 #>   Heywood-type solution).
 #>   Note: 2 of 100 bootstrap resamples were excluded (0 degenerate, 2
@@ -260,7 +261,8 @@ cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
 #>     LM    360 294.230  NA  NA 0.806  NA  NA
 #>     NO     45  11.305  NA  NA 1.000  NA  NA
 #> 
-#> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
+#> Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042;
+#>      CFI = 0.984
 #>   Note: a communality index reached its upper boundary (ζ > 0.995, a
 #>   Heywood-type solution).
 ```

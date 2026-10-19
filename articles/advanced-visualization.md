@@ -409,7 +409,9 @@ the warning in full.
 
 ``` r
 
-cpm <- cpm_fit(jz2017, scales = PANO(), angles = octants(), ci_method = "analytic")
+cpm <- cpm_fit(
+  jz2017, scales = PANO(), angles = octants(), ci_method = "analytic"
+)
 #> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles
 #> may be clustered or parameters weakly determined.
 cpm$results[, c("Scale", "Angle_theory", "Angle", "Zeta")]

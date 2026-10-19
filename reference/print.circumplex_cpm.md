@@ -3,7 +3,8 @@
 Compact display of a
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
 object: the estimated angles and communality indices with confidence
-intervals, a one-line fit summary, and any boundary/convergence notes.
+intervals, a fit summary that wraps after a `;` when it is wider than
+the console, and any boundary/convergence notes.
 
 ## Usage
 
