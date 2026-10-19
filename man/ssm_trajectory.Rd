@@ -116,10 +116,14 @@ every time in \code{times}, unless \code{vcov} is zero everywhere. The check rea
 only the given \code{times}, so with a single time it sees only the covariance
 terms that time reaches. A \code{draws} matrix is not checked for a joint fit.
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
-estimated variance components and are too narrow at small samples; the
-"Growth Models on SSM Parameters" vignette, Section 7, states what the
-package's coverage oracle measured and that no shipped correction exists.
-Intervals from \code{draws} summarize those draws as given.
+estimated variance components and are too narrow at small samples. In the
+package's small-sample coverage oracle for the \code{ssm_growth_formula()} model, the mean
+coverage among converged fits was .938 to .944 at 20 to 50 persons, against
+a nominal .95. At 10 persons, 27.4\% and 17.7\% of the fits under its two
+simulated truths had a non-positive-definite Hessian. The "Growth Models on
+SSM Parameters" vignette, Section 7, gives the design, the other figures and
+the records, and says that no shipped correction exists. Intervals from
+\code{draws} summarize those draws as given.
 }
 \examples{
 # Fixed effects and covariance in the shape a joint fit returns

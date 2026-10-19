@@ -46,7 +46,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 
 - [x] T1: Compute the Section 7 figures from `devel/m161-small-n-results.rds` with a short script run in the session. Record each figure and its source element in a work-log line.
 - [x] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
-- [ ] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
+- [x] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
 - [ ] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -62,6 +62,8 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - 2026-10-19: implement started on branch m163-trajectory-small-sample-docs, cut from master at 5d4cb2e1.
 - 2026-10-19: T1: figures from `summary[[cell]]` of the M161 `.rds`, R0, mean over waves 0:4 and e, x, y, d. `cov_conv` at 20/30/50 complete: pole .9380/.9432/.9435, xycor .9414/.9436/.9406, so .938 to .944. Non-PD share `1 - n_ok/n_reps`: n10 pole .274, xycor .177; n20 pole .032, xycor .010. At n10, `cov_conv` pole .9389, xycor .9195; `nonpd_cov$cov` pole .9064 (274 fits), xycor .9031 (177 fits). Design from `meta$waves` (0:4), `meta$reps` (1000) and the script header.
 - 2026-10-19: T2: Section 7 rewritten with the T1 figures, the design and both records. The two AC3 paragraphs (Section 4 shortcut result, Section 6 near-origin result) name 200 persons per cell and `devel/m27-coverage-oracle.md`, read from its header and A2/A3 rows. Section 7 citers (Overview `:43`, Section 5 `:220`, Section 10 `:515`, the printed caution) still hold. The helper roxygen's "the coverage oracle" goes plural at T3. The re-render changed prose lines only.
+- 2026-10-19: T2 staleness: after the T2 commit, a re-render and `tools/check-vignette-staleness.R` report all 11 pre-computed vignettes up to date.
+- 2026-10-19: T3: the `ssm_trajectory()` small-sample roxygen paragraph states the .938 to .944 converged range at 20 to 50 persons and the 27.4% and 17.7% non-PD shares at 10 persons, and keeps the Section 7 pointer; `document()` rewrote `man/ssm_trajectory.Rd` only. The dev NEWS entry on Section 7 now names the 10-to-50-person figures and `?ssm_trajectory`. `devtools::test()`: 14865 passed, 0 failed, 1 skipped.
 
 ## Decisions
 
