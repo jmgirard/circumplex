@@ -55,6 +55,7 @@
 - 2026-10-18: criteria re-audit (full mode, same fresh reader) returned three findings, all fixed: AC4 now requires the `@return` text to list the third `input` value, with the M155-D1 extension recorded at T2; AC3 refuses an `NA` value rather than a missing argument, which is the default path; AC6 adds a ledger category for prose that describes the uncorrected caution.
 - 2026-10-18: plan gate chose an opt-in argument over a new default because the helper cannot know N from `coef` and `vcov`; falsified by a rule whose degrees of freedom are computable from `coef` and `vcov` alone.
 - 2026-10-18: routed from M161's RR25 ingest (`cairn/reviews/archive/RR25-small-n-trajectory-draws.md`): rec 6, an argument giving the df (lower bound 1) rather than N, with the df = N - 1 mapping and its conditions in the help text, and the chi-square divisor drawn after the normals so AC1 holds; rec 7, the help text and Section 7 state the N = 10 boundary-fit rate from the M161 record; rec 9, one test at an `interval` other than .95. The argument name stays this milestone's irreversible-api choice.
+- 2026-10-18: M161's oracle selected no rule (D-066): R1 failed M161's pre-registered band in `pole` at N = 20 only, through boundary fits counted as misses, and met it among converged fits. This milestone's goal is wrong as planned; its next step is `/milestone-plan`, where a converged-fit band with a boundary-rate ceiling and fresh seeds is the open design.
 
 ## Decisions
 

@@ -1,6 +1,6 @@
 # M161: Small-N coverage oracle for trajectory intervals
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR25 (advisory)
@@ -42,7 +42,7 @@ Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` 
 - [x] T1: Ingest the driving review's report through `/milestone-brief`. Set the `Driving RR:` slot. Fold each candidate rule and each binding criterion into AC2 and the tasks under the amendment protocol, with a work-log line either way.
 - [x] T2: Write `devel/m161-small-n-oracle.R`. Reuse the M27 truths and generator from `devel/m27-coverage-oracle.R`. Write the header's pre-registration (candidate rules, gated waves, gate, seeds disjoint from the M27 and M21 offsets) before any full run. Add a smoke mode (`M161_SMOKE=1`, 25 replicates per cell) that checks the machinery only. Each candidate rule draws from the same fit, so the rules share replicates. `fit_joint()` returns a distinct status for a non-finite `vcov`, which coverage counts as not covering. R1 draws its divisor after the normals, so R0 and R1 share each replicate's normals.
 - [x] T3: Run the full grid in the background and commit `devel/m161-small-n-results.rds`. Record the run time and the R, glmmTMB and package versions in a work-log line. If AC3 misses, revise the oracle as a recorded design iteration before T4.
-- [ ] T4: Write `devel/m161-small-n-oracle.md` in the M27 record's shape: verdict table, reading, design iterations and oracle types. Record the N = 10 boundary-fit rate for M162. Append the D-entry that AC6 names. If R1 fails the AC2 band, M162's goal is wrong, and its next step is `/milestone-plan`.
+- [x] T4: Write `devel/m161-small-n-oracle.md` in the M27 record's shape: verdict table, reading, design iterations and oracle types. Record the N = 10 boundary-fit rate for M162. Append the D-entry that AC6 names. If R1 fails the AC2 band, M162's goal is wrong, and its next step is `/milestone-plan`.
 
 ## Work log
 
@@ -73,6 +73,9 @@ Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` 
 - 2026-10-18: T1 done: RR25 ingested and folded into AC2 to AC6 and the tasks under the amendment protocol.
 - 2026-10-18: T2 done: `devel/m161-small-n-oracle.R` with the pre-registration header (rules, gated waves, AC2 band, AC3 targets and tolerance), seeds at offset 52e7 by cell level index 1 to 14, and a smoke mode. Choices: all three rules summarize through `ssm_trajectory(draws = )` so they share the shipped machinery; non-PD fits with a finite `vcov` get coverage stored for the record only. Smoke (25 reps per cell, 14 s) passed its machinery checks: R0 draws equal `mvn_draws()` at the same seed, the fit formula matches `ssm_growth_formula("glmmTMB")`, and min a(t) is at least .59; it saw 11/25 non-PD fits at pole N = 10. No package file changed (`devel/` is build-ignored), so the suite runs at completion.
 - 2026-10-18: T3 done: full grid, 14 cells by 1000 replicates, 3.4 min on 17 of 18 cores; R 4.6.1, glmmTMB 1.1.15.2, TMB 1.9.25, circumplex 2.0.1.9000. The script is unchanged since its header commit 2e9bd0e2. No fit failed and no `vcov` was non-finite; non-PD fits were 274 and 177 of 1000 at N = 10, 32 (pole) and 10 (xycor) at N = 20, and 85 and 39 in the N = 20 missing-wave cells. Verdicts: AC3 (i) and (ii) pass, AC5 passes, and every rule fails the AC2 band. R1 fails it only in pole N = 20, where the 32 non-PD fits counted as misses put its means at .919 to .923; among converged fits it covers .949 to .954 there. RR25 put the N = 20 boundary rate at 0% to 1.2%, which is why its rec 4 (gate among converged fits) was not applied at ingest.
+- 2026-10-18: T4 done: `devel/m161-small-n-oracle.md` (verdicts, per-cell table on both bases, reading, design iterations none, two oracle types) and D-066, which records that R1 failed the band in `pole` N = 20 only, that no rule passed, and that M161 names no rule for M162. Per T4, M162's goal is wrong as planned and its next step is `/milestone-plan`.
+- 2026-10-18: claim audit: not owed — internal tier.
+- 2026-10-18: implement complete: `devtools::test()` FAIL 0, WARN 11, SKIP 1, PASS 14865; cairn_validate green; status review.
 
 ## Decisions
 
