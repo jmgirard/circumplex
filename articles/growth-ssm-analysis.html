@@ -342,7 +342,9 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>.
 Our validation simulations included a design with strongly correlated
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>–<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-person effects. In that design, the shortcut’s pointwise
+person effects, with 200 persons per cell (record
+<code>devel/m27-coverage-oracle.md</code>). In that design, the
+shortcut’s pointwise
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 coverage drops from the nominal 95% to roughly 86%. Pointwise coverage
 is how often the interval at one wave contains the true direction. The
@@ -527,10 +529,11 @@ and the fit reads the same two formulas:</p>
 states the rule. At that wave, the amplitude interval sits too close to
 zero. The displacement interval, which here spans more than half the
 circle, is not a statement about direction. In our validation
-simulations of this near-origin case, the uncertified mark appears at
-the degraded wave in essentially every replicate. Meanwhile, the waves
-far from the origin remain certified, and their intervals keep their
-nominal coverage.</p>
+simulations of this near-origin case, which used 200 persons per cell
+(record <code>devel/m27-coverage-oracle.md</code>), the uncertified mark
+appears at the degraded wave in essentially every replicate. Meanwhile,
+the waves far from the origin remain certified, and their intervals keep
+their nominal coverage.</p>
 <p>The plot marks the verdict itself:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span><span class="op">)</span></span></code></pre></div>
@@ -572,17 +575,57 @@ resulting intervals anticonservative (too narrow). This is a property of
 the mixed-model machinery, not of the SSM transform. The caution under
 the Section 5 table states this for the <code>coef</code> and
 <code>vcov</code> shape.</p>
-<p>The package’s coverage oracle ran this model with the glmmTMB REML
-fit at 200 persons in each coverage cell. The
+<p>The package’s coverage oracles fit this model, the one
+<code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> writes, with glmmTMB and REML to
+simulated data. The figures below come from samples with five balanced
+waves and no missing values. The first oracle used 200 persons and 500
+simulated samples in each coverage cell. The
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 intervals held coverage between .93 and .97 at every certified wave. At
 the uncertified low-amplitude wave the coverage was .854, which is the
-case the certification of Section 6 flags. This page’s sample has 150
-persons. The oracle record is <code>devel/m27-coverage-oracle.md</code>,
-with its per-wave results in
-<code>devel/m27-coverage-results.rds</code>, in the package’s GitHub
-repository. The <code>devel</code> directory is not part of the CRAN
-build.</p>
+case the certification of Section 6 flags. Its record is
+<code>devel/m27-coverage-oracle.md</code>, with its per-wave results in
+<code>devel/m27-coverage-results.rds</code>.</p>
+<p>A second oracle fit the same model at 10, 20, 30, 50 and 200 persons,
+with 1000 simulated samples in each cell. It used two simulated truths.
+In the crossing truth (<code>pole</code> in the record),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
+crosses 0°/360°. In the correlated truth (<code>xycor</code>), the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+person effects are strongly correlated. Each coverage figure below is a
+mean over the five waves and over
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>.
+The oracle counts a fit as converged when glmmTMB fits it without error
+and reports a positive-definite Hessian. Among the converged fits, the
+mean coverage was between .938 and .944 at 20, 30 and 50 persons,
+against the nominal .95. Adding normal draws on the other fits’
+<code>vcov</code> changes this range by less than .001. So at these
+sizes the intervals are too narrow by .006 to .012, as the first
+paragraph says.</p>
+<p>At smaller samples, more fits fail to converge. At 20 persons glmmTMB
+reported a non-positive-definite Hessian in 3.2% of the samples under
+the crossing truth and 1.0% under the correlated truth. At 10 persons it
+did so in 27.4% and 17.7% of the samples, in the same order. In the
+oracle, each such fit still returned a finite <code>coef</code> and
+<code>vcov</code>. At 10 persons, normal draws on those fits’
+<code>vcov</code> covered .906 on average under the crossing truth and
+.903 under the correlated truth. The helper refuses a <code>vcov</code>
+that is not symmetric or has a negative eigenvalue larger than rounding
+error, so it can refuse some of these fits. The converged fits at 10
+persons covered .939 and .920 on average, in the same order. These two
+figures run high. Part of the reason is that the fits that fail come
+most often from samples with narrow intervals. The record is
+<code>devel/m161-small-n-oracle.md</code>, with its results in
+<code>devel/m161-small-n-results.rds</code>. These figures describe this
+model and these two truths only. This page’s sample has 150 persons.
+Both records are in the package’s GitHub repository. The
+<code>devel</code> directory is not part of the CRAN build.</p>
 <p>The package ships no small-sample correction. A percentile parametric
 bootstrap of the fixed effects is not one on complete balanced data such
 as this page’s. There every refit’s fixed effects equal ordinary least
@@ -592,8 +635,8 @@ to simulation error. Under <code>coef</code> and <code>vcov</code> the
 helper draws from a normal distribution on the covariance matrix alone.
 So no
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-quantile or denominator degrees of freedom enters it. At samples much
-smaller than the oracle’s, read the intervals as approximate.</p>
+quantile or denominator degrees of freedom enters it. At small samples,
+read the intervals as approximate.</p>
 <p>A matrix of coefficient draws from any source enters the helper as
 <code>draws =</code>, one row per draw, with columns named for the six
 coefficients. A <code>b_</code> prefix is dropped. The caution printed

@@ -153,10 +153,16 @@ only the given `times`, so with a single time it sees only the
 covariance terms that time reaches. A `draws` matrix is not checked for
 a joint fit. The intervals from a REML fit's `coef` and `vcov` condition
 on its estimated variance components and are too narrow at small
-samples; the "Growth Models on SSM Parameters" vignette, Section 7,
-states what the package's coverage oracle measured and that no shipped
-correction exists. Intervals from `draws` summarize those draws as
-given.
+samples. The package's small-sample coverage oracle fit the
+[`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
+model with glmmTMB. Among its converged fits (those with a
+positive-definite Hessian), the coverage averaged over waves and over
+`e`, `x`, `y` and `d` was .938 to .944 at 20 to 50 persons, against a
+nominal .95. At 10 persons, 27.4% and 17.7% of the fits under its two
+simulated truths had a non-positive-definite Hessian. The "Growth Models
+on SSM Parameters" vignette, Section 7, gives the design, the other
+figures and the records, and says that no shipped correction exists.
+Intervals from `draws` summarize those draws as given.
 
 ## See also
 
