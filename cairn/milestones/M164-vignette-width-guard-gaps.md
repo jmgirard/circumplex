@@ -57,7 +57,7 @@ Every line in a column-1 code fence of every vignette fits the website's code bo
 - [x] T5: Rewrite the guard to the `list.files()` domain, the knit of live vignettes into a temporary copy, and the fence rule of AC2. Rewrite its header comment, which says "two live vignettes" and reads only `#>` lines. Update the comment in `.github/workflows/vignette-precompute.yaml` that says the same.
 - [x] T6: Write a plant script under `tools/` and run it in the vignette-precompute workflow. Each plant must fail the guard. The plants are: a wide line in a backtick fence and in a tilde fence, a 4-backtick fence that holds an inner 3-backtick line, a fence that never closes, wide output under `comment = "##"` and `comment = ""`, an indented `#>` line, a line wide only after tab expansion, a line of double-width characters, a wide line first and last in a block, a wide echoed source line, a fence that an asis chunk writes, and a wide line in a knitted live vignette. Each control must pass: a wide prose line outside a fence, and the unchanged tree.
 - [x] T7: Reflow the two wide echoed source lines in the `.Rmd.orig` sources. Re-render every pre-computed vignette that the staleness check reports stale. Install the branch and run the guard to exit 0.
-- [ ] T8: Add the NEWS entry. Run the tests and the check.
+- [x] T8: Add the NEWS entry. Run the tests and the check.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates. -->
@@ -87,6 +87,7 @@ Every line in a column-1 code fence of every vignette fits the website's code bo
 - 2026-10-19: T6: `tools/check-vignette-width-plants.R` appends one plant per run to a fresh copy of vignettes/ and requires a non-zero guard exit whose report names the planted file and the line's width and text (or "never closes"); controls require exit 0 and the "all 14 vignettes" line. 14 plants and 2 controls, about 28 s.
 - 2026-10-19: T7: the two echoed calls are split over three lines in their `.Rmd.orig`; after `R CMD INSTALL .` and a full re-render, only those two code lines changed in the rendered `.Rmd` files (the re-rendered figure PNGs were restored, since their bytes are device-dependent and unchecked). The guard exits 0 over 14 files with only the two `sem-based-ssm-analysis` entries exempting; all 14 plants fail it and both controls pass.
 - 2026-10-19: T6 discrimination: five one-line mutations of the committed guard, restored by copy and checked equal to HEAD. Measuring only `#>` lines made 6 plants WRONG (both comment prefixes, indented, tab, source, asis fence); closing a fence at any length, the 4-backtick plant only; no tab expansion, the tab plant only; `type = "chars"`, the double-width plant only; skipping live vignettes, the 4 live plants and both controls. Swapping in master's guard made all 16 WRONG, through its different report text.
+- 2026-10-19: T8: NEWS.md has the new wrap entry under Minor improvements, and the M131 entry now says test-statistic lines rather than fit lines stay unwrapped. Full `devtools::test()` exits 0 with no failure section; `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings, 0 notes.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
