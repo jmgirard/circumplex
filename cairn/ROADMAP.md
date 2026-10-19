@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-19 (M162 dropped and archived at the user's choice, M163 planned for the docs; trajectory-draws row parked; M159 row pruned for retention.)_
+_Last hygiene check: 2026-10-19 (M163 done and archived: small-sample coverage in the trajectory docs; M160 row pruned for retention; M90 lesson extended; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M163 | Small-sample coverage in the trajectory docs | review | — | normal | milestones/M163-trajectory-small-sample-docs.md |
+| M163 | Small-sample coverage in the trajectory docs | done | — | normal | milestones/archive/M163-trajectory-small-sample-docs.md |
 | M162 | Small-sample draws in ssm_trajectory() | dropped | M161 | normal | milestones/archive/M162-trajectory-small-sample-draws.md |
 | M161 | Small-N coverage oracle for trajectory intervals | done | — | normal | milestones/archive/M161-small-n-trajectory-oracle.md |
-| M160 | Selection guards for items and the remaining column arguments | done | — | normal | milestones/archive/M160-items-selection-guards.md |
 
 ## Candidates
 
