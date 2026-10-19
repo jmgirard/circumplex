@@ -205,8 +205,8 @@ So combining them silently sets $\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0$.
 
 The $x$ and $y$ person effects are each person's stable shifts in $x$ and
 $y$. Our validation simulations included a design with strongly correlated
-$x$–$y$ person effects, with 200 persons per cell. Section 7 names the
-record, `devel/m27-coverage-oracle.md`. In that design, the shortcut's pointwise $d(t)$
+$x$–$y$ person effects, with 200 persons per cell (record
+`devel/m27-coverage-oracle.md`). In that design, the shortcut's pointwise $d(t)$
 coverage drops from the nominal 95% to roughly 86%. Pointwise coverage is how
 often the interval at one wave contains the true direction. The joint recipe
 stays at nominal. Strongly correlated person effects are realistic, because
@@ -375,8 +375,8 @@ The asterisk marks the uncertified row, and the note under the table
 states the rule. At that wave, the amplitude interval sits too close to
 zero. The displacement interval, which here spans more than half the
 circle, is not a statement about direction. In our validation simulations
-of this near-origin case, with 200 persons per cell and the record
-`devel/m27-coverage-oracle.md`, the uncertified mark appears at the degraded wave
+of this near-origin case, which used 200 persons per cell (record
+`devel/m27-coverage-oracle.md`), the uncertified mark appears at the degraded wave
 in essentially every replicate. Meanwhile, the waves far from the origin remain
 certified, and their intervals keep their nominal coverage.
 
@@ -428,34 +428,37 @@ states this for the `coef` and `vcov` shape.
 The package's coverage oracles fit this model, the one
 `ssm_growth_formula()` writes, with glmmTMB and REML to simulated data.
 The figures below come from samples with five balanced waves and no
-missing values. The first oracle used 200 persons in each
-coverage cell.
-The $d(t)$ intervals held coverage between .93 and .97 at every certified
-wave. At the uncertified low-amplitude wave the coverage was .854, which
+missing values. The first oracle used 200 persons and 500 simulated
+samples in each coverage cell. The $d(t)$ intervals held coverage between
+.93 and .97 at every certified wave. At the uncertified low-amplitude wave the coverage was .854, which
 is the case the certification of Section 6 flags. Its record is
 `devel/m27-coverage-oracle.md`, with its per-wave results in
 `devel/m27-coverage-results.rds`.
 
 A second oracle fit the same model at 10, 20, 30, 50 and 200 persons, with
 1000 simulated samples in each cell. It used two simulated truths. In the
-crossing truth, $d(t)$ crosses 0°/360°. In the correlated truth, the $x$
-and $y$ person effects are strongly correlated. Among the fits that
-converged, the intervals covered between .938 and .944 at 20, 30 and 50
-persons, against the nominal .95.
-Each of these figures is a mean over the five waves and over $e$, $x$, $y$
-and $d$. So at these sizes the intervals are slightly too narrow, as the
-first paragraph says.
+crossing truth (`pole` in the record), $d(t)$ crosses 0°/360°. In the
+correlated truth (`xycor`), the $x$ and $y$ person effects are strongly
+correlated. Each coverage figure below is a mean over the five waves and
+over $e$, $x$, $y$ and $d$. The oracle counts a fit as converged when
+glmmTMB fits it without error and reports a positive-definite Hessian.
+Among the converged fits, the mean coverage was between .938 and .944 at
+20, 30 and 50 persons, against the nominal .95. Adding normal draws on the
+other fits' `vcov` changes this range by less than .001. So at these sizes
+the intervals are too narrow by .006 to .012, as the first paragraph says.
 
-Small samples also bring a problem with the fit itself. In some samples
-glmmTMB reports a non-positive-definite Hessian, which means that the fit
-did not converge cleanly. At 20 persons this happened in 3.2% of the
-samples under the crossing truth and 1.0% under the correlated truth. At
-10 persons it happened in 27.4% and 17.7%, in the same order. Such a fit
-still returns a finite `coef` and `vcov`. The helper refuses a `vcov` that
-is not symmetric or has a negative eigenvalue larger than rounding error,
-and otherwise draws from it. At 10 persons, normal draws on those fits' `vcov` covered .906 and
-.903 on average, in the same order. The intervals from the converged fits
-covered .939 and .920. The record is
+At smaller samples, more fits fail to converge. At 20 persons glmmTMB
+reported a non-positive-definite Hessian in 3.2% of the samples under the
+crossing truth and 1.0% under the correlated truth. At 10 persons it did
+so in 27.4% and 17.7% of the samples, in the same order. In the oracle,
+each such fit still returned a finite `coef` and `vcov`. At 10 persons,
+normal draws on those fits' `vcov` covered .906 on average under the
+crossing truth and .903 under the correlated truth. The helper refuses a
+`vcov` that is not symmetric or has a negative eigenvalue larger than
+rounding error, so it can refuse some of these fits. The converged fits at
+10 persons covered .939 and .920 on average, in the same order. These two
+figures run high. Part of the reason is that the fits that fail come most
+often from samples with narrow intervals. The record is
 `devel/m161-small-n-oracle.md`, with its results in
 `devel/m161-small-n-results.rds`. These figures describe this model and
 these two truths only. This page's sample has 150 persons. Both records
