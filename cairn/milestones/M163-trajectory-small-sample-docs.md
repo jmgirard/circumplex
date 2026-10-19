@@ -93,27 +93,28 @@ Pass 2 (2026-10-19, branch head d0453019, master unmoved at 5d4cb2e1, no PR, Cop
 
 spawned: diff-bug, blame-history, prior-review, ripple
 
-- diff-bug #1: the 10-person converged coverage (.939, .920) has no selection caveat, though the record says kept fits run above target — fix now: Section 7 says the two figures run high and gives the record's reason (failed fits come most often from narrow-interval samples).
-- diff-bug #2: "Such a fit still returns a finite `coef` and `vcov`" states a general glmmTMB property — fix now: scoped to "In the oracle, each such fit still returned".
-- diff-bug #3: the refusal sentence before .906/.903 invites reading them as helper output — fix now: the figures come first and the refusal sentence now says the helper can refuse some of these fits.
-- diff-bug #4: the help page does not define "converged" or the averaging basis or engine — fix now: roxygen names glmmTMB, defines converged as a positive-definite Hessian, and states the averaging over waves and e, x, y, d.
-- diff-bug #5: ".938 to .944" comes before the averaging and reads as a per-interval range — fix now: the averaging sentence comes first and the figure is called the mean coverage.
-- diff-bug #6: ".939 and .920" lacks "on average" — fix now.
-- diff-bug #7: "Section 7 names the record" while naming it inline — fix now: one parenthetical record.
-- diff-bug #8: the record clause inside the near-origin design description is awkward — fix now: "which used 200 persons per cell (record ...)".
-- diff-bug #9: the first oracle's 500 samples per cell is not given — fix now: added (M27 record header).
-- diff-bug #10: "did not converge cleanly" is a loose gloss — fix now: Section 7 states the oracle's converged rule (fit without error, positive-definite Hessian).
-- diff-bug #11: NEWS "the coverage oracle's result" is singular for two oracles — fix now: "the first coverage oracle's result".
-- diff-bug #12: lines past the wrap width in NEWS, roxygen and Section 7 — fix now: re-wrapped.
-- blame-history #1: converged figures stated without D-066's bias caveat — fix now, with diff-bug #1. At 20 to 50 persons the recompute shows the bias is small: adding normal draws on non-PD fits' `vcov` moves the range by under .001 (.9375 to .9436), and Section 7 now says so.
+- diff-bug #1: the 10-person converged coverage (.939, .920) has no selection caveat, though the record says kept fits run above target — fix now: Section 7 says the two figures run high and gives the record's reason (failed fits come most often from narrow-interval samples)., fixed 8fe1b1a3
+- diff-bug #2: "Such a fit still returns a finite `coef` and `vcov`" states a general glmmTMB property — fix now: scoped to "In the oracle, each such fit still returned"., fixed 8fe1b1a3
+- diff-bug #3: the refusal sentence before .906/.903 invites reading them as helper output — fix now: the figures come first and the refusal sentence now says the helper can refuse some of these fits., fixed 8fe1b1a3
+- diff-bug #4: the help page does not define "converged" or the averaging basis or engine — fix now: roxygen names glmmTMB, defines converged as a positive-definite Hessian, and states the averaging over waves and e, x, y, d., fixed 8fe1b1a3
+- diff-bug #5: ".938 to .944" comes before the averaging and reads as a per-interval range — fix now: the averaging sentence comes first and the figure is called the mean coverage., fixed 8fe1b1a3
+- diff-bug #6: ".939 and .920" lacks "on average" — fix now., fixed 8fe1b1a3
+- diff-bug #7: "Section 7 names the record" while naming it inline — fix now: one parenthetical record., fixed 8fe1b1a3
+- diff-bug #8: the record clause inside the near-origin design description is awkward — fix now: "which used 200 persons per cell (record ...)"., fixed 8fe1b1a3
+- diff-bug #9: the first oracle's 500 samples per cell is not given — fix now: added (M27 record header)., fixed 8fe1b1a3
+- diff-bug #10: "did not converge cleanly" is a loose gloss — fix now: Section 7 states the oracle's converged rule (fit without error, positive-definite Hessian)., fixed 8fe1b1a3
+- diff-bug #11: NEWS "the coverage oracle's result" is singular for two oracles — fix now: "the first coverage oracle's result"., fixed 8fe1b1a3
+- diff-bug #12: lines past the wrap width in NEWS, roxygen and Section 7 — fix now: re-wrapped., fixed 8fe1b1a3
+- blame-history #1: converged figures stated without D-066's bias caveat — fix now, with diff-bug #1. At 20 to 50 persons the recompute shows the bias is small: adding normal draws on non-PD fits' `vcov` moves the range by under .001 (.9375 to .9436), and Section 7 now says so., fixed 8fe1b1a3
 - blame-history #2: "At small samples, read the intervals as approximate" drops the old size-relative bound — reject (planned change): the plan gate chose figures only, with no minimum-N advice, and the old bound was relative to a 200-person oracle the page no longer treats as the only one.
 - blame-history #3: "essentially every replicate" is not supported by the M27 record — reject (false): `devel/m27-coverage-oracle.md` A2 gives a certification rate of .02 at the degraded wave, and its Reading says the caution fires in 98% of replicates.
 - prior-review #1: converged coverage is the headline and the all-replicate basis (.908 at 20 persons) is left out — reject (false) in its premise, fix the caveat with diff-bug #1: the all-replicate basis scores a non-PD fit as a miss, which is the band's rule, not what a user sees; counting those fits' draws gives .9375 to .9436 at 20 to 50.
-- prior-review #2: "slightly too narrow" understates a four-point gap — fix now in part: the adjective is replaced by the figure (.006 to .012); the four-point premise is the band's scoring, rejected as in #1.
+- prior-review #2: "slightly too narrow" understates a four-point gap — fix now in part: the adjective is replaced by the figure (.006 to .012); the four-point premise is the band's scoring, rejected as in #1., fixed 8fe1b1a3
 - prior-review #3: .906 and .903 are not in the record's `.md` — reject (false): they come from `summary[[cell]]$nonpd_cov` in the `.rds`, recomputed by the diff-bug lens and the AC1 script.
-- prior-review #4: the help figure has no averaging basis — fix now, with diff-bug #4.
-- prior-review #5: "in the same order" leaves the mapping to the reader — fix now: the .906/.903 sentence names each truth.
-- prior-review #6: no mapping from "crossing"/"correlated" to the record's `pole`/`xycor` — fix now: each truth names its record label.
+- prior-review #4: the help figure has no averaging basis — fix now, with diff-bug #4., fixed 8fe1b1a3
+- prior-review #5: "in the same order" leaves the mapping to the reader — fix now: the .906/.903 sentence names each truth., fixed 8fe1b1a3
+- prior-review #6: no mapping from "crossing"/"correlated" to the record's `pole`/`xycor` — fix now: each truth names its record label., fixed 8fe1b1a3
 - prior-review #7: "At small samples" is unbounded — reject (planned change), as blame-history #2.
 - prior-review #8: the NEWS entry is one long sentence — reject (style).
+- After the fix-now commit 8fe1b1a3: `document()` 0 `resolve link` lines and no stray diff; the AC1/AC2 recompute script all TRUE, Section 7 identical in both files; staleness check all 11 up to date; `devtools::check(args = "--no-manual")` Status OK, 0 errors, 0 warnings, 0 notes, tests OK, vignette re-build OK (AC5 evidence refreshed). Dispositions: 17 fix now, 7 reject, 0 follow-up; no finding met the return floor (every criterion still passes).
 - ripple #1: `R/ssm_growth_formula.R:2-3, 25`, `man/ssm_growth_formula.Rd:62` and `tests/testthat/test-ssm_growth_formula.R:3-4` name only the M27 oracle — reject (false as a staleness claim): each statement stays true, since the M27 oracle did validate the model; nothing the diff changed makes them wrong.
