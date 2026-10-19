@@ -1,13 +1,13 @@
 # M163: Small-sample coverage in the trajectory docs
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, GP2, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the growth vignette, the `ssm_trajectory()` help page and NEWS.md
-- **Branch/PR:** —
+- **Branch/PR:** m163-trajectory-small-sample-docs
 
 ## Goal
 
@@ -44,8 +44,8 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 
 ## Tasks
 
-- [ ] T1: Compute the Section 7 figures from `devel/m161-small-n-results.rds` with a short script run in the session. Record each figure and its source element in a work-log line.
-- [ ] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
+- [x] T1: Compute the Section 7 figures from `devel/m161-small-n-results.rds` with a short script run in the session. Record each figure and its source element in a work-log line.
+- [x] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
 - [ ] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
 - [ ] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
 
@@ -59,6 +59,9 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - 2026-10-19: collision sweep: M162 (planned) dropped at the user's choice and archived. The "Small-sample correction for trajectory draws" row is parked under D-066's reopen condition, and D-066 holds. The peer-review row stays parked at the user's choice, its "next opens those roxygen blocks" condition removed.
 - 2026-10-19: inbox sweep: one open issue (#180, a master-red alert) and no open PRs. Neither overlaps.
 - 2026-10-19: lessons harvested: M56 family (sweep the prose that cites Section 7, in both directions), M94 (state what the study covered, not a general threshold), M90 (compute each figure from the committed `.rds`).
+- 2026-10-19: implement started on branch m163-trajectory-small-sample-docs, cut from master at 5d4cb2e1.
+- 2026-10-19: T1: figures from `summary[[cell]]` of the M161 `.rds`, R0, mean over waves 0:4 and e, x, y, d. `cov_conv` at 20/30/50 complete: pole .9380/.9432/.9435, xycor .9414/.9436/.9406, so .938 to .944. Non-PD share `1 - n_ok/n_reps`: n10 pole .274, xycor .177; n20 pole .032, xycor .010. At n10, `cov_conv` pole .9389, xycor .9195; `nonpd_cov$cov` pole .9064 (274 fits), xycor .9031 (177 fits). Design from `meta$waves` (0:4), `meta$reps` (1000) and the script header.
+- 2026-10-19: T2: Section 7 rewritten with the T1 figures, the design and both records. The two AC3 paragraphs (Section 4 shortcut result, Section 6 near-origin result) name 200 persons per cell and `devel/m27-coverage-oracle.md`, read from its header and A2/A3 rows. Section 7 citers (Overview `:43`, Section 5 `:220`, Section 10 `:515`, the printed caution) still hold. The helper roxygen's "the coverage oracle" goes plural at T3. The re-render changed prose lines only.
 
 ## Decisions
 
