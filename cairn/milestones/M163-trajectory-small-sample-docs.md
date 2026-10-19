@@ -69,6 +69,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - 2026-10-19: T4: `devtools::check(args = "--no-manual")` on the final tree: Status OK, 0 errors, 0 warnings, 0 notes, vignette re-build OK; a first run started before the claim-audit fixes was stopped unfinished. Test suite as at T3. Status set to review.
 - 2026-10-19: review return 1: AC1 — Section 7 does not name the `ssm_growth_formula()` model in its design fact ("this model" only); every figure and the other design facts were found. Status back to in-progress.
 - 2026-10-19: T5 added for review return 1 (minor amendment; Coverage AC1 and AC5 now also cite T5). Section 7 now says the oracles fit "the one `ssm_growth_formula()` writes"; checked for M27 too, whose `glmmTMB()` call (`devel/m27-coverage-oracle.R:118-120`) has the same formula and dispformula that `ssm_growth_formula("glmmTMB")` returns. NEWS line re-wrapped. Staleness check: all 11 up to date. `devtools::check(args = "--no-manual")` at 0acf2a3c: Status OK, 0 errors, 0 warnings, 0 notes, tests OK, vignette re-build OK. Status set to review.
+- 2026-10-19: step-7 approval: m163-trajectory-small-sample-docs approved for merge (chip re-posed after the first was interrupted; branch and master unchanged in between).
 
 ## Decisions
 
