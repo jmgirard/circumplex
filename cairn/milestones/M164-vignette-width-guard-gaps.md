@@ -51,7 +51,7 @@ Every line in a column-1 code fence of every vignette fits the website's code bo
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
 - [x] T1: Write the regression tests for AC4 to AC6 first, and see each fail before its fix.
-- [ ] T2: Make `cpm_fit_line()` (R/cpm_oop.R:31) wrap through `wrap_prose(atomic = TRUE)`, with one unit per `;` clause and a five-space continuation. Remove the `fit line` entry and kind from the width ledger in `tests/testthat/test-print-width.R`. Update the CPM snapshots.
+- [x] T2: Make `cpm_fit_line()` (R/cpm_oop.R:31) wrap through `wrap_prose(atomic = TRUE)`, with one unit per `;` clause and a five-space continuation. Remove the `fit line` entry and kind from the width ledger in `tests/testthat/test-print-width.R`. Update the CPM snapshots.
 - [ ] T3: Make `instruments()` (R/instrument_oop.R:240) print each entry with `cat_item()`. Stop the separator space of `cat()` from opening lines 2 and later. Update snapshots.
 - [ ] T4: Send the `norm_standardize()` message (R/tidying_functions.R:358) through `wrap_prose()`. Tests that match message text across a break match it with whitespace tolerance.
 - [ ] T5: Rewrite the guard to the `list.files()` domain, the knit of live vignettes into a temporary copy, and the fence rule of AC2. Rewrite its header comment, which says "two live vignettes" and reads only `#>` lines. Update the comment in `.github/workflows/vignette-precompute.yaml` that says the same.
@@ -78,6 +78,8 @@ Every line in a column-1 code fence of every vignette fits the website's code bo
 - 2026-10-19: plan gate chose wrapping the fit line at its `;` clauses over a fixed two-line layout, because the line stays unchanged where it fits; falsified by a reader report that the wrapped line reads worse.
 - 2026-10-19: the fence rule's narrowing leaves indented fences unread; recorded as a candidate row ("Indented code fences in the width guard").
 - 2026-10-19: T1: `tests/testthat/test-print-wrap-lines.R` written; before any fix it fails 4 of 6 blocks (fit line 4+2 failures, instruments() 3, norms message 46+1); the other two blocks are guards that pass by design. Width set by a base-R helper, since withr is not in Suggests.
+- 2026-10-19: correction to the T1 line: before the fixes 5 of 6 blocks failed (fit line 4, break-at-60 guard 2, instruments() 3, norms message 46, long-message break 1); only the >100-column check passed.
+- 2026-10-19: T2: `cpm_fit_line()` cuts its text at "; " into clauses and wraps them with `wrap_prose(atomic = TRUE)` and a five-space continuation; the `fit line` ledger entry and kind are gone from test-print-width.R; cpm_api and cpm_summary_markers snapshots moved one line break each. Full `devtools::test()` (with T3 and T4 in the tree) exits 0 with no failure.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->

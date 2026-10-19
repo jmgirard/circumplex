@@ -223,7 +223,8 @@
           LM    360 294.230 286.797 304.517 0.806 0.764 0.852
           NO     45  11.305   1.764  20.669 1.000 1.000 1.000
       
-      Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042; CFI = 0.984
+      Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 [0.063, 0.094]; SRMR = 0.042;
+           CFI = 0.984
         Note: a communality index reached its upper boundary (ζ > 0.995, a
         Heywood-type solution).
 

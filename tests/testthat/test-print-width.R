@@ -42,16 +42,14 @@
 # not see it either, and the shape pattern that would catch it was rejected at
 # T3 because it excuses as much as it catches. What stands in for it is the
 # classification: every entry is NAMED by its kind, a third guard requires
-# that kind to be one of the four this milestone leaves alone, and there is no
+# that kind to be one of the kinds this milestone leaves alone, and there is no
 # kind a caution could honestly be filed under. Parking one here now means
 # writing down a false kind, which is a visible act in the diff rather than a
 # silent one.
 
+# The CPM fit line left this ledger in M164, when it began to wrap at its "; "
+# separators (test-print-wrap-lines.R).
 caution_width_ledger <- c(
-  `fit line` = paste0(
-    "Fit: χ²(10) = 81.169, p = <1e-04; RMSEA = 0.078 ",
-    "[0.063, 0.094]; SRMR = 0.042; CFI = 0.984"
-  ),
   `test-statistic line` =
     "  Correspondence index = 0.694, p = 0.0167 (exact, 120 relabelings)",
   `test-statistic line` =
@@ -80,9 +78,11 @@ caution_width_ledger <- c(
 # is a table or a column header; what puts them here is what puts the Scope's
 # four here, that their layout is written into the line rather than flowed,
 # and re-flowing them would change what they are rather than where they break.
-# Nothing else may be excused, and no caution is any of these.
+# Nothing else may be excused, and no caution is any of these. M164 removed
+# the "fit line" kind, because the CPM fit line now wraps, so three kinds
+# remain.
 caution_ledger_kinds <- c(
-  "fit line", "test-statistic line", "heading", "section heading"
+  "test-statistic line", "heading", "section heading"
 )
 
 # Lines over the width that the ledger does not account for.
@@ -180,7 +180,7 @@ test_that("every ledger entry is a line some fixture really prints", {
 
 test_that("every ledger entry is named by a kind this milestone leaves alone", {
   # The classification is what stands in for a guard that cannot be written
-  # (see the header). An entry with no kind, or with a kind outside the four
+  # (see the header). An entry with no kind, or with a kind outside the ones
   # the Scope leaves unwrapped, is a caution being smuggled in under a label.
   kinds <- names(caution_width_ledger)
   expect_false(is.null(kinds))
