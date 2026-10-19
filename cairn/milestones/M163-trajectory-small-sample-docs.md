@@ -1,6 +1,6 @@
 # M163: Small-sample coverage in the trajectory docs
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,7 +47,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - [x] T1: Compute the Section 7 figures from `devel/m161-small-n-results.rds` with a short script run in the session. Record each figure and its source element in a work-log line.
 - [x] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
 - [x] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
-- [ ] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
+- [x] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -65,6 +65,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - 2026-10-19: T2 staleness: after the T2 commit, a re-render and `tools/check-vignette-staleness.R` report all 11 pre-computed vignettes up to date.
 - 2026-10-19: T3: the `ssm_trajectory()` small-sample roxygen paragraph states the .938 to .944 converged range at 20 to 50 persons and the 27.4% and 17.7% non-PD shares at 10 persons, and keeps the Section 7 pointer; `document()` rewrote `man/ssm_trajectory.Rd` only. The dev NEWS entry on Section 7 now names the 10-to-50-person figures and `?ssm_trajectory`. `devtools::test()`: 14865 passed, 0 failed, 1 skipped.
 - 2026-10-19: claim audit: 38 claims read, 3 corrected — vignettes/growth-ssm-analysis.Rmd.orig (and .Rmd), NEWS.md. The five-balanced-waves sentence now covers only the reported figures, since M161 also ran missing-wave cells. The 10-person non-PD coverage now says normal draws on those fits' `vcov`, since the oracle passed its own draws as `draws =` and the helper refuses an asymmetric or invalid `vcov` (`R/ssm_trajectory_helper.R:301-318`); the auditor's spot check found one such fit in 123. NEWS names the non-PD rate at 10 and 20 persons only, as Section 7 states it.
+- 2026-10-19: T4: `devtools::check(args = "--no-manual")` on the final tree: Status OK, 0 errors, 0 warnings, 0 notes, vignette re-build OK; a first run started before the claim-audit fixes was stopped unfinished. Test suite as at T3. Status set to review.
 
 ## Decisions
 
