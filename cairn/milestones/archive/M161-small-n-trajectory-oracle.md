@@ -1,0 +1,13 @@
+# M161: Small-N coverage oracle for trajectory intervals
+
+**Status:** done (2026-10-19, PR #196 https://github.com/jmgirard/circumplex/pull/196)
+
+**Goal:** Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` at small numbers of persons, and select by a pre-registered coverage gate the small-sample draw rule that M162 ships.
+
+feature series: M161 -> M162.
+
+**Outcome:** `devel/m161-small-n-oracle.R` simulates the M27 `pole` and `xycor` truths at N = 10, 20, 30, 50 and 200, plus 20%-missing cells at N = 20 and 30, 1000 replicates each, fit by glmmTMB REML. It scores three draw rules on shared fits and normals: R0, the shipped normal draws; R1, multivariate t with one shared chi-square divisor and nu = N - 1; and R3a, a `vcov` inflation by N / (N - 1). Its header pre-registers a band (counting a non-PD fit as a miss), closed-form wave-2 targets and a paired R1 minus R0 check. The results are in `devel/m161-small-n-results.rds`, and the record is `devel/m161-small-n-oracle.md`. The closed-form and paired checks and the N = 200 control pass. Every rule fails the band. R1 fails only in pole N = 20, where 32 of 1000 fits had a non-PD Hessian, and it met the band among converged fits. On that basis R0 and R3a pass too, so a moved band does not separate the rules. Selection is by RR25's derivation: R1 is exact at the mean design time on complete balanced data, with the oracle to confirm it. No package code changed.
+
+**Decisions:** D-066: no rule passed the band, M161 names no rule for M162, and M162 returns to `/milestone-plan`, where it needs a separating criterion with fresh seeds. M161-D1 to D3 ingest RR25: the premise correction (shipped coverage .918 to .944 at the centre wave for N = 10 to 50), the candidate set, and glmmTMB's REML `vcov` and boundary behavior. The user adopted a substantive amendment at the stop, so the derivation selects and the oracle confirms, in place of the narrowest-width rule.
+
+**Review:** RB25 and RR25 came from a Fable review. Two criteria re-audits ran on the amendment, reaching the second-audit stop. Four-lens fan-out with 29 findings: 14 fixed, framing of the record and D-066 (the converged-basis non-separation, conditioning bias, AC3 (i) overclaim) and the M162 replan inputs; 8 follow-ups as replan inputs in M162's work log; 7 rejected. RR25's projections fell short (boundary rate 3.2% against 1.2% at N = 20), and the user accepted the shortfall at the merge gate. CI green on four checks. Hygiene: the "Small-sample correction for trajectory draws" row narrowed to M162's remainder; M158's row pruned for retention; no lesson added (the outcome is D-066).
