@@ -21,7 +21,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 
 ## Acceptance criteria
 
-- [ ] AC1: Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig` and the re-rendered `vignettes/growth-ssm-analysis.Rmd` state five facts from the M161 record.
+- [x] AC1: Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig` and the re-rendered `vignettes/growth-ssm-analysis.Rmd` state five facts from the M161 record.
   - The simulated design: the `ssm_growth_formula()` model, five balanced waves, the two truths and 1000 replicates per cell.
   - The range of the shipped (R0) mean coverage among converged fits over the six complete-data cells at 20, 30 and 50 persons. Each mean is over the five waves and over e, x, y and d.
   - The share of fits with a non-positive-definite Hessian in the complete-data cells at 10 and at 20 persons, for each truth.
@@ -29,10 +29,10 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
   - The record path `devel/m161-small-n-oracle.md`.
 
   Each figure equals, at its printed precision, the value computed from `devel/m161-small-n-results.rds`. No sentence of Section 7 contradicts a stated figure.
-- [ ] AC2: The small-sample paragraph of the `ssm_trajectory()` help page states two facts. They are the R0 converged-fit coverage range at 20 to 50 persons, and the non-positive-definite share at 10 persons for each truth. This holds in the roxygen of `R/ssm_trajectory_helper.R` and in the regenerated `man/ssm_trajectory.Rd`. Each figure equals the one that Section 7 states. The paragraph keeps its pointer to Section 7, and no sentence of it contradicts a stated figure.
-- [ ] AC3: Two paragraphs of `vignettes/growth-ssm-analysis.Rmd.orig` report a measured coverage result outside Section 7. They hold the roughly 86% result of Section 4 and the near-origin result of Section 6. Each names the persons per cell and the record that measured its result.
-- [ ] AC4: Take the development-version NEWS.md entry that opens "The same vignette's Section 7 now states". It also says that Section 7 and `?ssm_trajectory` report the coverage at 10 to 50 persons. NEWS.md gains no other entry from this milestone, and the entry names no milestone.
-- [ ] AC5: `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and 0 notes. `tools/precompute-vignettes.R` renders the growth vignette, and `Rscript tools/check-vignette-staleness.R` passes after the render.
+- [x] AC2: The small-sample paragraph of the `ssm_trajectory()` help page states two facts. They are the R0 converged-fit coverage range at 20 to 50 persons, and the non-positive-definite share at 10 persons for each truth. This holds in the roxygen of `R/ssm_trajectory_helper.R` and in the regenerated `man/ssm_trajectory.Rd`. Each figure equals the one that Section 7 states. The paragraph keeps its pointer to Section 7, and no sentence of it contradicts a stated figure.
+- [x] AC3: Two paragraphs of `vignettes/growth-ssm-analysis.Rmd.orig` report a measured coverage result outside Section 7. They hold the roughly 86% result of Section 4 and the near-origin result of Section 6. Each names the persons per cell and the record that measured its result.
+- [x] AC4: Take the development-version NEWS.md entry that opens "The same vignette's Section 7 now states". It also says that Section 7 and `?ssm_trajectory` report the coverage at 10 to 50 persons. NEWS.md gains no other entry from this milestone, and the entry names no milestone.
+- [x] AC5: `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and 0 notes. `tools/precompute-vignettes.R` renders the growth vignette, and `Rscript tools/check-vignette-staleness.R` passes after the render.
 
 ## Coverage
 
@@ -81,3 +81,12 @@ Pass 1 (2026-10-19, branch head 1b95f546, master unmoved at 5d4cb2e1, no PR, Cop
 - AC3: pass. `vignettes/growth-ssm-analysis.Rmd.orig:188-191` (Section 4, 86% result) and `:312-315` (Section 6, near-origin result) each name 200 persons per cell and `devel/m27-coverage-oracle.md`.
 - AC4: pass. `NEWS.md:335-340`, the dev entry opening "The same vignette's Section 7 now states", says Section 7 reports the coverage at 10 to 50 persons and that `?ssm_trajectory` states the main figures; `git diff master...HEAD -- NEWS.md` adds no other entry and names no milestone.
 - AC5: not run this pass; the fresh check was stopped at the AC1 return because the fix changes the vignette.
+
+Pass 2 (2026-10-19, branch head d0453019, master unmoved at 5d4cb2e1, no PR, Copilot round off).
+
+- AC1: pass. The recompute script over the M161 `.rds` found every figure and design phrase in Section 7 of both files (all checks TRUE): .938/.944, 27.4%/17.7%, 3.2%/1.0%, .939/.920 and .906/.903 on the stated basis, 1000 samples, five balanced waves, the two truths, `ssm_growth_formula()` (`.Rmd.orig:361-362`), `devel/m161-small-n-oracle.md`. Section 7 is identical in `.Rmd.orig` and `.Rmd`. A full read of Section 7 found no sentence contradicting a stated figure.
+- AC2: pass. Same script: the four help figures appear in the roxygen (`R/ssm_trajectory_helper.R:43-51`) and in `man/ssm_trajectory.Rd`, equal to Section 7, with the Section 7 pointer in both; a read found no contradiction.
+- AC3: pass. `vignettes/growth-ssm-analysis.Rmd.orig:188-191` and `:312-315` each name 200 persons per cell and `devel/m27-coverage-oracle.md` (unchanged since pass 1).
+- AC4: pass. `NEWS.md:335-340` states the 10-to-50-person coverage and that `?ssm_trajectory` states the main figures; `git diff master...HEAD -- NEWS.md` adds no new entry (0 added `* ` lines) and names no milestone.
+- AC5: pass. `devtools::check(args = "--no-manual")` at 0acf2a3c: Status OK, 0 errors, 0 warnings, 0 notes, tests OK, vignette re-build OK; `git diff 0acf2a3c HEAD` touches only `cairn/`, which `.Rbuildignore` excludes. After the T5 commit, a re-render and `tools/check-vignette-staleness.R` reported all 11 vignettes up to date.
+- Gate: `cairn_validate` exit 0; `document()` no diff, 0 `resolve link` lines; README untouched; `pkgdown::check_pkgdown()` no problems; NEWS entry present; no new top-level files; master watches: newest push verdicts on `R-CMD-check.yaml` and `test-coverage.yaml` are success (37d75eb1); `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit 0. No principle changed, so no `cairn_impact` run.
