@@ -76,6 +76,7 @@ Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` 
 - 2026-10-18: T4 done: `devel/m161-small-n-oracle.md` (verdicts, per-cell table on both bases, reading, design iterations none, two oracle types) and D-066, which records that R1 failed the band in `pole` N = 20 only, that no rule passed, and that M161 names no rule for M162. Per T4, M162's goal is wrong as planned and its next step is `/milestone-plan`.
 - 2026-10-18: claim audit: not owed — internal tier.
 - 2026-10-18: implement complete: `devtools::test()` FAIL 0, WARN 11, SKIP 1, PASS 14865; cairn_validate green; status review.
+- 2026-10-18: step-7 approval: m161-small-n-trajectory-oracle approved for merge (with the RR25 shortfall accepted, recorded in the Review section).
 
 ## Decisions
 
@@ -126,3 +127,4 @@ Pass 1 (2026-10-18), branch `m161-small-n-trajectory-oracle` at 8407c38c; `origi
 - ripple #4: "keep their nominal coverage" and "stays at nominal" do not name the 200-person sample — follow-up (M162 replan input; pre-existing text).
 - ripple #5: `R/ssm_trajectory_helper.R:43-45` says Section 7 states what the oracle measured — follow-up (M162 replan input; M161 scope excludes `R/`).
 - Fix-now items fixed ac6f1aca: diff-bug #1 to #8 and #11, blame-history #2, #3 and #5, prior-review #1. Ripple #2 lands at post-merge hygiene. The follow-ups are recorded as replan inputs in M162's work log, the home for the work they name. None of the findings shows an acceptance criterion failing, so no return.
+- Accepted shortfall (user, merge gate 2026-10-18): the measured outcomes fall short of RR25's projections, which state no tolerance — R0 at the centre wave, pole N = 20, e: .933 against .935; N = 20 boundary-fit rate 3.2% (pole) against 1.2% — and the user accepted the gap as recorded.
