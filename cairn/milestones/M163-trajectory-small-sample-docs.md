@@ -1,6 +1,6 @@
 # M163: Small-sample coverage in the trajectory docs
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -66,7 +66,16 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - 2026-10-19: T3: the `ssm_trajectory()` small-sample roxygen paragraph states the .938 to .944 converged range at 20 to 50 persons and the 27.4% and 17.7% non-PD shares at 10 persons, and keeps the Section 7 pointer; `document()` rewrote `man/ssm_trajectory.Rd` only. The dev NEWS entry on Section 7 now names the 10-to-50-person figures and `?ssm_trajectory`. `devtools::test()`: 14865 passed, 0 failed, 1 skipped.
 - 2026-10-19: claim audit: 38 claims read, 3 corrected — vignettes/growth-ssm-analysis.Rmd.orig (and .Rmd), NEWS.md. The five-balanced-waves sentence now covers only the reported figures, since M161 also ran missing-wave cells. The 10-person non-PD coverage now says normal draws on those fits' `vcov`, since the oracle passed its own draws as `draws =` and the helper refuses an asymmetric or invalid `vcov` (`R/ssm_trajectory_helper.R:301-318`); the auditor's spot check found one such fit in 123. NEWS names the non-PD rate at 10 and 20 persons only, as Section 7 states it.
 - 2026-10-19: T4: `devtools::check(args = "--no-manual")` on the final tree: Status OK, 0 errors, 0 warnings, 0 notes, vignette re-build OK; a first run started before the claim-audit fixes was stopped unfinished. Test suite as at T3. Status set to review.
+- 2026-10-19: review return 1: AC1 — Section 7 does not name the `ssm_growth_formula()` model in its design fact ("this model" only); every figure and the other design facts were found. Status back to in-progress.
 
 ## Decisions
 
 ## Review
+
+Pass 1 (2026-10-19, branch head 1b95f546, master unmoved at 5d4cb2e1, no PR, Copilot round off).
+
+- AC1: FAIL. A recompute script over `devel/m161-small-n-results.rds` (R0, mean over waves 0:4 and e, x, y, d) found every figure in Section 7 of both files: .938/.944, 27.4%/17.7%, 3.2%/1.0%, .939/.920, .906/.903, 1000 samples, five waves, `devel/m161-small-n-oracle.md`. Section 7 is identical in `.Rmd.orig` and `.Rmd`. But Section 7 does not name the `ssm_growth_formula()` model, which the design fact requires; it says "this model" only. Returned to implement.
+- AC2: pass. The roxygen at `R/ssm_trajectory_helper.R:43-51` and `man/ssm_trajectory.Rd:119-126` state .938 to .944 at 20 to 50 persons and 27.4% and 17.7% at 10 persons, equal to Section 7, keep the Section 7 pointer, and contradict no figure (read).
+- AC3: pass. `vignettes/growth-ssm-analysis.Rmd.orig:188-191` (Section 4, 86% result) and `:312-315` (Section 6, near-origin result) each name 200 persons per cell and `devel/m27-coverage-oracle.md`.
+- AC4: pass. `NEWS.md:335-340`, the dev entry opening "The same vignette's Section 7 now states", says Section 7 reports the coverage at 10 to 50 persons and that `?ssm_trajectory` states the main figures; `git diff master...HEAD -- NEWS.md` adds no other entry and names no milestone.
+- AC5: not run this pass; the fresh check was stopped at the AC1 return because the fix changes the vignette.
