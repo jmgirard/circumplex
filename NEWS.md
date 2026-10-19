@@ -227,8 +227,9 @@
   past a narrow console or stopped short of a wide one. The
   words and their order do not change. Only the line breaks move. A
   fired marker label, such as `Heywood communality`, still stays on one line.
-  Tables, column headers, test-statistic lines and section headings do not
-  wrap, because wrapping them would destroy their columns.
+  Tables, column headers, the fit-index lines of `summary()`, test-statistic
+  lines and section headings do not wrap, because wrapping them would destroy
+  their columns.
 
 * In `summary()` for an `ssm_ci_accuracy()` result, the heading above the
   verdicts now reads `Verdicts (c = 1, as estimated), Bradley (1978) liberal

@@ -15,7 +15,8 @@
 # fit, so only a line that is not wrapped at all can fail there.
 #
 # THE LEDGER. This milestone wraps prose cautions and notes. It deliberately
-# leaves fit lines, test-statistic lines and section headings alone, because
+# leaves fit lines (until M164 wrapped the CPM fit line), test-statistic lines
+# and section headings alone, because
 # wrapping them destroys their columns. A few of those are wider than 60
 # columns, so they are listed here, classified, rather than silently excused
 # by a pattern that could also excuse a caution this milestone failed to wrap.
@@ -72,15 +73,14 @@ caution_width_ledger <- c(
 
 # The kinds of line this ledger may excuse. The milestone's Scope names the
 # families it leaves unwrapped -- tables, column headers, fit lines and
-# section headings -- and these four are the kinds the fixtures below actually
-# print over-long. Two of them are not the Scope's own words: a top-level
-# heading, and a test-statistic line. Neither is column-structured, so neither
-# is a table or a column header; what puts them here is what puts the Scope's
-# four here, that their layout is written into the line rather than flowed,
-# and re-flowing them would change what they are rather than where they break.
-# Nothing else may be excused, and no caution is any of these. M164 removed
-# the "fit line" kind, because the CPM fit line now wraps, so three kinds
-# remain.
+# section headings -- and these three are the kinds the fixtures below
+# actually print over-long (M164 removed "fit line", because the CPM fit line
+# now wraps). Two of them are not the Scope's own words: a top-level heading,
+# and a test-statistic line. Neither is column-structured, so neither is a
+# table or a column header; what puts them here is what puts the Scope's
+# families here, that their layout is written into the line rather than
+# flowed, and re-flowing them would change what they are rather than where
+# they break. Nothing else may be excused, and no caution is any of these.
 caution_ledger_kinds <- c(
   "test-statistic line", "heading", "section heading"
 )
