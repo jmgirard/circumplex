@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-18 (triage: merged "Norms-audit same-binding twins"
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M161 | Small-N coverage oracle for trajectory intervals | planned | — | normal | milestones/M161-small-n-trajectory-oracle.md |
+| M161 | Small-N coverage oracle for trajectory intervals | blocked | — | normal | milestones/M161-small-n-trajectory-oracle.md |
 | M162 | Small-sample draws in ssm_trajectory() | planned | M161 | normal | milestones/M162-trajectory-small-sample-draws.md |
 | M160 | Selection guards for items and the remaining column arguments | done | — | normal | milestones/archive/M160-items-selection-guards.md |
 | M159 | Selection guards for the scales argument | done | — | normal | milestones/archive/M159-scales-selection-guards.md |

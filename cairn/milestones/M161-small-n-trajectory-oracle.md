@@ -1,13 +1,13 @@
 # M161: Small-N coverage oracle for trajectory intervals
 
-- **Status:** planned
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, IP4
 - **Resolves:** —
 - **Surface tier:** internal — a `devel/` simulation oracle, its record and a decision entry, with no export, help page or behavior change
-- **Branch/PR:** —
+- **Branch/PR:** m161-small-n-trajectory-oracle
 
 ## Goal
 
@@ -53,6 +53,9 @@ Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` 
 - 2026-10-18: plan gate chose a simulation gate among named candidates over adopting a published Kenward-Roger or Satterthwaite rule because glmmTMB offers neither and nlme's DF is 2095 for every coefficient here; falsified by an engine-agnostic published rule for this model that the oracle shows nominal.
 - 2026-10-18: criteria re-audit after the question set (reduced mode, same fresh reader) returned three findings, all fixed: AC2 now gates all five waves with the amplitude floor that justifies it (true a(t) at least .591 in `pole` and .598 in `xycor`, read from `devel/m27-coverage-oracle.R:227-276`); AC3 reports coverage among converged fits beside the all-replicates figure, so a gate miss from fit failures is visible; AC5 limits the chosen rule to one computable from `coef`, `vcov`, `times` and one bounded numeric argument, the form M162 can ship. A review rule outside that form comes back through an amendment.
 - 2026-10-18: lessons bearing on this scope: run the oracle under `load_all()` (M21 family); commit exact seeds per level index; a frozen measurement needs a gate (M108 family).
+- 2026-10-18: implement started on branch m161-small-n-trajectory-oracle, cut from master at 1464b6d4.
+- 2026-10-18: T1: drafted RB25 (`cairn/reviews/RB25-small-n-trajectory-draws.md`), advisory, eight questions. Its background records the author's unverified Satterthwaite estimate that the shipped normal draws reach about .936 to .945 marginal coverage at N = 20, which would let them pass AC2's gate. First escalation of this mechanism (sweep of `cairn/reviews/` found none).
+- 2026-10-18: blocked on RB25.
 
 ## Decisions
 
