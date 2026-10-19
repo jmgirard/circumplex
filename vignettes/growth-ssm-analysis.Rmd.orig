@@ -358,9 +358,10 @@ anticonservative (too narrow). This is a property of the mixed-model
 machinery, not of the SSM transform. The caution under the Section 5 table
 states this for the `coef` and `vcov` shape.
 
-The package's coverage oracles fit this model with glmmTMB and REML to
-simulated data. The figures below come from samples with five balanced
-waves and no missing values. The first oracle used 200 persons in each
+The package's coverage oracles fit this model, the one
+`ssm_growth_formula()` writes, with glmmTMB and REML to simulated data.
+The figures below come from samples with five balanced waves and no
+missing values. The first oracle used 200 persons in each
 coverage cell.
 The $d(t)$ intervals held coverage between .93 and .97 at every certified
 wave. At the uncertified low-amplitude wave the coverage was .854, which

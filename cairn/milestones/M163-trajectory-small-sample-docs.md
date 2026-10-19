@@ -36,11 +36,11 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 
 ## Coverage
 
-- AC1 → T1, T2
+- AC1 → T1, T2, T5
 - AC2 → T1, T3
 - AC3 → T2
 - AC4 → T3
-- AC5 → T4
+- AC5 → T4, T5
 
 ## Tasks
 
@@ -48,6 +48,7 @@ The growth vignette, the `ssm_trajectory()` help page and NEWS.md state what the
 - [x] T2: Rewrite Section 7 in the `.Rmd.orig`. Name the sample and record in the two AC3 paragraphs, reading the M27 record for each. Grep the vignette and `R/` for text that cites Section 7 (the Overview, Section 5, Section 10 and the printed caution) and fix any claim the rewrite makes false. Re-render with `tools/precompute-vignettes.R` and run the staleness check.
 - [x] T3: Update the help-page paragraph, run `devtools::document()`, and edit the NEWS entry.
 - [x] T4: Run the test suite and `devtools::check(args = "--no-manual")`.
+- [ ] T5: Review return 1: name the `ssm_growth_formula()` model in Section 7's design fact, re-render, run the staleness check, and re-run the test suite and the check.
 
 ## Work log
 

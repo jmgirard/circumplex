@@ -337,8 +337,8 @@
   does not write. It reports the coverage oracle's result at 200 persons
   per cell. It also reports the coverage at 10 to 50 persons and how often
   the fit has a non-positive-definite Hessian at 10 and 20 persons, and
-  `?ssm_trajectory` states the main figures. It says that the package ships no small-sample
-  correction, and explains why a percentile parametric bootstrap of the
+  `?ssm_trajectory` states the main figures. It says that the package
+  ships no small-sample correction, and explains why a percentile parametric bootstrap of the
   fixed effects is not one on complete balanced data. It also says that a matrix of
   coefficient draws from any source enters `ssm_trajectory()` as `draws =`.
   The lme4 remedies it named before are gone.
