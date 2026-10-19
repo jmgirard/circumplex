@@ -239,16 +239,19 @@ norms <- function(x) {
 instruments <- function() {
   insts <- instrument_names()
 
-  header <- sprintf(
-    "The circumplex package currently includes %d instruments:\n",
+  cat_prose(sprintf(
+    "The circumplex package currently includes %d instruments:",
     length(insts)
-  )
-  lines <- vapply(seq_along(insts), function(i) {
+  ))
+  # Each entry wraps to the console width under its own text (M164). Each
+  # entry is its own cat() call, so no separator space opens a line.
+  for (i in seq_along(insts)) {
     d <- instrument_object(insts[[i]])$Details
-    sprintf("%d. %s: %s (%s)\n", i, d$Abbrev, d$Name, insts[[i]])
-  }, character(1))
-
-  cat(c(header, lines))
+    cat_item(
+      sprintf("%s: %s (%s)", d$Abbrev, d$Name, insts[[i]]),
+      paste0(i, ". ")
+    )
+  }
 }
 
 # Fetch a shipped dataset by name without attaching it to the search path.

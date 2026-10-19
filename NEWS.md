@@ -186,6 +186,15 @@
   and all ladder notes wrap by the same rule as the package's other notes.
   These changes move line breaks only. The text of every note is the same.
 
+* Three more printed lines wrap to the console width. If the `Fit:` line in
+  `print()` of a `cpm_fit()` result is wider than the console, it breaks only
+  after a `;`, and each later line is indented five spaces.
+  `instruments()` wraps each entry under the entry's own text, and its
+  entries no longer start with a space. The message from `norm_standardize()`
+  that names the normative sample also wraps. The words and numbers do not
+  change. Code that matches that message's text must now allow a line break
+  where the message had a space.
+
 * The "Growth Models on SSM Parameters" vignette prints the variance
   components of the joint model after the first fit, so the reader sees the
   correlated person block that separate fits cannot estimate. It also
@@ -218,8 +227,9 @@
   past a narrow console or stopped short of a wide one. The
   words and their order do not change. Only the line breaks move. A
   fired marker label, such as `Heywood communality`, still stays on one line.
-  Tables, column headers, fit lines and section headings do not wrap,
-  because wrapping them would destroy their columns.
+  Tables, column headers, the fit-index lines of `summary()`, test-statistic
+  lines and section headings do not wrap, because wrapping them would destroy
+  their columns.
 
 * In `summary()` for an `ssm_ci_accuracy()` result, the heading above the
   verdicts now reads `Verdicts (c = 1, as estimated), Bradley (1978) liberal

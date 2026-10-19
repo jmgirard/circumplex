@@ -52,8 +52,10 @@ policy <- list(
   # stale committed copy. A missing Suggest here would let a fitting chunk
   # skip, so the re-render would match a copy carrying less output than the
   # source asks for -- the same silent wrong-answer channel this guard exists
-  # for. brms is excluded for the same reason as everywhere else, and the
-  # Bayesian vignette is not pre-computed.
+  # for. The width guard also knits the live vignettes in this job, so a
+  # missing Suggest would shorten what it reads too. brms is excluded for the
+  # same reason as everywhere else: the Bayesian vignette is not pre-computed,
+  # and its brm() chunk is eval = FALSE, so the guard knits it without brms.
   ".github/workflows/vignette-precompute.yaml" = list(
     exclude = c("brms"),
     extra = character(0L)

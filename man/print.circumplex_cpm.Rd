@@ -18,6 +18,7 @@
 }
 \description{
 Compact display of a \code{\link[=cpm_fit]{cpm_fit()}} object: the estimated angles and communality
-indices with confidence intervals, a one-line fit summary, and any
+indices with confidence intervals, a fit summary that wraps after a \verb{;}
+when it is wider than the console, and any
 boundary/convergence notes.
 }

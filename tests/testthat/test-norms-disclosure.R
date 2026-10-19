@@ -60,7 +60,7 @@ test_that("a single-sample instrument's message names the sample, size and descr
     obj <- shipped_instrument(nm)
     if (nrow(obj$Norms[[2]]) > 1) next
     row <- obj$Norms[[2]]
-    msg <- capture_messages(standardize_probe(obj, row$Sample[[1]]))
+    msg <- disclosure_messages(standardize_probe(obj, row$Sample[[1]]))
     expect_length(msg, 1)
     expect_match(msg[[1]], paste0("sample ", row$Sample[[1]]), fixed = TRUE)
     expect_match(msg[[1]], paste0("N = ", row$Size[[1]]), fixed = TRUE)
@@ -77,7 +77,7 @@ test_that("a multi-sample instrument's message says how many other samples exist
     if (n < 2) next
     for (s in obj$Norms[[2]]$Sample) {
       if (!disclosure_usable(obj, s)) next
-      msg <- capture_messages(standardize_probe(obj, s))
+      msg <- disclosure_messages(standardize_probe(obj, s))
       expect_length(msg, 1)
       expect_match(msg[[1]], paste0("sample ", s), fixed = TRUE)
       # Derived independently of the implementation, which counts rows of
@@ -121,7 +121,7 @@ test_that("the message reads Size and description by Sample, not by row position
   # that separates the two.
   obj <- shipped_instrument("iipsc")
   obj$Norms[[2]] <- obj$Norms[[2]][c(2, 1), ]
-  msg <- capture_messages(standardize_probe(obj, 1))
+  msg <- disclosure_messages(standardize_probe(obj, 1))
   expect_match(msg[[1]], "N = 872", fixed = TRUE)
   expect_match(msg[[1]], "American college students", fixed = TRUE)
   expect_false(grepl("N = 106", msg[[1]], fixed = TRUE))
@@ -139,7 +139,7 @@ test_that("every shipped sample's message carries its Population value verbatim"
     for (s in obj$Norms[[2]]$Sample) {
       if (!disclosure_usable(obj, s)) next
       pop <- obj$Norms[[2]]$Population[obj$Norms[[2]]$Sample == s]
-      msg <- capture_messages(standardize_probe(obj, s))
+      msg <- disclosure_messages(standardize_probe(obj, s))
       expect_match(msg[[1]], pop, fixed = TRUE, info = paste(nm, "sample", s))
       seen <- seen + 1L
     }
@@ -158,7 +158,7 @@ test_that("the message's fixed text frames the sample as a description, not a po
   sentinel <- "a representative population of nobody"
   obj <- shipped_instrument("iipsc")
   obj$Norms[[2]]$Population[obj$Norms[[2]]$Sample == 1] <- sentinel
-  msg <- capture_messages(standardize_probe(obj, 1))
+  msg <- disclosure_messages(standardize_probe(obj, 1))
   expect_match(msg[[1]], sentinel, fixed = TRUE)
   fixed_text <- sub(sentinel, "", msg[[1]], fixed = TRUE)
   expect_false(grepl("population", fixed_text, ignore.case = TRUE))
@@ -305,7 +305,7 @@ test_that("the other-samples clause counts only samples that can be used", {
   values$M[[row]] <- max(obj$Anchors$Value) + 1
   obj$Norms[[1]] <- values
   expect_false(disclosure_usable(obj, 2))
-  msg <- capture_messages(standardize_probe(obj, 1))
+  msg <- disclosure_messages(standardize_probe(obj, 1))
   expect_false(grepl("other sample", msg[[1]], fixed = TRUE))
 
   # And the converse, on the shipped object: iipsc's second sample IS usable,
@@ -313,6 +313,6 @@ test_that("the other-samples clause counts only samples that can be used", {
   # cases is the one mean, not anything else about the object.
   ok <- shipped_instrument("iipsc")
   expect_true(disclosure_usable(ok, 2))
-  msg2 <- capture_messages(standardize_probe(ok, 1))
+  msg2 <- disclosure_messages(standardize_probe(ok, 1))
   expect_match(msg2[[1]], "1 other sample is available", fixed = TRUE)
 })

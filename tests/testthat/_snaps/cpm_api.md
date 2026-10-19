@@ -20,7 +20,8 @@
           LM    270   270 240.671 299.329 0.666 0.524 0.809
           NO    315   315 290.816 339.184 0.666 0.524 0.809
       
-      Fit: χ²(11) = 23.059, p = 0.0173; RMSEA = 0.061 [0.024, 0.095]; SRMR = 0.03; CFI = 0.965
+      Fit: χ²(11) = 23.059, p = 0.0173; RMSEA = 0.061 [0.024, 0.095]; SRMR = 0.03;
+           CFI = 0.965
         Note: harmonic(s) 3 were on the zero boundary and removed (df adjusted).
 
 ---

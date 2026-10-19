@@ -27,22 +27,29 @@ new_cpm <- function(results, betas, fit, corfun, matrices, details, call) {
 
 # ---- shared formatting helpers ----------------------------------------------
 
-# One-line fit summary: chi-square(df), RMSEA [90% CI], SRMR, CFI (design sec. 5.4).
+# Fit summary: chi-square(df), RMSEA [90% CI], SRMR, CFI (design sec. 5.4).
+# It is one line when it fits the console width. Otherwise it breaks only
+# after a "; ", so each index stays whole, and continuation lines are indented
+# five spaces to sit under the text after "Fit: " (M164).
 cpm_fit_line <- function(fit, digits = 3) {
-  if (is.na(fit$df) || fit$df < 1) {
-    return(paste0(
-      "Fit: saturated model (df = ", fit$df, "); fit indices undefined.\n"
-    ))
+  text <- if (is.na(fit$df) || fit$df < 1) {
+    paste0("Fit: saturated model (df = ", fit$df, "); fit indices undefined.")
+  } else {
+    paste0(
+      "Fit: \u03c7\u00b2(", fit$df, ") = ", round(fit$chisq, digits),
+      ", p = ", format.pval(fit$pvalue, digits = digits, eps = 1e-4),
+      "; RMSEA = ", round(fit$rmsea, digits),
+      " [", round(fit$rmsea_ci[1], digits), ", ",
+      round(fit$rmsea_ci[2], digits), "]",
+      "; SRMR = ", round(fit$srmr, digits),
+      "; CFI = ", round(fit$cfi, digits)
+    )
   }
-  paste0(
-    "Fit: \u03c7\u00b2(", fit$df, ") = ", round(fit$chisq, digits),
-    ", p = ", format.pval(fit$pvalue, digits = digits, eps = 1e-4),
-    "; RMSEA = ", round(fit$rmsea, digits),
-    " [", round(fit$rmsea_ci[1], digits), ", ",
-    round(fit$rmsea_ci[2], digits), "]",
-    "; SRMR = ", round(fit$srmr, digits),
-    "; CFI = ", round(fit$cfi, digits), "\n"
-  )
+  clauses <- strsplit(text, "; ", fixed = TRUE)[[1]]
+  last <- length(clauses)
+  clauses[-last] <- paste0(clauses[-last], ";")
+  lines <- wrap_prose(clauses, continuation = strrep(" ", 5), atomic = TRUE)
+  paste0(paste(lines, collapse = "\n"), "\n")
 }
 
 # Diagnostic/boundary lines, gathered so print() and summary() agree (design
@@ -147,7 +154,8 @@ cpm_display_results <- function(df, digits) {
 #' Print a circular process model fit
 #'
 #' Compact display of a [cpm_fit()] object: the estimated angles and communality
-#' indices with confidence intervals, a one-line fit summary, and any
+#' indices with confidence intervals, a fit summary that wraps after a `;`
+#' when it is wider than the console, and any
 #' boundary/convergence notes.
 #'
 #' @param x A `circumplex_cpm` object.

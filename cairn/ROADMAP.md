@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-19 (M163 done and archived: small-sample coverage i
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M164 | Vignette width guard gaps | planned | — | normal | milestones/M164-vignette-width-guard-gaps.md |
+| M164 | Vignette width guard gaps | review | — | normal | milestones/M164-vignette-width-guard-gaps.md |
 | M163 | Small-sample coverage in the trajectory docs | done | — | normal | milestones/archive/M163-trajectory-small-sample-docs.md |
 | M162 | Small-sample draws in ssm_trajectory() | dropped | M161 | normal | milestones/archive/M162-trajectory-small-sample-draws.md |
 | M161 | Small-N coverage oracle for trajectory intervals | done | — | normal | milestones/archive/M161-small-n-trajectory-oracle.md |
