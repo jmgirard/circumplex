@@ -366,7 +366,10 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
         " available; see norms()."
       )
     }
-    message(msg)
+    # Wrapped to the console width like the package's printed cautions, so a
+    # long sample description does not run off the console or the website's
+    # code box (M164).
+    message(paste(wrap_prose(msg), collapse = "\n"))
   }
 
   out <- if (append) {

@@ -17,6 +17,13 @@ shipped_instrument <- function(nm) {
   circumplex:::instrument_object(nm)
 }
 
+# norm_standardize() wraps its disclosure message to the console width (M164),
+# so a phrase the tests look for can straddle a line break. The tests match
+# the message with each run of whitespace collapsed to one space.
+disclosure_messages <- function(code) {
+  trimws(gsub("[ \t\r\n]+", " ", capture_messages(code)))
+}
+
 # The probe is deliberately shaped from the instrument itself rather than
 # hand-written, so the sweeps over it cover every shipped instrument whatever
 # its scale count or naming.

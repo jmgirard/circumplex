@@ -210,7 +210,7 @@ test_that("every accepted call discloses its sample's kind, in message and attri
     phrase <- KIND_PHRASES[[expected$kind[[i]]]]
 
     probe <- disclosure_probe(obj)
-    msg <- capture_messages(
+    msg <- disclosure_messages(
       norm_standardize(
         probe, scales = names(probe), angles = obj$Scales$Angle,
         instrument = obj, sample = smp, append = FALSE
