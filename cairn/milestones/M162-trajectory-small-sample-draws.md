@@ -54,6 +54,7 @@
 - 2026-10-18: criteria audit (full mode, fresh Opus reader): six findings fixed — AC2 now tests x(t) + y(t) at two argument values to separate a shared divisor from separate ones; AC3 lists its refusals; AC4 records the correction in `input` so a drop is all-or-nothing; AC5 names its assertions; AC6 counts three surfaces and catches the stale "no shipped correction" lines at `R/ssm_trajectory_helper.R:45` and in the help page.
 - 2026-10-18: criteria re-audit (full mode, same fresh reader) returned three findings, all fixed: AC4 now requires the `@return` text to list the third `input` value, with the M155-D1 extension recorded at T2; AC3 refuses an `NA` value rather than a missing argument, which is the default path; AC6 adds a ledger category for prose that describes the uncorrected caution.
 - 2026-10-18: plan gate chose an opt-in argument over a new default because the helper cannot know N from `coef` and `vcov`; falsified by a rule whose degrees of freedom are computable from `coef` and `vcov` alone.
+- 2026-10-18: routed from M161's RR25 ingest (`cairn/reviews/archive/RR25-small-n-trajectory-draws.md`): rec 6, an argument giving the df (lower bound 1) rather than N, with the df = N - 1 mapping and its conditions in the help text, and the chi-square divisor drawn after the normals so AC1 holds; rec 7, the help text and Section 7 state the N = 10 boundary-fit rate from the M161 record; rec 9, one test at an `interval` other than .95. The argument name stays this milestone's irreversible-api choice.
 
 ## Decisions
 

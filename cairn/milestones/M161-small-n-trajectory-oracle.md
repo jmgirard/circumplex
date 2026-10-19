@@ -1,9 +1,9 @@
 # M161: Small-N coverage oracle for trajectory intervals
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
-- **Driving RR:** —
+- **Driving RR:** RR25 (advisory)
 - **Principles touched:** IP1, IP3, IP4
 - **Resolves:** —
 - **Surface tier:** internal — a `devel/` simulation oracle, its record and a decision entry, with no export, help page or behavior change
@@ -56,7 +56,13 @@ Measure the coverage of the `ssm_trajectory()` intervals from `coef` and `vcov` 
 - 2026-10-18: implement started on branch m161-small-n-trajectory-oracle, cut from master at 1464b6d4.
 - 2026-10-18: T1: drafted RB25 (`cairn/reviews/RB25-small-n-trajectory-draws.md`), advisory, eight questions. Its background records the author's unverified Satterthwaite estimate that the shipped normal draws reach about .936 to .945 marginal coverage at N = 20, which would let them pass AC2's gate. First escalation of this mechanism (sweep of `cairn/reviews/` found none).
 - 2026-10-18: blocked on RB25.
+- 2026-10-18: RR25 returned by a Fable subagent (user-approved spawn) and ingested; recorded as M161-D1 to M161-D3 below. Triage: apply recs 1, 2, 5, 8 in M161, and rec 4's non-finite `vcov` check in `fit_joint()`; rec 3 (calibration selection with N = 10 in the domain) goes to the user at the amendment stop, beside a derivation-selects alternative; rec 4's boundary-rate ceiling is not applied while N = 10 stays ungated (measured N = 20 rate 0% to 1.2%); recs 6, 7 (help and vignette part) and 9 are routed to M162's work log; recs 10 to 12 rejected for the reasons RR25 gives. The `tbar` agreement check from "Beyond the brief" is a candidate row. No standing D-entry is contradicted (rec 12 upholds the plan gate's opt-in).
+- 2026-10-18: unblocked; status back to in-progress.
 
 ## Decisions
+
+- M161-D1 (2026-10-18, RR25 §1, §2, §6): the premise holds but is smaller than assumed. On complete balanced data REML equals the ANOVA fit, and at the mean design time (wave 2) the pivot of `e`, `x`, `y` and every linear combination is exactly t with N - 1 df under every truth. The shipped normal draws cover .918, .935, .940 and .944 at N = 10, 20, 30 and 50 there, and slightly more at the outer waves. AC2's band as planned does not separate them from a corrected rule at N = 20 to 50, and AC5's width criterion would choose a `vcov` inflation by N / (N - 1), which undercorrects (.931 at N = 10, centre wave).
+- M161-D2 (2026-10-18, RR25 §3, §4): the candidate set is R0 (shipped normal draws), R1 (multivariate t, one chi-square divisor shared by all coefficients, nu = N - 1) and R3a (normal draws on `vcov` times N / (N - 1)) as a plausible-but-wrong control. Not gated: independent t marginals (no closed form; correlation attenuated .931 at nu = 9), level-specific or variance-matched inflations, design-based df rules (need T as well as N; at most 3.4% narrower than R1 at N = 20), and nu = N - 2 or N - 3 (overcorrect). No rule's df are computable from `coef` and `vcov` alone, so the opt-in argument stands.
+- M161-D3 (2026-10-18, RR25 §5, §8): glmmTMB's REML `vcov` includes a variance-component term that vanishes on complete balanced data and adds 0.01% to 0.42% to the SE on 20%-missing cells, so the missing-wave cells are read like the complete ones. At N = 10 the fit reaches the boundary of the 3 by 3 random-effect covariance in 14% to 34% of replicates, so N = 10 coverage counting failures as misses reads .59 to .75 for every rule. `vcov.glmmTMB` can return an all-`NA` matrix with `pdHess` TRUE, which the oracle's `fit_joint()` must count as a failed fit.
 
 ## Review
