@@ -41,7 +41,7 @@ by position so it adds no second failing site.
 
 ## Acceptance criteria
 
-- [ ] AC1: Called with `coef` and `vcov` and the default contrast,
+- [x] AC1: Called with `coef` and `vcov` and the default contrast,
       `ssm_trajectory()` reads, for `k` in `e`, `x`, `y`, the slope variance
       `s_k = vcov["dvk:<time>", "dvk:<time>"]` and `c_k = vcov["dvk",
       "dvk:<time>"]` (located through `names(coef)`), skips the check when
@@ -58,7 +58,7 @@ by position so it adds no second failing site.
       of observations and unequal variance ratios across the coordinates, and
       on a closed-form balanced `vcov` with random slopes added, and assert
       that the message names the three values.
-- [ ] AC2: Tests assert no warning from `ssm_trajectory()` on each of these
+- [x] AC2: Tests assert no warning from `ssm_trajectory()` on each of these
       inputs: the closed-form `vcov` of the model on complete balanced data
       at waves 0 to 4 and at the unequally spaced times 2000, 2001, 2003,
       2006; the closed-form `vcov` for the AC1 unequal-count design when the
@@ -68,16 +68,16 @@ by position so it adds no second failing site.
       `tests/testthat/fixtures/growth-fixef.rds`; the `draws` shape; a
       `contrast` function; an all-zero `vcov`; and a `vcov` whose row and
       column for one slope are zero while its other entries are not.
-- [ ] AC3: Live nlme fits of the `ssm_growth_formula("nlme")` model to
+- [x] AC3: Live nlme fits of the `ssm_growth_formula("nlme")` model to
       `simulated_growth` raise no warning by REML, by ML, and by REML with
       `wave + 2000` as the time; the REML fit after a seeded removal of 10%
       of person-waves raises the AC1 warning. The test skips when nlme is
       not installed.
-- [ ] AC4: The check consumes no random numbers: `.Random.seed` after a call
+- [x] AC4: The check consumes no random numbers: `.Random.seed` after a call
       that raises the AC1 warning equals `.Random.seed` after a call from the
       same seed with a balanced `vcov` of the same size and the same
       `n_draws`.
-- [ ] AC5: The `ssm_trajectory()` help page states the AC1 condition in
+- [x] AC5: The `ssm_trajectory()` help page states the AC1 condition in
       words, its two causes, that equal values do not show balance (named
       cases: each person missing the same number of waves, and equal
       variance components across the coordinates), and that the `draws`
@@ -153,7 +153,16 @@ by position so it adds no second failing site.
 - 2026-10-20: T4 done: roxygen paragraph and `man/ssm_trajectory.Rd` regenerated (the `Config/roxygen2/version` bump reverted, M85 lesson); one NEWS bullet after the `ssm_trajectory()` feature bullet; one sentence in Section 7 of both growth vignette files; `tools/prose-sweep.R` reports 5 lines on the `.Rmd.orig` before and after the edit, none on the added sentence.
 - 2026-10-20: claim audit: 34 claims read, 5 corrected — R/ssm_trajectory_helper.R (roxygen, comment, warning text), man/ssm_trajectory.Rd, NEWS.md, vignettes/growth-ssm-analysis.Rmd(.orig), tests/testthat/test-ssm_trajectory_helper.R. The cause list was not complete (a residual variance varying by dv and wave also warns), so it became "causes that can make them differ include"; NEWS gained the model qualifier; "give" became "can give"; the equal-values cases were narrowed to the stated model; and the vignette now says that unequal counts "usually" cause the warning. On the re-read, finding 4 needed "For that model" added. Three new lines were rewrapped to 80 characters.
 - 2026-10-20: T5 done at 94e91ef4: `devtools::test()` exit 0 with 0 failures; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
+- 2026-10-20: review checkpoint: AC1-AC5 evidence recorded and ticked; AC6's full test and check run and the four review lenses are in flight.
 
 ## Decisions
 
 ## Review
+
+Evidence gathered 2026-10-20 at 8db63224 (branch synced, master had not moved).
+
+- AC1: `R/ssm_trajectory_helper.R:279-282` locates entries with `match(needed, names(coef))`, skips unless `all(s_k > 0)`, and computes `t_k = -c_k / s_k` against the stated threshold. Tests "unequal counts per person warn and name the three times" (3 expectations) and "random slopes on balanced data warn" (3) pass under `NOT_CRAN=true`; each parses the three numbers from the message and matches the closed-form `t_k` to 1e-8. Printed message on the unequal-count `vcov`: the three times (1.860379350, 1.859717220, 1.859763833), "A fit of the ssm_growth_formula() model to complete balanced data gives three equal values", the two causes, and "The small-sample coverage figures in ?ssm_trajectory come from complete balanced data".
+- AC2: tests "balanced and equal-structure inputs raise no warning" (8 expectations: closed form at waves 0-4 and at 2000/2001/2003/2006, exchangeable G on the unequal-count design, one missing wave per person, both fixture fits) and "the check is skipped where it has nothing exact to read" (5: draws, contrast function, all-zero `vcov`, one zero slope row and column with the rest non-zero) pass.
+- AC3: test "live nlme fits warn only when counts per person differ" (4 expectations: no warning for REML, ML and REML with `wave + 2000`; the AC1 warning after the seeded 10% removal) passes; nlme installed, not skipped; `skip_if_not_installed("nlme")` heads the test.
+- AC4: test "the check consumes no random numbers" (3 expectations) passes: the warned call and the balanced call from seed 7 with `n_draws = 100` leave identical `.Random.seed`.
+- AC5: `man/ssm_trajectory.Rd:119-135` states the condition in words, the threshold, the causes ("persons with different numbers of observations, and a random-effects structure or residual-variance structure other than that model's"), that equal values do not show balance with both named cases, the skip on a non-positive slope variance, and that `draws` and `contrast` are not checked. `NEWS.md:90` is one bullet in the development section. Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig:364-366` and `.Rmd:431-433` carries the same added text; its sentence "`ssm_trajectory()` warns when its `vcov` does not look like a fit to such data." says the helper warns, and a second sentence names the usual cause. `tools/prose-sweep.R` on both files reports no finding at those lines.
