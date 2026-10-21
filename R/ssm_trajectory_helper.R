@@ -278,27 +278,35 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   # For the ssm_growth_formula() model fit to complete balanced data,
   # -cov(intercept, slope) / var(slope) is the mean design time for each of
   # e, x and y, whatever the variance components are. Unequal numbers of
-  # observations per person, or another random-effects or residual-variance
-  # structure, can move the three values apart. Entries are read by position
-  # through names(coef).
+  # observations per person, fixed effects beyond the model's six, or another
+  # random-effects or residual-variance structure, can move the three values
+  # apart. Entries are read by position through names(coef).
+  # The spread is judged on a scale in units of time read from vcov: the
+  # largest of sqrt(var(intercept) / var(slope)), which equals
+  # sqrt(t_k^2 + m_k / var(slope)) for the smallest variance m_k. A change of
+  # time units scales it with the times.
   if (!has_draws && is.null(contrast)) {
     s_k <- vcov[cbind(pos[4:6], pos[4:6])]
-    if (all(s_k > 0)) {
+    v_k <- vcov[cbind(pos[1:3], pos[1:3])]
+    if (all(s_k > 0) && all(v_k > 0)) {
       t_k <- -vcov[cbind(pos[1:3], pos[4:6])] / s_k
       spread <- max(t_k) - min(t_k)
-      # A slope variance near the smallest double can overflow t_k to Inf;
-      # the comparison then has no answer, so the check is skipped.
-      if (all(is.finite(t_k)) &&
-          spread > sqrt(.Machine$double.eps) * max(1, max(abs(t_k)))) {
+      scale <- sqrt(max(v_k / s_k))
+      # A slope variance near the smallest double can overflow t_k or the
+      # scale to Inf; the comparison then has no answer, so the check is
+      # skipped.
+      if (all(is.finite(t_k)) && is.finite(scale) &&
+          spread > sqrt(.Machine$double.eps) * scale) {
         warning(
           "The times at which the variance of the fitted e, x and y is ",
           "smallest differ in `vcov`: ",
           paste(format(t_k, digits = 10), collapse = ", "),
           " (spread ", format(spread, digits = 3), "). A fit of the ",
           "ssm_growth_formula() model to complete balanced data gives three ",
-          "equal values. Persons with different numbers of observations, or ",
-          "a random-effects structure or residual-variance structure other ",
-          "than that model's, can give unequal ones. The small-sample ",
+          "equal values. Persons with different numbers of observations, ",
+          "fixed effects beyond that model's six, or a random-effects ",
+          "structure or residual-variance structure other than that ",
+          "model's, can give unequal ones. The small-sample ",
           "coverage figures in ?ssm_trajectory come from complete balanced ",
           "data.",
           call. = FALSE
