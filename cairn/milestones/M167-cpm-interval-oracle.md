@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -60,7 +60,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - [x] T3: Write a review brief of the fixed design through `/milestone-brief` and ingest the Fable report. Put each change it asks for into the header before any full run, with a work-log line for each.
 - [x] T4: Run the full study in the background (about 15 CPU-hours). Commit the results file and the record `devel/m167-interval-oracle.md`, which states the path each figure measured.
 - [x] T5: Write the verdict D-entry and the DESIGN.md section. Set the promotion state of the narrowed candidate row from the verdict.
-- [ ] T6: Correct the vignette item and the `cpm_fit()` roxygen in ASCII-safe text, then run `document()`, `test()` and `check()`. Apply the rules in `cairn/references/plain-vignettes.md` to the vignette edit.
+- [x] T6: Correct the vignette item and the `cpm_fit()` roxygen in ASCII-safe text, then run `document()`, `test()` and `check()`. Apply the rules in `cairn/references/plain-vignettes.md` to the vignette edit.
 
 ## Work log
 
@@ -99,6 +99,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: AC5 branch run: `devtools::test()` gives 0 failures and 11 warnings, no triple above its baseline count; `document()` with `cli.width = 500` prints no `resolve link` line and leaves no diff once `Config/roxygen2/version` is reverted. `check()` is running.
 - 2026-10-21: claim audit: 84 claims read, 7 corrected — devel/m167-interval-oracle.md, vignettes/cpm-boundary-fits.Rmd, vignettes/cpm-boundary-fits.Rmd.orig (the failing B1 angle is LM, not JK; B2 and F1 pass beta_0 conditionally at boundary N = 250 and 1000; the full run matches the control at five of six cells; N = 1000 is the largest N for the shipped bootstrap only; beta_0 ties beta_3 at boundary N = 250; the marker-study sentence no longer contradicts the measured bias; the control bound reads .021). The same reader is re-reading the corrections.
 - 2026-10-21: claim audit re-read: the corrections hold; it found two more, now fixed (the share with no interval at boundary N = 1000 is 16%, not 15%; beta_0's misses are nearly all below the truth, 0.5% above at interior N = 250, in the record, DESIGN.md and the vignette). No second pass, per the stopping rule.
+- 2026-10-21: T6 done: `devtools::check(args = "--no-manual")` on 986d7be6 gives Status OK, 0 errors, 0 warnings, 0 notes. All tasks checked; status review, handed to `/milestone-review`.
 
 ## Decisions
 
