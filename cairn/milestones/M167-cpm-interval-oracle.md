@@ -119,6 +119,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: correction to the T10 checkpoint line: the 50000 bound was added to the `scaling` parameter text, not the `ci_method` text.
 - 2026-10-21: plan deviation recorded: T1 said fresh seeds outside the six control cells, but the correlation-cell base 20261021 sits 315 above the M4 base (the block records it; kept, see prior-review #1 of pass 3).
 - 2026-10-21: review pass 3, thrash stop: diff-bug #1 shows P1's profile still misses lower basins (two starts per evaluation), the third defect return (after the NEWS entry and P1's warm-start endpoints) and the second failure of the P1 figures by a new mechanism of the same shape; and random restarts beat the engine's own optimum in 6 of 37 boundary N = 250 fits. The disposition goes to the user.
+- 2026-10-21: thrash stop answered: the user chose "Escalate to Fable" (a review brief on making P1's profile search, and the engine's own search, reach the global minimum; P1 then fixed on its advice and the study re-run). The 21 fix-now items of pass 3 wait for the same implement pass.
 
 ## Decisions
 
