@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -84,6 +84,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: T2 done: `devel/m167-interval-checks.R` passes 8 of 8 (F1 zeta arm equals CircE on all seven rows, B1 copy identical to `cpm_fit()` on 9 of 9 interval sets, Wishart and row-draw F2 agree, analytic SE vs F2 SD ratios .95 to .98, bias-corrected closed form); planting logit zeta for ln v and a flipped z0 each fails its check.
 - 2026-10-21: T2 control (`devel/m167-interval-control.rds`, 33 min on 17 cores): every pooled B1 and B2 entry of the six M4 cells lies within .020 of the M4 record (bar .03).
 - 2026-10-21: T2 baseline finding, B1 per weight at the boundary truth: beta0 (.45) covers .66 to .74 with its misses below the truth, beta2 and beta3 .73 to .79 with misses above, beta1 .93 to .95; at the interior truth beta0 covers .81 to .84; so the shortfall is not carried by the near-zero weight alone. Goes into the review brief.
+- 2026-10-21: blocked on RB26 (design review before the full run, granted at the plan question set). The brief is committed on this branch, as RB25 was on M161's branch, because the milestone's tracking lives here until merge.
 
 ## Decisions
 
