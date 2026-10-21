@@ -136,12 +136,14 @@ interval contained the truth), not bias in the point estimates.
 - *Correlation-function weights* moved least. Marker-firing fits covered
   $\beta$ only slightly less often than quiet ones, so a fired marker tells
   you least here. The real $\beta$ problem is a different one, and it does
-  not depend on any marker. In the package's bootstrap validation, percentile
-  intervals for a weight whose *population* value sits near zero under-covered
-  at every sample size studied. The shortfall did not shrink as $n$ grew.
-  That is a property of percentile intervals at a boundary, not a
-  small-sample artifact. It is about where the truth sits, not about what the
-  fit flagged.
+  not depend on any marker. In the package's bootstrap validation, the
+  percentile intervals missed the largest weight, $\beta_0$, most often, and
+  its intervals fell below the true value. Two smaller weights, $\beta_2$ and
+  $\beta_3$, missed above it. These shortfalls did not shrink from $n = 250$
+  to $n = 1000$, the largest bootstrap sample size studied. They appeared at
+  both weight patterns studied. Their cause is a bias in the weight estimates
+  themselves, not a weight that sits near zero. The bootstrap reproduces only
+  part of that bias, so its intervals stay off center.
 
 The record does *not* support four things, and no reading of these markers
 should assume them. First, nothing was measured about bias in the point
@@ -175,7 +177,9 @@ as what happens where those markers fire, not as how often they fire.
    number stripped of its own caveat.
 4. *Keep using what still holds.* Three things remain usable. The first is
    the point estimates, as the solution the model actually fitted. Their bias
-   in this regime is unmeasured, so read them as estimates, not to the digit.
+   was measured only at the validation's own weight patterns, where the weight
+   estimates were biased (see above). So read them as estimates, not to the
+   digit.
    The second is the fit indices and the residual summary. A boundary changes
    how the *intervals* around them behave. It does not change how the fit indices and
    the residual summary are computed.
