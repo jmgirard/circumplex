@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -123,3 +123,32 @@ Pass 2 (after review return 1), 2026-10-21, on c4be2db6; origin/master is an anc
 - AC5 evidence: `man/cpm_fit.Rd` carries "for 2000 <= N < 50000" with the `ci_method = "analytic"` condition, matching `summary.circumplex_cpm()` (`R/cpm_oop.R:333-347`) and the two constants; `document()` with `cli.width = 500` printed 0 `resolve link` lines and left no diff; `devtools::test()` 0 failures, and no (file, test, masked message) triple exceeds its count at 1a5aa9c4 (8 triples, 11 warnings both runs); `devtools::check(args = "--no-manual")` on 986d7be6 Status OK, 0/0/0, and `git diff 986d7be6 HEAD` over R, tests, vignettes, man, DESCRIPTION, NAMESPACE and src is empty.
 - Consistency gate, pass 2: `cairn_validate` 0 FAIL; `document()` 0 `resolve link` lines, no diff; NEWS.md carries the Documentation entries (T7); README untouched; `pkgdown::check_pkgdown()` no problems; master R-CMD-check and test-coverage push runs success at c215fe31; `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit 0; check clean (AC5). No principle text changed, so `cairn_impact` is skipped.
 - spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: P1's root search returns false endpoints for Heywood communalities (statistic far below 3.84 at 54 of 551 endpoints at boundary N = 250), so P1's coverage, vacuous shares and ladder entry are not established — fix now; floor return 2 (the verdict rests on it).
+- diff-bug #2: the confirmation seed base is 316 above the M4 base, so up to 184 of 500 confirmation replicates per cell repeat main-run data — fix now (non-colliding base, confirmation re-run, wording corrected).
+- diff-bug #3: an error inside one method (F2's refit, a singular `solve()`) drops the whole replicate from every method, against the header's exclusion rule — fix now (per-resample and per-method error handling); the shipped `cpm_bootstrap()` has the same unguarded refit — follow-up (new candidate row).
+- diff-bug #4: the ladder wording invites extrapolation past N = 1000 on the raw path and omits the N = 20000 failures — fix now (D-068, ROADMAP row).
+- diff-bug #5: F2bc weights pass below .90, inside the band only through the allowance — fix now (D-068 and the row say so).
+- diff-bug #6: B2 gives no interval for some removed harmonics, against the header's [0, 0] rule — fix now.
+- diff-bug #7: P1 with only harmonic 0 kept leaves beta_0 at [0, 0] — fix now.
+- diff-bug #8: the variant-B summaries include fits the engine did not accept — fix now (accepted fits only, count reported).
+- diff-bug #9: the correlation-cell and confirmation seed bases differ by 1 — fix now (covered by #2's new base).
+- diff-bug #10: DESIGN.md says variant B "removes it" without the reading's limits — fix now.
+- diff-bug #11: the vignette says beta_2 and beta_3 missed above at both patterns, but interior beta_2 is in band at N = 250 — fix now.
+- diff-bug #12: the results file records HEAD at save time — fix now (captured at start).
+- diff-bug #13: the help page lists marker labels in prose with no test tying them to `cpm_marker_labels()` — follow-up (same new candidate row as #3).
+- blame-history #1: the threshold comments in `R/cpm_fit.R` and `R/cpm_oop.R` call the analytic coverage measured without saying it was conditional on a defined SE — fix now.
+- blame-history #2: the vignette names bias as the cause without the mechanism — fix now (adds that refitting with the angles fixed removed the bias).
+- blame-history #3: the vignette's "bias was measured" overstates, since only beta_0's bias was measured — reject (false: the results file holds estimator bias for every angle and communality too).
+- blame-history #4: D-002 is not annotated — reject (false: entries are append-only, and D-068's heading names its reading of D-002 as the rules require).
+- blame-history #5: the `ci_method` parameter text omits the 50000 bound — fix now; NEWS lacks the analytic qualifier — reject (false: the entry says "analytic (Wald) intervals").
+- blame-history #6: the new threshold test skips on CRAN — fix now (it runs analytic fits only, so the skip goes).
+- blame-history #7: the .gitignore comment omits the confirmation file — fix now.
+- prior-review #1: confirmation seeds not fresh — fix now (same as diff-bug #2).
+- prior-review #2: the new test skips under `R CMD check` — fix now (same as blame-history #6).
+- prior-review #3: the vignette and NEWS overstate the cause — reject (false: the beta_0 bias is measured in every raw-data cell, and the claim is about that bias, not the deeper mechanism).
+- prior-review #4: NEWS calls it "a new validation study" while the vignette says "the package's bootstrap validation" — fix now.
+- prior-review #5: the new test has no `skip_on_covr()`, and N >= 50000 is checked only on the Heywood fixture — reject the covr part (false: it asserts no optimizer-sensitive digits); fix now the clean-fixture check at 50000.
+- ripple #1: the vignette's "measured interval coverage, not bias" sentence now contradicts the bias text — fix now (scoped to the marker study).
+- ripple #2: `R/cpm_fit.R:1515` still says "below n = 2000 and in near-boundary fits" — fix now (same as blame-history #5).
+- ripple #3: DESIGN.md's fragility line states the 59 to 91% Heywood rate without the free-angle qualifier — fix now.
+- ripple (excluded, dated): the ROADMAP row's "beta ~.77 flat in N (percentile bootstrap)" — fix now (current knowledge); the CPM simulation paper plan's "structural percentile failure" claims — follow-up (noted in that parked row).
