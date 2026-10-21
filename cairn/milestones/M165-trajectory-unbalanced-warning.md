@@ -11,9 +11,9 @@
 
 ## Goal
 
-`ssm_trajectory()` warns when the `coef` and `vcov` it is given show that the
-joint growth model was not fit to complete balanced data, the design that its
-help page's small-sample coverage figures come from.
+`ssm_trajectory()` warns when the structure of the `vcov` it is given shows
+that the joint growth model was not fit to complete balanced data, the design
+that its help page's small-sample coverage figures come from.
 
 ## Scope
 
@@ -21,8 +21,10 @@ help page's small-sample coverage figures come from.
 the fixed-effect covariance has, for each coordinate `k` in `e`, `x`, `y`,
 `-vcov["dvk", "dvk:<time>"] / vcov["dvk:<time>", "dvk:<time>"]` equal to the
 mean design time, whatever the variance components are (RR25 "Beyond the
-brief"; derivation and fixture check in the work log). With missing waves
-the three values differ in general. The milestone adds that check to the
+brief"; derivation and fixture check in the work log). When persons have
+different numbers of observations, or under another random-effects
+structure, the three values differ in general; missing waves that leave
+every person the same count do not move them. The milestone adds that check to the
 `coef` and `vcov` shape with the default contrast, with tests, help-page
 text, a NEWS bullet, and one sentence in Section 7 of the growth vignette.
 
@@ -32,45 +34,54 @@ owed. A check under a `contrast` function, which has no intercept and slope
 pair to read; no row is owed. A small-sample correction for unbalanced fits,
 which stays with the parked row "Small-sample correction for trajectory
 draws". A print-time caution in place of the warning (rejected at the plan
-gate; work log).
+gate; work log). A `vcov` with no dimnames, which the help page allows but
+the default contrast already fails on with R's subscript error, goes to the
+candidate row "Accept a vcov without dimnames"; the new check reads `vcov`
+by position so it adds no second failing site.
 
 ## Acceptance criteria
 
 - [ ] AC1: Called with `coef` and `vcov` and the default contrast,
-      `ssm_trajectory()` computes `t_k = -vcov["dvk", "dvk:<time>"] /
-      vcov["dvk:<time>", "dvk:<time>"]` for `k` in `e`, `x`, `y` and raises
-      one warning when `max(t_k) - min(t_k) > sqrt(.Machine$double.eps) *
-      max(1, max(abs(t_k)))`. The warning text names the three `t_k`, says
-      that a fit of the `ssm_growth_formula()` model to complete balanced
-      data gives three equal values, names missing waves and a different
+      `ssm_trajectory()` reads, for `k` in `e`, `x`, `y`, the slope variance
+      `s_k = vcov["dvk:<time>", "dvk:<time>"]` and `c_k = vcov["dvk",
+      "dvk:<time>"]` (located through `names(coef)`), skips the check when
+      any `s_k` is not positive, and otherwise computes `t_k = -c_k / s_k`
+      and raises one warning when `max(t_k) - min(t_k) >
+      sqrt(.Machine$double.eps) * max(1, max(abs(t_k)))`. The warning text
+      names the three `t_k`, says that a fit of the `ssm_growth_formula()`
+      model to complete balanced data gives three equal values, names
+      persons with different numbers of observations and another
       random-effects structure as causes, and says that the help page's
-      small-sample coverage figures come from complete balanced data. A test
-      fires it on a `vcov` built in closed form (the model's GLS covariance,
-      summed over persons) for a design with missing waves and unequal
-      variance ratios across the coordinates, and asserts that the message
-      names the three values.
+      small-sample coverage figures come from complete balanced data. Tests
+      fire it on a `vcov` built in closed form (the model's GLS covariance,
+      summed over persons) for a design whose persons have different numbers
+      of observations and unequal variance ratios across the coordinates, and
+      on a closed-form balanced `vcov` with random slopes added, and assert
+      that the message names the three values.
 - [ ] AC2: Tests assert no warning from `ssm_trajectory()` on each of these
       inputs: the closed-form `vcov` of the model on complete balanced data
       at waves 0 to 4 and at the unequally spaced times 2000, 2001, 2003,
-      2006; the closed-form `vcov` for the AC1 design with missing waves when
-      the three coordinates have equal variance components; the two glmmTMB
-      fits in `tests/testthat/fixtures/growth-fixef.rds`; the `draws` shape;
-      a `contrast` function; and an all-zero `vcov`. The check is skipped
-      when any of the three slope variances is not positive.
-- [ ] AC3: A live nlme fit of the `ssm_growth_formula("nlme")` model by REML
-      to `simulated_growth` raises no warning, and the same fit after a
-      seeded removal of 10% of person-waves raises the AC1 warning. The test
-      skips when nlme is not installed.
-- [ ] AC4: The check consumes no random numbers: with the same seed, the
-      table returned under the AC1 warning is identical to the table
-      returned for the same `coef` and `vcov` with the check's warning
-      muffled by `suppressWarnings()`, and `.Random.seed` after a warned call
-      equals `.Random.seed` after a call with a balanced `vcov` of the same
-      size and `n_draws`.
+      2006; the closed-form `vcov` for the AC1 unequal-count design when the
+      intercept covariance is `g * diag(3)` and the residual variances are
+      equal; the closed-form `vcov` for a design in which each person misses
+      exactly one wave; the two glmmTMB fits in
+      `tests/testthat/fixtures/growth-fixef.rds`; the `draws` shape; a
+      `contrast` function; an all-zero `vcov`; and a `vcov` whose row and
+      column for one slope are zero while its other entries are not.
+- [ ] AC3: Live nlme fits of the `ssm_growth_formula("nlme")` model to
+      `simulated_growth` raise no warning by REML, by ML, and by REML with
+      `wave + 2000` as the time; the REML fit after a seeded removal of 10%
+      of person-waves raises the AC1 warning. The test skips when nlme is
+      not installed.
+- [ ] AC4: The check consumes no random numbers: `.Random.seed` after a call
+      that raises the AC1 warning equals `.Random.seed` after a call from the
+      same seed with a balanced `vcov` of the same size and the same
+      `n_draws`.
 - [ ] AC5: The `ssm_trajectory()` help page states the AC1 condition in
-      words, its two causes, that equal values do not show balance (the AC2
-      equal-components case), and that the `draws` shape and a `contrast`
-      function are not checked. NEWS.md's development section has one bullet
+      words, its two causes, that equal values do not show balance (named
+      cases: each person missing the same number of waves, and equal
+      variance components across the coordinates), and that the `draws`
+      shape and a `contrast` function are not checked. NEWS.md's development section has one bullet
       for the warning. Section 7 of the growth vignette, in
       `vignettes/growth-ssm-analysis.Rmd.orig` and the shipped `.Rmd`, says
       in one sentence that the helper warns on such a fit, and
@@ -91,15 +102,15 @@ gate; work log).
 
 - [ ] T1: Tests first in `tests/testthat/test-ssm_trajectory_helper.R`: a
       test helper that builds the model's GLS `vcov` in closed form from a
-      list of per-person wave vectors, a 3 by 3 intercept covariance and
-      three residual variances (sum of `X_i' V_i^-1 X_i`, inverted, with the
+      list of per-person wave vectors, a 3 by 3 intercept covariance, an
+      optional random-slope covariance, and three residual variances (sum of `X_i' V_i^-1 X_i`, inverted, with the
       arithmetic in comments); the AC1 to AC4 tests. Run them and record
       which fail before the code exists (the warning tests must).
 - [ ] T2: Add the check to `R/ssm_trajectory_helper.R` after the joint-fit
       refusal (near line 251) and before the per-time draws loop, reading
-      `vcov` only. Record in the work log the spread `max(t_k) - min(t_k)`
-      measured on each balanced input and on the AC3 unbalanced fit, beside
-      the threshold.
+      `vcov` only and locating entries by position through `names(coef)`.
+      Record in the work log the spread `max(t_k) - min(t_k)` measured on
+      each AC2 and AC3 input, beside the threshold.
 - [ ] T3: Run the whole suite with warnings shown and list every existing
       test, example and vignette call that now warns. Change a hand-built
       test `vcov` only where its test does not depend on its intercept and
@@ -126,6 +137,13 @@ gate; work log).
 - 2026-10-20: plan gate scoped the check to the default contrast and the `coef` and `vcov` shape (Out items); falsified by a user model with other terms whose balanced fits have a readable centring time.
 - 2026-10-20: lessons harvested: M56 family (sweep every surface; T3, AC5), M90 (name the path a figure measured; the work-log figures name glmmTMB and the seed), M7 family (`knitr` error default if a vignette re-renders).
 - 2026-10-20: checkpoint: plan committed before the criteria audit returned; the audit's dispositions follow in a second plan commit.
+- 2026-10-20: criteria audit (full mode, fresh Opus reader) returned 6 findings; all fixed in the criteria as below. The premise and the IP/GP reading held.
+- 2026-10-20: audit F1 (AC2 equal-components claim false for correlated intercepts, spread about 6e-4): fixed, the case is now `g * diag(3)` with equal residual variances.
+- 2026-10-20: audit F2 (the check sees unequal counts per person, not missing waves; one missing wave per person gives a spread of 4.4e-15): fixed in Scope, AC1's cause list, AC5's named cases, and a new AC2 probe.
+- 2026-10-20: audit F3 (skip rule sat outside AC1, untested branch): fixed, the rule moved into AC1 and AC2 gained a one-zero-slope `vcov`; AC1 also gained the random-slopes probe the reader measured (t_k 0.67, 0.57, 1.82).
+- 2026-10-20: audit F4 (engine probes fixed at waves 0 to 4, REML only): fixed, AC3 adds nlme ML and REML with `wave + 2000`.
+- 2026-10-20: audit F5 (AC4's first clause compared two calls that both run the check): fixed, the clause was dropped.
+- 2026-10-20: audit F6 (a `vcov` with no dimnames already fails under the default contrast, confirmed): out of scope, recorded as the candidate row "Accept a vcov without dimnames"; T2 reads `vcov` by position.
 
 ## Decisions
 
