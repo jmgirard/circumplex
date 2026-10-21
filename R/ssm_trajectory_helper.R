@@ -250,6 +250,35 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
     }
   }
 
+  # The unbalanced-fit warning (coef and vcov shape, default contrast only).
+  # For the ssm_growth_formula() model fit to complete balanced data,
+  # -cov(intercept, slope) / var(slope) is the mean design time for each of
+  # e, x and y, whatever the variance components are. Unequal numbers of
+  # observations per person, or another random-effects structure, move the
+  # three values apart. Entries are read by position through names(coef).
+  if (!has_draws && is.null(contrast)) {
+    pos <- match(needed, names(coef))
+    s_k <- vcov[cbind(pos[4:6], pos[4:6])]
+    if (all(s_k > 0)) {
+      t_k <- -vcov[cbind(pos[1:3], pos[4:6])] / s_k
+      spread <- max(t_k) - min(t_k)
+      if (spread > sqrt(.Machine$double.eps) * max(1, max(abs(t_k)))) {
+        warning(
+          "The times at which the variance of the fitted e, x and y is ",
+          "smallest differ in `vcov`: ",
+          paste(format(t_k, digits = 10), collapse = ", "),
+          " (spread ", format(spread, digits = 3), "). A fit of the ",
+          "ssm_growth_formula() model to complete balanced data gives three ",
+          "equal values. Persons with different numbers of observations, or ",
+          "a random-effects structure other than that model's, give ",
+          "unequal ones. The small-sample coverage figures in ",
+          "?ssm_trajectory come from complete balanced data.",
+          call. = FALSE
+        )
+      }
+    }
+  }
+
   per_time <- lapply(L_list, function(L) {
     draws_t <- B %*% t(L)
     colnames(draws_t) <- c("e", "x", "y")

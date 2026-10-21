@@ -106,7 +106,7 @@ by position so it adds no second failing site.
       optional random-slope covariance, and three residual variances (sum of `X_i' V_i^-1 X_i`, inverted, with the
       arithmetic in comments); the AC1 to AC4 tests. Run them and record
       which fail before the code exists (the warning tests must).
-- [ ] T2: Add the check to `R/ssm_trajectory_helper.R` after the joint-fit
+- [x] T2: Add the check to `R/ssm_trajectory_helper.R` after the joint-fit
       refusal (near line 251) and before the per-time draws loop, reading
       `vcov` only and locating entries by position through `names(coef)`.
       Record in the work log the spread `max(t_k) - min(t_k)` measured on
@@ -147,6 +147,8 @@ by position so it adds no second failing site.
 - 2026-10-20: substantive amendment: AC2's equal-components case changed from `g * diag(3)` to an exchangeable intercept covariance with `r` not zero, because a diagonal G makes the x(t)/y(t) covariance exactly zero and the joint-fit refusal errors first (measured); the deliverable the user sees is unchanged.
 - 2026-10-20: re-audit: AC2 (full) — two findings, both answered without new wording: (1) the closed-form inputs reach the check only with a non-zero x-y intercept covariance, which T1's tests use (`G_unequal`, the exchangeable G), so AC2 is satisfiable as written; (2) "`r` not zero" admits non-PD values, where the claim still holds (r = -0.6 spread 1e-14), and the test pins g = 0.8, r = 0.3, s2 = 0.5.
 - 2026-10-20: T1 done: the M165 tests are in `tests/testthat/test-ssm_trajectory_helper.R` with the closed-form `gls_vcov()` helper; before the code, the AC1 warning tests (unequal counts, random slopes), the AC4 seed test and the nlme 10%-removal test fail on the missing warning, and every no-warning case passes, nlme REML, ML and `wave + 2000` included.
+- 2026-10-20: T2 done: the check sits after the joint-fit refusal in `R/ssm_trajectory_helper.R`, reads `vcov` by position through `names(coef)`, and the helper tests pass. Spreads measured against the threshold (scratch script, nlme 3.1 REML/ML, glmmTMB fixture): balanced closed form 8.9e-16 (waves 0-4) and 6.8e-13 (years, threshold 3.0e-5); exchangeable 1.8e-15; one missing wave per person 1.3e-15; fixture fits 2.7e-15 each; nlme REML 1.2e-14, ML 3.9e-14, `wave + 2000` 1.5e-10 (threshold 3.0e-5); unequal-count closed form 6.6e-4 and nlme with 10% of person-waves removed 1.7e-3 (thresholds near 3e-8).
+- 2026-10-20: implement choice: the message gives the three times at 10 significant digits and the spread at 3, so values just over the threshold still print as different (M159 lesson on rounded values in messages).
 
 ## Decisions
 
