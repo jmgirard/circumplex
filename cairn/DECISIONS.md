@@ -2431,3 +2431,35 @@ and the record's closed-form checks agree with it.
 
 **Reopens.** A pre-registered run in which R1 passes a band that the plan
 fixed before the run.
+
+### D-067 (2026-10-21): the certificate selector follow-ons are dropped, all three parts — D-062's Reopens clause stays the trigger (plan gate, no milestone)
+
+**Context.** The candidate row "Certificate selector follow-ons" held three
+parts left by the M147 review: (iv-a) sample floor-admitted designs with four
+or more scales whose `rcond(info)` sits between eps and 1e-10 before D-062's
+Reopens clause is read closed; (iv-b) pass the once-priced core into
+`axes_accuracy_certificate()`, which prices it again twice for a routed fit;
+(v) reword the `"uncertified"` warning on the selector route, which names a
+condition number of `sigma` that the floor accepted. A plan run on
+2026-10-21 chose the row, and its idea check raised two concerns.
+
+**Decision.** Drop the row whole. Part (v) changes a message that no
+exported call shows in any measured case: RR24 section 3 finds every
+selector-route `"uncertified"` refusal at a design the exported function
+refuses at its four-scale or equal-spacing door. Part (iv-b) saves a share of
+a routed fit's run time that RR24 section 2(c)'s timings put near one
+percent, on fits that are rare, and it touches estimation code. Part (iv-a)
+is not needed to keep D-062 sound: a Reopens clause stays live without being
+read closed, and RR24 section 2(a) measured every reachable routed fit
+certifying decades inside the target.
+
+**Rejected.** Planning the three parts as a milestone, for the reasons above.
+Keeping (iv-a) as a parked row: its promotion condition would restate D-062's
+Reopens clause, which already records it.
+
+**Consequences.** The row leaves the ROADMAP. Internal helpers given a
+floor-admitted fit with fewer than four scales can still print the misleading
+condition number in an `"uncertified"` warning.
+
+**Reopens.** Either condition in D-062's Reopens clause. A reachable fit
+refused `"uncertified"` on the selector route also reopens part (v).
