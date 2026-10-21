@@ -736,3 +736,210 @@ test_that("the trajectory object's plot renders as expected", {
   out2 <- ssm_trajectory(fx_origin$coef, fx_origin$vcov, times = 0:4)
   vdiffr::expect_doppelganger("ssm_trajectory object", ssm_plot_trajectory(out2))
 })
+
+# The unbalanced-fit warning (M165) -------------------------------------------
+#
+# Closed-form oracle. For the ssm_growth_formula() model, person i with
+# observation times t_i (n_i of them) has, per coordinate k, rows
+# value = b0k + b1k * t + u_ik [+ w_ik * t] + e. Stacking the coordinates,
+# X_i is the 3 n_i by 6 design (column k = 1, column 3 + k = t on the rows of
+# coordinate k), Z_i maps the random effects, and
+#   V_i = Z_i G Z_i' + diag(s2_k repeated n_i times).
+# The GLS covariance of the fixed effects is solve(sum_i X_i' V_i^-1 X_i).
+# Under complete balanced data, -v01 / v11 = mean(t) for every coordinate
+# and any G and s2 (M165 work log); unequal counts per person, or random
+# slopes, move the three values apart.
+gls_vcov <- function(designs, G, s2, G_slope = NULL) {
+  info <- matrix(0, 6, 6)
+  for (t in designs) {
+    n <- length(t)
+    X <- matrix(0, 3 * n, 6)
+    Z <- matrix(0, 3 * n, if (is.null(G_slope)) 3 else 6)
+    for (k in 1:3) {
+      r <- (k - 1) * n + seq_len(n)
+      X[r, k] <- 1
+      X[r, 3 + k] <- t
+      Z[r, k] <- 1
+      if (!is.null(G_slope)) Z[r, 3 + k] <- t
+    }
+    Gf <- if (is.null(G_slope)) G else
+      rbind(cbind(G, matrix(0, 3, 3)), cbind(matrix(0, 3, 3), G_slope))
+    V <- Z %*% Gf %*% t(Z) + diag(rep(s2, each = n))
+    info <- info + t(X) %*% solve(V, X)
+  }
+  out <- solve(info)
+  out <- (out + t(out)) / 2
+  dimnames(out) <- list(coef_names, coef_names)
+  out
+}
+# The three times, read independently of the helper: e, x, y in that order.
+centre_times <- function(V) {
+  -V[cbind(c("dve", "dvx", "dvy"), c("dve:wave", "dvx:wave", "dvy:wave"))] /
+    V[cbind(c("dve:wave", "dvx:wave", "dvy:wave"),
+            c("dve:wave", "dvx:wave", "dvy:wave"))]
+}
+# The first three numbers in a warning message.
+message_numbers <- function(msg) {
+  as.numeric(regmatches(msg, gregexpr("-?[0-9]+\\.[0-9]+(e-?[0-9]+)?",
+                                      msg))[[1]][1:3])
+}
+G_unequal <- matrix(c(1.0, 0.4, 0.2,
+                      0.4, 0.6, 0.1,
+                      0.2, 0.1, 0.9), 3)
+s2_unequal <- c(0.3, 0.5, 0.8)
+design_counts <- list(0:4, 0:4, 0:2, c(1, 3, 4), 0:3, c(0, 4))
+unbal_re <- "differ.*different numbers of observations.*complete balanced"
+
+test_that("unequal counts per person warn and name the three times", {
+  V <- gls_vcov(design_counts, G_unequal, s2_unequal)
+  tk <- centre_times(V)
+  expect_gt(max(tk) - min(tk), 1e-4)
+  set.seed(1)
+  w <- expect_warning(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 100),
+    unbal_re
+  )
+  expect_equal(message_numbers(conditionMessage(w)), unname(tk),
+               tolerance = 1e-8)
+})
+
+test_that("random slopes on balanced data warn", {
+  G_slope <- matrix(c(0.10, 0.02, 0.01,
+                      0.02, 0.05, 0.00,
+                      0.01, 0.00, 0.08), 3)
+  V <- gls_vcov(rep(list(0:4), 20), G_unequal, s2_unequal, G_slope)
+  tk <- centre_times(V)
+  expect_gt(max(tk) - min(tk), 1e-2)
+  set.seed(1)
+  w <- expect_warning(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 100),
+    "random-effects structure"
+  )
+  expect_equal(message_numbers(conditionMessage(w)), unname(tk),
+               tolerance = 1e-8)
+})
+
+test_that("balanced and equal-structure inputs raise no warning", {
+  set.seed(1)
+  # Complete balanced data at waves 0 to 4 and at unequally spaced years.
+  for (times in list(0:4, c(2000, 2001, 2003, 2006))) {
+    V <- gls_vcov(rep(list(times), 20), G_unequal, s2_unequal)
+    expect_equal(unname(centre_times(V)), rep(mean(times), 3),
+                 tolerance = 1e-10)
+    expect_no_warning(
+      ssm_trajectory(fx_growth$coef, V, times = times, n_draws = 100)
+    )
+  }
+  # Unequal counts, but an exchangeable intercept covariance and equal
+  # residual variances: the model is symmetric in the coordinates.
+  G_exch <- 0.8 * (0.7 * diag(3) + 0.3)
+  V <- gls_vcov(design_counts, G_exch, rep(0.5, 3))
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 100)
+  )
+  # Each person misses exactly one wave: equal counts, so equal times.
+  V <- gls_vcov(lapply(0:4, function(m) setdiff(0:4, m)), G_unequal,
+                s2_unequal)
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 100)
+  )
+  # The two glmmTMB fits of the bundled balanced datasets.
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, fx_growth$vcov, times = 0:4, n_draws = 100)
+  )
+  expect_no_warning(
+    ssm_trajectory(fx_origin$coef, fx_origin$vcov, times = 0:4, n_draws = 100)
+  )
+})
+
+test_that("the check is skipped where it has nothing exact to read", {
+  V <- gls_vcov(design_counts, G_unequal, s2_unequal)
+  set.seed(1)
+  # The draws shape: draws from the unbalanced vcov.
+  B <- circumplex:::mvn_draws(200, fx_growth$coef, V)
+  colnames(B) <- coef_names
+  expect_no_warning(ssm_trajectory(times = 0:4, draws = B))
+  # A contrast function.
+  default_L <- function(t) {
+    L <- matrix(0, 3, 6)
+    L[cbind(1:3, 1:3)] <- 1
+    L[cbind(1:3, 4:6)] <- t
+    L
+  }
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 100,
+                   contrast = default_L)
+  )
+  # An all-zero vcov.
+  V0 <- V * 0
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, V0, times = 0:4, n_draws = 100)
+  )
+  # One slope's row and column zero, the rest of the matrix not.
+  V1 <- V
+  V1["dvy:wave", ] <- 0
+  V1[, "dvy:wave"] <- 0
+  expect_gt(max(abs(V1)), 0)
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, V1, times = 0:4, n_draws = 100)
+  )
+})
+
+test_that("the check consumes no random numbers", {
+  V_unbal <- gls_vcov(design_counts, G_unequal, s2_unequal)
+  V_bal <- gls_vcov(rep(list(0:4), 20), G_unequal, s2_unequal)
+  set.seed(7)
+  expect_warning(
+    ssm_trajectory(fx_growth$coef, V_unbal, times = 0:4, n_draws = 100),
+    unbal_re
+  )
+  seed_unbal <- .Random.seed
+  set.seed(7)
+  expect_no_warning(
+    ssm_trajectory(fx_growth$coef, V_bal, times = 0:4, n_draws = 100)
+  )
+  expect_identical(seed_unbal, .Random.seed)
+})
+
+test_that("live nlme fits warn only when counts per person differ", {
+  skip_if_not_installed("nlme")
+  data("simulated_growth")
+  gf <- ssm_growth_formula("nlme", time = "wave", id = "person")
+  fit_vcov <- function(long, method) {
+    fit <- nlme::lme(
+      fixed = gf$fixed,
+      random = gf$random,
+      weights = nlme::varIdent(form = gf$weights),
+      data = long,
+      method = method
+    )
+    list(coef = nlme::fixef(fit), vcov = as.matrix(vcov(fit)))
+  }
+  long <- ssm_growth_data(simulated_growth, scales = PANO(),
+                          id = "person", time = "wave")
+  shifted <- simulated_growth
+  shifted$wave <- shifted$wave + 2000
+  long_shifted <- ssm_growth_data(shifted, scales = PANO(),
+                                  id = "person", time = "wave")
+  set.seed(20260716)
+  for (f in list(fit_vcov(long, "REML"), fit_vcov(long, "ML"))) {
+    expect_no_warning(
+      ssm_trajectory(f$coef, f$vcov, times = 0:4, n_draws = 100)
+    )
+  }
+  f <- fit_vcov(long_shifted, "REML")
+  expect_no_warning(
+    ssm_trajectory(f$coef, f$vcov, times = 2000:2004, n_draws = 100)
+  )
+  # Remove a seeded 10% of person-waves (all three coordinates of each).
+  pw <- unique(long[, c("person", "wave")])
+  set.seed(20261020)
+  drop <- pw[sample(nrow(pw), round(0.1 * nrow(pw))), ]
+  keep <- !paste(long$person, long$wave) %in% paste(drop$person, drop$wave)
+  f <- fit_vcov(long[keep, ], "REML")
+  set.seed(20260716)
+  expect_warning(
+    ssm_trajectory(f$coef, f$vcov, times = 0:4, n_draws = 100),
+    unbal_re
+  )
+})

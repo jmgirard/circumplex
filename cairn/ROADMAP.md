@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-19 (M164 done and archived: the width guard reads e
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | planned | — | normal | milestones/M165-trajectory-unbalanced-warning.md |
+| M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | in-progress | — | normal | milestones/M165-trajectory-unbalanced-warning.md |
 | M164 | Vignette width guard gaps | done | — | normal | milestones/archive/M164-vignette-width-guard-gaps.md |
 | M163 | Small-sample coverage in the trajectory docs | done | — | normal | milestones/archive/M163-trajectory-small-sample-docs.md |
 | M162 | Small-sample draws in ssm_trajectory() | dropped | M161 | normal | milestones/archive/M162-trajectory-small-sample-draws.md |

@@ -1,13 +1,13 @@
 # M165: ssm_trajectory() warns on a vcov from an unbalanced fit
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2, GP4
 - **Resolves:** —
 - **Surface tier:** user-facing — a new warning from an exported function, with help-page, NEWS and vignette text
-- **Branch/PR:** —
+- **Branch/PR:** m165-trajectory-unbalanced-warning
 
 ## Goal
 
@@ -62,8 +62,8 @@ by position so it adds no second failing site.
       inputs: the closed-form `vcov` of the model on complete balanced data
       at waves 0 to 4 and at the unequally spaced times 2000, 2001, 2003,
       2006; the closed-form `vcov` for the AC1 unequal-count design when the
-      intercept covariance is `g * diag(3)` and the residual variances are
-      equal; the closed-form `vcov` for a design in which each person misses
+      intercept covariance is exchangeable, `g * ((1 - r) * diag(3) + r)`
+      with `r` not zero, and the residual variances are equal; the closed-form `vcov` for a design in which each person misses
       exactly one wave; the two glmmTMB fits in
       `tests/testthat/fixtures/growth-fixef.rds`; the `draws` shape; a
       `contrast` function; an all-zero `vcov`; and a `vcov` whose row and
@@ -100,7 +100,7 @@ by position so it adds no second failing site.
 
 ## Tasks
 
-- [ ] T1: Tests first in `tests/testthat/test-ssm_trajectory_helper.R`: a
+- [x] T1: Tests first in `tests/testthat/test-ssm_trajectory_helper.R`: a
       test helper that builds the model's GLS `vcov` in closed form from a
       list of per-person wave vectors, a 3 by 3 intercept covariance, an
       optional random-slope covariance, and three residual variances (sum of `X_i' V_i^-1 X_i`, inverted, with the
@@ -144,6 +144,9 @@ by position so it adds no second failing site.
 - 2026-10-20: audit F4 (engine probes fixed at waves 0 to 4, REML only): fixed, AC3 adds nlme ML and REML with `wave + 2000`.
 - 2026-10-20: audit F5 (AC4's first clause compared two calls that both run the check): fixed, the clause was dropped.
 - 2026-10-20: audit F6 (a `vcov` with no dimnames already fails under the default contrast, confirmed): out of scope, recorded as the candidate row "Accept a vcov without dimnames"; T2 reads `vcov` by position.
+- 2026-10-20: substantive amendment: AC2's equal-components case changed from `g * diag(3)` to an exchangeable intercept covariance with `r` not zero, because a diagonal G makes the x(t)/y(t) covariance exactly zero and the joint-fit refusal errors first (measured); the deliverable the user sees is unchanged.
+- 2026-10-20: re-audit: AC2 (full) — two findings, both answered without new wording: (1) the closed-form inputs reach the check only with a non-zero x-y intercept covariance, which T1's tests use (`G_unequal`, the exchangeable G), so AC2 is satisfiable as written; (2) "`r` not zero" admits non-PD values, where the claim still holds (r = -0.6 spread 1e-14), and the test pins g = 0.8, r = 0.3, s2 = 0.5.
+- 2026-10-20: T1 done: the M165 tests are in `tests/testthat/test-ssm_trajectory_helper.R` with the closed-form `gls_vcov()` helper; before the code, the AC1 warning tests (unequal counts, random slopes), the AC4 seed test and the nlme 10%-removal test fail on the missing warning, and every no-warning case passes, nlme REML, ML and `wave + 2000` included.
 
 ## Decisions
 
