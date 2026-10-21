@@ -66,6 +66,7 @@ Under the default contrast, `ssm_trajectory()` reads `vcov` through the position
 - 2026-10-20: T5: `?ssm_trajectory` details now give the scale, the time-units sentence, the large-intercept-variance limit, the added cause and the intercept-variance skip; the NEWS bullet adds the cause. `devtools::document()` rewrote only `man/ssm_trajectory.Rd`; `Config/roxygen2/version` reverted. Sweep of `R/`, `man/`, `vignettes/`, `NEWS.md` for `residual-variance` (5 hits) and `largest of 1` (0 hits): every hit names the added cause; the growth vignette's one sentence on the warning gives a hedged example, not a cause list, and is left. The simple-english hook flagged 435 issues across NEWS.md, almost all older than this branch; out of scope, left.
 - 2026-10-20: T6: at 2ef15a36 `devtools::test()` FAIL 0, WARN 11 (lavaan), SKIP 1, PASS 15268; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (7m 50s).
 - 2026-10-20: claim audit: 24 claims read, 2 corrected — R/ssm_trajectory_helper.R (help omitted the overflow skip), tests/testthat/test-ssm_trajectory_helper.R (grid test name said "every variance scale"); also tightened "grows with the random-intercept variance" to "relative to the residual variance". Docs regenerated; the trajectory helper test file passes after the edits.
+- 2026-10-20: step-7 approval: m166-trajectory-vcov-follow-ons approved for merge
 
 ## Review
 
