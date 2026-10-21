@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -100,6 +100,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: claim audit: 84 claims read, 7 corrected — devel/m167-interval-oracle.md, vignettes/cpm-boundary-fits.Rmd, vignettes/cpm-boundary-fits.Rmd.orig (the failing B1 angle is LM, not JK; B2 and F1 pass beta_0 conditionally at boundary N = 250 and 1000; the full run matches the control at five of six cells; N = 1000 is the largest N for the shipped bootstrap only; beta_0 ties beta_3 at boundary N = 250; the marker-study sentence no longer contradicts the measured bias; the control bound reads .021). The same reader is re-reading the corrections.
 - 2026-10-21: claim audit re-read: the corrections hold; it found two more, now fixed (the share with no interval at boundary N = 1000 is 16%, not 15%; beta_0's misses are nearly all below the truth, 0.5% above at interior N = 250, in the record, DESIGN.md and the vignette). No second pass, per the stopping rule.
 - 2026-10-21: T6 done: `devtools::check(args = "--no-manual")` on 986d7be6 gives Status OK, 0 errors, 0 warnings, 0 notes. All tasks checked; status review, handed to `/milestone-review`.
+- 2026-10-21: review return 1: consistency gate — NEWS.md has no Documentation entry for the user-visible changes (the `cpm_fit()` help page's caution sentence and the `cpm-boundary-fits` vignette's weight and bias corrections). The rest of the gate is green: `cairn_validate`, `document()` no diff, README untouched, `pkgdown::check_pkgdown()`, master R-CMD-check and test-coverage push runs success at c215fe31, the two alert audits and the branch-protection check exit 0.
 
 ## Decisions
 
