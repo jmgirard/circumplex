@@ -124,17 +124,25 @@ divided by the slope variance is the time at which that coordinate's
 fitted value has its smallest variance. A fit of the
 \code{\link[=ssm_growth_formula]{ssm_growth_formula()}} model to complete balanced data gives three equal
 values, the mean design time. The function warns when the three differ by
-more than \code{sqrt(.Machine$double.eps)} times the largest of 1 and their
-absolute values. Causes that can make them differ include persons with
-different numbers of observations, and a random-effects structure or
-residual-variance structure other than that model's. Equal values do not
+more than \code{sqrt(.Machine$double.eps)} times a scale in units of time: the
+largest, over \code{e}, \code{x} and \code{y}, of the square root of the intercept
+variance divided by the slope variance. A change of time units changes
+the three values and this scale by the same factor, so it does not change
+whether the function warns. The scale grows with the random-intercept
+variance relative to the residual variance. So when that ratio is large,
+an unbalanced fit can give values whose spread is below the
+threshold, and no warning. Causes that can make the values differ include
+persons with different numbers of observations, fixed effects beyond that
+model's six, and a random-effects structure or residual-variance
+structure other than that model's. Equal values do not
 show balance. For that model, the values stay equal when every person has
 the same number of observations. With different numbers of observations,
 they also stay equal when the three coordinates have equal
 random-intercept variances, equal intercept covariances and equal residual
-variances. The function skips this balance check when a slope variance is
-not positive. The \code{draws} shape and a \code{contrast} function are not checked
-for balance.
+variances. The function skips this balance check when a slope variance or
+an intercept variance is not positive, or when extreme variances make the
+three values or the scale overflow, or make the scale underflow to zero.
+The \code{draws} shape and a \code{contrast} function are not checked for balance.
 
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples. The

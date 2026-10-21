@@ -48,17 +48,25 @@
 #' fitted value has its smallest variance. A fit of the
 #' [ssm_growth_formula()] model to complete balanced data gives three equal
 #' values, the mean design time. The function warns when the three differ by
-#' more than `sqrt(.Machine$double.eps)` times the largest of 1 and their
-#' absolute values. Causes that can make them differ include persons with
-#' different numbers of observations, and a random-effects structure or
-#' residual-variance structure other than that model's. Equal values do not
+#' more than `sqrt(.Machine$double.eps)` times a scale in units of time: the
+#' largest, over `e`, `x` and `y`, of the square root of the intercept
+#' variance divided by the slope variance. A change of time units changes
+#' the three values and this scale by the same factor, so it does not change
+#' whether the function warns. The scale grows with the random-intercept
+#' variance relative to the residual variance. So when that ratio is large,
+#' an unbalanced fit can give values whose spread is below the
+#' threshold, and no warning. Causes that can make the values differ include
+#' persons with different numbers of observations, fixed effects beyond that
+#' model's six, and a random-effects structure or residual-variance
+#' structure other than that model's. Equal values do not
 #' show balance. For that model, the values stay equal when every person has
 #' the same number of observations. With different numbers of observations,
 #' they also stay equal when the three coordinates have equal
 #' random-intercept variances, equal intercept covariances and equal residual
-#' variances. The function skips this balance check when a slope variance is
-#' not positive. The `draws` shape and a `contrast` function are not checked
-#' for balance.
+#' variances. The function skips this balance check when a slope variance or
+#' an intercept variance is not positive, or when extreme variances make the
+#' three values or the scale overflow, or make the scale underflow to zero.
+#' The `draws` shape and a `contrast` function are not checked for balance.
 #'
 #' The intervals from a REML fit's `coef` and `vcov` condition on its
 #' estimated variance components and are too narrow at small samples. The
@@ -253,8 +261,11 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   # time, is the signature of coordinates fit in separate models. An
   # all-zero vcov, read over the coefficients the contrast uses, is a
   # degenerate input with nothing to refuse.
+  # Under the default contrast, vcov is read by position through
+  # names(coef), so a vcov without dimnames is read the same way.
+  if (!has_draws && is.null(contrast)) pos <- match(needed, names(coef))
   V <- if (has_draws) NULL else if (is.null(contrast))
-    vcov[needed, needed, drop = FALSE] else vcov
+    vcov[pos, pos, drop = FALSE] else vcov
   if (!has_draws && !all(V == 0)) {
     cross <- vapply(L_list, function(L) {
       as.numeric(L[2, , drop = FALSE] %*% V %*% L[3, ])
@@ -275,28 +286,35 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   # For the ssm_growth_formula() model fit to complete balanced data,
   # -cov(intercept, slope) / var(slope) is the mean design time for each of
   # e, x and y, whatever the variance components are. Unequal numbers of
-  # observations per person, or another random-effects or residual-variance
-  # structure, can move the three values apart. Entries are read by position
-  # through names(coef).
+  # observations per person, fixed effects beyond the model's six, or another
+  # random-effects or residual-variance structure, can move the three values
+  # apart. Entries are read by position through names(coef).
+  # The spread is judged on a scale in units of time read from vcov: the
+  # largest of sqrt(var(intercept) / var(slope)), which equals
+  # sqrt(t_k^2 + m_k / var(slope)) for the smallest variance m_k. A change of
+  # time units scales it with the times.
   if (!has_draws && is.null(contrast)) {
-    pos <- match(needed, names(coef))
     s_k <- vcov[cbind(pos[4:6], pos[4:6])]
-    if (all(s_k > 0)) {
+    v_k <- vcov[cbind(pos[1:3], pos[1:3])]
+    if (all(s_k > 0) && all(v_k > 0)) {
       t_k <- -vcov[cbind(pos[1:3], pos[4:6])] / s_k
       spread <- max(t_k) - min(t_k)
-      # A slope variance near the smallest double can overflow t_k to Inf;
-      # the comparison then has no answer, so the check is skipped.
-      if (all(is.finite(t_k)) &&
-          spread > sqrt(.Machine$double.eps) * max(1, max(abs(t_k)))) {
+      scale <- sqrt(max(v_k / s_k))
+      # Extreme variances can overflow t_k or the scale to Inf, or underflow
+      # the scale to 0; the comparison then has no answer, so the check is
+      # skipped.
+      if (all(is.finite(t_k)) && is.finite(scale) && scale > 0 &&
+          spread > sqrt(.Machine$double.eps) * scale) {
         warning(
           "The times at which the variance of the fitted e, x and y is ",
           "smallest differ in `vcov`: ",
           paste(format(t_k, digits = 10), collapse = ", "),
           " (spread ", format(spread, digits = 3), "). A fit of the ",
           "ssm_growth_formula() model to complete balanced data gives three ",
-          "equal values. Persons with different numbers of observations, or ",
-          "a random-effects structure or residual-variance structure other ",
-          "than that model's, can give unequal ones. The small-sample ",
+          "equal values. Persons with different numbers of observations, ",
+          "fixed effects beyond that model's six, or a random-effects ",
+          "structure or residual-variance structure other than that ",
+          "model's, can give unequal ones. The small-sample ",
           "coverage figures in ?ssm_trajectory come from complete balanced ",
           "data.",
           call. = FALSE

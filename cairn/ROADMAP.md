@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-20 (M165 done and archived: ssm_trajectory() warns 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M166 | ssm_trajectory() reads vcov by position and scales its balance check | planned | — | normal | milestones/M166-trajectory-vcov-follow-ons.md |
+| M166 | ssm_trajectory() reads vcov by position and scales its balance check | review | — | normal | milestones/M166-trajectory-vcov-follow-ons.md |
 | M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | done | — | normal | milestones/archive/M165-trajectory-unbalanced-warning.md |
 | M164 | Vignette width guard gaps | done | — | normal | milestones/archive/M164-vignette-width-guard-gaps.md |
 | M163 | Small-sample coverage in the trajectory docs | done | — | normal | milestones/archive/M163-trajectory-small-sample-docs.md |
