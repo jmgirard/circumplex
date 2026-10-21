@@ -1,13 +1,13 @@
 # M166: ssm_trajectory() reads vcov by position and scales its balance check
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2, IP3
 - **Resolves:** —
 - **Surface tier:** user-facing — an exported function's input handling, warning and help page
-- **Branch/PR:** —
+- **Branch/PR:** m166-trajectory-vcov-follow-ons
 
 ## Goal
 
@@ -39,8 +39,8 @@ Under the default contrast, `ssm_trajectory()` reads `vcov` through the position
 
 ## Tasks
 
-- [ ] T1: Write the AC1 tests in the M165 section of `tests/testthat/test-ssm_trajectory_helper.R`: a helper that pads a 6 by 6 block into a 7 by 7 matrix behind an extra first coefficient, then the three checks. Run them on the unfixed code and record in the work log that each fails with R's "no 'dimnames' attribute for array" error.
-- [ ] T2: At `R/ssm_trajectory_helper.R:256-257`, read the joint-fit block as `vcov[pos, pos]` with `pos <- match(needed, names(coef))`, the indexing the balance check already uses. Search the function for any other name-indexed read of `vcov` and convert it. Make T1 green.
+- [x] T1: Write the AC1 tests in the M165 section of `tests/testthat/test-ssm_trajectory_helper.R`: a helper that pads a 6 by 6 block into a 7 by 7 matrix behind an extra first coefficient, then the three checks. Run them on the unfixed code and record in the work log that each fails with R's "no 'dimnames' attribute for array" error.
+- [x] T2: At `R/ssm_trajectory_helper.R:256-257`, read the joint-fit block as `vcov[pos, pos]` with `pos <- match(needed, names(coef))`, the indexing the balance check already uses. Search the function for any other name-indexed read of `vcov` and convert it. Make T1 green.
 - [ ] T3: Write the AC2 to AC5 tests. Extend `gls_vcov()` with an optional set of per-coordinate covariate-by-time columns and an optional time multiplier, leaving its present callers' output unchanged. The grid test covers nine cells; the AC3 test uses `diag(c(-1e-12, 1, 1, 1, 1, 1))` with x-y covariance 0.1; the AC4 test uses `G` times 1000; the AC5 test uses `z = rep(0:1, 10)` on 20 balanced persons. Record which tests fail on the old rule (the 1e-6 time cells; the plan probe measured spread 6.6e-10 against the old threshold 1.5e-8).
 - [ ] T4: At `R/ssm_trajectory_helper.R:281-291`, compute the scale from the three intercept variances and `s_k`, skip the check when an intercept variance is not positive or the scale is not finite, and compare the spread with `sqrt(.Machine$double.eps)` times that scale. Update the code comment and add fixed-effect terms other than the model's to the warning's cause list. Make T3 green.
 - [ ] T5: Rewrite the `?ssm_trajectory` details sentences on the threshold and the causes (AC4, AC5). The help page does not claim the threshold is unchanged by a shift of time. Edit the NEWS bullet at `NEWS.md:91-100`. Run `devtools::document()` and revert `Config/roxygen2/version` if it moves. Grep `R/`, `man/`, `vignettes/` and `NEWS.md` for `residual-variance` and `largest of 1`, and fix each stale hit.
@@ -58,3 +58,6 @@ Under the default contrast, `ssm_trajectory()` reads `vcov` through the position
 - 2026-10-20: plan gate chose the scale `sqrt(v_int / v_slope)` over keeping the floor of 1 (misses unbalanced fits in small time units) and over the smaller of the old and new thresholds (where intercept variance is large, fit error in `t_k` scales with `sqrt(v_int / v_slope)`, so the old threshold risks false warnings there); falsified by a balanced fit from glmmTMB or nlme that warns under the new rule, or an unbalanced fit with a realistic variance ratio that passes silently.
 - 2026-10-20: plan gate chose reading `vcov` by position over refusing a dimnames-free `vcov` with a message, because the help page already accepts one; falsified by a user report of a reordered dimnames-free `vcov` giving a wrong table.
 - 2026-10-20: Fable escalation considered (the audit reader suggested it for the threshold) and not offered: no RB tripwire, the trade-off is measured on the oracle grid and stated on the help page. Implement tier: Opus. IP6 does not apply (no displacement, contrast or `src/` change).
+- 2026-10-20: implement started on branch m166-trajectory-vcov-follow-ons, cut from master at 7ac277fe.
+- 2026-10-20: T1: three tests appended (new section "A vcov without dimnames (M166)", `pad_vcov()` helper, `coef7` with `age` first); on the unfixed code all three failed with `Error in vcov[needed, needed, drop = FALSE]: no 'dimnames' attribute for array`.
+- 2026-10-20: T2: the joint-fit block reads `vcov[pos, pos]` with `pos <- match(needed, names(coef))`, computed once and shared with the balance check; no other name-indexed `vcov` read in R/. T1 green; `devtools::test()` FAIL 0, PASS 15242.

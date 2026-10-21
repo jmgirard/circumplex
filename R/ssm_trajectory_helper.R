@@ -253,8 +253,11 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   # time, is the signature of coordinates fit in separate models. An
   # all-zero vcov, read over the coefficients the contrast uses, is a
   # degenerate input with nothing to refuse.
+  # Under the default contrast, vcov is read by position through
+  # names(coef), so a vcov without dimnames is read the same way.
+  if (!has_draws && is.null(contrast)) pos <- match(needed, names(coef))
   V <- if (has_draws) NULL else if (is.null(contrast))
-    vcov[needed, needed, drop = FALSE] else vcov
+    vcov[pos, pos, drop = FALSE] else vcov
   if (!has_draws && !all(V == 0)) {
     cross <- vapply(L_list, function(L) {
       as.numeric(L[2, , drop = FALSE] %*% V %*% L[3, ])
@@ -279,7 +282,6 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   # structure, can move the three values apart. Entries are read by position
   # through names(coef).
   if (!has_draws && is.null(contrast)) {
-    pos <- match(needed, names(coef))
     s_k <- vcov[cbind(pos[4:6], pos[4:6])]
     if (all(s_k > 0)) {
       t_k <- -vcov[cbind(pos[1:3], pos[4:6])] / s_k

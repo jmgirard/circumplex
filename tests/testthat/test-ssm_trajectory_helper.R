@@ -957,3 +957,49 @@ test_that("live nlme fits warn only when counts per person differ", {
     unbal_re
   )
 })
+
+# A vcov without dimnames (M166) ----------------------------------------------
+#
+# Under the default contrast, vcov is read through the positions of
+# names(coef). The coef here carries an extra first coefficient, so the six
+# model names are not its first six entries, and vcov is 7 by 7.
+pad_vcov <- function(V6) {
+  V <- matrix(0, 7, 7)
+  V[1, 1] <- 0.01
+  V[2:7, 2:7] <- unname(V6)
+  V
+}
+coef7 <- c(age = 0.3, fx_growth$coef)
+
+test_that("a vcov without dimnames gives the table a named one gives", {
+  V <- pad_vcov(fx_growth$vcov)
+  expect_null(dimnames(V))
+  set.seed(1)
+  bare <- ssm_trajectory(coef7, V, times = 0:4, n_draws = 200)
+  V_named <- V
+  dimnames(V_named) <- list(names(coef7), names(coef7))
+  set.seed(1)
+  named <- ssm_trajectory(coef7, V_named, times = 0:4, n_draws = 200)
+  expect_identical(bare, named)
+})
+
+test_that("the joint-fit refusal reads a vcov without dimnames", {
+  V6 <- fx_growth$vcov
+  xs <- c("dvx", "dvx:wave")
+  ys <- c("dvy", "dvy:wave")
+  V6[xs, ys] <- 0
+  V6[ys, xs] <- 0
+  expect_error(
+    ssm_trajectory(coef7, pad_vcov(V6), times = 0:4, n_draws = 50),
+    "zero covariance between x\\(t\\) and y\\(t\\) at every time.*joint fit"
+  )
+})
+
+test_that("the unbalanced-fit warning reads a vcov without dimnames", {
+  V <- pad_vcov(gls_vcov(design_counts, G_unequal, s2_unequal))
+  set.seed(1)
+  expect_warning(
+    ssm_trajectory(coef7, V, times = 0:4, n_draws = 50),
+    unbal_re
+  )
+})
