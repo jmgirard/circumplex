@@ -81,7 +81,8 @@ goal is reproducing published CIRCUM/CircE results. The fitted
 no confidence interval. The analytic intervals for the remaining parameters
 follow the same sample-size caution as the default family: their coverage
 regime was measured (the free-family coverage oracle) to match it, so
-\code{summary()} cautions below \code{n = 2000} and in near-boundary fits. The input
+\code{summary()} cautions below \code{n = 2000}, and up to \code{n = 50000} in fits
+that show a boundary or weak-identification marker. The input
 is still a correlation matrix (unit diagonal).}
 
 \item{reference}{The index into \code{scales} of the variable whose angle is fixed

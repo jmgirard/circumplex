@@ -111,8 +111,8 @@ does not guarantee that there is no boundary behind the data.
 **What a fired marker does and does not tell you.** The package's validation
 simulations measured what these markers predict, and the measurement is
 narrower than the markers are. It covered *analytic* (Wald) intervals fitted
-from a correlation matrix. It measured interval **coverage** (how often an
-interval contained the truth), not bias in the point estimates.
+from a correlation matrix. That marker study measured interval **coverage**
+(how often an interval contained the truth), not bias in the point estimates.
 
 - *Communality indices* take the worst of it **when an ill-conditioning, a
   Heywood, or a near-tied-optima marker fires**. All three covered $\zeta$
@@ -138,13 +138,16 @@ interval contained the truth), not bias in the point estimates.
   you least here. The real $\beta$ problem is a different one, and it does
   not depend on any marker. In the package's bootstrap validation, the
   percentile intervals missed the largest weight, $\beta_0$, at least as often
-  as any other weight. Almost every miss fell below the true value. Two
-  smaller weights, $\beta_2$ and $\beta_3$, missed above it. These shortfalls
+  as any other weight. Almost every miss fell below the true value. The
+  misses of two smaller weights, $\beta_2$ and $\beta_3$, fell mostly above
+  it. These shortfalls
   did not shrink from $n = 250$ to $n = 1000$, the largest sample size at
   which the package's own bootstrap was studied. They appeared at
   both weight patterns studied. Their cause is a bias in the weight estimates
-  themselves, not a weight that sits near zero. The bootstrap reproduces only
-  part of that bias, so its intervals stay off center.
+  themselves, not a weight that sits near zero. Refitting the same data with
+  the angles fixed at their theoretical values removed that bias. The
+  bootstrap reproduces only part of the bias, so its intervals stay off
+  center.
 
 The record does *not* support four things, and no reading of these markers
 should assume them. First, the marker study measured nothing about bias in

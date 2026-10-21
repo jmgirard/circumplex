@@ -340,8 +340,9 @@
   markers. Before, it named only the first condition.
 
 * The "CPM Fits at a Boundary" vignette now says which correlation-function
-  weights the bootstrap intervals miss, and why. A new validation study found
-  that the largest weight is missed at least as often as any other. Almost
+  weights the bootstrap intervals miss, and why. The package's bootstrap
+  validation found that the largest weight is missed at least as often as
+  any other. Almost
   all of its misses fall below the true value. The cause is a bias in
   the weight estimates, which the bootstrap reproduces only in part. The page
   no longer says that the shortfall belongs to a weight near zero. It also

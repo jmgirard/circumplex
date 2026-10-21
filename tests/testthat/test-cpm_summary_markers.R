@@ -131,8 +131,9 @@ test_that("the analytic caution follows its two sample-size thresholds", {
   # The cpm_fit() help page states the rule this pins (M167): for an
   # analytic fit, the small-N note prints whenever N < 2000, and the marker
   # note prints for 2000 <= N < 50000 only when a marker fires. Each side of
-  # each threshold is checked on a fit whose markers are known.
-  skip_on_cran()
+  # each threshold is checked on a fit whose markers are known. It runs on
+  # CRAN: the fits are analytic on fixed correlation matrices (no RNG), seven
+  # of them in under a second, and it asserts which note prints, not digits.
   notes <- function(fit) {
     out <- gsub("\\s+", " ", paste(capture.output(summary(fit)),
                                    collapse = " "))
@@ -149,6 +150,7 @@ test_that("the analytic caution follows its two sample-size thresholds", {
   expect_length(cpm_boundary_markers(clean_at(2000)), 0L)
   expect_identical(notes(clean_at(1999)), c(small_n = TRUE, marker = FALSE))
   expect_identical(notes(clean_at(2000)), c(small_n = FALSE, marker = FALSE))
+  expect_identical(notes(clean_at(50000)), c(small_n = FALSE, marker = FALSE))
   voc <- cpm_oracle_voc()
   hey_at <- function(n) {
     suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,

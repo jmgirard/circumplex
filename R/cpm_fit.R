@@ -1392,6 +1392,10 @@ cpm_bootstrap <- function(engine, sdata, boots, interval) {
 # measured the same two-regime pattern for scaling = "free" (interior in-band
 # at N = 2000, boundary only near N = 50000; sigma-hat ~= 1 at correlation
 # truths), so BOTH thresholds are coverage-validated for both families.
+# Both oracles measured that coverage on fits with a defined analytic
+# standard error; fits whose information matrix is singular have no Wald
+# interval and were not counted (M167's record, devel/m167-interval-oracle.md,
+# gives the share of such fits at N <= 1000).
 cpm_analytic_ci_n_caution <- 2000L
 cpm_analytic_ci_n_boundary_caution <- 50000L
 
@@ -1512,7 +1516,8 @@ cpm_boundary_proximity <- function(object) {
 #'   no confidence interval. The analytic intervals for the remaining parameters
 #'   follow the same sample-size caution as the default family: their coverage
 #'   regime was measured (the free-family coverage oracle) to match it, so
-#'   `summary()` cautions below `n = 2000` and in near-boundary fits. The input
+#'   `summary()` cautions below `n = 2000`, and up to `n = 50000` in fits
+#'   that show a boundary or weak-identification marker. The input
 #'   is still a correlation matrix (unit diagonal).
 #' @param reference The index into `scales` of the variable whose angle is fixed
 #'   at its theoretical value to identify the rotation (default = 1).

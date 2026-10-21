@@ -323,7 +323,8 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   # N-conditional analytic-CI caution (design sec. 5.2), calibrated by the B6
   # coverage oracle: unconditional below cpm_analytic_ci_n_caution;
   # boundary-marker-conditional below cpm_analytic_ci_n_boundary_caution
-  # (see the constants in R/cpm_fit.R for the measured coverage behind both).
+  # (see the constants in R/cpm_fit.R for the measured coverage behind both,
+  # which was measured on fits with a defined analytic standard error).
   # The SAME thresholds apply to the free-scaling family: the M19 coverage
   # oracle measured its theta/zeta/beta coverage regime to be the diag family's
   # (sigma-hat ~= 1 at correlation truths), so the diag thresholds are
