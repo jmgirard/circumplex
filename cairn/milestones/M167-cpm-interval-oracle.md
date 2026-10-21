@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -62,6 +62,8 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - [x] T5: Write the verdict D-entry and the DESIGN.md section. Set the promotion state of the narrowed candidate row from the verdict.
 - [x] T6: Correct the vignette item and the `cpm_fit()` roxygen in ASCII-safe text, then run `document()`, `test()` and `check()`. Apply the rules in `cairn/references/plain-vignettes.md` to the vignette edit.
 
+- [x] T7: Add a NEWS.md Documentation entry for the `cpm_fit()` help-page caution sentence and the `cpm-boundary-fits` vignette corrections (review return 1).
+
 ## Work log
 
 - 2026-10-21: created by /milestone-plan.
@@ -101,6 +103,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: claim audit re-read: the corrections hold; it found two more, now fixed (the share with no interval at boundary N = 1000 is 16%, not 15%; beta_0's misses are nearly all below the truth, 0.5% above at interior N = 250, in the record, DESIGN.md and the vignette). No second pass, per the stopping rule.
 - 2026-10-21: T6 done: `devtools::check(args = "--no-manual")` on 986d7be6 gives Status OK, 0 errors, 0 warnings, 0 notes. All tasks checked; status review, handed to `/milestone-review`.
 - 2026-10-21: review return 1: consistency gate — NEWS.md has no Documentation entry for the user-visible changes (the `cpm_fit()` help page's caution sentence and the `cpm-boundary-fits` vignette's weight and bias corrections). The rest of the gate is green: `cairn_validate`, `document()` no diff, README untouched, `pkgdown::check_pkgdown()`, master R-CMD-check and test-coverage push runs success at c215fe31, the two alert audits and the branch-protection check exit 0.
+- 2026-10-21: T7 added (minor amendment, review return 1) and done: two Documentation entries at the top of NEWS.md's development section, one for the `?cpm_fit` caution sentence and one for the vignette's weight and bias corrections, written against the help text and the vignette as they stand; the prose sweep reports no new long sentence in them. No test reads NEWS.md, and nothing else changed, so the suite and check runs on 986d7be6 stand. Status review.
 
 ## Decisions
 
