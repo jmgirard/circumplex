@@ -748,7 +748,7 @@ test_that("the trajectory object's plot renders as expected", {
 # The GLS covariance of the fixed effects is solve(sum_i X_i' V_i^-1 X_i).
 # Under complete balanced data, -v01 / v11 = mean(t) for every coordinate
 # and any G and s2 (M165 work log); unequal counts per person, or random
-# slopes, move the three values apart.
+# slopes, in general move the three values apart.
 gls_vcov <- function(designs, G, s2, G_slope = NULL) {
   info <- matrix(0, 6, 6)
   for (t in designs) {

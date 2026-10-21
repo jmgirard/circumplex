@@ -124,12 +124,14 @@ fitted value has its smallest variance. A fit of the
 \code{\link[=ssm_growth_formula]{ssm_growth_formula()}} model to complete balanced data gives three equal
 values, the mean design time. The function warns when the three differ by
 more than \code{sqrt(.Machine$double.eps)} times the largest of 1 and their
-absolute values. Two causes make them differ: persons with different
-numbers of observations, and a random-effects structure other than that
-model's. Equal values do not show balance. The values stay equal when
-each person misses the same number of waves, and when the three
-coordinates have equal variances, equal covariances and equal residual
-variances. The check is skipped when a slope variance is not positive.
+absolute values. Causes that can make them differ include persons with
+different numbers of observations, and a random-effects structure or
+residual-variance structure other than that model's. Equal values do not
+show balance. For that model, the values stay equal when every person has
+the same number of observations. They also stay equal when the three
+coordinates have equal random-intercept variances, equal intercept
+covariances and equal residual variances. The check is skipped when a
+slope variance is not positive.
 The \code{draws} shape and a \code{contrast} function are not checked.
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples. The

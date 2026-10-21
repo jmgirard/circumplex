@@ -48,12 +48,14 @@
 #' [ssm_growth_formula()] model to complete balanced data gives three equal
 #' values, the mean design time. The function warns when the three differ by
 #' more than `sqrt(.Machine$double.eps)` times the largest of 1 and their
-#' absolute values. Two causes make them differ: persons with different
-#' numbers of observations, and a random-effects structure other than that
-#' model's. Equal values do not show balance. The values stay equal when
-#' each person misses the same number of waves, and when the three
-#' coordinates have equal variances, equal covariances and equal residual
-#' variances. The check is skipped when a slope variance is not positive.
+#' absolute values. Causes that can make them differ include persons with
+#' different numbers of observations, and a random-effects structure or
+#' residual-variance structure other than that model's. Equal values do not
+#' show balance. For that model, the values stay equal when every person has
+#' the same number of observations. They also stay equal when the three
+#' coordinates have equal random-intercept variances, equal intercept
+#' covariances and equal residual variances. The check is skipped when a
+#' slope variance is not positive.
 #' The `draws` shape and a `contrast` function are not checked.
 #' The intervals from a REML fit's `coef` and `vcov` condition on its
 #' estimated variance components and are too narrow at small samples. The
@@ -270,8 +272,9 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
   # For the ssm_growth_formula() model fit to complete balanced data,
   # -cov(intercept, slope) / var(slope) is the mean design time for each of
   # e, x and y, whatever the variance components are. Unequal numbers of
-  # observations per person, or another random-effects structure, move the
-  # three values apart. Entries are read by position through names(coef).
+  # observations per person, or another random-effects or residual-variance
+  # structure, can move the three values apart. Entries are read by position
+  # through names(coef).
   if (!has_draws && is.null(contrast)) {
     pos <- match(needed, names(coef))
     s_k <- vcov[cbind(pos[4:6], pos[4:6])]
@@ -286,9 +289,10 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
           " (spread ", format(spread, digits = 3), "). A fit of the ",
           "ssm_growth_formula() model to complete balanced data gives three ",
           "equal values. Persons with different numbers of observations, or ",
-          "a random-effects structure other than that model's, give ",
-          "unequal ones. The small-sample coverage figures in ",
-          "?ssm_trajectory come from complete balanced data.",
+          "a random-effects structure or residual-variance structure other ",
+          "than that model's, can give unequal ones. The small-sample ",
+          "coverage figures in ?ssm_trajectory come from complete balanced ",
+          "data.",
           call. = FALSE
         )
       }

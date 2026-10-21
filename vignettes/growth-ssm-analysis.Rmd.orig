@@ -362,8 +362,8 @@ The package's coverage oracles fit this model, the one
 `ssm_growth_formula()` writes, with glmmTMB and REML to simulated data.
 The figures below come from samples with five balanced waves and no
 missing values. `ssm_trajectory()` warns when its `vcov` does not look like
-a fit to such data, for example when persons have different numbers of
-observations. The first oracle used 200 persons and 500 simulated
+a fit to such data. Different numbers of observations per person usually
+cause that warning. The first oracle used 200 persons and 500 simulated
 samples in each coverage cell. The $d(t)$ intervals held coverage between
 .93 and .97 at every certified wave. At the uncertified low-amplitude wave the coverage was .854, which
 is the case the certification of Section 6 flags. Its record is

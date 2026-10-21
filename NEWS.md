@@ -91,10 +91,11 @@
   does not look like a fit to complete balanced data. The small-sample
   coverage figures on its help page come from that design. For each of
   `e`, `x` and `y`, the function reads the time at which the fitted value
-  has its smallest variance. On complete balanced data the three times are
-  equal, and the function warns when they differ. Two causes make them
-  differ: persons with different numbers of observations, and a
-  random-effects structure other than the `ssm_growth_formula()` model's.
+  has its smallest variance. For the `ssm_growth_formula()` model fit to
+  complete balanced data, the three times are equal, and the function warns
+  when they differ. Causes that can make them differ include persons with
+  different numbers of observations, and a random-effects structure or
+  residual-variance structure other than that model's.
   Equal times do not show balance. The `draws` shape and a `contrast`
   function are not checked.
 
