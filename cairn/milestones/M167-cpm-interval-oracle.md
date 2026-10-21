@@ -73,9 +73,9 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: plan gate chose a bias-corrected percentile for F3 over a studentized bootstrap, because the studentized form needs a per-resample Wald SE that is NA or very large at the 59-91% Heywood rates of N ≤ 500; falsified by a per-resample SE that stays finite in that regime.
 - 2026-10-21: plan gate chose ln v for the ζ arm of F1 over logit ζ, because CircE's published intervals use ln v and a test already reconstructs them; falsified by logit ζ covering where ln v misses on the same replicates.
 - 2026-10-21: plan gate chose a study-only milestone over study and ship together, because the export shape depends on which family passes; falsified by a verdict whose ship step changes no exported argument or printed output.
+- 2026-10-21: lessons harvested: M161 (a conditioning event scored as a miss can decide a band, so T1 fixes how each counts) and M90 (name the path an oracle figure measured, for T4's record).
 - 2026-10-21: implement started on branch m167-cpm-interval-oracle.
 - 2026-10-21: checkpoint (T1, T2 in progress): `devel/m167-interval-oracle.R` header and skeleton, `devel/m167-interval-helpers.R` and `devel/m167-interval-checks.R` written; the checks pass 8 of 8 and two planted defects fail them; the control run and the suite are running.
-- 2026-10-21: lessons harvested: M161 (a conditioning event scored as a miss can decide a band, so T1 fixes how each counts) and M90 (name the path an oracle figure measured, for T4's record).
 
 ## Decisions
 
