@@ -86,7 +86,7 @@ by position so it adds no second failing site.
       `vignettes/growth-ssm-analysis.Rmd.orig` and the shipped `.Rmd`, says
       in one sentence that the helper warns on such a fit, and
       `tools/prose-sweep.R` reports no finding on the added sentence.
-- [ ] AC6: `devtools::test()` and `devtools::check(args = "--no-manual")`
+- [x] AC6: `devtools::test()` and `devtools::check(args = "--no-manual")`
       report 0 errors, 0 warnings, 0 notes.
 
 ## Coverage
@@ -169,25 +169,28 @@ Evidence gathered 2026-10-20 at 8db63224 (branch synced, master had not moved).
 - AC4: test "the check consumes no random numbers" (3 expectations) passes: the warned call and the balanced call from seed 7 with `n_draws = 100` leave identical `.Random.seed`.
 - AC5: `man/ssm_trajectory.Rd:119-135` states the condition in words, the threshold, the causes ("persons with different numbers of observations, and a random-effects structure or residual-variance structure other than that model's"), that equal values do not show balance with both named cases, the skip on a non-positive slope variance, and that `draws` and `contrast` are not checked. `NEWS.md:90` is one bullet in the development section. Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig:364-366` and `.Rmd:431-433` carries the same added text; its sentence "`ssm_trajectory()` warns when its `vcov` does not look like a fit to such data." says the helper warns, and a second sentence names the usual cause. `tools/prose-sweep.R` on both files reports no finding at those lines.
 - spawned: diff-bug, blame-history, prior-review, ripple.
-- diff-bug #1: the help page never said the coverage oracle used complete balanced data, though the warning sends users there for that fact — fix now (the oracle sentence now says "to complete balanced data at five waves", matching vignette Section 7).
-- diff-bug #2: no blank roxygen line after the new paragraph, so the coverage text ran on inside it — fix now.
-- diff-bug #3: the vignette's "usually cause that warning" is an unmeasured frequency claim — fix now (one sentence: "as can happen when persons have different numbers of observations").
+- diff-bug #1: the help page never said the coverage oracle used complete balanced data, though the warning sends users there for that fact — fix now (the oracle sentence now says "to complete balanced data at five waves", matching vignette Section 7), fixed 9e1ddd1e.
+- diff-bug #2: no blank roxygen line after the new paragraph, so the coverage text ran on inside it — fix now, fixed 9e1ddd1e.
+- diff-bug #3: the vignette's "usually cause that warning" is an unmeasured frequency claim — fix now (one sentence: "as can happen when persons have different numbers of observations"), fixed 9e1ddd1e.
 - diff-bug #4: the `max(1, ...)` floor makes the threshold absolute (1.5e-8) when every time is below 1 in size, so on a very small time scale a real spread can fall under it; no false positive found — follow-up, candidate row "Scale the balance check to small times".
 - diff-bug #5: the cause lists do not name other fixed-effect terms, which can also move the values; the lists are hedged ("include", "can give"), so nothing stated is false — follow-up, folded into the same candidate row.
-- diff-bug #6: slope variances near the smallest double, which the eigenvalue tolerance admits, overflow `t_k` to Inf and the `if` failed with "missing value where TRUE/FALSE needed" (reproduced) — fix now (skip when any `t_k` is not finite; regression test added to "the check is skipped where it has nothing exact to read").
-- diff-bug #7: `message_numbers()` missed positive exponents and integers — fix now (reads after the colon, wider pattern).
+- diff-bug #6: slope variances near the smallest double, which the eigenvalue tolerance admits, overflow `t_k` to Inf and the `if` failed with "missing value where TRUE/FALSE needed" (reproduced) — fix now (skip when any `t_k` is not finite; regression test added to "the check is skipped where it has nothing exact to read"), fixed 9e1ddd1e.
+- diff-bug #7: `message_numbers()` missed positive exponents and integers — fix now (reads after the colon, wider pattern), fixed 9e1ddd1e.
 - diff-bug #8: `data("simulated_growth")` writes to the global environment — reject, style: it matches `test-ssm_growth_data.R` and `test-ssm_growth_parity.R`.
-- blame-history #1: "usually" has no record behind it, and the addition was two sentences against AC5's one — fix now (same edit as diff-bug #3).
-- blame-history #2: GP4 is listed under Principles touched with no decision recorded — fix now (milestone-local Decisions entry below).
+- blame-history #1: "usually" has no record behind it, and the addition was two sentences against AC5's one — fix now (same edit as diff-bug #3), fixed 9e1ddd1e.
+- blame-history #2: GP4 is listed under Principles touched with no decision recorded — fix now (milestone-local Decisions entry below), fixed 9e1ddd1e.
 - blame-history #3: an unbalanced fit still prints certified rows with no balance note — reject, planned change: the plan gate chose a call-time warning over a print-time caution (work log).
 - blame-history #4: equal-but-unbalanced fits pass silently, read against GP2's fail-closed clause — reject, planned change: the warning is a caution, not a certification, and the plan scoped its promise to one direction; the help page states the limit.
 - blame-history #5: the new sentence sits between the design sentence and "The first oracle" — reject, style: "The first oracle" still follows "The package's coverage oracles" in the same paragraph.
-- prior-review #1: "usually" overclaims frequency (M153 review O4's class) — fix now (same edit as diff-bug #3).
-- prior-review #2: "equal residual variances" read as a requirement for balanced fits — fix now ("With different numbers of observations, they also stay equal when ...").
-- ripple #1: vignette Section 4's "The check is structural" became ambiguous with a second check — fix now ("This joint-fit check is structural", both vignette files).
-- ripple #2: the help page's "The check reads only the given `times`" and the new "The check is skipped" named two checks alike — fix now ("This joint-fit check" and "this balance check").
+- prior-review #1: "usually" overclaims frequency (M153 review O4's class) — fix now (same edit as diff-bug #3), fixed 9e1ddd1e.
+- prior-review #2: "equal residual variances" read as a requirement for balanced fits — fix now ("With different numbers of observations, they also stay equal when ..."), fixed 9e1ddd1e.
+- ripple #1: vignette Section 4's "The check is structural" became ambiguous with a second check — fix now ("This joint-fit check is structural", both vignette files), fixed 9e1ddd1e.
+- ripple #2: the help page's "The check reads only the given `times`" and the new "The check is skipped" named two checks alike — fix now ("This joint-fit check" and "this balance check"), fixed 9e1ddd1e.
 - ripple #3: Section 7 does not say whether the warning fires on the 10-person oracle fits — reject, false: those fits are complete balanced data, where the values are equal for any variance components (work-log derivation), so no stated fact went stale.
 - ripple #4: the candidate row "Unbalanced-fit check in ssm_trajectory()" reads as future work — reject, planned change: post-merge hygiene graduates it.
 - ripple #5: the row "Accept a vcov without dimnames" proposes reading by position, applied only in the new check — reject, false: the row's fact and fix still hold, since the joint-fit refusal at `vcov[needed, needed]` fails first.
 - ripple #6: the older NEWS bullet on Section 7 does not list the new sentence — reject, planned change: the plan gave the warning its own bullet.
 - ripple side note (inside the added lines): the paragraph break — same as diff-bug #2, fixed.
+- AC5 (re-verified after the fixes, 9e1ddd1e): `man/ssm_trajectory.Rd:120-137` carries the condition, threshold, causes, both equal-value cases, the skip and the `draws`/`contrast` exclusion; Section 7 now adds one sentence, "`ssm_trajectory()` warns when its `vcov` does not look like a fit to such data, as can happen when persons have different numbers of observations." (`.Rmd.orig:364-367`, `.Rmd:431-434`); `tools/prose-sweep.R` reports 5 lines on the `.Rmd.orig`, none on the added sentence or the reworded Section 4 sentence. The six M165 tests pass at this head (28 expectations, the overflow regression included).
+- AC6: at 9e1ddd1e `devtools::test()` exit 0 with 0 failures; `devtools::check()` (manual off by default, so `--no-manual`) 0 errors, 0 warnings, 0 notes.
+- Consistency gate: `cairn_validate.py` all checks passed; `devtools::document()` with `cli.width = 500` gives 0 `resolve link` lines and no diff after the `Config/roxygen2/version` revert; README untouched; `pkgdown::check_pkgdown()` no problems; NEWS has the bullet; no new top-level files; master watches: newest push runs of `R-CMD-check.yaml` and `test-coverage.yaml` on master (daf2b888) both `success`; `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` exit 0. No principle changed, so `cairn_impact` was skipped.
