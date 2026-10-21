@@ -17,6 +17,9 @@
 #   4c. P1 (profile likelihood) matches the Wald interval at an interior
 #      N = 20000 fit, and a gradient-free re-profile puts the statistic at
 #      3.84 at its endpoints.
+#   4d. P1's finite endpoints at boundary N = 250 (mostly Heywood fits) are
+#      not false: re-profiled from the estimate, the statistic there is not
+#      clearly below 3.84.
 #   5. The angle side rule scores hand-built arcs correctly.
 #
 # Usage: Rscript devel/m167-interval-checks.R   (about 2 minutes)
@@ -164,6 +167,48 @@ lr_ends <- vapply(pr$zeta[1, ], lr_at, numeric(1))
 report("LR at P1's zeta_1 endpoints equals 3.84 within .05 (gradient-free refit)",
        max(abs(lr_ends - stats::qchisq(.95, 1))) < 0.05,
        sprintf("%.3f %.3f", lr_ends[1], lr_ends[2]))
+
+# ---- 4d. P1 endpoints in the Heywood regime ------------------------------------
+# At boundary N = 250 most fits are Heywood fits, where a warm-started profile
+# once stalled and gave false endpoints (M167 review). Re-profile each finite
+# P1 endpoint from the estimate with a gradient-free minimizer: the statistic
+# there must not fall clearly below the cutoff. `p1_fun` lets a plant swap in
+# another P1 implementation.
+p1_endpoint_check <- function(p1_fun, n_fits = 12L) {
+  crit <- stats::qchisq(.95, 1)
+  low <- 0L
+  tested <- 0L
+  heywood_tested <- 0L
+  for (i in seq_len(n_fits)) {
+    set.seed(88000L + i)
+    X <- matrix(stats::rnorm(250 * 8L), 250) %*% chol(P_bnd)
+    R <- stats::cor(X)
+    eng <- suppressWarnings(cpm_engine(R, angles = angles, m = 3,
+                                       variant = "A"))
+    if (!isTRUE(eng$accepted)) next
+    pr <- p1_fun(eng, R, 250L)
+    setup <- m167_profile_setup(eng, R, 250L)
+    for (comp in setup$comps) {
+      ends <- pr[[comp$family]][comp$row, ]
+      for (t in ends) {
+        if (is.na(t) || t <= 1e-6 || t >= 1 - 1e-6) next   # natural bounds
+        st <- m167_profile_stat(setup, comp, stats::qlogis(t),
+                                use_gradient = FALSE)$stat
+        tested <- tested + 1L
+        if (comp$family == "zeta" && eng$zeta[comp$row] > 0.995) {
+          heywood_tested <- heywood_tested + 1L
+        }
+        if (st < crit - 0.05) low <- low + 1L
+      }
+    }
+  }
+  c(tested = tested, heywood_tested = heywood_tested, low = low)
+}
+hc <- p1_endpoint_check(m167_profile_ci)
+report("P1 endpoints at boundary N = 250: none with the statistic below 3.79",
+       hc[["low"]] == 0L && hc[["heywood_tested"]] > 0L,
+       sprintf("%d endpoints tested (%d on Heywood communalities), %d low",
+               hc[["tested"]], hc[["heywood_tested"]], hc[["low"]]))
 
 # ---- 5. angle side rule --------------------------------------------------------
 arcs <- rbind(c(350, 10),    # straddles 0/360, truth 0 inside

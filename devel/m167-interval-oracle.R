@@ -6,7 +6,9 @@
 # output exists. Changes after the design review and before the first full
 # run are listed at the end of this block, recorded in
 # cairn/milestones/M167-cpm-interval-oracle.md, and listed again in the
-# verdict D-entry. Nothing in this block changes after the first full run.
+# verdict D-entry. After the first full run, nothing in the truths, cells,
+# methods, scoring rule, band or pass rule changes; the corrections listed at
+# the end of this block change none of them.
 # "Full run" means a run with none of the M167_* mode variables set; the
 # control, smoke, named-cell and confirmation modes below are not full runs.
 #
@@ -129,7 +131,7 @@
 #
 # CONFIRMATION (RR26 rec 12): any (method, path, family) that passes, under
 # either verdict form, at a raw-data cell (N <= 1000) is re-run at those
-# cells on fresh seeds (20261022 + 1e6 * truth index + 1e3 * N index + i,
+# cells on fresh seeds (30261022 + 1e6 * truth index + 1e3 * N index + i,
 # 500 replicates, M167_CONFIRM=1), and both figures are reported. A pass the
 # confirmation fails is reported as not confirmed.
 #
@@ -150,6 +152,26 @@
 #   one (was descriptive); the fresh-seed confirmation; the zeta-hat = 1
 #   wording (was "ln v stays finite"); the expected outcome. The control
 #   mode ran before these changes and scores only B1 and B2.
+#
+# CORRECTIONS AFTER THE FIRST FULL RUN (M167 review, 2026-10-21). None
+# changes the truths, cells, methods, scoring rule, band or pass rule; the
+# full study and the confirmation are re-run after them.
+#   The confirmation seed base was 20261022, which sits 316 above the M4 base
+#   and 1 above the correlation-cell base, so up to 184 of 500 confirmation
+#   replicates per cell repeated main-run data. It is now 30261022, which no
+#   seed of the main run reaches.
+#   The implementation now follows the rules above where it did not: P1's
+#   profile keeps the lower of a start from the estimate and a warm start
+#   (a warm start alone gave false endpoints near a Heywood wall); an error
+#   inside one method or one resample no longer drops the replicate from
+#   every method (an erroring resample counts as nonconvergent); B2 gives
+#   [0, 0] for a removed weight whose SE is undefined; the VB arm counts
+#   accepted fits only.
+#   The correlation-cell base (20261021) still sits 315 above the M4 base,
+#   so a correlation-cell replicate can start from the RNG state of a
+#   raw-data replicate. The two draw different things (a Wishart matrix
+#   against simulated rows) at different N, and each cell is scored on its
+#   own, so this is left as it is and recorded here.
 # ==== PRE-REGISTRATION END ====
 #
 # Usage:  Rscript devel/m167-interval-oracle.R                  # full run
@@ -180,7 +202,10 @@ NS_RAW <- c(250, 500, 1000)
 NS_COR <- c(2000, 5000, 20000)
 SEED_M4 <- 20260706
 SEED_NEW <- 20261021
-SEED_CONF <- 20261022
+SEED_CONF <- 30261022
+# the code commit this run uses, read at start (the save happens much later)
+RUN_COMMIT <- tryCatch(system("git rev-parse HEAD", intern = TRUE),
+                       error = function(e) NA_character_)
 CORES <- max(1, parallel::detectCores() - 1)
 LEVEL <- 0.95
 BAND <- c(0.90, 0.98)
@@ -262,14 +287,24 @@ one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
   free <- eng$spec$free_pos
   ci <- list()
   boots <- list()
+  # An error inside one method leaves that method with no interval for this
+  # replicate (counted as undefined) and the other methods untouched, so a
+  # method's failure never removes the replicate from every method.
+  safe_ci <- function(expr) {
+    tryCatch(expr, error = function(e) m167_empty_ci(p, 4))
+  }
+  no_reps <- list(theta = matrix(NA_real_, 0, p), zeta = matrix(NA_real_, 0, p),
+                  beta = matrix(NA_real_, 0, 4), n_ok = 0L,
+                  n_degenerate = NA_integer_, n_nonconvergent = NA_integer_)
+  safe_reps <- function(expr) tryCatch(expr, error = function(e) no_reps)
   # B1 first: its resample draw must be the first RNG use after the data, as
   # in cpm_fit(), so the M4 control cells reproduce M4's intervals.
   if (raw) {
-    b1 <- suppressWarnings(m167_boot_reps(eng, X, BOOTS))
-    ci$B1 <- m167_percentile(b1, LEVEL)
+    b1 <- safe_reps(suppressWarnings(m167_boot_reps(eng, X, BOOTS)))
+    ci$B1 <- safe_ci(m167_percentile(b1, LEVEL))
     if (!control) {
-      ci$F3 <- m167_bc(b1, eng, LEVEL)
-      ci$Bb <- m167_basic(b1, eng, LEVEL)
+      ci$F3 <- safe_ci(m167_bc(b1, eng, LEVEL))
+      ci$Bb <- safe_ci(m167_basic(b1, eng, LEVEL))
       boots$B1 <- boot_summary(b1, eng)
     }
   }
@@ -279,16 +314,16 @@ one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
                beta = rep(NA_real_, 4))
   }
   se_defined <- !anyNA(c(se$angle[free], se$zeta, se$beta))
-  ci$B2 <- m167_wald(eng, se, LEVEL)
+  ci$B2 <- safe_ci(m167_wald(eng, se, LEVEL))
   vb <- NULL
   if (!control) {
-    ci$F1 <- m167_transformed_wald(eng, se, LEVEL)
-    f2 <- suppressWarnings(m167_param_reps(eng, N, BOOTS))
-    ci$F2p <- m167_percentile(f2, LEVEL)
-    ci$F2bc <- m167_bc(f2, eng, LEVEL)
-    ci$F2b <- m167_basic(f2, eng, LEVEL)
+    ci$F1 <- safe_ci(m167_transformed_wald(eng, se, LEVEL))
+    f2 <- safe_reps(suppressWarnings(m167_param_reps(eng, N, BOOTS)))
+    ci$F2p <- safe_ci(m167_percentile(f2, LEVEL))
+    ci$F2bc <- safe_ci(m167_bc(f2, eng, LEVEL))
+    ci$F2b <- safe_ci(m167_basic(f2, eng, LEVEL))
     boots$F2 <- boot_summary(f2, eng)
-    ci$P1 <- suppressWarnings(m167_profile_ci(eng, R, N, LEVEL))
+    ci$P1 <- safe_ci(suppressWarnings(m167_profile_ci(eng, R, N, LEVEL)))
     if (raw) {
       e_b <- try(suppressWarnings(cpm_engine(R, angles = angles, m = 3,
                                              variant = "B")), silent = TRUE)
@@ -403,8 +438,12 @@ summarize_bias <- function(reps, cfg) {
   })
   vbs <- lapply(reps, `[[`, "vb")
   vbs <- vbs[!vapply(vbs, is.null, logical(1))]
+  # the VB summaries read accepted variant-B fits only; the share accepted is
+  # reported beside them
+  n_vb <- length(vbs)
+  vbs <- vbs[vapply(vbs, `[[`, logical(1), "accepted")]
   vb <- NULL
-  if (length(vbs) > 0) {
+  if (length(vbs) > 1) {
     bm <- do.call(rbind, lapply(vbs, `[[`, "beta"))
     zm <- do.call(rbind, lapply(vbs, `[[`, "zeta"))
     sd0 <- stats::sd(bm[, 1])
@@ -413,7 +452,8 @@ summarize_bias <- function(reps, cfg) {
                beta_sd = apply(bm, 2, stats::sd),
                zeta_bias = colMeans(zm) - cfg$zeta,
                heywood_rate = hey,
-               accepted_rate = mean(vapply(vbs, `[[`, logical(1), "accepted")),
+               n_accepted = length(vbs),
+               accepted_rate = length(vbs) / n_vb,
                mechanism_confirmed = abs(mean(bm[, 1]) - cfg$beta[1]) <
                  0.25 * sd0 && hey < 0.05)
   }
@@ -672,7 +712,6 @@ saveRDS(list(results = results, verdict = verdict, control = control_table,
              allowance = "1.4 * sqrt(.93 * .07 / n)",
              vacuous_max = VACUOUS_MAX, undefined_max = UNDEFINED_MAX,
              seeds = c(m4 = SEED_M4, new = SEED_NEW, confirm = SEED_CONF),
-             commit = tryCatch(system("git rev-parse HEAD", intern = TRUE),
-                               error = function(e) NA_character_),
+             commit = RUN_COMMIT,
              date = Sys.Date()), out_file, compress = "xz")
 cat("saved:", out_file, "\n")

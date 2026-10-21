@@ -64,6 +64,10 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 
 - [x] T7: Add a NEWS.md Documentation entry for the `cpm_fit()` help-page caution sentence and the `cpm-boundary-fits` vignette corrections (review return 1).
 
+- [x] T8: Fix the harness (review return 2): P1's profile takes the lower of a start from the estimate and a warm start, with a Heywood-regime endpoint check added to the checks script; an error inside one method or one resample no longer drops the replicate; B2 gives [0, 0] for a removed weight; P1 handles a lone kept harmonic; the variant-B arm counts accepted fits only; the commit is read at start; the confirmation takes a non-colliding seed base, recorded in the block as a correction after the first full run.
+- [ ] T9: Re-run the full study and the confirmation, then update the record, D-068, DESIGN.md and the candidate row from the new results.
+- [ ] T10: Make the documentation and test fixes the Review section settles as fix now (code comments, `ci_method` text, vignette, NEWS, the threshold test, .gitignore), and file the follow-up candidate row.
+
 ## Work log
 
 - 2026-10-21: created by /milestone-plan.
@@ -105,6 +109,8 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: review return 1: consistency gate — NEWS.md has no Documentation entry for the user-visible changes (the `cpm_fit()` help page's caution sentence and the `cpm-boundary-fits` vignette's weight and bias corrections). The rest of the gate is green: `cairn_validate`, `document()` no diff, README untouched, `pkgdown::check_pkgdown()`, master R-CMD-check and test-coverage push runs success at c215fe31, the two alert audits and the branch-protection check exit 0.
 - 2026-10-21: T7 added (minor amendment, review return 1) and done: two Documentation entries at the top of NEWS.md's development section, one for the `?cpm_fit` caution sentence and one for the vignette's weight and bias corrections, written against the help text and the vignette as they stand; the prose sweep reports no new long sentence in them. No test reads NEWS.md, and nothing else changed, so the suite and check runs on 986d7be6 stand. Status review.
 - 2026-10-21: review return 2: diff-bug #1 — P1's root search returns false endpoints at Heywood communalities, so P1's figures and its ladder entry in D-068 are not established; with it, diff-bug #3 (a method error drops the replicate from every method) and #6 (B2's removed-harmonic rule) change scored figures, so the full study and the confirmation re-run after the fixes. The other fix-now dispositions in the Review section ride this return.
+- 2026-10-21: T8, T9 and T10 added (minor amendment) for review return 2.
+- 2026-10-21: T8 done: `m167_profile_setup()` and `m167_profile_stat()` split out of P1, each profile evaluation keeping the lower of the estimate start and the nearest warm start; refit errors count as nonconvergent and per-method errors leave only that method undefined; B2 gives [0, 0] for a removed weight; P1 gives beta_0 [1, 1] when it is the only kept harmonic; VB summaries read accepted fits only; the commit is read at start; the confirmation base is 30261022, recorded under a new "CORRECTIONS AFTER THE FIRST FULL RUN" heading in the block, which also records the correlation-cell base overlap left as it is. Checks pass 12 of 12; the new Heywood-regime check (175 endpoints, 14 on Heywood communalities) finds 0 low endpoints with the fixed P1 and 14 with the P1 of 46243f64.
 
 ## Decisions
 
