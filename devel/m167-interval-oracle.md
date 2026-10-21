@@ -17,10 +17,14 @@ figures below come from `devel/m167-interval-results.rds` (the full run),
   run used the code of 908ed678.
 - The control run scored B1 and B2 only, at the six raw-data cells, under the
   M4 seeds. It ran before the design review and took 33 minutes. The full run
-  reproduces its B1 and B2 figures.
+  reproduces its B1 and B2 figures at five of the six cells. At interior
+  N = 250, two replicates errored in the full run (404 accepted fits against
+  406), and the pooled B2 figures there differ by up to .006.
 - The confirmation run used fresh seeds (20261022) at the raw-data cells where
   a pass needed confirming. Its results are under "Confirmation" below.
 - The prototypes pass all 11 checks in `devel/m167-interval-checks.R`.
+- Run times are the elapsed times each run printed. The .rds files do not
+  store them.
 
 ## Path each figure measured
 
@@ -43,7 +47,7 @@ figures below come from `devel/m167-interval-results.rds` (the full run),
 ## AC2 control
 
 Pooled as M4 pooled it, every B1 and B2 entry at the six M4 cells lies within
-.020 of the M4 record. The largest difference is B2 beta at boundary N = 500,
+.021 of the M4 record (.020 at three decimals). The largest difference is B2 beta at boundary N = 500,
 .869 against .849. The B1 differences are at most .007. The accepted-fit
 counts differ slightly from M4's, for example 448 against 452 at interior
 N = 500. This run did not look into why.
@@ -80,7 +84,7 @@ intervals 15 to 26% lie above the truth and 0 to 2% below. At N = 500 they
 cover .85 to .91, with 9 to 15% above.
 
 B1 angles pass at N = 250 and 1000 under the pass rule. At boundary N = 500
-the JK angle covers .871 and fails.
+the LM angle covers .871 and fails.
 
 ## Why: the diagnostics
 
@@ -135,10 +139,11 @@ The per-component tables give these reasons for the other failures:
   (interior) of fits at N = 250.
 - The basic bootstrap (Bb, F2b) covers communalities at only .47 to .79 at
   N <= 1000.
-- At the boundary truth, F2bc is the only family whose beta_0 passes under the
-  pass rule at any cell: .894 at N = 5000 and .888 at N = 20000, both inside
-  the allowance and below .90. P1, B2 and F1 cover beta_0 at .83 to .87 from
-  N = 2000 to 20000.
+- At the boundary truth, F2bc is the only method whose beta_0 passes
+  unconditionally at any cell: .894 at N = 5000 and .888 at N = 20000, both
+  inside the allowance and below .90. B2 and F1 pass beta_0 only
+  conditionally, at N = 250 and 1000, where 60% and 15% of fits have no
+  interval. P1, B2 and F1 cover beta_0 at .83 to .87 from N = 2000 to 20000.
 
 ## Confirmation
 

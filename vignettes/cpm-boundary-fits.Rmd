@@ -242,17 +242,18 @@ interval contained the truth), not bias in the point estimates.
   $\beta$ only slightly less often than quiet ones, so a fired marker tells
   you least here. The real $\beta$ problem is a different one, and it does
   not depend on any marker. In the package's bootstrap validation, the
-  percentile intervals missed the largest weight, $\beta_0$, most often, and
-  its intervals fell below the true value. Two smaller weights, $\beta_2$ and
-  $\beta_3$, missed above it. These shortfalls did not shrink from $n = 250$
-  to $n = 1000$, the largest bootstrap sample size studied. They appeared at
+  percentile intervals missed the largest weight, $\beta_0$, at least as often
+  as any other weight. Its intervals fell below the true value. Two
+  smaller weights, $\beta_2$ and $\beta_3$, missed above it. These shortfalls
+  did not shrink from $n = 250$ to $n = 1000$, the largest sample size at
+  which the package's own bootstrap was studied. They appeared at
   both weight patterns studied. Their cause is a bias in the weight estimates
   themselves, not a weight that sits near zero. The bootstrap reproduces only
   part of that bias, so its intervals stay off center.
 
 The record does *not* support four things, and no reading of these markers
-should assume them. First, nothing was measured about bias in the point
-estimates. Second, the marker study fitted analytic intervals only. So the
+should assume them. First, the marker study measured nothing about bias in
+the point estimates. Second, the marker study fitted analytic intervals only. So the
 markers are not validated as predictors on the bootstrap path that this
 vignette uses by default. Third, the **boundary harmonic removed** marker
 showed no evidence of predicting mis-coverage at all. Fits carrying it
