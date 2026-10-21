@@ -1,6 +1,6 @@
 # M165: ssm_trajectory() warns on a vcov from an unbalanced fit
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -119,7 +119,7 @@ by position so it adds no second failing site.
 - [x] T4: Docs: the roxygen paragraph and `devtools::document()`; the NEWS
       bullet; the Section 7 sentence in both vignette files; run
       `tools/prose-sweep.R` on the vignette.
-- [ ] T5: `devtools::test()` and `devtools::check(args = "--no-manual")`
+- [x] T5: `devtools::test()` and `devtools::check(args = "--no-manual")`
       clean; record both results.
 
 ## Work log
@@ -152,6 +152,7 @@ by position so it adds no second failing site.
 - 2026-10-20: T3 done: the full suite under `NOT_CRAN=true` passed with no failure; its 11 warnings are older CPM, pole-value and lavaan ones, none the new warning. The help-page example's diagonal `vcov` gives three equal times (0), and no vignette other than the growth vignette calls `ssm_trajectory()`, so no test, example or vignette changed.
 - 2026-10-20: T4 done: roxygen paragraph and `man/ssm_trajectory.Rd` regenerated (the `Config/roxygen2/version` bump reverted, M85 lesson); one NEWS bullet after the `ssm_trajectory()` feature bullet; one sentence in Section 7 of both growth vignette files; `tools/prose-sweep.R` reports 5 lines on the `.Rmd.orig` before and after the edit, none on the added sentence.
 - 2026-10-20: claim audit: 34 claims read, 5 corrected — R/ssm_trajectory_helper.R (roxygen, comment, warning text), man/ssm_trajectory.Rd, NEWS.md, vignettes/growth-ssm-analysis.Rmd(.orig), tests/testthat/test-ssm_trajectory_helper.R. The cause list was not complete (a residual variance varying by dv and wave also warns), so it became "causes that can make them differ include"; NEWS gained the model qualifier; "give" became "can give"; the equal-values cases were narrowed to the stated model; and the vignette now says that unequal counts "usually" cause the warning. On the re-read, finding 4 needed "For that model" added. Three new lines were rewrapped to 80 characters.
+- 2026-10-20: T5 done at 94e91ef4: `devtools::test()` exit 0 with 0 failures; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 
 ## Decisions
 
