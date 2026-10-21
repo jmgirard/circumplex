@@ -1,0 +1,132 @@
+# M165: ssm_trajectory() warns on a vcov from an unbalanced fit
+
+- **Status:** planned
+- **Priority:** normal
+- **Depends on:** —
+- **Driving RR:** —
+- **Principles touched:** GP2, GP4
+- **Resolves:** —
+- **Surface tier:** user-facing — a new warning from an exported function, with help-page, NEWS and vignette text
+- **Branch/PR:** —
+
+## Goal
+
+`ssm_trajectory()` warns when the `coef` and `vcov` it is given show that the
+joint growth model was not fit to complete balanced data, the design that its
+help page's small-sample coverage figures come from.
+
+## Scope
+
+**In:** For the `ssm_growth_formula()` model fit to complete balanced data,
+the fixed-effect covariance has, for each coordinate `k` in `e`, `x`, `y`,
+`-vcov["dvk", "dvk:<time>"] / vcov["dvk:<time>", "dvk:<time>"]` equal to the
+mean design time, whatever the variance components are (RR25 "Beyond the
+brief"; derivation and fixture check in the work log). With missing waves
+the three values differ in general. The milestone adds that check to the
+`coef` and `vcov` shape with the default contrast, with tests, help-page
+text, a NEWS bullet, and one sentence in Section 7 of the growth vignette.
+
+**Out:** A check for the `draws` shape, because the covariance of sampled
+draws carries Monte Carlo error and cannot show exact agreement; no row is
+owed. A check under a `contrast` function, which has no intercept and slope
+pair to read; no row is owed. A small-sample correction for unbalanced fits,
+which stays with the parked row "Small-sample correction for trajectory
+draws". A print-time caution in place of the warning (rejected at the plan
+gate; work log).
+
+## Acceptance criteria
+
+- [ ] AC1: Called with `coef` and `vcov` and the default contrast,
+      `ssm_trajectory()` computes `t_k = -vcov["dvk", "dvk:<time>"] /
+      vcov["dvk:<time>", "dvk:<time>"]` for `k` in `e`, `x`, `y` and raises
+      one warning when `max(t_k) - min(t_k) > sqrt(.Machine$double.eps) *
+      max(1, max(abs(t_k)))`. The warning text names the three `t_k`, says
+      that a fit of the `ssm_growth_formula()` model to complete balanced
+      data gives three equal values, names missing waves and a different
+      random-effects structure as causes, and says that the help page's
+      small-sample coverage figures come from complete balanced data. A test
+      fires it on a `vcov` built in closed form (the model's GLS covariance,
+      summed over persons) for a design with missing waves and unequal
+      variance ratios across the coordinates, and asserts that the message
+      names the three values.
+- [ ] AC2: Tests assert no warning from `ssm_trajectory()` on each of these
+      inputs: the closed-form `vcov` of the model on complete balanced data
+      at waves 0 to 4 and at the unequally spaced times 2000, 2001, 2003,
+      2006; the closed-form `vcov` for the AC1 design with missing waves when
+      the three coordinates have equal variance components; the two glmmTMB
+      fits in `tests/testthat/fixtures/growth-fixef.rds`; the `draws` shape;
+      a `contrast` function; and an all-zero `vcov`. The check is skipped
+      when any of the three slope variances is not positive.
+- [ ] AC3: A live nlme fit of the `ssm_growth_formula("nlme")` model by REML
+      to `simulated_growth` raises no warning, and the same fit after a
+      seeded removal of 10% of person-waves raises the AC1 warning. The test
+      skips when nlme is not installed.
+- [ ] AC4: The check consumes no random numbers: with the same seed, the
+      table returned under the AC1 warning is identical to the table
+      returned for the same `coef` and `vcov` with the check's warning
+      muffled by `suppressWarnings()`, and `.Random.seed` after a warned call
+      equals `.Random.seed` after a call with a balanced `vcov` of the same
+      size and `n_draws`.
+- [ ] AC5: The `ssm_trajectory()` help page states the AC1 condition in
+      words, its two causes, that equal values do not show balance (the AC2
+      equal-components case), and that the `draws` shape and a `contrast`
+      function are not checked. NEWS.md's development section has one bullet
+      for the warning. Section 7 of the growth vignette, in
+      `vignettes/growth-ssm-analysis.Rmd.orig` and the shipped `.Rmd`, says
+      in one sentence that the helper warns on such a fit, and
+      `tools/prose-sweep.R` reports no finding on the added sentence.
+- [ ] AC6: `devtools::test()` and `devtools::check(args = "--no-manual")`
+      report 0 errors, 0 warnings, 0 notes.
+
+## Coverage
+
+- AC1 → T1, T2
+- AC2 → T1, T2
+- AC3 → T1, T2
+- AC4 → T1, T2
+- AC5 → T4
+- AC6 → T3, T5
+
+## Tasks
+
+- [ ] T1: Tests first in `tests/testthat/test-ssm_trajectory_helper.R`: a
+      test helper that builds the model's GLS `vcov` in closed form from a
+      list of per-person wave vectors, a 3 by 3 intercept covariance and
+      three residual variances (sum of `X_i' V_i^-1 X_i`, inverted, with the
+      arithmetic in comments); the AC1 to AC4 tests. Run them and record
+      which fail before the code exists (the warning tests must).
+- [ ] T2: Add the check to `R/ssm_trajectory_helper.R` after the joint-fit
+      refusal (near line 251) and before the per-time draws loop, reading
+      `vcov` only. Record in the work log the spread `max(t_k) - min(t_k)`
+      measured on each balanced input and on the AC3 unbalanced fit, beside
+      the threshold.
+- [ ] T3: Run the whole suite with warnings shown and list every existing
+      test, example and vignette call that now warns. Change a hand-built
+      test `vcov` only where its test does not depend on its intercept and
+      slope covariances; otherwise assert the warning. Re-render nothing
+      unless a vignette chunk warns.
+- [ ] T4: Docs: the roxygen paragraph and `devtools::document()`; the NEWS
+      bullet; the Section 7 sentence in both vignette files; run
+      `tools/prose-sweep.R` on the vignette.
+- [ ] T5: `devtools::test()` and `devtools::check(args = "--no-manual")`
+      clean; record both results.
+
+## Work log
+
+- 2026-10-20: created by /milestone-plan.
+- 2026-10-20: tier check: not run — work named at the question set.
+- 2026-10-20: question set: which work to plan — the unbalanced-fit warning in `ssm_trajectory()` (the prose-scope question was moot).
+- 2026-10-20: collision check: absorbs the candidate row "Unbalanced-fit check in ssm_trajectory()"; the parked row "Small-sample correction for trajectory draws" and D-066 stay as they are (no rule ships, and this check changes no interval); D-060 and D-064 hold, since the check reads `vcov` and fits nothing.
+- 2026-10-20: inbox sweep: 0 open issues, 0 open PRs on jmgirard/circumplex.
+- 2026-10-20: derivation: under balance, for person design `X_i = I_3 ⊗ [1, t]` and `V_i = G ⊗ 11' + diag(s2) ⊗ I`, `V_i X_i = X_i Q`, so `vcov = (G ⊗ e1 e1' + diag(s2) ⊗ (W'W)^-1) / N` and `-v01 / v11 = mean(t)` per coordinate for any G and s2.
+- 2026-10-20: measured: the fixture's two glmmTMB fits give `t_k` within 3e-15 of 2 (waves 0 to 4); glmmTMB fits of `simulated_growth` with 10% and 30% of person-waves removed (seed 1) give spreads of 3.7e-4 and 1.2e-2.
+- 2026-10-20: oracle types: closed-form (the GLS `vcov` built by explicit code), frozen (the glmmTMB fixture with its generator), live (nlme REML fits).
+- 2026-10-20: plan gate chose a call-time `warning()` over a print-time caution stored as an attribute because the caution would thread a new attribute through `print()`, subsetting and `rbind()`, and the question-set option named a warning; falsified by users reporting the warning as noise on routine fits with missing waves.
+- 2026-10-20: plan gate chose the relative threshold `sqrt(.Machine$double.eps) * max(1, max(abs(t_k)))` over an absolute threshold in time units because the time scale is the user's (waves, years, days); falsified by a balanced fit from glmmTMB or nlme whose spread exceeds it.
+- 2026-10-20: plan gate scoped the check to the default contrast and the `coef` and `vcov` shape (Out items); falsified by a user model with other terms whose balanced fits have a readable centring time.
+- 2026-10-20: lessons harvested: M56 family (sweep every surface; T3, AC5), M90 (name the path a figure measured; the work-log figures name glmmTMB and the seed), M7 family (`knitr` error default if a vignette re-renders).
+- 2026-10-20: checkpoint: plan committed before the criteria audit returned; the audit's dispositions follow in a second plan commit.
+
+## Decisions
+
+## Review
