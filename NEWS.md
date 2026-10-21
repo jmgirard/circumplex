@@ -92,8 +92,10 @@
   coverage figures on its help page come from that design. For each of
   `e`, `x` and `y`, the function reads the time at which the fitted value
   has its smallest variance. For the `ssm_growth_formula()` model fit to
-  complete balanced data, the three times are equal, and the function warns
-  when they differ. Causes that can make them differ include persons with
+  complete balanced data, the three times are equal. The function warns
+  when they differ by more than a small tolerance. The tolerance grows with
+  the random-intercept variance relative to the residual variance, so an
+  unbalanced fit can pass without a warning. Causes that can make them differ include persons with
   different numbers of observations, fixed effects beyond that model's six,
   and a random-effects structure or residual-variance structure other than
   that model's.

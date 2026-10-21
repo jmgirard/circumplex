@@ -64,9 +64,9 @@
 #' they also stay equal when the three coordinates have equal
 #' random-intercept variances, equal intercept covariances and equal residual
 #' variances. The function skips this balance check when a slope variance or
-#' an intercept variance is not positive, or when a slope variance is so
-#' small that the three values or the scale overflow. The `draws` shape and
-#' a `contrast` function are not checked for balance.
+#' an intercept variance is not positive, or when extreme variances make the
+#' three values or the scale overflow, or make the scale underflow to zero.
+#' The `draws` shape and a `contrast` function are not checked for balance.
 #'
 #' The intervals from a REML fit's `coef` and `vcov` condition on its
 #' estimated variance components and are too narrow at small samples. The
@@ -300,10 +300,10 @@ ssm_trajectory <- function(coef, vcov, times, draws = NULL, time = "wave",
       t_k <- -vcov[cbind(pos[1:3], pos[4:6])] / s_k
       spread <- max(t_k) - min(t_k)
       scale <- sqrt(max(v_k / s_k))
-      # A slope variance near the smallest double can overflow t_k or the
-      # scale to Inf; the comparison then has no answer, so the check is
+      # Extreme variances can overflow t_k or the scale to Inf, or underflow
+      # the scale to 0; the comparison then has no answer, so the check is
       # skipped.
-      if (all(is.finite(t_k)) && is.finite(scale) &&
+      if (all(is.finite(t_k)) && is.finite(scale) && scale > 0 &&
           spread > sqrt(.Machine$double.eps) * scale) {
         warning(
           "The times at which the variance of the fitted e, x and y is ",

@@ -140,9 +140,9 @@ the same number of observations. With different numbers of observations,
 they also stay equal when the three coordinates have equal
 random-intercept variances, equal intercept covariances and equal residual
 variances. The function skips this balance check when a slope variance or
-an intercept variance is not positive, or when a slope variance is so
-small that the three values or the scale overflow. The \code{draws} shape and
-a \code{contrast} function are not checked for balance.
+an intercept variance is not positive, or when extreme variances make the
+three values or the scale overflow, or make the scale underflow to zero.
+The \code{draws} shape and a \code{contrast} function are not checked for balance.
 
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples. The

@@ -747,8 +747,9 @@ test_that("the trajectory object's plot renders as expected", {
 #   V_i = Z_i G Z_i' + diag(s2_k repeated n_i times).
 # The GLS covariance of the fixed effects is solve(sum_i X_i' V_i^-1 X_i).
 # Under complete balanced data, -v01 / v11 = mean(t) for every coordinate
-# and any G and s2 (M165 work log); unequal counts per person, or random
-# slopes, in general move the three values apart.
+# and any G and s2 (M165 work log); unequal counts per person, random
+# slopes, or fixed effects beyond the six (M166) in general move the three
+# values apart.
 # With `z`, one value per person, the design adds three fixed effects after
 # the six, z times time on each of e, x and y (M166).
 gls_vcov <- function(designs, G, s2, G_slope = NULL, z = NULL) {
@@ -968,15 +969,18 @@ test_that("live nlme fits warn only when counts per person differ", {
 # A vcov without dimnames (M166) ----------------------------------------------
 #
 # Under the default contrast, vcov is read through the positions of
-# names(coef). The coef here carries an extra first coefficient, so the six
-# model names are not its first six entries, and vcov is 7 by 7.
-pad_vcov <- function(V6) {
+# names(coef). The coef here carries an extra coefficient, first or between
+# the intercepts and the slopes, so the six model names are not its first
+# six entries, and vcov is 7 by 7.
+pad_vcov <- function(V6, at = 1) {
+  keep <- setdiff(1:7, at)
   V <- matrix(0, 7, 7)
-  V[1, 1] <- 0.01
-  V[2:7, 2:7] <- unname(V6)
+  V[at, at] <- 0.01
+  V[keep, keep] <- unname(V6)
   V
 }
 coef7 <- c(age = 0.3, fx_growth$coef)
+coef7_mid <- c(fx_growth$coef[1:3], age = 0.3, fx_growth$coef[4:6])
 
 test_that("a vcov without dimnames gives the table a named one gives", {
   V <- pad_vcov(fx_growth$vcov)
@@ -998,6 +1002,14 @@ test_that("the joint-fit refusal reads a vcov without dimnames", {
   V6[ys, xs] <- 0
   expect_error(
     ssm_trajectory(coef7, pad_vcov(V6), times = 0:4, n_draws = 50),
+    "zero covariance between x\\(t\\) and y\\(t\\) at every time.*joint fit"
+  )
+  # With the extra coefficient between the intercepts and the slopes, a read
+  # that skips the first entry takes the y intercept as x's and the y slope
+  # as y's, so it finds their nonzero covariance and does not refuse.
+  expect_error(
+    ssm_trajectory(coef7_mid, pad_vcov(V6, at = 4), times = 0:4,
+                   n_draws = 50),
     "zero covariance between x\\(t\\) and y\\(t\\) at every time.*joint fit"
   )
 })
@@ -1039,10 +1051,32 @@ test_that("the check finds unequal counts over the time and G grid", {
 })
 
 test_that("the check is skipped when its scale is undefined", {
-  # An intercept variance of -1e-12, which the eigenvalue tolerance admits.
-  V <- diag(c(-1e-12, 1, 1, 1, 1, 1))
+  # Intercept variances of -1e-12, which the eigenvalue tolerance admits:
+  # with all three negative the scale would be NaN, and with one negative
+  # the other two give a spread of 1 that the scale would flag.
+  V <- diag(c(-1e-12, -1e-12, -1e-12, 1, 1, 1))
+  V[2, 3] <- V[3, 2] <- 1e-13
+  dimnames(V) <- list(coef_names, coef_names)
+  set.seed(1)
+  expect_no_condition(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 50)
+  )
+  V <- diag(c(-1e-12, 2, 1, 1, 1, 1))
+  V[2, 5] <- V[5, 2] <- -1
   V[2, 3] <- V[3, 2] <- 0.1
   dimnames(V) <- list(coef_names, coef_names)
+  expect_identical(unname(-V[cbind(1:3, 4:6)] / V[cbind(4:6, 4:6)]),
+                   c(0, 1, 0))
+  set.seed(1)
+  expect_no_condition(
+    ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 50)
+  )
+  # Intercept variances small enough that the scale underflows to 0.
+  V <- diag(c(1e-300, 1e-300, 1e-300, 1e30, 1e30, 1e30))
+  V[1, 4] <- V[4, 1] <- -1e-136
+  V[2, 3] <- V[3, 2] <- 1e-301
+  dimnames(V) <- list(coef_names, coef_names)
+  expect_identical(sqrt(max(diag(V)[1:3] / diag(V)[4:6])), 0)
   set.seed(1)
   expect_no_condition(
     ssm_trajectory(fx_growth$coef, V, times = 0:4, n_draws = 50)
