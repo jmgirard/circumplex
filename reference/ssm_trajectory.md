@@ -148,21 +148,44 @@ The displacement interval at a time point is wrong when `x(t)` and
 `y(t)` are treated as independent, which is what fitting the coordinates
 in separate models does. So the `coef` and `vcov` shape refuses a `vcov`
 whose implied covariance between `x(t)` and `y(t)` is exactly zero at
-every time in `times`, unless `vcov` is zero everywhere. The check reads
-only the given `times`, so with a single time it sees only the
-covariance terms that time reaches. A `draws` matrix is not checked for
-a joint fit. The intervals from a REML fit's `coef` and `vcov` condition
-on its estimated variance components and are too narrow at small
-samples. The package's small-sample coverage oracle fit the
+every time in `times`, unless `vcov` is zero everywhere. This joint-fit
+check reads only the given `times`, so with a single time it sees only
+the covariance terms that time reaches. A `draws` matrix is not checked
+for a joint fit.
+
+The `coef` and `vcov` shape with the default contrast also warns when
+`vcov` does not look like a fit to complete balanced data. For each of
+`e`, `x` and `y`, the negative covariance of the intercept and slope
+divided by the slope variance is the time at which that coordinate's
+fitted value has its smallest variance. A fit of the
 [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
-model with glmmTMB. Among its converged fits (those with a
-positive-definite Hessian), the coverage averaged over waves and over
-`e`, `x`, `y` and `d` was .938 to .944 at 20 to 50 persons, against a
-nominal .95. At 10 persons, 27.4% and 17.7% of the fits under its two
-simulated truths had a non-positive-definite Hessian. The "Growth Models
-on SSM Parameters" vignette, Section 7, gives the design, the other
-figures and the records, and says that no shipped correction exists.
-Intervals from `draws` summarize those draws as given.
+model to complete balanced data gives three equal values, the mean
+design time. The function warns when the three differ by more than
+`sqrt(.Machine$double.eps)` times the largest of 1 and their absolute
+values. Causes that can make them differ include persons with different
+numbers of observations, and a random-effects structure or
+residual-variance structure other than that model's. Equal values do not
+show balance. For that model, the values stay equal when every person
+has the same number of observations. With different numbers of
+observations, they also stay equal when the three coordinates have equal
+random-intercept variances, equal intercept covariances and equal
+residual variances. The function skips this balance check when a slope
+variance is not positive. The `draws` shape and a `contrast` function
+are not checked for balance.
+
+The intervals from a REML fit's `coef` and `vcov` condition on its
+estimated variance components and are too narrow at small samples. The
+package's small-sample coverage oracle fit the
+[`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
+model with glmmTMB to complete balanced data at five waves. Among its
+converged fits (those with a positive-definite Hessian), the coverage
+averaged over waves and over `e`, `x`, `y` and `d` was .938 to .944 at
+20 to 50 persons, against a nominal .95. At 10 persons, 27.4% and 17.7%
+of the fits under its two simulated truths had a non-positive-definite
+Hessian. The "Growth Models on SSM Parameters" vignette, Section 7,
+gives the design, the other figures and the records, and says that no
+shipped correction exists. Intervals from `draws` summarize those draws
+as given.
 
 ## See also
 

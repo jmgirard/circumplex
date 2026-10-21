@@ -417,10 +417,11 @@ at each time in <code>times</code>. A joint fit estimates that
 covariance, and it is almost never exactly zero. Separate fits produce
 one covariance matrix per coordinate, and a full matrix assembled from
 them block by block implies exactly zero at every time.
-<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> refuses such a matrix with an error. The
-check is structural, not a test of size: a covariance that is nonzero,
-however small, passes. A nonzero covariance does not show that the model
-is right, because a misspecified joint model passes the check too.</p>
+<code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> refuses such a matrix with an error. This
+joint-fit check is structural, not a test of size: a covariance that is
+nonzero, however small, passes. A nonzero covariance does not show that
+the model is right, because a misspecified joint model passes the check
+too.</p>
 <p>The displacement estimates hug the 0°/360° boundary by design. The
 estimate is near 350° at wave 0, crosses 0° between waves 1 and 2, and
 reaches about 14° at wave 4. The intervals wrap correctly rather than
@@ -578,8 +579,11 @@ the Section 5 table states this for the <code>coef</code> and
 <p>The package’s coverage oracles fit this model, the one
 <code><a href="../reference/ssm_growth_formula.html">ssm_growth_formula()</a></code> writes, with glmmTMB and REML to
 simulated data. The figures below come from samples with five balanced
-waves and no missing values. The first oracle used 200 persons and 500
-simulated samples in each coverage cell. The
+waves and no missing values. <code><a href="../reference/ssm_trajectory.html">ssm_trajectory()</a></code> warns when
+its <code>vcov</code> does not look like a fit to such data, as can
+happen when persons have different numbers of observations. The first
+oracle used 200 persons and 500 simulated samples in each coverage cell.
+The
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d(t)</annotation></semantics></math>
 intervals held coverage between .93 and .97 at every certified wave. At
 the uncertified low-amplitude wave the coverage was .854, which is the

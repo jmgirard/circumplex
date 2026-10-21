@@ -242,20 +242,39 @@ value, the 3 by <code>p</code> matrix that maps the <code>p</code> coefficients 
 are treated as independent, which is what fitting the coordinates in
 separate models does. So the <code>coef</code> and <code>vcov</code> shape refuses a <code>vcov</code>
 whose implied covariance between <code>x(t)</code> and <code>y(t)</code> is exactly zero at
-every time in <code>times</code>, unless <code>vcov</code> is zero everywhere. The check reads
-only the given <code>times</code>, so with a single time it sees only the covariance
-terms that time reaches. A <code>draws</code> matrix is not checked for a joint fit.
-The intervals from a REML fit's <code>coef</code> and <code>vcov</code> condition on its
+every time in <code>times</code>, unless <code>vcov</code> is zero everywhere. This joint-fit
+check reads only the given <code>times</code>, so with a single time it sees only the
+covariance terms that time reaches. A <code>draws</code> matrix is not checked for a
+joint fit.</p>
+<p>The <code>coef</code> and <code>vcov</code> shape with the default contrast also warns when
+<code>vcov</code> does not look like a fit to complete balanced data. For each of
+<code>e</code>, <code>x</code> and <code>y</code>, the negative covariance of the intercept and slope
+divided by the slope variance is the time at which that coordinate's
+fitted value has its smallest variance. A fit of the
+<code><a href="ssm_growth_formula.html">ssm_growth_formula()</a></code> model to complete balanced data gives three equal
+values, the mean design time. The function warns when the three differ by
+more than <code>sqrt(.Machine$double.eps)</code> times the largest of 1 and their
+absolute values. Causes that can make them differ include persons with
+different numbers of observations, and a random-effects structure or
+residual-variance structure other than that model's. Equal values do not
+show balance. For that model, the values stay equal when every person has
+the same number of observations. With different numbers of observations,
+they also stay equal when the three coordinates have equal
+random-intercept variances, equal intercept covariances and equal residual
+variances. The function skips this balance check when a slope variance is
+not positive. The <code>draws</code> shape and a <code>contrast</code> function are not checked
+for balance.</p>
+<p>The intervals from a REML fit's <code>coef</code> and <code>vcov</code> condition on its
 estimated variance components and are too narrow at small samples. The
 package's small-sample coverage oracle fit the <code><a href="ssm_growth_formula.html">ssm_growth_formula()</a></code> model
-with glmmTMB. Among its converged fits (those with a positive-definite
-Hessian), the coverage averaged over waves and over <code>e</code>, <code>x</code>, <code>y</code> and <code>d</code>
-was .938 to .944 at 20 to 50 persons, against a nominal .95. At 10 persons,
-27.4% and 17.7% of the fits under its two simulated truths had a
-non-positive-definite Hessian. The "Growth Models on SSM Parameters"
-vignette, Section 7, gives the design, the other figures and the records,
-and says that no shipped correction exists. Intervals from <code>draws</code>
-summarize those draws as given.</p>
+with glmmTMB to complete balanced data at five waves. Among its converged
+fits (those with a positive-definite Hessian), the coverage averaged over
+waves and over <code>e</code>, <code>x</code>, <code>y</code> and <code>d</code> was .938 to .944 at 20 to 50 persons,
+against a nominal .95. At 10 persons, 27.4% and 17.7% of the fits under
+its two simulated truths had a non-positive-definite Hessian. The "Growth
+Models on SSM Parameters" vignette, Section 7, gives the design, the other
+figures and the records, and says that no shipped correction exists.
+Intervals from <code>draws</code> summarize those draws as given.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
