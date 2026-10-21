@@ -1,6 +1,6 @@
 # M166: ssm_trajectory() reads vcov by position and scales its balance check
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
