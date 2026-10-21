@@ -157,6 +157,8 @@ by position so it adds no second failing site.
 
 ## Decisions
 
+- 2026-10-20 (review): GP4 does not bind this change. GP4's commitments are exported signatures, return structures and printed output. The new warning changes none of them, since the returned table and its print are the same with or without it. It is a condition raised at call time under GP2's "caution loudly". No deprecation cycle is owed and no D-entry is needed, unlike D-065, which read GP4 for refusals that changed results.
+
 ## Review
 
 Evidence gathered 2026-10-20 at 8db63224 (branch synced, master had not moved).
@@ -166,3 +168,26 @@ Evidence gathered 2026-10-20 at 8db63224 (branch synced, master had not moved).
 - AC3: test "live nlme fits warn only when counts per person differ" (4 expectations: no warning for REML, ML and REML with `wave + 2000`; the AC1 warning after the seeded 10% removal) passes; nlme installed, not skipped; `skip_if_not_installed("nlme")` heads the test.
 - AC4: test "the check consumes no random numbers" (3 expectations) passes: the warned call and the balanced call from seed 7 with `n_draws = 100` leave identical `.Random.seed`.
 - AC5: `man/ssm_trajectory.Rd:119-135` states the condition in words, the threshold, the causes ("persons with different numbers of observations, and a random-effects structure or residual-variance structure other than that model's"), that equal values do not show balance with both named cases, the skip on a non-positive slope variance, and that `draws` and `contrast` are not checked. `NEWS.md:90` is one bullet in the development section. Section 7 of `vignettes/growth-ssm-analysis.Rmd.orig:364-366` and `.Rmd:431-433` carries the same added text; its sentence "`ssm_trajectory()` warns when its `vcov` does not look like a fit to such data." says the helper warns, and a second sentence names the usual cause. `tools/prose-sweep.R` on both files reports no finding at those lines.
+- spawned: diff-bug, blame-history, prior-review, ripple.
+- diff-bug #1: the help page never said the coverage oracle used complete balanced data, though the warning sends users there for that fact — fix now (the oracle sentence now says "to complete balanced data at five waves", matching vignette Section 7).
+- diff-bug #2: no blank roxygen line after the new paragraph, so the coverage text ran on inside it — fix now.
+- diff-bug #3: the vignette's "usually cause that warning" is an unmeasured frequency claim — fix now (one sentence: "as can happen when persons have different numbers of observations").
+- diff-bug #4: the `max(1, ...)` floor makes the threshold absolute (1.5e-8) when every time is below 1 in size, so on a very small time scale a real spread can fall under it; no false positive found — follow-up, candidate row "Scale the balance check to small times".
+- diff-bug #5: the cause lists do not name other fixed-effect terms, which can also move the values; the lists are hedged ("include", "can give"), so nothing stated is false — follow-up, folded into the same candidate row.
+- diff-bug #6: slope variances near the smallest double, which the eigenvalue tolerance admits, overflow `t_k` to Inf and the `if` failed with "missing value where TRUE/FALSE needed" (reproduced) — fix now (skip when any `t_k` is not finite; regression test added to "the check is skipped where it has nothing exact to read").
+- diff-bug #7: `message_numbers()` missed positive exponents and integers — fix now (reads after the colon, wider pattern).
+- diff-bug #8: `data("simulated_growth")` writes to the global environment — reject, style: it matches `test-ssm_growth_data.R` and `test-ssm_growth_parity.R`.
+- blame-history #1: "usually" has no record behind it, and the addition was two sentences against AC5's one — fix now (same edit as diff-bug #3).
+- blame-history #2: GP4 is listed under Principles touched with no decision recorded — fix now (milestone-local Decisions entry below).
+- blame-history #3: an unbalanced fit still prints certified rows with no balance note — reject, planned change: the plan gate chose a call-time warning over a print-time caution (work log).
+- blame-history #4: equal-but-unbalanced fits pass silently, read against GP2's fail-closed clause — reject, planned change: the warning is a caution, not a certification, and the plan scoped its promise to one direction; the help page states the limit.
+- blame-history #5: the new sentence sits between the design sentence and "The first oracle" — reject, style: "The first oracle" still follows "The package's coverage oracles" in the same paragraph.
+- prior-review #1: "usually" overclaims frequency (M153 review O4's class) — fix now (same edit as diff-bug #3).
+- prior-review #2: "equal residual variances" read as a requirement for balanced fits — fix now ("With different numbers of observations, they also stay equal when ...").
+- ripple #1: vignette Section 4's "The check is structural" became ambiguous with a second check — fix now ("This joint-fit check is structural", both vignette files).
+- ripple #2: the help page's "The check reads only the given `times`" and the new "The check is skipped" named two checks alike — fix now ("This joint-fit check" and "this balance check").
+- ripple #3: Section 7 does not say whether the warning fires on the 10-person oracle fits — reject, false: those fits are complete balanced data, where the values are equal for any variance components (work-log derivation), so no stated fact went stale.
+- ripple #4: the candidate row "Unbalanced-fit check in ssm_trajectory()" reads as future work — reject, planned change: post-merge hygiene graduates it.
+- ripple #5: the row "Accept a vcov without dimnames" proposes reading by position, applied only in the new check — reject, false: the row's fact and fix still hold, since the joint-fit refusal at `vcov[needed, needed]` fails first.
+- ripple #6: the older NEWS bullet on Section 7 does not list the new sentence — reject, planned change: the plan gave the warning its own bullet.
+- ripple side note (inside the added lines): the paragraph break — same as diff-bug #2, fixed.

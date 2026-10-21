@@ -778,9 +778,10 @@ centre_times <- function(V) {
     V[cbind(c("dve:wave", "dvx:wave", "dvy:wave"),
             c("dve:wave", "dvx:wave", "dvy:wave"))]
 }
-# The first three numbers in a warning message.
+# The first three numbers after the colon in a warning message.
 message_numbers <- function(msg) {
-  as.numeric(regmatches(msg, gregexpr("-?[0-9]+\\.[0-9]+(e-?[0-9]+)?",
+  msg <- sub("^[^:]*:", "", msg)
+  as.numeric(regmatches(msg, gregexpr("-?[0-9]+(\\.[0-9]+)?(e[-+]?[0-9]+)?",
                                       msg))[[1]][1:3])
 }
 G_unequal <- matrix(c(1.0, 0.4, 0.2,
@@ -882,6 +883,19 @@ test_that("the check is skipped where it has nothing exact to read", {
   expect_gt(max(abs(V1)), 0)
   expect_no_warning(
     ssm_trajectory(fx_growth$coef, V1, times = 0:4, n_draws = 100)
+  )
+  # Slope variances near the smallest double, which the eigenvalue tolerance
+  # admits: each time overflows to -Inf, and the check is skipped rather
+  # than failing on an undefined comparison.
+  V2 <- matrix(0, 6, 6, dimnames = list(coef_names, coef_names))
+  V2[1:3, 1:3] <- G_unequal
+  for (k in 1:3) {
+    V2[3 + k, 3 + k] <- 1e-320
+    V2[k, 3 + k] <- V2[3 + k, k] <- 1e-10
+  }
+  expect_true(all(is.infinite(-V2[cbind(1:3, 4:6)] / V2[cbind(4:6, 4:6)])))
+  expect_no_condition(
+    ssm_trajectory(fx_growth$coef, V2, times = 0:4, n_draws = 100)
   )
 })
 
