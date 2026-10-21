@@ -111,12 +111,12 @@ by position so it adds no second failing site.
       `vcov` only and locating entries by position through `names(coef)`.
       Record in the work log the spread `max(t_k) - min(t_k)` measured on
       each AC2 and AC3 input, beside the threshold.
-- [ ] T3: Run the whole suite with warnings shown and list every existing
+- [x] T3: Run the whole suite with warnings shown and list every existing
       test, example and vignette call that now warns. Change a hand-built
       test `vcov` only where its test does not depend on its intercept and
       slope covariances; otherwise assert the warning. Re-render nothing
       unless a vignette chunk warns.
-- [ ] T4: Docs: the roxygen paragraph and `devtools::document()`; the NEWS
+- [x] T4: Docs: the roxygen paragraph and `devtools::document()`; the NEWS
       bullet; the Section 7 sentence in both vignette files; run
       `tools/prose-sweep.R` on the vignette.
 - [ ] T5: `devtools::test()` and `devtools::check(args = "--no-manual")`
@@ -149,6 +149,8 @@ by position so it adds no second failing site.
 - 2026-10-20: T1 done: the M165 tests are in `tests/testthat/test-ssm_trajectory_helper.R` with the closed-form `gls_vcov()` helper; before the code, the AC1 warning tests (unequal counts, random slopes), the AC4 seed test and the nlme 10%-removal test fail on the missing warning, and every no-warning case passes, nlme REML, ML and `wave + 2000` included.
 - 2026-10-20: T2 done: the check sits after the joint-fit refusal in `R/ssm_trajectory_helper.R`, reads `vcov` by position through `names(coef)`, and the helper tests pass. Spreads measured against the threshold (scratch script, nlme 3.1 REML/ML, glmmTMB fixture): balanced closed form 8.9e-16 (waves 0-4) and 6.8e-13 (years, threshold 3.0e-5); exchangeable 1.8e-15; one missing wave per person 1.3e-15; fixture fits 2.7e-15 each; nlme REML 1.2e-14, ML 3.9e-14, `wave + 2000` 1.5e-10 (threshold 3.0e-5); unequal-count closed form 6.6e-4 and nlme with 10% of person-waves removed 1.7e-3 (thresholds near 3e-8).
 - 2026-10-20: implement choice: the message gives the three times at 10 significant digits and the spread at 3, so values just over the threshold still print as different (M159 lesson on rounded values in messages).
+- 2026-10-20: T3 done: the full suite under `NOT_CRAN=true` passed with no failure; its 11 warnings are older CPM, pole-value and lavaan ones, none the new warning. The help-page example's diagonal `vcov` gives three equal times (0), and no vignette other than the growth vignette calls `ssm_trajectory()`, so no test, example or vignette changed.
+- 2026-10-20: T4 done: roxygen paragraph and `man/ssm_trajectory.Rd` regenerated (the `Config/roxygen2/version` bump reverted, M85 lesson); one NEWS bullet after the `ssm_trajectory()` feature bullet; one sentence in Section 7 of both growth vignette files; `tools/prose-sweep.R` reports 5 lines on the `.Rmd.orig` before and after the edit, none on the added sentence.
 
 ## Decisions
 

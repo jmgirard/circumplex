@@ -39,6 +39,22 @@
 #' every time in `times`, unless `vcov` is zero everywhere. The check reads
 #' only the given `times`, so with a single time it sees only the covariance
 #' terms that time reaches. A `draws` matrix is not checked for a joint fit.
+#'
+#' The `coef` and `vcov` shape with the default contrast also warns when
+#' `vcov` does not look like a fit to complete balanced data. For each of
+#' `e`, `x` and `y`, the negative covariance of the intercept and slope
+#' divided by the slope variance is the time at which that coordinate's
+#' fitted value has its smallest variance. A fit of the
+#' [ssm_growth_formula()] model to complete balanced data gives three equal
+#' values, the mean design time. The function warns when the three differ by
+#' more than `sqrt(.Machine$double.eps)` times the largest of 1 and their
+#' absolute values. Two causes make them differ: persons with different
+#' numbers of observations, and a random-effects structure other than that
+#' model's. Equal values do not show balance. The values stay equal when
+#' each person misses the same number of waves, and when the three
+#' coordinates have equal variances, equal covariances and equal residual
+#' variances. The check is skipped when a slope variance is not positive.
+#' The `draws` shape and a `contrast` function are not checked.
 #' The intervals from a REML fit's `coef` and `vcov` condition on its
 #' estimated variance components and are too narrow at small samples. The
 #' package's small-sample coverage oracle fit the `ssm_growth_formula()` model

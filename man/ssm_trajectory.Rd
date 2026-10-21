@@ -115,6 +115,22 @@ whose implied covariance between \code{x(t)} and \code{y(t)} is exactly zero at
 every time in \code{times}, unless \code{vcov} is zero everywhere. The check reads
 only the given \code{times}, so with a single time it sees only the covariance
 terms that time reaches. A \code{draws} matrix is not checked for a joint fit.
+
+The \code{coef} and \code{vcov} shape with the default contrast also warns when
+\code{vcov} does not look like a fit to complete balanced data. For each of
+\code{e}, \code{x} and \code{y}, the negative covariance of the intercept and slope
+divided by the slope variance is the time at which that coordinate's
+fitted value has its smallest variance. A fit of the
+\code{\link[=ssm_growth_formula]{ssm_growth_formula()}} model to complete balanced data gives three equal
+values, the mean design time. The function warns when the three differ by
+more than \code{sqrt(.Machine$double.eps)} times the largest of 1 and their
+absolute values. Two causes make them differ: persons with different
+numbers of observations, and a random-effects structure other than that
+model's. Equal values do not show balance. The values stay equal when
+each person misses the same number of waves, and when the three
+coordinates have equal variances, equal covariances and equal residual
+variances. The check is skipped when a slope variance is not positive.
+The \code{draws} shape and a \code{contrast} function are not checked.
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples. The
 package's small-sample coverage oracle fit the \code{ssm_growth_formula()} model
