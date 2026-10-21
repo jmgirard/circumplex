@@ -35,6 +35,10 @@ devel/m19-free-coverage-smoke.rds
 devel/m4-coverage-oracle-smoke.rds
 devel/m4-coverage-oracle-smoke-ana.rds
 devel/m4-coverage-oracle-partial.rds
+# M167 interval oracle: the results and control files are committed; smoke and
+# partial runs are regenerable and never the record
+devel/m167-interval-smoke.rds
+devel/m167-interval-partial.rds
 
 # cairn tracking
 cairn/references/sources/
