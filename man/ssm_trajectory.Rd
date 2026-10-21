@@ -112,20 +112,41 @@ The displacement interval at a time point is wrong when \code{x(t)} and \code{y(
 are treated as independent, which is what fitting the coordinates in
 separate models does. So the \code{coef} and \code{vcov} shape refuses a \code{vcov}
 whose implied covariance between \code{x(t)} and \code{y(t)} is exactly zero at
-every time in \code{times}, unless \code{vcov} is zero everywhere. The check reads
-only the given \code{times}, so with a single time it sees only the covariance
-terms that time reaches. A \code{draws} matrix is not checked for a joint fit.
+every time in \code{times}, unless \code{vcov} is zero everywhere. This joint-fit
+check reads only the given \code{times}, so with a single time it sees only the
+covariance terms that time reaches. A \code{draws} matrix is not checked for a
+joint fit.
+
+The \code{coef} and \code{vcov} shape with the default contrast also warns when
+\code{vcov} does not look like a fit to complete balanced data. For each of
+\code{e}, \code{x} and \code{y}, the negative covariance of the intercept and slope
+divided by the slope variance is the time at which that coordinate's
+fitted value has its smallest variance. A fit of the
+\code{\link[=ssm_growth_formula]{ssm_growth_formula()}} model to complete balanced data gives three equal
+values, the mean design time. The function warns when the three differ by
+more than \code{sqrt(.Machine$double.eps)} times the largest of 1 and their
+absolute values. Causes that can make them differ include persons with
+different numbers of observations, and a random-effects structure or
+residual-variance structure other than that model's. Equal values do not
+show balance. For that model, the values stay equal when every person has
+the same number of observations. With different numbers of observations,
+they also stay equal when the three coordinates have equal
+random-intercept variances, equal intercept covariances and equal residual
+variances. The function skips this balance check when a slope variance is
+not positive. The \code{draws} shape and a \code{contrast} function are not checked
+for balance.
+
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples. The
 package's small-sample coverage oracle fit the \code{ssm_growth_formula()} model
-with glmmTMB. Among its converged fits (those with a positive-definite
-Hessian), the coverage averaged over waves and over \code{e}, \code{x}, \code{y} and \code{d}
-was .938 to .944 at 20 to 50 persons, against a nominal .95. At 10 persons,
-27.4\% and 17.7\% of the fits under its two simulated truths had a
-non-positive-definite Hessian. The "Growth Models on SSM Parameters"
-vignette, Section 7, gives the design, the other figures and the records,
-and says that no shipped correction exists. Intervals from \code{draws}
-summarize those draws as given.
+with glmmTMB to complete balanced data at five waves. Among its converged
+fits (those with a positive-definite Hessian), the coverage averaged over
+waves and over \code{e}, \code{x}, \code{y} and \code{d} was .938 to .944 at 20 to 50 persons,
+against a nominal .95. At 10 persons, 27.4\% and 17.7\% of the fits under
+its two simulated truths had a non-positive-definite Hessian. The "Growth
+Models on SSM Parameters" vignette, Section 7, gives the design, the other
+figures and the records, and says that no shipped correction exists.
+Intervals from \code{draws} summarize those draws as given.
 }
 \examples{
 # Fixed effects and covariance in the shape a joint fit returns

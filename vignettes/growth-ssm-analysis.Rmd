@@ -263,9 +263,10 @@ $\hat{y}(t)$ at each time in `times`. A joint fit estimates that covariance,
 and it is almost never exactly zero. Separate fits produce one covariance matrix per
 coordinate, and a full matrix assembled from them block by block implies
 exactly zero at every time. `ssm_trajectory()` refuses such a matrix with an
-error. The check is structural, not a test of size: a covariance that is
-nonzero, however small, passes. A nonzero covariance does not show that the
-model is right, because a misspecified joint model passes the check too.
+error. This joint-fit check is structural, not a test of size: a covariance
+that is nonzero, however small, passes. A nonzero covariance does not show
+that the model is right, because a misspecified joint model passes the check
+too.
 
 The displacement estimates hug the 0°/360° boundary by design. The estimate
 is near 350° at wave 0, crosses 0° between waves 1 and 2, and reaches about
@@ -428,7 +429,9 @@ states this for the `coef` and `vcov` shape.
 The package's coverage oracles fit this model, the one
 `ssm_growth_formula()` writes, with glmmTMB and REML to simulated data.
 The figures below come from samples with five balanced waves and no
-missing values. The first oracle used 200 persons and 500 simulated
+missing values. `ssm_trajectory()` warns when its `vcov` does not look like
+a fit to such data, as can happen when persons have different numbers of
+observations. The first oracle used 200 persons and 500 simulated
 samples in each coverage cell. The $d(t)$ intervals held coverage between
 .93 and .97 at every certified wave. At the uncertified low-amplitude wave the coverage was .854, which
 is the case the certification of Section 6 flags. Its record is
