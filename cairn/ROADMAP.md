@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-19 (M164 done and archived: the width guard reads every vignette code box; its candidate row graduated; M161 row pruned for retention; M7-family lesson extended; validate green.)_
+_Last hygiene check: 2026-10-20 (M165 done and archived: ssm_trajectory() warns on an unbalanced vcov; its candidate row graduated; two rows filed; M162 row pruned for retention; no lesson; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | review | — | normal | milestones/M165-trajectory-unbalanced-warning.md |
+| M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | done | — | normal | milestones/archive/M165-trajectory-unbalanced-warning.md |
 | M164 | Vignette width guard gaps | done | — | normal | milestones/archive/M164-vignette-width-guard-gaps.md |
 | M163 | Small-sample coverage in the trajectory docs | done | — | normal | milestones/archive/M163-trajectory-small-sample-docs.md |
-| M162 | Small-sample draws in ssm_trajectory() | dropped | M161 | normal | milestones/archive/M162-trajectory-small-sample-draws.md |
 
 ## Candidates
 
@@ -21,7 +20,6 @@ _Candidates carry no milestone ID — an `M<NN>` is assigned at planning time. L
 - CIRCUM free-scaling extensions: CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see its archive + D-009): bootstrap σ CIs; covariance-matrix input — shipping it re-triggers the D-011 paired T calibration at non-unit σ truths first. The point-estimate oracle already shipped in M18.
 - CPM covariate extension (SPMC-E): **Covariate extension of the CPM (Nagy, Etzel & Lüdtke 2019, SPMC-E)**, registered 2026-09-19 after a SITAR reader's question. Attach external measures to the free-angle Browne model in `cpm_fit()`: per covariate a level scaling, a content-sensitivity scaling and an angle, with the paper's three least-squares identification constraints and a confidence ellipse on the Cartesian coordinates. A lavaan 0.7.2 smoke test (2026-09-19) recovered `cpm_fit()`'s one-harmonic angles on `jz2017` within 0.4° (`pi` inlined in `:=`); covariates and higher harmonics are untested, and the native optimizer is the likelier home. The plan gate decides the engine, checks the paper's parameterization against `cpm_fit()`'s convention, and oracles the intervals against the paper's simulation and wester2026's SPMC-E tables (E5 in the prospects note). Fable tier: the identification constraints are where a plausible-but-wrong fit hides.
 - Boundary-regime interval improvement: (post-M4 lineage, 2026-08-04 design interview): interval methods with better coverage where the record fails, with β ~.77 flat in N at boundary truths (percentile bootstrap) and analytic angle CIs outside the band until N ≈ 50000. BCa is refused for circular displacement (D-002). The search space is other interval families or corrections, each needing its own coverage oracle. Until promoted, the `summary()` cautions are the mitigation.
-- Unbalanced-fit check in ssm_trajectory(): under balance `vcov` encodes the mean design time as `-v01 / v11` for each of `e`, `x`, `y`; the helper could warn when the three disagree, which marks an unbalanced fit where a small-sample df is less exact. Added 2026-10-18 — RR25 "Beyond the brief" (M161). — started M165
 - Scale the balance check to small times: the unbalanced-fit warning in `ssm_trajectory()` compares the spread of its three times with `sqrt(.Machine$double.eps) * max(1, max(abs(t_k)))`, so when every time is far below 1 in size the threshold is an absolute 1.5e-8 and a real spread can pass unseen (no false positive found). A scale from `vcov` itself, such as `sqrt(v00 / v11)`, could replace the floor. The cause lists in the warning, help page and NEWS also omit fixed-effect terms beyond the model's, which can move the values (the lists are hedged). Added 2026-10-20 (M165 review, diff-bug #4 and #5).
 - Accept a vcov without dimnames: the `ssm_trajectory()` help page says `vcov`'s dimnames must equal `names(coef)` "when present", but under the default contrast a `vcov` with none fails with R's "no 'dimnames' attribute for array" error at `vcov[needed, needed]`. Fix by reading `vcov` through the positions of `names(coef)`, or refuse with a message and correct the help page; a user-visible bug, so `/hotfix` is the door. Added 2026-10-20 (M165 plan, criteria audit F6).
 - [parked] Indented code fences in the width guard: M164's guard measures only fences that start at column 1, so a fence indented 1 to 3 spaces (a list item) or a 4-space code block is not read; no vignette had one on 2026-10-19. Promote when a vignette adds one. Added 2026-10-19 (M164 plan gate).
