@@ -76,6 +76,9 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: lessons harvested: M161 (a conditioning event scored as a miss can decide a band, so T1 fixes how each counts) and M90 (name the path an oracle figure measured, for T4's record).
 - 2026-10-21: implement started on branch m167-cpm-interval-oracle.
 - 2026-10-21: checkpoint (T1, T2 in progress): `devel/m167-interval-oracle.R` header and skeleton, `devel/m167-interval-helpers.R` and `devel/m167-interval-checks.R` written; the checks pass 8 of 8 and two planted defects fail them; the control run and the suite are running.
+- 2026-10-21: the suite at the branch point (no package code changed) reports 0 failures and 11 warnings from tests this milestone does not touch, so AC5's "0 warnings" cannot be met; AC5 goes to re-audit.
+- 2026-10-21: re-audit: AC5 (full) — "0 warnings" replaced by "no more warnings per test than commit 1a5aa9c4"; the reader asked to name the commit, key on test file and description, bound the count, and mask numbers in messages.
+- 2026-10-21: re-audit: AC5 (full) — on the wording with those fixes: "up to N = 50000" reads as inclusive while the code tests N < 50000; the thresholds live in `R/cpm_fit.R`, not `R/cpm_oop.R`; the warning comparison must name the `testthat_results` object and the number mask. This is the second re-audit of AC5, so the fixed text goes to the user.
 
 ## Decisions
 
