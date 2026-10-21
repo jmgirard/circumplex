@@ -154,6 +154,7 @@ by position so it adds no second failing site.
 - 2026-10-20: claim audit: 34 claims read, 5 corrected — R/ssm_trajectory_helper.R (roxygen, comment, warning text), man/ssm_trajectory.Rd, NEWS.md, vignettes/growth-ssm-analysis.Rmd(.orig), tests/testthat/test-ssm_trajectory_helper.R. The cause list was not complete (a residual variance varying by dv and wave also warns), so it became "causes that can make them differ include"; NEWS gained the model qualifier; "give" became "can give"; the equal-values cases were narrowed to the stated model; and the vignette now says that unequal counts "usually" cause the warning. On the re-read, finding 4 needed "For that model" added. Three new lines were rewrapped to 80 characters.
 - 2026-10-20: T5 done at 94e91ef4: `devtools::test()` exit 0 with 0 failures; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. Status set to review.
 - 2026-10-20: review checkpoint: AC1-AC5 evidence recorded and ticked; AC6's full test and check run and the four review lenses are in flight.
+- 2026-10-20: step-7 approval: m165-trajectory-unbalanced-warning approved for merge
 
 ## Decisions
 
