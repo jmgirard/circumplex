@@ -131,9 +131,9 @@ listed for its path. In the ladder form ("passes from N"):
 The raw-data path's largest cell is N = 1000, so its two ladder entries mean
 a pass at N = 1000 and say nothing about larger N there. On the
 correlation-matrix path the same P1 communality intervals fail at boundary
-N = 20000. F2bc weights pass at N = 5000 and 20000 only through the Monte
-Carlo allowance: beta_0 covers .894 and .888 there, and beta_3 .916 and
-.890.
+N = 20000. At the boundary truth, F2bc weights pass at N = 5000 and 20000
+only through the Monte Carlo allowance: beta_0 covers .894 and .888, and
+beta_3 .890 at N = 20000. At the interior truth every weight is in the band.
 
 Every other entry fails at its largest listed N, so its ladder reads "never".
 Some entries pass at cells below the top of the ladder:
@@ -160,7 +160,7 @@ The per-component tables give these reasons for the other failures:
 - At the boundary truth, F2bc is the only method whose beta_0 passes
   unconditionally at any cell, .894 at N = 5000 and .888 at N = 20000, both
   inside the allowance and below .90. B2 and F1 pass beta_0 only
-  conditionally, at N = 250 and 1000, where 60% and 16% of fits have no
+  conditionally, at N = 250 and 1000, where 60% and 15% of fits have no
   interval. P1, B2 and F1 cover beta_0 at .83 to .87 from N = 2000 to 20000.
 
 ## Confirmation

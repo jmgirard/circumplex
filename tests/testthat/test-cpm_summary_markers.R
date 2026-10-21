@@ -132,8 +132,9 @@ test_that("the analytic caution follows its two sample-size thresholds", {
   # analytic fit, the small-N note prints whenever N < 2000, and the marker
   # note prints for 2000 <= N < 50000 only when a marker fires. Each side of
   # each threshold is checked on a fit whose markers are known. It runs on
-  # CRAN: the fits are analytic on fixed correlation matrices (no RNG), seven
-  # of them in under a second, and it asserts which note prints, not digits.
+  # CRAN: the fits are analytic on fixed correlation matrices (no RNG), nine
+  # of them (seven distinct n) in under a second, and it asserts which note
+  # prints, not digits.
   notes <- function(fit) {
     out <- gsub("\\s+", " ", paste(capture.output(summary(fit)),
                                    collapse = " "))

@@ -337,7 +337,8 @@
   about analytic (Wald) intervals. The caution prints whenever N is below
   2000. From 2000 up to but not including 50000 it prints only when a
   boundary or weak-identification marker fires. The page lists the five
-  markers. Before, it named only the first condition.
+  markers. Before, it gave the second condition only as "near-boundary
+  fits", with no upper limit and no list of markers.
 
 * The "CPM Fits at a Boundary" vignette now says which correlation-function
   weights the bootstrap intervals miss, and why. The package's bootstrap
