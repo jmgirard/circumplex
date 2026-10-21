@@ -72,7 +72,9 @@ co-maintainers.
 row): boundary-regime CI coverage failure at field N (documented, cautioned,
 but users live in that regime); shipped instrument norms have never been
 re-verified against their published sources; CPM fits at field N sit in a
-59–91% Heywood regime the cautions describe but users may not absorb. (A
+59–91% Heywood regime the cautions describe but users may not absorb (a
+rate measured at the M4 octant truths with free angles; fixing the angles
+removes most of it, corrected M167). (A
 fourth — the `repel = TRUE` branch hand-computing canvas coordinates, D-019's
 flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
 corrected 2026-08-06.)
@@ -366,8 +368,11 @@ matching the A-review F1 finding. What this record decides:
     lie above it.
   - The cause is a bias of the estimator, not a weight near zero. β̂0 is
     biased by .65 to 1.05 of its SD at N ≤ 1000. The bootstrap's mean shift
-    is 20 to 67% of that bias. Refitting the same data with the angles fixed
-    at theory (variant B) removes it (M167; D-068).
+    is 19 to 67% of that bias. Refitting the same data with the angles fixed
+    at theory (variant B) removes the β0 bias in every raw-data cell; the
+    pre-registered reading, which also asks for a variant-B Heywood rate under
+    5%, confirms the angle and communality mode as the cause at the boundary
+    truth and at interior N = 1000 only (M167; D-068).
   - M167 scored transformed Wald, parametric-bootstrap, bias-corrected,
     basic and profile-likelihood intervals on the same data. Its verdict is
     D-068.
@@ -380,7 +385,7 @@ matching the A-review F1 finding. What this record decides:
   | boundary N=250 | .741 (below .26) | .928 | .785 (above .22) | .741 (above .22) |
   | boundary N=500 | .674 (below .33) | .930 | .732 (above .27) | .740 (above .26) |
   | boundary N=1000 | .656 (below .34) | .949 | .756 (above .24) | .731 (above .27) |
-  | interior N=250 | .844 (below .15) | .953 | .906 | .869 (above .13) |
+  | interior N=250 | .842 (below .15) | .953 | .906 | .869 (above .13) |
   | interior N=500 | .806 (below .19) | .949 | .884 (above .11) | .893 (above .11) |
   | interior N=1000 | .814 (below .19) | .959 | .896 (above .10) | .857 (above .14) |
 
