@@ -116,6 +116,9 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: T9 re-run: the full study (117.0 minutes, b90b6ddd) and the confirmation (53.8 minutes, base 30261022) give the same verdict as the first run: strict none; ladder B1 angles and P1 communalities at N = 1000 on raw data, F2bc weights from N = 5000; the confirmation holds at N = 1000 and fails B1 angles at N = 250. No replicate errored; the full run matches the control run exactly except B2 beta at boundary N = 250 (the [0, 0] fix). P1 communality coverage at N <= 1000 rose to .90 to .97. Record rewritten; D-068 rewritten in place before merge (results commit df9ae5b9, the corrections, the ladder's reach and the allowance-only F2bc pass); DESIGN.md updated (interior N = 250 beta_0 .842, shift 19 to 67%, the variant-B reading's limits, the Heywood-rate qualifier); the candidate row restates the β shortfall and the ladder entries.
 - 2026-10-21: claim audit: 104 claims read, 5 corrected — devel/m167-interval-oracle.md, tests/testthat/test-cpm_summary_markers.R, NEWS.md, cairn/ROADMAP.md (the boundary N = 1000 share with no interval is 15%; F2bc's beta_3 needs the allowance only at N = 20000, and the figures are boundary-truth figures; the test makes nine fits; the old help page did name the near-boundary condition, loosely; the row's angle claim holds at the boundary truth and the mechanism claim carries the reading's limits). The run times and the cause of the first run's two errors are the author's report and the review's, not stored in the .rds files.
 - 2026-10-21: T9 and T10 done. Verify: `devtools::test()` on the branch 0 failures, 11 warnings over 8 triples, none above its count at 1a5aa9c4; `devtools::check(args = "--no-manual")` on 2681b316 Status OK, 0/0/0. Status review, handed back to `/milestone-review`.
+- 2026-10-21: correction to the T10 checkpoint line: the 50000 bound was added to the `scaling` parameter text, not the `ci_method` text.
+- 2026-10-21: plan deviation recorded: T1 said fresh seeds outside the six control cells, but the correlation-cell base 20261021 sits 315 above the M4 base (the block records it; kept, see prior-review #1 of pass 3).
+- 2026-10-21: review pass 3, thrash stop: diff-bug #1 shows P1's profile still misses lower basins (two starts per evaluation), the third defect return (after the NEWS entry and P1's warm-start endpoints) and the second failure of the P1 figures by a new mechanism of the same shape; and random restarts beat the engine's own optimum in 6 of 37 boundary N = 250 fits. The disposition goes to the user.
 
 ## Decisions
 
@@ -175,3 +178,36 @@ Pass 3 (after review return 2), 2026-10-21, on 7bfbbd1c; origin/master is an anc
 - AC5 evidence: `man/cpm_fit.Rd` carries "for 2000 <= N < 50000"; `document()` 0 `resolve link` lines and no diff; `devtools::test()` 0 failures with no triple above its 1a5aa9c4 count (T9/T10 line); `devtools::check(args = "--no-manual")` on 2681b316 Status OK, 0/0/0, and only tracking files changed after it.
 - Consistency gate, pass 3: `cairn_validate` 0 FAIL; `pkgdown::check_pkgdown()` no problems; NEWS.md carries the Documentation entries; master R-CMD-check push run success at c215fe31; the audit tools were green in pass 2 and their inputs are untouched.
 - spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: P1 still returns endpoints that are too narrow: each profile evaluation starts from the estimate and one warm start only, and in Heywood-regime fits a lower basin exists (52 of 637 endpoints at boundary N = 250 and 34 of 311 at N = 1000 have a true statistic below 3.79) — floor-qualifying; with return 2 on the same P1 figures this is the third defect return, so the thrash stop goes to the user.
+- diff-bug #2: check 4d re-profiles from the estimate start only, one of P1's own starts, so it cannot see this defect — fix with whatever the user chooses for P1.
+- diff-bug #3: the engine sometimes accepts a fit that is not the global minimum (confirmed: random restarts beat the reported optimum in 6 of 37 boundary N = 250 fits, by 0.3 to 2.0 in N times F) — follow-up (new candidate row; pre-existing, outside the diff, and it bears on every method's estimate).
+- diff-bug #4: D-068 and the record state P1's figures as established — fix with the P1 choice.
+- diff-bug #5: D-068's "no candidate fixes beta_0 at N <= 1000" is broader than the data (F1 passes conditionally; P1 and F3 pass at interior N = 1000) — fix now (scoped to the boundary truth).
+- diff-bug #6: the corrections list omits the edit to the block's own commitment sentence and the lone-harmonic fix — fix now.
+- diff-bug #7: the vignette's variant-B sentence omits that the theoretical angles were the true angles in the simulation — fix now.
+- diff-bug #8: the confirmation selects every cell-level pass, wider than the header's wording — fix now (the record says so).
+- diff-bug #9: after a method error, `safe_ci` leaves a removed weight NA, not [0, 0] — fix now (never fired: no replicate errored).
+- diff-bug #10: a P1 component can come back NA when `uniroot` re-evaluates its bracket — fix with the P1 choice.
+- diff-bug #11: the `scaling` parameter text says "up to `n = 50000`", read as inclusive — fix now.
+- diff-bug #12: the test comment's "seven distinct n" miscounts — fix now.
+- diff-bug #13: the threshold test runs on CRAN, where sibling `m = 2` tests skip — reject (false as a risk: its assertions rest on which note prints, and the fits' markers do not depend on n; the cross-platform differences on record (PR #123) are third-decimal digits, not marker presence).
+- diff-bug #14: DESIGN.md says beta_2 and beta_3 misses "lie above" without "mostly" — fix now.
+- diff-bug #15: the T10 work-log line names the `ci_method` text where the edit is in the `scaling` text — fix now (correction line).
+- diff-bug #16: the recorded commit does not show uncommitted edits — fix now (the harness also saves `git status --porcelain`).
+- diff-bug #17: NEWS has a mid-sentence line break — reject (style: Markdown joins the lines).
+- blame-history #1: the vignette's n = 250 to 1000 names validation design figures, against M92's no-figures rule — fix now (the values go).
+- blame-history #2: the "keep using" step does not give the bias size — reject (false: it says the estimates were biased and to read them as estimates, not to the digit).
+- blame-history #3: the `scaling` text says the coverage regime was measured without the defined-SE condition — fix now.
+- blame-history #4: D-002 not annotated — reject (as in pass 2: append-only, and D-068's heading names its reading).
+- blame-history #5: the test comment count — fix now (same as diff-bug #12).
+- blame-history #6: the "under a second" timing is not measured under `--as-cran` — fix now (the comment names where it was measured).
+- prior-review #1: the correlation-cell seeds overlap the M4 raw-cell seeds, against T1's "fresh seeds" — reject (false as a defect of the figures: each cell is scored on its own from a different draw; the block fixed these seeds before the first run, and reseeding after seeing results would add a forking path; the T1 deviation is recorded in the work log).
+- prior-review #2: "up to n = 50000" — fix now (same as diff-bug #11).
+- prior-review #3: the vignette and NEWS state the mechanism without the study's scope, and the help page does not say correlation-matrix intervals assume normality — fix now.
+- prior-review #4: the help page implies coverage measured on all fits — fix now (same as blame-history #3).
+- prior-review #5: the record omits B1 on the fits with a defined SE — fix now.
+- prior-review #6: M167-D1's "15% at the interior truth" is RR26's pilot figure — reject (false as an error: the Decisions entry is history quoting RR26, and the record carries the full-run figure).
+- prior-review #7: conditioning events labeled rather than scored as misses — noted (RR26 rec 7's choice; every ladder pass is unconditional).
+- ripple #1: DESIGN.md "lie above" — fix now (same as diff-bug #14).
+- ripple #2: the CPM simulation paper plan's superseded claims — follow-up (already noted in that parked row).
+- ripple #3: the vignette's "printed when N falls between 2000 and 50000" can read as unconditional — fix now.
