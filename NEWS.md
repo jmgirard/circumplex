@@ -94,8 +94,9 @@
   has its smallest variance. For the `ssm_growth_formula()` model fit to
   complete balanced data, the three times are equal, and the function warns
   when they differ. Causes that can make them differ include persons with
-  different numbers of observations, and a random-effects structure or
-  residual-variance structure other than that model's.
+  different numbers of observations, fixed effects beyond that model's six,
+  and a random-effects structure or residual-variance structure other than
+  that model's.
   Equal times do not show balance. The `draws` shape and a `contrast`
   function are not checked.
 
