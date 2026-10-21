@@ -1018,7 +1018,8 @@ test_that("the unbalanced-fit warning reads a vcov without dimnames", {
 # from vcov. The old floor of 1 hid unbalanced fits whose times were all far
 # below 1 (spread 6.6e-10 at time x 1e-6, against 1.5e-8).
 
-test_that("the check finds unequal counts at every time and variance scale", {
+# The grid: time x 1e-6 to 1e3, G x 0.01 to 100 (G x 1000 is below).
+test_that("the check finds unequal counts over the time and G grid", {
   set.seed(1)
   for (g in c(0.01, 1, 100)) {
     for (f in c(1e-6, 1, 1000)) {

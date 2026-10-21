@@ -129,8 +129,8 @@ largest, over \code{e}, \code{x} and \code{y}, of the square root of the interce
 variance divided by the slope variance. A change of time units changes
 the three values and this scale by the same factor, so it does not change
 whether the function warns. The scale grows with the random-intercept
-variance. So when that variance is large relative to the residual
-variance, an unbalanced fit can give values whose spread is below the
+variance relative to the residual variance. So when that ratio is large,
+an unbalanced fit can give values whose spread is below the
 threshold, and no warning. Causes that can make the values differ include
 persons with different numbers of observations, fixed effects beyond that
 model's six, and a random-effects structure or residual-variance
@@ -140,8 +140,9 @@ the same number of observations. With different numbers of observations,
 they also stay equal when the three coordinates have equal
 random-intercept variances, equal intercept covariances and equal residual
 variances. The function skips this balance check when a slope variance or
-an intercept variance is not positive. The \code{draws} shape and a \code{contrast}
-function are not checked for balance.
+an intercept variance is not positive, or when a slope variance is so
+small that the three values or the scale overflow. The \code{draws} shape and
+a \code{contrast} function are not checked for balance.
 
 The intervals from a REML fit's \code{coef} and \code{vcov} condition on its
 estimated variance components and are too narrow at small samples. The
