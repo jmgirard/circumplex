@@ -13,6 +13,10 @@
 #   4. The bias-corrected form gives the closed-form answer on a normal
 #      sample: with replicates N(mu, s^2) and estimate mu + c s, z0 = c and
 #      the endpoints are mu + s (2 c -/+ 1.96).
+#   4b. The basic bootstrap gives its closed form on a normal sample.
+#   4c. P1 (profile likelihood) matches the Wald interval at an interior
+#      N = 20000 fit, and a gradient-free re-profile puts the statistic at
+#      3.84 at its endpoints.
 #   5. The angle side rule scores hand-built arcs correctly.
 #
 # Usage: Rscript devel/m167-interval-checks.R   (about 2 minutes)
@@ -119,6 +123,47 @@ bc0 <- m167_bc_one(reps, mu)
 pc <- stats::quantile(reps, c(.025, .975), names = FALSE)
 report("bias-corrected interval equals the percentile interval when z0 = 0",
        max(abs(bc0 - pc)) < 1e-4)
+
+# ---- 4b. basic bootstrap, closed-form normal case ------------------------------
+# with replicates N(mu, s^2) and estimate mu + c s the basic interval is
+# [2 (mu + c s) - (mu + 1.96 s), 2 (mu + c s) - (mu - 1.96 s)]
+reps_obj <- list(n_ok = 1e5, zeta = matrix(reps, ncol = 1),
+                 beta = matrix(reps, ncol = 1))
+bb <- m167_basic(reps_obj, list(zeta = mu + cc * s, beta = mu + cc * s))
+want_b <- mu + s * (2 * cc + c(-1, 1) * stats::qnorm(0.975))
+report("basic interval equals 2 est - percentile endpoints on a normal sample",
+       max(abs(bb$zeta[1, ] - want_b)) < 2e-3,
+       sprintf("got %.4f %.4f", bb$zeta[1, 1], bb$zeta[1, 2]))
+
+# ---- 4c. P1 agrees with Wald at large N ----------------------------------------
+# Profile-likelihood and Wald intervals are asymptotically equivalent, so at
+# an interior N = 20000 fit their endpoints agree closely; the Wald interval
+# here is an independent construction (Hessian SE) of the same quantity.
+N <- 20000L
+set.seed(5L)
+X <- matrix(stats::rnorm(N * 8L), N) %*% chol(P_int)
+R <- stats::cor(X)
+eng <- suppressWarnings(cpm_engine(R, angles = angles, m = 3, variant = "A"))
+se <- cpm_analytic_se(eng, R, N)
+pr <- m167_profile_ci(eng, R, N)
+wd <- m167_wald(eng, se)
+d_p1 <- max(abs(c(pr$zeta - wd$zeta, pr$beta - wd$beta)))
+report("P1 endpoints within .002 of Wald at interior N = 20000 (zeta and beta)",
+       d_p1 < 0.002, sprintf("max difference %.5f", d_p1))
+# the statistic at each P1 endpoint equals the cutoff (re-profiled directly)
+ldR <- as.numeric(determinant(R, logarithm = TRUE)$modulus)
+F_hat <- cpm_objective(eng$par, R, eng$spec, ldR = ldR)
+idx <- eng$spec$i_zeta[1]
+lr_at <- function(t) {
+  f <- stats::nlminb(eng$par[-idx], function(x) {
+    cpm_objective(append(x, stats::qlogis(t), idx - 1L), R, eng$spec, ldR)
+  }, control = list(rel.tol = 1e-12))
+  (N - 1) * (f$objective - F_hat)
+}
+lr_ends <- vapply(pr$zeta[1, ], lr_at, numeric(1))
+report("LR at P1's zeta_1 endpoints equals 3.84 within .05 (gradient-free refit)",
+       max(abs(lr_ends - stats::qchisq(.95, 1))) < 0.05,
+       sprintf("%.3f %.3f", lr_ends[1], lr_ends[2]))
 
 # ---- 5. angle side rule --------------------------------------------------------
 arcs <- rbind(c(350, 10),    # straddles 0/360, truth 0 inside

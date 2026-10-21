@@ -57,7 +57,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 
 - [x] T1: Write the header and skeleton of `devel/m167-interval-oracle.R` from the Scope above. The scoring rule covers a removed harmonic (β̂ = 0), a Heywood communality (ζ̂ = 1, where ln v is undefined), an NA standard error, an excluded fit, and the angle direction. The band is [.90, .98] per component. The Monte Carlo and multiplicity rule is fixed here, before any output. Fresh seeds are used except in the six M4 control cells. Smoke runs are never committed as results.
 - [x] T2: Prototype F1 to F3. Make sure that the ζ arm of F1 reproduces the CircE intervals that `tests/testthat/test-cpm_oracles.R:136` reconstructs. Make sure that the F2 standard errors at an interior N = 2000 cell agree with that file's parametric-bootstrap cross-check. Make sure that F3 gives the textbook bias-corrected interval on a toy sample with a known answer. Run the six control cells (AC2). The 0.03 tolerance is about 1.5 Monte Carlo standard errors of a difference between two runs at 500 replicates. Commit the header.
-- [ ] T3: Write a review brief of the fixed design through `/milestone-brief` and ingest the Fable report. Put each change it asks for into the header before any full run, with a work-log line for each.
+- [x] T3: Write a review brief of the fixed design through `/milestone-brief` and ingest the Fable report. Put each change it asks for into the header before any full run, with a work-log line for each.
 - [ ] T4: Run the full study in the background (about 15 CPU-hours). Commit the results file and the record `devel/m167-interval-oracle.md`, which states the path each figure measured.
 - [ ] T5: Write the verdict D-entry and the DESIGN.md section. Set the promotion state of the narrowed candidate row from the verdict.
 - [ ] T6: Correct the vignette item and the `cpm_fit()` roxygen in ASCII-safe text, then run `document()`, `test()` and `check()`. Apply the rules in `cairn/references/plain-vignettes.md` to the vignette edit.
@@ -88,6 +88,8 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: blocked on RB26 (design review before the full run, granted at the plan question set). The brief is committed on this branch, as RB25 was on M161's branch, because the milestone's tracking lives here until merge.
 - 2026-10-21: RR26 ingested (Fable, advisory): Decisions M167-D1 to D4; RB26 and RR26 moved to `cairn/reviews/archive/`; unblocked.
 - 2026-10-21: substantive amendment: Scope In adds the basic bootstrap, P1 and the variant-B arm from RR26; Scope Out narrows the deferred profile-likelihood item to angles and adds RR26's two descriptive cells. The deliverable the user sees is unchanged (a study verdict and corrected docs), so no stop.
+- 2026-10-21: T3 done: RR26 recs 1 to 4, 6 to 10 and 12 are in the pre-registration block of `devel/m167-interval-oracle.R`, listed under its "CHANGES AFTER THE DESIGN REVIEW" heading, and rec 11 is in the block and in M167-D4. Added `m167_basic()` and `m167_profile_ci()` (P1 follows the profile outward in growing steps, because warm starts carried from a far point gave spurious roots); per-replicate records are packed matrices saved with xz.
+- 2026-10-21: T3 checks: `devel/m167-interval-checks.R` passes 11 of 11, adding the basic closed form, P1 within .00057 of Wald at interior N = 20000, and the statistic at 3.842 at P1's endpoints by a gradient-free re-profile; a planted chi-square(2) cutoff moves P1 .0105 from Wald and fails.
 
 ## Decisions
 

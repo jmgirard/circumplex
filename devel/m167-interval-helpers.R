@@ -176,6 +176,168 @@ m167_transformed_wald <- function(engine, se, level = 0.95) {
   out
 }
 
+# Basic bootstrap interval (Davison & Hinkley 1997, eq. 5.6) for zeta and beta:
+# [2 est - q(.975), 2 est - q(.025)] of the replicates, unclamped, so it can
+# leave (0, 1) as the textbook form does. Angles get no basic form.
+m167_basic <- function(reps, engine, level = 0.95) {
+  p <- ncol(reps$zeta)
+  out <- m167_empty_ci(p, ncol(reps$beta))
+  if (reps$n_ok == 0) return(out)
+  probs <- c((1 - level) / 2, 1 - (1 - level) / 2)
+  for (i in seq_len(p)) {
+    q <- stats::quantile(reps$zeta[, i], probs = probs, names = FALSE)
+    out$zeta[i, ] <- 2 * engine$zeta[i] - rev(q)
+  }
+  for (k in seq_len(ncol(reps$beta))) {
+    q <- stats::quantile(reps$beta[, k], probs = probs, names = FALSE)
+    out$beta[k, ] <- 2 * engine$beta[k] - rev(q)
+  }
+  out
+}
+
+# ---- P1: profile-likelihood intervals for zeta and beta ------------------------
+
+# For a component c with value t, minimize F over every other free parameter
+# with c held at t, and take {t : (N - 1) (F_prof(t) - F_hat) <= qchisq(.95, 1)}
+# (RR26 Q2). Each side is root-found on the logit scale of t from the estimate
+# out to a fixed far point; when the statistic stays under the cutoff there, the
+# natural bound (0 or 1) is the endpoint. Constructions, on the engine's
+# post-polish spec (keep_k lists the kept harmonics; a removed weight gets
+# [0, 0] as in every other method):
+#   zeta_i: hold u_i = logit(t), free the rest.
+#   beta at kept position a >= 2: v_a = logit(t) + log(S), S the sum of exp(v_j)
+#     over the other kept positions (v_1 = 0), free the other v.
+#   beta at kept position 1 (k = 0): v_j = w_j + c for j >= 2 with
+#     c = log((1 - t) / t) - log(sum exp(w)), w_2 = 0, free w_3.. .
+# Gradients chain cpm_gradient() through each map. The cutoff is the nominal
+# chi-square(1) quantile; at a Heywood wall the statistic is a chi-square
+# mixture, so the cutoff is approximate there (stated, not tuned).
+m167_profile_ci <- function(engine, R, N, level = 0.95) {
+  spec <- engine$spec
+  par <- engine$par
+  p <- spec$p
+  n <- N - 1
+  crit <- stats::qchisq(level, 1)
+  ldR <- as.numeric(determinant(R, logarithm = TRUE)$modulus)
+  obj <- function(g) cpm_objective(g, R, spec, ldR = ldR)
+  grad <- function(g) cpm_gradient(g, R, spec)
+  F_hat <- obj(par)
+  out <- m167_empty_ci(p, spec$m + 1L)
+
+  # profile the scalar s through a map: full(x, s) -> gstar, dfull(x, s, gg)
+  # -> gradient in x from the full gradient gg
+  # The profile is followed outward from the estimate in growing steps
+  # (.05 * 1.5^j on the logit scale), each minimization warm-started from the
+  # previous step, until the statistic crosses the cutoff or the step passes
+  # s_far; the crossing is then root-found inside that last bracket. Each
+  # minimization starts from the solution at the nearest s already evaluated,
+  # so no evaluation is seeded from another basin far along the path.
+  side_root <- function(s_hat, s_far, full, dgrad, x0) {
+    cache_s <- s_hat
+    cache_x <- list(x0)
+    lr <- function(s) {
+      start <- cache_x[[which.min(abs(cache_s - s))]]
+      fit <- stats::nlminb(
+        start = start,
+        objective = function(x) obj(full(x, s)),
+        gradient = function(x) dgrad(x, s, grad(full(x, s))),
+        control = list(rel.tol = 1e-10, iter.max = 300L, eval.max = 600L)
+      )
+      cache_s <<- c(cache_s, s)
+      cache_x[[length(cache_x) + 1L]] <<- fit$par
+      max(n * (fit$objective - F_hat), 0) - crit
+    }
+    dir <- sign(s_far - s_hat)
+    s_prev <- s_hat
+    step <- 0.05
+    repeat {
+      s_next <- s_prev + dir * step
+      if (dir * (s_next - s_far) >= 0) {
+        if (lr(s_far) < 0) return(NA_real_)      # no crossing: natural bound
+        s_next <- s_far
+        break
+      }
+      if (lr(s_next) >= 0) break
+      s_prev <- s_next
+      step <- step * 1.5
+    }
+    stats::uniroot(lr, sort(c(s_prev, s_next)), tol = 1e-4)$root
+  }
+  interval_for <- function(s_hat, full, dgrad, x0) {
+    lo <- side_root(s_hat, min(s_hat - 1, -14), full, dgrad, x0)
+    hi <- side_root(s_hat, max(s_hat + 1, 14), full, dgrad, x0)
+    c(if (is.na(lo)) 0 else stats::plogis(lo),
+      if (is.na(hi)) 1 else stats::plogis(hi))
+  }
+
+  # zeta_i
+  if (spec$n_zeta == p) {
+    for (i in seq_len(p)) {
+      idx <- spec$i_zeta[i]
+      full <- function(x, s) append(x, s, after = idx - 1L)
+      dgrad <- function(x, s, gg) gg[-idx]
+      out$zeta[i, ] <- tryCatch(
+        interval_for(par[idx], full, dgrad, par[-idx]),
+        error = function(e) c(NA_real_, NA_real_))
+    }
+  }
+
+  # beta
+  keep <- spec$keep_k
+  L <- length(keep)
+  ib <- spec$i_beta                       # gstar positions of v_2..v_L
+  out$beta[] <- 0                         # removed weights: [0, 0]
+  v_hat <- c(0, par[ib])
+  b_hat <- exp(v_hat) / sum(exp(v_hat))
+  for (a in seq_len(L)) {
+    others <- setdiff(seq_len(L), c(1L, a))   # free v positions (in 1..L)
+    if (a >= 2) {
+      full <- function(x, s) {
+        g <- x[seq_len(length(par) - length(ib))]
+        v <- numeric(L)
+        v[others] <- x[-seq_len(length(g))]
+        v[a] <- s + log(sum(exp(v[-a])))       # v[1] = 0 is included
+        append(g, v[-1], after = min(ib) - 1L)
+      }
+      dgrad <- function(x, s, gg) {
+        gnb <- gg[-ib]
+        gv <- c(0, gg[ib])
+        g_full <- full(x, s)
+        v <- c(0, g_full[ib])
+        S <- sum(exp(v[-a]))
+        c(gnb, gv[others] + gv[a] * exp(v[others]) / S)
+      }
+      x0 <- c(par[-ib], v_hat[others])
+    } else {
+      if (L < 2) next
+      wfree <- if (L > 2) 3:L else integer(0)
+      full <- function(x, s) {
+        g <- x[seq_len(length(par) - length(ib))]
+        w <- numeric(L)
+        w[wfree] <- x[-seq_len(length(g))]
+        w2 <- w[2:L]
+        cc <- log((1 - stats::plogis(s)) / stats::plogis(s)) - log(sum(exp(w2)))
+        append(g, w2 + cc, after = min(ib) - 1L)
+      }
+      dgrad <- function(x, s, gg) {
+        gnb <- gg[-ib]
+        gv <- gg[ib]                           # gradient in v_2..v_L
+        g_full <- full(x, s)
+        v2 <- g_full[ib]
+        pi_w <- exp(v2) / sum(exp(v2))
+        gw <- gv - sum(gv) * pi_w              # d/dw_l over l = 2..L
+        c(gnb, gw[-1])                         # w_2 fixed
+      }
+      x0 <- c(par[-ib], (v_hat[wfree] - v_hat[2]))
+    }
+    s_hat <- stats::qlogis(b_hat[a])
+    out$beta[keep[a] + 1L, ] <- tryCatch(
+      interval_for(s_hat, full, dgrad, x0),
+      error = function(e) c(NA_real_, NA_real_))
+  }
+  out
+}
+
 m167_empty_ci <- function(p, nb) {
   list(angle = matrix(NA_real_, p, 2), zeta = matrix(NA_real_, p, 2),
        beta = matrix(NA_real_, nb, 2))
