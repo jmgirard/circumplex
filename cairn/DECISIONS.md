@@ -2482,20 +2482,30 @@ no family passes on either path for angles, communalities or weights. In the
 ladder form, a pass from some N up to the largest listed N, three entries
 pass, all of them unconditionally: B1 angles from N = 1000 on the raw-data
 path, P1 communalities from N = 1000 on the raw-data path, and F2bc weights
-from N = 5000 on the correlation-matrix path. Every other (family, path,
-parameter family) fails at its largest listed N. A fresh-seed run confirmed
-the passes at N = 1000. It did not confirm B1 angles at N = 250, which the
-ladder entry does not rest on. No candidate fixes beta_0 at N <= 1000,
-because the shortfall is a bias of the estimator that no re-centering
-removes (M167-D1 and M167-D4; the expected outcome written before the run
-held). A ship step can take up the three ladder entries within the scope
-below.
+from N = 5000 on the correlation-matrix path. The raw-data path's largest
+cell is N = 1000, so its two entries mean a pass at N = 1000 and say nothing
+about larger N; on the correlation-matrix path the same P1 communality
+intervals fail at the boundary truth at N = 20000. The F2bc weights pass
+only through the Monte Carlo allowance, below .90 at the boundary truth.
+Every other (family, path, parameter family) fails at its largest listed N.
+A confirmation run on fresh seeds confirmed the passes at N = 1000. It did
+not confirm B1 angles at N = 250, which the ladder entry does not rest on.
+No candidate fixes beta_0 at N <= 1000, because the shortfall is a bias of
+the estimator that no re-centering removes (M167-D1 and M167-D4; the
+expected outcome written before the run held). A ship step can take up the
+three ladder entries within the scope below.
 
 The verdict applies the band and pass rule in the pre-registration block of
-`devel/m167-interval-oracle.R` at the results commit eaed2b22. Commit
-908ed678 fixed them. No full-run output existed at that commit; the
-control run's B1 and B2 output did, and the block names it. The changes
-after the design review and before the first full run were these: the
+`devel/m167-interval-oracle.R` at the results commit df9ae5b9. Commit
+908ed678 fixed the band, the scoring rule and the pass rule, and they have
+not changed since. No full-run output existed at that commit; the control
+run's B1 and B2 output did, and the block names it. The review of the first
+full run found three harness defects (false P1 endpoints near a Heywood
+wall, an error in one method dropping the replicate from every method, and
+confirmation seeds that collided with the main run's). The block lists the
+fixes under its corrections heading, and the study and the confirmation
+were re-run; the verdict did not change. The changes after the design
+review and before the first full run were these: the
 basic bootstrap on both replicate sets, P1, the variant-B diagnostic arm,
 per-replicate records, a width record with a 5% vacuous-interval limit, an
 allowance scaled to the realized count in place of a fixed .015, a 5%
