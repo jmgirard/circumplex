@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-21 (M166 done and archived: ssm_trajectory() reads 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | blocked | — | normal | milestones/M167-cpm-interval-oracle.md |
+| M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | in-progress | — | normal | milestones/M167-cpm-interval-oracle.md |
 | M166 | ssm_trajectory() reads vcov by position and scales its balance check | done | — | normal | milestones/archive/M166-trajectory-vcov-follow-ons.md |
 | M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | done | — | normal | milestones/archive/M165-trajectory-unbalanced-warning.md |
 | M164 | Vignette width guard gaps | done | — | normal | milestones/archive/M164-vignette-width-guard-gaps.md |

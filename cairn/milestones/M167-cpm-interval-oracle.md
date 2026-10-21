@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -27,12 +27,13 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - F1, a transformed Wald interval by the method of browne1982 (eqs. 1.6.30 to 1.6.32, p. 95). It uses ln v for each communality, with v = (1 − ζ²)/ζ² as CircE uses it, logit for each β weight, and the identity for angles.
 - F2, a parametric bootstrap from the fitted Σ̂ at the fit's N, for correlation-matrix input, scored as a percentile interval and as a bias-corrected percentile interval.
 - F3, a bias-corrected percentile interval on the B1 replicates, for ζ and β only.
+- Added from RR26: a basic bootstrap on the B1 and F2 replicates, and P1, a profile-likelihood interval for ζ and β, both for ζ and β only; a variant-B refit (angles fixed at theory) of each raw-data replicate as a diagnostic arm, not an interval.
 - The families are devel prototypes. Nothing is exported.
 - A D-entry with the verdict. The DESIGN.md CPM coverage section, the β item of `vignettes/cpm-boundary-fits.Rmd` and the Confidence intervals section of the `cpm_fit()` help page are corrected.
 
 **Out:**
 - Shipping a family that passes goes to the "Boundary-regime interval improvement" candidate row, narrowed by this plan.
-- Profile-likelihood and studentized-bootstrap intervals go to the same row.
+- Profile-likelihood intervals for angles, studentized-bootstrap intervals, and the non-normal and unequal-communality cells RR26 rated "consider" go to the same row.
 - The free-scaling family goes to the same row's ship step. D-010 found its coverage regime is the diag family's.
 - SSM amplitude near zero is a different mechanism. `ssm_ci_accuracy()` and the displacement certification rule (D-007) cover it.
 
@@ -85,7 +86,14 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: T2 control (`devel/m167-interval-control.rds`, 33 min on 17 cores): every pooled B1 and B2 entry of the six M4 cells lies within .020 of the M4 record (bar .03).
 - 2026-10-21: T2 baseline finding, B1 per weight at the boundary truth: beta0 (.45) covers .66 to .74 with its misses below the truth, beta2 and beta3 .73 to .79 with misses above, beta1 .93 to .95; at the interior truth beta0 covers .81 to .84; so the shortfall is not carried by the near-zero weight alone. Goes into the review brief.
 - 2026-10-21: blocked on RB26 (design review before the full run, granted at the plan question set). The brief is committed on this branch, as RB25 was on M161's branch, because the milestone's tracking lives here until merge.
+- 2026-10-21: RR26 ingested (Fable, advisory): Decisions M167-D1 to D4; RB26 and RR26 moved to `cairn/reviews/archive/`; unblocked.
+- 2026-10-21: substantive amendment: Scope In adds the basic bootstrap, P1 and the variant-B arm from RR26; Scope Out narrows the deferred profile-likelihood item to angles and adds RR26's two descriptive cells. The deliverable the user sees is unchanged (a study verdict and corrected docs), so no stop.
 
 ## Decisions
+
+- M167-D1 (2026-10-21, RR26 Q1): the β shortfall is taken to come from an upward finite-sample bias in the per-scale communalities. That bias comes from the weakly identified angle and communality modes of variant A, and a Heywood case is that mode at the wall ζ = 1. The polish and the warm start are not the cause, and the softmax only moves the loss from β0 to β2 and β3. The bootstrap reproduces about 40% of the β0 bias at the boundary truth and 15% at the interior truth. The control's better Wald figure for β0 is conditional on a defined SE, which most Heywood fits lack, so "on the same fits" does not hold. The study tests this in-sample with a variant-B diagnostic arm, whose reading is fixed in the header.
+- M167-D2 (2026-10-21, RR26 recommendations): applied 1 to 4, 6 to 12 and 15, which put per-replicate records, the variant-B arm, the basic bootstrap, P1, the "passes from N" ladder, a 5% conditioning limit, an allowance scaled to the realized count, a 5% vacuous-interval limit, the ln v wording fix, the expected outcome and a fresh-seed confirmation of any raw-path pass into the header before the first full run. Rec 5 (P1 for angles), 13 (a non-normal cell) and 14 (an unequal-communality cell) are deferred to the "Boundary-regime interval improvement" row, because the ship step needs them and this study's verdict does not. Rejects 16 to 21 are accepted as reasoned: no fresh seeds at the raw cells, 500 replicates, no studentized bootstrap, no softmax-scale Wald, F3 and the F2 bias-corrected form kept.
+- M167-D3 (2026-10-21, RR26 Q2 and rec 21): D-002 does not reach the CPM's ζ and β, because its ground is circularity and these parameters are linear. Where a bias-corrected interval fails here, the record gives RR26's reason: the bootstrap does not see most of the bias.
+- M167-D4 (2026-10-21, RR26 rec 11, the expected outcome, written before the run): the β0 shortfall is an estimator bias of about one SD at N <= 1000 that no re-centering of the present estimate removes. So "no family passes β on the raw-data path" is the expected reading, and the ship step reads the "passes from N" ladder.
 
 ## Review
