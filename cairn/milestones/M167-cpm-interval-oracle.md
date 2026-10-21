@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -65,8 +65,8 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - [x] T7: Add a NEWS.md Documentation entry for the `cpm_fit()` help-page caution sentence and the `cpm-boundary-fits` vignette corrections (review return 1).
 
 - [x] T8: Fix the harness (review return 2): P1's profile takes the lower of a start from the estimate and a warm start, with a Heywood-regime endpoint check added to the checks script; an error inside one method or one resample no longer drops the replicate; B2 gives [0, 0] for a removed weight; P1 handles a lone kept harmonic; the variant-B arm counts accepted fits only; the commit is read at start; the confirmation takes a non-colliding seed base, recorded in the block as a correction after the first full run.
-- [ ] T9: Re-run the full study and the confirmation, then update the record, D-068, DESIGN.md and the candidate row from the new results.
-- [ ] T10: Make the documentation and test fixes the Review section settles as fix now (code comments, `ci_method` text, vignette, NEWS, the threshold test, .gitignore), and file the follow-up candidate row.
+- [x] T9: Re-run the full study and the confirmation, then update the record, D-068, DESIGN.md and the candidate row from the new results.
+- [x] T10: Make the documentation and test fixes the Review section settles as fix now (code comments, `ci_method` text, vignette, NEWS, the threshold test, .gitignore), and file the follow-up candidate row.
 
 ## Work log
 
@@ -115,6 +115,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: T10 checkpoint (DESIGN.md waits for the re-run): the threshold comments in `R/cpm_fit.R` and `R/cpm_oop.R` say the coverage was measured on fits with a defined SE; the `ci_method` text names the 50000 bound; the vignette scopes the "coverage, not bias" sentence to the marker study, says beta_2 and beta_3 missed mostly above, and adds that fixing the angles removed the bias; NEWS says "the package's bootstrap validation"; the threshold test runs on CRAN (7 analytic fits, under a second) and checks the clean fit at 50000 (9 expectations pass without NOT_CRAN); .gitignore names the confirmation file; new candidate row "Catch errors in CPM bootstrap refits" (diff-bug #3 and #13); the CPM simulation paper row notes its plan's superseded claims. `document()` regenerated `man/cpm_fit.Rd` and `Config/roxygen2/version` was reverted.
 - 2026-10-21: T9 re-run: the full study (117.0 minutes, b90b6ddd) and the confirmation (53.8 minutes, base 30261022) give the same verdict as the first run: strict none; ladder B1 angles and P1 communalities at N = 1000 on raw data, F2bc weights from N = 5000; the confirmation holds at N = 1000 and fails B1 angles at N = 250. No replicate errored; the full run matches the control run exactly except B2 beta at boundary N = 250 (the [0, 0] fix). P1 communality coverage at N <= 1000 rose to .90 to .97. Record rewritten; D-068 rewritten in place before merge (results commit df9ae5b9, the corrections, the ladder's reach and the allowance-only F2bc pass); DESIGN.md updated (interior N = 250 beta_0 .842, shift 19 to 67%, the variant-B reading's limits, the Heywood-rate qualifier); the candidate row restates the β shortfall and the ladder entries.
 - 2026-10-21: claim audit: 104 claims read, 5 corrected — devel/m167-interval-oracle.md, tests/testthat/test-cpm_summary_markers.R, NEWS.md, cairn/ROADMAP.md (the boundary N = 1000 share with no interval is 15%; F2bc's beta_3 needs the allowance only at N = 20000, and the figures are boundary-truth figures; the test makes nine fits; the old help page did name the near-boundary condition, loosely; the row's angle claim holds at the boundary truth and the mechanism claim carries the reading's limits). The run times and the cause of the first run's two errors are the author's report and the review's, not stored in the .rds files.
+- 2026-10-21: T9 and T10 done. Verify: `devtools::test()` on the branch 0 failures, 11 warnings over 8 triples, none above its count at 1a5aa9c4; `devtools::check(args = "--no-manual")` on 2681b316 Status OK, 0/0/0. Status review, handed back to `/milestone-review`.
 
 ## Decisions
 
