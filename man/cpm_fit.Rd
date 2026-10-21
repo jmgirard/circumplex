@@ -131,8 +131,13 @@ Resamples with a degenerate (non-positive-definite) correlation matrix or
 a refit failing the convergence acceptance criterion are excluded with a
 warning reporting how many; the intervals are then conditional on
 estimability. Analytic (Wald) intervals are asymptotically valid but can
-materially mis-cover at field-typical sample sizes; \code{summary()} prints a
-caution below \code{n = 2000}. Analytic angle intervals are reported on the
+materially mis-cover at field-typical sample sizes. For
+\code{ci_method = "analytic"}, \code{summary()} prints a caution whenever the
+sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows
+a boundary or weak-identification marker (a Heywood communality, a
+removed harmonic, a correlation-function weight below 0.10, an
+ill-conditioned Hessian, or competing near-tied optima); at N >= 50000 it
+prints none. Analytic angle intervals are reported on the
 unwrapped branch of the estimate (endpoints may fall outside [0, 360)
 near the boundary).
 }
