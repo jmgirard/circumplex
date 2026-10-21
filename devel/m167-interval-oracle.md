@@ -75,8 +75,10 @@ Against the band [.90, .98], before the Monte Carlo allowance:
   beta_2 at N = 500 and 1000.
 - beta_1 is inside the band at every raw-data cell.
 
-The largest shortfall is on the largest weight, beta_0, and its misses all
-fall below the truth. The misses of beta_2 and beta_3 fall above it.
+The largest shortfall is on the largest weight, beta_0 (tied with beta_3 at
+boundary N = 250). Nearly all its misses fall below the truth: 0.5% of its
+intervals lie above it at interior N = 250, and none elsewhere. The misses of
+beta_2 and beta_3 fall above it.
 
 B1 communalities miss above the truth. At N = 250 they cover .79 to .85 per
 scale at the boundary truth and .73 to .80 at the interior truth. Of their
@@ -142,7 +144,7 @@ The per-component tables give these reasons for the other failures:
 - At the boundary truth, F2bc is the only method whose beta_0 passes
   unconditionally at any cell: .894 at N = 5000 and .888 at N = 20000, both
   inside the allowance and below .90. B2 and F1 pass beta_0 only
-  conditionally, at N = 250 and 1000, where 60% and 15% of fits have no
+  conditionally, at N = 250 and 1000, where 60% and 16% of fits have no
   interval. P1, B2 and F1 cover beta_0 at .83 to .87 from N = 2000 to 20000.
 
 ## Confirmation

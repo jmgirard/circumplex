@@ -98,6 +98,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: AC5 baseline: `devtools::test()` at commit 1a5aa9c4 (scratch worktree, same R library) gives 0 failures and 11 warnings over 8 (file, test, masked message) triples.
 - 2026-10-21: AC5 branch run: `devtools::test()` gives 0 failures and 11 warnings, no triple above its baseline count; `document()` with `cli.width = 500` prints no `resolve link` line and leaves no diff once `Config/roxygen2/version` is reverted. `check()` is running.
 - 2026-10-21: claim audit: 84 claims read, 7 corrected — devel/m167-interval-oracle.md, vignettes/cpm-boundary-fits.Rmd, vignettes/cpm-boundary-fits.Rmd.orig (the failing B1 angle is LM, not JK; B2 and F1 pass beta_0 conditionally at boundary N = 250 and 1000; the full run matches the control at five of six cells; N = 1000 is the largest N for the shipped bootstrap only; beta_0 ties beta_3 at boundary N = 250; the marker-study sentence no longer contradicts the measured bias; the control bound reads .021). The same reader is re-reading the corrections.
+- 2026-10-21: claim audit re-read: the corrections hold; it found two more, now fixed (the share with no interval at boundary N = 1000 is 16%, not 15%; beta_0's misses are nearly all below the truth, 0.5% above at interior N = 250, in the record, DESIGN.md and the vignette). No second pass, per the stopping rule.
 
 ## Decisions
 

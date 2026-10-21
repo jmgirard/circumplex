@@ -138,7 +138,7 @@ interval contained the truth), not bias in the point estimates.
   you least here. The real $\beta$ problem is a different one, and it does
   not depend on any marker. In the package's bootstrap validation, the
   percentile intervals missed the largest weight, $\beta_0$, at least as often
-  as any other weight. Its intervals fell below the true value. Two
+  as any other weight. Almost every miss fell below the true value. Two
   smaller weights, $\beta_2$ and $\beta_3$, missed above it. These shortfalls
   did not shrink from $n = 250$ to $n = 1000$, the largest sample size at
   which the package's own bootstrap was studied. They appeared at

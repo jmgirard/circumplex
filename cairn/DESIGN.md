@@ -361,7 +361,9 @@ matching the A-review F1 finding. What this record decides:
     β2 at N = 500 and 1000. β1 lies inside it everywhere. The per-weight
     table below gives each figure.
   - The largest shortfall is on the largest weight, β0 (tied with β3 at
-    boundary N = 250), and all its misses lie below the truth. The misses of β2 and β3 lie above it.
+    boundary N = 250). Nearly all its misses lie below the truth (0.5% of
+    its intervals lie above it at interior N = 250). The misses of β2 and β3
+    lie above it.
   - The cause is a bias of the estimator, not a weight near zero. β̂0 is
     biased by .65 to 1.05 of its SD at N ≤ 1000. The bootstrap's mean shift
     is 20 to 67% of that bias. Refitting the same data with the angles fixed
