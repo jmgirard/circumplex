@@ -2463,3 +2463,67 @@ condition number in an `"uncertified"` warning.
 
 **Reopens.** Either condition in D-062's Reopens clause. A reachable fit
 refused `"uncertified"` on the selector route also reopens part (v).
+
+### D-068 (2026-10-21): no CPM interval family passes M167's study at every sample size, and its ladder names three passes a ship step can take up — reads D-002 as not reaching zeta and beta (M167, RR26)
+
+**Context.** M167 scored `cpm_fit()`'s shipped percentile bootstrap (B1) and
+Wald interval (B2), and six candidate families, against the band
+[.90, .98] per component at the two M4 truths. The candidates were a
+transformed Wald interval (F1), a parametric bootstrap read as a percentile
+(F2p), bias-corrected (F2bc) or basic (F2b) interval, a bias-corrected (F3)
+or basic (Bb) interval on the B1 replicates, and a profile-likelihood
+interval (P1). The raw-data path ran at N = 250, 500 and 1000, and the
+correlation-matrix path at those N and 2000, 5000 and 20000, on normal data.
+RR26 reviewed the design before the full run. The figures are in
+`devel/m167-interval-oracle.md` and `devel/m167-interval-results.rds`.
+
+**Decision.** In the strict form, a pass at every cell listed for the path,
+no family passes on either path for angles, communalities or weights. In the
+ladder form, a pass from some N up to the largest listed N, three entries
+pass, all of them unconditionally: B1 angles from N = 1000 on the raw-data
+path, P1 communalities from N = 1000 on the raw-data path, and F2bc weights
+from N = 5000 on the correlation-matrix path. Every other (family, path,
+parameter family) fails at its largest listed N. A fresh-seed run confirmed
+the passes at N = 1000. It did not confirm B1 angles at N = 250, which the
+ladder entry does not rest on. No candidate fixes beta_0 at N <= 1000,
+because the shortfall is a bias of the estimator that no re-centering
+removes (M167-D1 and M167-D4; the expected outcome written before the run
+held). A ship step can take up the three ladder entries within the scope
+below.
+
+The verdict applies the band and pass rule in the pre-registration block of
+`devel/m167-interval-oracle.R` at the results commit eaed2b22. Commit
+908ed678 fixed them. No full-run output existed at that commit; the
+control run's B1 and B2 output did, and the block names it. The changes
+after the design review and before the first full run were these: the
+basic bootstrap on both replicate sets, P1, the variant-B diagnostic arm,
+per-replicate records, a width record with a 5% vacuous-interval limit, an
+allowance scaled to the realized count in place of a fixed .015, a 5%
+conditioning limit, the ladder as a verdict form, the fresh-seed
+confirmation, the corrected wording for an estimate of exactly 1, and the
+expected outcome.
+
+D-002 does not reach the CPM's communalities and weights. Its ground is
+circularity, and these parameters are linear. A bias-corrected interval is
+not refused for them. F3 fails here because the bootstrap does not see most
+of the bias, not because of D-002.
+
+**Scope.** The verdict holds for normal data, p = 8 octant scales, equal
+communalities of .75, m = 3, variant A, the two weight truths, and the unit
+(diag) family. Intervals on the correlation-matrix path assume normality,
+because that path sees no raw data. Nothing here covers non-normal data,
+unequal communalities, other instruments or variants, or the free family
+(D-010).
+
+**Rejected.** Shipping a family from this study: the ship step decides the
+API and is the "Boundary-regime interval improvement" row's work. A
+re-centered interval for beta_0 at N <= 1000: the bootstrap reproduces only
+part of the bias, so re-centering its replicates cannot remove it.
+
+**Consequences.** The candidate row's promotion condition, a pass named
+here, holds for the three ladder entries. `summary()` and its cautions do
+not change. Fixing the angles (variant B) removed the beta_0 bias on the
+same data, but whether variant B's shipped intervals cover was not measured.
+
+**Reopens.** A study at another truth family, on non-normal data, or with a
+bias-reduced estimator, whose verdict changes which families pass.

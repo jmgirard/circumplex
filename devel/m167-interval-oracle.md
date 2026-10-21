@@ -142,4 +142,19 @@ The per-component tables give these reasons for the other failures:
 
 ## Confirmation
 
-To be filled from `devel/m167-interval-confirm.rds`.
+The confirmation run (`M167_CONFIRM=1`, 44 minutes) re-ran the raw-data
+cells where the main run passed an entry: N = 250 and 1000, both truths,
+fresh seeds 20261022, 500 replicates.
+
+| Path | Method | Family | N | Confirmed |
+|---|---|---|---|---|
+| raw data | B1 | angles | 250 | no |
+| raw data | B1 | angles | 1000 | yes, unconditional |
+| raw data | P1 | communalities | 1000 | yes, unconditional |
+| correlation matrix | F2bc | communalities | 1000 | yes, unconditional |
+| correlation matrix | P1 | communalities | 1000 | yes, unconditional |
+
+B1 angles at boundary N = 250 cover .86 to .92 per scale on the fresh seeds,
+and 2 of the 7 angles fail. So the N = 250 pass of the main run does not
+hold up. The ladder entry "B1 angles pass from N = 1000" does not rest on
+N = 250 and stands.
