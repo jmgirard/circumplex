@@ -1,13 +1,13 @@
 # M168: Close the degeneracy criterion remainders
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP3, GP4
 - **Resolves:** —
 - **Surface tier:** internal — test fixtures, a test-suite detector and a devel-only oracle script; no exported behavior changes
-- **Branch/PR:** —
+- **Branch/PR:** m168-degeneracy-criterion-remainders
 
 ## Goal
 
@@ -35,7 +35,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 
 ## Tasks
 
-- [ ] T1: Add the `provenance` element to `rb18-counterexample-b.rds` (source: the RB18 random search over near-collinear 3×3 correlation matrices, `cairn/reviews/archive/RB18-axes-degeneracy-criterion-metric.md`; generator and seed not kept) and to `mc-seeded-pins.rds` (source: the M4 refactor's pre-refactor capture, legacy archive; seed 2026, calls as in `tests/testthat/test-ssm_montecarlo.R`; read its capture commit from `git log` before writing). Rewrite each file once from its plan-commit object plus the element, then confirm every old element `identical(num.eq = FALSE)` against `git show <plan-commit>:<path>` read into R. Point `cairn/PROFILE.md`'s fixture-provenance bullet at D-070. Grep the tests and `devel/` for any read of these fixtures' element names or length that the new element could change.
+- [x] T1: Add the `provenance` element to `rb18-counterexample-b.rds` (source: the RB18 random search over near-collinear 3×3 correlation matrices, `cairn/reviews/archive/RB18-axes-degeneracy-criterion-metric.md`; generator and seed not kept) and to `mc-seeded-pins.rds` (source: the M4 refactor's pre-refactor capture, legacy archive; seed 2026, calls as in `tests/testthat/test-ssm_montecarlo.R`; read its capture commit from `git log` before writing). Rewrite each file once from its plan-commit object plus the element, then confirm every old element `identical(num.eq = FALSE)` against `git show <plan-commit>:<path>` read into R. Point `cairn/PROFILE.md`'s fixture-provenance bullet at D-070. Grep the tests and `devel/` for any read of these fixtures' element names or length that the new element could change.
 - [ ] T2: In `tests/testthat/test-lavaan-cfi-helper.R`, add a test gated by `skip_on_cran()` and `skip_if_not_installed("lavaan")` only (not by `lav_fit_cfi_fn()` being non-NULL), asserting `lav_cfi_ref()` returns the closed-form CFI at one input. Plant both AC2 defects through `local_mocked_bindings()` on `lav_fit_cfi_fn` and see each fail before trusting the green; record the plants in the work log.
 - [ ] T3: In `exact_parse()`, check each `HEX_*` value's word count against its key and each word against the AC3 pattern, stopping with the key named. Extend the `local()` guard with the AC3 stubs. Check the pattern against every hex string in `cert_frozen` with a one-off read of the test file, and record the count in the work log.
 - [ ] T4: Run `devtools::test()`; review's consistency gate runs the check.
@@ -54,3 +54,5 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - 2026-10-22: plan gate chose recording provenance over a literal-copy generator because the generator would copy known bytes without rerunning the search; falsified by a fixture whose missing generator hides a stale value a test trusts.
 - 2026-10-22: plan chose a CRAN-skipped detector over one that runs everywhere because a lavaan internal rename would otherwise fail the package's CRAN check; falsified by a rename that reaches a release without CI having run on the new lavaan.
 - 2026-10-22: no changelog entry: internal tier, no user-visible change.
+- 2026-10-22: status in-progress; branch m168-degeneracy-criterion-remainders cut from master at bfdc649f. Untracked `devel/m167-interval-smoke.rds` (M167's) left unstaged.
+- 2026-10-22: T1 done: both fixtures gained a `provenance` list (source, generator, seed) via a one-off scratch script; every old element `identical(num.eq = FALSE)` to the bfdc649f copy read through `git show` (5 of 5 and 3 of 3); all 8 fixtures now carry provenance (`growth-fixef.rds` as one string naming all three); mc-seeded-pins' capture read from 6c7e5fc6 and its test comment; PROFILE.md bullet points at D-070; no test reads either fixture's element names or length; certificate, scaled-fit and Monte Carlo test files green. The simple-english hook flagged PROFILE.md's pre-existing text, left as is.

@@ -82,6 +82,8 @@ rules in tracking-rules:
   the R-mechanical form of the universal Reproducibility hard-stop. The required
   content is fixed; the shape is the repo's choice — a `provenance` attribute,
   embedded `.rds`/`.rda` fields, or a header comment naming source + generator + seed.
+  A fixture with no rerunnable origin says so in its provenance instead, and its
+  committed bytes are its definition (D-070).
 
 ## release-walk
 Followed by `/cairn-release` — a CRAN release walk (never self-submits):
