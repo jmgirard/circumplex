@@ -39,7 +39,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - [x] T2: In `tests/testthat/test-lavaan-cfi-helper.R`, add a test gated by `skip_on_cran()` and `skip_if_not_installed("lavaan")` only (not by `lav_fit_cfi_fn()` being non-NULL), asserting `lav_cfi_ref()` returns the closed-form CFI at one input. Plant both AC2 defects through `local_mocked_bindings()` on `lav_fit_cfi_fn` and see each fail before trusting the green; record the plants in the work log.
 - [x] T3: In `exact_parse()`, check each `HEX_*` value's word count against its key and each word against the AC3 pattern, stopping with the key named. Extend the `local()` guard with the AC3 stubs. Check the pattern against every hex string in `cert_frozen` with a one-off read of the test file, and record the count in the work log.
 - [x] T4: Run `devtools::test()`; review's consistency gate runs the check.
-- [ ] T5: Review return 1: bring `cairn/PROFILE.md` under its 120-line cap by folding the D-070 pointer into the fixture-provenance bullet's first sentence (ripple #2).
+- [x] T5: Review return 1: bring `cairn/PROFILE.md` under its 120-line cap by folding the D-070 pointer into the fixture-provenance bullet's first sentence (ripple #2).
 - [ ] T6: Land review pass 1's fix-now findings (Review section): the detector's comments (diff-bug #1, #6); both fixtures' provenance text (diff-bug #2, #3); the oracle guard's header, message assertions, `inf` and two-word `HEX_U_LO` stubs (diff-bug #4, #7, #8, prior-review #2); the fixture comment in test-axes-scaled-fit.R (ripple #1).
 
 ## Work log
@@ -65,6 +65,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - 2026-10-22: status review; no deviations from the plan; no amendments.
 - 2026-10-22: review pass 1 checkpoint: AC1-AC3 evidence recorded; the suite, the full check and four reviewers are still running; `cairn_validate` fails weight caps (PROFILE.md 121 lines, cap <120), a gate failure to route once those report.
 - 2026-10-22: review return 1: consistency gate FAIL, `cairn_validate` weight caps (`cairn/PROFILE.md` 121 lines, cap <120). Pass 1's eleven fix-now findings ride the same return as T6, and no finding met the return floor. T5 and T6 added (minor amendment), and Coverage AC4 → T4, T5, T6. Status in-progress.
+- 2026-10-22: T5 done: the PROFILE.md fixture bullet was rewritten from 7 lines to 4, with the D-070 pointer in its sentences, and the file is 118 lines; `cairn_validate` passes all checks. The simple-english hook's remaining 42 hits are all in pre-existing PROFILE.md text, left as is.
 
 ## Decisions
 
