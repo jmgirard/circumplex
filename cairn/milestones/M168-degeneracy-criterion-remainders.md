@@ -1,6 +1,6 @@
 # M168: Close the degeneracy criterion remainders
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -24,14 +24,14 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - [x] AC1: Every `.rds` file that `list.files("tests/testthat/fixtures", pattern = "\\.rds$")` returns carries a `provenance` element naming its source, its generator, and its seed, or stating which of these was not kept; in `rb18-counterexample-b.rds` and `mc-seeded-pins.rds`, every element present at the plan commit stays `identical()` to its plan-commit value with `num.eq = FALSE`.
 - [x] AC2: When lavaan is installed and `skip_on_cran()` does not skip, the test suite fails if `lav_cfi_ref()` gets no CFI from the installed lavaan's `lav_fit_cfi()` under both argument spellings (neither yields a finite number). It passes on the lavaan installed at review, and fails when `lav_fit_cfi_fn()` is replaced by one returning a function that accepts neither spelling, and by one returning `NULL`.
 - [x] AC3: `exact_parse()` in `devel/degeneracy-oracle/exact_oracle.R` stops, naming the key, when a `HEX_*` value does not split into the word count its key carries (`n_comp` for `HEX_V*` and `HEX_VNAIVE*`, 1 for `HEX_U*`), or when a word does not match `^-?0x[0-9a-f](\.[0-9a-f]+)?p[+-][0-9]+$`. The script's load-time guard asserts this on an empty value, a wrong word count for an `n_comp = 2` stub, and a non-hex word, and parses a valid stub written in Python's `float.hex()` form; every hex word in `cert_frozen` in `tests/testthat/test-axes-certificate.R` matches the same pattern.
-- [ ] AC4: The profile's `verify` slot is clean: `devtools::test()` passes.
+- [x] AC4: The profile's `verify` slot is clean: `devtools::test()` passes.
 
 ## Coverage
 
 - AC1 → T1
 - AC2 → T2
 - AC3 → T3
-- AC4 → T4
+- AC4 → T4, T5, T6
 
 ## Tasks
 
@@ -39,6 +39,8 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - [x] T2: In `tests/testthat/test-lavaan-cfi-helper.R`, add a test gated by `skip_on_cran()` and `skip_if_not_installed("lavaan")` only (not by `lav_fit_cfi_fn()` being non-NULL), asserting `lav_cfi_ref()` returns the closed-form CFI at one input. Plant both AC2 defects through `local_mocked_bindings()` on `lav_fit_cfi_fn` and see each fail before trusting the green; record the plants in the work log.
 - [x] T3: In `exact_parse()`, check each `HEX_*` value's word count against its key and each word against the AC3 pattern, stopping with the key named. Extend the `local()` guard with the AC3 stubs. Check the pattern against every hex string in `cert_frozen` with a one-off read of the test file, and record the count in the work log.
 - [x] T4: Run `devtools::test()`; review's consistency gate runs the check.
+- [ ] T5: Review return 1: bring `cairn/PROFILE.md` under its 120-line cap by folding the D-070 pointer into the fixture-provenance bullet's first sentence (ripple #2).
+- [ ] T6: Land review pass 1's fix-now findings (Review section): the detector's comments (diff-bug #1, #6); both fixtures' provenance text (diff-bug #2, #3); the oracle guard's header, message assertions, `inf` and two-word `HEX_U_LO` stubs (diff-bug #4, #7, #8, prior-review #2); the fixture comment in test-axes-scaled-fit.R (ripple #1).
 
 ## Work log
 
@@ -62,6 +64,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - 2026-10-22: claim audit: not owed — internal tier.
 - 2026-10-22: status review; no deviations from the plan; no amendments.
 - 2026-10-22: review pass 1 checkpoint: AC1-AC3 evidence recorded; the suite, the full check and four reviewers are still running; `cairn_validate` fails weight caps (PROFILE.md 121 lines, cap <120), a gate failure to route once those report.
+- 2026-10-22: review return 1: consistency gate FAIL, `cairn_validate` weight caps (`cairn/PROFILE.md` 121 lines, cap <120). Pass 1's eleven fix-now findings ride the same return as T6, and no finding met the return floor. T5 and T6 added (minor amendment), and Coverage AC4 → T4, T5, T6. Status in-progress.
 
 ## Decisions
 
@@ -70,6 +73,8 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - AC1 (2026-10-22, branch at 82ee9c53): `list.files("tests/testthat/fixtures", pattern = "[.]rds$")` returns 8 files, and each one's `provenance` names a source, a generator and a seed (`growth-fixef.rds` does so in one string). Read against the copies at the plan commit bfdc649f through `git show`: `rb18-counterexample-b.rds` keeps 5 of 5 elements and `mc-seeded-pins.rds` keeps 3 of 3, each `identical(num.eq = FALSE)`, and neither had `provenance` at bfdc649f.
 - AC2 (2026-10-22, lavaan 0.7.2): the "M168: the corroboration reaches the installed lavaan" test passes, and the file is green. Two plants were made in `lav_fit_cfi_fn()` in helper-lavaan-cfi.R. The first returned `function(a, b, c, d) 0.6`, which accepts neither spelling, and the second returned `NULL`. Each failed that test at test-lavaan-cfi-helper.R:77 with `actual` NULL. The helper was restored with a zero-line diff. Under `NOT_CRAN=false` the test skips with reason "On CRAN", and its gates are `skip_on_cran()` and `skip_if_not_installed("lavaan")` only.
 - AC3 (2026-10-22): the parser and its load-time guard, run apart from the oracle, pass. A valid stub in float.hex() form, at the right per-key counts, parses. An empty `HEX_V_LO`, one word under `HEX_VNAIVE_HI` at `n_comp = 2`, and `1.5` under `HEX_U_HI` each stop with "wrong word count or a non-hex word under key(s)" naming that key. Two plants were made in `exact_parse()`, one removing the count test and one removing the form test, and each failed the guard. In `cert_frozen` (test-axes-certificate.R:237-393, cases cxb, a4, a5, c4, b9a, b9b), 383 of 383 hex strings match `exact_hex_pattern`. The full `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0, with ANCHORS, SWEEP, REACHABLE and CERTIFICATE all PASS on real Python output.
+- AC4 (2026-10-22, branch at 145cf6d6): `devtools::test()` gave 15274 passed, 0 failed, 0 errors, and 1 skip (test-axes-scaled-fit.R:930, a version-gated fixture check).
+- Gate pass 1, toolchain (2026-10-22): `devtools::check()` gave Status OK with 0 errors, 0 warnings and 0 notes. `document()` emitted 0 `resolve link` lines, and its only diff was the `Config/roxygen2/version` stamp (8.1.0 to 8.1.1), reverted per lesson M85. `pkgdown::check_pkgdown()` found no problems. NEWS has no entry, since the milestone is internal. The diff adds no new top-level file.
 - Gate pass 1 (2026-10-22): `cairn_validate` FAIL weight caps, `cairn/PROFILE.md` 121 lines against a cap of under 120, from T1's two added lines. All other checks PASS. The master watches are green: R-CMD-check.yaml and test-coverage.yaml both `success` at c215fe31. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` all exit 0.
 - spawned: diff-bug, blame-history, prior-review, ripple
 - diff-bug #1: the new test's comment says "CI runs it", but R-CMD-check.yaml sets no `NOT_CRAN`, and only the master-push coverage job (covr) runs `skip_on_cran()` tests — fix now.
