@@ -101,3 +101,6 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - ripple #2: PROFILE.md's fixture sentence does not point at D-070 from its first line — fix now, inside the rewrite that the weight-cap failure needs.
 - ripple #3, #4: the skip comments in test-axes-scaled-fit.R and helper-lavaan-cfi.R stay accurate — reject, false: both still describe what a NULL does at those call sites.
 - ripple #5: the help text and comments that describe the matrix stay accurate — noted.
+- Pass 2 (after return 1, branch at 03c6a5ee; master unmoved): fresh evidence follows.
+- AC1 pass 2: all 8 fixtures carry `provenance` naming source, generator and seed. Against bfdc649f, rb18 keeps 5 of 5 elements and mc-seeded-pins 3 of 3, each `identical(num.eq = FALSE)`. Both `generator` texts read as corrected in T6.
+- AC3 pass 2: the guard passes; the count-check and form-check plants each fail it; in `cert_frozen` (lines 237-393), 383 of 383 hex strings match; the guard's five hex stubs are an empty value, one word under `HEX_VNAIVE_HI`, two words under `HEX_U_LO`, `1.5`, and `inf`; and the full oracle run prints its 4 PASS lines.
