@@ -1,6 +1,6 @@
 # M168: Close the degeneracy criterion remainders
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -38,7 +38,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - [x] T1: Add the `provenance` element to `rb18-counterexample-b.rds` (source: the RB18 random search over near-collinear 3×3 correlation matrices, `cairn/reviews/archive/RB18-axes-degeneracy-criterion-metric.md`; generator and seed not kept) and to `mc-seeded-pins.rds` (source: the M4 refactor's pre-refactor capture, legacy archive; seed 2026, calls as in `tests/testthat/test-ssm_montecarlo.R`; read its capture commit from `git log` before writing). Rewrite each file once from its plan-commit object plus the element, then confirm every old element `identical(num.eq = FALSE)` against `git show <plan-commit>:<path>` read into R. Point `cairn/PROFILE.md`'s fixture-provenance bullet at D-070. Grep the tests and `devel/` for any read of these fixtures' element names or length that the new element could change.
 - [x] T2: In `tests/testthat/test-lavaan-cfi-helper.R`, add a test gated by `skip_on_cran()` and `skip_if_not_installed("lavaan")` only (not by `lav_fit_cfi_fn()` being non-NULL), asserting `lav_cfi_ref()` returns the closed-form CFI at one input. Plant both AC2 defects through `local_mocked_bindings()` on `lav_fit_cfi_fn` and see each fail before trusting the green; record the plants in the work log.
 - [x] T3: In `exact_parse()`, check each `HEX_*` value's word count against its key and each word against the AC3 pattern, stopping with the key named. Extend the `local()` guard with the AC3 stubs. Check the pattern against every hex string in `cert_frozen` with a one-off read of the test file, and record the count in the work log.
-- [ ] T4: Run `devtools::test()`; review's consistency gate runs the check.
+- [x] T4: Run `devtools::test()`; review's consistency gate runs the check.
 
 ## Work log
 
@@ -58,3 +58,6 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - 2026-10-22: T1 done: both fixtures gained a `provenance` list (source, generator, seed) via a one-off scratch script; every old element `identical(num.eq = FALSE)` to the bfdc649f copy read through `git show` (5 of 5 and 3 of 3); all 8 fixtures now carry provenance (`growth-fixef.rds` as one string naming all three); mc-seeded-pins' capture read from 6c7e5fc6 and its test comment; PROFILE.md bullet points at D-070; no test reads either fixture's element names or length; certificate, scaled-fit and Monte Carlo test files green. The simple-english hook flagged PROFILE.md's pre-existing text, left as is.
 - 2026-10-22: T2 done: "M168: the corroboration reaches the installed lavaan" added, gated by `skip_on_cran()` and `skip_if_not_installed("lavaan")`; green on lavaan 0.7.2 (CFI 0.6). Plants were made in `lav_fit_cfi_fn()` in helper-lavaan-cfi.R, not by mocking, and each was reverted to zero diff. The first plant returned a function accepting neither spelling (it would return 0.6 if reached), and the second returned `NULL`. Each failed the M168 test at line 77 with `actual` NULL. Under `NOT_CRAN=false` the test skips "On CRAN". Implementation choice: planting the code under test over `local_mocked_bindings()` (lesson M116).
 - 2026-10-22: T3 done: `exact_parse()` checks each `HEX_*` word count (`exact_hex_words()`: `n_comp`, 1 for `HEX_U_*`) and form (`exact_hex_pattern`), stopping with the keys named. The load-time guard stub now uses float.hex() words at per-key counts and adds empty, wrong-count and non-hex stubs. The guard, run alone, passes, and 383 of 383 hex strings in `cert_frozen` (test-axes-certificate.R lines 237-393) match the pattern. Plants in the parser each fail the guard (count check removed; form check removed), and the unplanted parser passes. A full `Rscript devel/degeneracy-oracle/exact_oracle.R` exits 0 with ANCHORS, SWEEP, REACHABLE and CERTIFICATE all PASS. The header's "carries only `S` and `ia`" claim was reworded, because the fixture also holds `a`, `b`, `kappa` and now `provenance`.
+- 2026-10-22: T4 done: `devtools::test()` gave 15274 passed, 0 failed, 0 errors, and 1 skip (test-axes-scaled-fit.R:930, gated on the R and lavaan version, untouched). The 11 warnings all come from untouched files (ci_accuracy, pole-values, print-width, ssm_sem).
+- 2026-10-22: claim audit: not owed — internal tier.
+- 2026-10-22: status review; no deviations from the plan; no amendments.
