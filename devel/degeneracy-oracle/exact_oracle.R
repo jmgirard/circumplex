@@ -13,8 +13,8 @@
 # its inputs and checks its output against the pinned anchors.
 #
 # EVERY SETTING THE ANCHORS DEPEND ON IS NAMED HERE. The committed fixture
-# tests/testthat/fixtures/rb18-counterexample-b.rds carries only the matrix `S`
-# and the item angles `ia`; the rest of the model is not in it, and the anchors
+# tests/testthat/fixtures/rb18-counterexample-b.rds carries the matrix `S` and
+# the item angles `ia` but none of the model settings below, and the anchors
 # are not reproducible without these (M89 AC6). The fixture read is the PACKAGED
 # copy, and since M108 it is the only copy: the duplicate under cairn/reviews/
 # was deleted with the byte-identity guard that fenced the two against each
@@ -86,6 +86,17 @@ exact_keys <- function(n_comp) {
     "HEX_U_HI", "HEX_U_LO")
 }
 
+# A present key is not yet a usable value (M168). The Python script prints one
+# hex word per component under each HEX_V* and HEX_VNAIVE* key, and one under
+# each HEX_U* key (the hi and lo words of `u` are two keys), each in
+# float.hex() form, e.g. 0x1.0000000000000p+0. An empty or short value used to
+# reach cert_record() as an empty literal, so the count and the form are both
+# checked. `inf` and `nan` do not match the form, so a non-finite word stops too.
+exact_hex_words <- function(key, n_comp) {
+  ifelse(startsWith(key, "HEX_U_"), 1L, as.integer(n_comp))
+}
+exact_hex_pattern <- "^-?0x[0-9a-f](\\.[0-9a-f]+)?p[+-][0-9]+$"
+
 exact_parse <- function(out, n_comp) {
   key <- sub(":.*$", "", out)
   val <- trimws(sub("^[A-Z_0-9]+:", "", out))
@@ -103,6 +114,15 @@ exact_parse <- function(out, n_comp) {
   }
   res <- as.list(stats::setNames(num, key))
   res[hexish] <- lapply(val[hexish], function(s) strsplit(s, " +")[[1L]])
+  bad <- key[hexish][vapply(which(hexish), function(i) {
+    w <- res[[i]]
+    length(w) != exact_hex_words(key[[i]], n_comp) ||
+      !all(grepl(exact_hex_pattern, w))
+  }, logical(1))]
+  if (length(bad)) {
+    stop("exact_parse(): wrong word count or a non-hex word under key(s) ",
+         paste(bad, collapse = ", "), call. = FALSE)
+  }
   res
 }
 
@@ -118,21 +138,32 @@ exact <- function(S, d, df = DF, baseline_df = BASELINE_DF) {
 # it. The stub is one line per key with a placeholder value, so the assertion
 # is about the key check alone and not about any number.
 local({
+  # Hex words in the Python script's own float.hex() form, the right count
+  # per key: two components here, so two words under HEX_V*, one under HEX_U*.
+  one <- "0x1.0000000000000p+0"
   stub <- function(keys) {
-    sprintf("%s: %s", keys, ifelse(startsWith(keys, "HEX_"), "0x1p+0 0x1p+0", "1"))
+    val <- ifelse(startsWith(keys, "HEX_U_"), one,
+                  ifelse(startsWith(keys, "HEX_"), paste(one, "-0x0.0p+0"), "1"))
+    sprintf("%s: %s", keys, val)
   }
   keys <- exact_keys(2L)
   full <- exact_parse(stub(keys), 2L)
   stopifnot(identical(sort(names(full)), sort(keys)),
-            identical(full[["HEX_V_HI"]], c("0x1p+0", "0x1p+0")))
-  for (drop in c("EXACT_CVAL", "EXACT_SE2", "HEX_U_LO")) {
-    err <- tryCatch(exact_parse(stub(setdiff(keys, drop)), 2L),
-                    error = function(e) conditionMessage(e))
-    stopifnot(is.character(err), grepl(drop, err, fixed = TRUE))
+            identical(full[["HEX_V_HI"]], c(one, "-0x0.0p+0")),
+            identical(full[["HEX_U_LO"]], one))
+  stops_naming <- function(lines, key) {
+    err <- tryCatch(exact_parse(lines, 2L), error = function(e) conditionMessage(e))
+    stopifnot(is.character(err), grepl(key, err, fixed = TRUE))
   }
-  bad <- tryCatch(exact_parse(sub("^EXACT_PROJ: 1", "EXACT_PROJ: x", stub(keys)), 2L),
-                  error = function(e) conditionMessage(e))
-  stopifnot(is.character(bad), grepl("EXACT_PROJ", bad, fixed = TRUE))
+  for (drop in c("EXACT_CVAL", "EXACT_SE2", "HEX_U_LO")) {
+    stops_naming(stub(setdiff(keys, drop)), drop)
+  }
+  stops_naming(sub("^EXACT_PROJ: 1", "EXACT_PROJ: x", stub(keys)), "EXACT_PROJ")
+  # M168: an empty value, a wrong word count, and a non-hex word.
+  stops_naming(sub("^HEX_V_LO: .*$", "HEX_V_LO: ", stub(keys)), "HEX_V_LO")
+  stops_naming(sub("^HEX_VNAIVE_HI: .*$", paste("HEX_VNAIVE_HI:", one), stub(keys)),
+               "HEX_VNAIVE_HI")
+  stops_naming(sub("^HEX_U_HI: .*$", "HEX_U_HI: 1.5", stub(keys)), "HEX_U_HI")
 })
 
 # --- M115: the exact quadratic forms the packaged bracket prices against -----
