@@ -40,7 +40,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - [x] T3: In `exact_parse()`, check each `HEX_*` value's word count against its key and each word against the AC3 pattern, stopping with the key named. Extend the `local()` guard with the AC3 stubs. Check the pattern against every hex string in `cert_frozen` with a one-off read of the test file, and record the count in the work log.
 - [x] T4: Run `devtools::test()`; review's consistency gate runs the check.
 - [x] T5: Review return 1: bring `cairn/PROFILE.md` under its 120-line cap by folding the D-070 pointer into the fixture-provenance bullet's first sentence (ripple #2).
-- [ ] T6: Land review pass 1's fix-now findings (Review section): the detector's comments (diff-bug #1, #6); both fixtures' provenance text (diff-bug #2, #3); the oracle guard's header, message assertions, `inf` and two-word `HEX_U_LO` stubs (diff-bug #4, #7, #8, prior-review #2); the fixture comment in test-axes-scaled-fit.R (ripple #1).
+- [x] T6: Land review pass 1's fix-now findings (Review section): the detector's comments (diff-bug #1, #6); both fixtures' provenance text (diff-bug #2, #3); the oracle guard's header, message assertions, `inf` and two-word `HEX_U_LO` stubs (diff-bug #4, #7, #8, prior-review #2); the fixture comment in test-axes-scaled-fit.R (ripple #1).
 
 ## Work log
 
@@ -66,6 +66,7 @@ The test fixtures name their origin, a lavaan rename can no longer silence the C
 - 2026-10-22: review pass 1 checkpoint: AC1-AC3 evidence recorded; the suite, the full check and four reviewers are still running; `cairn_validate` fails weight caps (PROFILE.md 121 lines, cap <120), a gate failure to route once those report.
 - 2026-10-22: review return 1: consistency gate FAIL, `cairn_validate` weight caps (`cairn/PROFILE.md` 121 lines, cap <120). Pass 1's eleven fix-now findings ride the same return as T6, and no finding met the return floor. T5 and T6 added (minor amendment), and Coverage AC4 → T4, T5, T6. Status in-progress.
 - 2026-10-22: T5 done: the PROFILE.md fixture bullet was rewritten from 7 lines to 4, with the D-070 pointer in its sentences, and the file is 118 lines; `cairn_validate` passes all checks. The simple-english hook's remaining 42 hits are all in pre-existing PROFILE.md text, left as is.
+- 2026-10-22: T6 done: The detector comment now says local `devtools::test()` and the master covr job run it, and the R CMD check job does not; it was trimmed to what the code cannot show. The provenance `generator` text was corrected in both fixtures by a scratch script. rb18 now says "copied here in ac7fd860" with the original deleted in 096b7cda. mc-seeded-pins now names the parent of 6c7e5fc6 as the likely code, marked not rerun, and lists each call's arguments, which were checked against test-ssm_montecarlo.R. Every other element is unchanged. The oracle guard header was rewritten. `stops_naming()` now also asserts the `stop()` message, with two new stubs: a two-word `HEX_U_LO` and an `inf` `HEX_U_HI`. A plant that rewords the hex stop as the missing-key stop fails the guard at the message check. The test-axes-scaled-fit.R fixture comment now names the `provenance` field. The guard, the full oracle run (all PASS), and the helper, scaled-fit, certificate and Monte Carlo test files are green.
 
 ## Decisions
 

@@ -66,12 +66,11 @@ test_that("M107 review: a warning still does not rescue an unusable value", {
 })
 
 test_that("M168: the corroboration reaches the installed lavaan", {
-  # Every call site skips when the helper returns NULL, so a further rename
-  # of lav_fit_cfi()'s arguments, or its removal, would again silence all
-  # three CFI comparisons with the suite green. This test fails instead.
-  # Gated on lavaan alone, never on lav_fit_cfi_fn() being non-NULL, so a
-  # removed function fails here too. Skipped on CRAN so that a lavaan
-  # release cannot fail the package's own check there; CI runs it.
+  # The CFI comparisons skip when lav_cfi_ref() returns NULL, so a renamed or
+  # removed lav_fit_cfi() leaves them skipping with the suite green; this test
+  # fails instead. It skips on CRAN, so a lavaan release cannot fail the
+  # package's check there. Local devtools::test() and the master coverage job
+  # (covr sets NOT_CRAN) run it; the R CMD check job does not.
   skip_on_cran()
   skip_if_not_installed("lavaan")
   expect_equal(lav_cfi_ref(200, 100, 400, 150),

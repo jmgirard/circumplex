@@ -134,9 +134,10 @@ exact <- function(S, d, df = DF, baseline_df = BASELINE_DF) {
 }
 
 # The guard, asserted before anything is measured: a stubbed output carrying
-# every key parses, and the same output with one key removed stops naming
-# it. The stub is one line per key with a placeholder value, so the assertion
-# is about the key check alone and not about any number.
+# every key parses, and each malformed variant stops, naming its key and the
+# stop() that fired -- a missing key, a non-numeric EXACT_ value, and (M168) a
+# HEX_ value with the wrong word count or a word not in float.hex() form. The
+# values are placeholders, so the assertion is about the parser, not a number.
 local({
   # Hex words in the Python script's own float.hex() form, the right count
   # per key: two components here, so two words under HEX_V*, one under HEX_U*.
@@ -151,19 +152,23 @@ local({
   stopifnot(identical(sort(names(full)), sort(keys)),
             identical(full[["HEX_V_HI"]], c(one, "-0x0.0p+0")),
             identical(full[["HEX_U_LO"]], one))
-  stops_naming <- function(lines, key) {
+  stops_naming <- function(lines, key, why) {
     err <- tryCatch(exact_parse(lines, 2L), error = function(e) conditionMessage(e))
-    stopifnot(is.character(err), grepl(key, err, fixed = TRUE))
+    stopifnot(is.character(err), grepl(key, err, fixed = TRUE),
+              grepl(why, err, fixed = TRUE))
   }
   for (drop in c("EXACT_CVAL", "EXACT_SE2", "HEX_U_LO")) {
-    stops_naming(stub(setdiff(keys, drop)), drop)
+    stops_naming(stub(setdiff(keys, drop)), drop, "missing key")
   }
-  stops_naming(sub("^EXACT_PROJ: 1", "EXACT_PROJ: x", stub(keys)), "EXACT_PROJ")
-  # M168: an empty value, a wrong word count, and a non-hex word.
-  stops_naming(sub("^HEX_V_LO: .*$", "HEX_V_LO: ", stub(keys)), "HEX_V_LO")
-  stops_naming(sub("^HEX_VNAIVE_HI: .*$", paste("HEX_VNAIVE_HI:", one), stub(keys)),
-               "HEX_VNAIVE_HI")
-  stops_naming(sub("^HEX_U_HI: .*$", "HEX_U_HI: 1.5", stub(keys)), "HEX_U_HI")
+  stops_naming(sub("^EXACT_PROJ: 1", "EXACT_PROJ: x", stub(keys)), "EXACT_PROJ",
+               "non-numeric value")
+  hex <- function(key, val) sub(sprintf("^%s: .*$", key), paste0(key, ": ", val), stub(keys))
+  bad_hex <- "wrong word count or a non-hex word"
+  stops_naming(hex("HEX_V_LO", ""), "HEX_V_LO", bad_hex)
+  stops_naming(hex("HEX_VNAIVE_HI", one), "HEX_VNAIVE_HI", bad_hex)
+  stops_naming(hex("HEX_U_LO", paste(one, one)), "HEX_U_LO", bad_hex)
+  stops_naming(hex("HEX_U_HI", "1.5"), "HEX_U_HI", bad_hex)
+  stops_naming(hex("HEX_U_HI", "inf"), "HEX_U_HI", bad_hex)
 })
 
 # --- M115: the exact quadratic forms the packaged bracket prices against -----
