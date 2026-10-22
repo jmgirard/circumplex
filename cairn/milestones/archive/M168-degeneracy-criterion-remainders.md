@@ -1,0 +1,11 @@
+# M168: Close the degeneracy criterion remainders
+
+**Status:** done (2026-10-22, PR #201 https://github.com/jmgirard/circumplex/pull/201)
+
+**Goal:** The test fixtures name their origin, a lavaan rename can no longer silence the CFI corroboration unnoticed, and the exact oracle's parser refuses malformed hex output.
+
+**Outcome:** `rb18-counterexample-b.rds` and `mc-seeded-pins.rds` gained a `provenance` list (source, generator, seed), every older element bit-identical, so all 8 fixtures in `tests/testthat/fixtures/` carry one. rb18 names the RB18 random search with no seed or generator kept. mc-seeded-pins names its three seeded `ssm_analyze()` calls and the `num()` step. A 2026-10-22 rerun found that both a1593dd3 (the Z1 refactor's parent) and current code reproduce the pins within 7.2e-14 but not bit for bit, so the bytes are their only exact form. `cairn/PROFILE.md`'s fixture rule now carries D-070's exception. In `test-lavaan-cfi-helper.R`, "M168: the corroboration reaches the installed lavaan" fails when `lav_cfi_ref()` returns NULL. It skips on CRAN, so it runs only in local `devtools::test()`/`check()` and the master covr job. In `devel/degeneracy-oracle/exact_oracle.R`, `exact_parse()` checks each `HEX_*` value's word count (`n_comp` for `HEX_V*`/`HEX_VNAIVE*`, 1 for `HEX_U*`) and float.hex() form. Its load-time guard asserts each stop's message on empty, short, long, `1.5` and `inf` stubs. The row's "two hex words" premise was wrong. No exported behavior changed.
+
+**Decisions:** D-069 declines showing the certificate's estimate on computed fits (RR21 rec 5). D-070 says a fixture with no rerunnable origin states so in its provenance, and its bytes are its definition. Plan gate: CRAN-skipped detector over one that runs everywhere.
+
+**Review:** Plan audit (reduced) 3 findings, all fixed. Review return 1: `cairn_validate` weight caps (PROFILE.md 121 lines), fixed at 118. Two four-lens passes gave 40 findings: 14 fixed, 18 rejected (the CRAN skip, raised five times, a planned change; one edge), 6 noted. 2 follow-ups (false `NOT_CRAN` claims at test-axes-fiml.R:1169 and test-axes-certificate.R:1097) were absorbed into the "CRAN-dark boundary invariants" row. Local check 0/0/0; six PR checks green after one CI-wait timeout and resume. Hygiene graduated the "Degeneracy criterion remainders" row and pruned M164's terminal row.
