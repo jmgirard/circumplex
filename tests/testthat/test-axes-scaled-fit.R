@@ -1653,19 +1653,16 @@ test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at t
 
 
 test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 3", {
-  # Fixture provenance. The file is a list carrying the 3x3 correlation
-  # matrix `S`, the item angles `ia`, two fields `a` and `b`, and
-  # kappa = 6.65e6. Source: the RB18 brief's random search over
-  # near-collinear 3x3 correlation matrices at randomly drawn angles,
-  # keeping only draws the criterion accepted.
+  # The file is a list carrying the 3x3 correlation matrix `S`, the item
+  # angles `ia`, two fields `a` and `b`, kappa = 6.65e6, and its source and
+  # missing seed in a `provenance` field (M168, D-070).
   # `a` and `b` hold "NULL" and "indefinite" -- reasons recorded before the
   # M89/M90 criterion changes, NOT what the current surfaces return. Nothing
   # asserts them and nothing should: the assertions below state the expected
   # reasons independently, in the test, which is the only place they are
   # current. Measured 2026-08-24.
-  # NO GENERATOR AND NO SEED -- the search seed was never recorded, so
-  # nothing regenerates this matrix. That is the whole of the provenance gap;
-  # the file is NOT unwritable as code. Measured 2026-08-24:
+  # Nothing regenerates this matrix, so its bytes are its definition. The
+  # file is NOT unwritable as code. Measured 2026-08-24:
   # dput(S, control = c("all", "hexNumeric")) round-trips bit-identically,
   # and even a default dput() round trip (max element difference 4.44e-16)
   # still leaves axes_sigma_degenerate() returning "ill_conditioned". The

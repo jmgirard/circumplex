@@ -2537,3 +2537,58 @@ same data, but whether variant B's shipped intervals cover was not measured.
 
 **Reopens.** A study at another truth family, on non-normal data, or with a
 bias-reduced estimator, whose verdict changes which families pass.
+
+### D-069 (2026-10-22): `axes_reliability()` does not show the accuracy certificate's estimate on computed fits — declines RR21 recommendation 5, moves nothing D-051 or D-062 decided (M168 plan gate)
+
+**Context.** RR21 recommendation 5 asked M111 to consider showing the
+certificate's estimate on fits that compute, not only inside refusal
+warnings. M111 did not take it up, and the "Degeneracy criterion
+remainders" candidate row carried it as part (iii), waiting on its own
+GP4 gate. That gate is the M168 plan's.
+
+**Decision.** Do not add the field. D-062 consults the certificate only on
+fits its selector routes, and rejected consulting it on every fit, so the
+field would hold a number on rare near-degenerate fits and nothing on the
+rest. An empty value cannot tell a user whether a fit was certified or
+never checked, and GP4 makes the field a lasting part of the returned
+object once shipped.
+
+**Rejected.** A field filled on routed fits and NA elsewhere, for the
+reason above. A field filled on every fit, which reverses D-062's rejection
+of pricing every fit.
+
+**Consequences.** Part (iii) leaves the candidate row with M168. A computed
+fit's certificate stays internal; a refused fit still names its estimate in
+the warning (M111).
+
+**Reopens.** A user request for a per-fit accuracy figure, or a change to
+D-062 that consults the certificate on every fit.
+
+### D-070 (2026-10-22): a test fixture with no rerunnable origin carries a provenance element saying so, and its committed bytes are its definition — an exception to the r-package profile's generator rule (M168 plan gate)
+
+**Context.** `cairn/PROFILE.md`'s test-doctrine slot asks every committed
+test fixture for a committed generator that rebuilds it from scratch, plus
+any seed. `tests/testthat/fixtures/rb18-counterexample-b.rds` came from the
+RB18 random search, whose seed was not kept, so no generator can rebuild
+it. `mc-seeded-pins.rds` pins output from code that the M4 refactor
+replaced. Neither carries a provenance element.
+
+**Decision.** Such a fixture carries a `provenance` element naming its
+source, how it was made, and which of generator and seed was not kept. Its
+committed bytes are then its definition, and the generator clause does not
+apply to it. A fixture that a committed script can rebuild keeps the
+profile rule unchanged.
+
+**Rejected.** A data-raw script that writes the fixture from literal
+values: it copies the known bytes and gives no way to rerun the original
+search. Replacing counterexample B with a matrix from a seeded search: it
+changes what the certificate tests cover and regenerates every exact value
+pinned from the old matrix.
+
+**Consequences.** M168 adds the element to the two fixtures without it and
+points the profile rule at this entry. The validation doctrine's
+reproducibility rule still binds reference values; an input matrix found
+by search is not one.
+
+**Reopens.** A fixture whose missing generator hides a stale or wrong value
+that a test then trusts.

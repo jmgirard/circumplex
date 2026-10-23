@@ -77,11 +77,10 @@ rules in tracking-rules:
   D-entry for dependencies, pre-1.0 waiver rule — are universal
   (tracking-rules "Universal tracking rules").
 - Every newly exported object gets a `_pkgdown.yml` reference-index row in the same commit.
-- Every committed test fixture carries reproducible provenance: its source and
-  the committed generator (a `data-raw/` script) that regenerates it from scratch, plus any seed —
-  the R-mechanical form of the universal Reproducibility hard-stop. The required
-  content is fixed; the shape is the repo's choice — a `provenance` attribute,
-  embedded `.rds`/`.rda` fields, or a header comment naming source + generator + seed.
+- Every committed test fixture carries provenance, the R form of the Reproducibility hard-stop. It names the
+  source, the committed `data-raw/` generator that rebuilds the fixture, and any seed. A fixture with no
+  rerunnable origin states which of these was not kept, and its bytes are then its definition (D-070).
+  The repo picks the shape: a `provenance` attribute, `.rds`/`.rda` fields, or a header comment.
 
 ## release-walk
 Followed by `/cairn-release` — a CRAN release walk (never self-submits):
