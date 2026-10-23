@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,11 +47,11 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 
 ## Coverage
 
-- AC1 → T1, T4
+- AC1 → T1, T4, T13
 - AC2 → T2, T4
-- AC3 → T1, T3, T5
-- AC4 → T4, T5, T6
-- AC5 → T6
+- AC3 → T1, T3, T5, T11, T12, T13
+- AC4 → T4, T5, T6, T13, T14
+- AC5 → T6, T14
 
 ## Tasks
 
@@ -67,6 +67,10 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - [x] T8: Fix the harness (review return 2): P1's profile takes the lower of a start from the estimate and a warm start, with a Heywood-regime endpoint check added to the checks script; an error inside one method or one resample no longer drops the replicate; B2 gives [0, 0] for a removed weight; P1 handles a lone kept harmonic; the variant-B arm counts accepted fits only; the commit is read at start; the confirmation takes a non-colliding seed base, recorded in the block as a correction after the first full run.
 - [x] T9: Re-run the full study and the confirmation, then update the record, D-068, DESIGN.md and the candidate row from the new results.
 - [x] T10: Make the documentation and test fixes the Review section settles as fix now (code comments, `ci_method` text, vignette, NEWS, the threshold test, .gitignore), and file the follow-up candidate row.
+- [ ] T11: Rebuild P1 to M167-D6 (RR27 recs 1 to 3, 6, 7; pass-3 diff-bug #10) and replace check 4d with RR27's endpoint check, the two-start P1 as its plant (M167-D7, diff-bug #2). Record the changes under the block's corrections heading.
+- [ ] T12: Run the 10-fit timing pilot on an unloaded machine and the new endpoint check, and apply M167-D7's stop rule: keep P1, or remove it from the verdict with its figures reported as not established.
+- [ ] T13: Re-run the full study and the confirmation where T11 or T12 changes a scored figure, then update the record, D-068 (P1's status, the estimator it measures, pass-3 diff-bug #4 and #5), DESIGN.md and the candidate row from the results.
+- [ ] T14: Make the other pass-3 fix-now items (diff-bug #6 to #9, #11, #12, #14 to #16; blame-history #1, #3, #6; prior-review #3 to #5; ripple #3) and state the engine's contract in DESIGN.md (M167-D8), then run `document()`, `test()` and `check()`.
 
 ## Work log
 
@@ -121,6 +125,11 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-21: review pass 3, thrash stop: diff-bug #1 shows P1's profile still misses lower basins (two starts per evaluation), the third defect return (after the NEWS entry and P1's warm-start endpoints) and the second failure of the P1 figures by a new mechanism of the same shape; and random restarts beat the engine's own optimum in 6 of 37 boundary N = 250 fits. The disposition goes to the user.
 - 2026-10-21: thrash stop answered: the user chose "Escalate to Fable" (a review brief on making P1's profile search, and the engine's own search, reach the global minimum; P1 then fixed on its advice and the study re-run). The 21 fix-now items of pass 3 wait for the same implement pass.
 - 2026-10-21: blocked on RB27 (global minimum in P1's profile search and the engine; the user's escalation choice at the thrash stop is the per-instance approval to spawn Fable).
+- 2026-10-22: implement resumed (no id given, M167 the only blocked milestone); RR27 absent, so the approval gate was posed; the user chose to spawn Fable. An earlier Fable run started 2026-10-21 left scripts in that session's scratchpad and no report.
+- 2026-10-22: the user stopped Fable's K = 6 prototype run after 5 h 40 min (about 68 CPU-hours, no results file) and had Fable write RR27 from the evidence it had, with the prototype's cost as a Q3 finding and its figures marked unmeasured.
+- 2026-10-22: merged origin/master (M168) into the branch; ROADMAP and DECISIONS conflicts resolved by keeping both sides (M167 blocked, M168 done; D-068 before D-069 and D-070).
+- 2026-10-22: RR27 ingested (Fable, advisory): Decisions M167-D5 to D8, D-071, candidate row "State and settle the CPM engine estimate"; recs 1 to 8 and 10 applied, 9 not adopted, 11 to 15 rejected as reasoned; RB27 and RR27 moved to `cairn/reviews/archive/`; unblocked, status in-progress.
+- 2026-10-22: T11 to T14 added (minor amendment) for RR27 and the pass-3 fix-now items; Coverage extended.
 
 ## Decisions
 
@@ -128,6 +137,10 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - M167-D2 (2026-10-21, RR26 recommendations): applied 1 to 4, 6 to 12 and 15, which put per-replicate records, the variant-B arm, the basic bootstrap, P1, the "passes from N" ladder, a 5% conditioning limit, an allowance scaled to the realized count, a 5% vacuous-interval limit, the ln v wording fix, the expected outcome and a fresh-seed confirmation of any raw-path pass into the header before the first full run. Rec 5 (P1 for angles), 13 (a non-normal cell) and 14 (an unequal-communality cell) are deferred to the "Boundary-regime interval improvement" row, because the ship step needs them and this study's verdict does not. Rejects 16 to 21 are accepted as reasoned: no fresh seeds at the raw cells, 500 replicates, no studentized bootstrap, no softmax-scale Wald, F3 and the F2 bias-corrected form kept.
 - M167-D3 (2026-10-21, RR26 Q2 and rec 21): D-002 does not reach the CPM's ζ and β, because its ground is circularity and these parameters are linear. Where a bias-corrected interval fails here, the record gives RR26's reason: the bootstrap does not see most of the bias.
 - M167-D4 (2026-10-21, RR26 rec 11, the expected outcome, written before the run): the β0 shortfall is an estimator bias of about one SD at N <= 1000 that no re-centering of the present estimate removes. So "no family passes β on the raw-data path" is the expected reading, and the ship step reads the "passes from N" ladder.
+- M167-D5 (2026-10-22, RR27 Q1, Q2 and Q6; promoted to D-071): the lower minima that restarts find are stationary points of the same model, mostly at the Heywood wall, which the theory-centred battery cannot reach. The shipped estimate is the right object for B1, B2, F1, F3, the basic bootstraps and the F2 forms, so their figures stand as figures about that estimator, and the record and D-068 say which estimator it is, with the share of accepted fits where a lower optimum was found (rec 10, applied). The engine is not changed here; the third pass's diff-bug #3 is closed by D-071 and its candidate row.
+- M167-D6 (2026-10-22, RR27 Q2 and Q3, recs 1, 2, 3, 6, 7 applied): P1 is rebuilt to the pre-registered definition. An anchor pass per fit (the engine optimum, dispersed refits around it and around the battery start, a communality-wall probe per scale, wide angle probes) keeps every distinct minimum within 10 T units of the lowest as a branch, and P1's F-hat is the lowest. Each profile evaluation starts from the nearest path solution and from every branch. The outward search starts at the anchor's component value. Each finite crossing is verified with dispersed starts and the wall probes; a lower point joins the branches and the search continues outward, at most 3 rounds and within a per-component run budget, and a component that hits a cap is reported unverified. A set that is not an interval is reported as its hull, with the re-entry count per component. A throwing `nlminb()` start is skipped. Each fit records the anchor gap and whether the engine's estimate lies inside P1's interval. All of this goes under the block's corrections heading; the band, scoring rule and pass rule do not change.
+- M167-D7 (2026-10-22, RR27 Q4 and Q5, recs 4 and 5 applied): check 4d is replaced by RR27's endpoint check (its own anchor from 36 dispersed refits and the probes; 24 dispersed starts and the probes at every finite endpoint under an independent seed; pass when no endpoint is below 3.79 or above 3.89 and P1's anchor is within .05 T units of the check's), with the two-start P1 as its plant. Stop rule, fixed before any code: a 10-fit timing pilot of the final P1 on an unloaded core must come in at or under 6 CPU-seconds per fit at the median, and the check must pass. If either fails, P1 is removed from the verdict with its figures reported as not established, not re-tuned. A fourth defect return on P1's figures removes it the same way.
+- M167-D8 (2026-10-22, RR27 recs 8, 9 and 11 to 15): rec 8's DESIGN.md statement of the engine's contract is done here; the help-page statement and the estimator milestone go to the new candidate row "State and settle the CPM engine estimate", because this milestone already has defect returns and its criteria do not widen (D-118). Rec 9, following the profile from both ends, is not adopted: the design already projects about 1.25 times the budget, and the stop rule removes P1 rather than adding passes. Rejects 11 to 15 are accepted as reasoned: the battery as profile starts, random starts alone, an engine-anchored P1, an engine hotfix, and re-running the K = 6 prototype as written.
 
 ## Review
 

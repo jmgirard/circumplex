@@ -2592,3 +2592,42 @@ by search is not one.
 
 **Reopens.** A fixture whose missing generator hides a stale or wrong value
 that a test then trusts.
+
+### D-071 (2026-10-22): the CPM engine's estimate is the maximum-likelihood solution in the basin its theory-centred starts reach, not the global minimum; this is documented, not hotfixed, and what the estimate should be goes to its own milestone (M167, RR27)
+
+**Context.** M167's third review pass found that random restarts reach a
+lower discrepancy than the fit `cpm_engine()` accepts, while the fit is
+accepted and its multimodality flag stays FALSE. RR27 characterized these
+lower points. They are stationary points of the same model, most at the
+Heywood wall with one or two more scales at a communality of 1, some with
+two scales swapped across the circle; they are not mirror images or orders
+the canonicalization maps back. `cpm_start_set()` is theory-centred, and
+the reproduction rule certifies agreement among those starts only, so
+neither can see these basins. The design specifies this battery and "keep
+the lowest F", and the CircE oracle and the T calibration rest on the
+estimator it gives.
+
+**Decision.** The shipped estimator stays as it is: the maximum-likelihood
+solution in the basin that the theoretical configuration's starts reach.
+It is not a user-visible bug against the engine's design, so no hotfix. The
+gap is in the description: the help page and DESIGN.md do not say which
+solution the estimate is, or that the fit statistic is then conservative.
+M167 states the contract in DESIGN.md; the help-page statement and the
+choice of estimator go to one candidate row, the choice planned at Fable
+tier.
+
+**Rejected.** A hotfix that globalizes the engine: in RR27's simulation the
+lower solutions are farther from the truth than the shipped ones, the
+published oracle reports the shipped solution, and the T calibration would
+need a re-run. Leaving the contract unstated: users read the fit statistic,
+RMSEA and CFI without knowing that a lower discrepancy can exist.
+
+**Consequences.** M167's bootstrap, Wald and F-family figures describe the
+shipped estimator, and its record says so. P1, a likelihood-ratio interval,
+is anchored to the lowest minimum its own search finds, not to the engine's
+estimate (M167's Decisions section). A later milestone that changes the
+estimator re-runs the T calibration and the CPM oracles.
+
+**Reopens.** A real-data fit where the shipped solution misleads a user in
+a way the documented contract does not cover, or a search shown to
+saturate whose figures change which solution is the better estimate.
