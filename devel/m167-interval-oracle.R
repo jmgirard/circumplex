@@ -172,6 +172,29 @@
 #   raw-data replicate. The two draw different things (a Wishart matrix
 #   against simulated rows) at different N, and each cell is scored on its
 #   own, so this is left as it is and recorded here.
+#
+# CORRECTIONS AFTER THE THIRD REVIEW (RR27, 2026-10-22). None changes the
+# truths, cells, methods, scoring rule, band or pass rule.
+#   P1's statistic needs F_hat to be the global minimum of F and F_prof(t)
+#   the global minimum at each t; the engine's optimum is not always the
+#   global minimum, and two starts per evaluation missed lower basins. P1
+#   now follows the definition as far as a bounded search can
+#   (m167_profile_ci() in devel/m167-interval-helpers.R): F_hat is the
+#   lowest minimum of an anchor pass, each side starts from the anchor's
+#   value of the component rather than the estimate's, every evaluation
+#   also starts from each anchor branch, and every finite crossing is
+#   re-checked from dispersed starts and wall probes and followed further
+#   out when a lower point is found. A component that hits P1's caps has no
+#   interval, counted as undefined like an NA standard error. Where the set
+#   of t under the cutoff is not an interval, P1 reports its hull and counts
+#   the re-entry; a cell where over 5% of fits re-enter for a component
+#   carries that share beside the figure. P1 draws its starts from its own
+#   seed (the replicate's seed + 5e8) and restores the random stream.
+#   P1 is kept in the verdict only if a 10-fit timing pilot gives a median
+#   of at most 6 CPU-seconds per fit and the endpoint check (4d in
+#   devel/m167-interval-checks.R) passes; otherwise it is removed with its
+#   figures reported as not established (M167-D7).
+#   A method that errors now still gives [0, 0] for a removed weight.
 # ==== PRE-REGISTRATION END ====
 #
 # Usage:  Rscript devel/m167-interval-oracle.R                  # full run
@@ -205,6 +228,9 @@ SEED_NEW <- 20261021
 SEED_CONF <- 30261022
 # the code commit this run uses, read at start (the save happens much later)
 RUN_COMMIT <- tryCatch(system("git rev-parse HEAD", intern = TRUE),
+                       error = function(e) NA_character_)
+# uncommitted edits at start, which the commit alone would not show
+RUN_STATUS <- tryCatch(system("git status --porcelain", intern = TRUE),
                        error = function(e) NA_character_)
 CORES <- max(1, parallel::detectCores() - 1)
 LEVEL <- 0.95
@@ -271,12 +297,13 @@ boot_summary <- function(reps, eng) {
 
 one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
   ti <- match(cfg_name, names(configs))
+  rep_seed <- seed_base + 1e6 * ti +
+    1e3 * match(N, if (raw) NS_RAW else NS_COR) + i
+  set.seed(rep_seed)
   if (raw) {
-    set.seed(seed_base + 1e6 * ti + 1e3 * match(N, NS_RAW) + i)
     X <- cpm_simulate(truth_fit, N)
     R <- stats::cor(X)
   } else {
-    set.seed(seed_base + 1e6 * ti + 1e3 * match(N, NS_COR) + i)
     R <- stats::cov2cor(stats::rWishart(1, N - 1, truth_fit$matrices$Phat)[, , 1])
   }
   eng <- try(suppressWarnings(cpm_engine(R, angles = angles, m = 3,
@@ -291,7 +318,11 @@ one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
   # replicate (counted as undefined) and the other methods untouched, so a
   # method's failure never removes the replicate from every method.
   safe_ci <- function(expr) {
-    tryCatch(expr, error = function(e) m167_empty_ci(p, 4))
+    tryCatch(expr, error = function(e) {
+      out <- m167_empty_ci(p, 4)
+      out$beta[eng$beta == 0, ] <- 0     # a removed weight is [0, 0] for every method
+      out
+    })
   }
   no_reps <- list(theta = matrix(NA_real_, 0, p), zeta = matrix(NA_real_, 0, p),
                   beta = matrix(NA_real_, 0, 4), n_ok = 0L,
@@ -316,6 +347,7 @@ one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
   se_defined <- !anyNA(c(se$angle[free], se$zeta, se$beta))
   ci$B2 <- safe_ci(m167_wald(eng, se, LEVEL))
   vb <- NULL
+  p1diag <- NULL
   if (!control) {
     ci$F1 <- safe_ci(m167_transformed_wald(eng, se, LEVEL))
     f2 <- safe_reps(suppressWarnings(m167_param_reps(eng, N, BOOTS)))
@@ -323,7 +355,12 @@ one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
     ci$F2bc <- safe_ci(m167_bc(f2, eng, LEVEL))
     ci$F2b <- safe_ci(m167_basic(f2, eng, LEVEL))
     boots$F2 <- boot_summary(f2, eng)
-    ci$P1 <- safe_ci(suppressWarnings(m167_profile_ci(eng, R, N, LEVEL)))
+    # P1 draws its starts from its own seed and restores the stream, so the
+    # methods after it see the same random numbers as before
+    ci$P1 <- safe_ci(suppressWarnings(m167_profile_ci(eng, R, N, LEVEL,
+                                                      seed = rep_seed + 5e8)))
+    p1diag <- ci$P1$diag
+    ci$P1$diag <- NULL
     if (raw) {
       e_b <- try(suppressWarnings(cpm_engine(R, angles = angles, m = 3,
                                              variant = "B")), silent = TRUE)
@@ -346,7 +383,8 @@ one_replicate <- function(cfg_name, N, i, raw, truth_fit, cfg, seed_base) {
     sides = lapply(scored, `[[`, "side"),
     widths = lapply(scored, `[[`, "width"),
     boots = boots,
-    vb = vb
+    vb = vb,
+    p1diag = p1diag
   )
 }
 
@@ -513,7 +551,65 @@ pack_replicates <- function(reps, methods) {
   colnames(vb) <- c(paste0("zeta_", 1:8), paste0("beta_", 0:3), "heywood",
                     "accepted")
   list(est = round(est, 6), flags = flags, endpoints = round(ends, 5),
-       boot_B1 = boot_mat("B1"), boot_F2 = boot_mat("F2"), vb = round(vb, 6))
+       boot_B1 = boot_mat("B1"), boot_F2 = boot_mat("F2"), vb = round(vb, 6),
+       p1 = pack_p1(reps))
+}
+
+# P1's per-fit diagnostics (M167-D6): the anchor gap in T units, branches,
+# restarts, whether the anchor failed, minimizations, and per zeta and beta
+# component whether it is unverified, its re-entries, and whether the
+# engine's estimate lies inside P1's interval (NA for a removed weight or a
+# replicate where P1 errored).
+P1_COMPS <- c(paste0("zeta_", 1:8), paste0("beta_", 0:3))
+pack_p1 <- function(reps) {
+  cols <- c("anchor_gap", "n_branches", "restarts", "failed_anchor", "runs",
+            paste0("unverified_", P1_COMPS), paste0("reentry_", P1_COMPS),
+            paste0("est_inside_", P1_COMPS))
+  m <- t(vapply(reps, function(r) {
+    d <- r$p1diag
+    out <- stats::setNames(rep(NA_real_, length(cols)), cols)
+    if (is.null(d)) return(out)
+    out[1:5] <- c(d$anchor_gap, d$n_branches, d$restarts, d$failed_anchor,
+                  d$runs)
+    key <- ifelse(d$components$family == "zeta",
+                  paste0("zeta_", d$components$row),
+                  paste0("beta_", d$components$row - 1L))
+    out[paste0("unverified_", key)] <- d$components$unverified
+    out[paste0("reentry_", key)] <- d$components$reentry
+    out[paste0("est_inside_", key)] <- d$components$est_inside
+    out
+  }, numeric(length(cols))))
+  round(m, 4)
+}
+
+# per-cell P1 descriptives: the share of fits whose anchor lies below the
+# engine's optimum (gap over .05 T units), and per component the unverified
+# share, the share with a re-entry, and the share of fits whose estimate lies
+# outside P1's interval
+summarize_p1 <- function(reps) {
+  m <- pack_p1(reps)
+  if (all(is.na(m[, "runs"]))) return(NULL)
+  share <- function(x) mean(x, na.rm = TRUE)
+  list(
+    n = sum(!is.na(m[, "runs"])),
+    anchor_below_engine = share(m[, "anchor_gap"] > 0.05),
+    anchor_gap_max = max(m[, "anchor_gap"], na.rm = TRUE),
+    failed_anchor = share(m[, "failed_anchor"] == 1),
+    runs_median = stats::median(m[, "runs"], na.rm = TRUE),
+    components = data.frame(
+      component = P1_COMPS,
+      unverified = vapply(P1_COMPS, function(k) {
+        share(m[, paste0("unverified_", k)] == 1)
+      }, numeric(1)),
+      reentry = vapply(P1_COMPS, function(k) {
+        share(m[, paste0("reentry_", k)] > 0)
+      }, numeric(1)),
+      est_outside = vapply(P1_COMPS, function(k) {
+        share(m[, paste0("est_inside_", k)] == 0)
+      }, numeric(1)),
+      row.names = NULL
+    )
+  )
 }
 
 summarize_cell <- function(out, methods, cfg) {
@@ -543,6 +639,7 @@ summarize_cell <- function(out, methods, cfg) {
     removed_rate = colMeans(removed),
     by_method = by_method, pooled = pooled,
     bias = if (control) NULL else summarize_bias(reps, cfg),
+    p1 = if (control) NULL else summarize_p1(reps),
     replicates = if (control) NULL else pack_replicates(reps, methods)
   )
 }
@@ -712,6 +809,6 @@ saveRDS(list(results = results, verdict = verdict, control = control_table,
              allowance = "1.4 * sqrt(.93 * .07 / n)",
              vacuous_max = VACUOUS_MAX, undefined_max = UNDEFINED_MAX,
              seeds = c(m4 = SEED_M4, new = SEED_NEW, confirm = SEED_CONF),
-             commit = RUN_COMMIT,
+             commit = RUN_COMMIT, git_status = RUN_STATUS,
              date = Sys.Date()), out_file, compress = "xz")
 cat("saved:", out_file, "\n")

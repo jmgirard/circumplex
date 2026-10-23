@@ -18,8 +18,11 @@
 #      N = 20000 fit, and a gradient-free re-profile puts the statistic at
 #      3.84 at its endpoints.
 #   4d. P1's finite endpoints at boundary N = 250 (mostly Heywood fits) are
-#      not false: re-profiled from the estimate, the statistic there is not
-#      clearly below 3.84.
+#      neither too narrow nor too wide: an independent search (its own anchor
+#      and its own dispersed starts and probes, RR27 Q4) puts the statistic
+#      between 3.79 and 3.89 at every one, and P1's anchor within .05 T units
+#      of the check's. The two-start P1 that M167's third review found too
+#      narrow is the plant and must fail.
 #   5. The angle side rule scores hand-built arcs correctly.
 #
 # Usage: Rscript devel/m167-interval-checks.R   (about 2 minutes)
@@ -169,46 +172,113 @@ report("LR at P1's zeta_1 endpoints equals 3.84 within .05 (gradient-free refit)
        sprintf("%.3f %.3f", lr_ends[1], lr_ends[2]))
 
 # ---- 4d. P1 endpoints in the Heywood regime ------------------------------------
-# At boundary N = 250 most fits are Heywood fits, where a warm-started profile
-# once stalled and gave false endpoints (M167 review). Re-profile each finite
-# P1 endpoint from the estimate with a gradient-free minimizer: the statistic
-# there must not fall clearly below the cutoff. `p1_fun` lets a plant swap in
-# another P1 implementation.
+# At boundary N = 250 most fits are Heywood fits, and lower basins exist that
+# a profile started from few points misses (M167 reviews 2 and 3, RR27). The
+# check runs its own search, independent of P1's starts and seed: an anchor
+# from 36 dispersed free refits around the engine optimum (sd .7), a wall
+# probe per scale and +/-30 degree angle probes; then, at every finite P1
+# endpoint, a re-profile from 12 starts at sd .5 and 12 at sd .8 around the
+# estimate's free parameters, the same probes, the check's own anchor
+# solution and P1's own endpoint solution. The statistic is taken against the
+# lower of the check's anchor and P1's, F evaluated at the parameters P1
+# reports, so a P1 that out-searches the check is not read as too narrow.
+# Too narrow (below 3.79), too wide (above 3.89) and a P1 anchor more than
+# .05 T units above the check's all fail. `p1_fun` lets the plant swap in.
 p1_endpoint_check <- function(p1_fun, n_fits = 12L) {
   crit <- stats::qchisq(.95, 1)
-  low <- 0L
-  tested <- 0L
-  heywood_tested <- 0L
+  N <- 250L
+  out <- c(fits = 0L, tested = 0L, heywood_tested = 0L, low = 0L, high = 0L,
+           anchor_off = 0L, unverified = 0L)
   for (i in seq_len(n_fits)) {
     set.seed(88000L + i)
-    X <- matrix(stats::rnorm(250 * 8L), 250) %*% chol(P_bnd)
+    X <- matrix(stats::rnorm(N * 8L), N) %*% chol(P_bnd)
     R <- stats::cor(X)
     eng <- suppressWarnings(cpm_engine(R, angles = angles, m = 3,
                                        variant = "A"))
     if (!isTRUE(eng$accepted)) next
-    pr <- p1_fun(eng, R, 250L)
-    setup <- m167_profile_setup(eng, R, 250L)
-    for (comp in setup$comps) {
+    out[["fits"]] <- out[["fits"]] + 1L
+    pr <- suppressWarnings(p1_fun(eng, R, N))
+    if (!is.null(pr$diag)) {
+      out[["unverified"]] <- out[["unverified"]] +
+        sum(pr$diag$components$unverified)
+    }
+    spec <- eng$spec
+    q <- length(eng$par)
+    probe <- function(g) {
+      c(lapply(spec$i_zeta, function(k) {
+        h <- g
+        h[k] <- stats::qlogis(0.99)
+        h
+      }), unlist(lapply(spec$i_angle, function(k) {
+        lapply(c(30, -30), function(d) {
+          h <- g
+          h[k] <- h[k] + d * pi / 180
+          h
+        })
+      }), recursive = FALSE))
+    }
+    set.seed(99000L + i)
+    anchor_starts <- c(lapply(1:36, function(k) {
+      eng$par + stats::rnorm(q, 0, 0.7)
+    }), probe(eng$par))
+    best <- list(par = eng$par, F = eng$F)
+    for (st in anchor_starts) {
+      f <- tryCatch(cpm_optimize_one(st, R, spec), error = function(e) NULL)
+      if (!is.null(f) && is.finite(f$F) && f$F < best$F) best <- f
+    }
+    setup <- m167_profile_setup(eng, R, N)
+    # P1's anchor, evaluated at the parameters P1 reports (the engine
+    # optimum for the plant): a check anchor below it means P1 missed the
+    # global minimum; a P1 anchor below the check's is the better reference
+    F_p1 <- if (is.null(pr$diag)) eng$F else setup$obj(pr$diag$anchor_g)
+    if (setup$n * (F_p1 - best$F) > 0.05) {
+      out[["anchor_off"]] <- out[["anchor_off"]] + 1L
+    }
+    setup$F_hat <- min(best$F, F_p1)
+    for (j in seq_along(setup$comps)) {
+      comp <- setup$comps[[j]]
       ends <- pr[[comp$family]][comp$row, ]
-      for (t in ends) {
+      p1_end <- if (is.null(pr$diag)) NULL else pr$diag$end_g[[j]]
+      for (side in 1:2) {
+        t <- ends[side]
         if (is.na(t) || t <= 1e-6 || t >= 1 - 1e-6) next   # natural bounds
-        st <- m167_profile_stat(setup, comp, stats::qlogis(t),
-                                use_gradient = FALSE)$stat
-        tested <- tested + 1L
+        s <- stats::qlogis(t)
+        g_est <- comp$full(comp$x0, s)
+        # P1's own endpoint solution is a start too, so a reading above the
+        # cutoff means P1's own point is above it, not that the check's
+        # search fell short
+        sts <- c(lapply(1:12, function(k) comp$x0 + stats::rnorm(length(comp$x0), 0, 0.5)),
+                 lapply(1:12, function(k) comp$x0 + stats::rnorm(length(comp$x0), 0, 0.8)),
+                 lapply(probe(g_est), comp$split),
+                 list(comp$split(best$par)),
+                 if (!is.null(p1_end[[side]])) list(comp$split(p1_end[[side]])))
+        st <- m167_profile_stat(setup, comp, s, starts = sts)$raw
+        out[["tested"]] <- out[["tested"]] + 1L
         if (comp$family == "zeta" && eng$zeta[comp$row] > 0.995) {
-          heywood_tested <- heywood_tested + 1L
+          out[["heywood_tested"]] <- out[["heywood_tested"]] + 1L
         }
-        if (st < crit - 0.05) low <- low + 1L
+        if (st < crit - 0.05) out[["low"]] <- out[["low"]] + 1L
+        if (st > crit + 0.05) out[["high"]] <- out[["high"]] + 1L
       }
     }
   }
-  c(tested = tested, heywood_tested = heywood_tested, low = low)
+  out
 }
-hc <- p1_endpoint_check(m167_profile_ci)
-report("P1 endpoints at boundary N = 250: none with the statistic below 3.79",
-       hc[["low"]] == 0L && hc[["heywood_tested"]] > 0L,
-       sprintf("%d endpoints tested (%d on Heywood communalities), %d low",
-               hc[["tested"]], hc[["heywood_tested"]], hc[["low"]]))
+check_detail <- function(hc) {
+  sprintf(paste("%d fits, %d endpoints tested (%d on Heywood communalities),",
+                "%d low, %d high, %d anchors off, %d components unverified"),
+          hc[["fits"]], hc[["tested"]], hc[["heywood_tested"]], hc[["low"]],
+          hc[["high"]], hc[["anchor_off"]], hc[["unverified"]])
+}
+hc <- p1_endpoint_check(function(eng, R, N) m167_profile_ci(eng, R, N, seed = 1L))
+report("P1 endpoints at boundary N = 250: all within [3.79, 3.89], anchors agree",
+       hc[["low"]] == 0L && hc[["high"]] == 0L && hc[["anchor_off"]] == 0L &&
+         hc[["heywood_tested"]] > 0L,
+       check_detail(hc))
+hp <- p1_endpoint_check(m167_profile_ci_twostart)
+report("plant: the two-start P1 fails the same check",
+       hp[["low"]] > 0L || hp[["high"]] > 0L || hp[["anchor_off"]] > 0L,
+       check_detail(hp))
 
 # ---- 5. angle side rule --------------------------------------------------------
 arcs <- rbind(c(350, 10),    # straddles 0/360, truth 0 inside
