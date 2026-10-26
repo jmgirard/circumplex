@@ -121,6 +121,31 @@ point on a circle at an estimated angle, with a communality index and a
 shared correlation function; the fit of that structure is summarized with the
 usual covariance-structure indices (chi-square, RMSEA, SRMR, CFI, TLI).
 }
+\section{Which solution is reported}{
+
+The engine minimizes the discrepancy function from a fixed set of starts.
+For the free-angle models (\code{"quasi-circumplex"} and
+\code{"equal-communality"}), the starts are the theoretical \code{angles}, their
+mirror image about the reference scale, and four fixed patterns of 15- and
+30-degree offsets from them. For the fixed-angle models
+(\code{"constrained-angles"} and \code{"circulant"}), the angles stay at their
+theoretical values, and the starts are one start and three fixed
+rescalings of its communalities. In both cases the communality and weight
+starts are computed from the sample correlation matrix. With
+\code{scaling = "free"}, one more run starts from the \code{"unit"} solution. The
+estimate is the solution with the lowest discrepancy that these runs
+reach: the maximum-likelihood solution in the basin they reach.
+
+That solution is not always the global minimum. A configuration with a
+lower discrepancy can exist that these runs do not reach, for example with
+more scales at a communality of 1 or with scales in other positions on the
+circle. The reproduction part of the convergence acceptance criterion and
+the "competing near-tied optima" note compare these runs only, so neither
+signals such a configuration. Where one exists, the reported chi-square
+statistic is larger than at the lower discrepancy, so its p-value is
+smaller and its RMSEA and CFI are no better.
+}
+
 \section{Confidence intervals}{
 
 The bootstrap (the raw-data default) refits the model to each resampled
