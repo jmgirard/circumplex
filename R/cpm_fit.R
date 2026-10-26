@@ -1553,10 +1553,9 @@ cpm_boundary_proximity <- function(object) {
 #'   `scaling = "free"`, one more run starts from the `"unit"` solution. The
 #'   estimate is the solution with the lowest discrepancy that these runs
 #'   reach: the maximum-likelihood solution in the basin they reach. (When a
-#'   correlation-function weight of that solution is below 0.01, the reduced
-#'   model without that harmonic is refit from it. The refit is reported,
-#'   with more degrees of freedom, when its discrepancy is no more than 1e-8
-#'   higher.)
+#'   correlation-function weight of that solution is near zero, the harmonic
+#'   can be removed and the reduced model, which has more degrees of freedom,
+#'   is refit from it and reported instead.)
 #'
 #'   That solution is not always the global minimum. A configuration with a
 #'   lower discrepancy can exist that these runs do not reach, for example with
