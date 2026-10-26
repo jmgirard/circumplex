@@ -1,13 +1,13 @@
 # M169: State which solution the CPM estimate is on the cpm_fit() help page
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — the `cpm_fit()` help page that users read
-- **Branch/PR:** —
+- **Branch/PR:** m169-cpm-estimate-help-page
 
 ## Goal
 
@@ -35,7 +35,7 @@ The `cpm_fit()` help page says which solution the CPM estimate is, and that a co
 
 ## Tasks
 
-- [ ] T1: Pick the pinned sample. Refit RR27's boundary N = 250 cases (M167 raw-data seeds, replicates 11, 21, 26, 28, 30, 31) with `ci_method = "analytic"`. Choose a seed where one communality-wall start (one scale's communality start at logit .99, from the engine optimum) reaches a lower point. Both the gap and the highest F on the segment between the two points must be above 1 T unit. Measure the gap from the committed construction, not from RR27's figures.
+- [x] T1: Pick the pinned sample. Refit RR27's boundary N = 250 cases (M167 raw-data seeds, replicates 11, 21, 26, 28, 30, 31) with `ci_method = "analytic"`. Choose a seed where one communality-wall start (one scale's communality start at logit .99, from the engine optimum) reaches a lower point. Both the gap and the highest F on the segment between the two points must be above 1 T unit. Measure the gap from the committed construction, not from RR27's figures.
 - [ ] T2: Write the test in `tests/testthat/test-cpm_boundary.R`. Rebuild the boundary truth inline, simulate the sample at the stated seed, and assert the fit's acceptance, the absent marker and the gap. Mark it `skip_on_cran()`, because the basin `nlminb()` lands in can differ by platform. Keep its run time under 2 s.
 - [ ] T3: Add the roxygen section to `cpm_fit()` with ASCII text only, then run `devtools::document()`. Correct DESIGN.md's "At small N" sentence in place, marked `corrected M169`.
 - [ ] T4: Add the NEWS.md entry. Run `devtools::test()` and `devtools::check(manual = TRUE)` (TinyTeX on PATH).
@@ -49,6 +49,8 @@ The `cpm_fit()` help page says which solution the CPM estimate is, and that a co
 - 2026-10-26: criteria audit (full mode, fresh Opus reader): 7 findings on M169, all accepted. AC1(d) now says RMSEA and CFI are "no better", because they floor at 0 and cap at 1 (R/cpm_fit.R:1085, 1097). AC1(a) now names the fixed-angle start set and the data-based communality starts. AC1(c) now names only the reproduction part of the check. AC2 now promises that the test shows the claim, uses analytic CIs and a gap above 1 T unit, and is skipped on CRAN for platform basin drift. AC4 now uses the manual check, because roxygen prose can break the PDF manual.
 - 2026-10-26: plan gate chose a CRAN skip for the AC2 test over a CRAN-run test with a loose tolerance, because the basin `nlminb()` reaches can change by platform and a tolerance cannot cover a different basin. Falsified by an arm64 or win-builder run in which the pinned sample reaches the same basin.
 - 2026-10-26: question set: the user asked to plan without implementing yet. The run ends at the plan commit.
+- 2026-10-26: implement started on branch m169-cpm-estimate-help-page, cut from master at f354e17b.
+- 2026-10-26: T1 done: refit the six seeds (21261706 + replicate) with analytic CIs and ran one wall start per scale (that u_j at qlogis(.99), from the engine optimum, `cpm_optimize_one()`). Only replicate 30 (seed 21261736), wall start on HI, clears both bars: gap 1.963 T units (T 7.284 to 5.321), segment barrier 10.93 T units, gradient norm 6.7e-7 at the lower point; the fit is accepted with no warning and no multimodal marker. Its other seven wall starts return the engine's F (gap 0.000), so the gap check can fail. Replicate 11 HI/JK reached .75 T, replicate 21 DE/HI .65 T, below the bar.
 
 ## Decisions
 
