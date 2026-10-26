@@ -190,7 +190,8 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
 #' diagnostics in plain language. When the confidence intervals are analytic,
 #' prints a coverage caution calibrated by simulation: unconditionally when the
 #' sample size is modest (N < 2000, where Wald intervals mis-covered for every
-#' configuration studied), and up to N = 50000 when the fitted solution shows a
+#' configuration studied), and from N = 2000 up to but not including N = 50000
+#' when the fitted solution shows a
 #' boundary or weak-identification marker (Heywood communality, removed
 #' harmonic, small correlation-function weight, ill-conditioning, or competing
 #' near-tied optima), the regime where they mis-covered even at large N (see
@@ -323,7 +324,8 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   # N-conditional analytic-CI caution (design sec. 5.2), calibrated by the B6
   # coverage oracle: unconditional below cpm_analytic_ci_n_caution;
   # boundary-marker-conditional below cpm_analytic_ci_n_boundary_caution
-  # (see the constants in R/cpm_fit.R for the measured coverage behind both).
+  # (see the constants in R/cpm_fit.R for the measured coverage behind both,
+  # which was measured on fits with a defined analytic standard error).
   # The SAME thresholds apply to the free-scaling family: the M19 coverage
   # oracle measured its theta/zeta/beta coverage regime to be the diag family's
   # (sigma-hat ~= 1 at correlation truths), so the diag thresholds are

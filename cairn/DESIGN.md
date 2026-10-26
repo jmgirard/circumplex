@@ -72,7 +72,9 @@ co-maintainers.
 row): boundary-regime CI coverage failure at field N (documented, cautioned,
 but users live in that regime); shipped instrument norms have never been
 re-verified against their published sources; CPM fits at field N sit in a
-59–91% Heywood regime the cautions describe but users may not absorb. (A
+59–91% Heywood regime the cautions describe but users may not absorb (a
+rate measured at the M4 octant truths with free angles; fixing the angles
+at their true values removes most of it, corrected M167). (A
 fourth — the `repel = TRUE` branch hand-computing canvas coordinates, D-019's
 flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
 corrected 2026-08-06.)
@@ -321,6 +323,20 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 | Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS exactly when the angle set satisfies first- and second-harmonic balance (Σcos = Σsin = Σcos2θ = Σsin2θ = 0); equal spacing (p ≥ 3) implies the condition but is not necessary — structured unequal sets can satisfy it (sharpened 2026-07-07 per the M5 spec §2.1; the safe sufficient direction "equally spaced ⇒ identical" that all existing uses rely on is unchanged). Off the balance condition it is the conventional Gurtman estimator, not least-squares; documented. The SEM-based SSM layer (`ssm_sem()`) instead always uses the OLS projection `(BᵀB)⁻¹Bᵀ` — the two functionals coincide for all shipped (equally spaced) instruments and genuinely differ off balance. |
 | Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA'd; their unreliability is the CI's job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is **per parameter, not per replicate**: `ssm_replicate_intervals()` quantiles each parameter column with `na.rm = TRUE`, so a degenerate replicate's undefined displacement (and fit, if flat) is dropped only from that parameter's CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
 
+### CPM engine estimate: what it is (D-071)
+
+The estimate `cpm_fit()` reports is the maximum-likelihood solution in the
+basin that its theory-centred starts (`cpm_start_set()`) reach. The engine
+keeps the lowest discrepancy F among those starts. That is not always the
+global minimum of F. At small N a lower F can exist, mostly at the Heywood
+wall, that these starts cannot reach. The reproduction rule and the
+multimodality flag compare those starts only, so they do not see it. Where
+a lower F exists, T = n·F̂ is larger than at the lowest discrepancy, so the
+reported fit is worse than the model's best. The CircE oracle, the T
+calibration and M167's interval figures all describe this estimator. Which
+solution the estimate should be is the candidate row "State and settle the
+CPM engine estimate" (RR27, M167).
+
 ### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
 
 Recorded 2026-07-07 from `devel/m4-coverage-oracle.R` (seeded; results in
@@ -343,23 +359,60 @@ Analytic-only ladder: interior truths reach the [.90, .98] band at
 **N = 20000** (angle .70–.81) and recover only by **N = 50000** (.934) —
 matching the A-review F1 finding. What this record decides:
 
-- **Bootstrap default affirmed, with a documented failure.** The bootstrap
-  dominates the analytic method for angles everywhere (.90–.95 vs .76–.88;
-  analytic angle coverage does not improve 250→1000 at boundary truths) and
-  for ζ at N ≥ 500. But the design's acceptance band ([.90, .98] for the
-  default at every N/parameter) **fails**: ζ under-covers at N ≤ 500 (down
-  to .758, misses one-sided above truth — ζ̂'s boundary bias, which
-  percentile intervals inherit), and β under-covers at boundary truths at
-  every N (~.77, flat in N — the classic percentile-bootstrap failure for a
-  parameter near its boundary, structural rather than small-sample). The
-  BCa/alternative-interval follow-up is recorded in ROADMAP (post-M4 note).
+- **Bootstrap default affirmed, with documented failures** (corrected M167).
+  Pooled, the bootstrap covers angles better than the analytic method at
+  every cell in the table (.90 to .95 against .76 to .88), and analytic angle
+  coverage at the boundary truth does not rise from N = 250 to 1000. It does
+  not cover ζ better: pooled analytic ζ coverage is higher at both truths at
+  N = 250 and 500 and at interior N = 1000. The analytic figures are
+  conditional on a defined standard error, which 13 to 73% of fits at
+  N ≤ 1000 lack (M167 record, `devel/m167-interval-oracle.md`). The design's
+  band ([.90, .98] for the default at every N and parameter) fails. Per
+  component (M167 record):
+  - ζ covers .73 to .85 per scale at N = 250 and .85 to .91 at N = 500. Its
+    misses lie above the truth: 15 to 26% of intervals lie above it and 0 to
+    2% below at N = 250, and 9 to 15% above at N = 500.
+  - Before the Monte Carlo allowance: at the boundary truth, β0, β2 and β3
+    lie outside the band at every N studied. At the interior truth, β0 and β3 lie outside it at every N, and
+    β2 at N = 500 and 1000. β1 lies inside it everywhere. The per-weight
+    table below gives each figure.
+  - The largest shortfall is on the largest weight, β0 (tied with β3 at
+    boundary N = 250). Nearly all its misses lie below the truth (0.5% of
+    its intervals lie above it at interior N = 250). The misses of β2 and β3
+    lie mostly above it.
+  - The cause is a bias of the estimator, not a weight near zero. β̂0 is
+    biased by .65 to 1.05 of its SD at N ≤ 1000. The bootstrap's mean shift
+    is 19 to 67% of that bias. Refitting the same data with the angles fixed
+    at theory (variant B) removes the β0 bias in every raw-data cell; the
+    pre-registered reading, which also asks for a variant-B Heywood rate under
+    5%, confirms the angle and communality mode as the cause at the boundary
+    truth and at interior N = 1000 only (M167; D-068).
+  - M167 scored transformed Wald, parametric-bootstrap, bias-corrected,
+    basic and profile-likelihood intervals on the same data. Its verdict is
+    D-068. The profile-likelihood interval is out of that verdict: it failed
+    the stop rule M167-D7 fixed before any code, so its figures are not
+    established.
+
+  Shipped-bootstrap (B1) coverage per β weight, with the share of intervals
+  on the side that carries the misses (M167 record):
+
+  | Cell | β0 | β1 | β2 | β3 |
+  |---|---|---|---|---|
+  | boundary N=250 | .741 (below .26) | .928 | .785 (above .22) | .741 (above .22) |
+  | boundary N=500 | .674 (below .33) | .930 | .732 (above .27) | .740 (above .26) |
+  | boundary N=1000 | .656 (below .34) | .949 | .756 (above .24) | .731 (above .27) |
+  | interior N=250 | .842 (below .15) | .953 | .906 | .869 (above .13) |
+  | interior N=500 | .806 (below .19) | .949 | .884 (above .11) | .893 (above .11) |
+  | interior N=1000 | .814 (below .19) | .959 | .896 (above .10) | .857 (above .14) |
+
 - **`summary()` caution calibrated** (constants in R/cpm_fit.R):
   unconditional below N = 2000; between 2000 and 50000 conditional on the
   fit's own boundary/weak-identification markers (Heywood, removed
   harmonics, min β̂ < .10, Hessian condition > 1e8 — the markers that
   separated the two regimes above — plus the multimodality flag, not
   separately measured but the same regime), with the fired markers named in
-  the caution text.
+  the caution text. The analytic coverage behind these thresholds was
+  measured on fits with a defined standard error (noted M167, RR26).
 - **T = n·F̂ is not χ²_df at these truths at field N**: seeded KS rejects in
   5 of 6 cells (only interior N=1000 passes, p = .255), tracking the Heywood
   rates (.21–.91 across cells; boundary pile-up makes T a mixture). At a
@@ -369,8 +422,12 @@ matching the A-review F1 finding. What this record decides:
   accordingly (W1 vignette material).
 - **Heywood solutions are the norm, not the exception, at field N** for
   octant-like truths at ζ = .75: 59–91% of fits at N ≤ 500 contain at least
-  one ζ̂ > .995 (driven by the weakly identified alternating/Nyquist mode of
-  equally spaced grids interacting with β₀).
+  one ζ̂ > .995. The free angles drive most of it (corrected M167): refitting
+  the same data with the angles fixed at theory (the true angles in the
+  simulation) lowers the Heywood rate to 0
+  to 3% at the boundary truth, and to 37%, 8% and 1% at the interior truth
+  at N = 250, 500 and 1000. RR26 found the alternating communality mode is
+  the weakest direction at the interior truth.
 - Replicate exclusions were small (used 411–494 of 500 per cell; acceptance
   criterion; zero worker errors) and are counted in the RDS.
 - Measurement caveats, checked: the recorded run scored circular-CI
@@ -380,9 +437,9 @@ matching the A-review F1 finding. What this record decides:
   the anchor-free span rule reproduced every coverage number to all printed
   decimals, so the table is insensitive to the rule. The boundary-cell β
   coverage is not a polish artifact: fit-level polish rates were ≤ .04
-  (boundary N=250) and 0.00 elsewhere, so the flat ~.77 reflects percentile
-  intervals at a near-boundary β truth, not degenerate zero-width intervals
-  from removed harmonics.
+  (boundary N=250) and 0.00 elsewhere, so the flat ~.77 is not made of
+  degenerate zero-width intervals from removed harmonics. M167 traced it to
+  the estimator's bias (corrected M167).
 
 ### CPM free-scaling analytic CIs: measured coverage (M19 coverage oracle)
 

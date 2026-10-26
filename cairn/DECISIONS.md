@@ -2464,6 +2464,99 @@ condition number in an `"uncertified"` warning.
 **Reopens.** Either condition in D-062's Reopens clause. A reachable fit
 refused `"uncertified"` on the selector route also reopens part (v).
 
+### D-068 (2026-10-21): no CPM interval family passes M167's study at every sample size, and its ladder names two passes a ship step can take up — reads D-002 as not reaching zeta and beta (M167, RR26)
+
+**Context.** M167 scored `cpm_fit()`'s shipped percentile bootstrap (B1) and
+Wald interval (B2), and seven candidate intervals, against the band
+[.90, .98] per component at the two M4 truths. The candidates were a
+transformed Wald interval (F1), a parametric bootstrap read as a percentile
+(F2p), bias-corrected (F2bc) or basic (F2b) interval, a bias-corrected (F3)
+or basic (Bb) interval on the B1 replicates, and a profile-likelihood
+interval (P1), which M167-D7's stop rule later took out of the verdict. The
+raw-data path ran at N = 250, 500 and 1000, and the
+correlation-matrix path at those N and 2000, 5000 and 20000, on normal data.
+RR26 reviewed the design before the full run. The figures are in
+`devel/m167-interval-oracle.md` and `devel/m167-interval-results.rds`.
+
+**Decision.** In the strict form, a pass at every cell listed for the path,
+no family passes on either path for angles, communalities or weights. In the
+ladder form, a pass from some N up to the largest listed N, two entries
+pass, both unconditionally: B1 angles from N = 1000 on the raw-data path,
+and F2bc weights from N = 5000 on the correlation-matrix path. The raw-data
+path's largest cell is N = 1000, so the B1 entry means a pass at N = 1000
+and says nothing about larger N. P1 communalities also score as passing
+from N = 1000 on the raw-data path, but that figure is not established: the
+third review showed P1's endpoints too narrow, and the rebuilt P1 failed
+both gates M167-D7 fixed before any code (an endpoint check and a timing
+pilot; the pilot ran on a loaded machine, but the endpoint check failed on
+its own), so the stop rule removed P1 from the verdict. The F2bc weights pass
+only through the Monte Carlo allowance, below .90 at the boundary truth.
+Every other (family, path, parameter family) fails at its largest listed N.
+A confirmation run on fresh seeds confirmed the passes at N = 1000. It did
+not confirm B1 angles at N = 250, which the ladder entry does not rest on.
+At the boundary truth no candidate covers beta_0 inside the band
+unconditionally at N <= 1000: F3 and F2bc stay below it, and B2 and F1
+pass only on the fits with a defined standard error. The shortfall is a
+bias of the estimator that neither re-centered form tested here (F3, F2bc)
+removes at the boundary truth (M167-D1 and M167-D4;
+the expected outcome written before the run held). At the interior truth,
+F3's beta_0 passes at N = 1000. A ship step can take up the two ladder
+entries within the scope below.
+
+Every figure scores the estimate `cpm_fit()` ships, the maximum-likelihood
+solution in the basin its theory-centred starts reach, which is not always
+the global minimum (D-071). In the third review, random restarts found a
+lower discrepancy in some boundary N = 250 fits (the record gives the
+count). The study-wide share of such fits is not measured: it was to come
+from P1's anchor pass.
+
+The verdict applies the band and pass rule in the pre-registration block of
+`devel/m167-interval-oracle.R` at the results commit df9ae5b9. Commit
+908ed678 fixed the band, the scoring rule and the pass rule, and they have
+not changed since. No full-run output existed at that commit; the control
+run's B1 and B2 output did, and the block names it. The review of the first
+full run found harness defects, among them false P1 endpoints near a Heywood
+wall, an error in one method dropping the replicate from every method, and
+confirmation seeds that collided with the main run's. The block lists the
+fixes under its corrections heading, and the study and the confirmation
+were re-run; the verdict did not change. The third review found P1's
+endpoints still too narrow; P1 was rebuilt under RR27's design and stop rule
+and failed it, so P1 left the verdict and nothing was re-run, since no other
+scored figure changed. The changes after the design
+review and before the first full run were these: the
+basic bootstrap on both replicate sets, P1, the variant-B diagnostic arm,
+per-replicate records, a width record with a 5% vacuous-interval limit, an
+allowance scaled to the realized count in place of a fixed .015, a 5%
+conditioning limit, the ladder as a verdict form, the fresh-seed
+confirmation, the corrected wording for an estimate of exactly 1, and the
+expected outcome.
+
+D-002 does not reach the CPM's communalities and weights. Its ground is
+circularity, and these parameters are linear. A bias-corrected interval is
+not refused for them. F3 fails here because the bootstrap sees only part
+of the bias, not because of D-002.
+
+**Scope.** The verdict holds for normal data, p = 8 octant scales, equal
+communalities of .75, m = 3, variant A, the two weight truths, and the unit
+(diag) family. Intervals on the correlation-matrix path assume normality,
+because that path sees no raw data. Nothing here covers non-normal data,
+unequal communalities, other instruments or variants, or the free family
+(D-010).
+
+**Rejected.** Shipping a family from this study: the ship step decides the
+API and is the "Boundary-regime interval improvement" row's work. A
+re-centered interval for beta_0 at N <= 1000: the bootstrap reproduces only
+part of the bias, so the re-centered forms tested here stay below the band
+at the boundary truth.
+
+**Consequences.** The candidate row's promotion condition, a pass named
+here, holds for the two ladder entries. `summary()` and its cautions do
+not change. Fixing the angles (variant B) removed the beta_0 bias on the
+same data, but whether variant B's shipped intervals cover was not measured.
+
+**Reopens.** A study at another truth family, on non-normal data, or with a
+bias-reduced estimator, whose verdict changes which families pass.
+
 ### D-069 (2026-10-22): `axes_reliability()` does not show the accuracy certificate's estimate on computed fits — declines RR21 recommendation 5, moves nothing D-051 or D-062 decided (M168 plan gate)
 
 **Context.** RR21 recommendation 5 asked M111 to consider showing the
@@ -2518,3 +2611,44 @@ by search is not one.
 
 **Reopens.** A fixture whose missing generator hides a stale or wrong value
 that a test then trusts.
+
+### D-071 (2026-10-22): the CPM engine's estimate is the maximum-likelihood solution in the basin its theory-centred starts reach, not the global minimum; this is documented, not hotfixed, and what the estimate should be goes to its own milestone (M167, RR27)
+
+**Context.** M167's third review pass found that random restarts reach a
+lower discrepancy than the fit `cpm_engine()` accepts, while the fit is
+accepted and its multimodality flag stays FALSE. RR27 characterized these
+lower points. They are stationary points of the same model, most at the
+Heywood wall with one or two more scales at a communality of 1, some with
+two scales swapped across the circle; they are not mirror images or orders
+the canonicalization maps back. `cpm_start_set()` is theory-centred, and
+the reproduction rule certifies agreement among those starts only, so
+neither can see these basins. The design specifies this battery and "keep
+the lowest F", and the CircE oracle and the T calibration rest on the
+estimator it gives.
+
+**Decision.** The shipped estimator stays as it is: the maximum-likelihood
+solution in the basin that the theoretical configuration's starts reach.
+It is not a user-visible bug against the engine's design, so no hotfix. The
+gap is in the description: the help page and DESIGN.md do not say which
+solution the estimate is, or that the fit statistic is then larger than at
+the lowest discrepancy.
+M167 states the contract in DESIGN.md; the help-page statement and the
+choice of estimator go to one candidate row, the choice planned at Fable
+tier.
+
+**Rejected.** A hotfix that globalizes the engine: in RR27's simulation the
+lower solutions are farther from the truth than the shipped ones, the
+published oracle reports the shipped solution, and the T calibration would
+need a re-run. Leaving the contract unstated: users read the fit statistic,
+RMSEA and CFI without knowing that a lower discrepancy can exist.
+
+**Consequences.** M167's bootstrap, Wald and F-family figures describe the
+shipped estimator, and its record says so. P1, a likelihood-ratio interval,
+is anchored to the lowest minimum its own search finds, not to the engine's
+estimate (M167's Decisions section); M167-D7's stop rule later took P1 out
+of the verdict. A later milestone that changes the
+estimator re-runs the T calibration and the CPM oracles.
+
+**Reopens.** A real-data fit where the shipped solution misleads a user in
+a way the documented contract does not cover, or a search shown to
+saturate whose figures change which solution is the better estimate.

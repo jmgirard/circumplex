@@ -1392,6 +1392,10 @@ cpm_bootstrap <- function(engine, sdata, boots, interval) {
 # measured the same two-regime pattern for scaling = "free" (interior in-band
 # at N = 2000, boundary only near N = 50000; sigma-hat ~= 1 at correlation
 # truths), so BOTH thresholds are coverage-validated for both families.
+# Both oracles measured that coverage on fits with a defined analytic
+# standard error; fits whose information matrix is singular have no Wald
+# interval and were not counted (M167's record, devel/m167-interval-oracle.md,
+# gives the share of such fits at N <= 1000).
 cpm_analytic_ci_n_caution <- 2000L
 cpm_analytic_ci_n_boundary_caution <- 50000L
 
@@ -1511,8 +1515,10 @@ cpm_boundary_proximity <- function(object) {
 #'   `VarRatio` column (the ratio of reproduced to input variance); they carry
 #'   no confidence interval. The analytic intervals for the remaining parameters
 #'   follow the same sample-size caution as the default family: their coverage
-#'   regime was measured (the free-family coverage oracle) to match it, so
-#'   `summary()` cautions below `n = 2000` and in near-boundary fits. The input
+#'   regime was measured (the free-family coverage oracle, on fits with a
+#'   defined standard error) to match it, so `summary()` cautions below
+#'   `n = 2000`, and from `n = 2000` up to but not including `n = 50000` in
+#'   fits that show a boundary or weak-identification marker. The input
 #'   is still a correlation matrix (unit diagonal).
 #' @param reference The index into `scales` of the variable whose angle is fixed
 #'   at its theoretical value to identify the rotation (default = 1).
@@ -1545,8 +1551,17 @@ cpm_boundary_proximity <- function(object) {
 #'   a refit failing the convergence acceptance criterion are excluded with a
 #'   warning reporting how many; the intervals are then conditional on
 #'   estimability. Analytic (Wald) intervals are asymptotically valid but can
-#'   materially mis-cover at field-typical sample sizes; `summary()` prints a
-#'   caution below `n = 2000`. Analytic angle intervals are reported on the
+#'   materially mis-cover at field-typical sample sizes. For
+#'   `ci_method = "analytic"`, `summary()` prints a caution whenever the
+#'   sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows
+#'   a boundary or weak-identification marker (a Heywood communality, a
+#'   removed harmonic, a correlation-function weight below 0.10, an
+#'   ill-conditioned Hessian, or competing near-tied optima); at N >= 50000 it
+#'   prints none. The coverage behind these thresholds was measured on fits
+#'   with a defined analytic standard error. Analytic intervals come from the
+#'   normal-theory information matrix, so they assume multivariate-normal
+#'   data; on the `cormat` path, where they are the only choice, the data
+#'   cannot be resampled to avoid that. Analytic angle intervals are reported on the
 #'   unwrapped branch of the estimate (endpoints may fall outside [0, 360)
 #'   near the boundary).
 #' @section Reproducibility:

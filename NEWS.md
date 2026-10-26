@@ -333,6 +333,24 @@
 
 ## Documentation
 
+* `?cpm_fit` now states both conditions under which `summary()` cautions
+  about analytic (Wald) intervals. The caution prints whenever N is below
+  2000. From 2000 up to but not including 50000 it prints only when a
+  boundary or weak-identification marker fires. The page lists the five
+  markers. Before, it gave the second condition only as "near-boundary
+  fits", with no upper limit and no list of markers.
+
+* The "CPM Fits at a Boundary" vignette now says which correlation-function
+  weights the bootstrap intervals miss, and why. The package's bootstrap
+  validation found that the largest weight is missed at least as often as
+  any other. Almost
+  all of its misses fall below the true value. In those simulations, which
+  drew normal data for eight octant scales with equal communalities, the
+  cause is a bias in the weight estimates, which the bootstrap reproduces
+  only in part. The page
+  no longer says that the shortfall belongs to a weight near zero. It also
+  no longer says that the bias of the point estimates is unmeasured.
+
 * Four vignettes now open with a "Not yet peer reviewed" notice under their
   Level line. The pages are "SEM-Based SSM Analysis", "Latent Group
   Contrasts", "Bayesian SSM Analysis" and "Growth Models on SSM Parameters".
