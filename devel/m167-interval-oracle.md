@@ -30,7 +30,10 @@ figures below come from `devel/m167-interval-results.rds` (the full run),
   `devel/m167-interval-checks.R`. The third review replaced check 4d, and
   the rebuilt P1 fails the new check (next section).
 - Run times are the elapsed times each run printed. The .rds files do not
-  store them.
+  store them. Nor do they store the endpoint-check counts or the third
+  review's restart count below. Those come from the check's printed output
+  and the review, as the milestone file's work log and Review section record
+  them.
 
 ## P1 is not established
 

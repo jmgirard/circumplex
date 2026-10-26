@@ -2467,7 +2467,7 @@ refused `"uncertified"` on the selector route also reopens part (v).
 ### D-068 (2026-10-21): no CPM interval family passes M167's study at every sample size, and its ladder names two passes a ship step can take up — reads D-002 as not reaching zeta and beta (M167, RR26)
 
 **Context.** M167 scored `cpm_fit()`'s shipped percentile bootstrap (B1) and
-Wald interval (B2), and six candidate families, against the band
+Wald interval (B2), and seven candidate intervals, against the band
 [.90, .98] per component at the two M4 truths. The candidates were a
 transformed Wald interval (F1), a parametric bootstrap read as a percentile
 (F2p), bias-corrected (F2bc) or basic (F2b) interval, a bias-corrected (F3)
@@ -2488,7 +2488,8 @@ and says nothing about larger N. P1 communalities also score as passing
 from N = 1000 on the raw-data path, but that figure is not established: the
 third review showed P1's endpoints too narrow, and the rebuilt P1 failed
 both gates M167-D7 fixed before any code (an endpoint check and a timing
-pilot), so the stop rule removed P1 from the verdict. The F2bc weights pass
+pilot; the pilot ran on a loaded machine, but the endpoint check failed on
+its own), so the stop rule removed P1 from the verdict. The F2bc weights pass
 only through the Monte Carlo allowance, below .90 at the boundary truth.
 Every other (family, path, parameter family) fails at its largest listed N.
 A confirmation run on fresh seeds confirmed the passes at N = 1000. It did
@@ -2496,7 +2497,8 @@ not confirm B1 angles at N = 250, which the ladder entry does not rest on.
 At the boundary truth no candidate covers beta_0 inside the band
 unconditionally at N <= 1000: F3 and F2bc stay below it, and B2 and F1
 pass only on the fits with a defined standard error. The shortfall is a
-bias of the estimator that no re-centering removes (M167-D1 and M167-D4;
+bias of the estimator that neither re-centered form tested here (F3, F2bc)
+removes at the boundary truth (M167-D1 and M167-D4;
 the expected outcome written before the run held). At the interior truth,
 F3's beta_0 passes at N = 1000. A ship step can take up the two ladder
 entries within the scope below.
@@ -2513,9 +2515,9 @@ The verdict applies the band and pass rule in the pre-registration block of
 908ed678 fixed the band, the scoring rule and the pass rule, and they have
 not changed since. No full-run output existed at that commit; the control
 run's B1 and B2 output did, and the block names it. The review of the first
-full run found three harness defects (false P1 endpoints near a Heywood
+full run found harness defects, among them false P1 endpoints near a Heywood
 wall, an error in one method dropping the replicate from every method, and
-confirmation seeds that collided with the main run's). The block lists the
+confirmation seeds that collided with the main run's. The block lists the
 fixes under its corrections heading, and the study and the confirmation
 were re-run; the verdict did not change. The third review found P1's
 endpoints still too narrow; P1 was rebuilt under RR27's design and stop rule
@@ -2531,7 +2533,7 @@ expected outcome.
 
 D-002 does not reach the CPM's communalities and weights. Its ground is
 circularity, and these parameters are linear. A bias-corrected interval is
-not refused for them. F3 fails here because the bootstrap does not see most
+not refused for them. F3 fails here because the bootstrap sees only part
 of the bias, not because of D-002.
 
 **Scope.** The verdict holds for normal data, p = 8 octant scales, equal
@@ -2544,7 +2546,8 @@ unequal communalities, other instruments or variants, or the free family
 **Rejected.** Shipping a family from this study: the ship step decides the
 API and is the "Boundary-regime interval improvement" row's work. A
 re-centered interval for beta_0 at N <= 1000: the bootstrap reproduces only
-part of the bias, so re-centering its replicates cannot remove it.
+part of the bias, so the re-centered forms tested here stay below the band
+at the boundary truth.
 
 **Consequences.** The candidate row's promotion condition, a pass named
 here, holds for the two ladder entries. `summary()` and its cautions do
@@ -2627,7 +2630,8 @@ estimator it gives.
 solution in the basin that the theoretical configuration's starts reach.
 It is not a user-visible bug against the engine's design, so no hotfix. The
 gap is in the description: the help page and DESIGN.md do not say which
-solution the estimate is, or that the fit statistic is then conservative.
+solution the estimate is, or that the fit statistic is then larger than at
+the lowest discrepancy.
 M167 states the contract in DESIGN.md; the help-page statement and the
 choice of estimator go to one candidate row, the choice planned at Fable
 tier.

@@ -74,7 +74,7 @@ but users live in that regime); shipped instrument norms have never been
 re-verified against their published sources; CPM fits at field N sit in a
 59–91% Heywood regime the cautions describe but users may not absorb (a
 rate measured at the M4 octant truths with free angles; fixing the angles
-removes most of it, corrected M167). (A
+at their true values removes most of it, corrected M167). (A
 fourth — the `repel = TRUE` branch hand-computing canvas coordinates, D-019's
 flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
 corrected 2026-08-06.)
@@ -372,8 +372,8 @@ matching the A-review F1 finding. What this record decides:
   - ζ covers .73 to .85 per scale at N = 250 and .85 to .91 at N = 500. Its
     misses lie above the truth: 15 to 26% of intervals lie above it and 0 to
     2% below at N = 250, and 9 to 15% above at N = 500.
-  - At the boundary truth, β0, β2 and β3 lie outside the band at every N
-    studied. At the interior truth, β0 and β3 lie outside it at every N, and
+  - Before the Monte Carlo allowance: at the boundary truth, β0, β2 and β3
+    lie outside the band at every N studied. At the interior truth, β0 and β3 lie outside it at every N, and
     β2 at N = 500 and 1000. β1 lies inside it everywhere. The per-weight
     table below gives each figure.
   - The largest shortfall is on the largest weight, β0 (tied with β3 at
@@ -423,7 +423,8 @@ matching the A-review F1 finding. What this record decides:
 - **Heywood solutions are the norm, not the exception, at field N** for
   octant-like truths at ζ = .75: 59–91% of fits at N ≤ 500 contain at least
   one ζ̂ > .995. The free angles drive most of it (corrected M167): refitting
-  the same data with the angles fixed at theory lowers the Heywood rate to 0
+  the same data with the angles fixed at theory (the true angles in the
+  simulation) lowers the Heywood rate to 0
   to 3% at the boundary truth, and to 37%, 8% and 1% at the interior truth
   at N = 250, 500 and 1000. RR26 found the alternating communality mode is
   the weakest direction at the interior truth.

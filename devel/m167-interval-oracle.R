@@ -178,7 +178,9 @@
 #   own, so this is left as it is and recorded here.
 #
 # CORRECTIONS AFTER THE THIRD REVIEW (RR27, 2026-10-22). None changes the
-# truths, cells, methods, scoring rule, band or pass rule.
+# truths, cells, band or pass rule. They change P1's method (below, in place
+# of the METHODS text's "followed outward from the estimate") and add one
+# scoring case: a P1 component that hits P1's caps counts as undefined.
 #   P1's statistic needs F_hat to be the global minimum of F and F_prof(t)
 #   the global minimum at each t; the engine's optimum is not always the
 #   global minimum, and two starts per evaluation missed lower basins. P1
@@ -661,6 +663,9 @@ run_cell <- function(cfg_name, N, raw, truth_fit, seed_base) {
 }
 
 # ---- verdict: applies the pre-registered pass rule -----------------------------
+# P1 is still scored here, so the results file holds a P1 verdict row. The
+# block's T12 outcome takes P1 out of the verdict (M167-D7), and the record and
+# D-068 report its figures as not established; a re-run does not change that.
 
 PATHS <- list(
   raw = list(cells = NS_RAW, methods = c("B1", "F3", "Bb", "B2", "F1", "P1")),
