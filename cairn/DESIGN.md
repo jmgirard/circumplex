@@ -323,6 +323,20 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 | Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS exactly when the angle set satisfies first- and second-harmonic balance (Σcos = Σsin = Σcos2θ = Σsin2θ = 0); equal spacing (p ≥ 3) implies the condition but is not necessary — structured unequal sets can satisfy it (sharpened 2026-07-07 per the M5 spec §2.1; the safe sufficient direction "equally spaced ⇒ identical" that all existing uses rely on is unchanged). Off the balance condition it is the conventional Gurtman estimator, not least-squares; documented. The SEM-based SSM layer (`ssm_sem()`) instead always uses the OLS projection `(BᵀB)⁻¹Bᵀ` — the two functionals coincide for all shipped (equally spaced) instruments and genuinely differ off balance. |
 | Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA'd; their unreliability is the CI's job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is **per parameter, not per replicate**: `ssm_replicate_intervals()` quantiles each parameter column with `na.rm = TRUE`, so a degenerate replicate's undefined displacement (and fit, if flat) is dropped only from that parameter's CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
 
+### CPM engine estimate: what it is (D-071)
+
+The estimate `cpm_fit()` reports is the maximum-likelihood solution in the
+basin that its theory-centred starts (`cpm_start_set()`) reach. The engine
+keeps the lowest discrepancy F among those starts. That is not always the
+global minimum of F. At small N a lower F can exist, mostly at the Heywood
+wall, that these starts cannot reach. The reproduction rule and the
+multimodality flag compare those starts only, so they do not see it. Where
+a lower F exists, T = n·F̂ is larger than at the lowest discrepancy, so the
+reported fit is worse than the model's best. The CircE oracle, the T
+calibration and M167's interval figures all describe this estimator. Which
+solution the estimate should be is the candidate row "State and settle the
+CPM engine estimate" (RR27, M167).
+
 ### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
 
 Recorded 2026-07-07 from `devel/m4-coverage-oracle.R` (seeded; results in
@@ -365,7 +379,7 @@ matching the A-review F1 finding. What this record decides:
   - The largest shortfall is on the largest weight, β0 (tied with β3 at
     boundary N = 250). Nearly all its misses lie below the truth (0.5% of
     its intervals lie above it at interior N = 250). The misses of β2 and β3
-    lie above it.
+    lie mostly above it.
   - The cause is a bias of the estimator, not a weight near zero. β̂0 is
     biased by .65 to 1.05 of its SD at N ≤ 1000. The bootstrap's mean shift
     is 19 to 67% of that bias. Refitting the same data with the angles fixed
@@ -375,7 +389,9 @@ matching the A-review F1 finding. What this record decides:
     truth and at interior N = 1000 only (M167; D-068).
   - M167 scored transformed Wald, parametric-bootstrap, bias-corrected,
     basic and profile-likelihood intervals on the same data. Its verdict is
-    D-068.
+    D-068. The profile-likelihood interval is out of that verdict: it failed
+    the stop rule M167-D7 fixed before any code, so its figures are not
+    established.
 
   Shipped-bootstrap (B1) coverage per β weight, with the share of intervals
   on the side that carries the misses (M167 record):

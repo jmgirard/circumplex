@@ -344,8 +344,10 @@
   weights the bootstrap intervals miss, and why. The package's bootstrap
   validation found that the largest weight is missed at least as often as
   any other. Almost
-  all of its misses fall below the true value. The cause is a bias in
-  the weight estimates, which the bootstrap reproduces only in part. The page
+  all of its misses fall below the true value. In those simulations, which
+  drew normal data for eight octant scales with equal communalities, the
+  cause is a bias in the weight estimates, which the bootstrap reproduces
+  only in part. The page
   no longer says that the shortfall belongs to a weight near zero. It also
   no longer says that the bias of the point estimates is unmeasured.
 

@@ -80,9 +80,10 @@ goal is reproducing published CIRCUM/CircE results. The fitted
 \code{VarRatio} column (the ratio of reproduced to input variance); they carry
 no confidence interval. The analytic intervals for the remaining parameters
 follow the same sample-size caution as the default family: their coverage
-regime was measured (the free-family coverage oracle) to match it, so
-\code{summary()} cautions below \code{n = 2000}, and up to \code{n = 50000} in fits
-that show a boundary or weak-identification marker. The input
+regime was measured (the free-family coverage oracle, on fits with a
+defined standard error) to match it, so \code{summary()} cautions below
+\code{n = 2000}, and from \code{n = 2000} up to but not including \code{n = 50000} in
+fits that show a boundary or weak-identification marker. The input
 is still a correlation matrix (unit diagonal).}
 
 \item{reference}{The index into \code{scales} of the variable whose angle is fixed
@@ -138,7 +139,11 @@ sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows
 a boundary or weak-identification marker (a Heywood communality, a
 removed harmonic, a correlation-function weight below 0.10, an
 ill-conditioned Hessian, or competing near-tied optima); at N >= 50000 it
-prints none. Analytic angle intervals are reported on the
+prints none. The coverage behind these thresholds was measured on fits
+with a defined analytic standard error. Analytic intervals come from the
+normal-theory information matrix, so they assume multivariate-normal
+data; on the \code{cormat} path, where they are the only choice, the data
+cannot be resampled to avoid that. Analytic angle intervals are reported on the
 unwrapped branch of the estimate (endpoints may fall outside [0, 360)
 near the boundary).
 }

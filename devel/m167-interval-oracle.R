@@ -166,7 +166,11 @@
 #   inside one method or one resample no longer drops the replicate from
 #   every method (an erroring resample counts as nonconvergent); B2 gives
 #   [0, 0] for a removed weight whose SE is undefined; the VB arm counts
-#   accepted fits only.
+#   accepted fits only; P1 gives beta_0 [1, 1] when it is the only kept
+#   harmonic.
+#   The block's opening sentence read "Nothing in this block changes after
+#   the first full run"; it now names what does not change (the truths,
+#   cells, methods, scoring rule, band and pass rule) and points here.
 #   The correlation-cell base (20261021) still sits 315 above the M4 base,
 #   so a correlation-cell replicate can start from the RNG state of a
 #   raw-data replicate. The two draw different things (a Wishart matrix
@@ -195,6 +199,9 @@
 #   devel/m167-interval-checks.R) passes; otherwise it is removed with its
 #   figures reported as not established (M167-D7).
 #   A method that errors now still gives [0, 0] for a removed weight.
+#   Outcome (T12, applied 2026-10-26): the endpoint check and the pilot both
+#   failed, so P1 is out of the verdict and its figures are not established.
+#   Nothing is re-run: no other scored figure changes (M167-D9).
 # ==== PRE-REGISTRATION END ====
 #
 # Usage:  Rscript devel/m167-interval-oracle.R                  # full run

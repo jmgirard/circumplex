@@ -85,9 +85,9 @@ about the markers covers analytic intervals only. It also says that not every
 marker was measured. *What a fired marker does and does not tell you*,
 below, has the particulars. So the markers are not validated as predictors
 of the bootstrap intervals they accompany. When the intervals are analytic,
-the list instead arrives inside a coverage caution, printed when $N$ falls
-between 2000 and 50000. Below 2000, an unconditional caution prints without
-the list. Above 50000, neither prints. To see that caution-embedded form, we
+the list instead arrives inside a coverage caution, printed when $N$ is at
+least 2000 and below 50000 and a marker fires. Below 2000, an unconditional caution prints without
+the list. At 50000 and above, neither prints. To see that caution-embedded form, we
 simulate a larger sample from the structure just estimated with
 `cpm_simulate()`. Then we refit it on the correlation-matrix path, where the
 intervals are analytic.
@@ -141,11 +141,13 @@ from a correlation matrix. That marker study measured interval **coverage**
   as any other weight. Almost every miss fell below the true value. The
   misses of two smaller weights, $\beta_2$ and $\beta_3$, fell mostly above
   it. These shortfalls
-  did not shrink from $n = 250$ to $n = 1000$, the largest sample size at
+  did not shrink as the sample size grew, up to the largest sample size at
   which the package's own bootstrap was studied. They appeared at
-  both weight patterns studied. Their cause is a bias in the weight estimates
-  themselves, not a weight that sits near zero. Refitting the same data with
-  the angles fixed at their theoretical values removed that bias. The
+  both weight patterns studied. Those simulations drew normal data for eight
+  octant scales with equal communalities. There, the cause is a bias in the
+  weight estimates themselves, not a weight that sits near zero. Refitting
+  the same data with the angles fixed at their theoretical values, which in
+  the simulations were the true angles, removed that bias. The
   bootstrap reproduces only part of the bias, so its intervals stay off
   center.
 

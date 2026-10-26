@@ -2464,7 +2464,7 @@ condition number in an `"uncertified"` warning.
 **Reopens.** Either condition in D-062's Reopens clause. A reachable fit
 refused `"uncertified"` on the selector route also reopens part (v).
 
-### D-068 (2026-10-21): no CPM interval family passes M167's study at every sample size, and its ladder names three passes a ship step can take up — reads D-002 as not reaching zeta and beta (M167, RR26)
+### D-068 (2026-10-21): no CPM interval family passes M167's study at every sample size, and its ladder names two passes a ship step can take up — reads D-002 as not reaching zeta and beta (M167, RR26)
 
 **Context.** M167 scored `cpm_fit()`'s shipped percentile bootstrap (B1) and
 Wald interval (B2), and six candidate families, against the band
@@ -2472,28 +2472,41 @@ Wald interval (B2), and six candidate families, against the band
 transformed Wald interval (F1), a parametric bootstrap read as a percentile
 (F2p), bias-corrected (F2bc) or basic (F2b) interval, a bias-corrected (F3)
 or basic (Bb) interval on the B1 replicates, and a profile-likelihood
-interval (P1). The raw-data path ran at N = 250, 500 and 1000, and the
+interval (P1), which M167-D7's stop rule later took out of the verdict. The
+raw-data path ran at N = 250, 500 and 1000, and the
 correlation-matrix path at those N and 2000, 5000 and 20000, on normal data.
 RR26 reviewed the design before the full run. The figures are in
 `devel/m167-interval-oracle.md` and `devel/m167-interval-results.rds`.
 
 **Decision.** In the strict form, a pass at every cell listed for the path,
 no family passes on either path for angles, communalities or weights. In the
-ladder form, a pass from some N up to the largest listed N, three entries
-pass, all of them unconditionally: B1 angles from N = 1000 on the raw-data
-path, P1 communalities from N = 1000 on the raw-data path, and F2bc weights
-from N = 5000 on the correlation-matrix path. The raw-data path's largest
-cell is N = 1000, so its two entries mean a pass at N = 1000 and say nothing
-about larger N; on the correlation-matrix path the same P1 communality
-intervals fail at the boundary truth at N = 20000. The F2bc weights pass
+ladder form, a pass from some N up to the largest listed N, two entries
+pass, both unconditionally: B1 angles from N = 1000 on the raw-data path,
+and F2bc weights from N = 5000 on the correlation-matrix path. The raw-data
+path's largest cell is N = 1000, so the B1 entry means a pass at N = 1000
+and says nothing about larger N. P1 communalities also score as passing
+from N = 1000 on the raw-data path, but that figure is not established: the
+third review showed P1's endpoints too narrow, and the rebuilt P1 failed
+both gates M167-D7 fixed before any code (an endpoint check and a timing
+pilot), so the stop rule removed P1 from the verdict. The F2bc weights pass
 only through the Monte Carlo allowance, below .90 at the boundary truth.
 Every other (family, path, parameter family) fails at its largest listed N.
 A confirmation run on fresh seeds confirmed the passes at N = 1000. It did
 not confirm B1 angles at N = 250, which the ladder entry does not rest on.
-No candidate fixes beta_0 at N <= 1000, because the shortfall is a bias of
-the estimator that no re-centering removes (M167-D1 and M167-D4; the
-expected outcome written before the run held). A ship step can take up the
-three ladder entries within the scope below.
+At the boundary truth no candidate covers beta_0 inside the band
+unconditionally at N <= 1000: F3 and F2bc stay below it, and B2 and F1
+pass only on the fits with a defined standard error. The shortfall is a
+bias of the estimator that no re-centering removes (M167-D1 and M167-D4;
+the expected outcome written before the run held). At the interior truth,
+F3's beta_0 passes at N = 1000. A ship step can take up the two ladder
+entries within the scope below.
+
+Every figure scores the estimate `cpm_fit()` ships, the maximum-likelihood
+solution in the basin its theory-centred starts reach, which is not always
+the global minimum (D-071). In the third review, random restarts found a
+lower discrepancy in some boundary N = 250 fits (the record gives the
+count). The study-wide share of such fits is not measured: it was to come
+from P1's anchor pass.
 
 The verdict applies the band and pass rule in the pre-registration block of
 `devel/m167-interval-oracle.R` at the results commit df9ae5b9. Commit
@@ -2504,7 +2517,10 @@ full run found three harness defects (false P1 endpoints near a Heywood
 wall, an error in one method dropping the replicate from every method, and
 confirmation seeds that collided with the main run's). The block lists the
 fixes under its corrections heading, and the study and the confirmation
-were re-run; the verdict did not change. The changes after the design
+were re-run; the verdict did not change. The third review found P1's
+endpoints still too narrow; P1 was rebuilt under RR27's design and stop rule
+and failed it, so P1 left the verdict and nothing was re-run, since no other
+scored figure changed. The changes after the design
 review and before the first full run were these: the
 basic bootstrap on both replicate sets, P1, the variant-B diagnostic arm,
 per-replicate records, a width record with a 5% vacuous-interval limit, an
@@ -2531,7 +2547,7 @@ re-centered interval for beta_0 at N <= 1000: the bootstrap reproduces only
 part of the bias, so re-centering its replicates cannot remove it.
 
 **Consequences.** The candidate row's promotion condition, a pass named
-here, holds for the three ladder entries. `summary()` and its cautions do
+here, holds for the two ladder entries. `summary()` and its cautions do
 not change. Fixing the angles (variant B) removed the beta_0 bias on the
 same data, but whether variant B's shipped intervals cover was not measured.
 
@@ -2625,7 +2641,8 @@ RMSEA and CFI without knowing that a lower discrepancy can exist.
 **Consequences.** M167's bootstrap, Wald and F-family figures describe the
 shipped estimator, and its record says so. P1, a likelihood-ratio interval,
 is anchored to the lowest minimum its own search finds, not to the engine's
-estimate (M167's Decisions section). A later milestone that changes the
+estimate (M167's Decisions section); M167-D7's stop rule later took P1 out
+of the verdict. A later milestone that changes the
 estimator re-runs the T calibration and the CPM oracles.
 
 **Reopens.** A real-data fit where the shipped solution misleads a user in
