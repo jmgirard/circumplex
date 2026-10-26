@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-26 (lessons pass, `/cairn-triage lessons`: 42 lesso
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | in-progress | — | normal | milestones/M167-cpm-interval-oracle.md |
+| M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | review | — | normal | milestones/M167-cpm-interval-oracle.md |
 | M168 | Close the degeneracy criterion remainders | done | — | normal | milestones/archive/M168-degeneracy-criterion-remainders.md |
 | M166 | ssm_trajectory() reads vcov by position and scales its balance check | done | — | normal | milestones/archive/M166-trajectory-vcov-follow-ons.md |
 | M165 | ssm_trajectory() warns on a vcov from an unbalanced fit | done | — | normal | milestones/archive/M165-trajectory-unbalanced-warning.md |

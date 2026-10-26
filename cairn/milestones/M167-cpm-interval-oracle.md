@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M167: Measure CPM interval coverage per weight and test boundary-safe intervals
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -70,7 +70,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - [x] T11: Rebuild P1 to M167-D6 (RR27 recs 1 to 3, 6, 7; pass-3 diff-bug #10) and replace check 4d with RR27's endpoint check, the two-start P1 as its plant (M167-D7, diff-bug #2). Record the changes under the block's corrections heading.
 - [x] T12: Run the 10-fit timing pilot on an unloaded machine and the new endpoint check, and apply M167-D7's stop rule: keep P1, or remove it from the verdict with its figures reported as not established.
 - [x] T13: Re-run the full study and the confirmation where T11 or T12 changes a scored figure, then update the record, D-068 (P1's status, the estimator it measures, pass-3 diff-bug #4 and #5), DESIGN.md and the candidate row from the results.
-- [ ] T14: Make the other pass-3 fix-now items (diff-bug #6 to #9, #11, #12, #14 to #16; blame-history #1, #3, #6; prior-review #3 to #5; ripple #3) and state the engine's contract in DESIGN.md (M167-D8), then run `document()`, `test()` and `check()`.
+- [x] T14: Make the other pass-3 fix-now items (diff-bug #6 to #9, #11, #12, #14 to #16; blame-history #1, #3, #6; prior-review #3 to #5; ripple #3) and state the engine's contract in DESIGN.md (M167-D8), then run `document()`, `test()` and `check()`.
 
 ## Work log
 
@@ -141,6 +141,8 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-26: T14 checkpoint (in progress; `test()`, `check()` and the claim audit running, not yet read): diff-bug #6 (corrections list: commitment sentence, lone-harmonic fix, T12 outcome), #7, #11, #12, #14; blame-history #1, #3, #6 (0.7 s for the nine fits under `load_all()`); prior-review #3 to #5; ripple #3 and the 50000 wording; D-071's P1 note; DESIGN.md "CPM engine estimate: what it is" (M167-D8). #8, #9, #15 and #16 were already done. `document()` regenerated `man/cpm_fit.Rd`; `Config/roxygen2/version` reverted.
 - 2026-10-26: paused at the user's request with T14 open: the post-merge `devtools::test()` gave 0 failures, 11 warnings (the baseline count), 1 skip; the T14 `test()`/`check()` run and the claim-audit reader were stopped before reporting, so both are owed on resume, then T14's tick and the hand-off to `/milestone-review`.
 - 2026-10-26: correction to the 2026-10-22 T12 gates line and the 2026-10-26 substantive-amendment line: `devel/m167-p1-pilot.rds` saved load averages of 8.58, 6.51 and 6.26 (1, 5 and 15 minutes) at the pilot's end, not "6 to 7".
+- 2026-10-26: claim audit: 180 claims read, 4 corrected — devel/m167-interval-oracle.md, devel/m167-interval-helpers.R, devel/m167-interval-checks.R (the pilot's load averages are 8.58, 6.51 and 6.26, not 6 to 7; the CircE reconstruction is test-cpm_oracles.R:138-143, not :136; check 4d's anchor rule is one-sided, as the code is; the first run's results file stores 8a2c6fb2, which differs from 908ed678 only in roxygen). The same reader re-read the corrections once; they hold.
+- 2026-10-26: T14 done. Verify on 3259066b: `devtools::test()` 0 failures, 11 warnings (the baseline count), 1 skip; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (devel/ is build-ignored, so the audit corrections after the check started touch nothing it built). All tasks checked; status review, handed to `/milestone-review`.
 
 ## Decisions
 
