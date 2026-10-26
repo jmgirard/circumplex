@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-22 (M168 done and archived: fixture provenance, lavaan CFI detector, oracle hex check; "Degeneracy criterion remainders" graduated; M164 row pruned for retention; one lesson; validate green.)_
+_Last hygiene check: 2026-10-26 (lessons pass, `/cairn-triage lessons`: 42 lessons to 20. Compressed: 2026-07-19 (M7 family; extended M31, M119, M120, M164), 2026-08-16 (M90), 2026-08-23 (M106), 2026-08-24 (M108 family; M115, M122), 2026-09-02 (M120), 2026-10-17 (M157). Dropped, refuted: 2026-08-22 (M105; corrected M140). Dropped, planner test: 2026-07-18 (M33) render-and-look, 2026-07-18 (M36), 2026-09-15 (M130), 2026-09-21 (M146), 2026-09-23 (M150). Dropped, rank: 2026-07-16 (M21 family) 21, 2026-07-18 (M31, M32) 32, 2026-07-17/18 (M27, M33) 33, 2026-07-18 (M33, M34) 34, 2026-07-18 (M37) 37, 2026-07-19 (M39) 39, 2026-07-21 (M50) 50, 2026-07-24 (M56 family) 56, three 2026-07-25 (M58) 58, 2026-07-26 (M60) 60, 2026-07-27 (M65 family) 65, 2026-07-19 (M40 family) 72, 2026-07-18 (M32/M35) 84, 2026-08-18 (M94) 94. No decision entry; validate green.)_
 
 ## Milestones
 
