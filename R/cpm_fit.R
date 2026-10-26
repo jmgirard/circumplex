@@ -1548,19 +1548,25 @@ cpm_boundary_proximity <- function(object) {
 #'   30-degree offsets from them. For the fixed-angle models
 #'   (`"constrained-angles"` and `"circulant"`), the angles stay at their
 #'   theoretical values, and the starts are one start and three fixed
-#'   rescalings of its communalities. In both cases the communality and weight
-#'   starts are computed from the sample correlation matrix. With
+#'   rescalings of its communality indices. In both cases the communality-index
+#'   and weight starts are computed from the sample correlation matrix. With
 #'   `scaling = "free"`, one more run starts from the `"unit"` solution. The
 #'   estimate is the solution with the lowest discrepancy that these runs
-#'   reach: the maximum-likelihood solution in the basin they reach.
+#'   reach: the maximum-likelihood solution in the basin they reach. (When a
+#'   correlation-function weight of that solution is below 0.01, the reduced
+#'   model without that harmonic is refit from it. The refit is reported,
+#'   with more degrees of freedom, when its discrepancy is no more than 1e-8
+#'   higher.)
 #'
 #'   That solution is not always the global minimum. A configuration with a
 #'   lower discrepancy can exist that these runs do not reach, for example with
-#'   more scales at a communality of 1 or with scales in other positions on the
-#'   circle. The reproduction part of the convergence acceptance criterion and
-#'   the "competing near-tied optima" note compare these runs only, so neither
-#'   signals such a configuration. Where one exists, the reported chi-square
-#'   statistic is larger than at the lower discrepancy, so its p-value is
+#'   more scales at or near a communality index of 1 or with scales in other
+#'   positions on the circle. Two checks compare these runs only, so neither
+#'   signals such a configuration: the reproduction part of the convergence
+#'   acceptance criterion, which requires at least two independent starts to
+#'   reach the lowest discrepancy, and the "competing near-tied optima" note.
+#'   Where one exists, the reported chi-square statistic is larger than at the
+#'   lower discrepancy. At the same degrees of freedom, its p-value is then
 #'   smaller and its RMSEA and CFI are no better.
 #' @section Confidence intervals:
 #'   The bootstrap (the raw-data default) refits the model to each resampled

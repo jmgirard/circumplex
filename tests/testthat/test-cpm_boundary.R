@@ -14,6 +14,10 @@
 # covered once on the unit path and not re-proved here (boundary-coverage.md
 # "shared engine" convention).
 #
+# The last section is on the unit path: the start battery that the
+# cpm_fit() help section "Which solution is reported" describes, and a lower
+# discrepancy that battery does not reach.
+#
 # Oracle rule unchanged: expected values are closed-form / construction /
 # invariants, never from memory.
 
@@ -105,11 +109,39 @@ test_that("free scaling, class D: a near-flat (tiny-eigenvalue) matrix is refuse
 
 # ---- Heywood-wall start: a lower discrepancy outside the start battery -----
 
+test_that("the start battery has the size the help page states per model", {
+  theta <- as.numeric(as_radian(as_degree(octants())))
+  R <- cpm_implied_cor(theta, rep(0.75, 8), c(0.45, 0.35, 0.15, 0.05))
+  sv <- cpm_start_values(R, theta, 3)
+  n_starts <- function(variant) {
+    spec <- cpm_spec(8, 3, variant)
+    spec$theta_ref_val <- theta[1]
+    spec$theta_fixed <- theta
+    length(cpm_start_set(spec, theta, sv)$starts)
+  }
+  # theory, mirror and four offset patterns; or one start and three rescalings
+  expect_identical(vapply(c("A", "C", "B", "D"), n_starts, integer(1)),
+                   c(A = 6L, C = 6L, B = 4L, D = 4L))
+})
+
+test_that("at equal df a larger discrepancy gives a smaller p and worse RMSEA and CFI", {
+  theta <- as.numeric(as_radian(as_degree(octants())))
+  R <- cpm_implied_cor(theta, rep(0.75, 8), c(0.45, 0.35, 0.15, 0.05))
+  ix <- function(Fhat) {
+    cpm_fit_indices(Fhat, df = 10, p = 8, N = 250, R = R, Phat = R, q = 26)
+  }
+  lo <- ix(0.05)
+  hi <- ix(0.15)
+  expect_gt(hi$chisq, lo$chisq)
+  expect_lt(hi$pvalue, lo$pvalue)
+  expect_gt(hi$rmsea, lo$rmsea)
+  expect_lt(hi$cfi, lo$cfi)
+})
+
 test_that("a wall start reaches a lower F that the accepted fit does not signal", {
+  # Replicate 30 of the boundary N = 250 cell of devel/m167-interval-oracle.R.
+  # Skipped on CRAN: the basin nlminb() reaches can differ by platform.
   skip_on_cran()
-  # The basin nlminb() lands in can differ by platform, so this pins one
-  # sample: the M167 boundary truth at N = 250, replicate 30 of
-  # devel/m167-interval-oracle.R (seed 20260706 + 1e6 + 1e3 + 30).
   scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
   P0 <- cpm_implied_cor(as.numeric(as_radian(as_degree(octants()))),
                         rep(0.75, 8), c(0.45, 0.35, 0.15, 0.05))
@@ -123,8 +155,7 @@ test_that("a wall start reaches a lower F that the accepted fit does not signal"
   expect_false(cpm_marker_labels()[["multimodal"]] %in%
                  cpm_boundary_markers(fit))
 
-  # One communality-wall start: HI's communality start at logit .99, the
-  # other parameters at the reported optimum.
+  # A communality-wall start on HI.
   d <- fit$details
   g <- d$par
   g[d$spec$i_zeta[match("HI", scales)]] <- stats::qlogis(0.99)
