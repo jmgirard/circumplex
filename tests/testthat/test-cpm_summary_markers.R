@@ -133,9 +133,7 @@ test_that("the analytic caution follows its two sample-size thresholds", {
   # note prints for 2000 <= N < 50000 only when a marker fires. Each side of
   # each threshold is checked on a fit whose markers are known. It runs on
   # CRAN: the fits are analytic on fixed correlation matrices (no RNG), and
-  # it asserts which note prints, not digits. It makes nine fits, seven
-  # distinct (fixture, n) pairs over four values of n; they took 0.7 s under
-  # load_all() on a macOS machine on 2026-10-26 (not timed under R CMD check).
+  # it asserts which note prints, not digits.
   notes <- function(fit) {
     out <- gsub("\\s+", " ", paste(capture.output(summary(fit)),
                                    collapse = " "))
@@ -158,7 +156,8 @@ test_that("the analytic caution follows its two sample-size thresholds", {
     suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
                              angles = voc$th_start, n = n, m = 2))
   }
-  expect_gt(length(cpm_boundary_markers(hey_at(49999))), 0L)
+  expect_true(cpm_marker_labels()[["heywood"]] %in%
+                cpm_boundary_markers(hey_at(49999)))
   expect_identical(notes(hey_at(1999)), c(small_n = TRUE, marker = FALSE))
   expect_identical(notes(hey_at(2000)), c(small_n = FALSE, marker = TRUE))
   expect_identical(notes(hey_at(49999)), c(small_n = FALSE, marker = TRUE))

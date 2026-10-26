@@ -85,8 +85,8 @@ about the markers covers analytic intervals only. It also says that not every
 marker was measured. *What a fired marker does and does not tell you*,
 below, has the particulars. So the markers are not validated as predictors
 of the bootstrap intervals they accompany. When the intervals are analytic,
-the list instead arrives inside a coverage caution, printed when $N$ is at
-least 2000 and below 50000 and a marker fires. Below 2000, an unconditional caution prints without
+the list instead arrives inside a coverage caution. That caution prints when
+a marker fires and $N$ is at least 2000 and below 50000. Below 2000, an unconditional caution prints without
 the list. At 50000 and above, neither prints. To see that caution-embedded form, we
 simulate a larger sample from the structure just estimated with
 `cpm_simulate()`. Then we refit it on the correlation-matrix path, where the
@@ -193,7 +193,10 @@ as what happens where those markers fire, not as how often they fire.
    under *Reading the fit indices*, which is about field sample sizes, not
    about markers. The third is parameter intervals
    that came back with ordinary width. Read them knowing that marked fits
-   covered less well than unmarked ones across all three families. One thing
+   covered less well than unmarked ones across all three families. For the
+   weights, also keep in mind the shortfall described under
+   *Correlation-function weights* above, which appeared whether or not a
+   marker fired. One thing
    does not remain usable: a parameter interval that is missing or
    zero-width. (The demonstration fit above prints `RMSEA = 0 [0, 0]`, which
    is not that failure. It is a fit statistic at its own floor, because the

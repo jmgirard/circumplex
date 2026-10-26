@@ -575,7 +575,7 @@ test_that("summary()'s analytic-CI caution follows the coverage-oracle calibrati
   # ~50000 they mis-covered only in near-boundary regimes, which the fit's
   # own diagnostics (Heywood, removed harmonics, small beta, conditioning)
   # signal. The caution is therefore unconditional below 2000 and
-  # marker-conditional up to 50000.
+  # marker-conditional below 50000.
   # (1) N >= 2000, well-identified fit: no caution. (cpm_clean_truth()'s
   # smallest beta, .15, keeps clear margin above the .10 marker.)
   tr <- cpm_clean_truth()
