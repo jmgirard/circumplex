@@ -103,7 +103,7 @@ test_that("free scaling, class D: a near-flat (tiny-eigenvalue) matrix is refuse
   )
 })
 
-# ---- Heywood wall: a lower discrepancy outside the start battery -----------
+# ---- Heywood-wall start: a lower discrepancy outside the start battery -----
 
 test_that("a wall start reaches a lower F that the accepted fit does not signal", {
   skip_on_cran()

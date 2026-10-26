@@ -1,6 +1,6 @@
 # M169: State which solution the CPM estimate is on the cpm_fit() help page
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -38,7 +38,7 @@ The `cpm_fit()` help page says which solution the CPM estimate is, and that a co
 - [x] T1: Pick the pinned sample. Refit RR27's boundary N = 250 cases (M167 raw-data seeds, replicates 11, 21, 26, 28, 30, 31) with `ci_method = "analytic"`. Choose a seed where one communality-wall start (one scale's communality start at logit .99, from the engine optimum) reaches a lower point. Both the gap and the highest F on the segment between the two points must be above 1 T unit. Measure the gap from the committed construction, not from RR27's figures.
 - [x] T2: Write the test in `tests/testthat/test-cpm_boundary.R`. Rebuild the boundary truth inline, simulate the sample at the stated seed, and assert the fit's acceptance, the absent marker and the gap. Mark it `skip_on_cran()`, because the basin `nlminb()` lands in can differ by platform. Keep its run time under 2 s.
 - [x] T3: Add the roxygen section to `cpm_fit()` with ASCII text only, then run `devtools::document()`. Correct DESIGN.md's "At small N" sentence in place, marked `corrected M169`.
-- [ ] T4: Add the NEWS.md entry. Run `devtools::test()` and `devtools::check(manual = TRUE)` (TinyTeX on PATH).
+- [x] T4: Add the NEWS.md entry. Run `devtools::test()` and `devtools::check(manual = TRUE)` (TinyTeX on PATH).
 
 ## Work log
 
@@ -53,6 +53,9 @@ The `cpm_fit()` help page says which solution the CPM estimate is, and that a co
 - 2026-10-26: T1 done: refit the six seeds (21261706 + replicate) with analytic CIs and ran one wall start per scale (that u_j at qlogis(.99), from the engine optimum, `cpm_optimize_one()`). Only replicate 30 (seed 21261736), wall start on HI, clears both bars: gap 1.963 T units (T 7.284 to 5.321), segment barrier 10.93 T units, gradient norm 6.7e-7 at the lower point; the fit is accepted with no warning and no multimodal marker. Its other seven wall starts return the engine's F (gap 0.000), so the gap check can fail. Replicate 11 HI/JK reached .75 T, replicate 21 DE/HI .65 T, below the bar.
 - 2026-10-26: T2 done: test "a wall start reaches a lower F that the accepted fit does not signal" in test-cpm_boundary.R, skip_on_cran, file runs in 0.45 s. Planted control: the same test with the wall start on PA fails at the gap expectation. devtools::test(): 0 fail, 11 warnings (lavaan, same count on master), 1 skip.
 - 2026-10-26: T3 done: section "Which solution is reported" placed before "Confidence intervals", each claim read against cpm_start_set(), cpm_start_values(), cpm_engine()'s free-scaling seed and multimodality loop, and cpm_fit_indices(). Agent choices: the fixed-angle start set is written as "one start and three fixed rescalings" (the base start plus factors .85, 1.1, .7), and the free-scaling unit-solution seed is named, because the code runs both. DESIGN.md's "At small N" sentence corrected from RR27 Q1's survey shares. document() also bumped DESCRIPTION's Config/roxygen2/version 8.1.0 to 8.1.1 (installed roxygen); committed so AC4's no-diff check holds.
+- 2026-10-26: T4 done: NEWS.md entry under Documentation. document() leaves no diff. devtools::test(): 0 fail, 11 warnings (lavaan, as on master), 1 skip. devtools::check(manual = TRUE): 0 errors, 0 warnings, 0 notes (7m 31s).
+- 2026-10-26: claim audit: 21 claims read, 1 corrected — tests/testthat/test-cpm_boundary.R (section header said "Heywood wall"; the lower point is interior, so it now says "Heywood-wall start"). The reader also noted that after a weight polish the reported F can differ from the lowest run's by up to 1e-8; the help wording is kept, because 1e-8 is the engine's own reproduction tolerance.
+- 2026-10-26: status review; handed to /milestone-review.
 
 ## Decisions
 
