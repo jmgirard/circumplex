@@ -12,7 +12,9 @@ figures below come from `devel/m167-interval-results.rds` (the full run),
   It took 117.0 minutes on 17 cores, with 500 replicates per cell and 1000
   resamples per bootstrap. The file records that commit, read when the run
   started.
-- It replaces a first full run from commit 908ed678. The review of that run
+- It replaces a first full run from commit 908ed678. That run's results
+  file stores 8a2c6fb2, the commit when it saved, and the two differ only in
+  roxygen lines of `R/cpm_fit.R`. The review of that run
   found three defects in the harness: P1 gave false endpoints near a Heywood
   wall, an error inside one method dropped the replicate from every method,
   and the confirmation seeds collided with the main run's seeds. The block's
@@ -44,8 +46,8 @@ REVIEW" heading). The rebuilt P1 failed both of the rule's gates:
   two-start P1, failed the check with 63 endpoints below and 30 above.
 - The 10-fit timing pilot (`devel/m167-p1-pilot.R`,
   `devel/m167-p1-pilot.rds`) gave a median of 8.71 CPU-seconds per fit
-  against a limit of 6. The rule asks for an unloaded core, and the machine
-  load was 6 to 7 during the pilot. The endpoint check fails on its own, so
+  against a limit of 6. The rule asks for an unloaded core. At the pilot's
+  end the load averages were 8.58, 6.51 and 6.26 (1, 5 and 15 minutes). The endpoint check fails on its own, so
   the outcome does not depend on the pilot.
 
 So P1 is out of the verdict, and every P1 figure below is reported as not

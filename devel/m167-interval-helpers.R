@@ -153,7 +153,7 @@ m167_wald <- function(engine, se, level = 0.95) {
 }
 
 # F1, the zeta arm: browne1982 eqs. 1.6.30-1.6.32 (p. 95) with h = ln v,
-# v = (1 - zeta^2) / zeta^2 (CircE's interval; test-cpm_oracles.R:136).
+# v = (1 - zeta^2) / zeta^2 (CircE's interval; test-cpm_oracles.R:138-143).
 # SE(ln v) = 2 SE(zeta) / (zeta (1 - zeta^2)) by the delta method. ln v falls
 # as zeta rises, so the back-transformed endpoints swap.
 m167_lnv_ci <- function(zeta, se_zeta, level = 0.95) {

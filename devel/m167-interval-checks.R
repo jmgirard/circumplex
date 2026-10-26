@@ -3,7 +3,7 @@
 #
 #   1. F1's zeta arm reproduces CircE's published communality-index intervals
 #      (Grassi et al. 2010, Appendix A; the reconstruction at
-#      tests/testthat/test-cpm_oracles.R:136), for all seven rows.
+#      tests/testthat/test-cpm_oracles.R:138-143), for all seven rows.
 #   2. The B1 harness copy (m167_boot_reps + m167_percentile) gives intervals
 #      identical to cpm_fit()'s shipped bootstrap at the same seed.
 #   3. F2's Wishart draw matches a row-level parametric bootstrap (the
@@ -20,8 +20,8 @@
 #   4d. P1's finite endpoints at boundary N = 250 (mostly Heywood fits) are
 #      neither too narrow nor too wide: an independent search (its own anchor
 #      and its own dispersed starts and probes, RR27 Q4) puts the statistic
-#      between 3.79 and 3.89 at every one, and P1's anchor within .05 T units
-#      of the check's. The two-start P1 that M167's third review found too
+#      between 3.79 and 3.89 at every one, and P1's anchor no more than .05
+#      T units above the check's (a lower P1 anchor is the better reference). The two-start P1 that M167's third review found too
 #      narrow is the plant and must fail.
 #   5. The angle side rule scores hand-built arcs correctly.
 #
