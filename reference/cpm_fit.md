@@ -106,10 +106,12 @@ cpm_fit(
   ratio of reproduced to input variance); they carry no confidence
   interval. The analytic intervals for the remaining parameters follow
   the same sample-size caution as the default family: their coverage
-  regime was measured (the free-family coverage oracle) to match it, so
+  regime was measured (the free-family coverage oracle, on fits with a
+  defined standard error) to match it, so
   [`summary()`](https://rdrr.io/r/base/summary.html) cautions below
-  `n = 2000` and in near-boundary fits. The input is still a correlation
-  matrix (unit diagonal).
+  `n = 2000`, and from `n = 2000` up to but not including `n = 50000` in
+  fits that show a boundary or weak-identification marker. The input is
+  still a correlation matrix (unit diagonal).
 
 - reference:
 
@@ -166,11 +168,20 @@ Resamples with a degenerate (non-positive-definite) correlation matrix
 or a refit failing the convergence acceptance criterion are excluded
 with a warning reporting how many; the intervals are then conditional on
 estimability. Analytic (Wald) intervals are asymptotically valid but can
-materially mis-cover at field-typical sample sizes;
+materially mis-cover at field-typical sample sizes. For
+`ci_method = "analytic"`,
 [`summary()`](https://rdrr.io/r/base/summary.html) prints a caution
-below `n = 2000`. Analytic angle intervals are reported on the unwrapped
-branch of the estimate (endpoints may fall outside \[0, 360) near the
-boundary).
+whenever the sample size N is below 2000, and for 2000 \<= N \< 50000
+when the fit shows a boundary or weak-identification marker (a Heywood
+communality, a removed harmonic, a correlation-function weight below
+0.10, an ill-conditioned Hessian, or competing near-tied optima); at N
+\>= 50000 it prints none. The coverage behind these thresholds was
+measured on fits with a defined analytic standard error. Analytic
+intervals come from the normal-theory information matrix, so they assume
+multivariate-normal data; on the `cormat` path, where they are the only
+choice, the data cannot be resampled to avoid that. Analytic angle
+intervals are reported on the unwrapped branch of the estimate
+(endpoints may fall outside \[0, 360) near the boundary).
 
 ## Reproducibility
 
@@ -212,7 +223,7 @@ data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 set.seed(12345)
 fit <- cpm_fit(jz2017, scales = scales, boots = 100)
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 #> Warning: 2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.
 fit
 #> 
@@ -243,7 +254,7 @@ fit
 # Matrix-input path (supply the sample size; analytic CIs)
 R <- cor(jz2017[scales])
 cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 #> 
 #> Circular Process Model (Browne, 1992) 
 #> Model:             quasi-circumplex 
