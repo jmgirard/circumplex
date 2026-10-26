@@ -102,3 +102,32 @@ test_that("free scaling, class D: a near-flat (tiny-eigenvalue) matrix is refuse
     regexp = "positive definite|singular|PD"
   )
 })
+
+# ---- Heywood wall: a lower discrepancy outside the start battery -----------
+
+test_that("a wall start reaches a lower F that the accepted fit does not signal", {
+  skip_on_cran()
+  # The basin nlminb() lands in can differ by platform, so this pins one
+  # sample: the M167 boundary truth at N = 250, replicate 30 of
+  # devel/m167-interval-oracle.R (seed 20260706 + 1e6 + 1e3 + 30).
+  scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  P0 <- cpm_implied_cor(as.numeric(as_radian(as_degree(octants()))),
+                        rep(0.75, 8), c(0.45, 0.35, 0.15, 0.05))
+  truth <- cpm_fit(cormat = P0, scales = scales, n = 10000, m = 3)
+  set.seed(21261736)
+  X <- cpm_simulate(truth, 250)
+  expect_no_warning(
+    fit <- cpm_fit(X, scales = scales, m = 3, ci_method = "analytic")
+  )
+  expect_true(fit$details$accepted)
+  expect_false(cpm_marker_labels()[["multimodal"]] %in%
+                 cpm_boundary_markers(fit))
+
+  # One communality-wall start: HI's communality start at logit .99, the
+  # other parameters at the reported optimum.
+  d <- fit$details
+  g <- d$par
+  g[d$spec$i_zeta[match("HI", scales)]] <- stats::qlogis(0.99)
+  lower <- cpm_optimize_one(g, fit$matrices$R, d$spec)
+  expect_gt(fit$fit$chisq - fit$fit$n * lower$F, 1)
+})
