@@ -143,6 +143,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-26: correction to the 2026-10-22 T12 gates line and the 2026-10-26 substantive-amendment line: `devel/m167-p1-pilot.rds` saved load averages of 8.58, 6.51 and 6.26 (1, 5 and 15 minutes) at the pilot's end, not "6 to 7".
 - 2026-10-26: claim audit: 180 claims read, 4 corrected — devel/m167-interval-oracle.md, devel/m167-interval-helpers.R, devel/m167-interval-checks.R (the pilot's load averages are 8.58, 6.51 and 6.26, not 6 to 7; the CircE reconstruction is test-cpm_oracles.R:138-143, not :136; check 4d's anchor rule is one-sided, as the code is; the first run's results file stores 8a2c6fb2, which differs from 908ed678 only in roxygen). The same reader re-read the corrections once; they hold.
 - 2026-10-26: T14 done. Verify on 3259066b: `devtools::test()` 0 failures, 11 warnings (the baseline count), 1 skip; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (devel/ is build-ignored, so the audit corrections after the check started touch nothing it built). All tasks checked; status review, handed to `/milestone-review`.
+- 2026-10-26: correction to the 2026-10-22 T12 gates line: `devel/m167-p1-pilot.rds` gives a median of 1447.5 runs per fit, not "about 1470".
 
 ## Decisions
 
@@ -240,3 +241,44 @@ Pass 3 (after review return 2), 2026-10-21, on 7bfbbd1c; origin/master is an anc
 - ripple #1: DESIGN.md "lie above" — fix now (same as diff-bug #14).
 - ripple #2: the CPM simulation paper plan's superseded claims — follow-up (already noted in that parked row).
 - ripple #3: the vignette's "printed when N falls between 2000 and 50000" can read as unconditional — fix now.
+
+Pass 4 (after the T12 stop, T13 and T14), 2026-10-26, on c877f354; origin/master is an ancestor of the branch.
+
+- AC1 evidence: the results file holds all 12 header-listed cells (9 methods at raw-data cells, 6 at correlation-matrix cells); each of its 222 (cell, method, family) tables carries component, coverage, miss_low, miss_high and n, with no repeated component. The other 48 entries are the angle slots of methods the header runs for zeta and beta only (F3, Bb, F2bc, F2b, P1), empty by design.
+- AC2 evidence: the largest pooled B1 or B2 difference between the control run and the DESIGN.md M4 table is .0205 (B2 beta, boundary N = 500), under .03.
+- AC3 evidence: D-068 states the strict and ladder verdicts per (family, path, parameter family) as the results file's verdict table gives them, names the two ladder passes, and reports P1's raw-path ladder row as not established under the block's T12 outcome (M167-D7). It names results commit df9ae5b9 and fixing commit 908ed678; the results file first entered git at eaed2b22, after 908ed678, and `git diff 908ed678 df9ae5b9` over the block changes no band, scoring or pass-rule line. It lists the changes made after the design review.
+- AC4 evidence: DESIGN.md's per-weight B1 table equals the record's (diff empty), and both match the results file at three decimals with each miss side; the communality shortfall at N = 250 and 500 lies above the truth (15 to 26% and 9 to 15% above, 0 to 2% below). Neither "at every sample size studied" nor "a property of percentile intervals at a boundary" occurs in DESIGN.md or either vignette file.
+- AC5 evidence: `man/cpm_fit.Rd` states the N < 2000 and 2000 <= N < 50000 rule with the five markers, matching `summary.circumplex_cpm()` and both constants; `document()` 0 `resolve link` lines and no diff once `Config/roxygen2/version` is reverted; `devtools::test()` 0 failures, 11 warnings, 1 skip; per (file, test, numbers-masked message) triple, a run on c877f354 and a run of 1a5aa9c4 in a scratch worktree on the same library give 8 triples, none above its baseline count; after the fix-now commits the suite still gives 0 failures and 11 warnings; `devtools::check(manual = TRUE)` on f424f570 0 errors, 0 warnings, 0 notes.
+- Consistency gate, pass 4: `cairn_validate` 0 FAIL (one sizing advisory); `pkgdown::check_pkgdown()` no problems; README untouched; NEWS.md carries the Documentation entries; no new top-level file (`.gitignore` changed only); master's newest push runs of R-CMD-check and test-coverage are success at dbf2441b (the later master commits touch `cairn/` only); both master-red alert audits and the branch-protection check exit 0; no snapshot file changed.
+- spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: D-068's Rejected clause says re-centering "cannot remove" the beta_0 bias at N <= 1000, but F3 passes interior N = 1000 — fix now, fixed a1c53a10.
+- diff-bug #2: D-068's "the bootstrap does not see most of the bias" is false at both N = 1000 cells (shift over bias .53 and .67) — fix now, fixed a1c53a10.
+- diff-bug #3: DESIGN.md says interior beta_3 and beta_2 lie outside the band without "before the Monte Carlo allowance" — fix now, fixed a1c53a10.
+- diff-bug #4: the compressed "Boundary-regime interval improvement" row lost the mechanism's limits — fix now, fixed a1c53a10.
+- diff-bug #5: the oracle still scores P1 in its verdict code — fix now (a comment at the verdict code; the logic stays so the committed results remain reproducible), fixed a1c53a10.
+- diff-bug #6: the vignette's caution sentence is 27 words, against the plain-vignettes rule — fix now, fixed f424f570.
+- diff-bug #7: D-071 and the engine-estimate row call an inflated fit statistic "conservative" — fix now, fixed a1c53a10.
+- diff-bug #8: DESIGN.md's Heywood lines lack the theory-equals-truth qualifier — fix now, fixed a1c53a10.
+- diff-bug #9: the third-review corrections heading says no method or scoring change — fix now, fixed a1c53a10; its (N - 1) scale point — reject (false: `cpm_fit_indices()` uses n = N - 1, R/cpm_fit.R:1072, as P1 does).
+- diff-bug #10: check 4d's one-sided anchor rule is unrecorded — reject (false: the 2026-10-22 work-log line on check 4d records it, and the checks header says it).
+- diff-bug #11: counts that disagree with their lists ("six candidate families", "three harness defects", "names the five marker labels") — fix now, fixed a1c53a10.
+- diff-bug #12: the work log's pilot run median "about 1470" is 1447.5 — fix now (correction line).
+- diff-bug #13: the endpoint-check and restart counts sit in no committed file, unflagged — fix now, fixed a1c53a10.
+- diff-bug #14: the new test's marker precondition asserts a count — fix now (asserts the Heywood label), fixed f424f570.
+- diff-bug #15: the new test's comment carries timing and arithmetic narrative — fix now (removed), fixed f424f570.
+- blame-history #1: D-071 does not weigh a wider deterministic start battery — follow-up ("State and settle the CPM engine estimate" lists it as an option).
+- blame-history #2: the vignette states the mechanism unscoped and "did not shrink" is loose — reject (false: it claims only that fixing the angles removed the bias, which holds in every raw-data cell, and every weight's N = 1000 shortfall is at least its N = 250 one at both truths).
+- blame-history #3: D-068's reading of D-002 rests on judgment — reject (planned change: M167-D3 adopted RR26 Q2's reading; shown to the user at the merge question).
+- blame-history #4: the new `<=` and `>=` in the Rd were not checked in the PDF manual — fix now (check(manual = TRUE) run, clean).
+- blame-history #5: DESIGN.md dropped its post-M4 ROADMAP pointer — reject (false: no stale text remains, and D-068's Consequences names the row).
+- blame-history #6: lines past 80 columns and a repeated "measured" — reject (style).
+- prior-review #1: the help page lacks the engine contract, and the deferral cites a missing D-118 — reject (planned change: D-071's Decision sends the help-page statement to the "State and settle the CPM engine estimate" row; D-118 is the cairn plugin's return-adjacent rule, not a repo entry).
+- prior-review #2: D-068 states the pilot failure with no load caveat — fix now, fixed a1c53a10.
+- ripple #1: the CPM simulation paper design and plan call the beta shortfall a structural percentile failure — follow-up (already in the parked "CPM simulation paper" row).
+- ripple #2: the same files tie Heywood rates to the Nyquist mode — follow-up (same row).
+- ripple #3: the same files' RQ2 asks whether the failure is structural — follow-up (same row).
+- ripple #4: "Evaluating Circumplex Structure" says the boundary caution prints "up to very large N" — follow-up (pre-existing since 4bf30b24; added as (iv) to "Vignette prose follow-ons").
+- ripple #5: cpm-boundary-fits item 3 offers ordinary-width intervals without the weight shortfall — fix now, fixed f424f570.
+- ripple #6: the `summary()` help says "up to N = 50000" — fix now, fixed f424f570.
+- ripple #7: a test-cpm_api.R comment says "up to 50000" — fix now, fixed f424f570.
+- Pass 3 fix-now items: fixed in b297481e and 3259066b (T13, T14).
