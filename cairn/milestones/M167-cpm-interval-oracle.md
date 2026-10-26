@@ -144,6 +144,7 @@ Measure where the percentile-bootstrap and Wald intervals of `cpm_fit()` leave t
 - 2026-10-26: claim audit: 180 claims read, 4 corrected — devel/m167-interval-oracle.md, devel/m167-interval-helpers.R, devel/m167-interval-checks.R (the pilot's load averages are 8.58, 6.51 and 6.26, not 6 to 7; the CircE reconstruction is test-cpm_oracles.R:138-143, not :136; check 4d's anchor rule is one-sided, as the code is; the first run's results file stores 8a2c6fb2, which differs from 908ed678 only in roxygen). The same reader re-read the corrections once; they hold.
 - 2026-10-26: T14 done. Verify on 3259066b: `devtools::test()` 0 failures, 11 warnings (the baseline count), 1 skip; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (devel/ is build-ignored, so the audit corrections after the check started touch nothing it built). All tasks checked; status review, handed to `/milestone-review`.
 - 2026-10-26: correction to the 2026-10-22 T12 gates line: `devel/m167-p1-pilot.rds` gives a median of 1447.5 runs per fit, not "about 1470".
+- 2026-10-26: step-7 approval: m167-cpm-interval-oracle approved for merge
 
 ## Decisions
 
