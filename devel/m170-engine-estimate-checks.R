@@ -7,11 +7,14 @@
 #      reported gap among the six, 0.33, less rounding), and on replicate 26
 #      by at least 3.275 (RR27's heavier search there, 3.28). T = (N - 1) F.
 #   2. W's starts and W's result are the same on every run: two calls under
-#      different random states give identical starts, F and estimates, and
-#      the caller's random stream is left as it was.
+#      different random states give identical starts, F and estimates, the
+#      caller's random stream is left as it was, and every W start is finite
+#      on a fit with a communality at exactly 1 (RR28).
 #   3. The finish step matches the engine: refitting E's own estimate from
 #      the full layout and finishing it gives E's F (within 1e-8) and
-#      estimates (within 1e-4), so W and H are finished the way E is.
+#      estimates (within 1e-4), so W and H are finished the way E is. The
+#      fits include boundary N = 250 replicate 6, whose E has a communality
+#      at exactly 1 in double precision; the check confirms it does.
 #   4. A throwing start is skipped: a start whose refit throws is recorded
 #      as F = NA and the other starts still run.
 # Each check prints PASS or FAIL; the script stops on any FAIL.
@@ -44,7 +47,7 @@ gaps <- unlist(parallel::mclapply(cases, function(i) {
   R <- m167_R(i)
   eng <- m170_engine_e(R, angles, 3)
   if (is.null(eng) || !isTRUE(eng$accepted)) return(NA_real_)
-  est <- m170_estimators(R, eng, 3, K = K, seed = 60261027 + i)
+  est <- m170_estimators(R, eng, 3, K = K, seed = 60261027 + i, n1 = 249)
   249 * (est$F_E - est$F_H)
 }, mc.cores = min(length(cases), max(1, parallel::detectCores() - 1))))
 names(gaps) <- cases
@@ -53,33 +56,36 @@ report("1 H reaches RR27's six lower points",
        paste(sprintf("rep %s %.3f", names(gaps), gaps), collapse = ", "))
 
 # ---- 2 ----
-R <- m167_R(26)
+# replicate 6's E has a communality at exactly 1 (asserted in check 3)
+R <- m167_R(6)
 eng <- m170_engine_e(R, angles, 3)
 spec <- m170_full_spec(eng, 3)
+g0 <- m170_theory_par(R, eng, spec, 3)
 set.seed(1)
-s1 <- m170_w_starts(m170_base_par(eng, spec), spec)
-a1 <- m170_estimators(R, eng, 3, K = 2L, seed = 7)
-state_after <- .Random.seed
+s1 <- m170_w_starts(m170_base_par(eng, spec), g0, spec)
+a1 <- m170_estimators(R, eng, 3, K = 2L, seed = 7, n1 = 249)
 set.seed(99)
-s2 <- m170_w_starts(m170_base_par(eng, spec), spec)
-a2 <- m170_estimators(R, eng, 3, K = 2L, seed = 8)
+s2 <- m170_w_starts(m170_base_par(eng, spec), g0, spec)
+a2 <- m170_estimators(R, eng, 3, K = 2L, seed = 8, n1 = 249)
 set.seed(1)
-invisible(m170_w_starts(m170_base_par(eng, spec), spec))
 restored <- {
   state_before <- .Random.seed
-  invisible(m170_estimators(R, eng, 3, K = 2L, seed = 7))
+  invisible(m170_estimators(R, eng, 3, K = 2L, seed = 7, n1 = 249))
   identical(state_before, .Random.seed)
 }
+finite <- all(vapply(s1, function(g) all(is.finite(g)), logical(1)))
 report("2 W is the same on every run",
        identical(s1, s2) && identical(a1$F_W, a2$F_W) &&
-         identical(a1$W$par, a2$W$par) && restored,
-       sprintf("%d starts, identical starts %s, identical W %s, stream restored %s",
-               length(s1), identical(s1, s2),
+         identical(a1$W$par, a2$W$par) && restored && finite &&
+         length(s1) == 101,
+       sprintf(paste("%d starts, all finite %s, identical starts %s,",
+                     "identical W %s, stream restored %s"),
+               length(s1), finite, identical(s1, s2),
                identical(a1$F_W, a2$F_W) && identical(a1$W$par, a2$W$par),
                restored))
 
 # ---- 3 ----
-diffs <- vapply(c(1:5, cases), function(i) {
+diffs <- vapply(c(1:6, cases), function(i) {
   R <- m167_R(i)
   eng <- m170_engine_e(R, angles, 3)
   spec <- m170_full_spec(eng, 3)
@@ -87,12 +93,16 @@ diffs <- vapply(c(1:5, cases), function(i) {
   fin <- m170_finish(r$par, r$F, R, spec, eng)
   ang <- abs(((fin$theta - eng$theta + 180) %% 360) - 180)
   c(F = abs(fin$F - eng$F), est = max(ang / 360, abs(fin$zeta - eng$zeta),
-                                      abs(fin$beta - eng$beta)))
-}, numeric(2))
+                                      abs(fin$beta - eng$beta)),
+    exact_wall = any(eng$zeta == 1))
+}, numeric(3))
 report("3 finish step matches the engine",
-       all(diffs["F", ] <= 1e-8) && all(diffs["est", ] <= 1e-4),
-       sprintf("max |dF| %.1e, max estimate difference %.1e over %d fits",
-               max(diffs["F", ]), max(diffs["est", ]), ncol(diffs)))
+       all(diffs["F", ] <= 1e-8) && all(diffs["est", ] <= 1e-4) &&
+         any(diffs["exact_wall", ] == 1),
+       sprintf(paste("max |dF| %.1e, max estimate difference %.1e over %d",
+                     "fits, %d with a communality at exactly 1"),
+               max(diffs["F", ]), max(diffs["est", ]), ncol(diffs),
+               sum(diffs["exact_wall", ])))
 
 # ---- 4 ----
 # a NaN start makes nlminb() throw before its first step; the check confirms

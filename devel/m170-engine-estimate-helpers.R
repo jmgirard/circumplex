@@ -29,11 +29,18 @@ m170_full_spec <- function(eng, m) {
 }
 
 # E's estimate in the full layout. A weight the polish removed (beta = 0) has
-# no finite logit, so every weight is floored at 1e-4 and renormalized; the
-# point is a start, not an estimate, so the floor moves nothing reported.
+# no finite logit, so every weight is floored at 1e-4 and renormalized. The
+# communality logits come from E's own parameter vector (the block is
+# position-stable across the polish), clipped to [-30, 30]: the engine can
+# drive a logit past 37, where plogis() returns exactly 1 and qlogis() of the
+# reported communality is Inf, which would make every start built from this
+# point infinite (RR28). The point is a start, not an estimate, so neither
+# step moves anything reported.
 m170_base_par <- function(eng, spec) {
   b <- pmax(eng$beta, 1e-4)
-  cpm_pack(eng$theta_rad_unwrapped, eng$zeta, b / sum(b), spec)
+  g <- cpm_pack(eng$theta_rad_unwrapped, eng$zeta, b / sum(b), spec)
+  g[spec$i_zeta] <- pmin(pmax(eng$par[eng$spec$i_zeta], -30), 30)
+  g
 }
 
 # The battery's theory start g0 (cpm_engine()'s first start).
@@ -47,9 +54,12 @@ m170_theory_par <- function(R, eng, spec, m) {
 
 # Around E's estimate (full layout): one communality-wall start per scale (that
 # scale's logit set to logit .99), one all-communality-level start (every
-# scale's logit set to logit .99), and one start per free angle and shift
-# (+90, -90, 180 degrees). No random numbers, so W is the same on every run.
-m170_w_starts <- function(base, spec) {
+# scale's logit set to logit .99), one start per free angle and shift (+90,
+# -90, 180 degrees), one start per pair of free angles with the two values
+# swapped, and each swap again with the wall on one of the two swapped scales.
+# Around g0: one communality-wall start per scale. With p = 8: 8 + 1 + 21 +
+# 21 + 42 + 8 = 101 starts. No random numbers, so W is the same on every run.
+m170_w_starts <- function(base, g0, spec) {
   wall <- stats::qlogis(0.99)
   per_scale <- lapply(spec$i_zeta, function(i) {
     g <- base
@@ -65,7 +75,27 @@ m170_w_starts <- function(base, spec) {
       g
     })
   }), recursive = FALSE)
-  c(per_scale, list(all_level), shifts)
+  pairs <- utils::combn(spec$i_angle, 2, simplify = FALSE)
+  swap <- function(g, ij) {
+    g[ij] <- g[rev(ij)]
+    g
+  }
+  swaps <- lapply(pairs, function(ij) swap(base, ij))
+  # a free angle's position in the angle block is its scale's position among
+  # spec$free_pos, which names the scale whose communality goes to the wall
+  swap_walls <- unlist(lapply(pairs, function(ij) {
+    lapply(ij, function(i) {
+      g <- swap(base, ij)
+      g[spec$i_zeta[spec$free_pos[i]]] <- wall
+      g
+    })
+  }), recursive = FALSE)
+  g0_walls <- lapply(spec$i_zeta, function(i) {
+    g <- g0
+    g[i] <- wall
+    g
+  })
+  c(per_scale, list(all_level), shifts, swaps, swap_walls, g0_walls)
 }
 
 # ---- the saturation rule's independent family -------------------------------------
@@ -132,17 +162,24 @@ m170_finish <- function(par, F, R, spec, eng) {
 
 # ---- the three estimators ---------------------------------------------------------
 
-# W and H from one accepted E fit. W is the lowest of E and W's deterministic
-# starts; H is the lowest of E, W's starts and 2K random starts at sd .7 around
-# E's estimate and 2K around g0, all in the engine's unconstrained
-# coordinates. H_K is the same with only the first K random starts per centre.
-# A start replaces E only when its refit lies more than 1e-8 below E's F (the
-# engine's own reproduction tolerance), so a numerically equal point never
-# swaps the reported solution. The random starts come from `seed`, and the
+# W and H from one accepted E fit with N - 1 = `n1`. W is the lowest of E and
+# W's deterministic starts; H is the lowest of E, W's starts and 2K random
+# starts from each family in `random` (a centre, "E" for E's estimate or
+# "g0", and an sd; each start is the centre plus independent N(0, sd^2) draws
+# on every coordinate of the engine's unconstrained parameters). H_K is the
+# same with only the first K random starts of each family. A refit replaces
+# E only when it lies more than `thresh` T units below E's F, so the fits
+# where an estimator differs from E are exactly the fits where it finds a
+# lower discrepancy (RR28). The random starts come from `seed`, and the
 # caller's random stream is restored afterwards. `extra` adds named start
 # families that are run and recorded but enter neither W nor H (the
-# saturation rule's independent family).
-m170_estimators <- function(R, eng, m, K, seed, sd = 0.7, extra = list()) {
+# saturation rule's independent family); for each, the result holds its
+# lowest F, its hit rate (the share of its runs within `thresh` T units of
+# H's lowest F) and its finished best point.
+m170_estimators <- function(R, eng, m, K, seed, n1, thresh = 0.01,
+                            random = list(list(centre = "g0", sd = 0.7),
+                                          list(centre = "g0", sd = 1.2)),
+                            extra = list()) {
   genv <- globalenv()
   if (exists(".Random.seed", envir = genv, inherits = FALSE)) {
     old_seed <- get(".Random.seed", envir = genv, inherits = FALSE)
@@ -155,31 +192,42 @@ m170_estimators <- function(R, eng, m, K, seed, sd = 0.7, extra = list()) {
   g0 <- m170_theory_par(R, eng, spec, m)
   q <- length(base)
 
-  w_starts <- m170_w_starts(base, spec)
+  w_starts <- m170_w_starts(base, g0, spec)
   w <- m170_run_starts(w_starts, R, spec)
 
   set.seed(seed)
-  rs_e <- lapply(seq_len(2L * K), function(k) base + stats::rnorm(q, 0, sd))
-  rs_g <- lapply(seq_len(2L * K), function(k) g0 + stats::rnorm(q, 0, sd))
-  h_e <- m170_run_starts(rs_e, R, spec)
-  h_g <- m170_run_starts(rs_g, R, spec)
+  rs <- lapply(random, function(f) {
+    centre <- if (f$centre == "E") base else g0
+    lapply(seq_len(2L * K), function(k) centre + stats::rnorm(q, 0, f$sd))
+  })
+  h <- lapply(rs, m170_run_starts, R = R, spec = spec)
 
   extra_runs <- lapply(extra, function(make) {
     m170_run_starts(make(base = base, g0 = g0, spec = spec), R, spec)
   })
 
-  pick <- function(sets) {
+  lowest <- function(sets) {
     Fs <- unlist(lapply(sets, `[[`, "F"))
     pars <- unlist(lapply(sets, `[[`, "par"), recursive = FALSE)
     j <- which.min(Fs)
-    if (length(j) == 0 || !(Fs[j] < eng$F - 1e-8)) return(NULL)
+    if (length(j) == 0) return(list(par = NULL, F = Inf))
     list(par = pars[[j]], F = Fs[j])
   }
+  pick <- function(sets) {
+    pt <- lowest(sets)
+    if (!(n1 * (eng$F - pt$F) > thresh)) return(NULL)
+    pt
+  }
   first_k <- function(s, k) list(F = s$F[seq_len(k)], par = s$par[seq_len(k)])
+  h_sets <- c(list(w), h)
+  hk_sets <- c(list(w), lapply(h, first_k, k = K))
 
   w_pt <- pick(list(w))
-  h_pt <- pick(list(w, h_e, h_g))
-  hk_pt <- pick(list(w, first_k(h_e, K), first_k(h_g, K)))
+  h_pt <- pick(h_sets)
+  # the saturation rule's S1 reads both lowest values before any polish
+  F_H_raw <- min(eng$F, lowest(h_sets)$F)
+  F_HK_raw <- min(eng$F, lowest(hk_sets)$F)
+
 
   # A point that fails to finish (an error in the polish or the
   # canonicalization) leaves that estimator at E, and is counted.
@@ -195,18 +243,26 @@ m170_estimators <- function(R, eng, m, K, seed, sd = 0.7, extra = list()) {
                     H = inherits(H, "m170_finish_error"))
   if (finish_error[["W"]]) W <- NULL
   if (finish_error[["H"]]) H <- NULL
+  extra_out <- lapply(extra_runs, function(s) {
+    best <- lowest(list(s))
+    list(F = best$F,
+         hit_rate = mean(n1 * (s$F - F_H_raw) <= thresh, na.rm = TRUE),
+         point = if (is.finite(best$F)) {
+           tryCatch(m170_finish(best$par, best$F, R, spec, eng),
+                    error = function(e) NULL)
+         })
+  })
   list(
     W = W, H = H, finish_error = finish_error,
     F_E = eng$F,
     # W's and H's discrepancies are read after the polish, as E's is
     F_W = if (is.null(W)) eng$F else W$F,
     F_H = if (is.null(H)) eng$F else H$F,
-    F_HK = if (is.null(hk_pt)) eng$F else hk_pt$F,
-    extra_F = vapply(extra_runs, function(s) min(c(s$F, Inf), na.rm = TRUE),
-                     numeric(1)),
-    n_failed = c(W = sum(is.na(w$F)), H_E = sum(is.na(h_e$F)),
-                 H_G = sum(is.na(h_g$F))),
-    cpu = c(W = w$cpu, H = w$cpu + h_e$cpu + h_g$cpu,
+    F_H_raw = F_H_raw, F_HK_raw = F_HK_raw,
+    extra = extra_out,
+    n_failed = c(W = sum(is.na(w$F)),
+                 H = sum(vapply(h, function(s) sum(is.na(s$F)), numeric(1)))),
+    cpu = c(W = w$cpu, H = w$cpu + sum(vapply(h, `[[`, numeric(1), "cpu")),
             extra = sum(vapply(extra_runs, `[[`, numeric(1), "cpu"))),
     w_starts = w_starts
   )

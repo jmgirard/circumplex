@@ -1,6 +1,6 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -49,7 +49,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 
 - [x] T1: Write the helpers for E, W, H and the metrics on M167's generators (`devel/m167-interval-oracle.R`). Wrap each `nlminb()` call so that a start that throws is skipped (RR27 beyond-brief 3). Check that H reaches each of RR27's six boundary N = 250 lower points, and that W's starts are the same on every run.
 - [x] T2: Write the pre-registration block with the decision rule, and commit it before any full run.
-- [ ] T3: Write RB28 through `/milestone-brief` on the block and its decision rule. Apply the RR's accepted changes and list them under a corrections heading in the block, before the pilot.
+- [x] T3: Write RB28 through `/milestone-brief` on the block and its decision rule. Apply the RR's accepted changes and list them under a corrections heading in the block, before the pilot.
 - [ ] T4: Run a 10-fit timing pilot per cell on an unloaded machine. Set the replicate count by the block's rule so that the full run fits 12 CPU-hours.
 - [ ] T5: Run the full study on the 16-worker machine when the user is plugged in. Commit the results file.
 - [ ] T6: Fit the four AC5 cases at their oracle and vignette settings with the block's seeds.
@@ -76,7 +76,14 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: T1 done: `devel/m170-engine-estimate-helpers.R` and `devel/m170-engine-estimate-checks.R`, 4 checks pass. At K = 100, H gaps on RR27's six cases 0.81, 0.65, 3.31, 3.05, 1.96, 1.16 T units; W alone gives 0 on replicates 28 and 31, so check 1 can fail. H costs about 5.5 CPU-s per fit at K = 100 (6 workers); replicates 26 and 28 still vary with the seed at K = 100. devtools::test() clean.
 - 2026-10-27: T2 done: `devel/m170-engine-estimate.R` with its pre-registration block (K = 100; saturation S1 doubling share <= .02 and S2 400 uniform starts on 50 fits, at most 1 lower; decision rule branches 0 to 6, default the diagnostic, GP4 tie-break toward it; replicate rule R in [100, 500] under 12 CPU-hours with a 1.2 margin). Committed before any pilot or full run; no results file exists at this commit. A smoke run (4 replicates, K = 5) ran end to end and was not kept. The W and H discrepancies are now read after their polish, as E's is.
 - 2026-10-27: blocked on RB28 (`cairn/reviews/RB28-cpm-engine-estimate-prereg.md`): Fable review of the pre-registration block and decision rule, nine questions, the ninth on readings the block leaves open; second escalation on the engine estimate, so question 8 weighs not running the study. Committed on the milestone branch, not main, so the brief travels with the block it reviews.
+- 2026-10-27: RR28 ingested (Fable, spawned after the gate). Recommendations 1 to 12 applied and 13 applied after its check; 14 and 15 not taken; 16 to 20 rejections accepted (M170-D1 to D3). Block CORRECTIONS lists all 13 changes. Status back to in-progress.
+- 2026-10-27: rec 13 check (pre-pilot, M167's seeds, 18 accepted N = 250 fits): H with both random families around g0 (sd .7 and 1.2) reached a lower point than the old design (E at .7, g0 at .7) on 1 fit, by 0.087 T units, and the old design on none; adopted by the rule fixed before the check ("adopt if it is lower on more fits"). No W start was infinite on any of the 18 fits after rec 1.
+- 2026-10-27: T3 done: RB28/RR28 round complete, corrections applied before the pilot. Checks: 4 pass (check 2 now asserts all 101 W starts finite on boundary replicate 6, whose E has a communality at exactly 1, and check 3 asserts that fit is in its domain). Smoke run end to end; W now reaches the verbal matrix's lower point (3.158 T units, RR27 3.16); `demo` is now the vignette's sample (T_E 2.229).
 
 ## Decisions
+
+- M170-D1 (2026-10-27, RR28): the study runs, amended (RR28 Q8). Not running would leave the question on RR27's uncommitted survey, with no detection rate for any deterministic probe, so no diagnostic could be specified. The amended study costs the same 12 CPU-hours.
+- M170-D2 (2026-10-27, RR28): RR28's answers as applied. W gets 101 deterministic starts, adding swaps, swaps with the wall, and wall starts around g0, because the interior-truth lower points are two-scale swaps that single-angle shifts cannot reach (Q1). H is a bounded reference search, never the global minimum. Its random starts are both around g0 (Q2, rec 13). Saturation is expected to fail at N <= 1000 and at interior N = 2000, which leaves branches 3 to 6 (Q3). favors() splits into no_worse in every cell and improves in at least one (Q4). Branch 5 reads a 95% lower bound on W's median gap (Q5, Q7). The default stays the diagnostic, and the tie-break names IP3 beside GP4 (Q5). "Report H" means a later search shown to reach the same point whatever its seed (Q6). W's detection power is reported beside any diagnostic (Q6).
+- M170-D3 (2026-10-27, RR28): not taken. Rec 14 would drop the saturation requirement from branch 1 for W. It disagrees with AC1's wording, its practical effect is nil because favors(W) is expected to fail on its own, and amending a criterion for no effect is not worth the amendment. Rec 15 would apply one Wilson allowance to every threshold, but the share thresholds are read far from their bars (RR28 Q5, Q7), so point estimates stay. Rejections accepted: a "keep E" default (16), removing branch 2 (17), more all-communality levels (18), not running the study (19), raising K to chase saturation (20).
 
 ## Review
