@@ -58,6 +58,7 @@ The `cpm_fit()` help page says which solution the CPM estimate is, and that a co
 - 2026-10-26: status review; handed to /milestone-review.
 - 2026-10-26: review pass 1 checkpoint: AC1 to AC3 evidenced and ticked, four lenses settled (16 fix now, 16 reject, 1 follow-up, with duplicates), fixes in 10558935 and 9ad37191; AC4's test and manual check on 9ad37191 still running.
 - 2026-10-26: AC4 evidenced on 9ad37191 and ticked. The checkpoint line above miscounts: the dispositions are 17 fix now, 16 reject, 1 follow-up (34 lines, duplicates included).
+- 2026-10-27: step-7 approval: m169-cpm-estimate-help-page approved for merge
 
 ## Decisions
 
