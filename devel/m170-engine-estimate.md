@@ -60,8 +60,10 @@ has more scales at the Heywood wall than E. At the interior truth, 81 to
 2.32 T units by cell. Its one-sided 95% lower confidence bound runs from
 0.73 to 1.69. The largest single gap is 13.90 T units.
 
-**The lower points are worse estimates of the truth.** Take every cell
-where W or H differs from E. There, the angle RMSE and the weight RMSE are
+**W's and H's lower points are worse estimates of the truth, on average.**
+The study measured the quality of W's and H's points only. It did not
+measure the quality of the points that the uniform family found below H.
+Take every cell where W or H differs from E. There, the angle RMSE and the weight RMSE are
 larger for that estimator than for E. The communality RMSE is larger too,
 with one exception: H at interior N = 5000, at .04239 against E's .04243.
 Wald coverage is further from .95 for W and H in every such cell. Below
@@ -73,11 +75,21 @@ passes `no_worse()` for W or H. The one exception is interior N = 5000 for
 W, where W never differs from E. RR27 Q2 reported this direction from 60
 replicates per cell. This study measures it at 500.
 
+The table "Estimate quality on the lower fits only" repeats the comparison
+on the fits where W or H differs from E. There too, W's and H's mean angle
+error and mean weight error are larger than E's in every cell. The
+direction does not hold on every fit. W's angles are closer to the truth
+than E's on up to 31% of W's lower fits (boundary N = 250). W's weights
+are closer on up to 19% (interior N = 250).
+
 **E's fit test is conservative where lower points are common.** Take the
 cells at N <= 1000. There, E's T exceeds its .95 chi-square quantile on 1.6 to 3.9% of
 accepted fits. At boundary N = 2000 and 5000 the share is 1.8%. At interior
-N = 2000 and 5000 it is 5.0% and 4.8%. By construction, W and H lower that
-share further.
+N = 2000 and 5000 it is 5.0% and 4.8%. In the results, W's and H's T
+never exceeds the quantile on a fit where E's does not. Their shares are
+therefore at or below E's in every cell, and W's equals E's at interior
+N = 5000. This is a result of the run, not a property of the estimators:
+W's or H's polish can leave a model with a different df from E's.
 
 **A W-based diagnostic misses some lower points.** Consider the cells where
 H found more than 10 lower fits. In each of them, W finds 77.5 to 100% of
@@ -102,7 +114,8 @@ The pre-registered rule reads its branches in order.
   `no_worse()` fails for both W and H.
 - Branch 3 does not fire. W's share is .05 or more in eight cells.
 - Branch 4 does not fire. In the pilot, W costs 0.68 to 1.07 CPU-seconds
-  per fit. The limit is 10.
+  per fit. The limit is 10. The figure covers E and W's refits, but not the
+  finish step (at most one polish refit and the canonicalization).
 - Branch 5 does not fire. The largest lower bound on W's median gap is 1.69,
   at interior N = 500. The threshold is 2.0. Two point medians are above
   2.0: 2.02 at interior N = 500 and 2.32 at interior N = 2000. The bound
@@ -117,6 +130,10 @@ the same output, under `decision`.
 - The data are normal, at two truths: p = 8 octant scales, communality .75,
   m = 3, variant A, unit scaling, N = 250 to 5000.
 - The real and published fits extend the reach to those four data sets only.
+- The `demo` sample came from the full run on an Apple M5 Pro Mac
+  (Mac17,9, macOS 27.0.1). That machine had R 4.6.1 with R's reference BLAS
+  and LAPACK (`libRblas.0.dylib`, `libRlapack.dylib`), read on the same day.
+  The vignette marks this sample volatile across BLAS builds.
 - E's exclusion and Heywood rates match M167's for the same cells and
   generator. M170 excluded 41 and 95 fits at N = 250, against M167's 40 and
   94. Heywood rates are .82 and .93, against .78 and .91. E's SE-defined
@@ -129,11 +146,12 @@ the same output, under `decision`.
 - Results file written 2026-10-27 at commit 95120722 on arm64. Uncommitted paths at start: 0.
 - R = 500 replicates per cell (pilot rule), K = 100. H's random starts: 2K around g0 at sd .7, 2K around g0 at sd 1.2.
 - Pilot: commit a65a356e, projected 8.80 CPU-hours.
+- Metrics and decision recomputed 2026-10-27 at commit 6d6e6399 from the stored replicates (the block's CORRECTIONS after the full run). Decision before the recompute: branch 6.
 - Decision rule output: keep E and add a diagnostic for a lower optimum outside the theoretical configuration (branch 6).
 
 ### Shares of lower fits and the saturation verdict (AC2)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks an H share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 | cell | accepted | excluded | errored | H_K lower | H lower | S1 share | S2 | family hit rate | family reordered | family more Heywood | saturation |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -180,30 +198,30 @@ H's figures describe H, the study's bounded reference search, never the global m
 
 ### H against E (AC3)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks an H share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 | cell | lower | same order | reordered | gap median | gap median LCB | gap max | more Heywood | order changed |
 |---|---|---|---|---|---|---|---|---|
-| boundary N = 250 | >= 0.553 | >= 0.292 | >= 0.261 | 1.52 | 1.30 | 19.41 | 0.551 | 0.472 |
-| boundary N = 500 | >= 0.423 | >= 0.369 | >= 0.054 | 1.72 | 1.46 | 9.69 | 0.618 | 0.127 |
-| boundary N = 1000 | >= 0.362 | >= 0.346 | >= 0.016 | 1.62 | 1.39 | 12.08 | 0.461 | 0.045 |
-| boundary N = 2000 | >= 0.297 | >= 0.295 | >= 0.002 | 1.84 | 1.52 | 9.81 | 0.212 | 0.007 |
-| boundary N = 5000 | >= 0.161 | >= 0.161 | >= 0.000 | 1.10 | 0.74 | 8.17 | 0.000 | 0.000 |
-| interior N = 250 | >= 0.689 | >= 0.022 | >= 0.667 | 2.71 | 2.24 | 12.28 | 0.337 | 0.968 |
-| interior N = 500 | >= 0.391 | >= 0.045 | >= 0.345 | 2.49 | 2.10 | 12.22 | 0.423 | 0.885 |
-| interior N = 1000 | >= 0.112 | >= 0.014 | >= 0.097 | 1.99 | 1.10 | 13.90 | 0.509 | 0.873 |
-| interior N = 2000 | >= 0.020 | >= 0.000 | >= 0.020 | 1.90 | 0.79 | 9.84 | 0.500 | 1.000 |
-| interior N = 5000 | >= 0.008 | >= 0.000 | >= 0.008 | 4.65 | NA | 7.09 | 0.000 | 1.000 |
+| boundary N = 250 | >= 0.553 | 0.292 | 0.261 | 1.52 | 1.30 | 19.41 | 0.551 | 0.472 |
+| boundary N = 500 | >= 0.423 | 0.369 | 0.054 | 1.72 | 1.46 | 9.69 | 0.618 | 0.127 |
+| boundary N = 1000 | >= 0.362 | 0.346 | 0.016 | 1.62 | 1.39 | 12.08 | 0.461 | 0.045 |
+| boundary N = 2000 | >= 0.297 | 0.295 | 0.002 | 1.84 | 1.52 | 9.81 | 0.212 | 0.007 |
+| boundary N = 5000 | >= 0.161 | 0.161 | 0.000 | 1.10 | 0.74 | 8.17 | 0.000 | 0.000 |
+| interior N = 250 | >= 0.689 | 0.022 | 0.667 | 2.71 | 2.24 | 12.28 | 0.337 | 0.968 |
+| interior N = 500 | >= 0.391 | 0.045 | 0.345 | 2.49 | 2.10 | 12.22 | 0.423 | 0.885 |
+| interior N = 1000 | >= 0.112 | 0.014 | 0.097 | 1.99 | 1.10 | 13.90 | 0.509 | 0.873 |
+| interior N = 2000 | >= 0.020 | 0.000 | 0.020 | 1.90 | 0.79 | 9.84 | 0.500 | 1.000 |
+| interior N = 5000 | >= 0.008 | 0.000 | 0.008 | 4.65 | NA | 7.09 | 0.000 | 1.000 |
 
 ### Estimate quality by family (AC4)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks an H share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 | cell | estimator | RMSE angle (deg) | RMSE zeta | RMSE beta | cov dev | SE defined | T exceed |
 |---|---|---|---|---|---|---|---|
-| boundary N = 250 | E | 18.71 | 0.1411 | 0.0376 | 0.1082 | 0.338 | 0.017 |
-| boundary N = 250 | W | 29.89 | 0.1534 | 0.0552 | 0.2042 | 0.235 | 0.004 |
-| boundary N = 250 | H | 39.66 | 0.1542 | 0.0768 | 0.2738 | 0.235 | 0.002 |
+| boundary N = 250 | E | 18.71 | 0.1411 | 0.0376 | 0.1042 | 0.338 | 0.017 |
+| boundary N = 250 | W | 29.89 | 0.1534 | 0.0552 | 0.2019 | 0.235 | 0.004 |
+| boundary N = 250 | H | 39.66 | 0.1542 | 0.0768 | 0.2731 | 0.235 | 0.002 |
 | boundary N = 500 | E | 16.33 | 0.1207 | 0.0297 | 0.0920 | 0.568 | 0.031 |
 | boundary N = 500 | W | 21.72 | 0.1354 | 0.0394 | 0.1699 | 0.432 | 0.015 |
 | boundary N = 500 | H | 23.41 | 0.1355 | 0.0435 | 0.1561 | 0.396 | 0.012 |
@@ -232,6 +250,34 @@ H's figures describe H, the study's bounded reference search, never the global m
 | interior N = 5000 | W | 2.72 | 0.0424 | 0.0061 | 0.0089 | 1.000 | 0.048 |
 | interior N = 5000 | H | 11.20 | 0.0424 | 0.0106 | 0.0120 | 1.000 | 0.048 |
 
+### Estimate quality on the lower fits only
+
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
+
+X is W or H. Errors are each fit's root mean square error over the 7 free angles or the 4 weights, averaged over X's lower fits.
+
+| cell | estimator | lower fits | angle error E (deg) | angle error X (deg) | X closer on angles | weight error E | weight error X | X closer on weights |
+|---|---|---|---|---|---|---|---|---|
+| boundary N = 250 | W | 198 | 16.90 | 32.57 | 0.313 | 0.0339 | 0.0618 | 0.141 |
+| boundary N = 250 | H | 254 | 17.65 | 43.57 | 0.197 | 0.0340 | 0.0857 | 0.087 |
+| boundary N = 500 | W | 201 | 15.12 | 22.65 | 0.254 | 0.0270 | 0.0441 | 0.159 |
+| boundary N = 500 | H | 204 | 15.15 | 24.66 | 0.240 | 0.0271 | 0.0484 | 0.147 |
+| boundary N = 1000 | W | 177 | 11.97 | 18.12 | 0.260 | 0.0174 | 0.0305 | 0.102 |
+| boundary N = 1000 | H | 178 | 11.99 | 19.32 | 0.253 | 0.0174 | 0.0324 | 0.101 |
+| boundary N = 2000 | W | 146 | 10.73 | 15.11 | 0.247 | 0.0136 | 0.0228 | 0.062 |
+| boundary N = 2000 | H | 146 | 10.73 | 15.97 | 0.240 | 0.0136 | 0.0242 | 0.062 |
+| boundary N = 5000 | W |  80 | 7.40 | 12.92 | 0.138 | 0.0090 | 0.0155 | 0.050 |
+| boundary N = 5000 | H |  80 | 7.40 | 12.92 | 0.138 | 0.0090 | 0.0155 | 0.050 |
+| interior N = 250 | W | 219 | 10.47 | 55.83 | 0.041 | 0.0282 | 0.0467 | 0.187 |
+| interior N = 250 | H | 279 | 10.80 | 63.45 | 0.022 | 0.0292 | 0.0571 | 0.108 |
+| interior N = 500 | W | 141 | 8.71 | 54.08 | 0.092 | 0.0220 | 0.0436 | 0.149 |
+| interior N = 500 | H | 182 | 8.72 | 62.73 | 0.055 | 0.0220 | 0.0522 | 0.093 |
+| interior N = 1000 | W |  44 | 6.06 | 59.31 | 0.023 | 0.0159 | 0.0445 | 0.045 |
+| interior N = 1000 | H |  55 | 6.06 | 64.07 | 0.018 | 0.0159 | 0.0483 | 0.036 |
+| interior N = 2000 | W |   6 | 3.14 | 88.06 | 0.000 | 0.0112 | 0.0578 | 0.000 |
+| interior N = 2000 | H |  10 | 3.79 | 103.26 | 0.000 | 0.0104 | 0.0764 | 0.000 |
+| interior N = 5000 | H |   4 | 2.54 | 126.43 | 0.000 | 0.0056 | 0.1077 | 0.000 |
+
 ### Decision-rule inputs
 
 | cell | sat | no_worse W | improves W | no_worse H | improves H | share_lower W | gap LCB W | CPU W ok |
@@ -249,7 +295,7 @@ H's figures describe H, the study's bounded reference search, never the global m
 
 ### Estimate quality by parameter (AC4)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks an H share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 #### boundary N = 250
 
@@ -273,7 +319,7 @@ H's figures describe H, the study's bounded reference search, never the global m
 | beta0 | -0.0295 | 0.0503 | 0.338 | 0.897 | -0.0438 | 0.0577 | 0.235 | 0.787 | -0.0466 | 0.0592 | 0.235 | 0.769 |
 | beta1 | -0.0017 | 0.0312 | 0.338 | 0.903 | -0.0223 | 0.0553 | 0.235 | 0.815 | -0.0485 | 0.0863 | 0.235 | 0.648 |
 | beta2 | 0.0198 | 0.0338 | 0.338 | 0.871 | 0.0331 | 0.0566 | 0.235 | 0.833 | 0.0413 | 0.0743 | 0.235 | 0.769 |
-| beta3 | 0.0115 | 0.0350 | 0.338 | 0.743 | 0.0330 | 0.0511 | 0.235 | 0.578 | 0.0538 | 0.0873 | 0.235 | 0.486 |
+| beta3 | 0.0115 | 0.0350 | 0.338 | 0.819 | 0.0330 | 0.0511 | 0.235 | 0.620 | 0.0538 | 0.0873 | 0.235 | 0.500 |
 
 #### boundary N = 500
 

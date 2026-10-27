@@ -24,8 +24,9 @@ lb <- function(x, k, d = 3) {
   paste0(if (!res$metrics[[k]]$saturation$pass) ">= " else "", fmt(x, d))
 }
 H_NOTE <- paste("H's figures describe H, the study's bounded reference search,",
-                "never the global minimum of F. A \">=\" marks an H share in a",
-                "cell whose saturation verdict is a fail: a lower bound.")
+                "never the global minimum of F. A \">=\" marks H's total lower",
+                "share in a cell whose saturation verdict is a fail: a lower",
+                "bound.")
 cell_label <- function(key) {
   m <- regmatches(key, regexec("^(\\w+)_N(\\d+)$", key))[[1]]
   sprintf("%s N = %s", m[2], m[3])
@@ -43,8 +44,52 @@ run_facts <- function() {
             substr(res$pilot$commit, 1, 8),
             fmt(1.2 * sum(res$reps * res$pilot$cpu$replicate +
                             80 * res$pilot$cpu$family) / 3600, 2)),
+    if (!is.null(res$recomputed)) {
+      sprintf(paste("- Metrics and decision recomputed %s at commit %s from",
+                    "the stored replicates (the block's CORRECTIONS after the",
+                    "full run). Decision before the recompute: branch %d."),
+              res$recomputed$date, substr(res$recomputed$commit, 1, 8),
+              res$recomputed$decision_before$branch)
+    },
     sprintf("- Decision rule output: %s (branch %d).", res$decision$option,
             res$decision$branch))
+}
+
+# ---- the lower fits only ----------------------------------------------------------
+
+# On X's lower fits (where X differs from E), each fit's root mean square
+# error over the 7 free angles, and over the 4 weights, for E and for X:
+# the mean over those fits, and the share of fits on which X's error is the
+# smaller. The AC4 tables pool every accepted fit; this table isolates the
+# fits where the estimators differ.
+lower_fits_table <- function() {
+  rms <- function(e, idx) sqrt(mean(e[idx]^2))
+  ia <- grep("^angle_", names(res$cells[[1]]$reps[[which(!vapply(
+    res$cells[[1]]$reps, `[[`, logical(1), "excluded"))[1]]]$recs$E$err))
+  ib <- grep("^beta", names(res$cells[[1]]$reps[[which(!vapply(
+    res$cells[[1]]$reps, `[[`, logical(1), "excluded"))[1]]]$recs$E$err))
+  rows <- list()
+  for (k in cells) {
+    acc <- Filter(function(r) !r$excluded, res$cells[[k]]$reps)
+    for (x in c("W", "H")) {
+      lw <- Filter(function(r) r$replaced[[x]], acc)
+      if (!length(lw)) next
+      ea <- vapply(lw, function(r) rms(r$recs$E$err, ia), numeric(1))
+      xa <- vapply(lw, function(r) rms(r$recs[[x]]$err, ia), numeric(1))
+      eb <- vapply(lw, function(r) rms(r$recs$E$err, ib), numeric(1))
+      xb <- vapply(lw, function(r) rms(r$recs[[x]]$err, ib), numeric(1))
+      rows[[length(rows) + 1]] <- data.frame(
+        cell = cell_label(k), estimator = x, `lower fits` = length(lw),
+        `angle error E (deg)` = fmt(mean(ea), 2),
+        `angle error X (deg)` = fmt(mean(xa), 2),
+        `X closer on angles` = fmt(mean(xa < ea)),
+        `weight error E` = fmt(mean(eb), 4),
+        `weight error X` = fmt(mean(xb), 4),
+        `X closer on weights` = fmt(mean(xb < eb)),
+        check.names = FALSE)
+    }
+  }
+  md_table(do.call(rbind, rows))
 }
 
 # ---- AC2: shares and saturation -------------------------------------------------
@@ -89,10 +134,13 @@ ac3_table <- function(x) {
   df <- do.call(rbind, lapply(cells, function(k) {
     s <- res$metrics[[k]]$search[[x]]
     cpu <- res$pilot$cpu[res$pilot$cpu$cell == k, ]
-    share <- if (x == "H") function(v) lb(v, k) else fmt
-    out <- data.frame(cell = cell_label(k), lower = share(s$share_lower),
-                      `same order` = share(s$share_lower_same_order),
-                      reordered = share(s$share_lower_reordered),
+    # only the total share can only rise under a deeper search; its split by
+    # order can move either way, so only the total carries ">="
+    out <- data.frame(cell = cell_label(k),
+                      lower = if (x == "H") lb(s$share_lower, k) else
+                        fmt(s$share_lower),
+                      `same order` = fmt(s$share_lower_same_order),
+                      reordered = fmt(s$share_lower_reordered),
                       `gap median` = fmt(s$gap_median, 2),
                       `gap median LCB` = fmt(s$gap_median_lcb, 2),
                       `gap max` = fmt(s$gap_max, 2),
@@ -225,6 +273,10 @@ gen <- c(
   "### H against E (AC3)", "", H_NOTE, "", ac3_table("H"), "",
   "### Estimate quality by family (AC4)", "", H_NOTE, "",
   ac4_family_table(), "",
+  "### Estimate quality on the lower fits only", "", H_NOTE, "",
+  paste("X is W or H. Errors are each fit's root mean square error over the",
+        "7 free angles or the 4 weights, averaged over X's lower fits."), "",
+  lower_fits_table(), "",
   "### Decision-rule inputs", "", decision_inputs(), "",
   "### Estimate quality by parameter (AC4)", "", H_NOTE, "",
   unlist(lapply(cells, function(k) {
