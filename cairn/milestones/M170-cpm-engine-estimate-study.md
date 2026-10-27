@@ -1,13 +1,13 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP3, GP7
 - **Resolves:** —
 - **Surface tier:** internal — a devel study and decision records, with no change to package code, help pages or vignettes
-- **Branch/PR:** —
+- **Branch/PR:** m170-cpm-engine-estimate-study
 
 ## Goal
 
@@ -47,7 +47,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 
 ## Tasks
 
-- [ ] T1: Write the helpers for E, W, H and the metrics on M167's generators (`devel/m167-interval-oracle.R`). Wrap each `nlminb()` call so that a start that throws is skipped (RR27 beyond-brief 3). Check that H reaches each of RR27's six boundary N = 250 lower points, and that W's starts are the same on every run.
+- [x] T1: Write the helpers for E, W, H and the metrics on M167's generators (`devel/m167-interval-oracle.R`). Wrap each `nlminb()` call so that a start that throws is skipped (RR27 beyond-brief 3). Check that H reaches each of RR27's six boundary N = 250 lower points, and that W's starts are the same on every run.
 - [ ] T2: Write the pre-registration block with the decision rule, and commit it before any full run.
 - [ ] T3: Write RB28 through `/milestone-brief` on the block and its decision rule. Apply the RR's accepted changes and list them under a corrections heading in the block, before the pilot.
 - [ ] T4: Run a 10-fit timing pilot per cell on an unloaded machine. Set the replicate count by the block's rule so that the full run fits 12 CPU-hours.
@@ -69,6 +69,11 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-26: criteria audit (full mode, fresh Opus reader): 10 findings on M170, all accepted. The decision rule may pick W or H only where saturation passes (D-071 Reopens). It is an ordered if/else chain with a default branch and a GP4 tie-break. The commit-order promise moved into the D-entry. Saturation now also uses an independent search family. Only H's shares are lower bounds. The Heywood tolerance (.995), the order rule (after `cpm_canonicalize()`), the unloaded-core timing, the AC4 domain (accepted E fits) and df as fitted are now stated. AC5 fixes each fit's settings and seeds. AC6 lists only the RR27 Q6 items that apply. AC7: no finding.
 - 2026-10-26: plan gate chose Wald coverage for the alternatives over bootstrap coverage, because a bootstrap of W or H needs a full search per resample (tens of CPU-hours). Falsified by a decision that adopts W or H, which then needs bootstrap coverage in the ship step.
 - 2026-10-26: plan gate chose one study-and-decision milestone with the ship step left as a conditional candidate row over planning the ship step now, because its content depends on which option the rule selects. Falsified by a decision rule whose result is known before the run.
+- 2026-10-27: implement started; branch m170-cpm-engine-estimate-study cut from master at 445994d9.
+- 2026-10-27: implementation choice: the all-communality-level start sets every scale's communality to .99 at E's angles and weights (the plan left the level open).
+- 2026-10-27: implementation choice: W and H replace E only when their refit lies more than 1e-8 below E's F (the engine's reproduction tolerance); removed weights are floored at 1e-4 to place E's estimate in the full layout as a start.
+- 2026-10-27: implementation choice: the saturation rule's independent family is uniform configurations (angles uniform on the circle, communalities uniform on [.3, .99], weight logits standard normal), `m170_uniform_starts()`.
+- 2026-10-27: T1 done: `devel/m170-engine-estimate-helpers.R` and `devel/m170-engine-estimate-checks.R`, 4 checks pass. At K = 100, H gaps on RR27's six cases 0.81, 0.65, 3.31, 3.05, 1.96, 1.16 T units; W alone gives 0 on replicates 28 and 31, so check 1 can fail. H costs about 5.5 CPU-s per fit at K = 100 (6 workers); replicates 26 and 28 still vary with the seed at K = 100. devtools::test() clean.
 
 ## Decisions
 
