@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-27 (M169 done and archived: cpm_fit() help section on which solution is reported; "State and settle the CPM engine estimate" narrowed to part (ii); M166 row pruned for retention; one lesson captured, four marked used; validate green.)_
+_Last hygiene check: 2026-10-28 (status audit: M170 at review, its merge question not yet answered; no open issues or PRs, no linked-item news, no outside merges; validate green with M170's 12-task sizing advisory.)_
 
 ## Milestones
 
