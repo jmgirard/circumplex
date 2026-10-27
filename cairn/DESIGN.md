@@ -323,7 +323,7 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 | Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS exactly when the angle set satisfies first- and second-harmonic balance (Σcos = Σsin = Σcos2θ = Σsin2θ = 0); equal spacing (p ≥ 3) implies the condition but is not necessary — structured unequal sets can satisfy it (sharpened 2026-07-07 per the M5 spec §2.1; the safe sufficient direction "equally spaced ⇒ identical" that all existing uses rely on is unchanged). Off the balance condition it is the conventional Gurtman estimator, not least-squares; documented. The SEM-based SSM layer (`ssm_sem()`) instead always uses the OLS projection `(BᵀB)⁻¹Bᵀ` — the two functionals coincide for all shipped (equally spaced) instruments and genuinely differ off balance. |
 | Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA'd; their unreliability is the CI's job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is **per parameter, not per replicate**: `ssm_replicate_intervals()` quantiles each parameter column with `na.rm = TRUE`, so a degenerate replicate's undefined displacement (and fit, if flat) is dropped only from that parameter's CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
 
-### CPM engine estimate: what it is (D-071)
+### CPM engine estimate: what it is (D-071, D-072)
 
 The estimate `cpm_fit()` reports is the maximum-likelihood solution in the
 basin that its theory-centred starts (`cpm_start_set()`, plus the unit
@@ -337,9 +337,11 @@ contract. The reproduction rule and the multimodality flag compare those
 starts only, so they do not see it. Where
 a lower F exists, T = n·F̂ is larger than at the lowest discrepancy, so the
 reported fit is worse than the model's best. The CircE oracle, the T
-calibration and M167's interval figures all describe this estimator. Which
-solution the estimate should be is the candidate row "State and settle the
-CPM engine estimate" (RR27, M167).
+calibration and M167's interval figures all describe this estimator. D-072
+(M170) keeps this estimate, because the lower points estimate the truth
+worse. It adds a diagnostic that flags a lower optimum outside the
+theoretical configuration. That diagnostic is the candidate row "Flag a
+lower optimum in CPM fits".
 
 ### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
 

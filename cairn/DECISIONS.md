@@ -2652,3 +2652,57 @@ estimator re-runs the T calibration and the CPM oracles.
 **Reopens.** A real-data fit where the shipped solution misleads a user in
 a way the documented contract does not cover, or a search shown to
 saturate whose figures change which solution is the better estimate.
+
+### D-072 (2026-10-27): the CPM engine keeps its theory-basin estimate, and a deterministic probe that flags a lower optimum outside the theoretical configuration is added as a diagnostic — confirms D-071's estimator and annotates its handling (M170, RR28)
+
+**Context.** D-071 kept the shipped estimator and sent the choice of
+estimate to its own milestone. M170 ran a pre-registered study of three
+estimators. E is the shipped engine. W is E plus 101 deterministic extra
+starts. H is W plus 400 seeded random starts, a bounded reference search.
+The study used normal data at M167's two truths (p = 8, communality .75,
+m = 3, variant A, unit scaling) at N = 250 to 5000, and four real or
+published fits. The pre-registration block of `devel/m170-engine-estimate.R`
+fixed the decision rule. Commit 47836901 added the block, and commit
+a65a356e applied RR28's corrections to it. No pilot file or full-run results
+file existed at either commit. The figures are in `devel/m170-engine-estimate.md`,
+generated from `devel/m170-engine-estimate-results.rds`.
+
+**Decision.** The rule selected its default branch: keep E and add a
+diagnostic for a lower optimum outside the theoretical configuration. The
+estimate users see does not change. A later milestone ships the diagnostic.
+It runs W's deterministic starts at the top-level fit, and it reports a
+lower discrepancy found there without adopting it.
+
+**Rationale.** The saturation verdict failed in every cell, so the rule
+could not adopt W or H. H's shares are therefore lower bounds in every
+cell. Where W or H differed from E, its angles and weights were further
+from the truth than E's, so the theory-basin estimate stays the better
+estimate. W finds a lower discrepancy often enough, cheaply and
+deterministically, that silence is not the honest default (GP2). The lower
+confidence bound on W's median gap stayed under the report-beside threshold
+in every cell. The tie-break under GP4 and IP3 then chose a flag over a
+second fit statistic.
+
+**Rejected.** Adopting W or H: saturation fails, and both estimate the
+truth worse than E. Reporting the lowest discrepancy beside T: the gap
+bound did not reach the threshold. A second statistic would also need its
+own oracles and a T calibration, and W's lowest point is not the model's
+minimum either. Keeping E with no diagnostic: W finds a lower point on 5%
+or more of fits in most cells.
+
+**Scope.** Normal data, the two truths, variant A, unit scaling, N = 250 to
+5000, and the four real or published fits. Non-normal data, other truths
+and instruments, variants B to D and free scaling are outside it, as in
+D-068.
+
+**Consequences.** The M169 help-page statement stands. The ship step is
+the candidate row "Flag a lower optimum in CPM fits". W does not find every
+lower point that H or the uniform search found, so the diagnostic's silence
+does not mean that no lower point exists. The ship step's wording says so.
+
+**Relation to D-071.** Confirms its estimator, annotates its handling with
+the diagnostic, and supersedes nothing.
+
+**Reopens.** A real data set where the flagged lower point is the better
+solution against a known structure, or a search shown to saturate in a
+cell whose figures favor W or H.
