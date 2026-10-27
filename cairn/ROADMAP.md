@@ -8,7 +8,7 @@ _Last hygiene check: 2026-10-27 (M169 done and archived: cpm_fit() help section 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M169 | State which solution the CPM estimate is on the cpm_fit() help page | done | — | high | milestones/archive/M169-cpm-estimate-help-page.md |
-| M170 | Measure the CPM engine's missed optima and settle which solution it reports | review | — | high | milestones/M170-cpm-engine-estimate-study.md |
+| M170 | Measure the CPM engine's missed optima and settle which solution it reports | in-progress | — | high | milestones/M170-cpm-engine-estimate-study.md |
 | M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | done | — | normal | milestones/archive/M167-cpm-interval-oracle.md |
 | M168 | Close the degeneracy criterion remainders | done | — | normal | milestones/archive/M168-degeneracy-criterion-remainders.md |
 

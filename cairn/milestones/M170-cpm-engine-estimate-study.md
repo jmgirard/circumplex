@@ -1,6 +1,6 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -94,6 +94,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: review return 1: AC6 — D-072's Context and Scope give "N = 250 to 5000" but not the cells AC6 requires (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000). Fix the D-072 wording; nothing else failed (gate clean, AC1 to AC5 and AC7 ticked).
 - 2026-10-27: T9 added for review return 1 (minor amendment); Coverage AC6 → T8, T9.
 - 2026-10-27: T9 done: D-072's Context and Scope now name the ten cells (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000, at each truth). D-072 is edited in place because it has not reached the default branch; its first text exists only in this branch's commits. cairn_validate all checks pass. No package code changed, so the verify slot result stands (devtools::test() clean at a65a356e; devtools::check() 0/0/0 in review pass 1). Status review; handing back to /milestone-review.
+- 2026-10-27: review return 2: AC4(b) — `point_record()` forces a miss for a removed weight whose fit has no defined SE, so beta3's Wald coverage at boundary N = 250 is computed on 171 fits rather than on the 155 with a defined SE. Fix it, recompute the metrics from the stored per-replicate records, and settle the fix-now findings logged in the Review section (pass 2).
 
 ## Decisions
 
@@ -119,3 +120,28 @@ Pass 2 (2026-10-27), branch head 792a7917, after review return 1.
 - Since pass 1's evidence (e004d95a) only `cairn/DECISIONS.md` (D-072's Context and Scope) and this file changed (`git diff --stat e004d95a..HEAD`), so the pass-1 evidence for AC1 to AC5 and AC7 reads the same files and stands; AC7 re-run: `git diff master...HEAD --stat` over the AC7 paths prints nothing.
 - AC6 evidence (pass 2): D-072 names its option as the rule's output (branch 6) on the committed results, with rationale, scope (normal data, the two truths, variant A, unit scaling, and the ten cells: raw-data N = 250, 500, 1000 and correlation-matrix N = 2000, 5000), the record files, commit 47836901 with no pilot or results file at it, and its relation to D-071 (confirms, annotates). DESIGN.md's section heading and text name D-072. ROADMAP's "Flag a lower optimum in CPM fits" row covers the six RR27 Q6 items, two applied and four omitted with reasons. Pass.
 - Gate (pass 2): cairn_validate.py all checks pass; the package gate from pass 1 stands, since no file outside cairn/ changed.
+- spawned: diff-bug, blame-history, prior-review, ripple (pass 2, head 9419e86f).
+- diff-bug #1: the ROADMAP ship row's omission reason "saturating shares and local-vs-global quality (M170 measured them)" is false, since saturation failed and H is not the global minimum — fix now.
+- diff-bug #2: D-072 lacks W's detection figures (recall, missed shares) that the block's M3(f) says the D-entry carries — fix now: D-072 cites the record's W table by name (the tracking rules keep counts out of D-entries) and the block records that as a dated correction.
+- diff-bug #3: `point_record()` forces a miss for a removed weight even when the fit's SE is undefined, so beta3's Wald coverage at boundary N = 250 is computed on 171 fits, not the 155 with a defined SE (E .743 against .819 by the block's definition) — fix now; AC4(b) fails as written, so this is review return 2.
+- diff-bug #4: DESIGN.md and the record say "the lower points estimate the truth worse", but only W's and H's points were measured — fix now.
+- diff-bug #5: the record marks H's same-order and reordered split shares as lower bounds, but only the total share is monotone in search depth — fix now.
+- diff-bug #6: `improves()` returns TRUE on `any(NA, TRUE)`, against the block's fail-closed rule — fix now (no NA occurred).
+- diff-bug #7: the record's "by construction, W and H lower that share further" is inaccurate (W's df can differ from E's; at interior N = 5000 W leaves it equal) — fix now.
+- diff-bug #8: the milestone Scope still defines W with 30 starts and H's random starts around E's estimate, against the corrected block — fix now by a wording-only scope amendment.
+- diff-bug #9: the record names the architecture, not the machine and BLAS the `demo` sample was drawn with, as the block promises — fix now.
+- diff-bug #10: an SE of exactly 0 counts as defined — reject, planned change: the block defines defined as finite.
+- diff-bug #11: H's lower share reads `replaced` while H_K's reads the raw gap — reject, planned change: the block leaves an estimator at E when its finish throws, and 0 finishes threw.
+- diff-bug #12: `share_missed_subsample` compares the family with H rather than with E — fix now: it can miss a family point lower than E by more than the threshold that is within the threshold of H.
+- diff-bug #13: the family hit rate drops failed starts from its denominator — fix now in the helper; the stored values are unaffected, since no start failed.
+- diff-bug #14: the pilot's W CPU leaves out the finish step — fix now: the record states that W's CPU figure excludes the finish (one polish refit at most).
+- blame-history #1: same as diff-bug #1 — fix now, with diff-bug #1.
+- blame-history #2: the ship row dropped the old row's "Fable-tier plan" — fix now: the row names the tier.
+- blame-history #3: DESIGN.md says D-072 "adds a diagnostic" in the present tense, though the diagnostic is unshipped — fix now.
+- blame-history #4: D-072 does not say whether the verbal fit triggers D-071's Reopens clause — fix now: D-072 says why it does not.
+- blame-history #5: the claim that W's and H's points are further from the truth where they differ has no lower-fits figure in the record — fix now: the record adds a lower-fits line, and D-072's wording says "on average".
+- blame-history #6: the settle row drops its provenance and keeps "started M170" — reject, style: the row keeps RR27 and D-071, and the token is correct until hygiene removes the row.
+- blame-history #7: the work log's ROADMAP byte count (23,986) differs from HEAD (23,981) — reject, false: the count was measured before the status edit that removed 5 bytes.
+- prior-review #1: the threshold compares a pre-polish refit F with E's post-polish F — reject, false: the polish gate keeps E's post-polish F within 1e-8 of its pre-polish F (under 6e-5 T units at N = 5000, against a 0.01 threshold), and all W and H gaps on lower fits exceed 0.0113.
+- prior-review #2: D-072 states per fit what the record shows per cell (W is closer than E on 31% of boundary N = 250 lower fits) — fix now, with blame-history #5.
+- ripple: no ripple evidence.
