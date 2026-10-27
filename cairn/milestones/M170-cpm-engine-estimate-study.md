@@ -51,8 +51,8 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] T2: Write the pre-registration block with the decision rule, and commit it before any full run.
 - [x] T3: Write RB28 through `/milestone-brief` on the block and its decision rule. Apply the RR's accepted changes and list them under a corrections heading in the block, before the pilot.
 - [x] T4: Run a 10-fit timing pilot per cell on an unloaded machine. Set the replicate count by the block's rule so that the full run fits 12 CPU-hours.
-- [ ] T5: Run the full study on the 16-worker machine when the user is plugged in. Commit the results file.
-- [ ] T6: Fit the four AC5 cases at their oracle and vignette settings with the block's seeds.
+- [x] T5: Run the full study on the 16-worker machine when the user is plugged in. Commit the results file.
+- [x] T6: Fit the four AC5 cases at their oracle and vignette settings with the block's seeds.
 - [ ] T7: Write summary functions that read the results file, and write the record from their output.
 - [ ] T8: Apply the decision rule. Write the D-entry, point DESIGN.md at it, and add the ship-step candidate row when AC6 calls for it. Check AC7's diff.
 
@@ -82,6 +82,9 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: verify slot after T3: devtools::test() clean (0 failures).
 - 2026-10-27: T4 done: timing pilot at a65a356e (clean tree), one worker, 10 replicates per cell, 14.4 min wall, `devel/m170-engine-estimate-pilot.rds`. Median CPU per replicate 3.6 to 5.5 s, per family run 3.0 to 4.6 s; E 0.04 to 0.07 s, W 0.68 to 1.07 s. Replicate rule: R = 500, projected 8.80 CPU-hours.
 - 2026-10-27: stopped before T5: the machine moved to battery power after the pilot, and the plan's question set ties the full run to the user being plugged in. Resume with /milestone-implement M170 on AC power; the full run takes about 9 CPU-hours on 17 workers.
+- 2026-10-27: resumed on AC power; master unchanged since the cut (445994d9).
+- 2026-10-27: T5 done: full run at 95120722 (clean tree), 17 workers, 39.0 min wall, R = 500, `devel/m170-engine-estimate-results.rds`. No replicate errored; excluded fits 0 to 95 per cell. Saturation fails in all ten cells. Decision rule output: branch 6, keep E and add a diagnostic. The user asked mid-run whether the cost was worth it; on learning it was about 40 minutes of wall time, not 9 hours, they let it finish.
+- 2026-10-27: T6 done by the same full run (the block's AC5 section, seeds 50261027 + j): the four fits are stored in the results file under `real`. W and H find no lower point on jz2017, voc or demo; on verbal W finds 3.158 and H 3.628 T units.
 
 ## Decisions
 
