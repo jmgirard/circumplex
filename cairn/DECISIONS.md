@@ -2652,3 +2652,75 @@ estimator re-runs the T calibration and the CPM oracles.
 **Reopens.** A real-data fit where the shipped solution misleads a user in
 a way the documented contract does not cover, or a search shown to
 saturate whose figures change which solution is the better estimate.
+
+### D-072 (2026-10-27): the CPM engine keeps its theory-basin estimate, and a deterministic probe that flags a lower optimum outside the theoretical configuration is to be added as a diagnostic — confirms D-071's estimator and annotates its handling (M170, RR28)
+
+**Context.** D-071 kept the shipped estimator and sent the choice of
+estimate to its own milestone. M170 ran a pre-registered study of three
+estimators. E is the shipped engine. W is E plus 101 deterministic extra
+starts. H is W plus 400 seeded random starts, a bounded reference search.
+The study used normal data at M167's two truths (p = 8, communality .75,
+m = 3, variant A, unit scaling) in ten cells: raw-data N = 250, 500 and
+1000, and correlation-matrix N = 2000 and 5000, at each truth. It also
+used four real or published fits. The pre-registration block of `devel/m170-engine-estimate.R`
+fixed the decision rule. Commit 47836901 added the block, and commit
+a65a356e applied RR28's corrections to it. No pilot file or full-run results
+file existed at either commit. The figures are in `devel/m170-engine-estimate.md`,
+generated from `devel/m170-engine-estimate-results.rds`. After the full run,
+review found that the run's Wald coverage included some fits with no
+defined standard error. The block lists that fix and four others under "CORRECTIONS
+after the full run". The metrics and the decision were then recomputed from
+the stored replicates (commit 6d6e6399, results in d141a156), with nothing
+re-run, and the decision did not change.
+
+**Decision.** The rule selected its default branch: keep E and add a
+diagnostic for a lower optimum outside the theoretical configuration. The
+estimate users see does not change. A later milestone ships the diagnostic.
+It runs W's deterministic starts at the top-level fit, and it reports a
+lower discrepancy found there without adopting it.
+
+**Rationale.** The saturation verdict failed in every cell, so the rule
+could not adopt W or H. H's shares are therefore lower bounds in every
+cell. On the fits where W or H differed from E, its angles and weights
+were further from the truth than E's on average, though not on every fit.
+So the theory-basin estimate stays the better estimate. W finds a lower
+discrepancy often enough, and deterministically, that silence is not the
+honest default (GP2). In every cell where W found a lower point, the lower
+confidence bound on W's median gap stayed under the report-beside
+threshold. The tie-break under GP4 and IP3 then chose a flag over a
+second fit statistic.
+
+**Rejected.** Adopting W or H: saturation fails, and both estimate the
+truth worse than E on average. Reporting the lowest discrepancy beside T: the gap
+bound did not reach the threshold. A second statistic would also need its
+own oracles and a T calibration, and W's lowest point is not the model's
+minimum either. Keeping E with no diagnostic: W finds a lower point on 5%
+or more of fits in most cells.
+
+**Scope.** Normal data, the two truths, variant A and unit scaling, in the
+ten cells: raw-data N = 250, 500 and 1000, and correlation-matrix N = 2000
+and 5000. The four real or published fits are in scope too. Non-normal data, other truths
+and instruments, variants B to D and free scaling are outside it, as in
+D-068.
+
+**Consequences.** The M169 help-page statement stands until the ship step,
+the candidate row "Flag a lower optimum in CPM fits". That step revises the
+help section's sentence that no check signals such a configuration, the
+matching sentence in DESIGN.md, and the M169 test in
+`tests/testthat/test-cpm_boundary.R` that asserts the fit does not signal
+it. It also weighs W's cost per fit, which the record gives beside E's. W does not find every
+lower point that H or the uniform search found, so the diagnostic's silence
+does not mean that no lower point exists. The ship step's wording says so.
+The record's W table gives W's recall against H and the share of fits
+where a lower point exists and W misses it, per cell.
+
+**Relation to D-071.** Confirms its estimator, annotates its handling with
+the diagnostic, and supersedes nothing. D-071's Reopens clause does not
+fire. The verbal matrix has a lower, reordered point, but the M169 help
+page already says that a lower discrepancy can exist in another
+configuration. So that fit misleads no user in a way the documented
+contract leaves out.
+
+**Reopens.** A real data set where the flagged lower point is the better
+solution against a known structure, or a search shown to saturate in a
+cell whose figures favor W or H.

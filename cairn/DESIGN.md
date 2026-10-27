@@ -331,15 +331,20 @@ solution under free scaling) reach. The engine keeps the lowest discrepancy
 F among those starts. That is not always the global minimum of F. A lower F
 can exist that these starts cannot reach: RR27's survey found one at every N
 it covered, up to 5000. At N <= 500 the lower point is mostly at the Heywood
-wall, and at larger N mostly an interior stationary point (corrected M169).
+wall. At larger N it is mostly an interior stationary point at RR27's
+boundary truth (corrected M169). M170's record gives the per-cell shares for
+both truths (corrected M170).
 The `cpm_fit()` help section "Which solution is reported" states this
 contract. The reproduction rule and the multimodality flag compare those
 starts only, so they do not see it. Where
 a lower F exists, T = n·F̂ is larger than at the lowest discrepancy, so the
 reported fit is worse than the model's best. The CircE oracle, the T
-calibration and M167's interval figures all describe this estimator. Which
-solution the estimate should be is the candidate row "State and settle the
-CPM engine estimate" (RR27, M167).
+calibration and M167's interval figures all describe this estimator. D-072
+(M170) keeps this estimate, because the lower points that M170's W and H
+searches found estimate the truth worse on average. It also decides to add a
+diagnostic that flags a lower optimum outside the theoretical
+configuration. No such diagnostic ships yet: it is the candidate row "Flag
+a lower optimum in CPM fits".
 
 ### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
 
