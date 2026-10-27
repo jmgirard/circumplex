@@ -1,6 +1,6 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -75,6 +75,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: implementation choice: the saturation rule's independent family is uniform configurations (angles uniform on the circle, communalities uniform on [.3, .99], weight logits standard normal), `m170_uniform_starts()`.
 - 2026-10-27: T1 done: `devel/m170-engine-estimate-helpers.R` and `devel/m170-engine-estimate-checks.R`, 4 checks pass. At K = 100, H gaps on RR27's six cases 0.81, 0.65, 3.31, 3.05, 1.96, 1.16 T units; W alone gives 0 on replicates 28 and 31, so check 1 can fail. H costs about 5.5 CPU-s per fit at K = 100 (6 workers); replicates 26 and 28 still vary with the seed at K = 100. devtools::test() clean.
 - 2026-10-27: T2 done: `devel/m170-engine-estimate.R` with its pre-registration block (K = 100; saturation S1 doubling share <= .02 and S2 400 uniform starts on 50 fits, at most 1 lower; decision rule branches 0 to 6, default the diagnostic, GP4 tie-break toward it; replicate rule R in [100, 500] under 12 CPU-hours with a 1.2 margin). Committed before any pilot or full run; no results file exists at this commit. A smoke run (4 replicates, K = 5) ran end to end and was not kept. The W and H discrepancies are now read after their polish, as E's is.
+- 2026-10-27: blocked on RB28 (`cairn/reviews/RB28-cpm-engine-estimate-prereg.md`): Fable review of the pre-registration block and decision rule, nine questions, the ninth on readings the block leaves open; second escalation on the engine estimate, so question 8 weighs not running the study. Committed on the milestone branch, not main, so the brief travels with the block it reviews.
 
 ## Decisions
 
