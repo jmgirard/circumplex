@@ -1,6 +1,6 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -90,6 +90,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: verify: devtools::test() clean at a65a356e (0 failures). Later commits change only devel/ and cairn/ files, so no package code differs since that run.
 - 2026-10-27: claim audit: not owed — internal tier.
 - 2026-10-27: status review; handing off to /milestone-review.
+- 2026-10-27: review return 1: AC6 — D-072's Context and Scope give "N = 250 to 5000" but not the cells AC6 requires (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000). Fix the D-072 wording; nothing else failed (gate clean, AC1 to AC5 and AC7 ticked).
 
 ## Decisions
 
@@ -108,3 +109,4 @@ Pass 1 (2026-10-27), branch head c99b899f, master 445994d9 unchanged since the c
 - AC5 evidence: the record's AC5 section reports jz2017 (raw rows, octants, m = 3), voc (th_start, m = 1), verbal (360 (0:5)/6, m = 2) and demo (seed 12345 then 2026, n = 2500, m = 3), each with E's T and estimates and the W and H gaps; verbal, the only fit with a gap over 0.01, adds W's and H's estimates and a changed order. Independent check: `cpm_fit()` as the vignette calls it gives jz2017 T 81.169, and `cpm_oracle_voc_fit()` gives voc T 16.697, both equal to the record. Pass.
 - AC7 evidence: `git diff master...HEAD --stat -- R src man tests vignettes DESCRIPTION NEWS.md` prints nothing; the full diffstat is 13 files under devel/ and cairn/, 2726 insertions and 16 deletions. Pass.
 - AC6 evidence: D-072 records the option as the rule's output (branch 6) on the committed results. It gives the rationale and the record files, names 47836901 as the block's commit, says no pilot or results file existed at it, and states the relation to D-071 (confirms, annotates). DESIGN.md's section heading and text name D-072. The ROADMAP row covers all six RR27 Q6 items, two applied and four omitted with reasons. Fail on one clause: AC6 requires the scope to give "truths, cells, normal data, variant A, unit scaling", and D-072's Context and Scope give "N = 250 to 5000" without the cells (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000). Not ticked.
+- Gate (pass 1): `cairn_validate.py` all checks pass. `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (7m 16s). `devtools::document()` with cli.width 500: 0 "resolve link" lines, no diff. `pkgdown::check_pkgdown()` no problems. README.Rmd, NEWS.md and .Rbuildignore untouched (internal tier, no new top-level file). Master watches: newest push runs of R-CMD-check.yaml and test-coverage.yaml are success at d0482590. `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R` and `tools/check-branch-protection.R` clean. No principle changed, so no `cairn_impact.py`.
