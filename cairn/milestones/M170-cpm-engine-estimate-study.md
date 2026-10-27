@@ -1,6 +1,6 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -17,7 +17,7 @@ Measure how often and by how much a lower discrepancy than `cpm_engine()`'s esti
 
 **In:** a seeded study `devel/m170-engine-estimate.R` (helpers beside it) with a pre-registration block, a timing pilot, a full run, a record `devel/m170-engine-estimate.md` and a results file `devel/m170-engine-estimate-results.rds`. A Fable review of the pre-registration before the full run. Four real or published fits. A D-entry with the decision, and DESIGN.md's D-071 section pointing at it.
 
-Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic set of extra starts: a communality-wall start per scale, an all-communality-level start, and starts with each free angle moved by 90, -90 and 180 degrees. W keeps the lowest discrepancy. H is the lowest discrepancy over W's starts plus 2K seeded random starts around E's estimate and 2K around the theory start. H_K uses only the first K starts for each centre. W and H run the same boundary polish as E. Cells: M167's two truths (boundary, interior; p = 8, communality .75, m = 3, variant A, unit scaling) at raw-data N = 250, 500, 1000 and correlation-matrix N = 2000, 5000, with M167's data generators and fresh seeds.
+Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic set of extra starts: around E's estimate, a communality-wall start per scale, an all-communality-level start, starts with each free angle moved by 90, -90 and 180 degrees, pairwise swaps of two free angles, and each swap with the wall on one swapped scale; around the theory start, a communality-wall start per scale (RR28). W keeps the lowest discrepancy. H is the lowest discrepancy over W's starts plus 2K seeded random starts around the theory start at sd .7 and 2K at sd 1.2 (RR28). H_K uses only the first K starts of each family. W and H run the same boundary polish as E. Cells: M167's two truths (boundary, interior; p = 8, communality .75, m = 3, variant A, unit scaling) at raw-data N = 250, 500, 1000 and correlation-matrix N = 2000, 5000, with M167's data generators and fresh seeds.
 
 **Out:**
 - Shipping any change to `cpm_engine()`, `cpm_fit()`, `print()`, `summary()` or the bootstrap goes to the ship-step candidate row that AC6 writes, when the decision changes behavior. That row also carries the formal T calibration re-run for the shipped estimator, the CIRCUM/CircE oracle re-check, the bootstrap warm-start change, and bootstrap coverage of an adopted alternative. "Catch errors in CPM bootstrap refits" joins it if that step opens `cpm_bootstrap()`.
@@ -58,7 +58,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] T9: Name the cells in D-072's Context and Scope (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000), as AC6 requires (review return 1).
 - [x] T10: Compute Wald coverage only on fits with a defined SE (review return 2), make `improves()` fail closed on NA, compare the independent family with E in W's missed share, count failed starts in the family hit rate, recompute the metrics and decision from the stored per-replicate records, and list the changes under the block's corrections.
 - [x] T11: Correct the record (pass-2 findings): mark only H's total share as a lower bound, say that only W's and H's points were measured, fix the T-exceedance sentence, name the `demo` machine and BLAS, note that W's CPU leaves out the finish step, and add lower-fits-only figures.
-- [ ] T12: Correct the tracking text (pass-2 findings): the ship row's omission reasons and its Fable tier; DESIGN.md's tense and wording; D-072's per-fit wording, its pointer to W's detection figures and why D-071's Reopens clause does not fire; the Scope's W and H definitions (wording-only amendment).
+- [x] T12: Correct the tracking text (pass-2 findings): the ship row's omission reasons and its Fable tier; DESIGN.md's tense and wording; D-072's per-fit wording, its pointer to W's detection figures and why D-071's Reopens clause does not fire; the Scope's W and H definitions (wording-only amendment).
 
 ## Work log
 
@@ -101,6 +101,8 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: T10, T11, T12 added for review return 2 (minor amendment); AC4 unticked until re-verified; Coverage AC2, AC3 → +T11, AC4 → +T10, AC6 → +T12.
 - 2026-10-27: T10 done: Wald coverage is now computed from the stored errors and SEs, only where the SE is defined; improves() fails closed on NA; W's subsample missed share compares the family with E; the family hit rate counts failed starts. Metrics and decision recomputed with M170_RECOMPUTE=1 at 6d6e6399 from the stored replicates: only beta3's coverage at boundary N = 250 changed (E .743 to .819, W .578 to .620, H .486 to .500, equal to the diff-bug reviewer's own recomputation); every share, gap, RMSE, saturation figure and T-exceedance is identical; the decision stays branch 6. The block lists the five changes under CORRECTIONS after the full run. Checks: 4 pass.
 - 2026-10-27: T11 done: the record now marks only H's total lower share as a lower bound (H's same-order and reordered splits are plain); says only W's and H's points were measured for quality; adds a lower-fits-only table (W's angles closer than E's on at most 31% of W's lower fits, its weights on at most 19%); replaces the 'by construction' T-exceedance sentence with the observed result (0 fits where W or H exceeds the quantile and E does not); notes that W's CPU leaves out the finish step; names the demo sample's machine (Apple M5 Pro, Mac17,9, macOS 27.0.1, R 4.6.1, reference BLAS and LAPACK); and states the recompute in the run facts.
+- 2026-10-27: substantive amendment: Scope's Definitions paragraph now gives W's corrected start set (adds pairwise angle swaps, swaps with the wall, and wall starts around the theory start) and H's corrected random families (both around the theory start, at sd .7 and 1.2), as RR28 changed them at T3; wording only, the deliverable is unchanged, so no stop (review pass 2, diff-bug #8).
+- 2026-10-27: T12 done: the ship row's omission reasons now say E is only flagged and M170's search never saturated, and the row names the Fable tier at plan (ROADMAP 23,998 bytes); DESIGN.md says the lower points M170's searches found are worse on average and that no diagnostic ships yet; D-072 says 'on average, though not on every fit', points to the record's W table for W's detection figures, and says why D-071's Reopens clause does not fire (the M169 help page already names a lower configuration with scales in other positions). D-072 edited in place; it has not reached the default branch.
 
 ## Decisions
 

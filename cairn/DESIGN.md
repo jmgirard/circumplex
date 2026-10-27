@@ -338,10 +338,11 @@ starts only, so they do not see it. Where
 a lower F exists, T = n·F̂ is larger than at the lowest discrepancy, so the
 reported fit is worse than the model's best. The CircE oracle, the T
 calibration and M167's interval figures all describe this estimator. D-072
-(M170) keeps this estimate, because the lower points estimate the truth
-worse. It adds a diagnostic that flags a lower optimum outside the
-theoretical configuration. That diagnostic is the candidate row "Flag a
-lower optimum in CPM fits".
+(M170) keeps this estimate, because the lower points that M170's searches
+found estimate the truth worse on average. It also decides to add a
+diagnostic that flags a lower optimum outside the theoretical
+configuration. No such diagnostic ships yet: it is the candidate row "Flag
+a lower optimum in CPM fits".
 
 ### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
 

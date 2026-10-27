@@ -2676,16 +2676,16 @@ lower discrepancy found there without adopting it.
 
 **Rationale.** The saturation verdict failed in every cell, so the rule
 could not adopt W or H. H's shares are therefore lower bounds in every
-cell. Where W or H differed from E, its angles and weights were further
-from the truth than E's, so the theory-basin estimate stays the better
-estimate. W finds a lower discrepancy often enough, cheaply and
+cell. On the fits where W or H differed from E, its angles and weights
+were further from the truth than E's on average, though not on every fit.
+So the theory-basin estimate stays the better estimate. W finds a lower discrepancy often enough, cheaply and
 deterministically, that silence is not the honest default (GP2). The lower
 confidence bound on W's median gap stayed under the report-beside threshold
 in every cell. The tie-break under GP4 and IP3 then chose a flag over a
 second fit statistic.
 
 **Rejected.** Adopting W or H: saturation fails, and both estimate the
-truth worse than E. Reporting the lowest discrepancy beside T: the gap
+truth worse than E on average. Reporting the lowest discrepancy beside T: the gap
 bound did not reach the threshold. A second statistic would also need its
 own oracles and a T calibration, and W's lowest point is not the model's
 minimum either. Keeping E with no diagnostic: W finds a lower point on 5%
@@ -2701,9 +2701,15 @@ D-068.
 the candidate row "Flag a lower optimum in CPM fits". W does not find every
 lower point that H or the uniform search found, so the diagnostic's silence
 does not mean that no lower point exists. The ship step's wording says so.
+The record's W table gives W's recall against H and the share of fits
+where a lower point exists and W misses it, per cell.
 
 **Relation to D-071.** Confirms its estimator, annotates its handling with
-the diagnostic, and supersedes nothing.
+the diagnostic, and supersedes nothing. D-071's Reopens clause does not
+fire. The verbal matrix has a lower, reordered point, but the M169 help
+page already says that a lower discrepancy can exist in another
+configuration. So that fit misleads no user in a way the documented
+contract leaves out.
 
 **Reopens.** A real data set where the flagged lower point is the better
 solution against a known structure, or a search shown to saturate in a
