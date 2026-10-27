@@ -1540,6 +1540,33 @@ cpm_boundary_proximity <- function(object) {
 #'   `corfun` (the estimated correlation function), `matrices` (the sample and
 #'   model-implied matrices and residuals), and `details` (model, diagnostics,
 #'   and settings). See [print.circumplex_cpm()] and [summary.circumplex_cpm()].
+#' @section Which solution is reported:
+#'   The engine minimizes the discrepancy function from a fixed set of starts.
+#'   For the free-angle models (`"quasi-circumplex"` and
+#'   `"equal-communality"`), the starts are the theoretical `angles`, their
+#'   mirror image about the reference scale, and four fixed patterns of 15- and
+#'   30-degree offsets from them. For the fixed-angle models
+#'   (`"constrained-angles"` and `"circulant"`), the angles stay at their
+#'   theoretical values, and the starts are one start and three fixed
+#'   rescalings of its communality indices. In both cases the communality-index
+#'   and weight starts are computed from the sample correlation matrix. With
+#'   `scaling = "free"`, one more run starts from the `"unit"` solution. The
+#'   estimate is the solution with the lowest discrepancy that these runs
+#'   reach: the maximum-likelihood solution in the basin they reach. (When a
+#'   correlation-function weight of that solution is near zero, the harmonic
+#'   can be removed and the reduced model, which has more degrees of freedom,
+#'   is refit from it and reported instead.)
+#'
+#'   That solution is not always the global minimum. A configuration with a
+#'   lower discrepancy can exist that these runs do not reach, for example with
+#'   more scales at or near a communality index of 1 or with scales in other
+#'   positions on the circle. Two checks compare these runs only, so neither
+#'   signals such a configuration: the reproduction part of the convergence
+#'   acceptance criterion, which requires at least two independent starts to
+#'   reach the lowest discrepancy, and the "competing near-tied optima" note.
+#'   Where one exists, the reported chi-square statistic is larger than at the
+#'   lower discrepancy. At the same degrees of freedom, its p-value is then
+#'   smaller and its RMSEA and CFI are no better.
 #' @section Confidence intervals:
 #'   The bootstrap (the raw-data default) refits the model to each resampled
 #'   correlation matrix, warm-started from the reported solution, and forms

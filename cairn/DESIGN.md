@@ -326,11 +326,15 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 ### CPM engine estimate: what it is (D-071)
 
 The estimate `cpm_fit()` reports is the maximum-likelihood solution in the
-basin that its theory-centred starts (`cpm_start_set()`) reach. The engine
-keeps the lowest discrepancy F among those starts. That is not always the
-global minimum of F. At small N a lower F can exist, mostly at the Heywood
-wall, that these starts cannot reach. The reproduction rule and the
-multimodality flag compare those starts only, so they do not see it. Where
+basin that its theory-centred starts (`cpm_start_set()`, plus the unit
+solution under free scaling) reach. The engine keeps the lowest discrepancy
+F among those starts. That is not always the global minimum of F. A lower F
+can exist that these starts cannot reach: RR27's survey found one at every N
+it covered, up to 5000. At N <= 500 the lower point is mostly at the Heywood
+wall, and at larger N mostly an interior stationary point (corrected M169).
+The `cpm_fit()` help section "Which solution is reported" states this
+contract. The reproduction rule and the multimodality flag compare those
+starts only, so they do not see it. Where
 a lower F exists, T = n·F̂ is larger than at the lowest discrepancy, so the
 reported fit is worse than the model's best. The CircE oracle, the T
 calibration and M167's interval figures all describe this estimator. Which
