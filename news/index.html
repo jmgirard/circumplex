@@ -123,7 +123,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
-<ul><li>
+<ul><li><p><code><a href="../reference/cpm_fit.html">?cpm_fit</a></code> has a new section, “Which solution is reported”. It names the starts the engine runs and says that the estimate is the maximum-likelihood solution in the basin those starts reach. A configuration with a lower discrepancy can exist. The convergence acceptance criterion and the “competing near-tied optima” note do not signal it. Where one exists, the reported chi-square is larger than at that configuration.</p></li>
+<li>
 <p><code><a href="../reference/cpm_fit.html">?cpm_fit</a></code> now states both conditions under which <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> cautions about analytic (Wald) intervals. The caution prints whenever N is below</p>
 <ol start="2000" style="list-style-type: decimal"><li>From 2000 up to but not including 50000 it prints only when a boundary or weak-identification marker fires. The page lists the five markers. Before, it gave the second condition only as “near-boundary fits”, with no upper limit and no list of markers.</li>
 </ol></li>

@@ -242,6 +242,36 @@ model-implied matrices and residuals), and <code>details</code> (model, diagnost
 and settings). See <code><a href="print.circumplex_cpm.html">print.circumplex_cpm()</a></code> and <code><a href="summary.circumplex_cpm.html">summary.circumplex_cpm()</a></code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="which-solution-is-reported">Which solution is reported<a class="anchor" aria-label="anchor" href="#which-solution-is-reported"></a></h2>
+
+
+<p>The engine minimizes the discrepancy function from a fixed set of starts.
+For the free-angle models (<code>"quasi-circumplex"</code> and
+<code>"equal-communality"</code>), the starts are the theoretical <code>angles</code>, their
+mirror image about the reference scale, and four fixed patterns of 15- and
+30-degree offsets from them. For the fixed-angle models
+(<code>"constrained-angles"</code> and <code>"circulant"</code>), the angles stay at their
+theoretical values, and the starts are one start and three fixed
+rescalings of its communality indices. In both cases the communality-index
+and weight starts are computed from the sample correlation matrix. With
+<code>scaling = "free"</code>, one more run starts from the <code>"unit"</code> solution. The
+estimate is the solution with the lowest discrepancy that these runs
+reach: the maximum-likelihood solution in the basin they reach. (When a
+correlation-function weight of that solution is near zero, the harmonic
+can be removed and the reduced model, which has more degrees of freedom,
+is refit from it and reported instead.)</p>
+<p>That solution is not always the global minimum. A configuration with a
+lower discrepancy can exist that these runs do not reach, for example with
+more scales at or near a communality index of 1 or with scales in other
+positions on the circle. Two checks compare these runs only, so neither
+signals such a configuration: the reproduction part of the convergence
+acceptance criterion, which requires at least two independent starts to
+reach the lowest discrepancy, and the "competing near-tied optima" note.
+Where one exists, the reported chi-square statistic is larger than at the
+lower discrepancy. At the same degrees of freedom, its p-value is then
+smaller and its RMSEA and CFI are no better.</p>
+    </div>
+    <div class="section level2">
     <h2 id="confidence-intervals">Confidence intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"></a></h2>
 
 
@@ -310,7 +340,7 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-in"><span><span class="va">scales</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">cpm_fit</span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="va">scales</span>, boots <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.</span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -341,7 +371,7 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-in"><span><span class="co"># Matrix-input path (supply the sample size; analytic CIs)</span></span></span>
 <span class="r-in"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">[</span><span class="va">scales</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cpm_fit</span><span class="op">(</span>cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="va">scales</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Circular Process Model (Browne, 1992) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model:             quasi-circumplex </span>

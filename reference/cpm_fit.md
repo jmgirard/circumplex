@@ -155,6 +155,37 @@ diagnostics, and settings). See
 and
 [`summary.circumplex_cpm()`](http://circumplex.jmgirard.com/reference/summary.circumplex_cpm.md).
 
+## Which solution is reported
+
+The engine minimizes the discrepancy function from a fixed set of
+starts. For the free-angle models (`"quasi-circumplex"` and
+`"equal-communality"`), the starts are the theoretical `angles`, their
+mirror image about the reference scale, and four fixed patterns of 15-
+and 30-degree offsets from them. For the fixed-angle models
+(`"constrained-angles"` and `"circulant"`), the angles stay at their
+theoretical values, and the starts are one start and three fixed
+rescalings of its communality indices. In both cases the
+communality-index and weight starts are computed from the sample
+correlation matrix. With `scaling = "free"`, one more run starts from
+the `"unit"` solution. The estimate is the solution with the lowest
+discrepancy that these runs reach: the maximum-likelihood solution in
+the basin they reach. (When a correlation-function weight of that
+solution is near zero, the harmonic can be removed and the reduced
+model, which has more degrees of freedom, is refit from it and reported
+instead.)
+
+That solution is not always the global minimum. A configuration with a
+lower discrepancy can exist that these runs do not reach, for example
+with more scales at or near a communality index of 1 or with scales in
+other positions on the circle. Two checks compare these runs only, so
+neither signals such a configuration: the reproduction part of the
+convergence acceptance criterion, which requires at least two
+independent starts to reach the lowest discrepancy, and the "competing
+near-tied optima" note. Where one exists, the reported chi-square
+statistic is larger than at the lower discrepancy. At the same degrees
+of freedom, its p-value is then smaller and its RMSEA and CFI are no
+better.
+
 ## Confidence intervals
 
 The bootstrap (the raw-data default) refits the model to each resampled
@@ -223,7 +254,7 @@ data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 set.seed(12345)
 fit <- cpm_fit(jz2017, scales = scales, boots = 100)
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
 #> Warning: 2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.
 fit
 #> 
@@ -254,7 +285,7 @@ fit
 # Matrix-input path (supply the sample size; analytic CIs)
 R <- cor(jz2017[scales])
 cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
 #> 
 #> Circular Process Model (Browne, 1992) 
 #> Model:             quasi-circumplex 

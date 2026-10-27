@@ -431,6 +431,14 @@
 
 ### Documentation
 
+- [`?cpm_fit`](http://circumplex.jmgirard.com/reference/cpm_fit.md) has
+  a new section, “Which solution is reported”. It names the starts the
+  engine runs and says that the estimate is the maximum-likelihood
+  solution in the basin those starts reach. A configuration with a lower
+  discrepancy can exist. The convergence acceptance criterion and the
+  “competing near-tied optima” note do not signal it. Where one exists,
+  the reported chi-square is larger than at that configuration.
+
 - [`?cpm_fit`](http://circumplex.jmgirard.com/reference/cpm_fit.md) now
   states both conditions under which
   [`summary()`](https://rdrr.io/r/base/summary.html) cautions about
