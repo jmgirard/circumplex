@@ -53,7 +53,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] T4: Run a 10-fit timing pilot per cell on an unloaded machine. Set the replicate count by the block's rule so that the full run fits 12 CPU-hours.
 - [x] T5: Run the full study on the 16-worker machine when the user is plugged in. Commit the results file.
 - [x] T6: Fit the four AC5 cases at their oracle and vignette settings with the block's seeds.
-- [ ] T7: Write summary functions that read the results file, and write the record from their output.
+- [x] T7: Write summary functions that read the results file, and write the record from their output.
 - [ ] T8: Apply the decision rule. Write the D-entry, point DESIGN.md at it, and add the ship-step candidate row when AC6 calls for it. Check AC7's diff.
 
 ## Work log
@@ -85,6 +85,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: resumed on AC power; master unchanged since the cut (445994d9).
 - 2026-10-27: T5 done: full run at 95120722 (clean tree), 17 workers, 39.0 min wall, R = 500, `devel/m170-engine-estimate-results.rds`. No replicate errored; excluded fits 0 to 95 per cell. Saturation fails in all ten cells. Decision rule output: branch 6, keep E and add a diagnostic. The user asked mid-run whether the cost was worth it; on learning it was about 40 minutes of wall time, not 9 hours, they let it finish.
 - 2026-10-27: T6 done by the same full run (the block's AC5 section, seeds 50261027 + j): the four fits are stored in the results file under `real`. W and H find no lower point on jz2017, voc or demo; on verbal W finds 3.158 and H 3.628 T units.
+- 2026-10-27: T7 done: `devel/m170-engine-estimate-summary.R` writes the record's generated part (run facts, AC2 shares and saturation with H's shares marked ">=" as lower bounds, failed-start and gradient counts, AC3 for W and H, AC4 by family and by parameter, the decision inputs, AC5). Hand-written prose in `devel/m170-engine-estimate.md` cites those tables. Two drafted claims were corrected against the results before commit: H's communality RMSE is below E's at interior N = 5000 (.04239 against .04243), and every fit has defined SEs at N = 5000. Cross-check against M167's committed results: E's exclusion and Heywood rates agree at N = 250 (41/95 against 40/94 excluded).
 
 ## Decisions
 
