@@ -50,7 +50,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] T1: Write the helpers for E, W, H and the metrics on M167's generators (`devel/m167-interval-oracle.R`). Wrap each `nlminb()` call so that a start that throws is skipped (RR27 beyond-brief 3). Check that H reaches each of RR27's six boundary N = 250 lower points, and that W's starts are the same on every run.
 - [x] T2: Write the pre-registration block with the decision rule, and commit it before any full run.
 - [x] T3: Write RB28 through `/milestone-brief` on the block and its decision rule. Apply the RR's accepted changes and list them under a corrections heading in the block, before the pilot.
-- [ ] T4: Run a 10-fit timing pilot per cell on an unloaded machine. Set the replicate count by the block's rule so that the full run fits 12 CPU-hours.
+- [x] T4: Run a 10-fit timing pilot per cell on an unloaded machine. Set the replicate count by the block's rule so that the full run fits 12 CPU-hours.
 - [ ] T5: Run the full study on the 16-worker machine when the user is plugged in. Commit the results file.
 - [ ] T6: Fit the four AC5 cases at their oracle and vignette settings with the block's seeds.
 - [ ] T7: Write summary functions that read the results file, and write the record from their output.
@@ -79,6 +79,8 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: RR28 ingested (Fable, spawned after the gate). Recommendations 1 to 12 applied and 13 applied after its check; 14 and 15 not taken; 16 to 20 rejections accepted (M170-D1 to D3). Block CORRECTIONS lists all 13 changes. Status back to in-progress.
 - 2026-10-27: rec 13 check (pre-pilot, M167's seeds, 18 accepted N = 250 fits): H with both random families around g0 (sd .7 and 1.2) reached a lower point than the old design (E at .7, g0 at .7) on 1 fit, by 0.087 T units, and the old design on none; adopted by the rule fixed before the check ("adopt if it is lower on more fits"). No W start was infinite on any of the 18 fits after rec 1.
 - 2026-10-27: T3 done: RB28/RR28 round complete, corrections applied before the pilot. Checks: 4 pass (check 2 now asserts all 101 W starts finite on boundary replicate 6, whose E has a communality at exactly 1, and check 3 asserts that fit is in its domain). Smoke run end to end; W now reaches the verbal matrix's lower point (3.158 T units, RR27 3.16); `demo` is now the vignette's sample (T_E 2.229).
+- 2026-10-27: verify slot after T3: devtools::test() clean (0 failures).
+- 2026-10-27: T4 done: timing pilot at a65a356e (clean tree), one worker, 10 replicates per cell, 14.4 min wall, `devel/m170-engine-estimate-pilot.rds`. Median CPU per replicate 3.6 to 5.5 s, per family run 3.0 to 4.6 s; E 0.04 to 0.07 s, W 0.68 to 1.07 s. Replicate rule: R = 500, projected 8.80 CPU-hours.
 
 ## Decisions
 
