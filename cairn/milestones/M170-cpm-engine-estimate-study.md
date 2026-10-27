@@ -104,6 +104,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: substantive amendment: Scope's Definitions paragraph now gives W's corrected start set (adds pairwise angle swaps, swaps with the wall, and wall starts around the theory start) and H's corrected random families (both around the theory start, at sd .7 and 1.2), as RR28 changed them at T3; wording only, the deliverable is unchanged, so no stop (review pass 2, diff-bug #8).
 - 2026-10-27: T12 done: the ship row's omission reasons now say E is only flagged and M170's search never saturated, and the row names the Fable tier at plan (ROADMAP 23,998 bytes); DESIGN.md says the lower points M170's searches found are worse on average and that no diagnostic ships yet; D-072 says 'on average, though not on every fit', points to the record's W table for W's detection figures, and says why D-071's Reopens clause does not fire (the M169 help page already names a lower configuration with scales in other positions). D-072 edited in place; it has not reached the default branch.
 
+- 2026-10-28: step-7 approval: m170-cpm-engine-estimate-study approved for merge.
 ## Decisions
 
 - M170-D1 (2026-10-27, RR28): the study runs, amended (RR28 Q8). Not running would leave the question on RR27's uncommitted survey, with no detection rate for any deterministic probe, so no diagnostic could be specified. The amended study costs the same 12 CPU-hours.
