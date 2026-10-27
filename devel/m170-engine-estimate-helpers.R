@@ -181,15 +181,26 @@ m170_estimators <- function(R, eng, m, K, seed, sd = 0.7, extra = list()) {
   h_pt <- pick(list(w, h_e, h_g))
   hk_pt <- pick(list(w, first_k(h_e, K), first_k(h_g, K)))
 
+  # A point that fails to finish (an error in the polish or the
+  # canonicalization) leaves that estimator at E, and is counted.
   finish <- function(pt) {
     if (is.null(pt)) return(NULL)
-    tryCatch(m170_finish(pt$par, pt$F, R, spec, eng), error = function(e) NULL)
+    tryCatch(m170_finish(pt$par, pt$F, R, spec, eng), error = function(e) {
+      structure(list(), class = "m170_finish_error")
+    })
   }
+  W <- finish(w_pt)
+  H <- finish(h_pt)
+  finish_error <- c(W = inherits(W, "m170_finish_error"),
+                    H = inherits(H, "m170_finish_error"))
+  if (finish_error[["W"]]) W <- NULL
+  if (finish_error[["H"]]) H <- NULL
   list(
-    W = finish(w_pt), H = finish(h_pt),
+    W = W, H = H, finish_error = finish_error,
     F_E = eng$F,
-    F_W = if (is.null(w_pt)) eng$F else w_pt$F,
-    F_H = if (is.null(h_pt)) eng$F else h_pt$F,
+    # W's and H's discrepancies are read after the polish, as E's is
+    F_W = if (is.null(W)) eng$F else W$F,
+    F_H = if (is.null(H)) eng$F else H$F,
     F_HK = if (is.null(hk_pt)) eng$F else hk_pt$F,
     extra_F = vapply(extra_runs, function(s) min(c(s$F, Inf), na.rm = TRUE),
                      numeric(1)),
