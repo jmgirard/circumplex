@@ -24,9 +24,9 @@ lb <- function(x, k, d = 3) {
   paste0(if (!res$metrics[[k]]$saturation$pass) ">= " else "", fmt(x, d))
 }
 H_NOTE <- paste("H's figures describe H, the study's bounded reference search,",
-                "never the global minimum of F. A \">=\" marks H's total lower",
-                "share in a cell whose saturation verdict is a fail: a lower",
-                "bound.")
+                "never the global minimum of F. A \">=\" marks H's or H_K's",
+                "total lower share in a cell whose saturation verdict is a",
+                "fail: a lower bound.")
 cell_label <- function(key) {
   m <- regmatches(key, regexec("^(\\w+)_N(\\d+)$", key))[[1]]
   sprintf("%s N = %s", m[2], m[3])
@@ -134,8 +134,8 @@ ac3_table <- function(x) {
   df <- do.call(rbind, lapply(cells, function(k) {
     s <- res$metrics[[k]]$search[[x]]
     cpu <- res$pilot$cpu[res$pilot$cpu$cell == k, ]
-    # only the total share can only rise under a deeper search; its split by
-    # order can move either way, so only the total carries ">="
+    # a deeper search can only raise the total share; its split by order can
+    # move either way, so only the total carries ">="
     out <- data.frame(cell = cell_label(k),
                       lower = if (x == "H") lb(s$share_lower, k) else
                         fmt(s$share_lower),
@@ -198,7 +198,8 @@ ac4_parameter_table <- function(k) {
 
 # The per-cell inputs the decision rule read. nw() and im() restate
 # no_worse() and improves() of devel/m170-engine-estimate.R for display; the
-# decision itself is the one the full run stored (res$decision).
+# decision itself is the one stored in the results file (res$decision, from
+# the recompute where one ran).
 
 decision_inputs <- function() {
   df <- do.call(rbind, lapply(cells, function(k) {
@@ -214,9 +215,10 @@ decision_inputs <- function() {
     im <- function(x) {
       e <- q$E
       a <- q[[x]]
-      isTRUE(any(a$rmse_angle <= 0.95 * e$rmse_angle,
-                 a$rmse_zeta <= 0.95 * e$rmse_zeta,
-                 a$rmse_beta <= 0.95 * e$rmse_beta))
+      v <- c(a$rmse_angle <= 0.95 * e$rmse_angle,
+             a$rmse_zeta <= 0.95 * e$rmse_zeta,
+             a$rmse_beta <= 0.95 * e$rmse_beta)
+      !anyNA(v) && any(v)
     }
     data.frame(cell = cell_label(k),
                sat = if (m$saturation$pass) "pass" else "fail",

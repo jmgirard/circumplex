@@ -121,9 +121,9 @@
 #           are also W's; share_missed_H(W) = the share of accepted fits on
 #           which H finds a lower discrepancy and W does not; and on S2's
 #           subsample, the share on which H or the independent family finds
-#           one and W does not. The D-entry carries these beside any
+#           one and W does not. The D-entry points to these beside any
 #           diagnostic, because a W-based diagnostic's silence is what a user
-#           will over-read.
+#           will over-read (CORRECTIONS after the full run, item 5).
 #   M4  (AC4, for each of E, W and H, per parameter: 7 free angles, 8
 #       communalities, 4 weights)
 #       (a) bias and RMSE: angles as the signed circular difference from the
@@ -280,10 +280,20 @@
 #   3. M3(f)'s subsample share counts a family point that lies more than the
 #      threshold below E, not below H.
 #   4. The family hit rate counts a failed start as a run that missed H's
-#      basin. No start failed, so the stored rates are unchanged.
+#      basin. The stored rates came from the old rule, which left failed
+#      starts out of the denominator, and the full run did not store the
+#      family's failed-start count. Every nonzero stored rate is an exact
+#      multiple of 1/400, which is what a run with no failed family start
+#      gives. The hit rate enters no decision.
 #   5. The D-entry cites M3(f)'s figures in the record's W table rather than
 #      carrying them, because the repo's tracking rules keep counts and
 #      measurements out of D-entries.
+#   6. The family's CPU time is NA, not 0, on a replicate where the family
+#      does not run. Only the pilot's CPU table is used, and the pilot runs
+#      the family on every replicate.
+#   The stored per-replicate field `covered` still holds the full run's rule
+#   (item 1). The metrics no longer read it; they read the stored errors and
+#   SEs.
 # ==== PRE-REGISTRATION END ====
 #
 # Usage:  M170_PILOT=1 Rscript devel/m170-engine-estimate.R  # timing pilot
@@ -425,7 +435,7 @@ one_replicate <- function(cfg_name, N, i, truth_fit, with_family) {
                 H = if (is.null(est$H)) NA else est$H$grad_ok),
     cpu = c(E = cpu_E, W = cpu_E + est$cpu[["W"]], H = cpu_E + est$cpu[["H"]],
             replicate = cpu_E + est$cpu[["H"]] + cpu_se,
-            family = est$cpu[["extra"]])
+            family = if (with_family) est$cpu[["extra"]] else NA_real_)
   )
 }
 

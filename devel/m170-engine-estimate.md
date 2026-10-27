@@ -22,6 +22,14 @@ summary script.
   pilot set R = 500 replicates per cell.
 - The full run ran at 95120722 with a clean working tree. It used 17
   workers and took 39 minutes. Commit 07ca104f added its results file.
+- Review found that the full run computed Wald coverage on some fits with
+  no defined standard error. Commit 6d6e6399 added the block's "CORRECTIONS
+  after the full run" and a recompute mode. The metrics and the decision
+  were recomputed at 6d6e6399 from the stored per-replicate records, with
+  nothing re-run, and commit d141a156 added the recomputed results file.
+  Only beta3's coverage at boundary N = 250 changed, and the decision did
+  not. The stored per-replicate field `covered` still holds the full run's
+  rule. The metrics read the stored errors and standard errors instead.
 
 ## Estimators in brief
 
@@ -70,9 +78,9 @@ Wald coverage is further from .95 for W and H in every such cell. Below
 N = 5000, a smaller share of W and H fits than of E fits gets a finite
 standard error. At
 boundary N = 250, the angle RMSE is 18.71 degrees for E, 29.89 for W and
-39.66 for H. At interior N = 250 it is 11.84, 43.34 and 55.26. No cell
-passes `no_worse()` for W or H. The one exception is interior N = 5000 for
-W, where W never differs from E. RR27 Q2 reported this direction from 60
+39.66 for H. At interior N = 250 it is 11.84, 43.34 and 55.26.
+`no_worse()` fails for W and H in every cell but one. That cell is
+interior N = 5000 for W, where W never differs from E. RR27 Q2 reported this direction from 60
 replicates per cell. This study measures it at 500.
 
 The table "Estimate quality on the lower fits only" repeats the comparison
@@ -87,8 +95,8 @@ cells at N <= 1000. There, E's T exceeds its .95 chi-square quantile on 1.6 to 3
 accepted fits. At boundary N = 2000 and 5000 the share is 1.8%. At interior
 N = 2000 and 5000 it is 5.0% and 4.8%. In the results, W's and H's T
 never exceeds the quantile on a fit where E's does not. Their shares are
-therefore at or below E's in every cell, and W's equals E's at interior
-N = 5000. This is a result of the run, not a property of the estimators:
+therefore at or below E's in every cell. At interior N = 5000, W's and
+H's shares both equal E's. This is a result of the run, not a property of the estimators:
 W's or H's polish can leave a model with a different df from E's.
 
 **A W-based diagnostic misses some lower points.** Consider the cells where
@@ -111,7 +119,7 @@ The pre-registered rule reads its branches in order.
 
 - Branch 0 does not fire. No figure it reads is NA.
 - Branches 1 and 2 do not fire. Saturation fails in every cell, and
-  `no_worse()` fails for both W and H.
+  `favors()` fails for both W and H.
 - Branch 3 does not fire. W's share is .05 or more in eight cells.
 - Branch 4 does not fire. In the pilot, W costs 0.68 to 1.07 CPU-seconds
   per fit. The limit is 10. The figure covers E and W's refits, but not the
@@ -137,7 +145,8 @@ the same output, under `decision`.
 - E's exclusion and Heywood rates match M167's for the same cells and
   generator. M170 excluded 41 and 95 fits at N = 250, against M167's 40 and
   94. Heywood rates are .82 and .93, against .78 and .91. E's SE-defined
-  shares differ from M167's by up to .065 at N = 250, on different seeds.
+  shares differ from M167's by up to .065 (interior N = 250), on different
+  seeds.
 
 <!-- generated:begin (devel/m170-engine-estimate-summary.R) -->
 
@@ -151,7 +160,7 @@ the same output, under `decision`.
 
 ### Shares of lower fits and the saturation verdict (AC2)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's or H_K's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 | cell | accepted | excluded | errored | H_K lower | H lower | S1 share | S2 | family hit rate | family reordered | family more Heywood | saturation |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -198,7 +207,7 @@ H's figures describe H, the study's bounded reference search, never the global m
 
 ### H against E (AC3)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's or H_K's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 | cell | lower | same order | reordered | gap median | gap median LCB | gap max | more Heywood | order changed |
 |---|---|---|---|---|---|---|---|---|
@@ -215,7 +224,7 @@ H's figures describe H, the study's bounded reference search, never the global m
 
 ### Estimate quality by family (AC4)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's or H_K's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 | cell | estimator | RMSE angle (deg) | RMSE zeta | RMSE beta | cov dev | SE defined | T exceed |
 |---|---|---|---|---|---|---|---|
@@ -252,7 +261,7 @@ H's figures describe H, the study's bounded reference search, never the global m
 
 ### Estimate quality on the lower fits only
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's or H_K's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 X is W or H. Errors are each fit's root mean square error over the 7 free angles or the 4 weights, averaged over X's lower fits.
 
@@ -295,7 +304,7 @@ X is W or H. Errors are each fit's root mean square error over the 7 free angles
 
 ### Estimate quality by parameter (AC4)
 
-H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's total lower share in a cell whose saturation verdict is a fail: a lower bound.
+H's figures describe H, the study's bounded reference search, never the global minimum of F. A ">=" marks H's or H_K's total lower share in a cell whose saturation verdict is a fail: a lower bound.
 
 #### boundary N = 250
 
