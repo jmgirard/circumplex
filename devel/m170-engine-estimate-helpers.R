@@ -246,7 +246,8 @@ m170_estimators <- function(R, eng, m, K, seed, n1, thresh = 0.01,
   extra_out <- lapply(extra_runs, function(s) {
     best <- lowest(list(s))
     list(F = best$F,
-         hit_rate = mean(n1 * (s$F - F_H_raw) <= thresh, na.rm = TRUE),
+         # a failed start counts as a run that did not reach H's basin
+         hit_rate = mean(!is.na(s$F) & n1 * (s$F - F_H_raw) <= thresh),
          point = if (is.finite(best$F)) {
            tryCatch(m170_finish(best$par, best$F, R, spec, eng),
                     error = function(e) NULL)

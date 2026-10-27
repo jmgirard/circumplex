@@ -30,7 +30,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] AC1: A pre-registration block at the top of `devel/m170-engine-estimate.R` fixes these items: the truths, cells and seeds, including the seeds of the AC5 fits; the replicate count rule from the timing pilot; the definitions of E, W and H, with K; the threshold for a lower discrepancy (0.01 in T units, T = (N - 1) times the discrepancy); the saturation rule; every metric that AC3 and AC4 name; and the decision rule. The saturation rule compares H_K with H, and compares H with an independent search family (another spread or centre, fixed in the block) on a stated subsample per cell. The decision rule is an ordered if/else chain over named metrics. It ends in a default branch and selects one of five options: keep E unchanged; keep E and add a diagnostic for a lower optimum outside the theoretical configuration; report W; report H; or report E with the lowest discrepancy found beside it. It selects W or H only where the saturation verdict passes in the cells it relies on and AC4's figures favor that estimator. Otherwise it selects among the three options that keep E. The block states how it breaks a tie between the diagnostic and the report-beside option under GP4. (RB tripwire: no-oracle)
 - [x] AC2: For each cell, `devel/m170-engine-estimate.md` reports the share of accepted E fits where H_K and where H find a discrepancy lower than E's by more than the threshold. The figures are computed from `devel/m170-engine-estimate-results.rds`. The record also reports the saturation rule's verdict. In a cell whose verdict is a fail, H's shares are labelled as lower bounds in the record and in the D-entry. H's AC4 figures are labelled everywhere as describing H, not the global minimum.
 - [x] AC3: For each cell and for each of W and H, the record reports these figures from the same results file, over accepted E fits. (a) The share with a discrepancy lower than E's by more than the threshold. (b) The median and largest gap in T units among those fits. (c) The share of those whose lower point has more scales with a communality above .995 than E's. (d) The share of those whose cyclic angle order, after `cpm_canonicalize()`, differs from E's. (e) W's median CPU time per fit on an unloaded core, beside E's.
-- [x] AC4: For each cell and for each of E, W and H, the record reports these figures from the same results file, over accepted E fits. (a) The bias and RMSE of each free angle (the signed circular difference from the truth), each communality and each weight. (b) Per parameter, the share of fits with a defined analytic standard error, and the 95% Wald coverage on those fits. (c) The share of fits whose T exceeds the .95 chi-square quantile at the degrees of freedom of the model as fitted at that point.
+- [ ] AC4: For each cell and for each of E, W and H, the record reports these figures from the same results file, over accepted E fits. (a) The bias and RMSE of each free angle (the signed circular difference from the truth), each communality and each weight. (b) Per parameter, the share of fits with a defined analytic standard error, and the 95% Wald coverage on those fits. (c) The share of fits whose T exceeds the .95 chi-square quantile at the degrees of freedom of the model as fitted at that point.
 - [x] AC5: The record reports four real or published fits, each at the settings its oracle test or vignette uses (m, angles and model). The fits are: `jz2017`'s eight octant scales on the raw-data path; the matrices from `cpm_oracle_voc()` and `cpm_oracle_verbal()` in `tests/testthat/helper-cpm-oracles.R`; and the simulated `sim` sample that the `cpm-boundary-fits` vignette fits as `demo`. For each, the record gives E's T and estimates. For W and H it gives the gap in T units. Where the gap exceeds the threshold, it also gives their estimates and any change in angle order.
 - [x] AC6: A new entry in `cairn/DECISIONS.md` records which of the five options the estimate takes, as the output of AC1's decision rule on the committed results. It gives the rationale, the scope (truths, cells, normal data, variant A, unit scaling) and the record files its figures come from. It names the commit that added the pre-registration block and says whether any full-run results file existed at that commit. It states its relation to D-071: confirms, annotates or supersedes. DESIGN.md's section "CPM engine estimate: what it is (D-071)" names the new entry. If the option is not "keep E unchanged", `cairn/ROADMAP.md` gains a candidate row for shipping it. The row lists each RR27 Q6 item that applies to the chosen option, and gives a reason for each one it omits.
 - [x] AC7: `git diff <default-branch>...HEAD --stat` lists no path under `R/`, `src/`, `man/`, `tests/` or `vignettes/`, and no change to `DESCRIPTION` or `NEWS.md`.
@@ -38,11 +38,11 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 ## Coverage
 
 - AC1 → T2, T3
-- AC2 → T1, T5, T7
-- AC3 → T1, T4, T5, T7
-- AC4 → T5, T7
+- AC2 → T1, T5, T7, T11
+- AC3 → T1, T4, T5, T7, T11
+- AC4 → T5, T7, T10
 - AC5 → T6, T7
-- AC6 → T8, T9
+- AC6 → T8, T9, T12
 - AC7 → T8
 
 ## Tasks
@@ -56,6 +56,9 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] T7: Write summary functions that read the results file, and write the record from their output.
 - [x] T8: Apply the decision rule. Write the D-entry, point DESIGN.md at it, and add the ship-step candidate row when AC6 calls for it. Check AC7's diff.
 - [x] T9: Name the cells in D-072's Context and Scope (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000), as AC6 requires (review return 1).
+- [ ] T10: Compute Wald coverage only on fits with a defined SE (review return 2), make `improves()` fail closed on NA, compare the independent family with E in W's missed share, count failed starts in the family hit rate, recompute the metrics and decision from the stored per-replicate records, and list the changes under the block's corrections.
+- [ ] T11: Correct the record (pass-2 findings): mark only H's total share as a lower bound, say that only W's and H's points were measured, fix the T-exceedance sentence, name the `demo` machine and BLAS, note that W's CPU leaves out the finish step, and add lower-fits-only figures.
+- [ ] T12: Correct the tracking text (pass-2 findings): the ship row's omission reasons and its Fable tier; DESIGN.md's tense and wording; D-072's per-fit wording, its pointer to W's detection figures and why D-071's Reopens clause does not fire; the Scope's W and H definitions (wording-only amendment).
 
 ## Work log
 

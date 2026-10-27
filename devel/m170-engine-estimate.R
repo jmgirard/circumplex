@@ -266,12 +266,32 @@
 #      boundary replicate 6 and 11 interior N = 250 fits (M167's seeds), the
 #      new design reached a lower point than the old on 1 fit (by 0.087 T
 #      units) and the old design on none (rec 13).
+#
+# CORRECTIONS after the full run (M170 review, 2026-10-27). None changes the
+# truths, cells, seeds, estimators, metric definitions, saturation rule or
+# decision rule. Each makes the code follow the definitions above. The
+# metrics and the decision are recomputed from the stored per-replicate
+# records (M170_RECOMPUTE=1), with nothing re-run.
+#   1. Wald coverage (M4(b)) is computed only on fits whose SE is defined.
+#      The full run forced a miss for a removed weight even where the fit's
+#      SE was undefined, which put such fits in the denominator.
+#   2. improves() is FALSE when any of its inputs is NA, as favors() states.
+#      No input was NA.
+#   3. M3(f)'s subsample share counts a family point that lies more than the
+#      threshold below E, not below H.
+#   4. The family hit rate counts a failed start as a run that missed H's
+#      basin. No start failed, so the stored rates are unchanged.
+#   5. The D-entry cites M3(f)'s figures in the record's W table rather than
+#      carrying them, because the repo's tracking rules keep counts and
+#      measurements out of D-entries.
 # ==== PRE-REGISTRATION END ====
 #
 # Usage:  M170_PILOT=1 Rscript devel/m170-engine-estimate.R  # timing pilot
 #         Rscript devel/m170-engine-estimate.R               # full run
 #         M170_SMOKE=1 Rscript devel/m170-engine-estimate.R  # smoke run
 #         M170_REAL=1 Rscript devel/m170-engine-estimate.R   # AC5 fits only
+#         M170_RECOMPUTE=1 Rscript devel/m170-engine-estimate.R  # metrics from
+#                                                  # the stored replicates
 # The pilot writes devel/m170-engine-estimate-pilot.rds, which the full run
 # reads for R and for M3(e). The full run writes
 # devel/m170-engine-estimate-results.rds; the smoke run (4 replicates per
@@ -344,9 +364,10 @@ point_record <- function(est, R, N, cfg) {
   e <- c(err$angle, err$zeta, err$beta)
   s <- c(se$angle[free], se$zeta, se$beta)
   s[!is.finite(s)] <- NA_real_
+  # A removed weight has SE 0 and the interval [0, 0], which misses every
+  # truth weight (all > 0) without an override. Where the SE is undefined
+  # (NA), coverage is undefined too: the fit is outside M4(b)'s set.
   covered <- abs(e) <= 1.96 * s
-  # a removed weight: SE 0, interval [0, 0], a miss (every truth weight > 0)
-  covered[length(e) - 3:0][est$beta == 0] <- FALSE
   list(err = stats::setNames(e, PAR_NAMES), se = stats::setNames(s, PAR_NAMES),
        covered = stats::setNames(covered, PAR_NAMES),
        T = (N - 1) * est$F, df = est$df, n_heywood = m170_n_heywood(est),
@@ -486,13 +507,17 @@ cell_metrics <- function(cell, N, cfg) {
   search$W$recall <- if (any(lower$H)) sum(lower$W & lower$H) / sum(lower$H) else
     NA_real_
   search$W$share_missed_H <- mean(lower$H & !lower$W)
-  search$W$share_missed_subsample <- mean((lower$H[fam_rows] | fam_lower) &
+  fam_lower_E <- (N - 1) * (Fm[fam_rows, "E"] - Fm[fam_rows, "family"]) > THRESH
+  search$W$share_missed_subsample <- mean((lower$H[fam_rows] | fam_lower_E) &
                                             !lower$W[fam_rows])
 
   quality <- lapply(c(E = "E", W = "W", H = "H"), function(x) {
     err <- do.call(rbind, lapply(acc, function(r) r$recs[[x]]$err))
     se <- do.call(rbind, lapply(acc, function(r) r$recs[[x]]$se))
-    cov <- do.call(rbind, lapply(acc, function(r) r$recs[[x]]$covered))
+    # coverage from the stored errors and SEs, defined only where the SE is
+    # (M4(b)); the stored `covered` of the full run forced a miss for a
+    # removed weight with an undefined SE (M170 review return 2)
+    cov <- abs(err) <= 1.96 * se
     Tx <- vapply(acc, function(r) r$recs[[x]]$T, numeric(1))
     dfx <- vapply(acc, function(r) r$recs[[x]]$df, numeric(1))
     se_def <- colMeans(!is.na(se))
@@ -535,9 +560,10 @@ no_worse <- function(q, x) {
 improves <- function(q, x) {
   e <- q$E
   a <- q[[x]]
-  isTRUE(any(a$rmse_angle <= 0.95 * e$rmse_angle,
-             a$rmse_zeta <= 0.95 * e$rmse_zeta,
-             a$rmse_beta <= 0.95 * e$rmse_beta))
+  x <- c(a$rmse_angle <= 0.95 * e$rmse_angle,
+         a$rmse_zeta <= 0.95 * e$rmse_zeta,
+         a$rmse_beta <= 0.95 * e$rmse_beta)
+  !anyNA(x) && any(x)
 }
 
 # The block's DECISION RULE over the cells' metrics and the pilot's timing.
@@ -621,6 +647,30 @@ real_fit <- function(case, j) {
     }
   }
   out
+}
+
+# ---- recompute (the block's CORRECTIONS after the full run) -------------------------
+
+# Recomputes every cell's metrics and the decision from the per-replicate
+# records the full run stored, with this commit's cell_metrics() and
+# decide(), and writes them back into the results file beside a note naming
+# the commit. The replicates, the pilot and the AC5 fits are left as stored.
+if (nzchar(Sys.getenv("M170_RECOMPUTE"))) {
+  res_file <- file.path("devel", "m170-engine-estimate-results.rds")
+  res <- readRDS(res_file)
+  old <- res$decision
+  res$metrics <- lapply(res$cells, function(cell) {
+    cell_metrics(cell, cell$N, configs[[cell$cfg]])
+  })
+  res$decision <- decide(res$metrics, res$pilot$cpu)
+  res$recomputed <- list(commit = RUN_COMMIT, git_status = RUN_STATUS,
+                         date = Sys.Date(), decision_before = old)
+  cat(sprintf("decision before: %s (branch %d); after: %s (branch %d)\n",
+              old$option, old$branch, res$decision$option,
+              res$decision$branch))
+  saveRDS(res, res_file, compress = "xz")
+  cat("saved:", res_file, "\n")
+  quit(save = "no")
 }
 
 # ---- run -------------------------------------------------------------------------
