@@ -2660,8 +2660,9 @@ estimate to its own milestone. M170 ran a pre-registered study of three
 estimators. E is the shipped engine. W is E plus 101 deterministic extra
 starts. H is W plus 400 seeded random starts, a bounded reference search.
 The study used normal data at M167's two truths (p = 8, communality .75,
-m = 3, variant A, unit scaling) at N = 250 to 5000, and four real or
-published fits. The pre-registration block of `devel/m170-engine-estimate.R`
+m = 3, variant A, unit scaling) in ten cells: raw-data N = 250, 500 and
+1000, and correlation-matrix N = 2000 and 5000, at each truth. It also
+used four real or published fits. The pre-registration block of `devel/m170-engine-estimate.R`
 fixed the decision rule. Commit 47836901 added the block, and commit
 a65a356e applied RR28's corrections to it. No pilot file or full-run results
 file existed at either commit. The figures are in `devel/m170-engine-estimate.md`,
@@ -2690,8 +2691,9 @@ own oracles and a T calibration, and W's lowest point is not the model's
 minimum either. Keeping E with no diagnostic: W finds a lower point on 5%
 or more of fits in most cells.
 
-**Scope.** Normal data, the two truths, variant A, unit scaling, N = 250 to
-5000, and the four real or published fits. Non-normal data, other truths
+**Scope.** Normal data, the two truths, variant A and unit scaling, in the
+ten cells: raw-data N = 250, 500 and 1000, and correlation-matrix N = 2000
+and 5000. The four real or published fits are in scope too. Non-normal data, other truths
 and instruments, variants B to D and free scaling are outside it, as in
 D-068.
 

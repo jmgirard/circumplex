@@ -1,6 +1,6 @@
 # M170: Measure the CPM engine's missed optima and settle which solution it reports
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -42,7 +42,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - AC3 → T1, T4, T5, T7
 - AC4 → T5, T7
 - AC5 → T6, T7
-- AC6 → T8
+- AC6 → T8, T9
 - AC7 → T8
 
 ## Tasks
@@ -55,6 +55,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - [x] T6: Fit the four AC5 cases at their oracle and vignette settings with the block's seeds.
 - [x] T7: Write summary functions that read the results file, and write the record from their output.
 - [x] T8: Apply the decision rule. Write the D-entry, point DESIGN.md at it, and add the ship-step candidate row when AC6 calls for it. Check AC7's diff.
+- [x] T9: Name the cells in D-072's Context and Scope (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000), as AC6 requires (review return 1).
 
 ## Work log
 
@@ -91,6 +92,8 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: claim audit: not owed — internal tier.
 - 2026-10-27: status review; handing off to /milestone-review.
 - 2026-10-27: review return 1: AC6 — D-072's Context and Scope give "N = 250 to 5000" but not the cells AC6 requires (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000). Fix the D-072 wording; nothing else failed (gate clean, AC1 to AC5 and AC7 ticked).
+- 2026-10-27: T9 added for review return 1 (minor amendment); Coverage AC6 → T8, T9.
+- 2026-10-27: T9 done: D-072's Context and Scope now name the ten cells (raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000, at each truth). D-072 is edited in place because it has not reached the default branch; its first text exists only in this branch's commits. cairn_validate all checks pass. No package code changed, so the verify slot result stands (devtools::test() clean at a65a356e; devtools::check() 0/0/0 in review pass 1). Status review; handing back to /milestone-review.
 
 ## Decisions
 
