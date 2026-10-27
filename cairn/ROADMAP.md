@@ -1,21 +1,19 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-28 (status audit: M170 at review, its merge question not yet answered; no open issues or PRs, no linked-item news, no outside merges; validate green with M170's 12-task sizing advisory.)_
+_Last hygiene check: 2026-10-28 (M170 done and archived: D-072 keeps the CPM estimate and adds a diagnostic later; "State and settle the CPM engine estimate" graduated; M168 row pruned for retention; two lessons captured, three marked used; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M169 | State which solution the CPM estimate is on the cpm_fit() help page | done | — | high | milestones/archive/M169-cpm-estimate-help-page.md |
-| M170 | Measure the CPM engine's missed optima and settle which solution it reports | review | — | high | milestones/M170-cpm-engine-estimate-study.md |
+| M170 | Measure the CPM engine's missed optima and settle which solution it reports | done | — | high | milestones/archive/M170-cpm-engine-estimate-study.md |
 | M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | done | — | normal | milestones/archive/M167-cpm-interval-oracle.md |
-| M168 | Close the degeneracy criterion remainders | done | — | normal | milestones/archive/M168-degeneracy-criterion-remainders.md |
 
 ## Candidates
 
 _Candidates carry no milestone ID — an `M<NN>` is assigned at planning time. Legacy IDs (≤ M6) remain valid citations into `cairn/legacy/`; M7 is the first cairn-era ID. Struck rows are tombstones; their histories live in the named archives and git._
-- [high] State and settle the CPM engine estimate: (RR27, D-071) Part (i) shipped in M169. Part (ii) is decided by M170 (D-072); its ship step is the row below. — started M170
 - [high] Flag a lower optimum in CPM fits: (D-072, M170) `cpm_fit()` runs M170's W starts at the top-level fit only, keeps E, and flags one over 0.01 T units below. The wording separates a same-order wall point from a reordered one, and says W misses some. Decide whether `summary()`'s analytic caution fires on it (M169 review). RR27 Q6 items that apply: the CIRCUM/CircE oracles, the real fits (estimates unchanged, flag on verbal only). Omitted: T calibration and the bootstrap warm start (E and T unchanged, the bootstrap never runs W); saturating shares and local-vs-global quality (E is only flagged; M170's search never saturated). Fable tier at plan. — added 2026-10-27
 - Vignette prose follow-ons: (rules in `cairn/references/plain-vignettes.md`). (i) Plain-English pass over `introduction-to-ssm-analysis`, `intermediate-ssm-analysis` and `using-instruments` (8, 15 and 30 sentences over 25 words at `125b76db`); the ebook row applies. (ii) The prose sweep as a merge gate: CI and testthat run `tools/prose-sweep.R` (nestedtune M088 shape), review-only until its two parser fixes land. (iii) `axes-reliability-caveats` prose after the split (M137 review O3-O5): rules only in the Wrap-up, "Sections 2 to 5" sited inside Section 2 and skipping 6, bold lead-ins repeating headings 3 to 5; needs split-guard pairs. The after-M125 trigger for (i) and (ii) has fired; also promote on a reader finding a vignette hard to follow, or a vignette regressing past the sweep. (iv) "Evaluating Circumplex Structure" says the analytic caution with a boundary marker prints "up to very large $N$"; it stops at N = 50000 (M167 review pass 4).
 - CIRCUM free-scaling extensions: CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see its archive + D-009): bootstrap σ CIs; covariance-matrix input — shipping it re-triggers the D-011 paired T calibration at non-unit σ truths first. The point-estimate oracle already shipped in M18.

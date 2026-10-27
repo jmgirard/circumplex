@@ -1,0 +1,11 @@
+# M170: Measure the CPM engine's missed optima and settle which solution it reports
+
+**Status:** done (2026-10-28, PR #204 https://github.com/jmgirard/circumplex/pull/204)
+
+**Goal:** Measure how often and by how much a lower discrepancy than `cpm_engine()`'s estimate exists, and compare the engine's estimate with two alternatives, so that a decision rule fixed before the run settles which solution the estimate should be.
+
+**Outcome:** A pre-registered study in `devel/m170-engine-estimate.R` (block corrected after RB28/RR28, with helpers, checks, a summary script, pilot and results files, and the record `devel/m170-engine-estimate.md`). It compared three estimators. E is `cpm_engine()`. W adds 101 deterministic starts: communality-wall starts, an all-wall start, angle shifts, pairwise angle swaps, swaps with a wall, and wall starts around g0. H adds 400 seeded starts around g0. The study ran ten cells (two truths; raw-data N = 250, 500, 1000; correlation-matrix N = 2000, 5000; 500 replicates each) and four real or published fits. Saturation failed in every cell. W found a lower discrepancy on up to 54% of fits. W's and H's lower points estimated the truth worse on average. The lower bound on W's median gap stayed under 2.0 T units. The pre-registered rule chose its default, branch 6. After the run, metrics were recomputed from the stored replicates (Wald coverage on defined SEs only), and the decision did not change. No package code changed.
+
+**Decisions:** D-072 keeps E and adds a diagnostic for a lower optimum outside the theoretical configuration later, via the candidate row "Flag a lower optimum in CPM fits". Milestone-local: M170-D1 (run the study, amended per RR28), M170-D2 (RR28's answers as applied), M170-D3 (RR28 recs 14 and 15 not taken).
+
+**Review:** Four-lens fan-out over three passes. Two defect returns: D-072 omitted the ten cells (AC6), and Wald coverage counted fits with no defined SE (AC4(b)). One wording-only scope amendment. 52 findings: 37 fixed, 15 rejected, 0 follow-up; the ripple lens found nothing stale. Hygiene: graduated the row "State and settle the CPM engine estimate", pruned M168's row for retention, captured two lessons (refit starts from clipped engine logits; metrics from stored raw quantities), and marked three lessons used.
