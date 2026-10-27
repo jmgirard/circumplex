@@ -81,6 +81,7 @@ Definitions. E is `cpm_engine()` as shipped. W is E plus a fixed deterministic s
 - 2026-10-27: T3 done: RB28/RR28 round complete, corrections applied before the pilot. Checks: 4 pass (check 2 now asserts all 101 W starts finite on boundary replicate 6, whose E has a communality at exactly 1, and check 3 asserts that fit is in its domain). Smoke run end to end; W now reaches the verbal matrix's lower point (3.158 T units, RR27 3.16); `demo` is now the vignette's sample (T_E 2.229).
 - 2026-10-27: verify slot after T3: devtools::test() clean (0 failures).
 - 2026-10-27: T4 done: timing pilot at a65a356e (clean tree), one worker, 10 replicates per cell, 14.4 min wall, `devel/m170-engine-estimate-pilot.rds`. Median CPU per replicate 3.6 to 5.5 s, per family run 3.0 to 4.6 s; E 0.04 to 0.07 s, W 0.68 to 1.07 s. Replicate rule: R = 500, projected 8.80 CPU-hours.
+- 2026-10-27: stopped before T5: the machine moved to battery power after the pilot, and the plan's question set ties the full run to the user being plugged in. Resume with /milestone-implement M170 on AC power; the full run takes about 9 CPU-hours on 17 workers.
 
 ## Decisions
 
