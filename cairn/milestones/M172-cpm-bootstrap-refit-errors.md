@@ -143,6 +143,7 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: AC2 check: master's and the branch's fits at seeds 1 and 2 (N = 300, boots = 100; 1 and 2 nonconvergent exclusions) are `identical(..., ignore.environment = TRUE)`; plain `identical()` is FALSE even between two reads of the same master file, because `corfun` is a closure.
 - 2026-10-28: full suite after T2: 0 failures, 15446 passes.
 - 2026-10-28: T3: both lists now carry the five labels verbatim; the `cpm_fit()` page states the 0.10 cut in its own sentence. Test "the help pages list every marker label summary() prints" in test-cpm_summary_markers.R reads the parenthetical after "weak-identification marker" from `man/` or `tools::Rd_db()`. Plants: renamed label fails, label left only outside the list fails (it still occurs once elsewhere on the collapsed page), label split over a line break passes, added key fails; files restored.
+- 2026-10-28: T4 delegated to an Opus subagent (map each stale cite to its function by the cite's prose); checkpoint of its partial edits (`R/axes_reliability.R`, `INDEX.md`), T4 not done.
 
 ## Decisions
 
