@@ -91,6 +91,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: thrash stop: the user chose "Drop AC3, fix, merge" (descope) over parking or a re-plan. Checkpoint, half-done: pass-3 NEWS fixes applied (170 lines, token checks pass, linter 0 hits); the AC3 removal awaits its fresh re-audit; remainder row "Check NEWS against v2.0.1 before release" filed with `— split from M173`.
 - 2026-10-28: substantive amendment: AC3 (the change-ledger criterion) removed at the user's descope choice; old AC4-AC7 renumbered AC3-AC6; the length criterion (now AC4) loses its "AC3 holds" clause; Coverage renumbered; T5's criterion numbers updated (minor). Remainder: candidate row "Check NEWS against v2.0.1 before release" (`— split from M173`). T3, T6 and T7 now serve no criterion. The Goal's "loses no change a v2.0.1 user would notice" now rests on the token checks (AC3, AC5) and the review passes, not a criterion.
 - 2026-10-28: re-audit: AC4 (full) — passes all six questions; flagged the stale Coverage map, T5's numbers and the Goal's unbacked clause, each handled in the amendment line above.
+- 2026-10-28: step-7 approval: m173-pre-release-news-testthat approved for merge
 - 2026-10-28: review return 3 (thrash rule (a) reached, stop for the user): AC3 fails at pass 3 on N21's page attribution (L49, L77), the false L34 correction, and the missing return-2 ledger corrections (L24, L27, L56, L65); fix-now findings listed in the Review section.
 
 ## Decisions
