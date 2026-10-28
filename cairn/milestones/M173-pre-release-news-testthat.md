@@ -158,6 +158,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
   - L75 B49 four corrected statements (SEM tiers, uncertified display, `fit_structure()` labels, `cpm_fit()` free angles) — a N21
   - L76 B50 SEM latent profile table drops X and Y — a N21
   - L77 B51 structure vignette names the shorter reports; axes vignette explains `--` — a N21
+- 2026-10-28 (T5) **Ledger corrections.** L34 is a N10, stated as "`"unidentified"` now names only a design defect": `?axes_reliability` does not list the three grounds, which appear only in comments (`R/axes_corrected_se.R:168`), so a pointer there could not hold; L34's other two parts state behavior that did not change. L32's pointer is the growth vignette, named in N16 ("as the legend and the growth vignette show"), which describes the dashed segments. Count after correction: 77 rows, 8 (b), 1 (c), 68 (a); L22, L61 and L65 are (a) with extra detail left to a page.
 
 ## Review
 <!-- owner: review · exclusive -->

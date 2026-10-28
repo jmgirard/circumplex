@@ -69,8 +69,8 @@
 
 * `axes_reliability()` no longer refuses a fit as `"unidentified"` because
   of the default tolerance of `solve()`, which differed across platforms.
-  The per-fit accuracy check judges such a fit, which computes or is
-  refused `"uncertified"`. `"unidentified"` now names only a design defect.
+  The accuracy check judges such a fit, which computes or is refused
+  `"uncertified"`. `"unidentified"` now names only a design defect.
 
 * Printed cautions and notes in `print()` and `summary()` now wrap to
   `options(width = )`. So do `instruments()`, the `print()` heading of
@@ -101,9 +101,9 @@
   cap. It warns about a communality interval that is 0 at both ends, and
   names the reason for each scale drawn without its interval. That plot and
   `ssm_plot_circle()` put the amplitude axis in the widest gap with no
-  point. On the `ssm_plot_trajectory()` displacement panel, a segment next
-  to an uninterpretable displacement is dashed, with the line type in the
-  legend. A row whose `certified` value is `NA` is now a hollow point.
+  point. In `ssm_plot_trajectory()`, a displacement segment next to an
+  uninterpretable point is dashed, as the legend and the growth vignette
+  show. A row whose `certified` value is `NA` is now a hollow point.
 
 ## Documentation
 
