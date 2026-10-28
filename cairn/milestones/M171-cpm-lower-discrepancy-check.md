@@ -1,6 +1,6 @@
 # M171: Flag a lower discrepancy that extra starts find in cpm_fit()
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -71,6 +71,7 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - 2026-10-28: T5 oracle ran at 00fb11bc on Mac17,9 (Apple M5 Pro, R 4.6.1, reference BLAS). Boundary N = 250 had 459 accepted fits and interior N = 500 had 466. 0 mismatches. 198 and 141 fired, M170's W counts, and the largest gap difference was 0. Plant runs in a scratch copy over 57 accepted boundary fits: a 0.5 threshold with one start nudged gave 57 start and 7 flag mismatches, and a relative 1e-6 gap error gave 13 gap mismatches. So each comparison can fail.
 - 2026-10-28: claim audit: 75 claims read, 6 corrected — R/cpm_fit.R, man/cpm_fit.Rd, NEWS.md, vignettes/cpm-boundary-fits.Rmd(.orig), devel/m171-lower-check-oracle.R. Corrections: some extra starts come from the theory start; the communality count is "more or fewer above 0.995"; the quadratic growth is the number of starts, not the cost; the vignette's simulation claim states its scope (normal data, two eight-scale truths, m = 3) and adds "though not on every fit"; the roxygen adds three harmonics; the oracle header says that exclusion is compared on every replicate. The first devtools::check run was stopped before the fixes, and a rerun follows.
 - 2026-10-28: The next check failed with one WARNING: the note string in R/cpm_oop.R held a literal χ² in place of `\u` escapes. Fixed at 4719c2fe. `devtools::check(manual = TRUE)` at 4719c2fe then reported Status OK: 0 errors, 0 warnings, 0 notes, in 11m 38s. All tasks are done, and the status is now review.
+- 2026-10-28: review return 1: AC6 — no test asserts that no note prints for the constrained-angles, equal-communality and circulant models or for `scaling = "free"`. The not-run record is tested for each, but the note only for `check_lower = FALSE`. AC7 — the `check_lower` documentation now says that the number of extra starts grows with about the square of the number of scales, but the criterion requires the check's cost.
 
 ## Decisions
 
