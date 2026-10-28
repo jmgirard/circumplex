@@ -45,30 +45,30 @@ and "Repoint stale line cites into cpm_fit.R".
 
 ## Acceptance criteria
 
-- [ ] AC1: When a bootstrap refit's optimization or gradient call errors, on
+- [x] AC1: When a bootstrap refit's optimization or gradient call errors, on
       the first attempt or the restart, or yields a non-finite gradient norm,
       `cpm_fit()` returns a fit: the resample is excluded and added to
       `details$boots_nonconvergent`, which the exclusion warning reports, and
       the intervals come from the remaining replicates. When every refit
       errors, `cpm_fit()` returns with `NA` bootstrap intervals and the
       all-excluded warning.
-- [ ] AC2: Where no refit errors, results at a seed are unchanged: the existing
+- [x] AC2: Where no refit errors, results at a seed are unchanged: the existing
       bootstrap tests and snapshots pass with no edits, and `identical()`
       between master's and the branch's `cpm_fit()` result is `TRUE` at two
       seeds, one of which excludes a nonconvergent refit.
-- [ ] AC3: The `cpm_fit()` help page states that the nonconvergent count
+- [x] AC3: The `cpm_fit()` help page states that the nonconvergent count
       includes refits that stopped with an error. The marker list in its
       "Confidence intervals" text and the marker list on the
       `summary.circumplex_cpm()` page each contain every label
       `cpm_marker_labels()` returns, verbatim.
-- [ ] AC4: NEWS.md's development section carries an entry under "Minor
+- [x] AC4: NEWS.md's development section carries an entry under "Minor
       improvements and fixes" saying that a bootstrap refit error in
       `cpm_fit()` now excludes that resample with a warning instead of stopping
       the call.
-- [ ] AC5: `git grep -nE '(^|[^-[:alnum:]_])cpm_(fit|oop)\.R:[0-9]'` returns no
+- [x] AC5: `git grep -nE '(^|[^-[:alnum:]_])cpm_(fit|oop)\.R:[0-9]'` returns no
       line outside `cairn/milestones/`, `cairn/DECISIONS.md`, `cairn/legacy/`
       and `cairn/reviews/`.
-- [ ] AC6: `devtools::test()` passes, and
+- [x] AC6: `devtools::test()` passes, and
       `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and
       0 notes.
 
@@ -206,3 +206,14 @@ Pass 2 (2026-10-28, head 38498a26, after return 1).
 - prior-review #2: errors folded into nonconvergence follow the M167 precedent — noted, no action
 - ripple #1: vignette prose says "ill-conditioning marker" and "near-tied-optima marker" while the list uses the labels — reject, false: shorthand that predates M172 and contradicts no label
 - ripple #2: the warning and print note attribute errored refits to the criterion — reject, planned change (plan gate kept the warning text)
+- pass-2 fix-now items (diff-bug #1, #5, #6, #7, #8, #9; blame-history #1, #4; prior-review #1) fixed 2e783afa
+
+Evidence (2026-10-28, head 2e783afa).
+
+- AC1: `devtools::test()` at 2e783afa: 0 failures, 15476 passes, including "a bootstrap refit that errors is excluded and counted as nonconvergent" (ten probes: errors at opt1, grad1, opt2, grad2 in `stop()` and singular-`solve()` forms, a NaN gradient norm, an infinite F; each asserts its fault fired, nonconvergent +1 and used -1 against the unmocked run, other replicates' attempts unchanged, finite intervals) and "bootstrap intervals are NA with a warning when every refit errors" (20 faults, "All 20 bootstrap resamples were excluded", `NA` intervals, print and summary run). On master the one-error case stopped with "forced refit error" (work log, T1); the infinite-F probe failed on 99456de5 with the refit accepted (work log, T6).
+- AC2: at 2e783afa (R code unchanged since 38498a26 apart from roxygen) `cpm_fit()` on `sim_octant_data(300, 42)`, boots = 100, seeds 1 and 2 (1 and 2 nonconvergent exclusions) is `identical(..., ignore.environment = TRUE)` to master's saved fits: TRUE, TRUE. Plain `identical()` is FALSE even between two reads of one master file, because the fit's `corfun` is a closure whose environment differs per object. No `_snaps` file changed; test-cpm_api.R's diff removes no line; test-cpm_angle_ci.R's diff changes comment lines only (T4's cites, pass-1 diff-bug #7); the suite passes (AC1 line).
+- AC3: man/cpm_fit.Rd states "The count of refits failing the criterion, also stored as `details$boots_nonconvergent`, includes refits that stopped with an error." The parenthetical after "weak-identification marker" in man/cpm_fit.Rd and man/summary.circumplex_cpm.Rd each reads "(Heywood communality, boundary harmonic removed, small correlation-function weight, ill-conditioned Hessian, or competing near-tied optima)", the five values `cpm_marker_labels()` returns; the test "the help pages list every marker label summary() prints" passes in the AC1 run.
+- AC4: NEWS.md line 160, first entry under "Minor improvements and fixes" in the development section: "In `cpm_fit()`, a bootstrap refit that stops with an error no longer stops the call. The resample is excluded and counted ..."; the AC1 tests fail without that behavior.
+- AC5: at 2e783afa `git grep -nE '(^|[^-[:alnum:]_])cpm_(fit|oop)\.R:[0-9]' -- . ':!cairn/milestones' ':!cairn/DECISIONS.md' ':!cairn/legacy' ':!cairn/reviews'` prints nothing, exit 1 (62 lines in 14 files at f237fe11).
+- AC6: at 2e783afa `devtools::test()` 0 failures, 15476 passes, 1 skip, 11 warnings (lavaan, as before M172); `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (1 h 6 min on a loaded machine).
+- gate (2e783afa): `cairn_validate` passed; `document()` no diff, 0 `resolve link` lines; `pkgdown::check_pkgdown()` no problems; NEWS entry present (AC4); no new top-level file; README untouched by the diff; newest master push runs of R-CMD-check.yaml and test-coverage.yaml success (d50ffca9; later master commits touch `cairn/` only); `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`, `tools/check-branch-protection.R` exit 0; no DESIGN.md principle changed, so `cairn_impact` skipped; changed snapshot files: none.
