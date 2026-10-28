@@ -1,6 +1,6 @@
 # M171: Flag a lower discrepancy that extra starts find in cpm_fit()
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -47,7 +47,7 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - [x] T4: Add the note to `cpm_diagnostic_lines()` (`R/cpm_oop.R:57`), with the M146 wrapping helpers. Add the print, summary and marker tests, and update any snapshot whose fit now fires.
 - [x] T5: Write `devel/m171-lower-check-oracle.R`, reusing `replicate_seed()` and `draw_R()` from `devel/m170-engine-estimate.R`. Run it in the background (about 15 minutes) and commit its record `devel/m171-lower-check-oracle.md`.
 - [x] T6: Write the roxygen section and `@param check_lower`, and run `devtools::document()`. Update DESIGN.md's D-071 section in place, marked `corrected M171`. Write the vignette paragraph in `vignettes/cpm-boundary-fits.Rmd.orig`, and re-render each precomputed vignette whose CPM output changes. Write the NEWS.md entry.
-- [ ] T7: Measure `devtools::test()` wall time before T1 and after T6. If the increase is over 60 s, pass `check_lower = FALSE` in tests that are not about the check. Run `devtools::check(manual = TRUE)`.
+- [x] T7: Measure `devtools::test()` wall time before T1 and after T6. If the increase is over 60 s, pass `check_lower = FALSE` in tests that are not about the check. Run `devtools::check(manual = TRUE)`.
 
 ## Work log
 
@@ -70,6 +70,7 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - 2026-10-28: full suite green at 2afd83a5: 0 failures, 640 s user and 655 s real, at or below the baseline. T1 to T4 and T6 ticked. Minor amendment of T2's wording: `isTRUE() || isFALSE()` in place of `is_flag()`. Vignette re-render: only cpm-boundary-fits.Rmd changed (the new paragraph), and neither of its fits prints the note. The re-render's ci-accuracy elapsed-time line and four advanced-visualization PNGs were render noise and were restored.
 - 2026-10-28: T5 oracle ran at 00fb11bc on Mac17,9 (Apple M5 Pro, R 4.6.1, reference BLAS). Boundary N = 250 had 459 accepted fits and interior N = 500 had 466. 0 mismatches. 198 and 141 fired, M170's W counts, and the largest gap difference was 0. Plant runs in a scratch copy over 57 accepted boundary fits: a 0.5 threshold with one start nudged gave 57 start and 7 flag mismatches, and a relative 1e-6 gap error gave 13 gap mismatches. So each comparison can fail.
 - 2026-10-28: claim audit: 75 claims read, 6 corrected — R/cpm_fit.R, man/cpm_fit.Rd, NEWS.md, vignettes/cpm-boundary-fits.Rmd(.orig), devel/m171-lower-check-oracle.R. Corrections: some extra starts come from the theory start; the communality count is "more or fewer above 0.995"; the quadratic growth is the number of starts, not the cost; the vignette's simulation claim states its scope (normal data, two eight-scale truths, m = 3) and adds "though not on every fit"; the roxygen adds three harmonics; the oracle header says that exclusion is compared on every replicate. The first devtools::check run was stopped before the fixes, and a rerun follows.
+- 2026-10-28: The next check failed with one WARNING: the note string in R/cpm_oop.R held a literal χ² in place of `\u` escapes. Fixed at 4719c2fe. `devtools::check(manual = TRUE)` at 4719c2fe then reported Status OK: 0 errors, 0 warnings, 0 notes, in 11m 38s. All tasks are done, and the status is now review.
 
 ## Decisions
 
