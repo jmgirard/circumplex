@@ -2724,3 +2724,28 @@ contract leaves out.
 **Reopens.** A real data set where the flagged lower point is the better
 solution against a known structure, or a search shown to saturate in a
 cell whose figures favor W or H.
+
+### D-073 (2026-10-28): the testthat floor in Suggests is 3.1.7, the release that added `local_mocked_bindings()` (M173)
+
+**Context.** DESCRIPTION declared `testthat (>= 3.0.0)`, but the test
+suite calls `local_mocked_bindings()` and `with_mocked_bindings()`, which
+arrived in testthat 3.1.7. A user with an older testthat could not run the
+tests, and nothing in the package said so.
+
+**Decision.** The Suggests floor is `testthat (>= 3.1.7)`. M173 ran the
+suite under testthat 3.1.7 and under the installed 3.3.2 with the same
+outcome, recorded in its milestone file.
+
+**Rejected.** A higher floor such as 3.3.2, the version in use: the 3.1.7
+run shows the suite needs nothing newer, and a higher floor would turn away
+users on older R whose testthat is older. Leaving 3.0.0: it states a
+compatibility the tests do not have.
+
+**Consequences.** The 3.1.7 run needed a scratch build: on R 4.6, 3.1.7's
+C code for `with_mock()` cannot compile or load, so that one entry point
+was stubbed to stop with an error. The suite never calls `with_mock()`, so
+the run tested 3.1.7's R code as shipped. A test that later uses a testthat
+feature newer than 3.1.7 raises the floor again.
+
+**Reopens.** A test failure under testthat 3.1.7 on an R version that
+builds it unchanged.
