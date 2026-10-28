@@ -121,13 +121,15 @@ printed verdict headline additionally elevates to CAUTION whenever the
 guardrail `Caution` fired, so it can read worse than the overall
 coverage class), `cpm` (the embedded
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-object, or `NULL` when `structure = "observed"`), `population` (per
-profile row: the population profile vectors, truth parameters, and any
-positive-semidefiniteness repair magnitude, by condition), and
-`details`. The [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
-method draws coverage against the amplitude ladder with the Bradley band
-shaded; [`summary()`](https://rdrr.io/r/base/summary.html) adds a
-plain-language verdict (see
+object, or `NULL` when `structure = "observed"`; when this function fits
+it, it skips the lower-discrepancy check of `cpm_fit(check_lower = )`),
+`population` (per profile row: the population profile vectors, truth
+parameters, and any positive-semidefiniteness repair magnitude, by
+condition), and `details`. The
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) method draws
+coverage against the amplitude ladder with the Bradley band shaded;
+[`summary()`](https://rdrr.io/r/base/summary.html) adds a plain-language
+verdict (see
 [`summary.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/reference/summary.circumplex_ci_accuracy.md)).
 
 ## Details
@@ -271,7 +273,7 @@ res <- ssm_analyze(
 # Small reps/boots keep the example fast; use the defaults in practice
 set.seed(23456)
 acc <- ssm_ci_accuracy(res, reps = 25, amplitude_factors = c(1, 0.25))
-#> Warning: CPM Hessian is ill-conditioned (condition number 8.00e+17): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 8.89e+16): angles may be clustered or parameters weakly determined.
 acc
 #> 
 #> SSM CI accuracy, simulated at your n and settings (25 replications per
@@ -287,7 +289,7 @@ acc
 summary(acc)
 #> 
 #> Mean scores; bootstrap, 100 replicates, level 0.95; 25 reps per condition.
-#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.3s.
+#> Population: Browne circular model (CPM); groups All = 200; elapsed 0.2s.
 #> Ladder c = 1, 0.25; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,

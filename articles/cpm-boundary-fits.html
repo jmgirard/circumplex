@@ -325,6 +325,35 @@ carries NO’s communality at the boundary, yet this draw produced no
 Heywood case. A boundary in the population does not guarantee a boundary
 in every sample from it. In the same way, a quiet fit does not guarantee
 that there is no boundary behind the data.</p>
+<p><strong>A lower discrepancy beside the fit.</strong>
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> reports the lowest discrepancy that its starts
+from the theoretical angles reach (the <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> help
+section “Which solution is reported”). It then runs a fixed set of extra
+starts, most of them from that solution. If one reaches a discrepancy
+lower by more than 0.01 on the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>χ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\chi^2</annotation></semantics></math>
+scale, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> add a note that
+begins “extra starts reached a solution whose
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>χ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\chi^2</annotation></semantics></math>
+is lower by”. The note is not one of the five markers, and the analytic
+caution does not read it. It changes nothing that the fit reports: the
+estimates, the fit indices and the intervals stay those of the reported
+solution. What it tells you is that the reported
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>χ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\chi^2</annotation></semantics></math>
+is larger than at the lower solution, so at the same degrees of freedom
+the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+is smaller and RMSEA and CFI are no better than they would be there. It
+also says whether the lower solution keeps the scales’ order around the
+circle, and how many more or fewer communality indices it has above
+0.995. The package’s simulations covered normal data at two truths of
+eight octant scales with three harmonics. There, such lower solutions
+estimated the true angles and weights worse on average than the reported
+one, though not on every fit. Neither fit above prints the note. A fit
+with no note can still have a lower discrepancy, because the extra
+starts do not find every one. The check runs only for the default
+<code>"quasi-circumplex"</code> model with unit scaling, and
+<code>check_lower = FALSE</code> turns it off.</p>
 <p><strong>What a fired marker does and does not tell you.</strong> The
 package’s validation simulations measured what these markers predict,
 and the measurement is narrower than the markers are. It covered

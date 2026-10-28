@@ -24,7 +24,8 @@ cpm_fit(
   interval = 0.95,
   ci_method = c("bootstrap", "analytic"),
   boots = 2000,
-  listwise = TRUE
+  listwise = TRUE,
+  check_lower = TRUE
 )
 ```
 
@@ -143,6 +144,16 @@ cpm_fit(
   Whether to handle missing values by listwise deletion. Only listwise
   deletion is supported in this release (default = TRUE).
 
+- check_lower:
+
+  Whether to run the extra starts described in "Which solution is
+  reported" and note a lower discrepancy they reach (default = TRUE).
+  The check runs only for `model = "quasi-circumplex"` with
+  `scaling = "unit"`, and only on the fit itself, never on bootstrap
+  resamples. Its cost grows with about the square of the number of
+  scales, as the number of extra starts does, so set it to FALSE to skip
+  it when fitting many models.
+
 ## Value
 
 A `circumplex_cpm` object: a list with `results` (a data frame of
@@ -178,13 +189,46 @@ That solution is not always the global minimum. A configuration with a
 lower discrepancy can exist that these runs do not reach, for example
 with more scales at or near a communality index of 1 or with scales in
 other positions on the circle. Two checks compare these runs only, so
-neither signals such a configuration: the reproduction part of the
-convergence acceptance criterion, which requires at least two
+neither of them signals such a configuration: the reproduction part of
+the convergence acceptance criterion, which requires at least two
 independent starts to reach the lowest discrepancy, and the "competing
-near-tied optima" note. Where one exists, the reported chi-square
-statistic is larger than at the lower discrepancy. At the same degrees
-of freedom, its p-value is then smaller and its RMSEA and CFI are no
-better.
+near-tied optima" note. The lower-discrepancy check below is the one
+that can. Where one exists, the reported chi-square statistic is larger
+than at the lower discrepancy. At the same degrees of freedom, its
+p-value is then smaller and its RMSEA and CFI are no better.
+
+With `check_lower = TRUE` (the default), a fixed set of extra runs then
+follows, most of them from the reported solution: with each communality
+index in turn, and then all of them, set near the upper bound (0.99);
+with each free angle shifted by 90, -90 and 180 degrees; with each pair
+of free angles swapped, alone and with either swapped scale's
+communality index near the bound; and, from the theoretical start, with
+each communality index in turn near the bound. If one of these runs
+reaches a discrepancy lower than the reported one by more than 0.01 on
+the chi-square scale, [`print()`](https://rdrr.io/r/base/print.html) and
+[`summary()`](https://rdrr.io/r/base/summary.html) print a note. It
+gives that difference, the degrees of freedom of the lower solution when
+they differ, whether the lower solution keeps the scales' order around
+the circle, and how many more or fewer communality indices it has above
+0.995. The reported solution, its fit indices and its confidence
+intervals do not change: in the package's simulations of normal data at
+two eight-scale truths with three harmonics, the lower solutions these
+runs reached estimated the true angles and weights worse on average than
+the reported one, though not on every fit. The extra runs do not find
+every lower discrepancy, so a fit with no note can still have one. If
+the check cannot finish (every extra run fails, or it stops with an
+error), a note says so, and the fit itself is unaffected. The check uses
+no random numbers, and it runs only for `model = "quasi-circumplex"`
+with `scaling = "unit"` on a fit that meets the convergence acceptance
+criterion: the model, scaling and fits those simulations covered.
+
+`details$lower_check` holds the check's record: `checked` (whether it
+ran), `found` (whether it found a lower discrepancy; `NA` when it
+stopped with an error), `gap` (the difference on the chi-square scale,
+after the lower solution's weight polish), `df` (the lower solution's
+degrees of freedom), `order_changed`, `more_wall` (the change in the
+number of communality indices above 0.995), `failed_starts`, `n_starts`
+and `error`.
 
 ## Confidence intervals
 
@@ -254,7 +298,7 @@ data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 set.seed(12345)
 fit <- cpm_fit(jz2017, scales = scales, boots = 100)
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 #> Warning: 2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.
 fit
 #> 
@@ -285,7 +329,7 @@ fit
 # Matrix-input path (supply the sample size; analytic CIs)
 R <- cor(jz2017[scales])
 cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 #> 
 #> Circular Process Model (Browne, 1992) 
 #> Model:             quasi-circumplex 

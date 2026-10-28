@@ -95,7 +95,7 @@ data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 fit <- cpm_fit(cormat = cor(jz2017[scales]), scales = scales,
                n = nrow(jz2017))
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 set.seed(1)
 x <- cpm_simulate(fit, n = 500)
 round(cor(x) - fit$matrices$Phat, 2)
