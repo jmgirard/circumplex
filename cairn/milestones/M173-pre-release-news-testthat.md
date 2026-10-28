@@ -52,8 +52,8 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 
 - [ ] T1: Install testthat 3.1.7 (and any older dependency it needs) from the CRAN archive into a scratchpad library; run `testthat::test_local()` with `NOT_CRAN=true` under it and under 3.3.2, comparing failures, errors and skips. If 3.1.7 fails, try each later CRAN release in order and name in the work log the feature that raised the floor. Set the DESCRIPTION floor and append a D-entry for the re-pin.
 - [x] T2: Rewrite the sentence at `evaluating-circumplex-structure.Rmd.orig:167-168` and the shipped `.Rmd:228-229` identically, from `R/cpm_oop.R:383-394` and `R/cpm_fit.R:1566-1567` read in the same session.
-- [ ] T3: Write the change ledger into this file's Decisions section and commit it before any commit that changes NEWS.md: one row per user-visible change, citing its bullet, naming the path whose v2.0.1 copy shows the before-state, and its planned disposition (a, b or c) with the post-edit bullet or the page it points to.
-- [ ] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
+- [x] T3: Write the change ledger into this file's Decisions section and commit it before any commit that changes NEWS.md: one row per user-visible change, citing its bullet, naming the path whose v2.0.1 copy shows the before-state, and its planned disposition (a, b or c) with the post-edit bullet or the page it points to.
+- [x] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
 - [ ] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -73,6 +73,9 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: plan gate chose a scripted token check (AC6) over a reviewer read alone for new claims; falsified by a new behavior claim in plain prose that the script cannot see, which review must still catch.
 - 2026-10-28: implement started on branch m173-pre-release-news-testthat.
 - 2026-10-28: T2 done: the sentence now reads "the analytic caution prints for every $N$ below $N = 50000$", in `.Rmd.orig:168` and `.Rmd:229`, read against `R/cpm_oop.R:383-394` (unconditional caution below 2000, marker caution below `cpm_analytic_ci_n_boundary_caution` = 50000).
+- 2026-10-28: T3 done: ledger of 77 rows (L1-L77) committed at 359eea1d, before any NEWS commit; one row is (c) (L46, the accuracy heading new since v2.0.1, whose v2.0.1 heading is `R/ssm_ci_oop.R:472`), 15 are (b), the rest (a).
+- 2026-10-28: T4 done: development section rewritten to 21 bullets (N1-N21), 150 lines from 506; drafted in the scratchpad and copied over NEWS.md lines 1-506 by shell, since an Edit of a 506-line span was impractical (diff reviewable at the PR); the simple-english linter reports 0 hits on the new section.
+- 2026-10-28: T4 token checks (scratchpad `news-tokens.R`, plan-commit NEWS vs new): AC4 24 Breaking tokens, 0 missing; AC6 4 new backticked tokens, all `?topic` with an `\alias{}`, 0 new numeric literals over a 141-token, 38-number old domain; plants (a dropped `ipsatize()`, `0.02`, `?not_a_topic`, `new_token`) each fired.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
