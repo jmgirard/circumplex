@@ -20,7 +20,12 @@
 #   3. the file names in data/, without .rda;
 #   4. the VignetteIndexEntry titles of vignettes/*.Rmd;
 #   5. the package names and version floors in DESCRIPTION's Depends, Imports
-#      and Suggests.
+#      and Suggests. A package that moves between fields is reported as removed
+#      from one and added to the other; a floor is compared per package,
+#      whatever its field.
+# In NAMESPACE, a delayed registration S3method(pkg::generic,cls) counts under
+# its generic, and a third S3method() argument names the function that set 2
+# reads.
 #
 # The development section is the lines of the news file before its second
 # top-level (`# `) heading. A bullet is a line of that section starting with
@@ -91,16 +96,24 @@ refs <- list(
 read_namespace <- function(ref) {
   ns <- ref$read("NAMESPACE")
   # roxygen quotes non-syntactic names: export("%>%"), S3method("[",foo)
-  unquote <- function(x) gsub("^\\s*\"|\"\\s*$", "", x)
+  unquote <- function(x) trimws(gsub("^\\s*\"|\"\\s*$", "", trimws(x)))
   exports <- unquote(sub("^export\\((.*)\\)$", "\\1", grep("^export\\(", ns, value = TRUE)))
   s3 <- grep("^S3method\\(", ns, value = TRUE)
-  generic <- unquote(sub("^S3method\\(([^,]+),([^)]+)\\)$", "\\1", s3))
-  class <- unquote(sub("^S3method\\(([^,]+),([^)]+)\\)$", "\\2", s3))
-  # paste0() of two empty vectors gives ".", so build `method` only when
+  parts <- lapply(strsplit(sub("^S3method\\((.*)\\)$", "\\1", s3), ","), unquote)
+  # S3method(pkg::generic,cls) is a delayed registration: count it under the
+  # generic. A third argument names the function that implements the method.
+  generic <- sub("^.*::", "", vapply(parts, `[`, character(1L), 1L))
+  class <- vapply(parts, `[`, character(1L), 2L)
+  # paste0() of two empty vectors gives ".", so build the names only when
   # there are methods
+  method <- if (length(s3) > 0L) paste0(generic, ".", class) else character()
+  fun <- if (length(s3) > 0L) {
+    ifelse(lengths(parts) >= 3L, vapply(parts, function(p) p[length(p)], character(1L)), method)
+  } else {
+    character()
+  }
   methods <- data.frame(
-    generic = generic, class = class,
-    method = if (length(generic) > 0L) paste0(generic, ".", class) else character(),
+    generic = generic, class = class, method = method, fun = fun,
     stringsAsFactors = FALSE
   )
   list(exports = exports, methods = methods)
@@ -116,7 +129,8 @@ read_formals <- function(ref) {
       # as its head, which as.character() turns into a length-3 vector
       if (is.call(e) && is.name(e[[1L]]) &&
           as.character(e[[1L]]) %in% c("<-", "=") &&
-          is.name(e[[2L]]) && is.call(e[[3L]]) &&
+          (is.name(e[[2L]]) || (is.character(e[[2L]]) && length(e[[2L]]) == 1L)) &&
+          is.call(e[[3L]]) &&
           identical(e[[3L]][[1L]], as.name("function"))) {
         fm <- as.list(e[[3L]][[2L]])
         out[[as.character(e[[2L]])]] <- vapply(
@@ -250,7 +264,8 @@ for (side in c("head", "base")) {
   other <- if (side == "head") "base" else "head"
   m <- ns[[side]]$methods
   for (k in which(!m$method %in% ns[[other]]$methods$method)) {
-    rds <- rd_with_alias(refs[[side]], m$method[[k]])
+    rds <- unique(c(rd_with_alias(refs[[side]], m$method[[k]]),
+                    rd_with_alias(refs[[side]], m$fun[[k]])))
     exports <- intersect(unique(unlist(lapply(rds, function(rd) aliases_in(refs[[side]], rd)))),
                          ns[[side]]$exports)
     label <- paste(if (side == "head") "added" else "removed", "S3 method", m$method[[k]])
@@ -261,8 +276,10 @@ for (side in c("head", "base")) {
 # Set 2: arguments of functions exported or registered at both refs.
 both_exports <- intersect(ns$base$exports, ns$head$exports)
 both_methods <- merge(ns$base$methods, ns$head$methods)
+# `targets` maps the name in the news (an export, or a method's generic) to
+# the function whose formals are compared, which a method's `fun` names
 targets <- c(stats::setNames(both_exports, both_exports),
-             stats::setNames(both_methods$generic, both_methods$method))
+             stats::setNames(both_methods$generic, both_methods$fun))
 for (f in names(targets)) {
   a <- fm$base[[f]]
   b <- fm$head[[f]]
@@ -303,12 +320,15 @@ for (k in setdiff(names(deps$head), names(deps$base))) {
 for (k in setdiff(names(deps$base), names(deps$head))) {
   report(5L, paste("removed package", pkg_of(k), "from", field_of(k)), named_together(pkg_of(k)))
 }
-for (k in intersect(names(deps$base), names(deps$head))) {
-  old <- deps$base[[k]]
-  new <- deps$head[[k]]
+# Floors are compared per package, whatever its field, so a package that
+# moves field and changes floor still needs its new floor in the news
+floor_by_pkg <- lapply(deps, function(d) d[!duplicated(pkg_of(names(d)))])
+floor_by_pkg <- lapply(floor_by_pkg, function(d) stats::setNames(d, pkg_of(names(d))))
+for (p in intersect(names(floor_by_pkg$base), names(floor_by_pkg$head))) {
+  old <- floor_by_pkg$base[[p]]
+  new <- floor_by_pkg$head[[p]]
   if (identical(old, new)) next
-  p <- pkg_of(k)
-  label <- paste0("floor of ", p, " in ", field_of(k), ": ", old, " -> ", new)
+  label <- paste0("floor of ", p, ": ", old, " -> ", new)
   ok <- !is.na(new) && any(vapply(seq_along(bullets), function(i) {
     bullet_names(i, p) && floor_in(i, new)
   }, logical(1L)))
