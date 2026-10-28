@@ -214,3 +214,25 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - ripple #1 (pass 3): the new row "Tie documented caution limits to code" said no test fails if either constant changes; `test-cpm_summary_markers.R` pins the behavior at 1999, 2000, 49999 and 50000 — fix now (row corrected in place)
 - AC5: development section 166 lines (`awk`, from line 1 to the line before `# circumplex 2.0.1`), at most 170 (amended figure).
 - AC6: 5 new backticked tokens (`?ssm_growth_data`, `?geom_ssm_ellipse`, `?coord_circumplex`, `?ggcircumplex`, `?ssm_plot_trajectory`), each an `\alias{}` in man/, 0 not allowed; 0 new numeric literals over a 141-token, 38-number old domain. Plants (dropped `ipsatize()`, `0.02`, `?not_a_topic`, `new_token`) fired at T4.
+- AC3 (pass 3): fails. N21 credits "Evaluating Circumplex Structure" with the `ssm_ci_accuracy()` `print()`-first order and the shorter-report reading, which since the split are in "Confidence Interval Accuracy" (ci-accuracy.Rmd.orig:128-138, :224), so L49 and L77 are not stated correctly; L34's T6 correction ("other two parts state behavior that did not change") is false, since a fit the floor admits is now also checked when nearly singular and can be refused `"uncertified"`; the return-2 ledger corrections for L24, L27, L56 and L65 were never written. Not ticked.
+- diff-bug #1 (pass 3): N21 page attribution (above) — floor (AC3)
+- diff-bug #2: "gains `check_lower = TRUE`" reads as opt-in; `TRUE` is the default, so existing quasi-circumplex unit-scaling calls run the extra starts and can print a new note — fix now
+- diff-bug #3: ledger corrections for L24, L27, L56, L65 missing after T7 — floor (AC3)
+- diff-bug #4: N10 omits that a near-singular fit the floor admits is now checked and can be refused `"uncertified"` (L34) — floor (AC3)
+- diff-bug #5: N4 "match the former per-wave loop" drops "under the same seed" — fix now
+- diff-bug #6: N16 drops the fallback (every gap holds a point: widest gap, a label can still cover a point) and calls the `cpm_fit()` plot's axis amplitude, not communality — fix now
+- diff-bug #7: N6 "Plotmath labels ... take a leading minus" implies only plotmath labels are signed; every label there is signed — fix now
+- diff-bug #8: N1 "gave a wrong result or an unclear error" understates inputs that gave a defined result (D-065) — reject (planned change): the plan-commit Breaking bullet carried the same words, and every refusal is listed under Breaking changes
+- diff-bug #9: N4 reads as certification of all five parameters; only displacement is certified — fix now
+- diff-bug #10: N6 does not say the default `grid = "polar"` keeps the v2.0.1 canvas — fix now
+- diff-bug #11: the testthat floor is not in NEWS — reject (planned change): a developer dependency, and AC6 bars new tokens
+- diff-bug #12: D-073 omits the compiler flags — reject (planned change), as pass 2 #13
+- prior-review #1 (pass 3): N18 no longer names the four "Not yet peer reviewed" pages (M156) — fix now
+- prior-review #2: N11 no longer names the fit-index and test-statistic lines of `summary()` among those that do not wrap (M131) — fix now
+- blame-history #1 (pass 3): N16 drops the axis-label fallback caveat (same as diff-bug #6) — fix now
+- blame-history #2: no help page lists the three grounds for `"unidentified"`; NEWS should — fix now
+- blame-history #3: `ssm_trajectory()` unbalanced fits can pass silently — reject (false): N4 points to `?ssm_trajectory` for its cautions, which states it
+- blame-history #4: vignette sentence names only the boundary marker — reject (false): "CPM Fits at a Boundary", which the sentence cites, defines the five markers, weak-identification ones included (cpm-boundary-fits.Rmd.orig:64)
+- blame-history #5: "every reported number is unchanged" gone — reject (planned change): a statement of no change, recorded in D-062
+- blame-history #6: NA-label and `measures` refusals lack a D-entry — reject (false): M160 shipped them under D-065 at its merge gate (archive M160:7)
+- blame-history #7: marker-label, heading-text and caution-wording drops — reject (planned change): wording detail; the heading row is L46 (c)
