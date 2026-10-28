@@ -344,9 +344,10 @@ calibration and M167's interval figures all describe this estimator. D-072
 (M170) keeps this estimate, because the lower points that M170's W and H
 searches found estimate the truth worse on average. It also decides to add a
 diagnostic that flags a lower optimum outside the theoretical
-configuration. `cpm_fit()`'s `check_lower` (M171, corrected M171) ships it:
-`cpm_lower_check()` runs M170's W starts from the reported solution at the
-top-level fit only, for variant A with unit scaling, and records a lower F
+configuration. `cpm_fit()`'s `check_lower` ships it (corrected M171):
+`cpm_lower_check()` runs M170's W starts, most from the reported solution
+and p from the theory start, at the top-level fit only, for variant A with
+unit scaling on accepted fits, and records a lower F
 more than 0.01 T units below in `details$lower_check` and a printed note,
 without adopting it. W misses some lower points, so no note does not mean
 no lower F exists.

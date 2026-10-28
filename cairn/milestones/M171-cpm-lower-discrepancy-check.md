@@ -90,3 +90,37 @@ Pass 2 (2026-10-28, at 60391e40; master at 57dca081, unmoved):
 - AC4: devel/m171-lower-check-oracle.md, run at 00fb11bc on Mac17,9, Apple M5 Pro, R 4.6.1, reference BLAS: boundary N = 250, 459 accepted, 198 fired; interior N = 500, 466 accepted, 141 fired. Mismatches: 0 in exclusion, starts, flag and gap. Plant runs showed each comparison can fail.
 - AC5: "print() and summary() show one note when the check fires" passes, with exactly one note in each, carrying the gap, the order, the communality count, "estimates shown are unchanged" and the help section. "the note gives a differing df and each shape ..." passes (df 11 against 10; 1 more; 2 fewer; unreadable shape). "no note prints when the check does not fire or does not run" passes on jz2017 and on verbal with the check off. "the check adds no boundary marker" passes: labels unchanged, and the markers on verbal and jz2017 are the same with the check on and off.
 - AC6: "check_lower must be a single TRUE or FALSE" passes (errors naming `check_lower` for `NA` and `c(TRUE, TRUE)`). "the check runs only for ..." passes on 5 fits (off; constrained-angles; equal-communality; circulant; free scaling): each gives the not-run record and no note in print or summary. "a start whose refit throws ..." passes for the first and last starts, each by throw and by NaN, and for the lowest start. "the check runs and does not fire when every start fails" passes. "a failed finish keeps the flag ..." passes. `R/ssm_ci_accuracy.R` passes `check_lower = FALSE` (read this session).
+
+Pass 2 review, 29 findings: 21 fix now (4 of them with a rejected part), 7 rejected, 1 follow-up.
+- spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: the check fails open, so a check whose every start failed is silent, which goes against GP2 — fix now (a note says the check could not finish, and `n_starts` is recorded).
+- diff-bug #2: the check runs on fits that fail the acceptance criterion, which M170 never measured — fix now (it runs on accepted fits only; a test mocks `accepted = FALSE`; the help says so).
+- diff-bug #3: the `cpm` object returned by `ssm_ci_accuracy()` has the check off, and nothing says so — fix now (`@return` sentence).
+- diff-bug #4: "(at df = N)" can break across lines — fix now (`keep` phrase).
+- diff-bug #5: a gap just over 0.01 prints as 0.010 — fix now (four decimals below 0.1; tested with 0.010234).
+- diff-bug #6: the record's fields are not documented — fix now (help paragraph listing them).
+- diff-bug #7: the oracle is weak against IP3, and the different-df branch is tested only on a crafted record — fix now for the second part (the `test-cpm_api.R` snapshot now pins the note at df 10 against 11 on a real fixture). The IP3 part is rejected, ground false: the gap is a difference of the shipped objective, which the CircE and OpenMx oracles validate. The search is checked against M170's prototype and against independent searches (RR27's random restarts on verbal, M169's wall start on the pinned sample).
+- diff-bug #8: an error inside the check can abort `cpm_fit()` — fix now (`cpm_lower_check_safely()` records the error and a note prints; a test plants an error in `cpm_lower_starts()`).
+- diff-bug #9: warnings from the check's refits can reach the user — fix now (`suppressWarnings()` around the check's own refits and finish).
+- diff-bug #10: the cyclic order can be misread at the pole, because the reported angles carry the 360 label — fix now (both orders now read from plain wraps).
+- diff-bug #11: the theory angles go through a degree/radian round trip — reject, ground false: the starts are `all.equal()` to the prototype's on 925 fits, and jz2017 with LM = 360 as reference runs.
+- diff-bug #12: DESIGN.md says "from the reported solution" and "(M171, corrected M171)" — fix now. NEWS line break and lines over 80 columns — reject, ground style.
+- diff-bug #13: test-rule issues: a narrating comment, a conditional expectation, raw against polished gaps, and an implied `expect_true(found)` in test-cpm_boundary.R — fix now (comment removed; the expectation is unconditional with the polish mocked to a no-op; the raw gap is computed in the test; the redundant expectation is dropped). `is.na(res$gap)` is implied by `found` — reject, ground false: `gap` is a separate field.
+- diff-bug #14: tests excluded by "What gets a test" (one path repeated across inputs, weaker expectations, printed text alone, a guard on unchanged markers) — reject. The repeated-path and marker tests are a planned change, since AC1, AC3, AC5 and AC6 name them. The weaker-expectation and printed-text items are false: the regex reads printed output where the exact check reads the record, and the note is the deliverable.
+- blame-history #1: the help still says the two checks cannot signal a lower configuration, which D-072's Consequences asked the ship step to revise — fix now (the sentence now ends "The lower-discrepancy check below is the one that can").
+- blame-history #2: the snapshot tests run with the check mocked off, so no snapshot pins the note — fix now (the two snapshot tests use the real check, and the snapshots are re-recorded).
+- blame-history #3: printing the gap sits close to the rejected "report beside T" option — reject, ground planned change: AC5 and the question set chose to print the gap.
+- blame-history #4: the df phrase can break across lines — fix now (as diff-bug #4).
+- blame-history #5: roxygen breaks mid-sentence and lines are over 80 columns — fix now for the help break; the rest is rejected, ground style.
+- prior-review #1: no fixture with a communality index of exactly 1, so reverting the clip fails no test — fix now (a test sets one logit to 40; a plant that removes the clip turns it red).
+- prior-review #2: no test visits the 0.01 threshold — fix now (a test at gaps 0.011 and 0.009; a plant at 0.1 turns it red).
+- prior-review #3: thresholds quoted on the help page and vignette, against M169's no-figures lesson — reject, ground planned change: the question set fixed 0.01 as the printed bar, and M169's no-figures rule was its own criterion.
+- prior-review #4: the verbal gap's tolerance is absolute — reject, ground planned change: AC3 states "within 0.01".
+- prior-review #5: "the package's simulations" names no study — reject, ground style: the sentence names the data, truths and harmonics.
+- ripple #1: the ROADMAP row "Flag a lower optimum in CPM fits" still reads as open — reject, ground planned change: post-merge hygiene graduates it, and it carries "started M171".
+- ripple #2: the help sentence — fix now (as blame-history #1).
+- ripple #3: the M169 NEWS bullet says the checks do not signal it — fix now ("and the new `check_lower` check can").
+- ripple #4: line-number cites into `R/cpm_fit.R` and `R/cpm_oop.R` shifted — follow-up: candidate row "Repoint stale line cites into cpm_fit.R".
+- ripple #5: the `print()` and `summary()` help do not mention the note — fix now.
+- snapshot: tests/testthat/_snaps/cpm_api.md — called for by T4 and AC5: misfit_octant_P at n = 300 fires (gap 1.158, df 10 against 11, reordered), and the note lines are at most 80 columns.
+- snapshot: tests/testthat/_snaps/cpm_summary_markers.md — called for by T4 and AC5: the Heywood fixture fires (gap 5.956, same order, no more indices at the bound).

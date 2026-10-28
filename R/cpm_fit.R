@@ -1092,18 +1092,21 @@ cpm_cyclic_order <- function(theta_deg, reference) {
 # finished as the engine finishes its own (weight polish, canonicalization),
 # and the record gives the gap and df after that polish. A start whose refit
 # throws or returns a non-finite F is skipped; a finish that throws leaves the
-# raw gap at the full model's df, with the order and wall fields NA.
+# raw gap at the full model's df, with the order and wall fields NA. The
+# refits are the check's own, so their warnings are not the user's.
 cpm_lower_check <- function(engine, R, N) {
   n1 <- N - 1
   spec <- cpm_lower_spec(engine)
   starts <- cpm_lower_starts(engine, R)
   runs <- lapply(starts, function(st) {
-    tryCatch(cpm_optimize_one(st, R, spec), error = function(e) NULL)
+    tryCatch(suppressWarnings(cpm_optimize_one(st, R, spec)),
+             error = function(e) NULL)
   })
   ok <- vapply(runs, function(r) !is.null(r) && is.finite(r$F), logical(1))
   out <- list(checked = TRUE, found = FALSE, gap = NA_real_,
               df = NA_real_, order_changed = NA, more_wall = NA_integer_,
-              failed_starts = sum(!ok))
+              failed_starts = sum(!ok), n_starts = length(starts),
+              error = NA_character_)
   if (!any(ok)) return(out)
   Fs <- vapply(runs[ok], function(r) r$F, numeric(1))
   best <- runs[ok][[which.min(Fs)]]
@@ -1112,20 +1115,23 @@ cpm_lower_check <- function(engine, R, N) {
   out$found <- TRUE
   out$gap <- n1 * (engine$F - best$F)
   out$df <- spec$df
-  finished <- tryCatch({
+  finished <- tryCatch(suppressWarnings({
     polished <- cpm_polish_beta(best, R, spec)
     canon <- cpm_canonicalize(polished$fit$par, polished$spec,
                               engine$theta_theory * pi / 180)
     nat <- cpm_unpack(canon$par, polished$spec)
     list(F = polished$fit$F, df = polished$spec$df, zeta = nat$zeta,
          theta = as.numeric(as_degree(as_radian(nat$theta %% (2 * pi)))))
-  }, error = function(e) NULL)
+  }), error = function(e) NULL)
   if (!is.null(finished)) {
     out$gap <- n1 * (engine$F - finished$F)
     out$df <- finished$df
+    # both orders from plain wraps, not from the reported angles, whose pole
+    # carries the 360 label
     out$order_changed <- !identical(
       cpm_cyclic_order(finished$theta, engine$reference),
-      cpm_cyclic_order(engine$theta, engine$reference)
+      cpm_cyclic_order(as.numeric(as_degree(as_radian(engine$theta_rad))),
+                       engine$reference)
     )
     out$more_wall <- as.integer(sum(finished$zeta > 0.995) -
                                   sum(engine$zeta > 0.995))
@@ -1136,7 +1142,19 @@ cpm_lower_check <- function(engine, R, N) {
 # The record of a check that did not run.
 cpm_lower_not_run <- function() {
   list(checked = FALSE, found = NA, gap = NA_real_, df = NA_real_,
-       order_changed = NA, more_wall = NA_integer_, failed_starts = NA_integer_)
+       order_changed = NA, more_wall = NA_integer_, failed_starts = NA_integer_,
+       n_starts = NA_integer_, error = NA_character_)
+}
+
+# The check is a diagnostic, so an error inside it never aborts the fit: the
+# record says the check ran, could not decide, and why (GP2, fail closed).
+cpm_lower_check_safely <- function(engine, R, N) {
+  tryCatch(cpm_lower_check(engine, R, N), error = function(e) {
+    out <- cpm_lower_not_run()
+    out$checked <- TRUE
+    out$error <- conditionMessage(e)
+    out
+  })
 }
 
 # =============================================================================
@@ -1699,17 +1717,18 @@ cpm_boundary_proximity <- function(object) {
 #'   lower discrepancy can exist that these runs do not reach, for example with
 #'   more scales at or near a communality index of 1 or with scales in other
 #'   positions on the circle. Two checks compare these runs only, so neither
-#'   signals such a configuration: the reproduction part of the convergence
-#'   acceptance criterion, which requires at least two independent starts to
-#'   reach the lowest discrepancy, and the "competing near-tied optima" note.
+#'   of them signals such a configuration: the reproduction part of the
+#'   convergence acceptance criterion, which requires at least two independent
+#'   starts to reach the lowest discrepancy, and the "competing near-tied
+#'   optima" note. The lower-discrepancy check below is the one that can.
 #'   Where one exists, the reported chi-square statistic is larger than at the
 #'   lower discrepancy. At the same degrees of freedom, its p-value is then
 #'   smaller and its RMSEA and CFI are no better.
 #'
 #'   With `check_lower = TRUE` (the default), a fixed set of extra runs then
 #'   follows, most of them from the reported solution: with each communality
-#'   index in turn,
-#'   and then all of them, set near the upper bound (0.99); with each free
+#'   index in turn, and then all of them, set near the upper bound (0.99);
+#'   with each free
 #'   angle shifted by 90, -90 and 180 degrees; with each pair of free angles
 #'   swapped, alone and with either swapped scale's communality index near the
 #'   bound; and, from the theoretical start, with each communality index in
@@ -1718,15 +1737,26 @@ cpm_boundary_proximity <- function(object) {
 #'   `summary()` print a note. It gives that difference, the degrees of
 #'   freedom of the lower solution when they differ, whether the lower
 #'   solution keeps the scales' order around the circle, and how many more or
-#'   fewer communality indices it has above 0.995; `details$lower_check` holds
-#'   the same record. The reported solution, its fit indices and its
-#'   confidence intervals do not change: in the package's simulations of
-#'   normal data at two eight-scale truths with three harmonics, the lower
-#'   solutions these runs reached estimated the true angles and weights worse
-#'   on average than the reported one, though not on every fit. The extra runs do not find every lower discrepancy, so a
-#'   fit with no note can still have one. The check uses no random numbers,
-#'   and it runs only for `model = "quasi-circumplex"` with `scaling =
-#'   "unit"`, the model and scaling those simulations covered.
+#'   fewer communality indices it has above 0.995. The reported solution, its
+#'   fit indices and its confidence intervals do not change: in the package's
+#'   simulations of normal data at two eight-scale truths with three
+#'   harmonics, the lower solutions these runs reached estimated the true
+#'   angles and weights worse on average than the reported one, though not on
+#'   every fit. The extra runs do not find every lower discrepancy, so a fit
+#'   with no note can still have one. If the check cannot finish (every extra
+#'   run fails, or it stops with an error), a note says so, and the fit itself
+#'   is unaffected. The check uses no random numbers, and it runs only for
+#'   `model = "quasi-circumplex"` with `scaling = "unit"` on a fit that meets
+#'   the convergence acceptance criterion: the model, scaling and fits those
+#'   simulations covered.
+#'
+#'   `details$lower_check` holds the check's record: `checked` (whether it
+#'   ran), `found` (whether it found a lower discrepancy; `NA` when it stopped
+#'   with an error), `gap` (the difference on the chi-square scale, after the
+#'   lower solution's weight polish), `df` (the lower solution's degrees of
+#'   freedom), `order_changed`, `more_wall` (the change in the number of
+#'   communality indices above 0.995), `failed_starts`, `n_starts` and
+#'   `error`.
 #' @section Confidence intervals:
 #'   The bootstrap (the raw-data default) refits the model to each resampled
 #'   correlation matrix, warm-started from the reported solution, and forms
@@ -1881,9 +1911,11 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
                        reference = reference, scaling = scaling)
 
   # ---- lower-discrepancy check (D-072): top-level fit only, before the
-  # bootstrap, and only for the model and scaling M170 measured it on ----
-  lower_check <- if (check_lower && variant == "A" && scaling == "unit") {
-    cpm_lower_check(engine, R, N)
+  # bootstrap, and only for the model and scaling M170 measured it on, on
+  # accepted fits as there ----
+  lower_check <- if (check_lower && variant == "A" && scaling == "unit" &&
+                     isTRUE(engine$accepted)) {
+    cpm_lower_check_safely(engine, R, N)
   } else {
     cpm_lower_not_run()
   }

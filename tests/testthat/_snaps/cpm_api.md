@@ -23,6 +23,10 @@
       Fit: χ²(11) = 23.059, p = 0.0173; RMSEA = 0.061 [0.024, 0.095]; SRMR = 0.03;
            CFI = 0.965
         Note: harmonic(s) 3 were on the zero boundary and removed (df adjusted).
+        Note: extra starts reached a solution whose χ² is lower by 1.158 (at df = 10).
+        It puts the scales in a different order around the circle and has no more
+        communality indices at the upper bound. The estimates shown are unchanged; see
+        "Which solution is reported" in ?cpm_fit.
 
 ---
 
@@ -73,6 +77,10 @@
       # Diagnostics
       
         Note: harmonic(s) 3 were on the zero boundary and removed (df adjusted).
+        Note: extra starts reached a solution whose χ² is lower by 1.158 (at df = 10).
+        It puts the scales in a different order around the circle and has no more
+        communality indices at the upper bound. The estimates shown are unchanged; see
+        "Which solution is reported" in ?cpm_fit.
       
         Note: analytic (Wald) confidence intervals may materially mis-cover at this
         sample size (N < 2000); prefer the bootstrap on the raw-data path when

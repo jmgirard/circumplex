@@ -9,7 +9,9 @@
 # does not run on CRAN by design.
 
 # The lower-discrepancy check has its own tests (test-cpm_lower_check.R); it is
-# turned off for this file, whose fits do not need it.
+# turned off for this file, whose fits do not need it, except in the analytic
+# snapshot test, whose Heywood fixture fires it.
+real_lower_check <- cpm_lower_check
 local_mocked_bindings(cpm_lower_check = function(engine, R, N) {
   cpm_lower_not_run()
 })
@@ -82,6 +84,7 @@ m94_boot_clean <- local({
 # ---- AC3: analytic path snapshot fence ---------------------------------------
 
 test_that("analytic summary() output matches its snapshot (four regimes)", {
+  local_mocked_bindings(cpm_lower_check = real_lower_check)
   # The snapshot is a same-machine claim: the committed baselines were
   # captured on the authoring machine, and PR #123's CI
   # measured the cross-platform deltas directly — a third-decimal communality

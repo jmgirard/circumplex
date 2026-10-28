@@ -85,7 +85,8 @@ overall worst-of row per profile; note the printed verdict headline
 additionally elevates to CAUTION whenever the guardrail \code{Caution} fired,
 so it can read worse than the overall coverage class),
 \code{cpm} (the embedded \code{\link[=cpm_fit]{cpm_fit()}} object, or \code{NULL} when
-\code{structure = "observed"}), \code{population} (per profile row: the population
+\code{structure = "observed"}; when this function fits it, it skips the
+lower-discrepancy check of \code{cpm_fit(check_lower = )}), \code{population} (per profile row: the population
 profile vectors, truth parameters, and any positive-semidefiniteness
 repair magnitude, by condition), and \code{details}. The \code{plot()} method
 draws coverage against the amplitude ladder with the Bradley band

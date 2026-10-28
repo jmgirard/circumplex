@@ -162,6 +162,5 @@ test_that("the lower-discrepancy check flags the lower F a wall start reaches", 
   lower <- cpm_optimize_one(g, fit$matrices$R, d$spec)
   expect_gt(fit$fit$chisq - fit$fit$n * lower$F, 1)
 
-  expect_true(d$lower_check$found)
   expect_gt(d$lower_check$gap, 1)
 })

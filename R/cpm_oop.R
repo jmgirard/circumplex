@@ -117,6 +117,9 @@ cpm_diagnostic_lines <- function(details) {
     } else {
       ""
     }
+    # four decimals below 0.1, so a gap just over the 0.01 bar never prints
+    # as 0.010
+    gap_text <- sprintf(if (lc$gap < 0.1) "%.4f" else "%.3f", lc$gap)
     shape <- if (is.na(lc$order_changed) || is.na(lc$more_wall)) {
       "Its scale order and communality bounds could not be read. "
     } else {
@@ -135,9 +138,22 @@ cpm_diagnostic_lines <- function(details) {
     }
     msg <- c(msg, note(
       "Note: extra starts reached a solution whose \u03c7\u00b2 is lower by ",
-      sprintf("%.3f", lc$gap), df_text, ". ", shape,
+      gap_text, df_text, ". ", shape,
       "The estimates shown are unchanged; see \"Which solution is ",
-      "reported\" in ?cpm_fit."
+      "reported\" in ?cpm_fit.",
+      keep = if (nzchar(df_text)) trimws(df_text) else NULL
+    ))
+  } else if (isTRUE(lc$checked) &&
+             (!is.na(lc$error) || isTRUE(lc$failed_starts == lc$n_starts))) {
+    # The check could not decide, so its silence would read as "none found".
+    reason <- if (!is.na(lc$error)) {
+      paste0("it stopped with an error: ", lc$error)
+    } else {
+      "every extra start failed"
+    }
+    msg <- c(msg, note(
+      "Note: the check for a lower discrepancy could not finish (", reason,
+      "); see \"Which solution is reported\" in ?cpm_fit."
     ))
   }
   # Bootstrap replicate accounting (design sec. 5.2): surface exclusions.
@@ -188,7 +204,7 @@ cpm_display_results <- function(df, digits) {
 #' Compact display of a [cpm_fit()] object: the estimated angles and communality
 #' indices with confidence intervals, a fit summary that wraps after a `;`
 #' when it is wider than the console, and any
-#' boundary/convergence notes.
+#' boundary/convergence notes and lower-discrepancy note.
 #'
 #' @param x A `circumplex_cpm` object.
 #' @param digits The number of decimal places to display (default = 3).
@@ -219,7 +235,7 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
 #' Fuller display of a [cpm_fit()] object: adds the correlation-function weights,
 #' the full set of fit indices, a residual summary (the largest absolute
 #' residual and the pair it belongs to), and all boundary/identification
-#' diagnostics in plain language. When the confidence intervals are analytic,
+#' diagnostics and the lower-discrepancy note in plain language. When the confidence intervals are analytic,
 #' prints a coverage caution calibrated by simulation: unconditionally when the
 #' sample size is modest (N < 2000, where Wald intervals mis-covered for every
 #' configuration studied), and from N = 2000 up to but not including N = 50000

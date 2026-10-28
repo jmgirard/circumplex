@@ -350,8 +350,8 @@
   maximum-likelihood solution in the basin those starts reach. A
   configuration with a lower discrepancy can exist. The convergence
   acceptance criterion and the "competing near-tied optima" note do not
-  signal it. Where one exists, the reported chi-square is larger than at
-  that configuration.
+  signal it, and the new `check_lower` check can. Where one exists, the
+  reported chi-square is larger than at that configuration.
 
 * `?cpm_fit` now states both conditions under which `summary()` cautions
   about analytic (Wald) intervals. The caution prints whenever N is below

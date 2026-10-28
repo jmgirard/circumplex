@@ -81,11 +81,12 @@ test_that("print() and summary() show one note when the check fires", {
 })
 
 test_that("the note gives a differing df and each shape of the lower solution", {
-  details <- function(df, order_changed, more_wall) {
+  details <- function(df, order_changed, more_wall, gap = 1.23456) {
     list(accepted = TRUE, spec = list(df = 10),
-         lower_check = list(checked = TRUE, found = TRUE, gap = 1.23456,
+         lower_check = list(checked = TRUE, found = TRUE, gap = gap,
                             df = df, order_changed = order_changed,
-                            more_wall = more_wall, failed_starts = 0L))
+                            more_wall = more_wall, failed_starts = 0L,
+                            n_starts = 101L, error = NA_character_))
   }
   note_text <- function(d) {
     gsub("\\s+", " ", paste(cpm_diagnostic_lines(d), collapse = " "))
@@ -99,6 +100,29 @@ test_that("the note gives a differing df and each shape of the lower solution", 
   expect_match(same_df, "different order .* and has 2 fewer communality indices")
   expect_match(note_text(details(10, NA, NA_integer_)),
                "Its scale order and communality bounds could not be read")
+  expect_match(note_text(details(10, FALSE, 0L, gap = 0.010234)),
+               "lower by 0.0102\\. It keeps .* has no more communality")
+})
+
+test_that("the note says when the check could not finish", {
+  details <- function(failed_starts, error) {
+    list(accepted = TRUE, spec = list(df = 10),
+         lower_check = list(checked = TRUE,
+                            found = if (is.na(error)) FALSE else NA,
+                            gap = NA_real_, df = NA_real_, order_changed = NA,
+                            more_wall = NA_integer_,
+                            failed_starts = failed_starts, n_starts = 101L,
+                            error = error))
+  }
+  note_text <- function(d) {
+    gsub("\\s+", " ", paste(cpm_diagnostic_lines(d), collapse = " "))
+  }
+  expect_match(note_text(details(101L, NA_character_)),
+               "could not finish \\(every extra start failed\\)")
+  expect_match(note_text(details(NA_integer_, "planted")),
+               "could not finish \\(it stopped with an error: planted\\)")
+  expect_identical(cpm_diagnostic_lines(details(100L, NA_character_)),
+                   character(0))
 })
 
 test_that("no note prints when the check does not fire or does not run", {
@@ -202,7 +226,6 @@ test_that("a start whose refit throws or returns a non-finite F is skipped", {
   matches <- function(j) function(g) identical(g, starts[[j]])
   n_like <- function(j) sum(vapply(starts, identical, logical(1), starts[[j]]))
 
-  # the lowest start, found by running every start here
   spec <- cpm_lower_spec(eng)
   Fs <- vapply(starts, function(g) cpm_optimize_one(g, case$R, spec)$F,
                numeric(1))
@@ -218,12 +241,17 @@ test_that("a start whose refit throws or returns a non-finite F is skipped", {
     }
   }
 
+  # With the polish a no-op, the stored gap is the raw gap of the next start.
+  local_mocked_bindings(cpm_polish_beta = function(fit, R, spec) {
+    list(fit = fit, spec = spec, removed = integer(0))
+  })
   res <- lower_probe(case, eng, matches(lowest))
   expect_identical(res$failed_starts, as.integer(n_like(lowest)))
   failed <- vapply(starts, identical, logical(1), starts[[lowest]])
   rest <- (case$N - 1) * (eng$F - min(Fs[!failed]))
-  expect_identical(res$found, rest > 0.01)
-  if (rest > 0.01) expect_equal(res$gap, rest, tolerance = 1e-6)
+  expect_gt(rest, 0.01)
+  expect_true(res$found)
+  expect_equal(res$gap, rest, tolerance = 1e-10)
 })
 
 test_that("the check runs and does not fire when every start fails", {
@@ -241,14 +269,74 @@ test_that("a failed finish keeps the flag on the raw gap with order and wall NA"
   skip_on_cran()
   case <- lower_case("verbal")
   eng <- lower_engine(case)
-  base <- cpm_lower_check(eng, case$R, case$N)
+  spec <- cpm_lower_spec(eng)
+  Fs <- vapply(cpm_lower_starts(eng, case$R),
+               function(g) cpm_optimize_one(g, case$R, spec)$F, numeric(1))
   local_mocked_bindings(
     cpm_polish_beta = function(fit, R, spec) stop("planted finish failure")
   )
   res <- cpm_lower_check(eng, case$R, case$N)
   expect_true(res$found)
-  expect_equal(res$gap, base$gap, tolerance = 1e-6)
+  expect_equal(res$gap, (case$N - 1) * (eng$F - min(Fs)), tolerance = 1e-10)
   expect_identical(res$df, cpm_lower_spec(eng)$df)
   expect_true(is.na(res$order_changed))
   expect_true(is.na(res$more_wall))
+})
+
+# ---- the threshold, the start logits, and when the check cannot run ---------
+
+test_that("the flag fires only above 0.01 on the chi-square scale", {
+  case <- lower_case("jz2017")
+  eng <- lower_engine(case)
+  local_mocked_bindings(cpm_polish_beta = function(fit, R, spec) {
+    list(fit = fit, spec = spec, removed = integer(0))
+  })
+  found_at <- function(gap) {
+    local_mocked_bindings(cpm_optimize_one = function(gstar0, R, spec) {
+      list(par = gstar0, F = eng$F - gap / (case$N - 1), code = 0L)
+    })
+    cpm_lower_check(eng, case$R, case$N)$found
+  }
+  expect_true(found_at(0.011))
+  expect_false(found_at(0.009))
+})
+
+test_that("starts stay finite and clipped when a communality index is exactly 1", {
+  case <- lower_case("jz2017")
+  eng <- lower_engine(case)
+  eng$par[eng$spec$i_zeta[2]] <- 40
+  eng$zeta[2] <- stats::plogis(40)
+  expect_identical(eng$zeta[2], 1)
+  starts <- cpm_lower_starts(eng, case$R)
+  i_zeta <- cpm_lower_spec(eng)$i_zeta
+  expect_true(all(vapply(starts, function(g) all(is.finite(g)), logical(1))))
+  expect_lte(max(vapply(starts, function(g) max(g[i_zeta]), numeric(1))), 30)
+})
+
+test_that("the check does not run on a fit that fails the acceptance criterion", {
+  real <- cpm_engine
+  local_mocked_bindings(cpm_engine = function(...) {
+    e <- real(...)
+    e$accepted <- FALSE
+    e
+  })
+  fit <- lower_fit(lower_case("jz2017"))
+  expect_identical(fit$details$lower_check, cpm_lower_not_run())
+})
+
+test_that("an error inside the check leaves the fit intact and is noted", {
+  case <- lower_case("jz2017")
+  off <- lower_fit(case, check_lower = FALSE)
+  local_mocked_bindings(cpm_lower_starts = function(engine, R) {
+    stop("planted check failure")
+  })
+  fit <- lower_fit(case)
+  lc <- fit$details$lower_check
+  expect_true(lc$checked)
+  expect_true(is.na(lc$found))
+  expect_identical(lc$error, "planted check failure")
+  expect_identical(fit$results, off$results)
+  out <- gsub("\\s+", " ", paste(capture.output(print(fit)), collapse = " "))
+  expect_match(out, "could not finish (it stopped with an error: planted",
+               fixed = TRUE)
 })

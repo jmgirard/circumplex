@@ -5,7 +5,9 @@
 # in-test by closed form, construction, or an independent base-R computation.
 
 # The lower-discrepancy check has its own tests (test-cpm_lower_check.R); it is
-# turned off for this file, whose fits do not need it.
+# turned off for this file, whose fits do not need it, except in the print and
+# summary snapshot test, whose fixture fires it at a different df.
+real_lower_check <- cpm_lower_check
 local_mocked_bindings(cpm_lower_check = function(engine, R, N) {
   cpm_lower_not_run()
 })
@@ -553,6 +555,7 @@ test_that("RNG contract: analytic path is RNG-silent, bootstrap consumes the str
 # ---- print / summary snapshots ----------------------------------------------
 
 test_that("print and summary render as expected", {
+  local_mocked_bindings(cpm_lower_check = real_lower_check)
   fit <- cpm_fit(cormat = misfit_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 300)
   expect_cpm_table_one_block(fit, print)
