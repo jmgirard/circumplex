@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M172: Exclude a bootstrap refit that errors in cpm_fit()
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -123,7 +123,7 @@ and "Repoint stale line cites into cpm_fit.R".
       update `INDEX.md`. Re-run the grep. Cite by function name in this file's
       log.
 - [x] T5: `devtools::test()`, then `devtools::check(args = "--no-manual")`.
-- [ ] T6: Review return 1. Make `cpm_boot_refit()` reject a non-finite gradient
+- [x] T6: Review return 1. Make `cpm_boot_refit()` reject a non-finite gradient
       norm or F, with an `inf` probe (both infinite) that fails first; assert
       the test's replicate-2 precondition; fix the pass-1 fix-now comments and
       the `cpm_fit()` help sentence on excluded resamples; re-run T5's checks.
@@ -153,6 +153,7 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: T5 at 09317c69: `devtools::test()` 0 failures, 15458 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. 144b17af after it changes comments only. Status → review.
 - 2026-10-28: review return 1: AC1 fails for a refit whose gradient norm and F are both infinite: `Inf <= 1e-6 * Inf` accepts it instead of excluding it (diff-bug #2). Fix with the pass-1 fix-now items: diff-bug #3 and #7, blame-history #3 and #4, ripple #2.
 - 2026-10-28: T6: added the `inf` probe (infinite F and gradients on both attempts) and a counting-only `none` baseline asserting replicate 2 takes one attempt; on 99456de5 the `inf` probe failed with the refit accepted (nonconvergent 1, expected 2). `cpm_boot_refit()` now requires a finite norm and F; on the finite path the comparison is master's. Comments fixed (helper, restart, roxygen), help sentence names errored refits, narrative comment removed from test-cpm_angle_ci.R. cpm_api, cpm_summary_markers and cpm_angle_ci tests: 0 failures, 1640 passes.
+- 2026-10-28: T6 checks at 5a05ef52: `devtools::test()` 0 failures, 15465 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. claim audit (return 1): not re-run, the added lines are comments, one help sentence and test code that pass-2 review reads. Status → review.
 
 ## Decisions
 

@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-28 (M171 done and archived: `cpm_fit(check_lower = 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M172 | Exclude a bootstrap refit that errors in cpm_fit() | in-progress | — | normal | milestones/M172-cpm-bootstrap-refit-errors.md |
+| M172 | Exclude a bootstrap refit that errors in cpm_fit() | review | — | normal | milestones/M172-cpm-bootstrap-refit-errors.md |
 | M171 | Flag a lower discrepancy that extra starts find in cpm_fit() | done | — | high | milestones/archive/M171-cpm-lower-discrepancy-check.md |
 | M169 | State which solution the CPM estimate is on the cpm_fit() help page | done | — | high | milestones/archive/M169-cpm-estimate-help-page.md |
 | M170 | Measure the CPM engine's missed optima and settle which solution it reports | done | — | high | milestones/archive/M170-cpm-engine-estimate-study.md |
