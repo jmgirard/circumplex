@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M174: Check NEWS against v2.0.1 before release
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -109,6 +109,8 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - 2026-10-28: re-audit: AC5 (full) — nothing on all six questions; jointly satisfiable with AC1-AC4 at 175 lines; noted the falsifier line above and that Scope is plan-owned (amended here under the gate).
 - 2026-10-28: T4 done: section at 175 lines (AC5 180); edits are the growth, ellipse, items, SEM and plot bullets, with the dash bullet merged into the SEM bullet.
 - 2026-10-28: T5 done on a clean tree at 8c5c2ffa plus this commit's tracking: interface check exit 0, 26 of 26 matched; separate enumeration (NAMESPACE diff, 12 export/S3method lines; a `parse()` formals diff of exports, 4 argument changes) equals the script's set 1 and set 2; 117 plan-commit spans and titles, 0 missing; released sections identical to the plan commit; 175 lines. T5's per-sentence citations go to the Decisions section, since Review is review-owned.
+- 2026-10-28: claim audit: 27 claims read, 3 corrected — tools/news-interface-check.R header (set 2 also reads `=` assignments and skips a function missing at one ref or both; the S3 rule can be met by one name when the generic is the export; floor-removed and `Geom`-prefix behavior stated); the 10 NEWS claims hold; the same reader re-read the corrections once, and its one remaining wording fix (one ref or both) was applied as given.
+- 2026-10-28: verify slot: no file under R/, src/ or tests/ changed on the branch (`git diff --stat master...HEAD`), so `devtools::test()` is not triggered; the interface check reruns green after the header edit. Implement done, status review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->

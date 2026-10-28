@@ -14,7 +14,9 @@
 #   1. the export() and S3method() lines of NAMESPACE;
 #   2. the argument names and default expressions of each function exported at
 #      both refs and each S3 method registered at both refs, read with parse()
-#      from top-level `name <- function(...)` assignments in R/*.R;
+#      from top-level `name <- function(...)` or `name = function(...)`
+#      assignments in R/*.R (a function with no such assignment at one ref or
+#      both is skipped);
 #   3. the file names in data/, without .rda;
 #   4. the VignetteIndexEntry titles of vignettes/*.Rmd;
 #   5. the package names and version floors in DESCRIPTION's Depends, Imports
@@ -33,14 +35,15 @@
 #   - added or removed S3 method: one bullet names the generic and an export
 #     whose man/*.Rd file has the method's \alias{} (man/ read at the working
 #     tree for an added method, at the base ref for a removed one). This checks
-#     that the two names appear together, not that the bullet describes the
-#     method;
+#     that the bullet names both, which may be one name when the generic is
+#     itself that export, not that the bullet describes the method;
 #   - version floor change: one bullet names the package and holds the new
-#     floor as a whole token, with no digit or `.` on either side;
+#     floor as a whole token, with no digit or `.` on either side (a floor
+#     removed outright is always reported missing);
 #   - vignette: the section holds the title in straight double quotes, after
 #     line breaks and runs of spaces become one space.
-# One exemption: an export documented in man/circumplex-ggproto.Rd whose
-# geom_*() constructor is matched.
+# One exemption: an export whose name starts with `Geom`, documented in
+# man/circumplex-ggproto.Rd, whose geom_*() constructor is matched.
 #
 # Prints one line per difference (matched, exempt or MISSING) and exits 1 if
 # any difference is missing. Not part of the built package (`^tools$` is in

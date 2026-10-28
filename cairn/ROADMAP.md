@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-28 (M173 done and archived: NEWS cut to 170 lines, 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M174 | Check NEWS against v2.0.1 before release | in-progress | — | normal | milestones/M174-news-check-v201.md |
+| M174 | Check NEWS against v2.0.1 before release | review | — | normal | milestones/M174-news-check-v201.md |
 | M173 | Shorten NEWS and fix two pre-release details | done | — | normal | milestones/archive/M173-pre-release-news-testthat.md |
 | M172 | Exclude a bootstrap refit that errors in cpm_fit() | done | — | normal | milestones/archive/M172-cpm-bootstrap-refit-errors.md |
 | M171 | Flag a lower discrepancy that extra starts find in cpm_fit() | done | — | high | milestones/archive/M171-cpm-lower-discrepancy-check.md |
