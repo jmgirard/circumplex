@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M173: Shorten NEWS and fix two pre-release details
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -32,7 +32,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - [ ] AC2: In `vignettes/evaluating-circumplex-structure.Rmd.orig` and the shipped `vignettes/evaluating-circumplex-structure.Rmd`, the sentence that said the analytic caution prints "up to very large $N$" when a boundary marker is present instead states that, when a boundary marker is present, the analytic caution prints for every $N$ below $N = 50000$, matching `cpm_analytic_ci_n_boundary_caution` in `R/cpm_fit.R`. `grep -n 'very large' vignettes/*.Rmd vignettes/*.Rmd.orig` prints nothing, and `git diff` of each of the two files against the plan commit shows only that sentence changed.
 - [ ] AC3: Each row of the change ledger in this file's Decisions section (one row per user-visible change stated by the 51 development-section bullets of NEWS.md at the plan commit, each row citing its bullet) has one disposition that holds after the edit: (a) stated, where a post-edit development-section bullet states the change; (b) pointed, where a post-edit bullet names the change's subject and a help page (`?topic`) or vignette that, at the post-edit commit, states the change's after-state; or (c) dropped, where the row's before-state is absent from v2.0.1, shown by `git show v2.0.1:<path>` on the path the row names. Every row from a `## Breaking changes` bullet is (a), and its post-edit bullet sits under `## Breaking changes`. Every row naming a function, argument, dataset or vignette that v2.0.1 shipped, whose change alters returned values, refusals, warnings or printed output, is (a) or (b).
 - [ ] AC4: Every function and argument named in backticks in a `## Breaking changes` bullet at the plan commit is named in backticks in a post-edit bullet under that heading (a script compares the two token sets).
-- [ ] AC5: The post-edit development section of NEWS.md, from the `# circumplex (development version)` line to the line before `# circumplex 2.0.1`, is at most 150 lines (`awk` line count), down from 506. Where AC3 and AC5 cannot both hold, AC3 holds and AC5's figure is amended at a gate.
+- [ ] AC5: The post-edit development section of NEWS.md, from the `# circumplex (development version)` line to the line before `# circumplex 2.0.1`, is at most 170 lines (`awk` line count), down from 506. Where AC3 and AC5 cannot both hold, AC3 holds and AC5's figure is amended at a gate.
 - [ ] AC6: Every backticked token and every numeric literal in the post-edit development section also appears in the development section at the plan commit, except a backticked `?topic` whose topic is an `\alias{}` in `man/*.Rd`, or a backticked `vignette("<name>")` whose `<name>.Rmd` is in `vignettes/` (a script checks both).
 - [ ] AC7: `Rscript -e 'devtools::test()'` reports 0 failures with the installed testthat, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors and 0 warnings.
 
@@ -55,6 +55,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - [x] T3: Write the change ledger into this file's Decisions section and commit it before any commit that changes NEWS.md: one row per user-visible change, citing its bullet, naming the path whose v2.0.1 copy shows the before-state, and its planned disposition (a, b or c) with the post-edit bullet or the page it points to.
 - [x] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
 - [x] T6: Review return 1: state in NEWS, or correct in the ledger to a page the bullet names, the detail of rows L28, L40, L56, L60, L67, L70 and L74; rerun the token checks and line count.
+- [x] T7: Review return 2: fix the NEWS findings the review settled fix-now (Review section), rebuilt with code spans kept whole; rerun token checks, lint and line count.
 - [x] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -86,6 +87,9 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: review return 1: AC3 fails as written; rows marked (a) whose detail the final NEWS does not state: L28 (margin widening for `angle_labels`), L40 (`instruments()` entries lose their leading space), L56 (reference scale now shows its communality interval), L60 (`?cpm_fit` lists the markers), L67 (menu built from the articles index), L70 ("Axes Reliability" now in the menu), L74 (plain-English vignettes link the introduction). Fix: state each in NEWS, or append a ledger correction to (b) where a page named in the bullet states it (`?ggcircumplex` states the margin; `?cpm_fit` lists the markers), keeping AC4-AC6 and the 150-line figure.
 - 2026-10-28: T6 added for review return 1 (minor amendment); done: N6, N11, N16, N17 and N18 reworded to state the seven rows' detail, ledger correction appended; token checks pass (150 lines, AC4 0 missing, AC6 5 allowed pointers incl. `?ggcircumplex`, 0 new numbers), linter 0 hits, released sections identical.
 - 2026-10-28: review return 2: AC3 fails on L56 (N16 states the reference scale's interval wrongly), L27 (`?coord_circumplex` does not state the plotmath minus rule), L24 and L65 (pointers missing); plus fix-now NEWS findings diff-bug #3-#11 and blame-history #1, #2, #7 listed in the Review section. Follow-up row "Tie documented caution limits to code" filed.
+- 2026-10-28: T7 added for review return 2 (minor amendment); done: 14 bullets edited (N3, N4, N5, N6, N8, N10, N11, N12, N13, N14, N16, N18, N19, N21) and the section reflowed at width 77 by a scratchpad script that keeps code spans whole; section 166 lines; AC4 0 missing; AC6 5 allowed pointers, 0 new numbers; linter 0 hits; released sections identical; copied over NEWS.md by shell.
+- 2026-10-28: substantive amendment: AC5's figure 150 → 170 lines. The return-2 fixes (a corrected false statement on the reference scale and restored qualifiers) made the section 166 lines; AC3 wins under AC5's own clause, and the user chose "Allow 170 lines" at the stop over holding 150. The Goal's "about 150 lines" stands as written (plan-owned).
+- 2026-10-28: re-audit: AC5 (full) — passes all six questions; minor note to log the gate decision with its reason, done above.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
