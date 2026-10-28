@@ -1,21 +1,19 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-28 (M170 done and archived: D-072 keeps the CPM estimate and adds a diagnostic later; "State and settle the CPM engine estimate" graduated; M168 row pruned for retention; two lessons captured, three marked used; validate green.)_
+_Last hygiene check: 2026-10-28 (M171 done and archived: `cpm_fit(check_lower = TRUE)` ships D-072's diagnostic; "Flag a lower optimum in CPM fits" graduated; M167 row pruned for retention; two lessons captured, M104 and M106 evicted, six marked used; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M171 | Flag a lower discrepancy that extra starts find in cpm_fit() | review | — | high | milestones/M171-cpm-lower-discrepancy-check.md |
+| M171 | Flag a lower discrepancy that extra starts find in cpm_fit() | done | — | high | milestones/archive/M171-cpm-lower-discrepancy-check.md |
 | M169 | State which solution the CPM estimate is on the cpm_fit() help page | done | — | high | milestones/archive/M169-cpm-estimate-help-page.md |
 | M170 | Measure the CPM engine's missed optima and settle which solution it reports | done | — | high | milestones/archive/M170-cpm-engine-estimate-study.md |
-| M167 | Measure CPM interval coverage per weight and test boundary-safe intervals | done | — | normal | milestones/archive/M167-cpm-interval-oracle.md |
 
 ## Candidates
 
 _Candidates carry no milestone ID — an `M<NN>` is assigned at planning time. Legacy IDs (≤ M6) remain valid citations into `cairn/legacy/`; M7 is the first cairn-era ID. Struck rows are tombstones; their histories live in the named archives and git._
-- [high] Flag a lower optimum in CPM fits: (D-072, M170) `cpm_fit()` runs M170's W starts at the top-level fit only, keeps E, and flags one over 0.01 T units below. The wording separates a same-order wall point from a reordered one, and says W misses some. Decide whether `summary()`'s analytic caution fires on it (M169 review). RR27 Q6 items that apply: the CIRCUM/CircE oracles, the real fits (estimates unchanged, flag on verbal only). Omitted: T calibration and the bootstrap warm start (E and T unchanged, the bootstrap never runs W); saturating shares and local-vs-global quality (E is only flagged; M170's search never saturated). Fable tier at plan. — added 2026-10-27 — started M171
 - Check other CPM models for lower fits: (M171 plan gate, 2026-10-28) M171's check runs only for the quasi-circumplex model with unit scaling, where M170 measured W. The other three models and free scaling need W's starts adapted, with cost and misses measured. Promote on a user request or such a study.
 - Repoint stale line cites into cpm_fit.R: (M171 review, 2026-10-28) line-number cites into `R/cpm_fit.R` and `R/cpm_oop.R` moved with M171, in `cairn/references/` pages browne1982, browne1992, browne1992a and hu1999, `R/axes_reliability.R:1225`, `tests/testthat/test-cpm_angle_ci.R` and `devel/cpm-marker-validation-brief.md`; some were stale before. Cite functions, not lines. Promote with the milestone that next opens those files.
 - Vignette prose follow-ons: (rules in `cairn/references/plain-vignettes.md`). (i) Plain-English pass over `introduction-to-ssm-analysis`, `intermediate-ssm-analysis` and `using-instruments` (8, 15 and 30 sentences over 25 words at `125b76db`); the ebook row applies. (ii) The prose sweep as a merge gate: CI and testthat run `tools/prose-sweep.R` (nestedtune M088 shape), review-only until its two parser fixes land. (iii) `axes-reliability-caveats` prose after the split (M137 review O3-O5): rules only in the Wrap-up, "Sections 2 to 5" sited inside Section 2 and skipping 6, bold lead-ins repeating headings 3 to 5; needs split-guard pairs. The after-M125 trigger for (i) and (ii) has fired; also promote on a reader finding a vignette hard to follow, or a vignette regressing past the sweep. (iv) "Evaluating Circumplex Structure" says the analytic caution with a boundary marker prints "up to very large $N$"; it stops at N = 50000 (M167 review pass 4).
