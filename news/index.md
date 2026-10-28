@@ -1,6 +1,6 @@
 # Changelog
 
-## circumplex (development version)
+## circumplex 2.1.0
 
 ### Breaking changes
 
@@ -57,10 +57,10 @@
 ### New features
 
 - [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  gains `check_lower = TRUE`, the default, so a quasi-circumplex fit
-  with unit scaling now runs extra starts after the fit. If one reaches
-  a discrepancy more than 0.01 lower on the chi-square scale,
-  [`print()`](https://rdrr.io/r/base/print.html) and
+  gains `check_lower = TRUE`, the default, so a converged
+  quasi-circumplex fit with unit scaling now runs extra starts after the
+  fit. If one reaches a discrepancy more than 0.01 lower on the
+  chi-square scale, [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) note the
   difference. The note also says whether the lower solution keeps the
   scales’ order. `details$lower_check` records it. The reported
@@ -114,7 +114,7 @@
   leading minus.
   [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
   also ticks the rim on that grid and gains `angle_labels`, which adds
-  each label’s angle and widens the margin (see
+  each text label’s angle and widens the margin (see
   [`?ggcircumplex`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)).
 
 - New simulated datasets: `simulated_occasions`, `simulated_growth` and
@@ -143,9 +143,9 @@
   accuracy check judges such a fit, which computes or is refused
   `"uncertified"`. If its information matrix is nearly singular, a fit
   the floor admits is now also checked, and it can be refused
-  `"uncertified"`. `"unidentified"` now names only two identical
-  derivative matrices, a derivative matrix equal to the identity, or an
-  exactly singular inversion.
+  `"uncertified"`. As a refusal, `"unidentified"` now names only two
+  identical derivative matrices, a derivative matrix equal to the
+  identity, or an exactly singular inversion.
 
 - Printed cautions and notes in
   [`print()`](https://rdrr.io/r/base/print.html) and
@@ -175,10 +175,10 @@
 
 - [`summary()`](https://rdrr.io/r/base/summary.html) of an
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
-  result is about half as long. One table shows each condition’s
+  result is a third to half as long. One table shows each condition’s
   coverage, certification rate and `Structural` flag. The other columns
   stay in `coverage` and `guardrail`. The verdicts say the same things,
-  but a few joining words change.
+  and their dashes become colons, commas or full stops.
 
 - [`print()`](https://rdrr.io/r/base/print.html) of a multi-group
   [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
@@ -234,14 +234,15 @@
   Interval Accuracy” and “Structure Tests and Ipsatization”. Each
   vignette has a Level line, an Overview and a Wrap-up. The website’s
   “Articles” menu is built from the articles index and lists every page
-  by level, “Axes Reliability” included. Six vignettes show only the
-  calls they teach, and two load the new datasets with
-  [`data()`](https://rdrr.io/r/utils/data.html). Output that follows the
-  console width fits 80 columns (`options(width = 77)`). Six vignettes
-  are now in plain English and link the introduction. A “Not yet peer
-  reviewed” notice opens the four pages on the package’s unpublished
-  methods. They are “SEM-Based SSM Analysis”, “Latent Group Contrasts”,
-  “Bayesian SSM Analysis” and “Growth Models on SSM Parameters”.
+  by level, “Axes Reliability” included. Six vignettes hide the code
+  that simulates data, formats tables or checks internals, and two load
+  the new datasets with [`data()`](https://rdrr.io/r/utils/data.html).
+  Output that follows the console width fits 80 columns
+  (`options(width = 77)`). Six vignettes are now in plain English and
+  link the introduction. A “Not yet peer reviewed” notice opens the four
+  pages on the package’s unpublished methods. They are “SEM-Based SSM
+  Analysis”, “Latent Group Contrasts”, “Bayesian SSM Analysis” and
+  “Growth Models on SSM Parameters”.
 
 - The “Growth Models on SSM Parameters” vignette is rewritten on the
   growth helpers, with the model’s nlme and brms versions. It prints the
@@ -256,7 +257,8 @@
 - “Advanced Circumplex Visualization” adds a section, “The latent
   circumplex from a CPM fit”, with figures after Nagy, Etzel and Lüdtke
   (2019). Its occasions figures no longer have tall, narrow panels or
-  axis labels over a point, and the first labels its spokes PA to NO.
+  axis labels over a point. The first occasions circle figure labels its
+  spokes PA to NO.
 
 - Vignette statements now match the package. “SEM-Based SSM Analysis”
   says the strict tier frees the factor variances and covariances that
