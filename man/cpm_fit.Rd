@@ -202,12 +202,12 @@ percentile intervals; angle replicates are pooled with the package's
 circular quantile machinery, so an angle interval that straddles the
 0/360 boundary is reported wrapped (its lower limit numerically exceeds
 its upper limit, as with displacement intervals in \code{\link[=ssm_analyze]{ssm_analyze()}}).
-Resamples with a degenerate (non-positive-definite) correlation matrix or
-a refit failing the convergence acceptance criterion are excluded with a
-warning reporting how many; the intervals are then conditional on
-estimability. The count of refits failing the criterion, also stored as
-\code{details$boots_nonconvergent}, includes refits that stopped with an
-error. Analytic (Wald) intervals are asymptotically valid but can
+Resamples with a degenerate (non-positive-definite) correlation matrix,
+or whose refit fails the convergence acceptance criterion or stops with
+an error, are excluded with a warning reporting how many; the intervals
+are then conditional on estimability. The count of refits failing the
+criterion, also stored as \code{details$boots_nonconvergent}, includes refits
+that stopped with an error. Analytic (Wald) intervals are asymptotically valid but can
 materially mis-cover at field-typical sample sizes. For
 \code{ci_method = "analytic"}, \code{summary()} prints a caution whenever the
 sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows
