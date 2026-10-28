@@ -167,3 +167,7 @@ Pass 2, 2026-10-28, at 22af88b4 (branch level with `origin/master` 077ab172, cle
 - AC4: released sections byte-identical to 077ab172 (`cmp`).
 - AC5: 176 lines (≤ 180).
 - Gate: `cairn_validate` all checks passed; master runs, alert audits and branch protection as pass 1 (no master change since).
+- spawned: diff-bug, blame-history, prior-review, ripple.
+- prior-review #1: "The stored verdict changes only in wording" is false because the stored verdict gains "which was not tested" — reject (false: that clause goes into `facts$result` only, `R/ssm_sem.R:963-970`; the fit stores `verdict_facts$verdict` alone, `:1154`, and `print()` rebuilds the facts at `:1951`; the "also rejected" clause for comparable fits existed at v2.0.1 as "additionally rejected").
+- ripple #1: the new candidate row names only the three new reserved `time` names, while `ssm_trajectory_reserved()` lists about 20 — fix now (row corrected in this pass's commit).
+- ripple #2: "`rbind()` stacks results" uses "results" where `?ssm_trajectory` says "trajectory tables" — reject (style: the sentence's subject is the `ssm_trajectory()` result, which is a trajectory table).
