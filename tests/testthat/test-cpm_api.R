@@ -4,6 +4,12 @@
 # from memory or from devel/g2xx1.txt. Every expected value below is derived
 # in-test by closed form, construction, or an independent base-R computation.
 
+# The lower-discrepancy check has its own tests (test-cpm_lower_check.R); it is
+# turned off for this file, whose fits do not need it.
+local_mocked_bindings(cpm_lower_check = function(engine, R, N) {
+  cpm_lower_not_run()
+})
+
 # ---- helpers ----------------------------------------------------------------
 
 # Independent implied correlation matrix (re-derived, not the engine's).

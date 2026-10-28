@@ -8,6 +8,12 @@
 # Analytic fits use the deterministic cormat path (no RNG); expect_snapshot()
 # does not run on CRAN by design.
 
+# The lower-discrepancy check has its own tests (test-cpm_lower_check.R); it is
+# turned off for this file, whose fits do not need it.
+local_mocked_bindings(cpm_lower_check = function(engine, R, N) {
+  cpm_lower_not_run()
+})
+
 m94_labels <- function() c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
 # Eight scale names of exactly 16 characters (M146 width fixture).

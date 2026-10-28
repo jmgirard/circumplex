@@ -126,7 +126,8 @@ cpm_diagnostic_lines <- function(details) {
         } else {
           "It keeps the scales' order around the circle"
         },
-        " and has ", abs(lc$more_wall),
+        " and has ",
+        if (lc$more_wall == 0) "no" else abs(lc$more_wall),
         if (lc$more_wall < 0) " fewer" else " more",
         " communality ", if (abs(lc$more_wall) == 1) "index" else "indices",
         " at the upper bound. "
