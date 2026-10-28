@@ -23,7 +23,7 @@ Before the CRAN release walk, NEWS.md names every interface change since v2.0.1 
 
 These terms apply below. The development section is the lines of NEWS.md before the `# circumplex 2.0.1` line. A bullet is a line of that section that starts with `* `, plus its next lines up to the next bullet or heading. The plan commit is the commit that adds this file. The merge head is the last commit of the milestone branch.
 
-**In:** a script, `tools/news-interface-check.R`, that lists the interface differences between a git ref and the current code and matches each one in NEWS.md. A read of the 44 code commits since v2.0.1. Edits to the development section for each gap that the script or the read finds, inside the current 170 lines.
+**In:** a script, `tools/news-interface-check.R`, that lists the interface differences between a git ref and the current code and matches each one in NEWS.md. A read of the 44 code commits since v2.0.1. Edits to the development section for each gap that the script or the read finds, within 180 lines.
 
 **Out:** the truth of sentences that this milestone does not change (M173 audited 85 claims in four review passes). The version bump, `cran-comments.md` and the release checks, which belong to `/cairn-release`. The NEWS sections of released versions.
 
@@ -48,7 +48,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - [ ] AC2: Each sentence of the development section at the merge head that is not in it at the plan commit is true of the package at the merge head. A sentence about earlier behavior is true of v2.0.1 instead. Sentences are compared after line breaks and runs of spaces become one space.
 - [ ] AC3: Each backtick span and each double-quoted title in the development section at the plan commit is also in it at the merge head (a script compares the two sets).
 - [ ] AC4: `sed -n '/^# circumplex 2.0.1/,$p' NEWS.md` gives the same bytes at the plan commit and at the merge head.
-- [ ] AC5: At the merge head, `awk '/^# circumplex 2.0.1/{exit} {n++} END{print n}' NEWS.md` prints 170 or less.
+- [ ] AC5: At the merge head, `awk '/^# circumplex 2.0.1/{exit} {n++} END{print n}' NEWS.md` prints 180 or less.
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -78,7 +78,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
 
   Each form below must still match: `f()`, `?f`, `arg = value`, a title split across two lines, and an S3 method whose generic is also the export.
 - [x] T3: List the commits with `git log --first-parent --oneline v2.0.1..<plan commit> -- R src data inst vignettes DESCRIPTION NAMESPACE`. Leave out the version bump `76f253fb` and the `plan` and `review` tracking commits (44 commits on 2026-10-28). Read the diff of each commit against the development section. An owed change is a change that users can see, that the section does not state, and that no page named in its bullet states. For each owed change, add or edit a bullet. Write each new sentence from a read of the code in the same session. Write one work-log line with the counts.
-- [ ] T4: For each difference that the script reports missing, and each owed change from T3, edit NEWS.md. To stay at 170 lines, shorten other bullets, and restate each condition of a shortened bullet from the code. When you rewrap, keep each backtick span and each quoted title whole. Keep every span and title of the plan-commit section.
+- [ ] T4: For each difference that the script reports missing, and each owed change from T3, edit NEWS.md. To stay within 180 lines, shorten other bullets, and restate each condition of a shortened bullet from the code. When you rewrap, keep each backtick span and each quoted title whole. Keep every span and title of the plan-commit section.
 - [ ] T5: Run the checks at the merge head with a clean tree. Run the script, and check its set 1 and set 2 lists against a separate enumeration. Compare the spans and titles with the plan commit, compare the released sections, and count the lines. For each new sentence, record in the Review section a file and line that make it true.
 
 ## Work log
@@ -105,3 +105,5 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - 2026-10-28: delegation: T3's read of the 44 commits split across four fresh Opus readers (11 commits each, read-only), each told to judge the final state at HEAD against v2.0.1; every reported item re-read in the code by the session before any NEWS edit.
 - 2026-10-28: T3 done: 44 commits read, 39 owe nothing; 6 owed changes found, all confirmed in code. Clear: `items()` wraps its prefix and suffix lines (`R/instrument_oop.R:118-119`; M173's cut lost the phrase). Borderline, taken: `ssm_plot_trajectory()` on a data frame refuses a `time` column named `xend`, `yend` or `Interpretable` (`R/ssm_trajectory.R:185,223`); `print()` of a multi-group `ssm_sem()` fit says an untested contrast rung, and prints rejected higher rungs on an `Also:` line when the groups are not comparable (`R/ssm_sem.R:956-990`); `GeomSsmEllipse` named in NEWS, since the 2.0.0 section names its siblings. Borderline, declined: the lower-discrepancy paragraph in "CPM Fits at a Boundary", since the feature's bullet and `?cpm_fit` cover it. One false sentence found: "The stored verdict text does not change" (`R/ssm_sem.R:977-986` against v2.0.1's `:1018`, "additionally" became "also"), corrected to "changes only in wording".
 - 2026-10-28: T4 checkpoint (half-done): NEWS edits for the 5 interface gaps and the T3 items are in. Interface check 26 of 26 matched, every plan-commit span and title present (117, 0 missing), released sections identical, but the section is 175 lines against AC5's 170. Rewording four bullets and a reflow at width 80 saved 1 line; going lower would cut conditions from other bullets. Stop for the user on AC5's figure. The lint hook's hits in NEWS.md are all in released sections, which AC4 freezes.
+- 2026-10-28: substantive amendment: AC5's figure 170 → 180 lines, with Scope In ("within 180 lines") and T4 (minor) to match. The plan gate's falsifier for holding 170 fired (needed bullets could not fit without dropping conditions), and the user chose "Allow 180 lines" at the stop over dropping the two borderline additions and cutting wording. The section is at 175.
+- 2026-10-28: re-audit: AC5 (full) — nothing on all six questions; jointly satisfiable with AC1-AC4 at 175 lines; noted the falsifier line above and that Scope is plan-owned (amended here under the gate).
