@@ -79,6 +79,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: T5 ledger corrections appended to Decisions (L34 to a, L32 pointer named in N16); the T3 line's "15 are (b)" was wrong, the corrected count is 8 (b), 1 (c), 68 (a).
 - 2026-10-28: T1: testthat 3.1.7 from the CRAN archive does not build on R 4.6.1 (`reassign.c` calls `SET_BODY` and its siblings, gone from R's API; vendored Catch needs `std::uncaught_exception`). Scratch build with `-Wno-implicit-function-declaration`, `-D_LIBCPP_ENABLE_CXX20_REMOVED_UNCAUGHT_EXCEPTION`, and `reassign_function` stubbed to `Rf_error()`; only `with_mock()`/`local_mock()` reach it, and `grep -rnE '\b(with_mock|local_mock)\(' tests/ R/` finds none.
 - 2026-10-28: T1 done: `test_local()` with `NOT_CRAN=true` gave 81 files, 1353 tests, 0 failed, 0 errors, 1 skipped under both 3.1.7 and 3.3.2, the same skip (`test-axes-scaled-fit.R`, "AC9: the committed rates reproduce exactly in the same environment") and the same test set; V = 3.1.7, so no later release was tried. DESCRIPTION set to `testthat (>= 3.1.7)`; D-073 appended.
+- 2026-10-28: claim audit: 85 claims read, 5 corrected — NEWS.md (single-number acceptance vs `ssm_analyze_long()`, `vcov` warning only with the default contrast, amplitude and displacement match only, `NA` hollow only beside a verdict, SEM tier sentence); the same reader re-read the five and one reflowed sentence, all hold; vignette sentence and DESCRIPTION held.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->

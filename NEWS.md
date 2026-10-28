@@ -8,20 +8,19 @@
   `scales` in `ssm_analyze()`, `ssm_analyze_long()`, `ssm_score()`,
   `ssm_parameters_id()`, `ssm_sem()`, `cpm_fit()`, `fit_structure()` and
   `norm_standardize()`. It also covers `items` in `score()`, `ipsatize()`
-  and `axes_reliability()`, and `scales` in `self_standardize()`. Only
-  `axes_reliability()` refuses a number that selects a repeated name, and
-  it also refuses one column under two scales. `occasions` in
-  `ssm_analyze()` must not name a repeated name. Before, a repeat shifted
-  the columns the `score()` key read, or counted an item twice in
-  `ipsatize()`. `ssm_sem_parameters()`, `ssm_sem_syntax()` and the
-  `cormat` path of `cpm_fit()` refuse a label listed twice.
+  and `axes_reliability()`, and `scales` in `self_standardize()`. A single
+  number that reaches a repeated name is still accepted, except by
+  `axes_reliability()`, which also refuses one column under two scales.
+  `occasions` in `ssm_analyze()` must not name a repeated name. Before, a
+  repeat shifted the columns the `score()` key read, or counted an item
+  twice in `ipsatize()`. `ssm_sem_parameters()`, `ssm_sem_syntax()` and
+  the `cormat` path of `cpm_fit()` refuse a label listed twice.
 
 * If numbers in `scales` reach two columns with one name,
   `ssm_analyze_long()` now names that name. Before, the error spoke of
   overlapping `occasions` blocks. `ssm_sem_syntax()`, `ssm_sem_parameters()`
   and the `cormat` path of `cpm_fit()` refuse `NA` listed twice as a label.
-  `ssm_sem()` and `ssm_sem_syntax()` refuse a `measures` entry that carries
-  the name of a scale.
+  `ssm_sem()` and `ssm_sem_syntax()` refuse a `measures` entry named as a scale.
 
 ## New features
 
@@ -38,8 +37,9 @@
   still fits nothing. `ssm_trajectory()` takes the fitted fixed effects and
   their covariance, or posterior draws. It returns the estimate, interval
   and displacement certification of `e`, `x`, `y`, `a` and `d` at each
-  time. Its results match the growth vignette's former per-wave loop. If a
-  `vcov` does not look like a fit to complete balanced data, it warns.
+  time. Its amplitude and displacement match the growth vignette's former
+  per-wave loop. If the contrast is the default and a `vcov` does not look
+  like a fit to complete balanced data, it warns.
   `ssm_plot_trajectory()` plots the result. nlme is a new suggested
   package. `?ssm_growth_data` and `?ssm_trajectory` list the refusals.
 
@@ -103,7 +103,7 @@
   `ssm_plot_circle()` put the amplitude axis in the widest gap with no
   point. In `ssm_plot_trajectory()`, a displacement segment next to an
   uninterpretable point is dashed, as the legend and the growth vignette
-  show. A row whose `certified` value is `NA` is now a hollow point.
+  show. If another row has a verdict, an `NA` in `certified` is a hollow point.
 
 ## Documentation
 
@@ -137,8 +137,8 @@
   (2019). Its occasions figures no longer have tall, narrow panels or axis
   labels over a point, and the first labels its spokes PA to NO.
 
-* Vignette statements now match the package. The plane factors in
-  "SEM-Based SSM Analysis" are fixed only under the default scaled tier.
+* Vignette statements now match the package. "SEM-Based SSM Analysis" says
+  the strict tier frees the factor covariances that the scaled tier fixes.
   `print()` shows an uncertified displacement with a note. The
   `fit_structure()` labels are "not clearly supported" and "unsupported".
   The default `cpm_fit()` model estimates every angle except the reference
