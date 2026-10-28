@@ -90,12 +90,17 @@ refs <- list(
 
 read_namespace <- function(ref) {
   ns <- ref$read("NAMESPACE")
-  exports <- sub("^export\\((.*)\\)$", "\\1", grep("^export\\(", ns, value = TRUE))
+  # roxygen quotes non-syntactic names: export("%>%"), S3method("[",foo)
+  unquote <- function(x) gsub("^\\s*\"|\"\\s*$", "", x)
+  exports <- unquote(sub("^export\\((.*)\\)$", "\\1", grep("^export\\(", ns, value = TRUE)))
   s3 <- grep("^S3method\\(", ns, value = TRUE)
-  generic <- sub("^S3method\\(([^,]+),([^)]+)\\)$", "\\1", s3)
-  class <- sub("^S3method\\(([^,]+),([^)]+)\\)$", "\\2", s3)
+  generic <- unquote(sub("^S3method\\(([^,]+),([^)]+)\\)$", "\\1", s3))
+  class <- unquote(sub("^S3method\\(([^,]+),([^)]+)\\)$", "\\2", s3))
+  # paste0() of two empty vectors gives ".", so build `method` only when
+  # there are methods
   methods <- data.frame(
-    generic = generic, class = class, method = paste0(generic, ".", class),
+    generic = generic, class = class,
+    method = if (length(generic) > 0L) paste0(generic, ".", class) else character(),
     stringsAsFactors = FALSE
   )
   list(exports = exports, methods = methods)
@@ -107,7 +112,10 @@ read_formals <- function(ref) {
   for (f in files) {
     exprs <- parse(text = ref$read(file.path("R", f)), keep.source = FALSE)
     for (e in exprs) {
-      if (is.call(e) && as.character(e[[1L]]) %in% c("<-", "=") &&
+      # is.name() first: a call such as utils::globalVariables() has a call
+      # as its head, which as.character() turns into a length-3 vector
+      if (is.call(e) && is.name(e[[1L]]) &&
+          as.character(e[[1L]]) %in% c("<-", "=") &&
           is.name(e[[2L]]) && is.call(e[[3L]]) &&
           identical(e[[3L]][[1L]], as.name("function"))) {
         fm <- as.list(e[[3L]][[2L]])
@@ -134,13 +142,18 @@ read_vignettes <- function(ref) {
 read_deps <- function(ref) {
   dcf <- read.dcf(textConnection(ref$read("DESCRIPTION")))
   fields <- intersect(c("Depends", "Imports", "Suggests"), colnames(dcf))
-  entries <- trimws(unlist(strsplit(dcf[1L, fields], ",")))
-  entries <- entries[nzchar(entries)]
-  pkg <- trimws(sub("\\(.*$", "", entries))
-  floor <- ifelse(grepl("\\(", entries),
-                  trimws(sub("^[^(]*\\(\\s*>=?\\s*([^)]*)\\).*$", "\\1", entries)),
-                  NA_character_)
-  stats::setNames(floor, pkg)
+  # One entry per field and package, so a move between fields is a difference
+  out <- character()
+  for (field in fields) {
+    entries <- trimws(unlist(strsplit(dcf[1L, field], ",")))
+    entries <- entries[nzchar(entries)]
+    pkg <- trimws(sub("\\(.*$", "", entries))
+    floor <- ifelse(grepl("\\(", entries),
+                    trimws(sub("^[^(]*\\(\\s*>=?\\s*([^)]*)\\).*$", "\\1", entries)),
+                    NA_character_)
+    out <- c(out, stats::setNames(floor, paste(field, pkg)))
+  }
+  out
 }
 
 aliases_in <- function(ref, rd) {
@@ -282,13 +295,20 @@ for (x in setdiff(titles$base, titles$head)) report(4L, paste0("removed vignette
 
 # Set 5: dependencies.
 deps <- lapply(refs, read_deps)
-for (p in setdiff(names(deps$head), names(deps$base))) report(5L, paste("added package", p), named_together(p))
-for (p in setdiff(names(deps$base), names(deps$head))) report(5L, paste("removed package", p), named_together(p))
-for (p in intersect(names(deps$base), names(deps$head))) {
-  old <- deps$base[[p]]
-  new <- deps$head[[p]]
+pkg_of <- function(key) sub("^\\S+ ", "", key)
+field_of <- function(key) sub(" .*$", "", key)
+for (k in setdiff(names(deps$head), names(deps$base))) {
+  report(5L, paste("added package", pkg_of(k), "to", field_of(k)), named_together(pkg_of(k)))
+}
+for (k in setdiff(names(deps$base), names(deps$head))) {
+  report(5L, paste("removed package", pkg_of(k), "from", field_of(k)), named_together(pkg_of(k)))
+}
+for (k in intersect(names(deps$base), names(deps$head))) {
+  old <- deps$base[[k]]
+  new <- deps$head[[k]]
   if (identical(old, new)) next
-  label <- paste0("floor of ", p, ": ", old, " -> ", new)
+  p <- pkg_of(k)
+  label <- paste0("floor of ", p, " in ", field_of(k), ": ", old, " -> ", new)
   ok <- !is.na(new) && any(vapply(seq_along(bullets), function(i) {
     bullet_names(i, p) && floor_in(i, new)
   }, logical(1L)))

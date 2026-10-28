@@ -20,7 +20,9 @@
   now names that name. Before, the error spoke of overlapping `occasions`
   blocks. `ssm_sem_syntax()`, `ssm_sem_parameters()` and the `cormat` path of
   `cpm_fit()` refuse `NA` listed twice as a label. `ssm_sem()` and
-  `ssm_sem_syntax()` refuse a `measures` entry named as a scale.
+  `ssm_sem_syntax()` refuse a `measures` entry named as a scale. Given a data
+  frame, `ssm_plot_trajectory()` refuses a `time` column named `xend`, `yend`
+  or `Interpretable`.
 
 ## New features
 
@@ -41,8 +43,8 @@
   and `d` at each time and certifies the displacement. Under the same seed,
   its amplitude and displacement match the growth vignette's former per-wave
   loop. If the contrast is the default and a `vcov` does not look like a fit
-  to complete balanced data, it warns. `rbind()` stacks its tables, and
-  `ssm_plot_trajectory()` plots them. Suggests gains `nlme` and raises
+  to complete balanced data, it warns. `ssm_plot_trajectory()` plots the
+  result, and `rbind()` stacks results. Suggests gains `nlme` and raises
   `testthat` to (>= 3.1.7). `?ssm_growth_data` and `?ssm_trajectory` list the
   refusals and cautions.
 
@@ -123,8 +125,7 @@
   with no point. If every gap holds a point, a label can still cover one. In
   `ssm_plot_trajectory()`, a segment next to an uninterpretable displacement
   is dashed, as the legend and the growth vignette show. If another row has a
-  verdict, an `NA` in `certified` is a hollow point. Given a data frame, it
-  refuses a `time` column named `xend`, `yend` or `Interpretable`.
+  verdict, an `NA` in `certified` is a hollow point.
 
 ## Documentation
 

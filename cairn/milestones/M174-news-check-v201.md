@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M174: Check NEWS against v2.0.1 before release
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -53,8 +53,8 @@ These terms apply below. The development section is the lines of NEWS.md before 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
 
-- AC1 → T1, T2, T4, T5
-- AC2 → T3, T4, T5
+- AC1 → T1, T2, T4, T5, T6
+- AC2 → T3, T4, T5, T6
 - AC3 → T4, T5
 - AC4 → T5
 - AC5 → T4, T5
@@ -80,6 +80,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - [x] T3: List the commits with `git log --first-parent --oneline v2.0.1..<plan commit> -- R src data inst vignettes DESCRIPTION NAMESPACE`. Leave out the version bump `76f253fb` and the `plan` and `review` tracking commits (44 commits on 2026-10-28). Read the diff of each commit against the development section. An owed change is a change that users can see, that the section does not state, and that no page named in its bullet states. For each owed change, add or edit a bullet. Write each new sentence from a read of the code in the same session. Write one work-log line with the counts.
 - [x] T4: For each difference that the script reports missing, and each owed change from T3, edit NEWS.md. To stay within 180 lines, shorten other bullets, and restate each condition of a shortened bullet from the code. When you rewrap, keep each backtick span and each quoted title whole. Keep every span and title of the plan-commit section.
 - [x] T5: Run the checks at the merge head with a clean tree. Run the script, and check its set 1 and set 2 lists against a separate enumeration. Compare the spans and titles with the plan commit, compare the released sections, and count the lines. For each new sentence, record in the Review section a file and line that make it true.
+- [x] T6: Review return 1. Reword the `rbind()`/plot sentence so it does not imply a stack plots, and move the reserved `time` name refusal to Breaking changes. In the script, skip a top-level call whose head is not a name, compare dependencies per field, and strip quotes from NAMESPACE names. Rerun T2's probes and the T5 checks.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates. -->
@@ -112,6 +113,8 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - 2026-10-28: claim audit: 27 claims read, 3 corrected — tools/news-interface-check.R header (set 2 also reads `=` assignments and skips a function missing at one ref or both; the S3 rule can be met by one name when the generic is the export; floor-removed and `Geom`-prefix behavior stated); the 10 NEWS claims hold; the same reader re-read the corrections once, and its one remaining wording fix (one ref or both) was applied as given.
 - 2026-10-28: verify slot: no file under R/, src/ or tests/ changed on the branch (`git diff --stat master...HEAD`), so `devtools::test()` is not triggered; the interface check reruns green after the header edit. Implement done, status review.
 - 2026-10-28: review return 1: AC2 fails on sentence S2 ("`rbind()` stacks its tables, and `ssm_plot_trajectory()` plots them" implies a stack plots, but repeated times are refused, `R/ssm_trajectory.R:305-315`); with it fix the review's other fix-now findings: move the `xend`/`yend`/`Interpretable` refusal to Breaking changes (diff-bug #5), and in `tools/news-interface-check.R` guard a top-level call whose head is a call (#2), compare dependencies per field (#3), and strip quotes from NAMESPACE names (#4). Gate otherwise clean (check 0/0/0).
+- 2026-10-28: T6 added for review return 1 (minor amendment; Coverage AC1 and AC2 gain T6).
+- 2026-10-28: T6 done: S2 now reads "`ssm_plot_trajectory()` plots the result, and `rbind()` stacks results."; the reserved `time` name refusal moved to the second Breaking changes bullet. Script: `is.name()` guard before reading a call's head; dependencies keyed by field and package, so a move reports a removal and an addition; quotes stripped from NAMESPACE names; and a new fix found while testing, `methods` built empty when a NAMESPACE has no `S3method()` line (`paste0()` of two empty vectors gave "."). A scratch git repo (scratchpad `t6/`) with `utils::globalVariables()`, `export("%>%")`, `S3method("[",foo)` and ggplot2 moved from Suggests to Imports lists 4 differences, all missing on an empty NEWS (exit 1) and all matched with a bullet naming them (exit 0). T2's probes, repointed at the plan-commit NEWS with the new set-5 labels, pass 20 of 20. Checks: AC1 exit 0 (26 of 26), AC3 0 missing, AC4 identical, AC5 176 lines. Runs against v2.0.0, v1.0.0 and v0.3.10 finish with no error. Status review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
@@ -126,6 +129,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
   - S7 rungs rejected above the required one print on an `Also:` line, comparable or not: `R/ssm_sem.R:975-983` sets `facts$also` either way, printed at `:829`; v2.0.1 named them only in a comparable fit's verdict (`v2.0.1:R/ssm_sem.R:1016-1023`).
   - S8 the stored verdict changes only in wording: each verdict phrase at v2.0.1 is still in `R/ssm_sem.R` except "additionally rejected (reported only -- not required", which became "also rejected (reported only and not required" (`:977-986`), a `grep -cF` count of seven phrases at both refs.
   - S9 given a data frame, `ssm_plot_trajectory()` refuses a `time` column named `xend`, `yend` or `Interpretable`: `R/ssm_trajectory.R:185` (reserved names), `:223-233` (the refusal), reached from the data-frame method at `:555` through `:571`; v2.0.1's reserved list `:179-186` lacks the three.
+- 2026-10-28 (T6) **Citations after review return 1.** S2 is now "`ssm_plot_trajectory()` plots the result, and `rbind()` stacks results.": the trajectory plot method `R/ssm_trajectory_helper.R:526` and `rbind.circumplex_ssm_trajectory` at `:493`; it no longer says a stack plots, which `R/ssm_trajectory.R:305-315` refuses for repeated times. S9 moved, unchanged in substance, to the Breaking changes bullet as "Given a data frame, `ssm_plot_trajectory()` refuses a `time` column named `xend`, `yend` or `Interpretable`.", with the same citations.
 
 ## Review
 <!-- owner: review · exclusive -->
