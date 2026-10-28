@@ -82,9 +82,7 @@ test_that("cpm_fit() bootstrap angle CI wraps a pole-straddling item, not linear
   # that its bootstrap angle replicates straddle the pole. The CIRCULAR quantile
   # then reports that item's CI as a WRAPPED short arc (Angle_lci > Angle_uci,
   # crossing 0/360); a LINEAR quantile at the call site would instead report a
-  # ~357deg non-wrapped span [~1, ~358] with the estimate outside it. Verified
-  # out-of-band (assignInNamespace linearization) that all three pole-row
-  # assertions below flip to FAIL when that quantile call is linearized.
+  # ~357deg non-wrapped span [~1, ~358] with the estimate outside it.
   deg <- c(45, 90, 135, 180, 225, 270, 315, 360)   # item 8 on the pole
   th  <- as.numeric(as_radian(as_degree(deg)))
   P   <- cpm_implied_cor(th, rep(0.7, 8), c(0.6, 0.25, 0.15))

@@ -1393,17 +1393,18 @@ cpm_mirror_guard <- function(par, spec, ref_rel_hat) {
 }
 
 # One bootstrap refit attempt from `start`: the optimization and the sec. 3.5
-# scaled-gradient-norm acceptance test. An error from either call, a
-# non-finite gradient norm or a NaN F returns `accepted = FALSE` (an infinite
-# F with a finite gradient passes, as before this helper), so the caller counts
-# the resample as nonconvergent instead of stopping cpm_fit(); `par` is NULL
-# after an error, so an attempt that errors is not restarted.
+# scaled-gradient-norm acceptance test. An error from either call, or a
+# non-finite gradient norm or F, returns `accepted = FALSE`, so the caller
+# counts the resample as nonconvergent instead of stopping cpm_fit(). `par` is
+# NULL after any error, including a gradient error after the optimizer
+# returned a point, so an attempt that errors is never restarted.
 cpm_boot_refit <- function(start, Rb, spec) {
   tryCatch({
     run <- cpm_optimize_one(start, Rb, spec)
     gnorm <- max(abs(cpm_gradient(run$par, Rb, spec)))
     list(par = run$par,
-         accepted = isTRUE(gnorm <= 1e-6 * max(1, abs(run$F))))
+         accepted = is.finite(gnorm) && is.finite(run$F) &&
+           gnorm <= 1e-6 * max(1, abs(run$F)))
   }, error = function(e) list(par = NULL, accepted = FALSE))
 }
 
@@ -1415,8 +1416,8 @@ cpm_boot_refit <- function(start, Rb, spec) {
 #' polished-out harmonic stays fixed at 0 in every replicate (its interval is
 #' degenerate at 0 by construction). Replicate exclusion keys on the sec. 3.5
 #' scaled-gradient-norm acceptance criterion, never on the nlminb code
-#' (A-review F2); a refit whose optimization or gradient errors fails it too
-#' (`cpm_boot_refit()`); degenerate resamples (NA or non-PD correlation matrices,
+#' (A-review F2); a refit whose optimization or gradient errors, or whose
+#' gradient norm or F is not finite, fails it too (`cpm_boot_refit()`); degenerate resamples (NA or non-PD correlation matrices,
 #' e.g. rank-deficient at small N) are excluded with the same
 #' count-warning, conditional-on-estimability convention as `ssm_analyze()`.
 #' Angle replicates go through the existing circular quantile machinery
@@ -1465,7 +1466,8 @@ cpm_bootstrap <- function(engine, sdata, boots, interval) {
       # One deterministic restart from the stalled point before excluding:
       # ~1% of warm refits stop with the gradient norm just above the sec. 3.5
       # threshold (nlminb rel.tol exit), and a restart polishes some of them
-      # through. Acceptance still keys ONLY on the scaled gradient norm.
+      # through. Acceptance keys on the scaled gradient norm, never on the
+      # nlminb code; an error or a non-finite norm or F fails it.
       run <- cpm_boot_refit(run$par, Rb, spec)
     }
     if (!isTRUE(run$accepted)) {
@@ -1778,12 +1780,12 @@ cpm_boundary_proximity <- function(object) {
 #'   circular quantile machinery, so an angle interval that straddles the
 #'   0/360 boundary is reported wrapped (its lower limit numerically exceeds
 #'   its upper limit, as with displacement intervals in [ssm_analyze()]).
-#'   Resamples with a degenerate (non-positive-definite) correlation matrix or
-#'   a refit failing the convergence acceptance criterion are excluded with a
-#'   warning reporting how many; the intervals are then conditional on
-#'   estimability. The count of refits failing the criterion, also stored as
-#'   `details$boots_nonconvergent`, includes refits that stopped with an
-#'   error. Analytic (Wald) intervals are asymptotically valid but can
+#'   Resamples with a degenerate (non-positive-definite) correlation matrix,
+#'   or whose refit fails the convergence acceptance criterion or stops with
+#'   an error, are excluded with a warning reporting how many; the intervals
+#'   are then conditional on estimability. The count of refits failing the
+#'   criterion, also stored as `details$boots_nonconvergent`, includes refits
+#'   that stopped with an error. Analytic (Wald) intervals are asymptotically valid but can
 #'   materially mis-cover at field-typical sample sizes. For
 #'   `ci_method = "analytic"`, `summary()` prints a caution whenever the
 #'   sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows

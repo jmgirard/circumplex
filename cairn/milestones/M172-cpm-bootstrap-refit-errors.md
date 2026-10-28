@@ -74,12 +74,12 @@ and "Repoint stale line cites into cpm_fit.R".
 
 ## Coverage
 
-- AC1 → T1, T2
+- AC1 → T1, T2, T6
 - AC2 → T1, T2
-- AC3 → T2, T3
+- AC3 → T2, T3, T6
 - AC4 → T2
 - AC5 → T4
-- AC6 → T5
+- AC6 → T5, T6
 
 ## Tasks
 
@@ -123,6 +123,10 @@ and "Repoint stale line cites into cpm_fit.R".
       update `INDEX.md`. Re-run the grep. Cite by function name in this file's
       log.
 - [x] T5: `devtools::test()`, then `devtools::check(args = "--no-manual")`.
+- [ ] T6: Review return 1. Make `cpm_boot_refit()` reject a non-finite gradient
+      norm or F, with an `inf` probe (both infinite) that fails first; assert
+      the test's replicate-2 precondition; fix the pass-1 fix-now comments and
+      the `cpm_fit()` help sentence on excluded resamples; re-run T5's checks.
 
 ## Work log
 
