@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M172: Exclude a bootstrap refit that errors in cpm_fit()
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -147,7 +147,32 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: T4 done: 62 cites in 14 files now name a function or roxygen block (stale ones traced through `git show` of the commit that added them); AC5's grep prints nothing; every named function exists in `R/`; three reference pages carry `corrected M172`, hu1999's M164 note extended. Fixed two vague test-comment cites in test-cpm_angle_ci.R by hand. Bare-number cites with no file prefix in `devel/cpm-pack-boundary-brief.md` stay: outside AC5's grep and the row.
 - 2026-10-28: claim audit: 49 claims read, 2 corrected — R/cpm_fit.R (`cpm_boot_refit()` comment now names the NaN-F and infinite-F cases), tests/testthat/test-cpm_api.R (`local_refit_fault()` returns an environment).
 - 2026-10-28: T5 at 09317c69: `devtools::test()` 0 failures, 15458 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. 144b17af after it changes comments only. Status → review.
+- 2026-10-28: review return 1: AC1 fails for a refit whose gradient norm and F are both infinite: `Inf <= 1e-6 * Inf` accepts it instead of excluding it (diff-bug #2). Fix with the pass-1 fix-now items: diff-bug #3 and #7, blame-history #3 and #4, ripple #2.
 
 ## Decisions
 
 ## Review
+
+Pass 1 (2026-10-28, head 219bf738).
+
+- AC2 (pre-return evidence, re-run next pass): `identical(..., ignore.environment = TRUE)` TRUE at seeds 1 and 2 against master's saved fits; no `_snaps` change; test-cpm_api.R diff removes no line.
+- AC3, AC4, AC5 (pre-return evidence, re-run next pass): both Rd marker lists hold the five labels; the count sentence is in man/cpm_fit.Rd; NEWS entry present; AC5's grep prints nothing.
+- gate (pass 1): `cairn_validate` passed; `document()` no diff, 0 `resolve link` lines; `pkgdown::check_pkgdown()` no problems; R-CMD-check.yaml and test-coverage.yaml newest master push runs success (d50ffca9); alert audits and branch-protection check exit 0; README untouched.
+- spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: `tryCatch(error=)` cannot tell a package defect from a numerical failure, so a future bug shows as nonconvergence — follow-up, candidate row "Keep the first CPM refit error message"
+- diff-bug #2: a refit with infinite gradient norm and infinite F is accepted (`Inf <= Inf`), so AC1's "non-finite gradient norm ... excluded" fails — fix now, review return 1
+- diff-bug #3: test comment "Replicate 2 is accepted without a fault" is an unchecked precondition, fragile across BLAS — fix now
+- diff-bug #4: nine probes repeat one handler path — reject, planned change (T1 named the battery at the audit's request)
+- diff-bug #5: warning and print note call an errored refit nonconvergent — reject, planned change (plan gate kept the warning text)
+- diff-bug #6: roxygen lines over 80 columns — reject, style
+- diff-bug #7: test-cpm_angle_ci.R:86-87 keeps a narrative "verified out-of-band" comment the Test-comments rule bars — fix now (the diff edits that line)
+- blame-history #1: errors from any wrapped call become nonconvergent and the message is lost — follow-up, same row as diff-bug #1
+- blame-history #2: warning wording attributes errors to the criterion — reject, planned change
+- blame-history #3: comment "Acceptance still keys ONLY on the scaled gradient norm" in `cpm_bootstrap()` is now false — fix now
+- blame-history #4: the "its point is gone" rationale is wrong when only the gradient call errors — fix now (comment and wording; behavior kept)
+- blame-history #5: the help-list test checks containment only — reject, planned change (AC3 promises containment)
+- blame-history #6: line width and a mid-paragraph sentence — reject, style
+- prior-review #1: no prior-review point reintroduced; roxygen lines over 80 columns — reject, style
+- ripple #1: ROADMAP row "Catch errors in CPM bootstrap refits" now describes fixed code — reject, planned change (step 9 graduates the row)
+- ripple #2: the `cpm_fit()` help sentence on excluded resamples names only refits failing the criterion — fix now
+- ripple #3: ROADMAP row "Repoint stale line cites into cpm_fit.R" still open — reject, planned change (step 9 graduates the row)
