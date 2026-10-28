@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M173: Shorten NEWS and fix two pre-release details
 
-- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -85,6 +85,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: user override: the user asked to pause when implement is done, so implement stops at `review` without invoking /milestone-review.
 - 2026-10-28: review return 1: AC3 fails as written; rows marked (a) whose detail the final NEWS does not state: L28 (margin widening for `angle_labels`), L40 (`instruments()` entries lose their leading space), L56 (reference scale now shows its communality interval), L60 (`?cpm_fit` lists the markers), L67 (menu built from the articles index), L70 ("Axes Reliability" now in the menu), L74 (plain-English vignettes link the introduction). Fix: state each in NEWS, or append a ledger correction to (b) where a page named in the bullet states it (`?ggcircumplex` states the margin; `?cpm_fit` lists the markers), keeping AC4-AC6 and the 150-line figure.
 - 2026-10-28: T6 added for review return 1 (minor amendment); done: N6, N11, N16, N17 and N18 reworded to state the seven rows' detail, ledger correction appended; token checks pass (150 lines, AC4 0 missing, AC6 5 allowed pointers incl. `?ggcircumplex`, 0 new numbers), linter 0 hits, released sections identical.
+- 2026-10-28: review return 2: AC3 fails on L56 (N16 states the reference scale's interval wrongly), L27 (`?coord_circumplex` does not state the plotmath minus rule), L24 and L65 (pointers missing); plus fix-now NEWS findings diff-bug #3-#11 and blame-history #1, #2, #7 listed in the Review section. Follow-up row "Tie documented caution limits to code" filed.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
@@ -172,3 +173,31 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 
 ## Review
 <!-- owner: review · exclusive -->
+
+- Pass 1 (2026-10-28, head a1b75f2b): AC3 failed on seven rows missing detail; returned (review return 1), fixed in T6.
+- Pass 2 (2026-10-28, head d285bc26). spawned: diff-bug, blame-history, prior-review, ripple.
+- Gate (head d285bc26): `cairn_validate` all pass; `devtools::document()` no diff, 0 `resolve link` lines; `pkgdown::check_pkgdown()` no problems; README untouched; `tools/check-master-red-alert.R`, `tools/master-red-alert-dryrun.R`, `tools/check-branch-protection.R` clean; master push verdicts R-CMD-check and test-coverage success at d08ecfd2 (later master commits docs-only).
+- diff-bug #1: N16 calls the reference scale's zero-width interval its communality interval; it is the angle interval, drawn as a radial line (R/cpm_oop.R:458-460) — fix now (AC3 L56)
+- diff-bug #2: L27 (b) pointer fails; `?coord_circumplex` does not state the plotmath minus rule, and rim ticks are in `?ggcircumplex` — fix now (AC3)
+- diff-bug #3: N8 says a non-finite refit used to stop the call; at v2.0.1 an infinite one was accepted — fix now
+- diff-bug #4: N12 drops "for scale names of up to 16 characters" — fix now
+- diff-bug #5: N18 "Output fits 80 columns" overclaims; the `cat()` lavaan syntax stays wider — fix now
+- diff-bug #6: N10 says the tolerance differed across platforms; whether it fired differed — fix now
+- diff-bug #7: "no words change" now reads over the accuracy verdicts, whose joining words changed (L52) — fix now
+- diff-bug #8: N21 "explains its printed `--`" reads against N15; `--` marks a missing Nunnally-Bernstein comparison — fix now
+- diff-bug #9: N18 generalizes shown-code and `data()` to every vignette; it was six and two — fix now
+- diff-bug #10: N21 "frees the factor covariances" omits variances; vignette says the full factor covariance matrix — fix now
+- diff-bug #11: N14 drops "a rung with a `dcfi` value" and the default MLR exclusion — fix now
+- diff-bug #12: L24 (b) pointer omits the vignette use — fix now (point to the vignette)
+- diff-bug #13: D-073 Consequences omits the compiler flags — reject (planned change): the D-entry rule keeps build detail in the milestone file it cites, whose T1 work-log line has the flags
+- diff-bug #14: no test ties "50000" in the vignette and Rd to `cpm_analytic_ci_n_boundary_caution` — follow-up, candidate row "Tie documented caution thresholds to code"
+- prior-review #1: N19 lost M163's coverage figures and the `?ssm_trajectory` pointer that L65 relies on — fix now (pointer)
+- prior-review #2: cartesian bullet lost its argument name — reject (false): N6 names `grid`
+- ripple #1: ROADMAP candidate (iv) still lists the vignette defect — reject (planned change): post-merge hygiene narrows the row
+- blame-history #1: `check_lower` no longer says it does not find every lower discrepancy (D-072) — fix now
+- blame-history #2: `ssm_trajectory()` small-sample caution gone from NEWS — fix now (pointer names cautions)
+- blame-history #3: D-065 and compressed Breaking text — reject (false): every refusal of a v2.0.1 function is under Breaking changes; `ssm_growth_data()` is new, so its refusals change no prior behavior
+- blame-history #4: peer-review notice lost its meaning — reject (false): N18 says the four pages teach the package's own unpublished methods
+- blame-history #5: machine-dependence note gone — reject (false): N17 states it; `details$naive_reason` is unchanged behavior (ledger L34)
+- blame-history #6: glmmTMB 1e-6 agreement figure gone — reject (planned change): a validation figure, not a user-visible change
+- blame-history #7: "The estimates do not change" narrower than estimates, fit indices and intervals — fix now
