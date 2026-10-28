@@ -25,7 +25,7 @@ source(file.path("devel", "m170-engine-estimate-helpers.R"))
 m170_defs <- c("NS", "NS_RAW", "SEED_DATA", "p", "angles", "scales",
                "configs", "make_truth", "replicate_seed", "draw_R")
 for (e in parse(file.path("devel", "m170-engine-estimate.R"))) {
-  if (is.call(e) && identical(e[[1]], as.name("<-")) &&
+  if (is.call(e) && identical(e[[1]], as.name("<-")) && is.name(e[[2]]) &&
       as.character(e[[2]]) %in% m170_defs) {
     eval(e, globalenv())
   }
