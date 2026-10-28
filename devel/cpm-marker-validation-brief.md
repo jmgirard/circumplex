@@ -11,8 +11,9 @@ judgment — **the marker set itself**.
 **Read first:** CLAUDE.md invariants (angles: degrees [0,360) in the API,
 LM=360, radians internally); DESIGN.md displacement-boundary + CPM sections;
 ROADMAP.md v2.0.0 pre-release items (the B6 caution bullet, W1 outcome);
-`R/cpm_fit.R:1150-1197` (the two threshold constants and
-`cpm_boundary_markers()`); `R/cpm_oop.R:216-242` (the `summary()` caution that
+`R/cpm_fit.R` (the two threshold constants `cpm_analytic_ci_n_caution` and
+`cpm_analytic_ci_n_boundary_caution`, and `cpm_boundary_markers()`);
+`R/cpm_oop.R` (the `summary.circumplex_cpm()` caution that
 consumes them); `devel/m4-browne-design.md:458-491` and `:806-839` (the
 analytic-vs-bootstrap CI decision and the B6 validation-battery log);
 `devel/m4-coverage-oracle.R` (the existing oracle — this brief extends it).
@@ -38,7 +39,7 @@ The oracle measured coverage as a function of N and truth regime and the cuts
 follow directly. Jeff has ratified them.
 
 **NOT yet validated — the object of this brief:** the marker set
-(`R/cpm_fit.R:1179`) as a **runtime-observable predictor of mis-coverage**:
+(`cpm_boundary_markers()` in `R/cpm_fit.R`) as a **runtime-observable predictor of mis-coverage**:
 
 ```r
 cpm_boundary_markers <- function(object) {

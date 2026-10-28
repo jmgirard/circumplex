@@ -157,6 +157,14 @@
 
 ## Minor improvements and fixes
 
+* In `cpm_fit()`, a bootstrap refit that stops with an error no longer stops
+  the call. The resample is excluded and counted with the refits that fail
+  the convergence acceptance criterion, which the exclusion warning reports
+  and `details$boots_nonconvergent` stores. The intervals come from the
+  remaining resamples. When every refit errors, the bootstrap intervals are
+  `NA`, with a warning. A refit whose gradient or discrepancy is not finite is
+  counted the same way.
+
 * On the displacement panel of `ssm_plot_trajectory()`, the line segments on
   either side of a time point whose displacement is not interpretable are now
   drawn dashed, and the "Displacement interpretable" legend shows the line

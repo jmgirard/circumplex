@@ -188,7 +188,7 @@ if (analyze_only) {
 # within-fit dependence a pooled binomial interval would ignore.
 # NA coverage flags are real behavior, not artifacts: cpm_analytic_se()
 # returns all-NA SEs (all three families at once) when solve() rejects its
-# FD Hessian as computationally singular (R/cpm_fit.R:930-938); an
+# FD Hessian as computationally singular (R/cpm_fit.R); an
 # indefinite-but-invertible Hessian instead has its negative variances
 # CLAMPED to zero (pmax), yielding zero-width CIs that are legitimately
 # scored as misses. Verified on the 2026-07-08 record: the per-fit NA

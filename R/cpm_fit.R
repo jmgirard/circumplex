@@ -1392,6 +1392,23 @@ cpm_mirror_guard <- function(par, spec, ref_rel_hat) {
   list(par = par, reflected = FALSE)
 }
 
+# One bootstrap refit attempt from `start`: the optimization and the sec. 3.5
+# scaled-gradient-norm acceptance test. An error from either call, or a
+# non-finite gradient norm or F, returns `accepted = FALSE` instead of stopping
+# cpm_fit(). The caller restarts a failed attempt once and counts the resample
+# as nonconvergent if the restart fails too. `par` is NULL after any error,
+# including a gradient error after the optimizer returned a point, so an
+# attempt that errors is never restarted.
+cpm_boot_refit <- function(start, Rb, spec) {
+  tryCatch({
+    run <- cpm_optimize_one(start, Rb, spec)
+    gnorm <- max(abs(cpm_gradient(run$par, Rb, spec)))
+    list(par = run$par,
+         accepted = is.finite(gnorm) && is.finite(run$F) &&
+           gnorm <= 1e-6 * max(1, abs(run$F)))
+  }, error = function(e) list(par = NULL, accepted = FALSE))
+}
+
 #' Warm-started nonparametric bootstrap CIs (design sec. 5.2)
 #'
 #' Resample rows, recompute the Pearson correlation matrix, and refit
@@ -1400,7 +1417,9 @@ cpm_mirror_guard <- function(par, spec, ref_rel_hat) {
 #' polished-out harmonic stays fixed at 0 in every replicate (its interval is
 #' degenerate at 0 by construction). Replicate exclusion keys on the sec. 3.5
 #' scaled-gradient-norm acceptance criterion, never on the nlminb code
-#' (A-review F2); degenerate resamples (NA or non-PD correlation matrices,
+#' (A-review F2); a refit whose optimization or gradient errors, or whose
+#' gradient norm or F is not finite, fails it too (`cpm_boot_refit()`; an
+#' attempt that errors gets no restart); degenerate resamples (NA or non-PD correlation matrices,
 #' e.g. rank-deficient at small N) are excluded with the same
 #' count-warning, conditional-on-estimability convention as `ssm_analyze()`.
 #' Angle replicates go through the existing circular quantile machinery
@@ -1444,19 +1463,18 @@ cpm_bootstrap <- function(engine, sdata, boots, interval) {
       next
     }
     Rb <- (Rb + t(Rb)) / 2
-    run <- cpm_optimize_one(par_hat, Rb, spec)
-    gnorm <- max(abs(cpm_gradient(run$par, Rb, spec)))
-    if (gnorm > 1e-6 * max(1, abs(run$F))) {
+    run <- cpm_boot_refit(par_hat, Rb, spec)
+    if (!isTRUE(run$accepted) && !is.null(run$par)) {
       # One deterministic restart from the stalled point before excluding:
       # ~1% of warm refits stop with the gradient norm just above the sec. 3.5
       # threshold (nlminb rel.tol exit), and a restart polishes some of them
-      # through. Acceptance still keys ONLY on the scaled gradient norm.
-      run <- cpm_optimize_one(run$par, Rb, spec)
-      gnorm <- max(abs(cpm_gradient(run$par, Rb, spec)))
-      if (gnorm > 1e-6 * max(1, abs(run$F))) {
-        n_nonconvergent <- n_nonconvergent + 1L
-        next
-      }
+      # through. Acceptance keys on the scaled gradient norm, never on the
+      # nlminb code; an error or a non-finite norm or F fails it.
+      run <- cpm_boot_refit(run$par, Rb, spec)
+    }
+    if (!isTRUE(run$accepted)) {
+      n_nonconvergent <- n_nonconvergent + 1L
+      next
     }
     guard <- cpm_mirror_guard(run$par, spec, ref_rel_hat)
     reflected[b] <- guard$reflected
@@ -1764,17 +1782,20 @@ cpm_boundary_proximity <- function(object) {
 #'   circular quantile machinery, so an angle interval that straddles the
 #'   0/360 boundary is reported wrapped (its lower limit numerically exceeds
 #'   its upper limit, as with displacement intervals in [ssm_analyze()]).
-#'   Resamples with a degenerate (non-positive-definite) correlation matrix or
-#'   a refit failing the convergence acceptance criterion are excluded with a
-#'   warning reporting how many; the intervals are then conditional on
-#'   estimability. Analytic (Wald) intervals are asymptotically valid but can
-#'   materially mis-cover at field-typical sample sizes. For
+#'   Resamples with a degenerate (NA or non-positive-definite) correlation
+#'   matrix, or whose refit fails the convergence acceptance criterion or
+#'   stops with an error, are excluded with a warning reporting how many; the
+#'   intervals are then conditional on estimability. The count of refits
+#'   failing the criterion, also stored as `details$boots_nonconvergent`,
+#'   includes refits that stopped with an error. Analytic (Wald) intervals are
+#'   asymptotically valid but can materially mis-cover at field-typical sample
+#'   sizes. For
 #'   `ci_method = "analytic"`, `summary()` prints a caution whenever the
 #'   sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows
-#'   a boundary or weak-identification marker (a Heywood communality, a
-#'   removed harmonic, a correlation-function weight below 0.10, an
-#'   ill-conditioned Hessian, or competing near-tied optima); at N >= 50000 it
-#'   prints none. The coverage behind these thresholds was measured on fits
+#'   a boundary or weak-identification marker (Heywood communality, boundary
+#'   harmonic removed, small correlation-function weight, ill-conditioned
+#'   Hessian, or competing near-tied optima); at N >= 50000 it prints none. A
+#'   correlation-function weight counts as small below 0.10. The coverage behind these thresholds was measured on fits
 #'   with a defined analytic standard error. Analytic intervals come from the
 #'   normal-theory information matrix, so they assume multivariate-normal
 #'   data; on the `cormat` path, where they are the only choice, the data

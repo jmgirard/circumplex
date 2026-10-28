@@ -1222,7 +1222,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   missing <- match.arg(missing)
 
   # Exactly one of data / cormat, and `n` only with cormat -- the house pattern
-  # cpm_fit() already uses for its CircE-style matrix path (R/cpm_fit.R:1583).
+  # cpm_fit() already uses for its CircE-style matrix path (R/cpm_fit.R).
   has_data <- !is.null(data)
   has_cormat <- !is.null(cormat)
   if (has_data == has_cormat) {

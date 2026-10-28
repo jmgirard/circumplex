@@ -32,7 +32,7 @@ snapshots, vdiffr) are already handled by `skip_on_ci()`/`skip_on_cran()` on the
 
 ## Mechanism (confirmed by reading the code)
 
-`cpm_pack()` (`R/cpm_fit.R:157-174`) maps the harmonic correlation-function
+`cpm_pack()` (`R/cpm_fit.R`) maps the harmonic correlation-function
 weights β into the optimizer's unconstrained coordinates via a **softmax
 inverse** over the kept harmonics (`spec$keep_k = 0:m`, line 144):
 
@@ -53,7 +53,7 @@ at 0" language in the CI-trustworthiness vignette), so this is a real boundary
 the estimator must survive, not a data error.
 
 Note the engine already has a **harmonic-removal ("polishing") path**
-(`polished$removed`, `R/cpm_fit.R:588`, `removed_harmonics` at 689) that zeroes
+(`polished$removed` and `removed_harmonics` in `cpm_engine()`, `R/cpm_fit.R`) that zeroes
 out top harmonics; `keep_k` is `0:m` unless polishing dropped one. The bug is
 that a β reaches ≤ 0 on the kept set **without** being polished out (or a caller
 re-packs such a solution), so `cpm_pack` is asked to invert an unrepresentable

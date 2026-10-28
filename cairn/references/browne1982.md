@@ -16,7 +16,7 @@ shelf PDF is exactly 2 pages and holds nothing else of Browne (1982). The
 equation numbering is the source's chapter-internal `(1.6.n)` scheme, which
 means these two pages sit inside a §1.6 whose earlier equations — (1.6.9)
 among them — are **not on the shelf**.
-Extraction: verified 2026-07-19 against the source by a read of the `pdftoppm`-rendered page images, which is the only channel that carries the equations at all — the PDF is an Acrobat "Paper Capture" OCR scan of typescript and its `pdftotext -layout` text layer drops **every display equation on both pages**, preserving only the equation numbers, so per M42-D1 the page images are authoritative and the text layer served only to cross-check the running prose; no value here has been read by a human and a defect in the scan itself would be caught by neither channel — observed 2026-07-19.
+Extraction: verified 2026-07-19 against the source by a read of the `pdftoppm`-rendered page images, which is the only channel that carries the equations at all — the PDF is an Acrobat "Paper Capture" OCR scan of typescript and its `pdftotext -layout` text layer drops **every display equation on both pages**, preserving only the equation numbers, so per M42-D1 the page images are authoritative and the text layer served only to cross-check the running prose; no value here has been read by a human and a defect in the scan itself would be caught by neither channel — observed 2026-07-19 (line cites replaced by function names, corrected M172).
 
 **Citation.** Browne, M. W. (1982). Covariance structures. In D. M. Hawkins
 (Ed.), *Topics in applied multivariate analysis* (pp. 72–141). Cambridge:
@@ -175,15 +175,15 @@ correct; the correction is to the attribution, not to the arithmetic.
 confidence interval by this source's route — transform to an unbounded scale,
 take the symmetric normal interval there, invert. The package offers two ζ
 interval routes and neither is that one: a bootstrap **percentile** interval
-(`R/cpm_fit.R:1346-1359`), which is asymmetric about ζ̂ but gets its asymmetry
+(`cpm_bootstrap()` in `R/cpm_fit.R`), which is asymmetric about ζ̂ but gets its asymmetry
 from the replicate distribution rather than from a transformation, and an
-analytic **Wald** interval ζ̂ ± z·σ̂(ζ̂) (`R/cpm_fit.R:1682-1683`), which is
+analytic **Wald** interval ζ̂ ± z·σ̂(ζ̂) (`cpm_fit()` in `R/cpm_fit.R`), which is
 symmetric on the natural scale and is exactly the form eq. (1.6.29) describes
 and eqs. (1.6.30)–(1.6.34) exist to improve on. Neither transforms first.
 Two `R/` sites do apply a transformation
 and are **not** instances of this method: `R/ssm_montecarlo.R:158` wraps
 Monte Carlo *draws* in `atanh`/`tanh` (variance stabilization for simulation,
-not an interval), and `R/cpm_fit.R:272` exponentiates the log-scale
+not an interval), and `cpm_unpack()` in `R/cpm_fit.R` exponentiates the log-scale
 optimization parameter (the unconstrained parameterization, not an interval).
 `structure_fisher()` in `R/fit_structure.R` is Fisher's equal-axes test and
 unrelated to Fisher's z. Checked by grep over `R/` for `exp(`/`log(`/`atanh`

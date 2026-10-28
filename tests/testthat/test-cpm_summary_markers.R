@@ -470,3 +470,30 @@ test_that("the marker note stays inside the width except for a lone label", {
     }
   }
 })
+
+# The marker list a help page gives: the parenthetical after "weak-identification
+# marker". man/ in the dev tree, Rd_db() once installed (the dual-source
+# pattern of test-cpm_boundary_vignette.R), so the check runs under both
+# devtools::test() and R CMD check.
+help_marker_list <- function(page) {
+  rd <- test_path("..", "..", "man", paste0(page, ".Rd"))
+  txt <- if (file.exists(rd)) {
+    readLines(rd, warn = FALSE, encoding = "UTF-8")
+  } else {
+    as.character(tools::Rd_db("circumplex")[[paste0(page, ".Rd")]])
+  }
+  txt <- gsub("\\s+", " ", paste(txt, collapse = " "))
+  m <- regmatches(txt, gregexpr("weak-identification marker \\([^)]*\\)", txt))[[1]]
+  expect_length(m, 1L)
+  m
+}
+
+test_that("the help pages list every marker label summary() prints", {
+  for (page in c("cpm_fit", "summary.circumplex_cpm")) {
+    list_text <- help_marker_list(page)
+    for (lab in cpm_marker_labels()) {
+      expect_true(grepl(lab, list_text, fixed = TRUE),
+                  info = paste0(page, ": ", lab))
+    }
+  }
+})
