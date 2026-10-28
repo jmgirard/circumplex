@@ -77,5 +77,84 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
 
+- 2026-10-28 (T3) **Change ledger.** Bullets B1-B51 are the development-section bullets of NEWS.md at `8c42b975` in file order (Breaking B1-B3, New features B4-B10, Minor B11-B33, Documentation B34-B51). Targets N1-N21 are the post-edit bullets (Breaking N1-N2, New features N3-N7, Minor N8-N16, Documentation N17-N21). Disposition a = stated in the target; b = the target names the subject and points to the page; c = before-state absent from v2.0.1 (path checked). Before-state paths are v2.0.1 paths unless "new" (absent there: exports per `git show v2.0.1:NAMESPACE`, vignettes per `git ls-tree v2.0.1 vignettes/`).
+  - L1 B1 repeated column in `scales` refused (8 functions listed) — R/ (v2.0.1 accepted) — a N1
+  - L2 B1 number below 1 in `scales` refused — a N1
+  - L3 B1 name occurring twice in `data` refused — a N1
+  - L4 B1 character `occasions` in `ssm_analyze()` naming a repeated name refused — a N1
+  - L5 B1 `ssm_sem_parameters()`, `ssm_sem_syntax()`, `cpm_fit()` `cormat` refuse a repeated label — a N1
+  - L6 B2 `items` of `score()`, `ipsatize()`, `axes_reliability()` and `scales` of `self_standardize()` refuse the same three — a N1
+  - L7 B2 why: `score()` key read wrong columns silently; `ipsatize()` counted twice — a N1 (one clause)
+  - L8 B2 `axes_reliability()` refuses one column under two scales, and a number reaching a duplicated name — a N1
+  - L9 B3 `ssm_analyze_long()` refusal message names the duplicated name — a N2
+  - L10 B3 `NA` label listed twice refused (`ssm_sem_syntax()`, `ssm_sem_parameters()`, `cpm_fit()` `cormat`) — a N2
+  - L11 B3 `ssm_sem()`/`ssm_sem_syntax()` refuse a `measures` entry named like a scale — a N2
+  - L12 B4 `cpm_fit(check_lower = TRUE)`, note in print/summary, `details$lower_check`, order note, estimates unchanged — a N3
+  - L13 B4 scope: quasi-circumplex unit scaling, no RNG, not exhaustive — b N3 → `?cpm_fit`
+  - L14 B5 `ssm_growth_data()` long table of e, x, y — a N4
+  - L15 B5 `ssm_growth_data()` refusal list — b N4 → `?ssm_growth_data`
+  - L16 B5 `ssm_growth_formula()` formulas for glmmTMB, nlme, brms; print shows fit call; fits nothing — a N4
+  - L17 B5 nlme added to Suggests — a N4
+  - L18 B6 `ssm_trajectory()` from coef+vcov or draws, rows per time, e/x/y/a/d intervals and certification — a N4
+  - L19 B6 contrast, zero-covariance refusal, print cautions, `input` attribute, `rbind()` — b N4 → `?ssm_trajectory`
+  - L20 B6 `ssm_plot_trajectory()` plots the object — a N4
+  - L21 B6 its amplitude and displacement match the growth vignette's former per-wave loop (shipped in v2.0.1 vignettes/growth-ssm-analysis.Rmd) — a N4
+  - L22 B7 `ssm_trajectory()` balance warning — a N4 (one clause); detail b → `?ssm_trajectory`
+  - L23 B8 `geom_ssm_ellipse()` layer and `ssm_ellipse_data()` generic — a N5
+  - L24 B8 seam and origin handling, vignette use — b N5 → `?geom_ssm_ellipse`
+  - L25 B9 datasets `simulated_occasions`, `simulated_growth`, `simulated_growth_origin` — a N7
+  - L26 B10 `grid = "cartesian"` on `coord_circumplex()`/`ggcircumplex()` — a N6
+  - L27 B10 cartesian grid detail (labels, ticks, plotmath minus) — b N6 → `?coord_circumplex`
+  - L28 B10 `ggcircumplex(angle_labels = )` and margin widening — a N6
+  - L29 B11 `cpm_fit()` bootstrap refit error excluded and counted; all-error gives NA with warning; non-finite counted — a N8
+  - L30 B12 `ssm_plot_trajectory()` dashed segments by uninterpretable points, legend line type — R/ssm_trajectory.R (solid in v2.0.1) — a N16
+  - L31 B12 `certified = NA` row drawn hollow — a N16
+  - L32 B12 two vignettes describe the dashed segments — b N16 → "Growth Models on SSM Parameters"
+  - L33 B13 `axes_reliability()` no longer refuses "unidentified" on conditioning; such fits are certified or refused "uncertified" — a N10
+  - L34 B13 three exact grounds for "unidentified"; unchanged numbers; uncorrected arm keeps tolerance — b N10 → `?axes_reliability`
+  - L35 B14 `scales(items = TRUE)` fixed on `iip32`/`iip64`, prints licence notice — a N9
+  - L36 B15 `items()` and `scales(items = TRUE)` wrap item text — a N9
+  - L37 B16 `cpm_fit()` print/summary drops Communality column; `results$Communality` kept — a N12
+  - L38 B17 Heywood note, bootstrap note, axes summary sentence, ladder `Verdict:` wrap — a N11 (folded into "every note wraps")
+  - L39 B18 `cpm_fit()` `Fit:` line breaks after `;` — a N11
+  - L40 B18 `instruments()` wraps, no leading space — a N11
+  - L41 B18 `norm_standardize()` message wraps; code matching it must allow a line break — a N11
+  - L42 B19 growth vignette prints variance components and explains the vcov check — a N19
+  - L43 B20 advanced visualization vignette section "The latent circumplex from a CPM fit" — a N20
+  - L44 B20 figure-by-figure detail — b N20 → "Advanced Circumplex Visualization"
+  - L45 B21 every prose caution/note wraps to `options(width = )`; tables and headings do not — a N11
+  - L46 B22 accuracy summary heading two characters shorter — c (that heading is new since v2.0.1: R/ssm_ci_oop.R:472 had another)
+  - L47 B23 `cpm_fit()` table headers `Theory`, `lci`, `uci`; `results` names kept — a N12
+  - L48 B24 `print()` heading of `ssm_ci_accuracy()` wraps — a N11
+  - L49 B25 structure vignette shows `print()` before `summary()`, warns before chunks — a N21
+  - L50 B26 vignettes use `options(width = 77)` — a N18
+  - L51 B27 `summary()` of `ssm_ci_accuracy()` shorter, one table, columns kept in `coverage`/`guardrail` — a N13
+  - L52 B27 punctuation of verdicts changes (see dashes) — a N15
+  - L53 B28 multi-group `ssm_sem()` print: `Verdict:` block with labeled lines; stored text unchanged — a N14
+  - L54 B29 `dcfi`/`cr` columns and note only for two-group ML plain CFI; `invariance$dcfi_scope` — a N14
+  - L55 B30 no `--` dash in `ssm_ci_accuracy()`, `axes_reliability()`, `ssm_sem()` output and the collinearity warning — a N15
+  - L56 B31 `plot()` of `cpm_fit()` draws zero-width intervals (line, arc, cap); reference scale shows communality interval — a N16
+  - L57 B32 `plot()` of `cpm_fit()` warns on zero communality interval; warnings name reasons — a N16
+  - L58 B33 `ssm_plot_circle()` and `cpm_fit()` plot place the axis in the widest empty gap — a N16
+  - L59 B34 `?cpm_fit` section "Which solution is reported" — a N17
+  - L60 B35 `?cpm_fit` states both caution conditions (below 2000; 2000 to 50000 with a marker) and lists markers — a N17
+  - L61 B36 boundary vignette: which weights the bootstrap misses and why; two old claims removed — R/vignettes evaluating-circumplex-structure.Rmd.orig:231,269 — a N21 (short); detail b → "CPM Fits at a Boundary"
+  - L62 B37 "Not yet peer reviewed" notice on four vignettes — a N18
+  - L63 B38 growth vignette rewritten on the helpers — a N19
+  - L64 B38 Section 10 nlme and brms calls; `growth_brms_draws.rds`; `?simulated_growth` See also — b N19 → "Growth Models on SSM Parameters"
+  - L65 B39 growth vignette Section 7 states measured REML coverage, no small-sample correction; lme4 remedies removed — a N19 (short); figures b → `?ssm_trajectory`
+  - L66 B40 `?axes_reliability`: uncertified error estimate depends on the machine — a N17
+  - L67 B41 website menu built from articles index, titled "Articles" — a N18
+  - L68 B42 "SEM-Based SSM Analysis" and "Axes Reliability" split; new "Latent Group Contrasts", "Axes Reliability Caveats" — a N18
+  - L69 B43 "Evaluating Circumplex Structure" split; new "CPM Fits at a Boundary", "Confidence Interval Accuracy", "Structure Tests and Ipsatization" — a N18
+  - L70 B44 Level line, Overview, Wrap-up; menu by level; "Axes Reliability" in menu — a N18
+  - L71 B45 shown code keeps to package calls; data simulation hidden; `data()` loads — a N18
+  - L72 B46 `?ssm_plot_trajectory` bound placement description corrected; plot unchanged — a N17
+  - L73 B47 advanced vignette occasions figures: panel shape, labels, octant spoke labels — a N20
+  - L74 B48 six vignettes in plain English, link the introduction — a N18
+  - L75 B49 four corrected statements (SEM tiers, uncertified display, `fit_structure()` labels, `cpm_fit()` free angles) — a N21
+  - L76 B50 SEM latent profile table drops X and Y — a N21
+  - L77 B51 structure vignette names the shorter reports; axes vignette explains `--` — a N21
+
 ## Review
 <!-- owner: review · exclusive -->
