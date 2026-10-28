@@ -123,7 +123,8 @@
 #'   additionally elevates to CAUTION whenever the guardrail `Caution` fired,
 #'   so it can read worse than the overall coverage class),
 #'   `cpm` (the embedded [cpm_fit()] object, or `NULL` when
-#'   `structure = "observed"`), `population` (per profile row: the population
+#'   `structure = "observed"`; when this function fits it, it skips the
+#'   lower-discrepancy check of `cpm_fit(check_lower = )`), `population` (per profile row: the population
 #'   profile vectors, truth parameters, and any positive-semidefiniteness
 #'   repair magnitude, by condition), and `details`. The `plot()` method
 #'   draws coverage against the amplitude ladder with the Bradley band
@@ -435,7 +436,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         cpm_obj <- cpm_fit(
           cormat = Rw, n = sum(n_g) - G + 1, scales = scale_names,
           angles = angles_deg, m = m_eff, model = "quasi-circumplex",
-          ci_method = "analytic"
+          ci_method = "analytic", check_lower = FALSE
         )
       }
       P <- cpm_obj$matrices$Phat[scale_names, scale_names]

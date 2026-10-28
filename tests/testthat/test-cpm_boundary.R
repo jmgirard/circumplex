@@ -16,7 +16,7 @@
 #
 # The last section is on the unit path: the start battery that the
 # cpm_fit() help section "Which solution is reported" describes, and a lower
-# discrepancy that battery does not reach.
+# discrepancy that battery does not reach but the lower-discrepancy check flags.
 #
 # Oracle rule unchanged: expected values are closed-form / construction /
 # invariants, never from memory.
@@ -138,7 +138,7 @@ test_that("at equal df a larger discrepancy gives a smaller p and worse RMSEA an
   expect_lt(hi$cfi, lo$cfi)
 })
 
-test_that("a wall start reaches a lower F that the accepted fit does not signal", {
+test_that("the lower-discrepancy check flags the lower F a wall start reaches", {
   # Replicate 30 of the boundary N = 250 cell of devel/m167-interval-oracle.R.
   # Skipped on CRAN: the basin nlminb() reaches can differ by platform.
   skip_on_cran()
@@ -161,4 +161,6 @@ test_that("a wall start reaches a lower F that the accepted fit does not signal"
   g[d$spec$i_zeta[match("HI", scales)]] <- stats::qlogis(0.99)
   lower <- cpm_optimize_one(g, fit$matrices$R, d$spec)
   expect_gt(fit$fit$chisq - fit$fit$n * lower$F, 1)
+
+  expect_gt(d$lower_check$gap, 1)
 })

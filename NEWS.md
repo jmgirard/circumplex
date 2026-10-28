@@ -37,6 +37,18 @@
 
 ## New features
 
+* `cpm_fit()` gains `check_lower = TRUE`. After the fit, a fixed set of
+  extra starts runs, most of them from the reported solution. If one
+  reaches a
+  discrepancy more than 0.01 lower on the chi-square scale, `print()` and
+  `summary()` print a note with the difference. `details$lower_check`
+  records it too. The note also says whether the lower
+  solution keeps the scales' order around the circle. The reported
+  estimates, fit indices and intervals do not change. The check runs only
+  for the quasi-circumplex model with unit scaling, uses no random
+  numbers, and does not find every lower discrepancy. See "Which solution
+  is reported" in `?cpm_fit`.
+
 * Two new helpers build the input to a growth model on SSM coordinates, so
   the reader of the "Growth Models on SSM Parameters" vignette writes neither
   the reshape nor the model formula by hand. `ssm_growth_data()` scores each
@@ -338,8 +350,8 @@
   maximum-likelihood solution in the basin those starts reach. A
   configuration with a lower discrepancy can exist. The convergence
   acceptance criterion and the "competing near-tied optima" note do not
-  signal it. Where one exists, the reported chi-square is larger than at
-  that configuration.
+  signal it, and the new `check_lower` check can. Where one exists, the
+  reported chi-square is larger than at that configuration.
 
 * `?cpm_fit` now states both conditions under which `summary()` cautions
   about analytic (Wald) intervals. The caution prints whenever N is below

@@ -93,6 +93,10 @@
       
         Note: a communality index reached its upper boundary (ζ > 0.995, a
         Heywood-type solution).
+        Note: extra starts reached a solution whose χ² is lower by 5.956. It keeps the
+        scales' order around the circle and has no more communality indices at the
+        upper bound. The estimates shown are unchanged; see "Which solution is
+        reported" in ?cpm_fit.
       
         Note: this solution is near a parameter boundary or weakly identified
         (Heywood communality; small correlation-function weight;

@@ -20,7 +20,7 @@
 Fuller display of a \code{\link[=cpm_fit]{cpm_fit()}} object: adds the correlation-function weights,
 the full set of fit indices, a residual summary (the largest absolute
 residual and the pair it belongs to), and all boundary/identification
-diagnostics in plain language. When the confidence intervals are analytic,
+diagnostics and the lower-discrepancy note in plain language. When the confidence intervals are analytic,
 prints a coverage caution calibrated by simulation: unconditionally when the
 sample size is modest (N < 2000, where Wald intervals mis-covered for every
 configuration studied), and from N = 2000 up to but not including N = 50000

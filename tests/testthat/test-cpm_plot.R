@@ -3,6 +3,12 @@
 # given by its communality, with a joint angle x communality CI wedge where the
 # interval is estimable.
 
+# The lower-discrepancy check has its own tests (test-cpm_lower_check.R); it is
+# turned off for this file, whose fits do not need it.
+local_mocked_bindings(cpm_lower_check = function(engine, R, N) {
+  cpm_lower_not_run()
+})
+
 # A clean, model-implied correlation matrix so the fit recovers exactly and the
 # analytic CIs are well defined -- a deterministic (cormat-path, no RNG) fixture
 # for the visual snapshot.
