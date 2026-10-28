@@ -75,6 +75,7 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - 2026-10-28: review return 1: AC6 — no test asserts that no note prints for the constrained-angles, equal-communality and circulant models or for `scaling = "free"`. The not-run record is tested for each, but the note only for `check_lower = FALSE`. AC7 — the `check_lower` documentation now says that the number of extra starts grows with about the square of the number of scales, but the criterion requires the check's cost.
 - 2026-10-28: minor amendment: T8 added for review return 1. The not-run test now asserts that no note prints in each of its five fits, and `@param check_lower` says that the cost grows with about the square of the number of scales. That claim is backed by `cpm_lower_check()` timings on synthetic N = 500 fits: 0.88, 1.85 and 3.20 s user at p = 8, 12 and 16, ratios 2.1 and 3.7 against 2.25 and 4.
 - 2026-10-28: full suite green at 1c801626 with 0 failures. T8 ticked, and the status is review again. Coverage maps AC6 and AC7 to T8 as well.
+- 2026-10-28: step-7 approval: m171-cpm-lower-check approved for merge
 
 ## Decisions
 
