@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M173: Shorten NEWS and fix two pre-release details
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -54,6 +54,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - [x] T2: Rewrite the sentence at `evaluating-circumplex-structure.Rmd.orig:167-168` and the shipped `.Rmd:228-229` identically, from `R/cpm_oop.R:383-394` and `R/cpm_fit.R:1566-1567` read in the same session.
 - [x] T3: Write the change ledger into this file's Decisions section and commit it before any commit that changes NEWS.md: one row per user-visible change, citing its bullet, naming the path whose v2.0.1 copy shows the before-state, and its planned disposition (a, b or c) with the post-edit bullet or the page it points to.
 - [x] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
+- [x] T6: Review return 1: state in NEWS, or correct in the ledger to a page the bullet names, the detail of rows L28, L40, L56, L60, L67, L70 and L74; rerun the token checks and line count.
 - [x] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -83,6 +84,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: T5 done: token checks pass on the final NEWS (150 lines; AC4 0 missing; AC6 4 allowed pointers, 0 new numbers); each (b) row's page read and holds after the L34 correction; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes, run on 8980d4f1, before the DESCRIPTION floor and the claim-audit NEWS fixes, which change no code; review reruns it on the final head.
 - 2026-10-28: user override: the user asked to pause when implement is done, so implement stops at `review` without invoking /milestone-review.
 - 2026-10-28: review return 1: AC3 fails as written; rows marked (a) whose detail the final NEWS does not state: L28 (margin widening for `angle_labels`), L40 (`instruments()` entries lose their leading space), L56 (reference scale now shows its communality interval), L60 (`?cpm_fit` lists the markers), L67 (menu built from the articles index), L70 ("Axes Reliability" now in the menu), L74 (plain-English vignettes link the introduction). Fix: state each in NEWS, or append a ledger correction to (b) where a page named in the bullet states it (`?ggcircumplex` states the margin; `?cpm_fit` lists the markers), keeping AC4-AC6 and the 150-line figure.
+- 2026-10-28: T6 added for review return 1 (minor amendment); done: N6, N11, N16, N17 and N18 reworded to state the seven rows' detail, ledger correction appended; token checks pass (150 lines, AC4 0 missing, AC6 5 allowed pointers incl. `?ggcircumplex`, 0 new numbers), linter 0 hits, released sections identical.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
@@ -166,6 +168,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
   - L76 B50 SEM latent profile table drops X and Y — a N21
   - L77 B51 structure vignette names the shorter reports; axes vignette explains `--` — a N21
 - 2026-10-28 (T5) **Ledger corrections.** L34 is a N10, stated as "`"unidentified"` now names only a design defect": `?axes_reliability` does not list the three grounds, which appear only in comments (`R/axes_corrected_se.R:168`), so a pointer there could not hold; L34's other two parts state behavior that did not change. L32's pointer is the growth vignette, named in N16 ("as the legend and the growth vignette show"), which describes the dashed segments. Count after correction: 77 rows, 8 (b), 1 (c), 68 (a); L22, L61 and L65 are (a) with extra detail left to a page.
+- 2026-10-28 (T6, review return 1) **Ledger corrections.** N6 now states the margin ("widens the margin") and points to `?ggcircumplex` (L28 a). N11 states that `instruments()` entries lose their leading space (L40 a). N16 names the reference scale's communality interval (L56 a). L60 is (b): N17 names `?cpm_fit`, whose page lists the five markers (`man/cpm_fit.Rd:215`). N18 states the menu is built from the articles index and lists "Axes Reliability" (L67 a, L70 a), and that the plain-English vignettes link the introduction (L74 a). Count: 77 rows, 9 (b), 1 (c), 67 (a).
 
 ## Review
 <!-- owner: review · exclusive -->

@@ -51,7 +51,7 @@
   value `"cartesian"` draws the canvas of Nagy, Etzel and Lüdtke (2019). It
   has one outer ring and a labelled crosshair in place of the polar grid
   (see `?coord_circumplex`). `ggcircumplex()` also gains `angle_labels`,
-  which adds each label's angle.
+  which adds each label's angle and widens the margin (see `?ggcircumplex`).
 
 * New simulated datasets: `simulated_occasions`, `simulated_growth` and
   `simulated_growth_origin`.
@@ -73,11 +73,11 @@
   `"uncertified"`. `"unidentified"` now names only a design defect.
 
 * Printed cautions and notes in `print()` and `summary()` now wrap to
-  `options(width = )`. So do `instruments()`, the `print()` heading of
-  `ssm_ci_accuracy()` and the `norm_standardize()` message. Code that
-  matches that message must allow a line break. The `Fit:` line of
-  `cpm_fit()` breaks after a `;`. Tables, column headers and section
-  headings do not wrap, and no words change.
+  `options(width = )`. So do `instruments()`, whose entries lose their
+  leading space, the `print()` heading of `ssm_ci_accuracy()` and the
+  `norm_standardize()` message. Code that matches that message must allow
+  a line break. The `Fit:` line of `cpm_fit()` breaks after a `;`. Tables,
+  column headers and section headings do not wrap, and no words change.
 
 * The `cpm_fit()` results table in `print()` and `summary()` drops the
   Communality column, which equals `Zeta` squared and stays in
@@ -97,34 +97,34 @@
 * Output of `ssm_ci_accuracy()`, `axes_reliability()` and `ssm_sem()`, and
   the `axes_reliability()` collinearity warning, no longer use `--` as a dash.
 
-* `plot()` of a `cpm_fit()` result draws a zero-width interval as a line or
-  cap. It warns about a communality interval that is 0 at both ends, and
-  names the reason for each scale drawn without its interval. That plot and
-  `ssm_plot_circle()` put the amplitude axis in the widest gap with no
-  point. In `ssm_plot_trajectory()`, a displacement segment next to an
-  uninterpretable point is dashed, as the legend and the growth vignette
-  show. If another row has a verdict, an `NA` in `certified` is a hollow point.
+* `plot()` of a `cpm_fit()` result draws a zero-width interval, such as the
+  reference scale's communality interval, as a line or cap. It warns about a
+  communality interval of 0 at both ends and names the reason for each scale
+  drawn without one. That plot and `ssm_plot_circle()` put the amplitude
+  axis in the widest gap with no point. In `ssm_plot_trajectory()`, a
+  segment next to an uninterpretable displacement is dashed, as the legend
+  and the growth vignette show. If another row has a verdict, an `NA` in
+  `certified` is a hollow point.
 
 ## Documentation
 
 * `?cpm_fit` has a new section, "Which solution is reported". It also says
-  when `summary()` cautions about analytic intervals. Below N = 2000 the
-  caution always prints. If a boundary or weak-identification marker
-  fires, it also prints from 2000 up to but not including 50000.
-  `?axes_reliability` says that the error estimate of an `"uncertified"`
-  refusal can depend on the machine. `?ssm_plot_trajectory` now describes
-  correctly where each displacement bound is drawn.
+  that the analytic-interval caution in `summary()` prints below N = 2000.
+  If a boundary or weak-identification marker fires, it prints up to but not
+  including 50000. `?axes_reliability` says that an `"uncertified"`
+  refusal's error estimate can depend on the machine. `?ssm_plot_trajectory`
+  now says where each displacement bound is drawn.
 
 * "SEM-Based SSM Analysis", "Axes Reliability" and "Evaluating Circumplex
-  Structure" are split, with every code chunk kept. The new pages are
-  "Latent Group Contrasts", "Axes Reliability Caveats", "CPM Fits at a
-  Boundary", "Confidence Interval Accuracy" and "Structure Tests and
-  Ipsatization". Each vignette has a Level line, an Overview and a Wrap-up,
-  and the website's "Articles" menu groups the pages by level. Shown code
-  keeps to the package calls taught and loads data with `data()`. Output
-  fits 80 columns (`options(width = 77)`). Six vignettes are rewritten in
-  plain English. Four that teach the package's own unpublished methods open
-  with a "Not yet peer reviewed" notice.
+  Structure" are split, adding "Latent Group Contrasts", "Axes Reliability
+  Caveats", "CPM Fits at a Boundary", "Confidence Interval Accuracy" and
+  "Structure Tests and Ipsatization". Each vignette has a Level line, an
+  Overview and a Wrap-up. The website's "Articles" menu is built from the
+  articles index and lists every page by level, "Axes Reliability" included.
+  Shown code keeps to the calls taught and loads data with `data()`. Output
+  fits 80 columns (`options(width = 77)`). Six vignettes are now in plain
+  English and link the introduction. Four on the package's own unpublished
+  methods open with a "Not yet peer reviewed" notice.
 
 * The "Growth Models on SSM Parameters" vignette is rewritten on the growth
   helpers, with the model's nlme and brms versions. It prints the variance
