@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M174: Check NEWS against v2.0.1 before release
 
-- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -111,6 +111,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - 2026-10-28: T5 done on a clean tree at 8c5c2ffa plus this commit's tracking: interface check exit 0, 26 of 26 matched; separate enumeration (NAMESPACE diff, 12 export/S3method lines; a `parse()` formals diff of exports, 4 argument changes) equals the script's set 1 and set 2; 117 plan-commit spans and titles, 0 missing; released sections identical to the plan commit; 175 lines. T5's per-sentence citations go to the Decisions section, since Review is review-owned.
 - 2026-10-28: claim audit: 27 claims read, 3 corrected — tools/news-interface-check.R header (set 2 also reads `=` assignments and skips a function missing at one ref or both; the S3 rule can be met by one name when the generic is the export; floor-removed and `Geom`-prefix behavior stated); the 10 NEWS claims hold; the same reader re-read the corrections once, and its one remaining wording fix (one ref or both) was applied as given.
 - 2026-10-28: verify slot: no file under R/, src/ or tests/ changed on the branch (`git diff --stat master...HEAD`), so `devtools::test()` is not triggered; the interface check reruns green after the header edit. Implement done, status review.
+- 2026-10-28: review return 1: AC2 fails on sentence S2 ("`rbind()` stacks its tables, and `ssm_plot_trajectory()` plots them" implies a stack plots, but repeated times are refused, `R/ssm_trajectory.R:305-315`); with it fix the review's other fix-now findings: move the `xend`/`yend`/`Interpretable` refusal to Breaking changes (diff-bug #5), and in `tools/news-interface-check.R` guard a top-level call whose head is a call (#2), compare dependencies per field (#3), and strip quotes from NAMESPACE names (#4). Gate otherwise clean (check 0/0/0).
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
@@ -136,7 +137,7 @@ Pass 1, 2026-10-28, at d07eb836 (branch level with `origin/master` 077ab172, cle
 - AC4: `cmp` of `sed -n '/^# circumplex 2.0.1/,$p' NEWS.md` at 077ab172 and d07eb836: identical.
 - AC5: `awk '/^# circumplex 2.0.1/{exit} {n++} END{print n}' NEWS.md` prints 175 (≤ 180).
 - AC2: fails. Sentence S2, "`rbind()` stacks its tables, and `ssm_plot_trajectory()` plots them", reads as plotting a stack, but the plot refuses repeated time values (`R/ssm_trajectory.R:305-315`), so `rbind()` of two tables over the same times cannot be plotted. The other eight new sentences hold (diff-bug, blame-history, prior-review and ripple each re-read them; the claim audit read them before review).
-- Gate so far: `cairn_validate` all checks passed; master `R-CMD-check.yaml` and `test-coverage.yaml` newest push runs success at e4ab911b (the later master commits are `cairn/`-only, path-ignored); `check-master-red-alert.R`, `master-red-alert-dryrun.R`, `check-branch-protection.R` exit 0. `devtools::check()` still running at this record.
+- Gate so far: `cairn_validate` all checks passed; master `R-CMD-check.yaml` and `test-coverage.yaml` newest push runs success at e4ab911b (the later master commits are `cairn/`-only, path-ignored); `check-master-red-alert.R`, `master-red-alert-dryrun.R`, `check-branch-protection.R` exit 0. `devtools::check()` still running at this record; it then finished at d07eb836's tree: 0 errors, 0 warnings, 0 notes (11m 32s). `devtools::document()` (cli width 500): 0 `resolve link` lines, no diff; `pkgdown::check_pkgdown()`: no problems; README.Rmd and README.md untouched by the branch; NEWS entry present (this milestone's deliverable).
 - spawned: diff-bug, blame-history, prior-review, ripple.
 - diff-bug #1: the `rbind()`/plot sentence implies the stack plots, but repeated times are refused — fix now (AC2 failure, floor return).
 - diff-bug #2: the script errors on a top-level call whose head is a call, such as `utils::globalVariables()`, because `as.character(e[[1L]])` has length 3 — fix now (a common R/ shape; none in R/ today).
