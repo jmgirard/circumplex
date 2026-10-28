@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M173: Shorten NEWS and fix two pre-release details
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
 - **Principles touched:** GP3, GP5   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
 - **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
 - **Surface tier:** user-facing — NEWS.md, a vignette and DESCRIPTION ship to CRAN users   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
+- **Branch/PR:** m173-pre-release-news-testthat   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -51,7 +51,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 <!-- owner: plan (create) / implement (check-off, minor edits). -->
 
 - [ ] T1: Install testthat 3.1.7 (and any older dependency it needs) from the CRAN archive into a scratchpad library; run `testthat::test_local()` with `NOT_CRAN=true` under it and under 3.3.2, comparing failures, errors and skips. If 3.1.7 fails, try each later CRAN release in order and name in the work log the feature that raised the floor. Set the DESCRIPTION floor and append a D-entry for the re-pin.
-- [ ] T2: Rewrite the sentence at `evaluating-circumplex-structure.Rmd.orig:167-168` and the shipped `.Rmd:228-229` identically, from `R/cpm_oop.R:383-394` and `R/cpm_fit.R:1566-1567` read in the same session.
+- [x] T2: Rewrite the sentence at `evaluating-circumplex-structure.Rmd.orig:167-168` and the shipped `.Rmd:228-229` identically, from `R/cpm_oop.R:383-394` and `R/cpm_fit.R:1566-1567` read in the same session.
 - [ ] T3: Write the change ledger into this file's Decisions section and commit it before any commit that changes NEWS.md: one row per user-visible change, citing its bullet, naming the path whose v2.0.1 copy shows the before-state, and its planned disposition (a, b or c) with the post-edit bullet or the page it points to.
 - [ ] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
 - [ ] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
@@ -71,6 +71,8 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: sizing: three small parts kept in one milestone, one pre-release PR, 7 criteria and 5 tasks, under the tripwires.
 - 2026-10-28: plan gate chose the aggressive NEWS cut over the about-half cut at the user's choice; falsified by a v2.0.1 user change that a pointed page does not state.
 - 2026-10-28: plan gate chose a scripted token check (AC6) over a reviewer read alone for new claims; falsified by a new behavior claim in plain prose that the script cannot see, which review must still catch.
+- 2026-10-28: implement started on branch m173-pre-release-news-testthat.
+- 2026-10-28: T2 done: the sentence now reads "the analytic caution prints for every $N$ below $N = 50000$", in `.Rmd.orig:168` and `.Rmd:229`, read against `R/cpm_oop.R:383-394` (unconditional caution below 2000, marker caution below `cpm_analytic_ci_n_boundary_caution` = 50000).
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
