@@ -50,7 +50,9 @@
   refuse `NA` listed twice as a label.
   [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) and
   [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
-  refuse a `measures` entry named as a scale.
+  refuse a `measures` entry named as a scale. Given a data frame,
+  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
+  refuses a `time` column named `xend`, `yend` or `Interpretable`.
 
 ### New features
 
@@ -72,7 +74,8 @@
   a long table.
   [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
   returns the package’s joint growth model as formulas for glmmTMB, nlme
-  or brms and prints the fit call. The package still fits nothing.
+  or brms, and its [`print()`](https://rdrr.io/r/base/print.html) shows
+  the fit call. The package still fits nothing.
   [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
   takes the fitted fixed effects and their covariance, or posterior
   draws. It returns the estimate and interval of `e`, `x`, `y`, `a` and
@@ -81,7 +84,9 @@
   per-wave loop. If the contrast is the default and a `vcov` does not
   look like a fit to complete balanced data, it warns.
   [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
-  plots the result. nlme is a new suggested package.
+  plots the result, and [`rbind()`](https://rdrr.io/r/base/cbind.html)
+  stacks results. Suggests gains `nlme` and raises `testthat` to (\>=
+  3.1.7).
   [`?ssm_growth_data`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md)
   and
   [`?ssm_trajectory`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
@@ -95,7 +100,8 @@
   [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
   object (see
   [`?geom_ssm_ellipse`](http://circumplex.jmgirard.com/reference/geom_ssm_ellipse.md)).
-  “Advanced Circumplex Visualization” draws it beside the wedge.
+  “Advanced Circumplex Visualization” draws it beside the wedge, and
+  `GeomSsmEllipse` is exported.
 
 - [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md)
   and
@@ -126,7 +132,9 @@
 - `scales(x, items = TRUE)` no longer stops with “subscript out of
   bounds” on `iip32` and `iip64`, and prints their licence notice.
   [`items()`](http://circumplex.jmgirard.com/reference/items.md) and
-  `scales(items = TRUE)` wrap long item text to the console width.
+  `scales(items = TRUE)` wrap long item text to the console width, and
+  [`items()`](http://circumplex.jmgirard.com/reference/items.md) also
+  wraps its prefix and suffix lines.
 
 - [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
   no longer refuses a fit as `"unidentified"` because of the default
@@ -175,14 +183,15 @@
 - [`print()`](https://rdrr.io/r/base/print.html) of a multi-group
   [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
   result shows the invariance verdict as a `Verdict:` line with labelled
-  lines under it. The stored verdict text does not change. The `dcfi`
-  and `cr` columns and the ΔCFI note now print only for a two-group ML
-  fit with a plain CFI. They also need a rung with a `dcfi` value. The
-  .01 rule was simulated only for that case. For other fits, including
-  the default `estimator = "MLR"`, the values stay in `invariance`, and
-  `invariance$dcfi_scope` records the scope.
-
-- Output of
+  lines under it. If a comparable fit with no contrast asked for stops
+  below the rung a latent contrast needs, it says that rung was not
+  tested. Rungs rejected above the required one print on an `Also:`
+  line, comparable or not. The stored verdict changes only in wording.
+  The `dcfi` and `cr` columns and the ΔCFI note now print only for a
+  two-group ML fit with a plain CFI. They also need a rung with a `dcfi`
+  value. The .01 rule was simulated only for that case. For other fits,
+  including the default `estimator = "MLR"`, the values stay in
+  `invariance`, and `invariance$dcfi_scope` records the scope. Output of
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md),
   [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
   and
