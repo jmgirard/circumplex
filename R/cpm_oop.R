@@ -134,7 +134,7 @@ cpm_diagnostic_lines <- function(details) {
       )
     }
     msg <- c(msg, note(
-      "Note: extra starts reached a solution whose χ² is lower by ",
+      "Note: extra starts reached a solution whose \u03c7\u00b2 is lower by ",
       sprintf("%.3f", lc$gap), df_text, ". ", shape,
       "The estimates shown are unchanged; see \"Which solution is ",
       "reported\" in ?cpm_fit."
