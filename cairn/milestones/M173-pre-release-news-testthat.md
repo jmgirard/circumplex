@@ -90,6 +90,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: T7 added for review return 2 (minor amendment); done: 14 bullets edited (N3, N4, N5, N6, N8, N10, N11, N12, N13, N14, N16, N18, N19, N21) and the section reflowed at width 77 by a scratchpad script that keeps code spans whole; section 166 lines; AC4 0 missing; AC6 5 allowed pointers, 0 new numbers; linter 0 hits; released sections identical; copied over NEWS.md by shell.
 - 2026-10-28: substantive amendment: AC5's figure 150 → 170 lines. The return-2 fixes (a corrected false statement on the reference scale and restored qualifiers) made the section 166 lines; AC3 wins under AC5's own clause, and the user chose "Allow 170 lines" at the stop over holding 150. The Goal's "about 150 lines" stands as written (plan-owned).
 - 2026-10-28: re-audit: AC5 (full) — passes all six questions; minor note to log the gate decision with its reason, done above.
+- 2026-10-28: thrash stop: the user chose "Drop AC3, fix, merge" (descope) over parking or a re-plan. Checkpoint, half-done: pass-3 NEWS fixes applied (170 lines, token checks pass, linter 0 hits); the AC3 removal awaits its fresh re-audit; remainder row "Check NEWS against v2.0.1 before release" filed with `— split from M173`.
 - 2026-10-28: review return 3 (thrash rule (a) reached, stop for the user): AC3 fails at pass 3 on N21's page attribution (L49, L77), the false L34 correction, and the missing return-2 ledger corrections (L24, L27, L56, L65); fix-now findings listed in the Review section.
 
 ## Decisions
