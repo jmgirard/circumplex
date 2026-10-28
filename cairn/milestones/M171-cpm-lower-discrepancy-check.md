@@ -48,6 +48,7 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - [x] T5: Write `devel/m171-lower-check-oracle.R`, reusing `replicate_seed()` and `draw_R()` from `devel/m170-engine-estimate.R`. Run it in the background (about 15 minutes) and commit its record `devel/m171-lower-check-oracle.md`.
 - [x] T6: Write the roxygen section and `@param check_lower`, and run `devtools::document()`. Update DESIGN.md's D-071 section in place, marked `corrected M171`. Write the vignette paragraph in `vignettes/cpm-boundary-fits.Rmd.orig`, and re-render each precomputed vignette whose CPM output changes. Write the NEWS.md entry.
 - [x] T7: Measure `devtools::test()` wall time before T1 and after T6. If the increase is over 60 s, pass `check_lower = FALSE` in tests that are not about the check. Run `devtools::check(manual = TRUE)`.
+- [ ] T8: Review return 1. Assert that no note prints for each not-run model and for free scaling, and say in the `check_lower` documentation that its cost grows with about the square of the number of scales.
 
 ## Work log
 
@@ -72,6 +73,7 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - 2026-10-28: claim audit: 75 claims read, 6 corrected — R/cpm_fit.R, man/cpm_fit.Rd, NEWS.md, vignettes/cpm-boundary-fits.Rmd(.orig), devel/m171-lower-check-oracle.R. Corrections: some extra starts come from the theory start; the communality count is "more or fewer above 0.995"; the quadratic growth is the number of starts, not the cost; the vignette's simulation claim states its scope (normal data, two eight-scale truths, m = 3) and adds "though not on every fit"; the roxygen adds three harmonics; the oracle header says that exclusion is compared on every replicate. The first devtools::check run was stopped before the fixes, and a rerun follows.
 - 2026-10-28: The next check failed with one WARNING: the note string in R/cpm_oop.R held a literal χ² in place of `\u` escapes. Fixed at 4719c2fe. `devtools::check(manual = TRUE)` at 4719c2fe then reported Status OK: 0 errors, 0 warnings, 0 notes, in 11m 38s. All tasks are done, and the status is now review.
 - 2026-10-28: review return 1: AC6 — no test asserts that no note prints for the constrained-angles, equal-communality and circulant models or for `scaling = "free"`. The not-run record is tested for each, but the note only for `check_lower = FALSE`. AC7 — the `check_lower` documentation now says that the number of extra starts grows with about the square of the number of scales, but the criterion requires the check's cost.
+- 2026-10-28: minor amendment: T8 added for review return 1. The not-run test now asserts that no note prints in each of its five fits, and `@param check_lower` says that the cost grows with about the square of the number of scales. That claim is backed by `cpm_lower_check()` timings on synthetic N = 500 fits: 0.88, 1.85 and 3.20 s user at p = 8, 12 and 16, ratios 2.1 and 3.7 against 2.25 and 4.
 
 ## Decisions
 

@@ -162,14 +162,17 @@ test_that("check_lower must be a single TRUE or FALSE", {
 test_that("the check runs only for the quasi-circumplex model with unit scaling", {
   case <- lower_case("verbal")
   not_run <- cpm_lower_not_run()
-  expect_identical(lower_fit(case, check_lower = FALSE)$details$lower_check,
-                   not_run)
-  for (model in c("constrained-angles", "equal-communality", "circulant")) {
-    expect_identical(lower_fit(case, model = model)$details$lower_check,
-                     not_run)
+  fits <- c(
+    list(lower_fit(case, check_lower = FALSE)),
+    lapply(c("constrained-angles", "equal-communality", "circulant"),
+           function(model) lower_fit(case, model = model)),
+    list(lower_fit(case, scaling = "free"))
+  )
+  for (fit in fits) {
+    expect_identical(fit$details$lower_check, not_run)
+    out <- c(capture.output(print(fit)), capture.output(summary(fit)))
+    expect_false(any(grepl(lower_note, out, fixed = TRUE)))
   }
-  expect_identical(lower_fit(case, scaling = "free")$details$lower_check,
-                   not_run)
 })
 
 # ---- failed starts and a failed finish -------------------------------------

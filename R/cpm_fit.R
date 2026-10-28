@@ -1669,8 +1669,9 @@ cpm_boundary_proximity <- function(object) {
 #'   solution is reported" and note a lower discrepancy they reach (default =
 #'   TRUE). The check runs only for `model = "quasi-circumplex"` with
 #'   `scaling = "unit"`, and only on the fit itself, never on bootstrap
-#'   resamples. The number of extra starts grows with about the square of the
-#'   number of scales, so set it to FALSE to skip it when fitting many models.
+#'   resamples. Its cost grows with about the square of the number of scales,
+#'   as the number of extra starts does, so set it to FALSE to skip it when
+#'   fitting many models.
 #' @return A `circumplex_cpm` object: a list with `results` (a data frame of
 #'   estimated angles and communality indices with confidence intervals),
 #'   `betas` (the correlation-function weights), `fit` (the fit indices),

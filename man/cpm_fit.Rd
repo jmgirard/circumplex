@@ -110,8 +110,9 @@ listwise deletion is supported in this release (default = TRUE).}
 solution is reported" and note a lower discrepancy they reach (default =
 TRUE). The check runs only for \code{model = "quasi-circumplex"} with
 \code{scaling = "unit"}, and only on the fit itself, never on bootstrap
-resamples. The number of extra starts grows with about the square of the
-number of scales, so set it to FALSE to skip it when fitting many models.}
+resamples. Its cost grows with about the square of the number of scales,
+as the number of extra starts does, so set it to FALSE to skip it when
+fitting many models.}
 }
 \value{
 A \code{circumplex_cpm} object: a list with \code{results} (a data frame of
