@@ -30,10 +30,10 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 
 - [x] AC1: DESCRIPTION's Suggests entry reads `testthat (>= V)`, where V is 3.1.7, or, if the 3.1.7 run fails, the lowest version under which the run passes, the versions tried including every CRAN release from 3.1.7 up to V. The run is the package's test suite under `testthat::test_local()` with `NOT_CRAN=true` set and testthat V loaded from a temporary library placed ahead of the user library; it passes when it reports 0 failures and 0 errors and no more skipped tests than the same run under the installed testthat 3.3.2.
 - [x] AC2: In `vignettes/evaluating-circumplex-structure.Rmd.orig` and the shipped `vignettes/evaluating-circumplex-structure.Rmd`, the sentence that said the analytic caution prints "up to very large $N$" when a boundary marker is present instead states that, when a boundary marker is present, the analytic caution prints for every $N$ below $N = 50000$, matching `cpm_analytic_ci_n_boundary_caution` in `R/cpm_fit.R`. `grep -n 'very large' vignettes/*.Rmd vignettes/*.Rmd.orig` prints nothing, and `git diff` of each of the two files against the plan commit shows only that sentence changed.
-- [ ] AC3: Every function and argument named in backticks in a `## Breaking changes` bullet at the plan commit is named in backticks in a post-edit bullet under that heading (a script compares the two token sets).
-- [ ] AC4: The post-edit development section of NEWS.md, from the `# circumplex (development version)` line to the line before `# circumplex 2.0.1`, is at most 170 lines (`awk` line count), down from 506.
-- [ ] AC5: Every backticked token and every numeric literal in the post-edit development section also appears in the development section at the plan commit, except a backticked `?topic` whose topic is an `\alias{}` in `man/*.Rd`, or a backticked `vignette("<name>")` whose `<name>.Rmd` is in `vignettes/` (a script checks both).
-- [ ] AC6: `Rscript -e 'devtools::test()'` reports 0 failures with the installed testthat, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors and 0 warnings.
+- [x] AC3: Every function and argument named in backticks in a `## Breaking changes` bullet at the plan commit is named in backticks in a post-edit bullet under that heading (a script compares the two token sets).
+- [x] AC4: The post-edit development section of NEWS.md, from the `# circumplex (development version)` line to the line before `# circumplex 2.0.1`, is at most 170 lines (`awk` line count), down from 506.
+- [x] AC5: Every backticked token and every numeric literal in the post-edit development section also appears in the development section at the plan commit, except a backticked `?topic` whose topic is an `\alias{}` in `man/*.Rd`, or a backticked `vignette("<name>")` whose `<name>.Rmd` is in `vignettes/` (a script checks both).
+- [x] AC6: `Rscript -e 'devtools::test()'` reports 0 failures with the installed testthat, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors and 0 warnings.
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -237,3 +237,11 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - blame-history #5: "every reported number is unchanged" gone — reject (planned change): a statement of no change, recorded in D-062
 - blame-history #6: NA-label and `measures` refusals lack a D-entry — reject (false): M160 shipped them under D-065 at its merge gate (archive M160:7)
 - blame-history #7: marker-label, heading-text and caution-wording drops — reject (planned change): wording detail; the heading row is L46 (c)
+- Pass-3 fix-now findings (diff-bug #1-#7, #9, #10; prior-review #1, #2; blame-history #1, #2) fixed in 7a549a76.
+- Pass 4 (2026-10-28, head 629e626d, narrowed set after the descope; criteria numbered as renumbered: AC3 Breaking tokens, AC4 length, AC5 tokens, AC6 test/check). No reviewers spawned: the descope re-reviews the narrowed set's evidence; the fix-now commit follows pass 3. `git diff --stat a1b75f2b..629e626d -- . ':!cairn' ':!NEWS.md'` is empty, so the a1b75f2b suite and check runs cover the code at this head.
+- AC1: DESCRIPTION:56 `testthat (>= 3.1.7)`; 3.1.7 and 3.3.2 runs as recorded in pass 3 (81 files, 1353 tests, 0 failed, 0 errors, same 1 skip).
+- AC2: `grep -n 'very large'` over vignettes/*.Rmd and *.Rmd.orig exits 1 (no match); the two files' diffs and the sentence as recorded in pass 3, unchanged since.
+- AC3: `news-tokens.R` (its "AC4" line): 24 Breaking tokens at the plan commit, 0 missing after the edit.
+- AC4: development section 170 lines (`awk`, line 1 to the line before `# circumplex 2.0.1`), at most 170; down from 506.
+- AC5: `news-tokens.R` (its "AC6" lines): 5 new backticked tokens, each a `?topic` with an `\alias{}`, 0 not allowed; 0 new numeric literals.
+- AC6: at a1b75f2b (code identical): `devtools::test()` `[ FAIL 0 | WARN 11 | SKIP 1 | PASS 15476 ]`; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes, Status OK.
