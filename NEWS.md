@@ -35,20 +35,21 @@
 * New growth-model helpers. `ssm_growth_data()` stacks the `e`, `x` and `y` of
   each row of a person-by-time table into a long table. `ssm_growth_formula()`
   returns the package's joint growth model as formulas for glmmTMB, nlme or
-  brms and prints the fit call. The package still fits nothing.
+  brms, and its `print()` shows the fit call. The package still fits nothing.
   `ssm_trajectory()` takes the fitted fixed effects and their covariance, or
   posterior draws. It returns the estimate and interval of `e`, `x`, `y`, `a`
   and `d` at each time and certifies the displacement. Under the same seed,
   its amplitude and displacement match the growth vignette's former per-wave
   loop. If the contrast is the default and a `vcov` does not look like a fit
-  to complete balanced data, it warns. `ssm_plot_trajectory()` plots the
-  result. nlme is a new suggested package. `?ssm_growth_data` and
-  `?ssm_trajectory` list the refusals and cautions.
+  to complete balanced data, it warns. `rbind()` stacks its tables, and
+  `ssm_plot_trajectory()` plots them. Suggests gains `nlme` and raises
+  `testthat` to (>= 3.1.7). `?ssm_growth_data` and `?ssm_trajectory` list the
+  refusals and cautions.
 
 * `geom_ssm_ellipse()` draws the confidence ellipse of the Cartesian `(x, y)`
   SSM coordinates. The new generic `ssm_ellipse_data()` computes its input
   from an `ssm_draws()` object (see `?geom_ssm_ellipse`). "Advanced Circumplex
-  Visualization" draws it beside the wedge.
+  Visualization" draws it beside the wedge, and `GeomSsmEllipse` is exported.
 
 * `coord_circumplex()` and `ggcircumplex()` take a `grid` argument. The
   default `"polar"` is unchanged. The value `"cartesian"` draws the canvas of
@@ -70,7 +71,8 @@
 
 * `scales(x, items = TRUE)` no longer stops with "subscript out of bounds" on
   `iip32` and `iip64`, and prints their licence notice. `items()` and
-  `scales(items = TRUE)` wrap long item text to the console width.
+  `scales(items = TRUE)` wrap long item text to the console width, and
+  `items()` also wraps its prefix and suffix lines.
 
 * `axes_reliability()` no longer refuses a fit as `"unidentified"` because of
   the default tolerance of `solve()`, which near machine precision fired on
@@ -100,16 +102,18 @@
   flag. The other columns stay in `coverage` and `guardrail`. The verdicts say
   the same things, but a few joining words change.
 
-* `print()` of a multi-group `ssm_sem()` result shows the invariance verdict
-  as a `Verdict:` line with labelled lines under it. The stored verdict text
-  does not change. The `dcfi` and `cr` columns and the ΔCFI note now print
-  only for a two-group ML fit with a plain CFI. They also need a rung with a
-  `dcfi` value. The .01 rule was simulated only for that case. For other fits,
-  including the default `estimator = "MLR"`, the values stay in `invariance`,
-  and `invariance$dcfi_scope` records the scope.
-
-* Output of `ssm_ci_accuracy()`, `axes_reliability()` and `ssm_sem()`, and the
-  `axes_reliability()` collinearity warning, no longer use `--` as a dash.
+* `print()` of a multi-group `ssm_sem()` result shows the invariance verdict as
+  a `Verdict:` line with labelled lines under it. If a comparable fit with no
+  contrast asked for stops below the rung a latent contrast needs, it says that
+  rung was not tested. Rungs rejected above the required one print on an
+  `Also:` line, comparable or not. The stored verdict changes only in wording.
+  The `dcfi` and `cr` columns and the ΔCFI note now print only for a two-group
+  ML fit with a plain CFI. They also need a rung with a `dcfi` value. The .01
+  rule was simulated only for that case. For other fits, including the default
+  `estimator = "MLR"`, the values stay in `invariance`, and
+  `invariance$dcfi_scope` records the scope. Output of `ssm_ci_accuracy()`,
+  `axes_reliability()` and `ssm_sem()`, and the `axes_reliability()`
+  collinearity warning, no longer use `--` as a dash.
 
 * `plot()` of a `cpm_fit()` result draws a zero-width interval as a line or
   cap, so the reference scale, whose angle is fixed, now shows its communality
@@ -119,7 +123,8 @@
   with no point. If every gap holds a point, a label can still cover one. In
   `ssm_plot_trajectory()`, a segment next to an uninterpretable displacement
   is dashed, as the legend and the growth vignette show. If another row has a
-  verdict, an `NA` in `certified` is a hollow point.
+  verdict, an `NA` in `certified` is a hollow point. Given a data frame, it
+  refuses a `time` column named `xend`, `yend` or `Interpretable`.
 
 ## Documentation
 
