@@ -530,7 +530,11 @@ local_refit_fault <- function(site, at = 2L, form = c("stop", "solve"),
   }
   boot_b <- function() {
     hit <- on_stack(quote(cpm_bootstrap))
-    if (length(hit) == 0L) NULL else get("b", envir = sys.frame(hit[1]))
+    if (length(hit) == 0L) {
+      NULL
+    } else {
+      get("b", envir = sys.frame(hit[1]), inherits = FALSE)
+    }
   }
   bump <- function(kind, b) {
     v <- state[[kind]]
@@ -589,11 +593,12 @@ test_that("a bootstrap refit that errors is excluded and counted as nonconvergen
     cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 20)
   }
   # A fault at replicate 2 moves one resample from used to nonconvergent only
-  # if that replicate is used without one; it settles in one attempt.
+  # if that replicate is used without one; it takes one attempt there.
   base <- local({
     state <- local_refit_fault("none")
     det <- suppressWarnings(boot_fit())$details
     expect_identical(state$opt[2], 1L)
+    det$opt <- state$opt
     det
   })
 
@@ -607,8 +612,10 @@ test_that("a bootstrap refit that errors is excluded and counted as nonconvergen
       state <- local_refit_fault(pr$site, form = pr$form)
       w <- capture_warnings(fit <- boot_fit())
       expect_gt(state$fired, 0L, label = label)
-      expect_match(w, paste(base$boots_nonconvergent + 1L,
-                            "failing the convergence acceptance criterion"),
+      # Only replicate 2 changed: every other one took the same attempts.
+      expect_identical(state$opt[-2], base$opt[-2], label = label)
+      expect_match(w, paste0("\\b", base$boots_nonconvergent + 1L,
+                             " failing the convergence acceptance criterion"),
                    all = FALSE, label = label)
       fit
     })
@@ -639,6 +646,7 @@ test_that("bootstrap intervals are NA with a warning when every refit errors", {
   expect_true(all(is.na(c(fit$results$Angle_lci, fit$results$Zeta_uci,
                           fit$betas$Beta_lci))))
   expect_true(all(is.finite(fit$results$Zeta)))
+  expect_no_error(utils::capture.output(print(fit), summary(fit)))
 })
 
 test_that("the per-replicate mirror guard reflects a mirrored solution back", {

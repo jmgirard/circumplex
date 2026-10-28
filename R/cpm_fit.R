@@ -1783,13 +1783,13 @@ cpm_boundary_proximity <- function(object) {
 #'   0/360 boundary is reported wrapped (its lower limit numerically exceeds
 #'   its upper limit, as with displacement intervals in [ssm_analyze()]).
 #'   Resamples with a degenerate (NA or non-positive-definite) correlation
-#'   matrix,
-#'   or whose refit fails the convergence acceptance criterion or stops with
-#'   an error, are excluded with a warning reporting how many; the intervals
-#'   are then conditional on estimability. The count of refits failing the
-#'   criterion, also stored as `details$boots_nonconvergent`, includes refits
-#'   that stopped with an error. Analytic (Wald) intervals are asymptotically valid but can
-#'   materially mis-cover at field-typical sample sizes. For
+#'   matrix, or whose refit fails the convergence acceptance criterion or
+#'   stops with an error, are excluded with a warning reporting how many; the
+#'   intervals are then conditional on estimability. The count of refits
+#'   failing the criterion, also stored as `details$boots_nonconvergent`,
+#'   includes refits that stopped with an error. Analytic (Wald) intervals are
+#'   asymptotically valid but can materially mis-cover at field-typical sample
+#'   sizes. For
 #'   `ci_method = "analytic"`, `summary()` prints a caution whenever the
 #'   sample size N is below 2000, and for 2000 <= N < 50000 when the fit shows
 #'   a boundary or weak-identification marker (Heywood communality, boundary

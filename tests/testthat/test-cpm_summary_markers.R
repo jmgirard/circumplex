@@ -483,7 +483,7 @@ help_marker_list <- function(page) {
     as.character(tools::Rd_db("circumplex")[[paste0(page, ".Rd")]])
   }
   txt <- gsub("\\s+", " ", paste(txt, collapse = " "))
-  m <- regmatches(txt, regexpr("weak-identification marker \\([^)]*\\)", txt))
+  m <- regmatches(txt, gregexpr("weak-identification marker \\([^)]*\\)", txt))[[1]]
   expect_length(m, 1L)
   m
 }

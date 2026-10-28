@@ -183,3 +183,26 @@ Pass 1 (2026-10-28, head 219bf738).
 - ripple #1: ROADMAP row "Catch errors in CPM bootstrap refits" now describes fixed code — reject, planned change (step 9 graduates the row)
 - ripple #2: the `cpm_fit()` help sentence on excluded resamples names only refits failing the criterion — fix now
 - ripple #3: ROADMAP row "Repoint stale line cites into cpm_fit.R" still open — reject, planned change (step 9 graduates the row)
+- pass-1 fix-now items (diff-bug #2, #3, #7; blame-history #3, #4; ripple #2) fixed through review return 1, d3b546f2 and 38498a26
+
+Pass 2 (2026-10-28, head 38498a26, after return 1).
+
+- spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: `local_refit_fault()` reads `b` from `cpm_bootstrap()`'s frame with `inherits = TRUE`, so a renamed loop variable could pick up an outer `b` — fix now (`inherits = FALSE`, fails loudly)
+- diff-bug #2: an infinite F with a finite gradient was accepted on master and is now excluded without an error, against AC2's "where no refit errors" — reject, false: `nlminb()` returns the best objective it found from a start with finite F (`par_hat`, or the first attempt's point), so a returned infinite F is not reachable, and a NaN F errored on master; the NEWS clause below records the non-finite case
+- diff-bug #3: `cpm_engine()`'s `grad_ok` has the same `Inf <= Inf` gap — follow-up, candidate row "Harden CPM refit acceptance and errors" (part ii)
+- diff-bug #4: under `options(warn = 2)` a refit warning becomes an error that is now counted as nonconvergent — reject, edge: a debugging setting outside documented and common use; the effect is an exclusion with the exclusion warning
+- diff-bug #5: probes check counts, not which resample — fix now (other replicates' attempt counts must equal the baseline's)
+- diff-bug #6: `opt[2] == 1` cannot tell a first-attempt accept from a first-attempt error — fix now (comment reworded; a probe would fail, not pass, if replicate 2 were not used)
+- diff-bug #7: `regexpr` sees only the first marker list on a page — fix now (`gregexpr`, exactly one)
+- diff-bug #8: warning-count match unanchored ("2" matches "12") — fix now (`\\b`)
+- diff-bug #9: a lone `#'   matrix,` roxygen line — fix now (re-wrapped)
+- diff-bug #10: DESCRIPTION's `testthat (>= 3.0.0)` is below what `local_mocked_bindings()` needs (3.1.7), pre-existing — follow-up, candidate row "Raise the testthat floor to 3.1.7"
+- blame-history #1: the infinite-F exclusion is a behavior change NEWS does not name — fix now (NEWS clause); AC2's seed check re-ran after T6, TRUE at both seeds
+- blame-history #2: the removed "verified out-of-band" comment was M13's mutation record — reject, planned change (the Test-comments paragraph of tracking-rules bars narrative; the M13 archive keeps the record)
+- blame-history #3: a gradient-only error discards a usable point with no restart — reject, planned change (pass-1 blame-history #4 kept the behavior, now documented)
+- blame-history #4: print and plot of an all-excluded fit are untested — fix now for print and summary (all-error test prints both); plot left, the state predates M172
+- prior-review #1: the new tests' runtime is not recorded — fix now: measured with `testthat::test_file()` on the pass-2 fixes, 5.8 s for the probe test and 0.14 s for the all-error test, both `skip_on_cran()`
+- prior-review #2: errors folded into nonconvergence follow the M167 precedent — noted, no action
+- ripple #1: vignette prose says "ill-conditioning marker" and "near-tied-optima marker" while the list uses the labels — reject, false: shorthand that predates M172 and contradicts no label
+- ripple #2: the warning and print note attribute errored refits to the criterion — reject, planned change (plan gate kept the warning text)
