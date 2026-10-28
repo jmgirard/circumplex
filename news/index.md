@@ -4,13 +4,10 @@
 
 ### Breaking changes
 
-- The functions that select columns with `scales` now refuse three
-  selections that gave a wrong result or an unclear error. One column
-  selected twice entered the profile at two angles. A number below 1
-  once truncated to a whole number, such as `0`, `0.5` or `-1`, dropped
-  a column or selected columns by exclusion. A name that occurs more
-  than once in `data` used the first column with that name. The refusals
-  apply to
+- Functions that select columns now refuse three selections that gave a
+  wrong result or an unclear error: a column selected twice, a number
+  below 1 (`0`, `0.5`, `-1`), and a name that occurs twice in `data`.
+  This covers `scales` in
   [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md),
   [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md),
   [`ssm_score()`](http://circumplex.jmgirard.com/reference/ssm_score.md),
@@ -20,40 +17,31 @@
   [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
   and
   [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md).
-  A character `occasions` block in
+  It also covers `items` in
+  [`score()`](http://circumplex.jmgirard.com/reference/score.md),
+  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md)
+  and
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md),
+  and `scales` in
+  [`self_standardize()`](http://circumplex.jmgirard.com/reference/self_standardize.md).
+  A single number that reaches a repeated name is still accepted, except
+  by
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md),
+  which also refuses one column under two scales. `occasions` in
   [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
-  must not name a column whose name repeats either. A number that
-  selects such a column is still accepted.
+  must not name a repeated name. Before, a repeat shifted the columns
+  the [`score()`](http://circumplex.jmgirard.com/reference/score.md) key
+  read, or counted an item twice in
+  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md).
   [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md),
   [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
   and the `cormat` path of
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
   refuse a label listed twice.
 
-- The `items` argument of
-  [`score()`](http://circumplex.jmgirard.com/reference/score.md),
-  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md)
-  and
-  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md),
-  and the `scales` argument of
-  [`self_standardize()`](http://circumplex.jmgirard.com/reference/self_standardize.md),
-  now refuse the same three selections. The
-  [`score()`](http://circumplex.jmgirard.com/reference/score.md) key
-  reads items by position. A repeat inserted in the list moved every
-  later item one place on, and a repeat in place of an item took that
-  item’s position. Each scale that uses such a position read the wrong
-  column, with no message. In
-  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md) a
-  repeated item counted twice in each row’s mean.
-  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
-  also refuses one column listed under two scales. It reads items by
-  name, so it also refuses a number that reaches a column whose name
-  occurs more than once in `data` or `cormat`. Such a number used to get
-  the first column with that name.
-
-- [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md)
-  refuses numbers in `scales` that reach two columns with one name, and
-  the message names that name. Before, the error spoke of overlapping
+- If numbers in `scales` reach two columns with one name,
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md)
+  now names that name. Before, the error spoke of overlapping
   `occasions` blocks.
   [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md),
   [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md)
@@ -62,581 +50,221 @@
   refuse `NA` listed twice as a label.
   [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md) and
   [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/reference/ssm_sem_syntax.md)
-  refuse a `measures` entry that carries the name of a scale.
+  refuse a `measures` entry named as a scale.
 
 ### New features
 
 - [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  gains `check_lower = TRUE`. After the fit, a fixed set of extra starts
-  runs, most of them from the reported solution. If one reaches a
-  discrepancy more than 0.01 lower on the chi-square scale,
+  gains `check_lower = TRUE`, the default, so a quasi-circumplex fit
+  with unit scaling now runs extra starts after the fit. If one reaches
+  a discrepancy more than 0.01 lower on the chi-square scale,
   [`print()`](https://rdrr.io/r/base/print.html) and
-  [`summary()`](https://rdrr.io/r/base/summary.html) print a note with
-  the difference. `details$lower_check` records it too. The note also
-  says whether the lower solution keeps the scales’ order around the
-  circle. The reported estimates, fit indices and intervals do not
-  change. The check runs only for the quasi-circumplex model with unit
-  scaling, uses no random numbers, and does not find every lower
-  discrepancy. See “Which solution is reported” in
-  [`?cpm_fit`](http://circumplex.jmgirard.com/reference/cpm_fit.md).
+  [`summary()`](https://rdrr.io/r/base/summary.html) note the
+  difference. The note also says whether the lower solution keeps the
+  scales’ order. `details$lower_check` records it. The reported
+  estimates, fit indices and intervals do not change. The check does not
+  find every lower discrepancy (see
+  [`?cpm_fit`](http://circumplex.jmgirard.com/reference/cpm_fit.md)).
 
-- Two new helpers build the input to a growth model on SSM coordinates,
-  so the reader of the “Growth Models on SSM Parameters” vignette writes
-  neither the reshape nor the model formula by hand.
+- New growth-model helpers.
   [`ssm_growth_data()`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md)
-  scores each row of a person-by-time table as its own profile and
-  stacks the three coordinates `e`, `x` and `y` into a long table with
-  columns `<id>`, `<time>`, `dv` and `value`, one row per input row per
-  coordinate. It refuses an `id` or `time` name absent from the data, a
-  non-numeric `time` column, missing values in either, infinite `time`
-  values, and an `id` or `time` named `dv` or `value` or equal to each
-  other. It refuses two rows with the same id and time. It refuses two
-  distinct ids that share one text label in the output, such as
-  `0.1 + 0.2` and `0.3`. It refuses `scales` that select the `id` or
-  `time` column by name or number, that select one column more than
-  once, or that hold a number below 1. It also refuses a column name
-  that occurs more than once in the data when `id`, `time` or a name in
-  `scales` refers to it. It refuses an `id` that names a list column.
+  stacks the `e`, `x` and `y` of each row of a person-by-time table into
+  a long table.
   [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
-  returns the package’s one joint growth model as formula objects for
-  glmmTMB, nlme or brms, with the `time` and `id` names substituted.
-  Printing it shows the engine’s complete fit call on the long table.
-  Below the call it shows the line that extracts the fixed effects and
-  their covariance, or the draws for brms. The package still fits
-  nothing and calls no engine. nlme is a new suggested package, and its
-  dialect fits the same model: its fixed effects match glmmTMB’s to 1e-6
-  on the bundled growth data.
-
-- [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
-  is the output side of the same recipe. It takes the fitted joint
-  model’s fixed effects and their covariance, or a matrix of posterior
-  coefficient draws such as `as.matrix(fit)` from brms, and returns one
-  row per time point with the estimate and interval of `e`, `x`, `y`,
-  `a` and `d` and the displacement certification. From coefficients and
-  covariance it draws `n_draws` coefficient vectors; a draws matrix is
-  summarized as given. The default contrast reads the six coefficient
-  names the model from
-  [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
-  produces, drops a `b_` prefix and ignores other columns, and a
-  `contrast` function replaces it for a model with other terms. A
-  covariance matrix whose implied covariance between `x(t)` and `y(t)`
-  is exactly zero at every time is refused, unless it is zero
-  everywhere, since coordinates fit in separate models give wrong
-  displacement intervals. A draws matrix is not checked. The object
-  records its input shape in an `input` attribute and prints rounded,
-  with each uncertified row marked and a closing caution for that shape:
-  under `coef` and `vcov`, that intervals from a fitted model’s
-  fixed-effect covariance condition on its estimated variance components
-  and are too narrow at small samples; under `draws`, that the intervals
-  summarize the draws as given and the joint fit was not checked. An
-  object that no longer carries the attribute prints a caution that says
-  the shape is not recorded.
-  [`rbind()`](https://rdrr.io/r/base/cbind.html) of trajectory tables
-  keeps a shared shape and drops a mixed one.
+  returns the package’s joint growth model as formulas for glmmTMB, nlme
+  or brms and prints the fit call. The package still fits nothing.
+  [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
+  takes the fitted fixed effects and their covariance, or posterior
+  draws. It returns the estimate and interval of `e`, `x`, `y`, `a` and
+  `d` at each time and certifies the displacement. Under the same seed,
+  its amplitude and displacement match the growth vignette’s former
+  per-wave loop. If the contrast is the default and a `vcov` does not
+  look like a fit to complete balanced data, it warns.
   [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
-  plots the object with no `time` argument. Its amplitude and
-  displacement columns match the hand-built per-wave loop the growth
-  vignette used before, to 1e-12 under the same seed.
-
-- [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
-  warns when a `vcov` given with the default contrast does not look like
-  a fit to complete balanced data. The small-sample coverage figures on
-  its help page come from that design. For each of `e`, `x` and `y`, the
-  function reads the time at which the fitted value has its smallest
-  variance. For the
-  [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
-  model fit to complete balanced data, the three times are equal. The
-  function warns when they differ by more than a small tolerance. The
-  tolerance grows with the random-intercept variance relative to the
-  residual variance, so an unbalanced fit can pass without a warning.
-  Causes that can make them differ include persons with different
-  numbers of observations, fixed effects beyond that model’s six, and a
-  random-effects structure or residual-variance structure other than
-  that model’s. Equal times do not show balance. The `draws` shape and a
-  `contrast` function are not checked.
+  plots the result. nlme is a new suggested package.
+  [`?ssm_growth_data`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md)
+  and
+  [`?ssm_trajectory`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
+  list the refusals and cautions.
 
 - [`geom_ssm_ellipse()`](http://circumplex.jmgirard.com/reference/geom_ssm_ellipse.md)
-  is a new ggplot2 layer for the circumplex canvas. For each row it
-  draws the confidence ellipse of a bivariate normal region on the
-  Cartesian `(x, y)` SSM coordinates, from a centre `(x0, y0)` and the
-  three elements of a 2 by 2 covariance matrix, at a chosen `level`. An
-  ellipse that straddles 0/360 degrees is drawn across the seam, and one
-  whose inscribed polygon contains the origin winds once round the
-  centre.
+  draws the confidence ellipse of the Cartesian `(x, y)` SSM
+  coordinates. The new generic
   [`ssm_ellipse_data()`](http://circumplex.jmgirard.com/reference/ssm_ellipse_data.md)
-  is a new generic that computes those five columns from an
+  computes its input from an
   [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
-  object: the centre is the object’s `x_est` and `y_est`, and the
-  covariance is the sample covariance of the draws of `x` and `y`. The
-  “Advanced Circumplex Visualization” vignette draws the ellipse beside
-  the wedge and the point for the same posterior draws and states how
-  the two regions differ.
-
-- The package has three new simulated datasets. `simulated_occasions`
-  holds octant scores for 200 persons at three waves. `simulated_growth`
-  and `simulated_growth_origin` hold octant scores for 150 persons at
-  five waves. Their help pages state how the data were simulated. The
-  “Advanced Circumplex Visualization” and “Growth Models on SSM
-  Parameters” vignettes load them with
-  [`data()`](https://rdrr.io/r/utils/data.html).
+  object (see
+  [`?geom_ssm_ellipse`](http://circumplex.jmgirard.com/reference/geom_ssm_ellipse.md)).
+  “Advanced Circumplex Visualization” draws it beside the wedge.
 
 - [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md)
   and
   [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
-  take a `grid` argument. The default `"polar"` is the canvas as before.
-  `"cartesian"` draws one ring at the outer amplitude, a crosshair along
-  displacements 0/180 and 90/270 with a tick mark and a signed label at
-  each amplitude break between the center and the rim on every
-  half-axis, and no other ring, spoke or amplitude axis. The labels on
-  the 180 and 270 halves are Cartesian coordinates, not negative
-  amplitudes. On
+  take a `grid` argument. The default `"polar"` is unchanged. The value
+  `"cartesian"` draws the canvas of Nagy, Etzel and Lüdtke (2019). It
+  has one outer ring and a labelled crosshair (see
+  [`?coord_circumplex`](http://circumplex.jmgirard.com/reference/coord_circumplex.md)).
+  Labels on the 180 and 270 halves are signed, plotmath ones with a
+  leading minus.
   [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
-  the cartesian grid also puts tick marks outward from the rim at the
-  scale angles. This is the canvas of Nagy, Etzel and Lüdtke (2019). The
-  data are drawn the same way on both grids. Plotmath amplitude labels
-  (an expression, or a labelling function returning one) draw as
-  plotmath on the crosshair. On the 180 and 270 halves they take a
-  leading minus. A label that is a call is put in parentheses, as in
-  `-(a + b)`, unless it is a subscript, a superscript or already in
-  parentheses.
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
-  also has a new `angle_labels` argument, independent of `grid`: `TRUE`
-  labels each text label as `<label> (<angle>°)`, the 0/360 pole written
-  as 360, read along its radius. The default degree labels are left as
-  they are. Each side of the plot margin is widened only for the labels
-  that point toward it, estimated at half the font size per character,
-  so the circle can sit off-center when the labels are uneven.
+  also ticks the rim on that grid and gains `angle_labels`, which adds
+  each label’s angle and widens the margin (see
+  [`?ggcircumplex`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)).
+
+- New simulated datasets: `simulated_occasions`, `simulated_growth` and
+  `simulated_growth_origin`.
 
 ### Minor improvements and fixes
 
-- In [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md),
-  a bootstrap refit that stops with an error no longer stops the call.
-  The resample is excluded and counted with the refits that fail the
-  convergence acceptance criterion, which the exclusion warning reports
-  and `details$boots_nonconvergent` stores. The intervals come from the
-  remaining resamples. When every refit errors, the bootstrap intervals
-  are `NA`, with a warning. A refit whose gradient or discrepancy is not
-  finite is counted the same way.
-
-- On the displacement panel of
-  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md),
-  the line segments on either side of a time point whose displacement is
-  not interpretable are now drawn dashed, and the “Displacement
-  interpretable” legend shows the line type beside the point shape. A
-  dashed segment touches a time point with no interpretable direction,
-  so the direction of change along it is not to be read; the segment is
-  kept so the unwrapped branch stays visible. A trajectory table row
-  whose `certified` value is `NA` is now drawn as a hollow point on
-  dashed segments when another row carries a verdict, where before its
-  point was silently left out of the panel. The “Growth Models on SSM
-  Parameters” and “Advanced Circumplex Visualization” vignettes describe
-  the dashed segments.
-
-- [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
-  no longer refuses a fit as `"unidentified"` on the conditioning of its
-  information matrix. That refusal came from the default tolerance of
-  [`solve()`](https://rdrr.io/r/base/solve.html), and at a fitted matrix
-  near machine precision it fired on some platforms and not on others.
-  The per-fit accuracy check now judges every such fit: below the
-  conditioning floor, a fit that a platform used to refuse
-  `"unidentified"` is refused `"uncertified"` with its estimated
-  relative error in the warning, or computes when the check places its
-  numbers inside the accuracy target. A fit the floor admits is also
-  checked when its information matrix is nearly singular.
-  `"unidentified"` now names only a design defect: two identical
-  derivative matrices, a derivative matrix equal to the identity, or an
-  exactly singular inversion. Where the previous tolerance inverted,
-  every reported number is unchanged, because the tolerance is the only
-  change to that arithmetic, and every newly checked fit of a kind the
-  function can produce that the package’s sweep measured passed the
-  check. A fit the floor admits but that the function itself refuses at
-  its door (fewer than four scales) can now be refused `"uncertified"`
-  at the internal helpers where it used to compute. The internal
-  uncorrected arm, reported in `details$naive_reason`, keeps the default
-  tolerance and can still differ across platforms at such a matrix.
+- A bootstrap refit in
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  that stops with an error no longer stops the call. Such a refit, and
+  one whose gradient or discrepancy is not finite, is excluded and
+  counted in the warning and `details$boots_nonconvergent`. If every
+  refit errors, the bootstrap intervals are `NA`, with a warning.
 
 - `scales(x, items = TRUE)` no longer stops with “subscript out of
-  bounds” on `iip32` and `iip64`. These licensed instruments ship a
-  notice in place of their item text, and
-  [`scales()`](http://circumplex.jmgirard.com/reference/scales.md) now
-  prints that notice once, after the scale lines.
+  bounds” on `iip32` and `iip64`, and prints their licence notice.
+  [`items()`](http://circumplex.jmgirard.com/reference/items.md) and
+  `scales(items = TRUE)` wrap long item text to the console width.
 
-- [`items()`](http://circumplex.jmgirard.com/reference/items.md) and
-  `scales(items = TRUE)` wrap long item text, and the item prefix and
-  suffix, to the console width. A wrapped item continues under the first
-  character of its text.
+- [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  no longer refuses a fit as `"unidentified"` because of the default
+  tolerance of [`solve()`](https://rdrr.io/r/base/solve.html), which
+  near machine precision fired on some platforms and not on others. The
+  accuracy check judges such a fit, which computes or is refused
+  `"uncertified"`. If its information matrix is nearly singular, a fit
+  the floor admits is now also checked, and it can be refused
+  `"uncertified"`. `"unidentified"` now names only two identical
+  derivative matrices, a derivative matrix equal to the identity, or an
+  exactly singular inversion.
 
-- [`print()`](https://rdrr.io/r/base/print.html) and
-  [`summary()`](https://rdrr.io/r/base/summary.html) of a
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result no longer show the Communality column in the results table. It
-  equals `Zeta` squared, which the table still prints, and
-  `results$Communality` still holds it. Without it, the table prints as
-  one block at width 77 for scale names of up to 16 characters.
-
-- Printed notes wrap more cleanly at narrow console widths. In
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  output, the Heywood note keeps “(ζ \> 0.995,” on one line, and the
-  bootstrap marker note breaks its opening words instead of running past
-  the width. In [`summary()`](https://rdrr.io/r/base/summary.html) of an
-  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
-  result, the sentence about lavaan’s `*.scaled` definitions starts a
-  new line. In [`print()`](https://rdrr.io/r/base/print.html) of an
-  [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
-  result with an invariance ladder, the `Verdict:` line wraps, and all
-  ladder notes wrap by the same rule as the package’s other notes. These
-  changes move line breaks only. The text of every note is the same.
-
-- Three more printed lines wrap to the console width. If the `Fit:` line
-  in [`print()`](https://rdrr.io/r/base/print.html) of a
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result is wider than the console, it breaks only after a `;`, and each
-  later line is indented five spaces.
-  [`instruments()`](http://circumplex.jmgirard.com/reference/instruments.md)
-  wraps each entry under the entry’s own text, and its entries no longer
-  start with a space. The message from
-  [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
-  that names the normative sample also wraps. The words and numbers do
-  not change. Code that matches that message’s text must now allow a
-  line break where the message had a space.
-
-- The “Growth Models on SSM Parameters” vignette prints the variance
-  components of the joint model after the first fit, so the reader sees
-  the correlated person block that separate fits cannot estimate. It
-  also explains the check
-  [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
-  makes on the fixed-effect covariance matrix: a matrix assembled from
-  separate fits implies a covariance of exactly zero between `x(t)` and
-  `y(t)` at every time, and the helper refuses that structure only. A
-  nonzero covariance does not show that the model is right.
-
-- The “Advanced Circumplex Visualization” vignette has a new section,
-  “The latent circumplex from a CPM fit”. Its circle figures follow
-  Nagy, Etzel and Lüdtke (2019, Figures 3, 4 and 6) and are drawn on the
-  cartesian canvas with the layers the package already exports. The
-  first is the canvas alone, its rim ticks and labels at the angles
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  estimated. The second adds five measures from
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
-  as labelled points joined to the origin. The third annotates one
-  measure with an arc for its displacement and its two values. A fourth,
-  linear figure draws the fitted correlation function against angular
-  separation, with the observed and reproduced correlations as points.
-  The ellipse figure adds two tangent lines from the origin out to the
-  rim, at the angles of the confidence ellipse’s tangents, and the lines
-  from the origin to the ellipse’s nearest and farthest boundary points,
-  computed in an echoed chunk that the test suite runs against
-  independent oracles. The prose states which model each set of angles
-  comes from.
-
-- Every prose caution and note that
+- Printed cautions and notes in
   [`print()`](https://rdrr.io/r/base/print.html) and
-  [`summary()`](https://rdrr.io/r/base/summary.html) show now wraps to
-  the console width you set with `options(width = )`. Before this, the
-  text ignored the width you set. Some cautions broke their lines at a
-  column written into the package and some printed as one long line, so
-  they ran past a narrow console or stopped short of a wide one. The
-  words and their order do not change. Only the line breaks move. A
-  fired marker label, such as `Heywood communality`, still stays on one
-  line. Tables, column headers, the fit-index lines of
-  [`summary()`](https://rdrr.io/r/base/summary.html), test-statistic
-  lines and section headings do not wrap, because wrapping them would
-  destroy their columns.
-
-- In [`summary()`](https://rdrr.io/r/base/summary.html) for an
+  [`summary()`](https://rdrr.io/r/base/summary.html) now wrap to
+  `options(width = )`. So do
+  [`instruments()`](http://circumplex.jmgirard.com/reference/instruments.md),
+  whose entries lose their leading space, the
+  [`print()`](https://rdrr.io/r/base/print.html) heading of
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
-  result, the heading above the verdicts now reads
-  `Verdicts (c = 1, as estimated), Bradley (1978) liberal band, 95% Wilson CIs:`.
-  It was two characters longer. The heading is not wrapped, so in a
-  vignette, where each output line starts with `#>`, the old heading
-  took 81 columns and the new one takes 79.
-
-- In [`print()`](https://rdrr.io/r/base/print.html) and
-  [`summary()`](https://rdrr.io/r/base/summary.html) for a
+  and the
+  [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  message. Code that matches that message must allow a line break. The
+  `Fit:` line of
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result, the table of angles and communality indices uses shorter
-  column headers: `Theory` for `Angle_theory`, and `lci` and `uci` after
-  each estimate for its confidence limits. At a width of 77 the
-  `Communality` column no longer drops into a second block below the
-  table. The values do not change, and the `results` data frame keeps
-  its column names.
+  breaks after a `;`. Tables, column headers, the fit-index and
+  test-statistic lines of
+  [`summary()`](https://rdrr.io/r/base/summary.html) and section
+  headings do not wrap, and the wrapping changes no words.
 
-- The heading of [`print()`](https://rdrr.io/r/base/print.html) for an
+- The [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  results table in [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) drops the
+  Communality column, which equals `Zeta` squared and stays in
+  `results$Communality`. Its headers are now `Theory`, `lci` and `uci`.
+  For scale names of up to 16 characters it prints as one block at
+  width 77. The `results` names do not change.
+
+- [`summary()`](https://rdrr.io/r/base/summary.html) of an
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
-  result now wraps to the console width. The first entry in this section
-  keeps headings unwrapped to protect their columns. This heading is a
-  sentence about the simulation settings with no columns under it, so it
-  wraps. Before this, it printed as one line of any length.
+  result is about half as long. One table shows each condition’s
+  coverage, certification rate and `Structural` flag. The other columns
+  stay in `coverage` and `guardrail`. The verdicts say the same things,
+  but a few joining words change.
 
-- The “Evaluating Circumplex Structure” vignette now shows the short
-  [`print()`](https://rdrr.io/r/base/print.html) report of
-  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
-  first, and the full [`summary()`](https://rdrr.io/r/base/summary.html)
-  report after it. It also says before each affected chunk that a
-  warning about an ill-conditioned CPM Hessian will print.
-
-- The vignettes set `options(width = 77)`, so output that follows the
-  console width fits, with its `#>` prefix, in 80 columns. The package
-  website’s code box shows 81 monospace columns without scrolling. The
-  generated lavaan syntax in the SEM vignette is printed with
-  [`cat()`](https://rdrr.io/r/base/cat.html) and stays wider.
-
-- [`summary()`](https://rdrr.io/r/base/summary.html) for an
-  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
-  result is about half as long. The settings print as three short
-  sentences, usually on three lines. The coverage and guardrail tables
-  are replaced by one table with a row for each profile and amplitude
-  condition. That table shows the coverage of each parameter, the
-  displacement coverage when certified, the certification rate and the
-  `Structural` flag. The other columns are no longer printed, but they
-  are still in the `coverage` and `guardrail` elements of the result.
-  The verdicts and cautions say the same things. Only their punctuation
-  and a few joining words change (see the entry on dashes below).
-
-- [`print()`](https://rdrr.io/r/base/print.html) for a multi-group
+- [`print()`](https://rdrr.io/r/base/print.html) of a multi-group
   [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
-  result shows the invariance verdict as a `Verdict:` line and short
-  labeled lines under it. The labels are `Test:` and `Result:`, and
-  `Also:` for a rung rejected above the required one. `Contrast:` and
-  `Profiles:` print when the groups cannot be compared. If they cannot
-  be compared and a contrast was requested, `Instead:` also prints. The
-  labeled values wrap to the console width. In a UTF-8 locale, every
-  line of the block fits at 77 and 80 columns. The stored verdict text
-  does not change, and the warning and the error that quote it do not
-  change.
+  result shows the invariance verdict as a `Verdict:` line with labelled
+  lines under it. The stored verdict text does not change. The `dcfi`
+  and `cr` columns and the ΔCFI note now print only for a two-group ML
+  fit with a plain CFI. They also need a rung with a `dcfi` value. The
+  .01 rule was simulated only for that case. For other fits, including
+  the default `estimator = "MLR"`, the values stay in `invariance`, and
+  `invariance$dcfi_scope` records the scope.
 
-- [`print()`](https://rdrr.io/r/base/print.html) for a multi-group
-  [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
-  result shows the `dcfi` and `cr` columns and a short ΔCFI note only
-  for a two-group fit estimated by ML with a plain CFI. The .01 rule was
-  simulated only for that case. The columns and the note also need a
-  rung with a `dcfi` value. The note is two lines at 80 columns. For
-  other fits, including the default `estimator = "MLR"`, the `dcfi`
-  values stay in the `invariance` element of the result.
-  `invariance$dcfi_scope` records the number of groups and the estimator
-  as lavaan reports it (`"ML"` for `"MLR"` and `"MLM"`). It also records
-  whether the CFI is plain.
-
-- The printed output of
+- Output of
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md),
   [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
-  and [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
-  results, and the refusal warning of
+  and
+  [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md),
+  and the
   [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
-  for nearly collinear items, no longer use `--` as a dash. For example,
-  a verdict now reads `Verdict: CAUTION. Amplitude CIs ...` and a
-  coverage line reads `coverage 96.7%: borderline`.
+  collinearity warning, no longer use `--` as a dash.
 
-- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
+- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) of a
   [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result now draws a confidence interval of zero width as a visible
-  line. Before, a zero-width angle interval was not drawn at all. A
-  zero-width angle interval is now drawn as a line along the radius. A
-  zero-width communality interval is drawn as a line along the arc. When
-  both widths are zero, a short cap is drawn across the interval. The
-  cap has the same length at every radius except near the centre, where
-  it is shorter. The reference scale, whose angle is fixed, now shows
-  its communality interval this way.
-
-- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result now warns about a scale whose communality interval is 0 at both
-  ends, and draws that scale as a point. The warning for a scale drawn
-  without its interval now names the reason for each scale.
-
-- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md)
-  and [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for a
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  result now draw the amplitude (or communality) axis in the widest gap
-  between spokes that holds no plotted point, so that the axis labels do
-  not cover a point. When every gap holds a point, the axis goes in the
-  widest gap, as before, and a label can still cover a point.
+  result draws a zero-width interval as a line or cap, so the reference
+  scale, whose angle is fixed, now shows its communality interval. It
+  warns about a communality interval of 0 at both ends and names the
+  reason for each scale drawn without one. That plot and
+  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md)
+  put the communality or amplitude axis in the widest gap with no point.
+  If every gap holds a point, a label can still cover one. In
+  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md),
+  a segment next to an uninterpretable displacement is dashed, as the
+  legend and the growth vignette show. If another row has a verdict, an
+  `NA` in `certified` is a hollow point.
 
 ### Documentation
 
 - [`?cpm_fit`](http://circumplex.jmgirard.com/reference/cpm_fit.md) has
-  a new section, “Which solution is reported”. It names the starts the
-  engine runs and says that the estimate is the maximum-likelihood
-  solution in the basin those starts reach. A configuration with a lower
-  discrepancy can exist. The convergence acceptance criterion and the
-  “competing near-tied optima” note do not signal it, and the new
-  `check_lower` check can. Where one exists, the reported chi-square is
-  larger than at that configuration.
+  a new section, “Which solution is reported”. It also says that the
+  analytic-interval caution in
+  [`summary()`](https://rdrr.io/r/base/summary.html) prints below N
+  = 2000. If a boundary or weak-identification marker fires, it prints
+  up to but not including 50000.
+  [`?axes_reliability`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  says that an `"uncertified"` refusal’s error estimate can depend on
+  the machine.
+  [`?ssm_plot_trajectory`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
+  now says where each displacement bound is drawn.
 
-- [`?cpm_fit`](http://circumplex.jmgirard.com/reference/cpm_fit.md) now
-  states both conditions under which
-  [`summary()`](https://rdrr.io/r/base/summary.html) cautions about
-  analytic (Wald) intervals. The caution prints whenever N is below
-
-  2000. From 2000 up to but not including 50000 it prints only when a
-        boundary or weak-identification marker fires. The page lists the
-        five markers. Before, it gave the second condition only as
-        “near-boundary fits”, with no upper limit and no list of
-        markers.
-
-- The “CPM Fits at a Boundary” vignette now says which
-  correlation-function weights the bootstrap intervals miss, and why.
-  The package’s bootstrap validation found that the largest weight is
-  missed at least as often as any other. Almost all of its misses fall
-  below the true value. In those simulations, which drew normal data for
-  eight octant scales with equal communalities, the cause is a bias in
-  the weight estimates, which the bootstrap reproduces only in part. The
-  page no longer says that the shortfall belongs to a weight near zero.
-  It also no longer says that the bias of the point estimates is
-  unmeasured.
-
-- Four vignettes now open with a “Not yet peer reviewed” notice under
-  their Level line. The pages are “SEM-Based SSM Analysis”, “Latent
-  Group Contrasts”, “Bayesian SSM Analysis” and “Growth Models on SSM
-  Parameters”. Each teaches a method that is the package’s own proposal.
-  The notice says that the package’s authors have not yet published the
-  method in a peer-reviewed venue. The package website shows the notice
-  as a warning box.
+- “SEM-Based SSM Analysis”, “Axes Reliability” and “Evaluating
+  Circumplex Structure” are split, adding “Latent Group Contrasts”,
+  “Axes Reliability Caveats”, “CPM Fits at a Boundary”, “Confidence
+  Interval Accuracy” and “Structure Tests and Ipsatization”. Each
+  vignette has a Level line, an Overview and a Wrap-up. The website’s
+  “Articles” menu is built from the articles index and lists every page
+  by level, “Axes Reliability” included. Six vignettes show only the
+  calls they teach, and two load the new datasets with
+  [`data()`](https://rdrr.io/r/utils/data.html). Output that follows the
+  console width fits 80 columns (`options(width = 77)`). Six vignettes
+  are now in plain English and link the introduction. A “Not yet peer
+  reviewed” notice opens the four pages on the package’s unpublished
+  methods. They are “SEM-Based SSM Analysis”, “Latent Group Contrasts”,
+  “Bayesian SSM Analysis” and “Growth Models on SSM Parameters”.
 
 - The “Growth Models on SSM Parameters” vignette is rewritten on the
-  growth helpers, and every chunk is shown except the unlabeled options
-  chunk at the top and the note for a missing glmmTMB. The first worked
-  example is five calls.
-  [`ssm_growth_data()`](http://circumplex.jmgirard.com/reference/ssm_growth_data.md)
-  builds the long table, and
-  [`ssm_growth_formula()`](http://circumplex.jmgirard.com/reference/ssm_growth_formula.md)
-  prints the glmmTMB fit call. That call is pasted with its two formulas
-  read from the object.
-  [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
-  turns the fixed effects and their covariance into the trajectory
-  table, and
-  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
-  draws it. The second example reuses the formula object, so it is four
-  calls. The reshape, the draw function and the per-wave loop the page
-  used to hide are gone. A new Section 10 shows the same model’s nlme
-  call and its brms call. The brms fit is shown and not run. Its six
-  fixed-effect draw columns ship as `vignettes/growth_brms_draws.rds`,
-  written by the seeded `data-raw/growth-brms-draws.R`. So the page
-  summarizes posterior draws through `ssm_trajectory(draws = )` without
-  a Stan toolchain.
-  [`?simulated_growth`](http://circumplex.jmgirard.com/reference/simulated_growth.md)
-  now names the vignette under See also.
-
-- The same vignette’s Section 7 now states what the package measured
-  about the REML intervals rather than naming remedies for engines the
-  package does not write. It reports the first coverage oracle’s result
-  at 200 persons per cell. It also reports the coverage at 10 to 50
-  persons and how often the fit has a non-positive-definite Hessian at
-  10 and 20 persons, and
+  growth helpers, with the model’s nlme and brms versions. It prints the
+  variance components and explains the covariance check in
+  [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md).
+  It states the measured coverage of the REML intervals and that the
+  package ships no small-sample correction, in place of its lme4
+  remedies.
   [`?ssm_trajectory`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
-  states the main figures. It says that the package ships no
-  small-sample correction, and explains why a percentile parametric
-  bootstrap of the fixed effects is not one on complete balanced data.
-  It also says that a matrix of coefficient draws from any source enters
-  [`ssm_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_trajectory.md)
-  as `draws =`. The lme4 remedies it named before are gone.
+  gives the main figures.
 
-- [`?axes_reliability`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
-  now says that at a severely ill-conditioned fit, the error estimate
-  printed with an `"uncertified"` refusal depends on the machine as well
-  as the data. It cites one test matrix whose estimate differed between
-  macOS with R’s reference BLAS and LAPACK and Linux with OpenBLAS,
-  while both machines refused it.
+- “Advanced Circumplex Visualization” adds a section, “The latent
+  circumplex from a CPM fit”, with figures after Nagy, Etzel and Lüdtke
+  (2019). Its occasions figures no longer have tall, narrow panels or
+  axis labels over a point, and the first labels its spokes PA to NO.
 
-- The website’s vignette menu is now built by pkgdown from the articles
-  index rather than written out a second time by hand, so the menu is
-  titled “Articles” and lists each level’s pages in the index’s own
-  order.
-
-- The “SEM-Based SSM Analysis” and “Axes Reliability” vignettes are each
-  now two pages, with every code chunk kept and the prose moved rather
-  than cut. “SEM-Based SSM Analysis” keeps its name and holds the latent
-  profile of a measure, its measurement model, its confidence intervals
-  and what its parameters mean. “Latent Group Contrasts” holds the two
-  questions about group differences, the invariance-gated latent
-  contrast, the limitations of the method and its relation to the
-  literature. “Axes Reliability” keeps its name and holds the worked
-  example, the variance components and the correlation-matrix input.
-  “Axes Reliability Caveats” holds the correlation-metric correction and
-  its calibration table, missing data, boundary fits, blockwise
-  instruments and the standard error of measurement. The four pages are
-  read in that order.
-
-- The “Evaluating Circumplex Structure” vignette is now four shorter
-  pages, with every code chunk kept and the prose moved rather than cut.
-  “Evaluating Circumplex Structure” keeps its name and holds the two
-  questions, the circular process model fit, its fit indices and its
-  model variants. “CPM Fits at a Boundary”, an Advanced page, holds the
-  boundary section behind a refit of the same model. “Confidence
-  Interval Accuracy” holds the published accuracy findings,
+- Vignette statements now match the package. “SEM-Based SSM Analysis”
+  says the strict tier frees the factor variances and covariances that
+  the scaled tier fixes. [`print()`](https://rdrr.io/r/base/print.html)
+  shows an uncertified displacement with a note. The
+  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
+  labels are “not clearly supported” and “unsupported”. The default
+  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
+  model estimates every angle except the reference scale’s. “CPM Fits at
+  a Boundary” says which weights the bootstrap misses and why.
+  “Evaluating Circumplex Structure” warns before chunks that print a CPM
+  Hessian warning. “Confidence Interval Accuracy” shows the short
+  [`print()`](https://rdrr.io/r/base/print.html) report of
   [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
-  and the checklist. “Structure Tests and Ipsatization” holds
-  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
-  and
-  [`ipsatize()`](http://circumplex.jmgirard.com/reference/ipsatize.md).
-  Cross-references that named a section now name a page.
-
-- Every vignette now opens with a Level line (Introductory, Intermediate
-  or Advanced) and an Overview that names its sections. Each closes with
-  a Wrap-up that names the next page, or a related page where a path
-  ends. The website groups the vignettes by level in reading order, and
-  the “Axes Reliability” vignette now appears in its menu.
-
-- The code shown in six vignettes now keeps to the package calls and
-  model fits they teach. Code that simulates data, builds or formats a
-  display table, or checks internals is hidden, and the prose says what
-  it does. The “Advanced Circumplex Visualization” and “Growth Models on
-  SSM Parameters” vignettes now load the new simulated datasets with
-  [`data()`](https://rdrr.io/r/utils/data.html). The growth vignette
-  shows
-  [`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md)
-  called for a single wave and hides the loop over waves. The
-  “Evaluating Circumplex Structure” vignette writes out its three
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  calls.
-
-- The
-  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
-  help page now describes correctly where each confidence bound is drawn
-  on the displacement panel. The lower bound sits below the estimate by
-  the counterclockwise angle from the lower bound to the estimate, and
-  the upper bound sits above the lower bound by the interval’s
-  counterclockwise width. The plot itself did not change.
-
-- In the “Advanced Circumplex Visualization” vignette, the three panels
-  of the occasions trajectory figure are no longer tall and narrow, and
-  the axis labels of the two circle figures of the occasions no longer
-  cover a point. The first of those circle figures now labels its spokes
-  with the octant abbreviations (PA to NO) instead of degrees.
-
-- Six vignettes now use plain English: “Bayesian SSM Analysis”, “Growth
-  Models on SSM Parameters”, “Advanced Circumplex Visualization”, “Axes
-  Reliability”, “SEM-Based SSM Analysis” and “Evaluating Circumplex
-  Structure”. Their sentences are shorter and carry no em dashes or
-  semicolons. Each now links the introduction vignette near its start.
-  That pass changed neither their code nor its output.
-
-- Four statements in two vignettes now match what the package does. In
-  “SEM-Based SSM Analysis”, the plane factors are fixed isotropic and
-  orthogonal only under the default scaled tier. The strict tier frees
-  the factor variances and covariances. In “Evaluating Circumplex
-  Structure”, [`print()`](https://rdrr.io/r/base/print.html) shows an
-  uncertified displacement and its interval with a note that the
-  displacement is not interpretable. It does not withhold them. The
-  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
-  label is “not clearly supported” in
-  [`print()`](https://rdrr.io/r/base/print.html) and “unsupported” in
-  [`summary()`](https://rdrr.io/r/base/summary.html), not “weak”. And
-  the default
-  [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
-  model estimates every scale angle except the reference scale’s, which
-  anchors the rotation. It does not fix them all at their theoretical
-  values.
-
-- The latent profile table in “SEM-Based SSM Analysis” now leaves out
-  the X and Y values. On the package website, each estimate and its
-  interval now stay on one line.
-
-- The prose of “Evaluating Circumplex Structure” now names what the
-  shorter printed reports show. For example, it reads the certification
-  rate from the `cert` column of the accuracy summary’s coverage table.
-  “Axes Reliability” now says that its table prints a missing
-  Nunnally-Bernstein comparison as `--`.
+  first and names what the shorter reports show. The SEM latent profile
+  table drops X and Y. “Axes Reliability” explains that `--` marks a
+  missing Nunnally-Bernstein comparison.
 
 ## circumplex 2.0.1
 

@@ -301,7 +301,7 @@ data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 set.seed(12345)
 fit <- cpm_fit(jz2017, scales = scales, boots = 100)
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 #> Warning: 2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.
 fit
 #> 
@@ -332,7 +332,7 @@ fit
 # Matrix-input path (supply the sample size; analytic CIs)
 R <- cor(jz2017[scales])
 cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
-#> Warning: CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.
 #> 
 #> Circular Process Model (Browne, 1992) 
 #> Model:             quasi-circumplex 

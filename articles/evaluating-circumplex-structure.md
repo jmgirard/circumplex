@@ -223,10 +223,11 @@ package’s own validation simulations:
 For the same reasons, [`summary()`](https://rdrr.io/r/base/summary.html)
 prints a caution for analytic (Wald) intervals below $`N = 2000`$. When
 a boundary marker (defined in “CPM Fits at a Boundary”) is present, the
-analytic caution prints up to very large $`N`$. In validation, analytic
-intervals mis-covered in exactly those regimes. Analytic intervals are
-the only option on the correlation-matrix input path. Prefer the
-bootstrap (the raw-data default) when you have raw data.
+analytic caution prints for every $`N`$ below $`N = 50000`$. In
+validation, analytic intervals mis-covered in exactly those regimes.
+Analytic intervals are the only option on the correlation-matrix input
+path. Prefer the bootstrap (the raw-data default) when you have raw
+data.
 
 ### Comparing model variants
 
