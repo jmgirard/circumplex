@@ -110,8 +110,8 @@ listwise deletion is supported in this release (default = TRUE).}
 solution is reported" and note a lower discrepancy they reach (default =
 TRUE). The check runs only for \code{model = "quasi-circumplex"} with
 \code{scaling = "unit"}, and only on the fit itself, never on bootstrap
-resamples. Its cost grows with about the square of the number of scales,
-so set it to FALSE to skip it when fitting many models.}
+resamples. The number of extra starts grows with about the square of the
+number of scales, so set it to FALSE to skip it when fitting many models.}
 }
 \value{
 A \code{circumplex_cpm} object: a list with \code{results} (a data frame of
@@ -159,7 +159,8 @@ lower discrepancy. At the same degrees of freedom, its p-value is then
 smaller and its RMSEA and CFI are no better.
 
 With \code{check_lower = TRUE} (the default), a fixed set of extra runs then
-starts from the reported solution: with each communality index in turn,
+follows, most of them from the reported solution: with each communality
+index in turn,
 and then all of them, set near the upper bound (0.99); with each free
 angle shifted by 90, -90 and 180 degrees; with each pair of free angles
 swapped, alone and with either swapped scale's communality index near the
@@ -168,13 +169,13 @@ turn near the bound. If one of these runs reaches a discrepancy lower than
 the reported one by more than 0.01 on the chi-square scale, \code{print()} and
 \code{summary()} print a note. It gives that difference, the degrees of
 freedom of the lower solution when they differ, whether the lower
-solution keeps the scales' order around the circle, and how many more
-communality indices it has at the upper bound; \code{details$lower_check}
-holds the same record. The reported solution, its fit indices and its
+solution keeps the scales' order around the circle, and how many more or
+fewer communality indices it has above 0.995; \code{details$lower_check} holds
+the same record. The reported solution, its fit indices and its
 confidence intervals do not change: in the package's simulations of
-normal data at two eight-scale truths, the lower solutions these runs
-reached estimated the true angles and weights worse on average than the
-reported one. The extra runs do not find every lower discrepancy, so a
+normal data at two eight-scale truths with three harmonics, the lower
+solutions these runs reached estimated the true angles and weights worse
+on average than the reported one, though not on every fit. The extra runs do not find every lower discrepancy, so a
 fit with no note can still have one. The check uses no random numbers,
 and it runs only for \code{model = "quasi-circumplex"} with \code{scaling = "unit"}, the model and scaling those simulations covered.
 }

@@ -1011,8 +1011,8 @@ cpm_polish_beta <- function(fit, R, spec) {
 # ---- lower-discrepancy check (D-072) ----------------------------------------
 
 # The engine reports the lowest F its theory-centred battery reaches (D-071).
-# The check runs a fixed set of extra starts from that solution and reports a
-# lower F they reach, without adopting it (D-072). The starts are M170's
+# The check runs a fixed set of extra starts, most from that solution and some
+# from the battery's theory start, and reports a lower F they reach, without adopting it (D-072). The starts are M170's
 # estimator W (devel/m170-engine-estimate-helpers.R), whose shares, gaps and
 # misses devel/m170-engine-estimate.md records for variant A with unit
 # scaling, the only fits cpm_fit() runs the check on. Deterministic: no
@@ -1034,7 +1034,7 @@ cpm_lower_spec <- function(engine) {
 # angle, one swap per pair of free angles, and each swap again with the wall
 # on one of the two swapped scales. Around the battery's theory start: one
 # wall start per scale. That is p + 1 + 3(p - 1) + 3 choose(p - 1, 2) + p
-# starts, so the cost grows with about the square of p.
+# starts, a number that grows with about the square of p.
 cpm_lower_starts <- function(engine, R) {
   spec <- cpm_lower_spec(engine)
   # A weight the polish removed has no finite logit, so weights are floored
@@ -1669,8 +1669,8 @@ cpm_boundary_proximity <- function(object) {
 #'   solution is reported" and note a lower discrepancy they reach (default =
 #'   TRUE). The check runs only for `model = "quasi-circumplex"` with
 #'   `scaling = "unit"`, and only on the fit itself, never on bootstrap
-#'   resamples. Its cost grows with about the square of the number of scales,
-#'   so set it to FALSE to skip it when fitting many models.
+#'   resamples. The number of extra starts grows with about the square of the
+#'   number of scales, so set it to FALSE to skip it when fitting many models.
 #' @return A `circumplex_cpm` object: a list with `results` (a data frame of
 #'   estimated angles and communality indices with confidence intervals),
 #'   `betas` (the correlation-function weights), `fit` (the fit indices),
@@ -1706,7 +1706,8 @@ cpm_boundary_proximity <- function(object) {
 #'   smaller and its RMSEA and CFI are no better.
 #'
 #'   With `check_lower = TRUE` (the default), a fixed set of extra runs then
-#'   starts from the reported solution: with each communality index in turn,
+#'   follows, most of them from the reported solution: with each communality
+#'   index in turn,
 #'   and then all of them, set near the upper bound (0.99); with each free
 #'   angle shifted by 90, -90 and 180 degrees; with each pair of free angles
 #'   swapped, alone and with either swapped scale's communality index near the
@@ -1715,13 +1716,13 @@ cpm_boundary_proximity <- function(object) {
 #'   the reported one by more than 0.01 on the chi-square scale, `print()` and
 #'   `summary()` print a note. It gives that difference, the degrees of
 #'   freedom of the lower solution when they differ, whether the lower
-#'   solution keeps the scales' order around the circle, and how many more
-#'   communality indices it has at the upper bound; `details$lower_check`
-#'   holds the same record. The reported solution, its fit indices and its
+#'   solution keeps the scales' order around the circle, and how many more or
+#'   fewer communality indices it has above 0.995; `details$lower_check` holds
+#'   the same record. The reported solution, its fit indices and its
 #'   confidence intervals do not change: in the package's simulations of
-#'   normal data at two eight-scale truths, the lower solutions these runs
-#'   reached estimated the true angles and weights worse on average than the
-#'   reported one. The extra runs do not find every lower discrepancy, so a
+#'   normal data at two eight-scale truths with three harmonics, the lower
+#'   solutions these runs reached estimated the true angles and weights worse
+#'   on average than the reported one, though not on every fit. The extra runs do not find every lower discrepancy, so a
 #'   fit with no note can still have one. The check uses no random numbers,
 #'   and it runs only for `model = "quasi-circumplex"` with `scaling =
 #'   "unit"`, the model and scaling those simulations covered.

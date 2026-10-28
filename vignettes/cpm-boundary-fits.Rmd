@@ -216,7 +216,7 @@ does not guarantee that there is no boundary behind the data.
 **A lower discrepancy beside the fit.** `cpm_fit()` reports the lowest
 discrepancy that its starts from the theoretical angles reach (the
 `cpm_fit()` help section "Which solution is reported"). It then runs a fixed
-set of extra starts from that solution. If one reaches a discrepancy lower
+set of extra starts, most of them from that solution. If one reaches a discrepancy lower
 by more than 0.01 on the $\chi^2$ scale, `print()` and `summary()` add a note
 that begins "extra starts reached a solution whose $\chi^2$ is lower by". The
 note is not one of the five markers, and the analytic caution does not read
@@ -225,10 +225,11 @@ and the intervals stay those of the reported solution. What it tells you is
 that the reported $\chi^2$ is larger than at the lower solution, so at the
 same degrees of freedom the $p$-value is smaller and RMSEA and CFI are no
 better than they would be there. It also says whether the lower solution
-keeps the scales' order around the circle and how many more communality
-indices it has at the boundary. In the package's simulations, such lower
-solutions estimated the true angles and weights worse on average than the
-reported one, so the reported solution is still the one to read. Neither
+keeps the scales' order around the circle, and how many more or fewer
+communality indices it has above 0.995. The package's simulations covered
+normal data at two truths of eight octant scales with three harmonics.
+There, such lower solutions estimated the true angles and weights worse on
+average than the reported one, though not on every fit. Neither
 fit above prints the note. A fit with no note can still have a lower
 discrepancy, because the extra starts do not find every one. The check runs
 only for the default `"quasi-circumplex"` model with unit scaling, and

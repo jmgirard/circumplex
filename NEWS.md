@@ -38,7 +38,8 @@
 ## New features
 
 * `cpm_fit()` gains `check_lower = TRUE`. After the fit, a fixed set of
-  extra starts runs from the reported solution. If one reaches a
+  extra starts runs, most of them from the reported solution. If one
+  reaches a
   discrepancy more than 0.01 lower on the chi-square scale, `print()` and
   `summary()` print a note with the difference. `details$lower_check`
   records it too. The note also says whether the lower

@@ -2,8 +2,8 @@
 #
 # cpm_fit()'s check (cpm_lower_check() in R/cpm_fit.R) ports M170's W starts
 # (devel/m170-engine-estimate-helpers.R). This script regenerates every
-# replicate of two M170 cells from M170's own seeds and compares, on each
-# accepted fit:
+# replicate of two M170 cells from M170's own seeds. On every replicate it
+# compares whether the engine's fit is excluded, and on each accepted fit:
 #   - the shipped starts against m170_w_starts() (all.equal),
 #   - whether the shipped flag fires against the stored replaced[["W"]],
 #   - where it fires, the shipped gap against the stored (N - 1) (F_E - F_W),
