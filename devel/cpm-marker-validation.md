@@ -53,7 +53,7 @@ end-to-end.
 
 n = fits; coverage over defined CIs; **NA-CI rate** = fraction of fired
 fits whose Wald CIs are NA. Mechanism (verified against
-`cpm_analytic_se()`, R/cpm_fit.R:930–940): the SEs come back NA — all
+`cpm_analytic_se()` in R/cpm_fit.R): the SEs come back NA — all
 three families at once — exactly when `solve()` rejects the
 finite-difference Hessian as computationally singular; an
 indefinite-but-invertible Hessian instead has negative asymptotic

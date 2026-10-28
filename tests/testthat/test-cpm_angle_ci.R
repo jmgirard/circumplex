@@ -1,4 +1,4 @@
-# Oracle coverage for the CPM bootstrap angle-CI path (R/cpm_fit.R:1119-1121),
+# Oracle coverage for the CPM bootstrap angle-CI path (cpm_bootstrap()),
 # where cpm_bootstrap() reuses the SSM circular-quantile primitive
 # quantile.circumplex_radian() and converts the result to degrees. The primitive
 # itself is oracle-tested at the SSM bootstrap boundary (test-ssm_bootstrap.R);
@@ -8,11 +8,11 @@
 test_that("CPM angle-CI transform matches a dumb circular-quantile oracle at the 0/360 straddle (M13)", {
   # theta_reps[ok, i] for a variable whose accepted bootstrap displacement
   # straddles the 0/2*pi pole: four replicates just above 0 rad, four just
-  # below 2*pi. This is the input cpm_fit.R:1119 feeds to the circular quantile.
+  # below 2*pi. This is the input cpm_bootstrap() feeds to the circular quantile.
   reps  <- c(0.02, 0.05, 0.09, 0.13, 6.16, 6.20, 6.24, 6.27)
   probs <- c(0.025, 0.975)
 
-  # The verbatim composition cpm_bootstrap() applies at cpm_fit.R:1119-1121.
+  # The verbatim composition cpm_bootstrap() applies in cpm_fit.R.
   got <- as.numeric(as_degree(
     quantile.circumplex_radian(new_radian(reps), probs = probs)
   ))
@@ -76,7 +76,7 @@ test_that("cpm_fit() reports a pole-fixed reference angle and its CI as 360, not
 
 test_that("cpm_fit() bootstrap angle CI wraps a pole-straddling item, not linearizes it (M13)", {
   skip_on_cran()
-  # End-to-end guard with teeth on the real cpm_fit.R:1119 call site. We drive a
+  # End-to-end guard with teeth on the real call site in cpm_bootstrap(). We drive a
   # population whose last item sits at the 0/360 pole (Angle_theory = 360, a
   # non-reference item so it is estimated, not fixed) and sample enough noise
   # that its bootstrap angle replicates straddle the pole. The CIRCULAR quantile
@@ -84,7 +84,7 @@ test_that("cpm_fit() bootstrap angle CI wraps a pole-straddling item, not linear
   # crossing 0/360); a LINEAR quantile at the call site would instead report a
   # ~357deg non-wrapped span [~1, ~358] with the estimate outside it. Verified
   # out-of-band (assignInNamespace linearization) that all three pole-row
-  # assertions below flip to FAIL when line 1119 is linearized.
+  # assertions below flip to FAIL when that quantile call is linearized.
   deg <- c(45, 90, 135, 180, 225, 270, 315, 360)   # item 8 on the pole
   th  <- as.numeric(as_radian(as_degree(deg)))
   P   <- cpm_implied_cor(th, rep(0.7, 8), c(0.6, 0.25, 0.15))

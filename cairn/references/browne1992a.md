@@ -14,7 +14,7 @@ Pagination: the journal's own, *SMR* 21(2) 230–258; the shelf PDF is 29 pages
 and PDF page *n* is printed page *n* + 229, so printed p. 239 is PDF p. 10,
 confirmed by its running head rather than by arithmetic.
 Extraction: verified 2026-07-19 against the source by two independent channels — `pdftotext -layout` and a visual read of the `pdftoppm`-rendered page image — covering every value on this page, all of which come from the single p. 239 passage; per M41-D1 the second channel is the implementing session's own read of the page image, which is independent of the text layer but is **not** a human attestation, and no value here has been read by a human — observed 2026-07-19.
-Chapter-twin re-check: re-verified 2026-07-21 by M48 against `sources/browne1993.pdf` by the same two machine channels — `pdftotext -layout` and a read of the `pdftoppm`-rendered page image. The three cutoffs sit in one passage on **chapter p. 144** (PDF p. 9); the m = 2 worked-example row (4.915, 0.098, (0.083; 0.113), 7.282, (6.612; 8.086), 417.81) sits in **Table 6.1 on chapter p. 152** (PDF p. 17) — a *different* chapter page from the cutoffs, confirmed by the p. 151 / p. 153 running heads on the flanking PDF pages. Both match the 1992 values banked here word-for-word and digit-for-digit; still no page read by a human — observed 2026-07-21.
+Chapter-twin re-check: re-verified 2026-07-21 by M48 against `sources/browne1993.pdf` by the same two machine channels — `pdftotext -layout` and a read of the `pdftoppm`-rendered page image. The three cutoffs sit in one passage on **chapter p. 144** (PDF p. 9); the m = 2 worked-example row (4.915, 0.098, (0.083; 0.113), 7.282, (6.612; 8.086), 417.81) sits in **Table 6.1 on chapter p. 152** (PDF p. 17) — a *different* chapter page from the cutoffs, confirmed by the p. 151 / p. 153 running heads on the flanking PDF pages. Both match the 1992 values banked here word-for-word and digit-for-digit; still no page read by a human — observed 2026-07-21 (line cites replaced by function names, corrected M172).
 
 **Citation.** Browne, M. W., & Cudeck, R. (1992). Alternative ways of
 assessing model fit. *Sociological Methods & Research, 21*(2), 230–258. The
@@ -113,7 +113,7 @@ so a future change to that code has a published form to check against.
 
   ε̂ₐ = √(F̂₀ / d) = √( Max{ (F̂/d − 1/n), 0 } )
 
-  Implemented at `R/cpm_fit.R:1085` as
+  Implemented in `cpm_fit_indices()` (`R/cpm_fit.R`) as
   `rmsea <- sqrt(max(Fhat / df - 1 / n, 0))`. The `Max{·, 0}` truncation and
   the `− 1/n` correction are both the equation's, not the implementation's.
 
@@ -122,7 +122,7 @@ so a future change to that code has a published form to check against.
   (ε̂ₐL ; ε̂ₐU) = ( √( λ̂L / (n d) ) ; √( λ̂U / (n d) ) )
 
   where λ̂L and λ̂U are the noncentrality parameters obtained by inverting the
-  noncentral chi-square. Implemented at `R/cpm_fit.R:1039-1060`
+  noncentral chi-square. Implemented in `R/cpm_fit.R`
   (`cpm_rmsea_ci()`), whose closing line
   `c(sqrt(lambda_l / (n * df)), sqrt(lambda_u / (n * df)))` is eq. 14 term for
   term, with λ̂ found by `uniroot` on `pchisq(Tstat, df, ncp = λ)`.
@@ -147,9 +147,9 @@ rather than assume it is complete.
 these lines — a corrector changing any of them is changing an implementation of
 this paper, and the code now says so locally):
 
-- `R/cpm_fit.R:1085` — eq. 13, the RMSEA point estimate.
-- `R/cpm_fit.R:1039-1060` — eq. 14, `cpm_rmsea_ci()`, the 90% interval.
-- `R/cpm_oop.R:40-42,183-185` — where that estimate and interval are printed.
+- `R/cpm_fit.R`, `cpm_fit_indices()` — eq. 13, the RMSEA point estimate.
+- `R/cpm_fit.R`, `cpm_rmsea_ci()` — eq. 14, the 90% interval.
+- `R/cpm_oop.R`, `cpm_fit_line()` and `summary.circumplex_cpm()` — where that estimate and interval are printed.
 
 **Wording path** (the cutoffs):
 

@@ -326,7 +326,7 @@ This section is binding for M31 and supersedes any conflicting detail above.
 correctly and be in the snapshot/boundary sweep:
 `ggcircumplex()`, `geom_ssm_point()`, `geom_ssm_arc()`, `scale_x_circumplex()`,
 `ssm_plot_circle/curve/contrast()`, **`plot.circumplex_cpm`**
-(`R/cpm_oop.R:355-392`; maps communality with `amax = 1` → `rlim = c(0, 1)`),
+(`R/cpm_oop.R`; maps communality with `amax = 1` → `rlim = c(0, 1)`),
 and **`plot.circumplex_fit_structure`** (`R/fit_structure_oop.R:290-297`).
 
 **Two M31 tasks the spec originally missed (RR08 gap 6, R-7).**
@@ -352,13 +352,13 @@ and **`plot.circumplex_fit_structure`** (`R/fit_structure_oop.R:290-297`).
   pole without straddling; exercise `ssm_arc_span()`'s `max==360`/`min==0` edge).
 - **T-i2c** full-circle rejection relocated: `span >= 360` still errors with the
   same message from the new `setup_data()` home (`plot.circumplex_cpm`'s
-  `drawable` pre-filter, `R/cpm_oop.R:335`, assumes it exists).
+  `drawable` pre-filter, `R/cpm_oop.R`, assumes it exists).
 - **T-i3** pole: `d ∈ {0, 360}` (both float labels) draw at the identical angle,
   asserted at **grob level with tolerance** (`≤ 1e-12` npc, not `identical()`);
   bonus: out-of-branch `-10`/`370` wrap correctly.
 - **T-arc0** zero-width wedge: `xmin == xmax` **drops**, does not draw a
   degenerate radial line, and `plot.circumplex_cpm`'s legend-order coupling
-  (`R/cpm_oop.R:350-354`) still holds.
+  (`R/cpm_oop.R`) still holds.
 - **T-r1** amplitude `= amax` on the outer ring / `= center` at center, no
   per-layer `amax`. **T-r2** non-zero `center` relabels rings + remaps
   consistently (guards the R3 mislabel).

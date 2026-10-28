@@ -81,7 +81,7 @@ the current scheme satisfies (a) and (c) but not (b).
 `tryCatch`.
 
 **Defect.** `cpm_spec()` caps `m ≤ floor((p−1)/2) = 3` for variant A at p = 8
-(R/cpm_fit.R:112–121). Fitting `m = 4` therefore stops:
+(R/cpm_fit.R). Fitting `m = 4` therefore stops:
 `"m = 4 exceeds the identification cap (3) for variant A at p = 8"`
 (fixture-confirmed). The error propagates uncaught through
 `project_truth → resolve_cell → build_config_table`, so **every invocation of
@@ -436,7 +436,7 @@ time only the mapped work. Not a correctness issue; flagged because the plan's
 
 1. **Percentile arm as verbatim `cpm_bootstrap` reconstruction — CORRECT.**
    Line-by-line comparison of `sim_replicates()` (intervals.R:27–89) against
-   `cpm_bootstrap()` (R/cpm_fit.R:1038–1144): identical up-front
+   `cpm_bootstrap()` (R/cpm_fit.R): identical up-front
    `sample.int(N, N*boots)` index block, identical degenerate-resample test
    (NA or min eigenvalue ≤ 1e-10, then symmetrize), identical warm start +
    scaled-gradient acceptance with one deterministic restart, identical mirror
@@ -576,7 +576,7 @@ generating config) passes every check.**
 ### First, correct the record
 
 The config.R:148–150 rationale — "`accepted` … bundles the Heywood condition"
-— is factually wrong: `accepted = grad_ok && reproduced` (R/cpm_fit.R:632–635);
+— is factually wrong: `accepted = grad_ok && reproduced` (`cpm_engine()` in R/cpm_fit.R);
 Heywood is a separate flag it never reads. What failed on the underfit
 projection was the **`reproduced`** limb: of the six standard starts, exactly
 one reached min-F (probe: `at_min = {6}`, the other basins at ΔF = 2.2e-5 and
