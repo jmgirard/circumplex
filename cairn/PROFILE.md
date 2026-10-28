@@ -89,7 +89,8 @@ Followed by `/cairn-release` — a CRAN release walk (never self-submits):
 - Full local verification: `devtools::document()` (no diff), `devtools::test()`
   and `devtools::check()` clean, `devtools::build_readme()`, `pkgdown::check_pkgdown()`,
   `urlchecker::url_check()`.
-- Wide checks as applicable: `devtools::check_win_devel()` and/or R-hub; `revdepcheck` if dependents exist.
+- Wide checks: `devtools::check_win_devel()` on the final tree, every release, its result
+  in `cran-comments.md`. R-hub as applicable. `revdepcheck` if dependents exist.
 - Update `cran-comments.md` (test environments, check results, NOTE justifications, revdep summary).
 - Bump `Version:` in DESCRIPTION.
 - **linux-arm64 check, before the handoff**: `tools/arm64/check.sh <tarball>` on
