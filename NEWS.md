@@ -1,4 +1,4 @@
-# circumplex (development version)
+# circumplex 2.1.0
 
 ## Breaking changes
 
@@ -26,8 +26,8 @@
 
 ## New features
 
-* `cpm_fit()` gains `check_lower = TRUE`, the default, so a quasi-circumplex fit
-  with unit scaling now runs extra starts after the fit. If one reaches a
+* `cpm_fit()` gains `check_lower = TRUE`, the default, so a converged
+  quasi-circumplex fit with unit scaling now runs extra starts after the fit. If one reaches a
   discrepancy more than 0.01 lower on the chi-square scale, `print()` and
   `summary()` note the difference. The note also says whether the lower
   solution keeps the scales' order. `details$lower_check` records it. The
@@ -58,8 +58,8 @@
   Nagy, Etzel and Lüdtke (2019). It has one outer ring and a labelled
   crosshair (see `?coord_circumplex`). Labels on the 180 and 270 halves are
   signed, plotmath ones with a leading minus. `ggcircumplex()` also ticks the
-  rim on that grid and gains `angle_labels`, which adds each label's angle and
-  widens the margin (see `?ggcircumplex`).
+  rim on that grid and gains `angle_labels`, which adds each text label's angle
+  and widens the margin (see `?ggcircumplex`).
 
 * New simulated datasets: `simulated_occasions`, `simulated_growth` and
   `simulated_growth_origin`.
@@ -81,9 +81,9 @@
   some platforms and not on others. The accuracy check judges such a fit,
   which computes or is refused `"uncertified"`. If its information matrix is
   nearly singular, a fit the floor admits is now also checked, and it can be
-  refused `"uncertified"`. `"unidentified"` now names only two identical
-  derivative matrices, a derivative matrix equal to the identity, or an
-  exactly singular inversion.
+  refused `"uncertified"`. As a refusal, `"unidentified"` now names only two
+  identical derivative matrices, a derivative matrix equal to the identity,
+  or an exactly singular inversion.
 
 * Printed cautions and notes in `print()` and `summary()` now wrap to
   `options(width = )`. So do `instruments()`, whose entries lose their leading
@@ -99,10 +99,11 @@
   scale names of up to 16 characters it prints as one block at width 77. The
   `results` names do not change.
 
-* `summary()` of an `ssm_ci_accuracy()` result is about half as long. One
-  table shows each condition's coverage, certification rate and `Structural`
-  flag. The other columns stay in `coverage` and `guardrail`. The verdicts say
-  the same things, but a few joining words change.
+* `summary()` of an `ssm_ci_accuracy()` result is a third to half as long.
+  One table shows each condition's coverage, certification rate and
+  `Structural` flag. The other columns stay in `coverage` and `guardrail`. The
+  verdicts say the same things, and their dashes become colons, commas or full
+  stops.
 
 * `print()` of a multi-group `ssm_sem()` result shows the invariance verdict as
   a `Verdict:` line with labelled lines under it. If a comparable fit with no
@@ -142,8 +143,8 @@
   "Structure Tests and Ipsatization". Each vignette has a Level line, an
   Overview and a Wrap-up. The website's "Articles" menu is built from the
   articles index and lists every page by level, "Axes Reliability" included.
-  Six vignettes show only the calls they teach, and two load the new datasets
-  with `data()`. Output that follows the console width fits 80 columns
+  Six vignettes hide the code that simulates data, formats tables or checks
+  internals, and two load the new datasets with `data()`. Output that follows the console width fits 80 columns
   (`options(width = 77)`). Six vignettes are now in plain English and link the
   introduction. A "Not yet peer reviewed" notice opens the four pages on the
   package's unpublished methods. They are "SEM-Based SSM Analysis", "Latent
@@ -160,7 +161,7 @@
 * "Advanced Circumplex Visualization" adds a section, "The latent circumplex
   from a CPM fit", with figures after Nagy, Etzel and Lüdtke (2019). Its
   occasions figures no longer have tall, narrow panels or axis labels over a
-  point, and the first labels its spokes PA to NO.
+  point. The first occasions circle figure labels its spokes PA to NO.
 
 * Vignette statements now match the package. "SEM-Based SSM Analysis" says the
   strict tier frees the factor variances and covariances that the scaled tier
