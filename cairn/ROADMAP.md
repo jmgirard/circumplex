@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-28 (M172 done and archived: a bootstrap refit that 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M173 | Shorten NEWS and fix two pre-release details | review | — | normal | milestones/M173-pre-release-news-testthat.md |
+| M173 | Shorten NEWS and fix two pre-release details | in-progress | — | normal | milestones/M173-pre-release-news-testthat.md |
 | M172 | Exclude a bootstrap refit that errors in cpm_fit() | done | — | normal | milestones/archive/M172-cpm-bootstrap-refit-errors.md |
 | M171 | Flag a lower discrepancy that extra starts find in cpm_fit() | done | — | high | milestones/archive/M171-cpm-lower-discrepancy-check.md |
 | M170 | Measure the CPM engine's missed optima and settle which solution it reports | done | — | high | milestones/archive/M170-cpm-engine-estimate-study.md |

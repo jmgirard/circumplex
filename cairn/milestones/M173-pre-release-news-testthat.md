@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M173: Shorten NEWS and fix two pre-release details
 
-- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -82,6 +82,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: claim audit: 85 claims read, 5 corrected — NEWS.md (single-number acceptance vs `ssm_analyze_long()`, `vcov` warning only with the default contrast, amplitude and displacement match only, `NA` hollow only beside a verdict, SEM tier sentence); the same reader re-read the five and one reflowed sentence, all hold; vignette sentence and DESCRIPTION held.
 - 2026-10-28: T5 done: token checks pass on the final NEWS (150 lines; AC4 0 missing; AC6 4 allowed pointers, 0 new numbers); each (b) row's page read and holds after the L34 correction; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes, run on 8980d4f1, before the DESCRIPTION floor and the claim-audit NEWS fixes, which change no code; review reruns it on the final head.
 - 2026-10-28: user override: the user asked to pause when implement is done, so implement stops at `review` without invoking /milestone-review.
+- 2026-10-28: review return 1: AC3 fails as written; rows marked (a) whose detail the final NEWS does not state: L28 (margin widening for `angle_labels`), L40 (`instruments()` entries lose their leading space), L56 (reference scale now shows its communality interval), L60 (`?cpm_fit` lists the markers), L67 (menu built from the articles index), L70 ("Axes Reliability" now in the menu), L74 (plain-English vignettes link the introduction). Fix: state each in NEWS, or append a ledger correction to (b) where a page named in the bullet states it (`?ggcircumplex` states the margin; `?cpm_fit` lists the markers), keeping AC4-AC6 and the 150-line figure.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
