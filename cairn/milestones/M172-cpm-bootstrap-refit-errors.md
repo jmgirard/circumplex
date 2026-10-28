@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M172: Exclude a bootstrap refit that errors in cpm_fit()
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP4, GP2
 - **Resolves:** —
 - **Surface tier:** user-facing — changes what `cpm_fit()` returns when a bootstrap refit errors, and two help pages
-- **Branch/PR:** —
+- **Branch/PR:** m172-cpm-bootstrap-refit-errors
 
 ## Goal
 
@@ -83,7 +83,7 @@ and "Repoint stale line cites into cpm_fit.R".
 
 ## Tasks
 
-- [ ] T1: Tests first, in `tests/testthat/test-cpm_fit.R` or a new
+- [x] T1: Tests first, in `tests/testthat/test-cpm_fit.R` or a new
       `test-cpm_bootstrap.R`. Inside `test_that()`, mock `cpm_optimize_one()`
       and `cpm_gradient()` so they misbehave on bootstrap refits only, leaving
       the engine fit untouched. Probes: an error at each of the four wrapped
@@ -97,7 +97,7 @@ and "Repoint stale line cites into cpm_fit.R".
       nonconvergent exclusion; the seed behind `_snaps/cpm_api.md` has one)
       to the scratchpad for AC2's one-time `identical()` check; nothing is
       committed from master.
-- [ ] T2: In `cpm_bootstrap()`, wrap each attempt's `cpm_optimize_one()` and
+- [x] T2: In `cpm_bootstrap()`, wrap each attempt's `cpm_optimize_one()` and
       `cpm_gradient()` calls in `tryCatch(error = )`, and test acceptance with
       `isTRUE(gnorm <= tol)` so a non-finite norm fails it; a caught error or
       a failed test counts as nonconvergent. Nothing else in the loop is
@@ -105,7 +105,7 @@ and "Repoint stale line cites into cpm_fit.R".
       failing the convergence acceptance criterion are excluded" so it says
       the count includes refits that errored. NEWS entry.
       `devtools::document()`. Run AC2's `identical()` check and log it.
-- [ ] T3: Reword both marker lists so each `cpm_marker_labels()` value appears
+- [x] T3: Reword both marker lists so each `cpm_marker_labels()` value appears
       verbatim: `cpm_fit()`'s roxygen ("a removed harmonic", "a
       correlation-function weight below 0.10") and `summary.circumplex_cpm()`'s
       in `R/cpm_oop.R` ("removed harmonic", "small correlation-function
@@ -137,6 +137,12 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: plan chose wrapping only the estimation calls and the acceptance test over wrapping the whole loop body, because an error in the mirror guard or unpacking is a package defect that should stop the call; falsified by a user-reported refit error from those steps on valid data.
 - 2026-10-28: criteria audit (full, fresh Opus reader) returned 12 findings, all disposed: (1) AC1's master-failure clause moved to T1; (2) probes widened to four call sites, two error forms and a NaN norm in T1; (3) chose the help-sentence fix over reopening the warning label, held by the gate's answer; (4) non-finite gradient norm now fails acceptance (AC1, T2); (5) AC2 rewritten to a one-time `identical()` check plus unedited snapshots, no master fixture committed; (6) AC3 reads source Rd or the installed database, not "installed" alone; (7) the test reads each list, with four plants in T3; (8) `summary.circumplex_cpm()`'s marker list brought in, since it carries the same mismatch; (9) AC3 now promises page content, the test lives in T3; (10) AC4 no finding; (11) AC5 excludes `cairn/milestones/`; (12) AC6 no finding.
 - 2026-10-28: changelog: one NEWS entry for the refit fix; the help-page wording changes take none.
+- 2026-10-28: implement started on m172-cpm-bootstrap-refit-errors.
+- 2026-10-28: T1: probes in test-cpm_api.R through `local_refit_fault()` (four sites x two forms, a NaN norm, every refit); on master the one-error case stopped with "forced refit error" raised from `cpm_optimize_one()` inside `cpm_bootstrap()`, and the all-error case the same. Dropped a wrong precondition (one of master's 20 baseline refits is already nonconvergent); the count checks are relative to the unmocked run.
+- 2026-10-28: T2: the attempt moved into a helper, `cpm_boot_refit()`, whose `tryCatch()` covers the optimization, gradient and acceptance test; an attempt that errors is not restarted, since its point is gone. NEWS entry added; `cpm_api` tests pass.
+- 2026-10-28: AC2 check: master's and the branch's fits at seeds 1 and 2 (N = 300, boots = 100; 1 and 2 nonconvergent exclusions) are `identical(..., ignore.environment = TRUE)`; plain `identical()` is FALSE even between two reads of the same master file, because `corfun` is a closure.
+- 2026-10-28: full suite after T2: 0 failures, 15446 passes.
+- 2026-10-28: T3: both lists now carry the five labels verbatim; the `cpm_fit()` page states the 0.10 cut in its own sentence. Test "the help pages list every marker label summary() prints" in test-cpm_summary_markers.R reads the parenthetical after "weak-identification marker" from `man/` or `tools::Rd_db()`. Plants: renamed label fails, label left only outside the list fails (it still occurs once elsewhere on the collapsed page), label split over a line break passes, added key fails; files restored.
 
 ## Decisions
 

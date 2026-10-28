@@ -508,6 +508,126 @@ test_that("discarded bootstrap replicates are counted, warned, and surfaced", {
   expect_match(out, "excluded")
 })
 
+# Makes bootstrap refits misbehave at one site: `opt1`/`grad1` are the first
+# attempt's optimization and acceptance-gradient calls, `opt2`/`grad2` the
+# restart's (reached by a huge first gradient), `nan` returns NaN gradients on
+# both attempts. `at` names bootstrap replicates (`b`) or is "all". Engine fits
+# and the optimizer's own gradient calls run unchanged. Returns a counter of
+# faults fired.
+local_refit_fault <- function(site, at = 2L, form = c("stop", "solve"),
+                              .env = parent.frame()) {
+  form <- match.arg(form)
+  real_opt <- cpm_optimize_one
+  real_grad <- cpm_gradient
+  state <- new.env()
+  state$opt <- integer()
+  state$grad <- integer()
+  state$fired <- 0L
+  on_stack <- function(fn) {
+    which(vapply(sys.calls(), function(cl) identical(cl[[1]], fn), logical(1)))
+  }
+  boot_b <- function() {
+    hit <- on_stack(quote(cpm_bootstrap))
+    if (length(hit) == 0L) NULL else get("b", envir = sys.frame(hit[1]))
+  }
+  bump <- function(kind, b) {
+    v <- state[[kind]]
+    n <- if (length(v) >= b && !is.na(v[b])) v[b] + 1L else 1L
+    v[b] <- n
+    state[[kind]] <- v
+    n
+  }
+  targeted <- function(b) identical(at, "all") || b %in% at
+  fault <- function() {
+    state$fired <- state$fired + 1L
+    if (form == "stop") stop("forced refit error") else solve(matrix(0, 2, 2))
+  }
+  local_mocked_bindings(
+    cpm_optimize_one = function(gstar0, R, spec) {
+      b <- boot_b()
+      if (!is.null(b)) {
+        n <- bump("opt", b)
+        if (targeted(b) && site == paste0("opt", n)) fault()
+      }
+      real_opt(gstar0, R, spec)
+    },
+    cpm_gradient = function(gstar, R, spec) {
+      b <- boot_b()
+      if (!is.null(b) && length(on_stack(quote(cpm_optimize_one))) == 0L &&
+          targeted(b)) {
+        n <- bump("grad", b)
+        if (site == paste0("grad", n)) fault()
+        if (site %in% c("opt2", "grad2") && n == 1L) {
+          return(rep(1e6, length(gstar)))
+        }
+        if (site == "nan") {
+          state$fired <- state$fired + 1L
+          return(rep(NaN, length(gstar)))
+        }
+      }
+      real_grad(gstar, R, spec)
+    },
+    .env = .env
+  )
+  state
+}
+
+test_that("a bootstrap refit that errors is excluded and counted as nonconvergent", {
+  skip_on_cran()
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  boot_fit <- function() {
+    set.seed(1)
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 20)
+  }
+  # Replicate 2 is accepted without a fault, so a fault there moves one
+  # resample from used to nonconvergent.
+  base <- suppressWarnings(boot_fit())$details
+
+  probes <- expand.grid(site = c("opt1", "grad1", "opt2", "grad2"),
+                        form = c("stop", "solve"), stringsAsFactors = FALSE)
+  probes <- rbind(probes, data.frame(site = "nan", form = "stop"))
+  for (i in seq_len(nrow(probes))) {
+    pr <- probes[i, ]
+    label <- paste(pr$site, pr$form)
+    fit <- local({
+      state <- local_refit_fault(pr$site, form = pr$form)
+      w <- capture_warnings(fit <- boot_fit())
+      expect_gt(state$fired, 0L, label = label)
+      expect_match(w, paste(base$boots_nonconvergent + 1L,
+                            "failing the convergence acceptance criterion"),
+                   all = FALSE, label = label)
+      fit
+    })
+    det <- fit$details
+    expect_identical(det$boots_nonconvergent, base$boots_nonconvergent + 1L,
+                     label = label)
+    expect_identical(det$boots_used, base$boots_used - 1L, label = label)
+    expect_identical(det$boots_degenerate, base$boots_degenerate,
+                     label = label)
+    expect_true(all(is.finite(c(fit$results$Angle_lci, fit$results$Zeta_lci,
+                                fit$betas$Beta_lci))), label = label)
+  }
+})
+
+test_that("bootstrap intervals are NA with a warning when every refit errors", {
+  skip_on_cran()
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  state <- local_refit_fault("opt1", at = "all")
+  set.seed(1)
+  expect_warning(
+    fit <- cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 20),
+    "All 20 bootstrap resamples were excluded"
+  )
+  expect_identical(state$fired, 20L)
+  expect_identical(fit$details$boots_used, 0L)
+  expect_identical(fit$details$boots_nonconvergent, 20L)
+  expect_true(all(is.na(c(fit$results$Angle_lci, fit$results$Zeta_uci,
+                          fit$betas$Beta_lci))))
+  expect_true(all(is.finite(fit$results$Zeta)))
+})
+
 test_that("the per-replicate mirror guard reflects a mirrored solution back", {
   skip_on_cran()
   # A-review F10: reflect any replicate angularly closer to the mirror of
