@@ -30,22 +30,20 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 
 - [x] AC1: DESCRIPTION's Suggests entry reads `testthat (>= V)`, where V is 3.1.7, or, if the 3.1.7 run fails, the lowest version under which the run passes, the versions tried including every CRAN release from 3.1.7 up to V. The run is the package's test suite under `testthat::test_local()` with `NOT_CRAN=true` set and testthat V loaded from a temporary library placed ahead of the user library; it passes when it reports 0 failures and 0 errors and no more skipped tests than the same run under the installed testthat 3.3.2.
 - [x] AC2: In `vignettes/evaluating-circumplex-structure.Rmd.orig` and the shipped `vignettes/evaluating-circumplex-structure.Rmd`, the sentence that said the analytic caution prints "up to very large $N$" when a boundary marker is present instead states that, when a boundary marker is present, the analytic caution prints for every $N$ below $N = 50000$, matching `cpm_analytic_ci_n_boundary_caution` in `R/cpm_fit.R`. `grep -n 'very large' vignettes/*.Rmd vignettes/*.Rmd.orig` prints nothing, and `git diff` of each of the two files against the plan commit shows only that sentence changed.
-- [ ] AC3: Each row of the change ledger in this file's Decisions section (one row per user-visible change stated by the 51 development-section bullets of NEWS.md at the plan commit, each row citing its bullet) has one disposition that holds after the edit: (a) stated, where a post-edit development-section bullet states the change; (b) pointed, where a post-edit bullet names the change's subject and a help page (`?topic`) or vignette that, at the post-edit commit, states the change's after-state; or (c) dropped, where the row's before-state is absent from v2.0.1, shown by `git show v2.0.1:<path>` on the path the row names. Every row from a `## Breaking changes` bullet is (a), and its post-edit bullet sits under `## Breaking changes`. Every row naming a function, argument, dataset or vignette that v2.0.1 shipped, whose change alters returned values, refusals, warnings or printed output, is (a) or (b).
-- [x] AC4: Every function and argument named in backticks in a `## Breaking changes` bullet at the plan commit is named in backticks in a post-edit bullet under that heading (a script compares the two token sets).
-- [x] AC5: The post-edit development section of NEWS.md, from the `# circumplex (development version)` line to the line before `# circumplex 2.0.1`, is at most 170 lines (`awk` line count), down from 506. Where AC3 and AC5 cannot both hold, AC3 holds and AC5's figure is amended at a gate.
-- [x] AC6: Every backticked token and every numeric literal in the post-edit development section also appears in the development section at the plan commit, except a backticked `?topic` whose topic is an `\alias{}` in `man/*.Rd`, or a backticked `vignette("<name>")` whose `<name>.Rmd` is in `vignettes/` (a script checks both).
-- [ ] AC7: `Rscript -e 'devtools::test()'` reports 0 failures with the installed testthat, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors and 0 warnings.
+- [ ] AC3: Every function and argument named in backticks in a `## Breaking changes` bullet at the plan commit is named in backticks in a post-edit bullet under that heading (a script compares the two token sets).
+- [ ] AC4: The post-edit development section of NEWS.md, from the `# circumplex (development version)` line to the line before `# circumplex 2.0.1`, is at most 170 lines (`awk` line count), down from 506.
+- [ ] AC5: Every backticked token and every numeric literal in the post-edit development section also appears in the development section at the plan commit, except a backticked `?topic` whose topic is an `\alias{}` in `man/*.Rd`, or a backticked `vignette("<name>")` whose `<name>.Rmd` is in `vignettes/` (a script checks both).
+- [ ] AC6: `Rscript -e 'devtools::test()'` reports 0 failures with the installed testthat, and `Rscript -e 'devtools::check(args = "--no-manual")'` reports 0 errors and 0 warnings.
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
 
 - AC1 → T1
 - AC2 → T2
-- AC3 → T3, T4
+- AC3 → T4, T5
 - AC4 → T4, T5
 - AC5 → T4, T5
-- AC6 → T4, T5
-- AC7 → T5
+- AC6 → T5
 
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits). -->
@@ -56,7 +54,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - [x] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
 - [x] T6: Review return 1: state in NEWS, or correct in the ledger to a page the bullet names, the detail of rows L28, L40, L56, L60, L67, L70 and L74; rerun the token checks and line count.
 - [x] T7: Review return 2: fix the NEWS findings the review settled fix-now (Review section), rebuilt with code spans kept whole; rerun token checks, lint and line count.
-- [x] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T5: Run the checks: the AC3 and AC5 token scripts, the AC4 line count (numbers as renumbered at the descope), a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates. -->
@@ -91,6 +89,8 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: substantive amendment: AC5's figure 150 → 170 lines. The return-2 fixes (a corrected false statement on the reference scale and restored qualifiers) made the section 166 lines; AC3 wins under AC5's own clause, and the user chose "Allow 170 lines" at the stop over holding 150. The Goal's "about 150 lines" stands as written (plan-owned).
 - 2026-10-28: re-audit: AC5 (full) — passes all six questions; minor note to log the gate decision with its reason, done above.
 - 2026-10-28: thrash stop: the user chose "Drop AC3, fix, merge" (descope) over parking or a re-plan. Checkpoint, half-done: pass-3 NEWS fixes applied (170 lines, token checks pass, linter 0 hits); the AC3 removal awaits its fresh re-audit; remainder row "Check NEWS against v2.0.1 before release" filed with `— split from M173`.
+- 2026-10-28: substantive amendment: AC3 (the change-ledger criterion) removed at the user's descope choice; old AC4-AC7 renumbered AC3-AC6; the length criterion (now AC4) loses its "AC3 holds" clause; Coverage renumbered; T5's criterion numbers updated (minor). Remainder: candidate row "Check NEWS against v2.0.1 before release" (`— split from M173`). T3, T6 and T7 now serve no criterion. The Goal's "loses no change a v2.0.1 user would notice" now rests on the token checks (AC3, AC5) and the review passes, not a criterion.
+- 2026-10-28: re-audit: AC4 (full) — passes all six questions; flagged the stale Coverage map, T5's numbers and the Goal's unbacked clause, each handled in the amendment line above.
 - 2026-10-28: review return 3 (thrash rule (a) reached, stop for the user): AC3 fails at pass 3 on N21's page attribution (L49, L77), the false L34 correction, and the missing return-2 ledger corrections (L24, L27, L56, L65); fix-now findings listed in the Review section.
 
 ## Decisions
