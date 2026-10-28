@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M174: Check NEWS against v2.0.1 before release
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
 - **Principles touched:** GP3, GP5   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
 - **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
 - **Surface tier:** user-facing — NEWS.md ships to CRAN users   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
+- **Branch/PR:** m174-news-check-v201   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -62,7 +62,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits). -->
 
-- [ ] T1: Write `tools/news-interface-check.R`. The `^tools$` line of `.Rbuildignore` already keeps it out of the build. The script takes a base git ref and reads that ref's files with `git show` and `git ls-tree`. It applies the AC1 sets and match rules to the current code and prints each difference as matched, exempt or missing. If a difference is missing, it exits 1. It finds names only by the AC1 span rule, so `ssm_trajectory` is not found inside `ssm_plot_trajectory`.
+- [x] T1: Write `tools/news-interface-check.R`. The `^tools$` line of `.Rbuildignore` already keeps it out of the build. The script takes a base git ref and reads that ref's files with `git show` and `git ls-tree`. It applies the AC1 sets and match rules to the current code and prints each difference as matched, exempt or missing. If a difference is missing, it exits 1. It finds names only by the AC1 span rule, so `ssm_trajectory` is not found inside `ssm_plot_trajectory`.
 - [ ] T2: Show that the script reads a domain that is not empty and that it can fail. Against v2.0.1, it lists at least one difference in each set. Then run it on scratch copies of NEWS.md. Each plant below must be reported missing, with exit 1:
   - a name that is present only without backticks,
   - a name that is present only inside a longer name,
@@ -99,3 +99,5 @@ These terms apply below. The development section is the lines of NEWS.md before 
 - 2026-10-28: plan checkpoint (half-done): committed while a fresh Opus re-audit of the repaired AC1-AC3 and of AC4 at 170 runs; its findings land in a follow-up plan commit before implement starts.
 - 2026-10-28: re-audit (full mode, fresh Opus reader): 9 findings with repairs, 5 clean. Fixed: set 2 limited to exports and registered methods (it reached 9 internal helpers), span rule reworded to "is X, or begins with `X(` or X and `=`" with T1 using the same rule, exemption tied to `man/circumplex-ggproto.Rd`, floor as a whole token, AC2's citation clause moved to T5, new AC3 keeping every plan-commit span and title (guards M173's lost-condition failure under the 170-line hold; old AC3-AC4 now AC4-AC5), T2 gained 7 location and form plants, T5 checks the script's lists against a separate enumeration. It found 6 AC1 gaps today: 3 S3 methods (`print`/`rbind` on the trajectory, `print` on the growth formula), bare `nlme`, and the testthat floor.
 - 2026-10-28: release-window advisory overridden: `cairn_validate` flags M174 by its title, but it ships no version and the user asked for it by name; the release itself stays with `/cairn-release`.
+- 2026-10-28: implement started on branch m174-news-check-v201.
+- 2026-10-28: T1 done: `tools/news-interface-check.R` (base R; strips CR from `git show` output because some R/ files are CRLF, and marks text UTF-8 because Rscript runs here under `en_US`). Against v2.0.1 it lists 26 differences, 20 matched, 1 exempt (`GeomSsmEllipse`), 5 missing: `print`/`rbind` on the trajectory, `print` on the growth formula, `nlme`, the testthat floor; this equals the re-audit's independent count. It takes an optional news-file argument for T2's scratch copies, and finds the section as the lines before the second `# ` heading.
