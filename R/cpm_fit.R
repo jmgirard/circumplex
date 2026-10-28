@@ -1394,10 +1394,11 @@ cpm_mirror_guard <- function(par, spec, ref_rel_hat) {
 
 # One bootstrap refit attempt from `start`: the optimization and the sec. 3.5
 # scaled-gradient-norm acceptance test. An error from either call, or a
-# non-finite gradient norm or F, returns `accepted = FALSE`, so the caller
-# counts the resample as nonconvergent instead of stopping cpm_fit(). `par` is
-# NULL after any error, including a gradient error after the optimizer
-# returned a point, so an attempt that errors is never restarted.
+# non-finite gradient norm or F, returns `accepted = FALSE` instead of stopping
+# cpm_fit(). The caller restarts a failed attempt once and counts the resample
+# as nonconvergent if the restart fails too. `par` is NULL after any error,
+# including a gradient error after the optimizer returned a point, so an
+# attempt that errors is never restarted.
 cpm_boot_refit <- function(start, Rb, spec) {
   tryCatch({
     run <- cpm_optimize_one(start, Rb, spec)
@@ -1417,7 +1418,8 @@ cpm_boot_refit <- function(start, Rb, spec) {
 #' degenerate at 0 by construction). Replicate exclusion keys on the sec. 3.5
 #' scaled-gradient-norm acceptance criterion, never on the nlminb code
 #' (A-review F2); a refit whose optimization or gradient errors, or whose
-#' gradient norm or F is not finite, fails it too (`cpm_boot_refit()`); degenerate resamples (NA or non-PD correlation matrices,
+#' gradient norm or F is not finite, fails it too (`cpm_boot_refit()`; an
+#' attempt that errors gets no restart); degenerate resamples (NA or non-PD correlation matrices,
 #' e.g. rank-deficient at small N) are excluded with the same
 #' count-warning, conditional-on-estimability convention as `ssm_analyze()`.
 #' Angle replicates go through the existing circular quantile machinery
@@ -1780,7 +1782,8 @@ cpm_boundary_proximity <- function(object) {
 #'   circular quantile machinery, so an angle interval that straddles the
 #'   0/360 boundary is reported wrapped (its lower limit numerically exceeds
 #'   its upper limit, as with displacement intervals in [ssm_analyze()]).
-#'   Resamples with a degenerate (non-positive-definite) correlation matrix,
+#'   Resamples with a degenerate (NA or non-positive-definite) correlation
+#'   matrix,
 #'   or whose refit fails the convergence acceptance criterion or stops with
 #'   an error, are excluded with a warning reporting how many; the intervals
 #'   are then conditional on estimability. The count of refits failing the

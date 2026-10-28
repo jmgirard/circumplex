@@ -511,11 +511,11 @@ test_that("discarded bootstrap replicates are counted, warned, and surfaced", {
 # Makes bootstrap refits misbehave at one site: `opt1`/`grad1` are the first
 # attempt's optimization and acceptance-gradient calls, `opt2`/`grad2` the
 # restart's (reached by a huge first gradient), `nan` returns NaN gradients on
-# both attempts, `inf` an infinite F and infinite gradients on both, and `none`
+# both attempts, `inf` an infinite F with the real gradient on both, and `none`
 # only counts calls. `at` names bootstrap replicates (`b`) or is "all". Engine
 # fits and the optimizer's own gradient calls run unchanged. Returns an
-# environment whose `fired` field counts the faults fired and whose `opt` field
-# counts optimization attempts per replicate.
+# environment whose `fired` field counts the faults injected and whose `opt`
+# field counts optimization attempts per replicate.
 local_refit_fault <- function(site, at = 2L, form = c("stop", "solve"),
                               .env = parent.frame()) {
   form <- match.arg(form)
@@ -551,6 +551,7 @@ local_refit_fault <- function(site, at = 2L, form = c("stop", "solve"),
         n <- bump("opt", b)
         if (targeted(b) && site == paste0("opt", n)) fault()
         if (targeted(b) && site == "inf") {
+          state$fired <- state$fired + 1L
           res <- real_opt(gstar0, R, spec)
           res$F <- Inf
           return(res)
@@ -567,9 +568,9 @@ local_refit_fault <- function(site, at = 2L, form = c("stop", "solve"),
         if (site %in% c("opt2", "grad2") && n == 1L) {
           return(rep(1e6, length(gstar)))
         }
-        if (site %in% c("nan", "inf")) {
+        if (site == "nan") {
           state$fired <- state$fired + 1L
-          return(rep(if (site == "nan") NaN else Inf, length(gstar)))
+          return(rep(NaN, length(gstar)))
         }
       }
       real_grad(gstar, R, spec)
@@ -588,7 +589,7 @@ test_that("a bootstrap refit that errors is excluded and counted as nonconvergen
     cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 20)
   }
   # A fault at replicate 2 moves one resample from used to nonconvergent only
-  # if that replicate is accepted on its first attempt without one.
+  # if that replicate is used without one; it settles in one attempt.
   base <- local({
     state <- local_refit_fault("none")
     det <- suppressWarnings(boot_fit())$details

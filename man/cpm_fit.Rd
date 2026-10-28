@@ -202,7 +202,8 @@ percentile intervals; angle replicates are pooled with the package's
 circular quantile machinery, so an angle interval that straddles the
 0/360 boundary is reported wrapped (its lower limit numerically exceeds
 its upper limit, as with displacement intervals in \code{\link[=ssm_analyze]{ssm_analyze()}}).
-Resamples with a degenerate (non-positive-definite) correlation matrix,
+Resamples with a degenerate (NA or non-positive-definite) correlation
+matrix,
 or whose refit fails the convergence acceptance criterion or stops with
 an error, are excluded with a warning reporting how many; the intervals
 are then conditional on estimability. The count of refits failing the
