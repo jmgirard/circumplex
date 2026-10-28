@@ -155,6 +155,7 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: T6: added the `inf` probe (infinite F and gradients on both attempts) and a counting-only `none` baseline asserting replicate 2 takes one attempt; on 99456de5 the `inf` probe failed with the refit accepted (nonconvergent 1, expected 2). `cpm_boot_refit()` now requires a finite norm and F; on the finite path the comparison is master's. Comments fixed (helper, restart, roxygen), help sentence names errored refits, narrative comment removed from test-cpm_angle_ci.R. cpm_api, cpm_summary_markers and cpm_angle_ci tests: 0 failures, 1640 passes.
 - 2026-10-28: T6 checks at 5a05ef52: `devtools::test()` 0 failures, 15465 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. claim audit (return 1): not re-run, the added lines are comments, one help sentence and test code that pass-2 review reads. Status → review.
 - 2026-10-28: correction to the line above: the claim audit was owed and ran. claim audit: 21 claims read, 4 corrected — R/cpm_fit.R (helper comment names the one restart; roxygen notes an erroring attempt gets none; help sentence says "NA or non-positive-definite"), tests/testthat/test-cpm_api.R (baseline comment). Its coverage gap closed: the `inf` probe now sets only F infinite, keeping the real gradient; on 99456de5's `R/cpm_fit.R` it failed (refit accepted), on the fix it passes; cpm_api and cpm_summary_markers 0 failures, 1629 passes.
+- 2026-10-28: step-7 approval: m172-cpm-bootstrap-refit-errors approved for merge
 
 ## Decisions
 
