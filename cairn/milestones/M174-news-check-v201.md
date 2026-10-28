@@ -30,7 +30,7 @@ These terms apply below. The development section is the lines of NEWS.md before 
 ## Acceptance criteria
 <!-- owner: plan · create/amend-via-gate; review reads, never reinterprets. -->
 
-- [ ] AC1: Each difference between v2.0.1 and the merge head in the five sets below is matched in the development section. The one exception is an export documented in `man/circumplex-ggproto.Rd` whose `geom_*()` constructor is matched. The sets are:
+- [x] AC1: Each difference between v2.0.1 and the merge head in the five sets below is matched in the development section. The one exception is an export documented in `man/circumplex-ggproto.Rd` whose `geom_*()` constructor is matched. The sets are:
   1. the `export()` and `S3method()` lines of NAMESPACE,
   2. the argument names and default expressions of each function exported at both refs and each S3 method registered at both refs, read with `parse()` from top-level `name <- function(...)` assignments in `R/*.R`,
   3. the file names in `data/`, without `.rda`,
@@ -46,9 +46,9 @@ These terms apply below. The development section is the lines of NEWS.md before 
 
   The evidence is the output of `Rscript tools/news-interface-check.R v2.0.1`, run at the merge head with a clean working tree.
 - [ ] AC2: Each sentence of the development section at the merge head that is not in it at the plan commit is true of the package at the merge head. A sentence about earlier behavior is true of v2.0.1 instead. Sentences are compared after line breaks and runs of spaces become one space.
-- [ ] AC3: Each backtick span and each double-quoted title in the development section at the plan commit is also in it at the merge head (a script compares the two sets).
-- [ ] AC4: `sed -n '/^# circumplex 2.0.1/,$p' NEWS.md` gives the same bytes at the plan commit and at the merge head.
-- [ ] AC5: At the merge head, `awk '/^# circumplex 2.0.1/{exit} {n++} END{print n}' NEWS.md` prints 180 or less.
+- [x] AC3: Each backtick span and each double-quoted title in the development section at the plan commit is also in it at the merge head (a script compares the two sets).
+- [x] AC4: `sed -n '/^# circumplex 2.0.1/,$p' NEWS.md` gives the same bytes at the plan commit and at the merge head.
+- [x] AC5: At the merge head, `awk '/^# circumplex 2.0.1/{exit} {n++} END{print n}' NEWS.md` prints 180 or less.
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -125,3 +125,13 @@ These terms apply below. The development section is the lines of NEWS.md before 
   - S7 rungs rejected above the required one print on an `Also:` line, comparable or not: `R/ssm_sem.R:975-983` sets `facts$also` either way, printed at `:829`; v2.0.1 named them only in a comparable fit's verdict (`v2.0.1:R/ssm_sem.R:1016-1023`).
   - S8 the stored verdict changes only in wording: each verdict phrase at v2.0.1 is still in `R/ssm_sem.R` except "additionally rejected (reported only -- not required", which became "also rejected (reported only and not required" (`:977-986`), a `grep -cF` count of seven phrases at both refs.
   - S9 given a data frame, `ssm_plot_trajectory()` refuses a `time` column named `xend`, `yend` or `Interpretable`: `R/ssm_trajectory.R:185` (reserved names), `:223-233` (the refusal), reached from the data-frame method at `:555` through `:571`; v2.0.1's reserved list `:179-186` lacks the three.
+
+## Review
+<!-- owner: review · exclusive -->
+
+Pass 1, 2026-10-28, at d07eb836 (branch level with `origin/master` 077ab172, clean tree).
+
+- AC1: `Rscript tools/news-interface-check.R v2.0.1` at d07eb836, clean tree: exit 0, "26 differences since v2.0.1: 26 matched, 0 exempt, 0 missing" (set 1: 6 exports, 6 S3 methods; set 2: 4 arguments; set 3: 3 datasets; set 4: 5 titles; set 5: `nlme` added, testthat floor). T5's separate enumeration (NAMESPACE diff 12 lines, a `parse()` formals diff with 4 changes) agrees; T2's 12 plants and 8 positive forms passed (work log).
+- AC3: scratchpad `spans.R 077ab172`: 117 backtick spans and double-quoted titles in the plan-commit development section, 0 missing at d07eb836.
+- AC4: `cmp` of `sed -n '/^# circumplex 2.0.1/,$p' NEWS.md` at 077ab172 and d07eb836: identical.
+- AC5: `awk '/^# circumplex 2.0.1/{exit} {n++} END{print n}' NEWS.md` prints 175 (≤ 180).
