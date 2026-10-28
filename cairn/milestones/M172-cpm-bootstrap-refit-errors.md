@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M172: Exclude a bootstrap refit that errors in cpm_fit()
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -122,7 +122,7 @@ and "Repoint stale line cites into cpm_fit.R".
       Mark the `cairn/references/` pages `corrected M172` where they sit, and
       update `INDEX.md`. Re-run the grep. Cite by function name in this file's
       log.
-- [ ] T5: `devtools::test()`, then `devtools::check(args = "--no-manual")`.
+- [x] T5: `devtools::test()`, then `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -146,6 +146,7 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: T4 delegated to an Opus subagent (map each stale cite to its function by the cite's prose); checkpoint of its partial edits (`R/axes_reliability.R`, `INDEX.md`), T4 not done.
 - 2026-10-28: T4 done: 62 cites in 14 files now name a function or roxygen block (stale ones traced through `git show` of the commit that added them); AC5's grep prints nothing; every named function exists in `R/`; three reference pages carry `corrected M172`, hu1999's M164 note extended. Fixed two vague test-comment cites in test-cpm_angle_ci.R by hand. Bare-number cites with no file prefix in `devel/cpm-pack-boundary-brief.md` stay: outside AC5's grep and the row.
 - 2026-10-28: claim audit: 49 claims read, 2 corrected — R/cpm_fit.R (`cpm_boot_refit()` comment now names the NaN-F and infinite-F cases), tests/testthat/test-cpm_api.R (`local_refit_fault()` returns an environment).
+- 2026-10-28: T5 at 09317c69: `devtools::test()` 0 failures, 15458 passes; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes. 144b17af after it changes comments only. Status → review.
 
 ## Decisions
 
