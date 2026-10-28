@@ -1393,8 +1393,9 @@ cpm_mirror_guard <- function(par, spec, ref_rel_hat) {
 }
 
 # One bootstrap refit attempt from `start`: the optimization and the sec. 3.5
-# scaled-gradient-norm acceptance test. An error from either call, or a
-# non-finite gradient norm, returns `accepted = FALSE`, so the caller counts
+# scaled-gradient-norm acceptance test. An error from either call, a
+# non-finite gradient norm or a NaN F returns `accepted = FALSE` (an infinite
+# F with a finite gradient passes, as before this helper), so the caller counts
 # the resample as nonconvergent instead of stopping cpm_fit(); `par` is NULL
 # after an error, so an attempt that errors is not restarted.
 cpm_boot_refit <- function(start, Rb, spec) {

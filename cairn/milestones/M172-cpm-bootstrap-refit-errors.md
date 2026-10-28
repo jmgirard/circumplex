@@ -145,6 +145,7 @@ and "Repoint stale line cites into cpm_fit.R".
 - 2026-10-28: T3: both lists now carry the five labels verbatim; the `cpm_fit()` page states the 0.10 cut in its own sentence. Test "the help pages list every marker label summary() prints" in test-cpm_summary_markers.R reads the parenthetical after "weak-identification marker" from `man/` or `tools::Rd_db()`. Plants: renamed label fails, label left only outside the list fails (it still occurs once elsewhere on the collapsed page), label split over a line break passes, added key fails; files restored.
 - 2026-10-28: T4 delegated to an Opus subagent (map each stale cite to its function by the cite's prose); checkpoint of its partial edits (`R/axes_reliability.R`, `INDEX.md`), T4 not done.
 - 2026-10-28: T4 done: 62 cites in 14 files now name a function or roxygen block (stale ones traced through `git show` of the commit that added them); AC5's grep prints nothing; every named function exists in `R/`; three reference pages carry `corrected M172`, hu1999's M164 note extended. Fixed two vague test-comment cites in test-cpm_angle_ci.R by hand. Bare-number cites with no file prefix in `devel/cpm-pack-boundary-brief.md` stay: outside AC5's grep and the row.
+- 2026-10-28: claim audit: 49 claims read, 2 corrected — R/cpm_fit.R (`cpm_boot_refit()` comment now names the NaN-F and infinite-F cases), tests/testthat/test-cpm_api.R (`local_refit_fault()` returns an environment).
 
 ## Decisions
 

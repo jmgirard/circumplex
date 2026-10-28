@@ -512,8 +512,8 @@ test_that("discarded bootstrap replicates are counted, warned, and surfaced", {
 # attempt's optimization and acceptance-gradient calls, `opt2`/`grad2` the
 # restart's (reached by a huge first gradient), `nan` returns NaN gradients on
 # both attempts. `at` names bootstrap replicates (`b`) or is "all". Engine fits
-# and the optimizer's own gradient calls run unchanged. Returns a counter of
-# faults fired.
+# and the optimizer's own gradient calls run unchanged. Returns an environment
+# whose `fired` field counts the faults fired.
 local_refit_fault <- function(site, at = 2L, form = c("stop", "solve"),
                               .env = parent.frame()) {
   form <- match.arg(form)
