@@ -108,6 +108,37 @@ cpm_diagnostic_lines <- function(details) {
       "weakly identified."
     ))
   }
+  # Lower-discrepancy check (D-072): a lower F the extra starts reached. It
+  # is reported, never adopted, so the estimates shown are unchanged.
+  lc <- details$lower_check
+  if (isTRUE(lc$found)) {
+    df_text <- if (!isTRUE(all.equal(lc$df, details$spec$df))) {
+      paste0(" (at df = ", lc$df, ")")
+    } else {
+      ""
+    }
+    shape <- if (is.na(lc$order_changed) || is.na(lc$more_wall)) {
+      "Its scale order and communality bounds could not be read. "
+    } else {
+      paste0(
+        if (lc$order_changed) {
+          "It puts the scales in a different order around the circle"
+        } else {
+          "It keeps the scales' order around the circle"
+        },
+        " and has ", abs(lc$more_wall),
+        if (lc$more_wall < 0) " fewer" else " more",
+        " communality ", if (abs(lc$more_wall) == 1) "index" else "indices",
+        " at the upper bound. "
+      )
+    }
+    msg <- c(msg, note(
+      "Note: extra starts reached a solution whose χ² is lower by ",
+      sprintf("%.3f", lc$gap), df_text, ". ", shape,
+      "The estimates shown are unchanged; see \"Which solution is ",
+      "reported\" in ?cpm_fit."
+    ))
+  }
   # Bootstrap replicate accounting (design sec. 5.2): surface exclusions.
   if (identical(details$ci_method, "bootstrap") &&
       isTRUE(details$boots_used < details$boots)) {

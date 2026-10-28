@@ -1,0 +1,128 @@
+# M171: the shipped lower-discrepancy check against M170's estimator W.
+#
+# cpm_fit()'s check (cpm_lower_check() in R/cpm_fit.R) ports M170's W starts
+# (devel/m170-engine-estimate-helpers.R). This script regenerates every
+# replicate of two M170 cells from M170's own seeds and compares, on each
+# accepted fit:
+#   - the shipped starts against m170_w_starts() (all.equal),
+#   - whether the shipped flag fires against the stored replaced[["W"]],
+#   - where it fires, the shipped gap against the stored (N - 1) (F_E - F_W),
+#     within 1e-6 T units.
+# The cells are boundary N = 250 and interior N = 500. M170's results file
+# is devel/m170-engine-estimate-results.rds, run on an Apple M5 Pro (Mac17,9)
+# with R 4.6.1 and R's reference BLAS; the comparison is exact only on that
+# machine, because the basin nlminb() reaches can differ by BLAS build.
+#
+# Run from the package root:
+#   Rscript devel/m171-lower-check-oracle.R
+# It writes devel/m171-lower-check-oracle.md.
+
+devtools::load_all(".", quiet = TRUE)
+source(file.path("devel", "m170-engine-estimate-helpers.R"))
+
+# M170's truths, seeds and data draw, evaluated from its own script so that
+# they cannot drift from it (sourcing the script would run the study).
+m170_defs <- c("NS", "NS_RAW", "SEED_DATA", "p", "angles", "scales",
+               "configs", "make_truth", "replicate_seed", "draw_R")
+for (e in parse(file.path("devel", "m170-engine-estimate.R"))) {
+  if (is.call(e) && identical(e[[1]], as.name("<-")) &&
+      as.character(e[[2]]) %in% m170_defs) {
+    eval(e, globalenv())
+  }
+}
+stopifnot(all(vapply(m170_defs, exists, logical(1))))
+
+stored <- readRDS(file.path("devel", "m170-engine-estimate-results.rds"))
+cells <- list(list(cfg = "boundary", N = 250), list(cfg = "interior", N = 500))
+REPS <- stored$reps
+CORES <- max(1, parallel::detectCores() - 1)
+
+stored_cell <- function(cfg, N) {
+  hit <- Filter(function(cc) identical(cc$cfg, cfg) && cc$N == N, stored$cells)
+  stopifnot(length(hit) == 1)
+  hit[[1]]
+}
+
+compare_one <- function(cfg, N, i, truth_fit, rec) {
+  set.seed(replicate_seed(match(cfg, names(configs)), N, i))
+  R <- draw_R(truth_fit, N)
+  eng <- m170_engine_e(R, angles, 3)
+  excluded <- is.null(eng) || !isTRUE(eng$accepted)
+  out <- list(i = i, excluded = excluded,
+              excluded_match = identical(excluded, isTRUE(rec$excluded)))
+  if (excluded || isTRUE(rec$excluded)) return(out)
+  spec <- m170_full_spec(eng, 3)
+  proto <- m170_w_starts(m170_base_par(eng, spec),
+                         m170_theory_par(R, eng, spec, 3), spec)
+  lc <- cpm_lower_check(eng, R, N)
+  stored_gap <- (N - 1) * (rec$F[["E"]] - rec$F[["W"]])
+  c(out, list(
+    starts_match = isTRUE(all.equal(cpm_lower_starts(eng, R), proto)),
+    found = lc$found, stored_found = isTRUE(rec$replaced[["W"]]),
+    gap = lc$gap, stored_gap = stored_gap,
+    gap_match = !lc$found || isTRUE(abs(lc$gap - stored_gap) <= 1e-6)
+  ))
+}
+
+results <- lapply(cells, function(cl) {
+  truth_fit <- make_truth(configs[[cl$cfg]])
+  sc <- stored_cell(cl$cfg, cl$N)
+  stopifnot(length(sc$reps) == REPS)
+  rows <- parallel::mclapply(seq_len(REPS), function(i) {
+    compare_one(cl$cfg, cl$N, i, truth_fit, sc$reps[[i]])
+  }, mc.cores = CORES, mc.preschedule = FALSE)
+  acc <- Filter(function(r) !r$excluded, rows)
+  list(
+    cell = sprintf("%s N = %d", cl$cfg, cl$N),
+    replicates = length(rows),
+    excluded_mismatch = sum(!vapply(rows, `[[`, logical(1), "excluded_match")),
+    accepted = length(acc),
+    start_mismatch = sum(!vapply(acc, `[[`, logical(1), "starts_match")),
+    flag_mismatch = sum(vapply(acc, function(r) r$found != r$stored_found,
+                               logical(1))),
+    gap_mismatch = sum(!vapply(acc, `[[`, logical(1), "gap_match")),
+    fired = sum(vapply(acc, `[[`, logical(1), "found")),
+    max_gap_diff = max(c(0, vapply(Filter(function(r) r$found, acc),
+                                   function(r) abs(r$gap - r$stored_gap),
+                                   numeric(1))))
+  )
+})
+
+si <- utils::sessionInfo()
+machine <- tryCatch(system("sysctl -n hw.model machdep.cpu.brand_string",
+                           intern = TRUE), error = function(e) NA_character_)
+commit <- tryCatch(system("git rev-parse HEAD", intern = TRUE),
+                   error = function(e) NA_character_)
+dirty <- tryCatch(system("git status --porcelain -- R src", intern = TRUE),
+                  error = function(e) NA_character_)
+mismatches <- sum(vapply(results, function(r) {
+  r$excluded_mismatch + r$start_mismatch + r$flag_mismatch + r$gap_mismatch
+}, numeric(1)))
+
+row <- function(r) {
+  sprintf("| %s | %d | %d | %d | %d | %d | %d | %d | %.2e |", r$cell,
+          r$replicates, r$accepted, r$fired, r$excluded_mismatch,
+          r$start_mismatch, r$flag_mismatch, r$gap_mismatch, r$max_gap_diff)
+}
+md <- c(
+  "# M171: the shipped lower-discrepancy check against M170's W",
+  "",
+  "Generated by `devel/m171-lower-check-oracle.R`; do not edit by hand.",
+  "",
+  paste0("- Run ", format(Sys.Date()), " at commit ", commit,
+         if (length(dirty) > 0) " with uncommitted changes under R/ or src/"
+         else " with no uncommitted changes under R/ or src/", "."),
+  paste0("- Machine: ", paste(machine, collapse = ", "), "; ",
+         R.version.string, "; BLAS ", si$BLAS, "; LAPACK ", si$LAPACK, "."),
+  paste0("- M170's results file: devel/m170-engine-estimate-results.rds, ",
+         "run at commit ", stored$commit, " on ", stored$machine, "."),
+  "",
+  paste0("| cell | replicates | accepted | fired | excluded mismatch | ",
+         "start mismatch | flag mismatch | gap mismatch | max gap diff |"),
+  "|---|---|---|---|---|---|---|---|---|",
+  vapply(results, row, character(1)),
+  "",
+  paste0("Mismatches in all: ", mismatches, ".")
+)
+writeLines(md, file.path("devel", "m171-lower-check-oracle.md"))
+cat(md, sep = "\n")

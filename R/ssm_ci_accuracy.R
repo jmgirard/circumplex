@@ -435,7 +435,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         cpm_obj <- cpm_fit(
           cormat = Rw, n = sum(n_g) - G + 1, scales = scale_names,
           angles = angles_deg, m = m_eff, model = "quasi-circumplex",
-          ci_method = "analytic"
+          ci_method = "analytic", check_lower = FALSE
         )
       }
       P <- cpm_obj$matrices$Phat[scale_names, scale_names]

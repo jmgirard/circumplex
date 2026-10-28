@@ -1,13 +1,13 @@
 # M171: Flag a lower discrepancy that extra starts find in cpm_fit()
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP3, IP4, GP2, GP4, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing — a new `cpm_fit()` argument, new `details` fields and a printed note
-- **Branch/PR:** —
+- **Branch/PR:** m171-cpm-lower-check
 
 ## Goal
 
@@ -64,6 +64,8 @@ After the engine's fit, `cpm_fit()` runs M170's fixed set of extra starts and re
 - 2026-10-28: plan gate chose the default model only over all models, because M170 measured W there only; falsified by a study of W's cost and misses on the other models.
 - 2026-10-28: Fable review of the plan not requested. The question tool holds four questions, so the agent decided this one: the estimate does not change, D-072 already settled the statistics at Fable tier, and the oracles and review cover the wording.
 - 2026-10-28: changelog: one NEWS.md New features entry, for the argument and the note.
+- 2026-10-28: implement started on branch m171-cpm-lower-check. Implementation choices: the record is `details$lower_check` (checked, found, gap, df, order_changed, more_wall, failed_starts); `check_lower` is checked with `isTRUE() || isFALSE()` because `is_flag(NA)` is TRUE; the check is code in `cpm_fit()`, not `cpm_engine()`, so the engine and its oracles are untouched.
+- 2026-10-28: checkpoint, half done: T1 to T4 code and tests written, and `test-cpm_lower_check.R` passes with NOT_CRAN=true. T6 roxygen, DESIGN.md, the vignette paragraph and NEWS are written, and the vignette re-render is running. Not yet run: the full suite, the T5 oracle and T7. No task is ticked until the full suite passes.
 
 ## Decisions
 

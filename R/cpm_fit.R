@@ -1008,6 +1008,137 @@ cpm_polish_beta <- function(fit, R, spec) {
   list(fit = fit, spec = spec, removed = integer(0))
 }
 
+# ---- lower-discrepancy check (D-072) ----------------------------------------
+
+# The engine reports the lowest F its theory-centred battery reaches (D-071).
+# The check runs a fixed set of extra starts from that solution and reports a
+# lower F they reach, without adopting it (D-072). The starts are M170's
+# estimator W (devel/m170-engine-estimate-helpers.R), whose shares, gaps and
+# misses devel/m170-engine-estimate.md records for variant A with unit
+# scaling, the only fits cpm_fit() runs the check on. Deterministic: no
+# random numbers.
+
+# The full (unpolished) variant-A spec the engine fits before its polish.
+cpm_lower_spec <- function(engine) {
+  p <- length(engine$zeta)
+  spec <- cpm_spec(p, engine$spec$m, "A", engine$reference, scaling = "unit")
+  theta_theory <- engine$theta_theory * pi / 180
+  spec$theta_ref_val <- theta_theory[engine$reference]
+  spec$theta_fixed <- theta_theory
+  spec
+}
+
+# The extra starts, in the full layout. Around the engine's solution: one
+# communality-wall start per scale (its logit at logit .99), one start with
+# every communality there, three shifts (+90, -90, 180 degrees) per free
+# angle, one swap per pair of free angles, and each swap again with the wall
+# on one of the two swapped scales. Around the battery's theory start: one
+# wall start per scale. That is p + 1 + 3(p - 1) + 3 choose(p - 1, 2) + p
+# starts, so the cost grows with about the square of p.
+cpm_lower_starts <- function(engine, R) {
+  spec <- cpm_lower_spec(engine)
+  # A weight the polish removed has no finite logit, so weights are floored
+  # and renormalized. Communality logits come from the engine's own vector,
+  # clipped: the engine can push one past 37, where plogis() gives exactly 1
+  # and qlogis() of the reported communality is Inf (RR28).
+  b <- pmax(engine$beta, 1e-4)
+  base <- cpm_pack(engine$theta_rad_unwrapped, engine$zeta, b / sum(b), spec)
+  base[spec$i_zeta] <- pmin(pmax(engine$par[engine$spec$i_zeta], -30), 30)
+  theta_theory <- engine$theta_theory * pi / 180
+  sv <- cpm_start_values(R, theta_theory, engine$spec$m)
+  g0 <- cpm_pack(theta_theory, sv$zeta, sv$beta, spec)
+
+  wall <- stats::qlogis(0.99)
+  set_wall <- function(g, i) {
+    g[i] <- wall
+    g
+  }
+  swap <- function(g, ij) {
+    g[ij] <- g[rev(ij)]
+    g
+  }
+  per_scale <- lapply(spec$i_zeta, set_wall, g = base)
+  all_level <- set_wall(base, spec$i_zeta)
+  shifts <- unlist(lapply(spec$i_angle, function(i) {
+    lapply(c(90, -90, 180), function(d) {
+      g <- base
+      g[i] <- g[i] + d * pi / 180
+      g
+    })
+  }), recursive = FALSE)
+  pairs <- utils::combn(spec$i_angle, 2, simplify = FALSE)
+  swaps <- lapply(pairs, swap, g = base)
+  # a free angle's position in the angle block is its scale's position among
+  # spec$free_pos, which names the scale whose communality goes to the wall
+  swap_walls <- unlist(lapply(pairs, function(ij) {
+    lapply(ij, function(i) {
+      set_wall(swap(base, ij), spec$i_zeta[spec$free_pos[i]])
+    })
+  }), recursive = FALSE)
+  g0_walls <- lapply(spec$i_zeta, set_wall, g = g0)
+  starts <- c(per_scale, list(all_level), shifts, swaps, swap_walls, g0_walls)
+  stopifnot(all(vapply(starts, function(g) all(is.finite(g)), logical(1))))
+  starts
+}
+
+# Cyclic order of the scales, read counterclockwise from the reference.
+cpm_cyclic_order <- function(theta_deg, reference) {
+  order((theta_deg - theta_deg[reference]) %% 360)
+}
+
+# The check's record for cpm_fit()'s details. `n1` is N - 1, the multiplier
+# of the fit statistic. The flag fires when the lowest refit F lies more than
+# 0.01 below the engine's F in chi-square units. The lowest point is then
+# finished as the engine finishes its own (weight polish, canonicalization),
+# and the record gives the gap and df after that polish. A start whose refit
+# throws or returns a non-finite F is skipped; a finish that throws leaves the
+# raw gap at the full model's df, with the order and wall fields NA.
+cpm_lower_check <- function(engine, R, N) {
+  n1 <- N - 1
+  spec <- cpm_lower_spec(engine)
+  starts <- cpm_lower_starts(engine, R)
+  runs <- lapply(starts, function(st) {
+    tryCatch(cpm_optimize_one(st, R, spec), error = function(e) NULL)
+  })
+  ok <- vapply(runs, function(r) !is.null(r) && is.finite(r$F), logical(1))
+  out <- list(checked = TRUE, found = FALSE, gap = NA_real_,
+              df = NA_real_, order_changed = NA, more_wall = NA_integer_,
+              failed_starts = sum(!ok))
+  if (!any(ok)) return(out)
+  Fs <- vapply(runs[ok], function(r) r$F, numeric(1))
+  best <- runs[ok][[which.min(Fs)]]
+  if (!(n1 * (engine$F - best$F) > 0.01)) return(out)
+
+  out$found <- TRUE
+  out$gap <- n1 * (engine$F - best$F)
+  out$df <- spec$df
+  finished <- tryCatch({
+    polished <- cpm_polish_beta(best, R, spec)
+    canon <- cpm_canonicalize(polished$fit$par, polished$spec,
+                              engine$theta_theory * pi / 180)
+    nat <- cpm_unpack(canon$par, polished$spec)
+    list(F = polished$fit$F, df = polished$spec$df, zeta = nat$zeta,
+         theta = as.numeric(as_degree(as_radian(nat$theta %% (2 * pi)))))
+  }, error = function(e) NULL)
+  if (!is.null(finished)) {
+    out$gap <- n1 * (engine$F - finished$F)
+    out$df <- finished$df
+    out$order_changed <- !identical(
+      cpm_cyclic_order(finished$theta, engine$reference),
+      cpm_cyclic_order(engine$theta, engine$reference)
+    )
+    out$more_wall <- as.integer(sum(finished$zeta > 0.995) -
+                                  sum(engine$zeta > 0.995))
+  }
+  out
+}
+
+# The record of a check that did not run.
+cpm_lower_not_run <- function() {
+  list(checked = FALSE, found = NA, gap = NA_real_, df = NA_real_,
+       order_changed = NA, more_wall = NA_integer_, failed_starts = NA_integer_)
+}
+
 # =============================================================================
 # cpm_fit() user-facing API (design sec. 4-5, sec. 7) and the fit-index / analytic-CI
 # machinery it needs. The engine above is internal; this layer adds input
@@ -1534,6 +1665,12 @@ cpm_boundary_proximity <- function(object) {
 #'   `ci_method = "bootstrap"` (default = 2000).
 #' @param listwise Whether to handle missing values by listwise deletion. Only
 #'   listwise deletion is supported in this release (default = TRUE).
+#' @param check_lower Whether to run the extra starts described in "Which
+#'   solution is reported" and note a lower discrepancy they reach (default =
+#'   TRUE). The check runs only for `model = "quasi-circumplex"` with
+#'   `scaling = "unit"`, and only on the fit itself, never on bootstrap
+#'   resamples. Its cost grows with about the square of the number of scales,
+#'   so set it to FALSE to skip it when fitting many models.
 #' @return A `circumplex_cpm` object: a list with `results` (a data frame of
 #'   estimated angles and communality indices with confidence intervals),
 #'   `betas` (the correlation-function weights), `fit` (the fit indices),
@@ -1567,6 +1704,27 @@ cpm_boundary_proximity <- function(object) {
 #'   Where one exists, the reported chi-square statistic is larger than at the
 #'   lower discrepancy. At the same degrees of freedom, its p-value is then
 #'   smaller and its RMSEA and CFI are no better.
+#'
+#'   With `check_lower = TRUE` (the default), a fixed set of extra runs then
+#'   starts from the reported solution: with each communality index in turn,
+#'   and then all of them, set near the upper bound (0.99); with each free
+#'   angle shifted by 90, -90 and 180 degrees; with each pair of free angles
+#'   swapped, alone and with either swapped scale's communality index near the
+#'   bound; and, from the theoretical start, with each communality index in
+#'   turn near the bound. If one of these runs reaches a discrepancy lower than
+#'   the reported one by more than 0.01 on the chi-square scale, `print()` and
+#'   `summary()` print a note. It gives that difference, the degrees of
+#'   freedom of the lower solution when they differ, whether the lower
+#'   solution keeps the scales' order around the circle, and how many more
+#'   communality indices it has at the upper bound; `details$lower_check`
+#'   holds the same record. The reported solution, its fit indices and its
+#'   confidence intervals do not change: in the package's simulations of
+#'   normal data at two eight-scale truths, the lower solutions these runs
+#'   reached estimated the true angles and weights worse on average than the
+#'   reported one. The extra runs do not find every lower discrepancy, so a
+#'   fit with no note can still have one. The check uses no random numbers,
+#'   and it runs only for `model = "quasi-circumplex"` with `scaling =
+#'   "unit"`, the model and scaling those simulations covered.
 #' @section Confidence intervals:
 #'   The bootstrap (the raw-data default) refits the model to each resampled
 #'   correlation matrix, warm-started from the reported solution, and forms
@@ -1623,7 +1781,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
                     scaling = c("unit", "free"),
                     reference = 1, interval = 0.95,
                     ci_method = c("bootstrap", "analytic"),
-                    boots = 2000, listwise = TRUE) {
+                    boots = 2000, listwise = TRUE, check_lower = TRUE) {
 
   call <- match.call()
   model <- match.arg(model)
@@ -1652,6 +1810,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   stopifnot(is_scalar_count(m))
   stopifnot(is_num(interval, n = 1), interval > 0, interval < 1)
   stopifnot(is_flag(listwise))
+  stopifnot(isTRUE(check_lower) || isFALSE(check_lower))
   stopifnot(is_scalar_count(boots))
   if (!isTRUE(listwise)) {
     stop("Only listwise deletion is supported (`listwise = TRUE`).", call. = FALSE)
@@ -1718,6 +1877,14 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   # ---- fit the engine (deterministic; RNG is consumed only by the bootstrap) ----
   engine <- cpm_engine(R, angles = angles, m = m, variant = variant,
                        reference = reference, scaling = scaling)
+
+  # ---- lower-discrepancy check (D-072): top-level fit only, before the
+  # bootstrap, and only for the model and scaling M170 measured it on ----
+  lower_check <- if (check_lower && variant == "A" && scaling == "unit") {
+    cpm_lower_check(engine, R, N)
+  } else {
+    cpm_lower_not_run()
+  }
 
   # ---- fit indices ----
   q <- engine$spec$q
@@ -1824,6 +1991,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     heywood = engine$heywood,
     removed_harmonics = engine$removed_harmonics,
     multimodal = engine$multimodal,
+    lower_check = lower_check,
     # internal handles for the later bootstrap / simulate tasks (B3/B4)
     spec = engine$spec,
     par = engine$par,
