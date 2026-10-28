@@ -158,3 +158,12 @@ Pass 1, 2026-10-28, at d07eb836 (branch level with `origin/master` 077ab172, cle
 - prior-review: no regression of a prior review point; one record note on M173's "removed" wording, which names the graduated row — noted.
 - ripple #1: `?ssm_plot_trajectory` names no reserved `time` column names, so a reader of the help page will not find the refusal NEWS states — follow-up (candidate row "Document reserved trajectory time names").
 - ripple #2: the title of `tests/testthat/test-ssm_sem_groups.R:1194` says the stored verdict does not change — reject (false: that test compares two HEAD fits, which NEWS's v2.0.1 comparison does not contradict).
+- fixed 22af88b4: diff-bug #1, #2, #3, #4, #5 (T6).
+
+Pass 2, 2026-10-28, at 22af88b4 (branch level with `origin/master` 077ab172, clean tree).
+
+- AC1: `Rscript tools/news-interface-check.R v2.0.1` at 22af88b4: exit 0, 26 of 26 matched (set 5 now labelled by field: `nlme` added to Suggests, testthat floor in Suggests). T6's scratch repo and T2's 20 probes pass (work log).
+- AC3: `spans.R 077ab172`: 117 plan-commit spans and titles, 0 missing.
+- AC4: released sections byte-identical to 077ab172 (`cmp`).
+- AC5: 176 lines (≤ 180).
+- Gate: `cairn_validate` all checks passed; master runs, alert audits and branch protection as pass 1 (no master change since).
