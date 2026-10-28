@@ -10,10 +10,10 @@ are analytic, prints a coverage caution calibrated by simulation:
 unconditionally when the sample size is modest (N \< 2000, where Wald
 intervals mis-covered for every configuration studied), and from N =
 2000 up to but not including N = 50000 when the fitted solution shows a
-boundary or weak-identification marker (Heywood communality, removed
-harmonic, small correlation-function weight, ill-conditioning, or
-competing near-tied optima), the regime where they mis-covered even at
-large N (see
+boundary or weak-identification marker (Heywood communality, boundary
+harmonic removed, small correlation-function weight, ill-conditioned
+Hessian, or competing near-tied optima), the regime where they
+mis-covered even at large N (see
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)). The
 vignette section *When a fit sits at a boundary*
 ([`vignette("cpm-boundary-fits")`](http://circumplex.jmgirard.com/articles/cpm-boundary-fits.md))

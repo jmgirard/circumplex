@@ -324,17 +324,20 @@ percentile intervals; angle replicates are pooled with the package's
 circular quantile machinery, so an angle interval that straddles the
 0/360 boundary is reported wrapped (its lower limit numerically exceeds
 its upper limit, as with displacement intervals in <code><a href="ssm_analyze.html">ssm_analyze()</a></code>).
-Resamples with a degenerate (non-positive-definite) correlation matrix or
-a refit failing the convergence acceptance criterion are excluded with a
-warning reporting how many; the intervals are then conditional on
-estimability. Analytic (Wald) intervals are asymptotically valid but can
-materially mis-cover at field-typical sample sizes. For
+Resamples with a degenerate (NA or non-positive-definite) correlation
+matrix, or whose refit fails the convergence acceptance criterion or
+stops with an error, are excluded with a warning reporting how many; the
+intervals are then conditional on estimability. The count of refits
+failing the criterion, also stored as <code>details$boots_nonconvergent</code>,
+includes refits that stopped with an error. Analytic (Wald) intervals are
+asymptotically valid but can materially mis-cover at field-typical sample
+sizes. For
 <code>ci_method = "analytic"</code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints a caution whenever the
 sample size N is below 2000, and for 2000 &lt;= N &lt; 50000 when the fit shows
-a boundary or weak-identification marker (a Heywood communality, a
-removed harmonic, a correlation-function weight below 0.10, an
-ill-conditioned Hessian, or competing near-tied optima); at N &gt;= 50000 it
-prints none. The coverage behind these thresholds was measured on fits
+a boundary or weak-identification marker (Heywood communality, boundary
+harmonic removed, small correlation-function weight, ill-conditioned
+Hessian, or competing near-tied optima); at N &gt;= 50000 it prints none. A
+correlation-function weight counts as small below 0.10. The coverage behind these thresholds was measured on fits
 with a defined analytic standard error. Analytic intervals come from the
 normal-theory information matrix, so they assume multivariate-normal
 data; on the <code>cormat</code> path, where they are the only choice, the data
@@ -383,7 +386,7 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-in"><span><span class="va">scales</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">cpm_fit</span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="va">scales</span>, boots <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.</span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -414,7 +417,7 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-in"><span><span class="co"># Matrix-input path (supply the sample size; analytic CIs)</span></span></span>
 <span class="r-in"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">[</span><span class="va">scales</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cpm_fit</span><span class="op">(</span>cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="va">scales</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Circular Process Model (Browne, 1992) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model:             quasi-circumplex </span>
