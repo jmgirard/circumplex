@@ -4,7 +4,7 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M173: Shorten NEWS and fix two pre-release details
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
@@ -54,7 +54,7 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - [x] T2: Rewrite the sentence at `evaluating-circumplex-structure.Rmd.orig:167-168` and the shipped `.Rmd:228-229` identically, from `R/cpm_oop.R:383-394` and `R/cpm_fit.R:1566-1567` read in the same session.
 - [x] T3: Write the change ledger into this file's Decisions section and commit it before any commit that changes NEWS.md: one row per user-visible change, citing its bullet, naming the path whose v2.0.1 copy shows the before-state, and its planned disposition (a, b or c) with the post-edit bullet or the page it points to.
 - [x] T4: Rewrite NEWS.md lines 1-506 from the ledger, merging related bullets (for example the print-wrapping entries and the vignette splits), keeping the four headings, with Breaking changes first.
-- [ ] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T5: Run the checks: the AC4 and AC6 token scripts, the AC5 line count, a read of each (b) row's page, `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates. -->
@@ -80,6 +80,8 @@ Ready the development version for its CRAN release walk: a testthat floor the te
 - 2026-10-28: T1: testthat 3.1.7 from the CRAN archive does not build on R 4.6.1 (`reassign.c` calls `SET_BODY` and its siblings, gone from R's API; vendored Catch needs `std::uncaught_exception`). Scratch build with `-Wno-implicit-function-declaration`, `-D_LIBCPP_ENABLE_CXX20_REMOVED_UNCAUGHT_EXCEPTION`, and `reassign_function` stubbed to `Rf_error()`; only `with_mock()`/`local_mock()` reach it, and `grep -rnE '\b(with_mock|local_mock)\(' tests/ R/` finds none.
 - 2026-10-28: T1 done: `test_local()` with `NOT_CRAN=true` gave 81 files, 1353 tests, 0 failed, 0 errors, 1 skipped under both 3.1.7 and 3.3.2, the same skip (`test-axes-scaled-fit.R`, "AC9: the committed rates reproduce exactly in the same environment") and the same test set; V = 3.1.7, so no later release was tried. DESCRIPTION set to `testthat (>= 3.1.7)`; D-073 appended.
 - 2026-10-28: claim audit: 85 claims read, 5 corrected — NEWS.md (single-number acceptance vs `ssm_analyze_long()`, `vcov` warning only with the default contrast, amplitude and displacement match only, `NA` hollow only beside a verdict, SEM tier sentence); the same reader re-read the five and one reflowed sentence, all hold; vignette sentence and DESCRIPTION held.
+- 2026-10-28: T5 done: token checks pass on the final NEWS (150 lines; AC4 0 missing; AC6 4 allowed pointers, 0 new numbers); each (b) row's page read and holds after the L34 correction; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes, run on 8980d4f1, before the DESCRIPTION floor and the claim-audit NEWS fixes, which change no code; review reruns it on the final head.
+- 2026-10-28: user override: the user asked to pause when implement is done, so implement stops at `review` without invoking /milestone-review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local. -->
