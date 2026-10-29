@@ -56,7 +56,11 @@ knit_one <- function(name) {
   # which reads the committed files. Where a chunk sets out.width, it governs
   # display size. Plotmath symbols such as Delta are drawn in Arial rather than
   # the Symbol font, which Windows encodes without them.
+  #
+  # error = FALSE makes a chunk error stop the knit; knitr's default writes the
+  # error into the output and exits 0, which would ship it.
   knitr::opts_chunk$set(
+    error = FALSE,
     fig.path = file.path("figures", paste0(name, "-")),
     fig.cap = "",
     dev = "svglite",
@@ -69,13 +73,22 @@ knit_one <- function(name) {
     }
     options
   })
+  # knitr truncates its output file before it runs the first chunk, so a knit
+  # that fails part-way would leave the shipped .Rmd cut short. It knits to a
+  # temporary file instead, which replaces the .Rmd only once knit() returns.
+  out <- paste0(name, ".Rmd")
+  tmp <- paste0(out, ".tmp")
+  # after = FALSE: the relative path must be removed before setwd() restores.
+  on.exit(unlink(tmp), add = TRUE, after = FALSE)
   set.seed(12345)
-  knitr::knit(paste0(name, ".Rmd.orig"), paste0(name, ".Rmd"), quiet = TRUE)
+  knitr::knit(paste0(name, ".Rmd.orig"), tmp, quiet = TRUE)
+  if (!file.rename(tmp, out)) stop("could not replace ", out, call. = FALSE)
   invisible(NULL)
 }
 
-# Sourced by tools/m120-vignette-parity.R for VIGNETTES and knit_one(); the
-# command-line block below runs only when this file is the script being run.
+# Sourced by tools/check-vignette-staleness.R, tools/check-vignette-width.R and
+# tools/m120-vignette-parity.R, which read only VIGNETTES; the command-line
+# block below runs only when this file is the script being run.
 if (identical(environment(), globalenv())) {
 
 args <- commandArgs(trailingOnly = TRUE)
