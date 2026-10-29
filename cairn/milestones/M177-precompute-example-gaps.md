@@ -25,7 +25,7 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - [x] AC2: `knit_one()` knits with chunk errors fatal (`error = FALSE`) into a temporary file in `vignettes/` that replaces `vignettes/<name>.Rmd` only after `knitr::knit()` returns. In a scratch copy of the repo, `Rscript tools/precompute-vignettes.R introduction-to-ssm-analysis` run once with a chunk-level `stop()` and once with an inline `stop()` planted in `introduction-to-ssm-analysis.Rmd.orig` exits non-zero each time, leaves the shipped `introduction-to-ssm-analysis.Rmd` byte-identical (`cmp`), and leaves the list of `vignettes/*.Rmd*` files unchanged.
 - [x] AC3: The "Sourced by" comment in `tools/precompute-vignettes.R` names each file that `grep -rlE '(sys\.)?source\("tools/precompute-vignettes' --include='*.R' .` returns, says they read only `VIGNETTES`, and no longer names `knit_one()`.
 - [ ] AC4: After `Rscript tools/precompute-vignettes.R` re-renders all eleven vignettes with the new `knit_one()`, `Rscript tools/check-vignette-staleness.R` exits 0, and the vignette-precompute workflow passes on the PR head.
-- [ ] AC5: `devtools::test()` passes and `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings, 0 notes.
+- [x] AC5: `devtools::test()` passes and `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings, 0 notes.
 
 ## Coverage
 
@@ -70,6 +70,9 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - AC3 evidence (2026-10-30): the grep returns tools/check-vignette-staleness.R, tools/check-vignette-width.R, tools/m120-vignette-parity.R; the comment names those three, says they "read only VIGNETTES", and `grep -c "knit_one()"` on the file is 0.
 - Gate (2026-10-30): `cairn_validate.py` all passed; `document()` 0 `resolve link` lines and no man/NAMESPACE diff; `pkgdown::check_pkgdown()` no problems; master R-CMD-check and test-coverage newest push runs `success` (53580402); both alert audits and the branch-protection check exit 0; no new top-level files; README untouched. NEWS lacked an entry for the example change: fixed now, one Documentation bullet. Staleness re-run on the branch: all 11 up to date.
 - AC1 re-read after the fix-now commit 17a4782c: the comment now reads "This fit reaches a boundary (a communality at its upper limit), and its Hessian is also ill-conditioned, so the call warns and reports no usable intervals" and names the vignette; the call is unchanged (R/cpm_fit.R:1834).
+- AC5 evidence (2026-10-30, head 1f44c32e, after the fix-now commit): `devtools::check()` (`--no-manual --as-cran`, the gate's full check) 0 errors, 0 warnings, 0 notes in 8 m 0 s, its testthat run included (421 s, no failures); the new test also passed alone under `NOT_CRAN=true`. The earlier `devtools::test()` exit 0 and `check(args = "--no-manual")` clean ran before the fix-now commit.
+- AC4 part 1 evidence (2026-10-30): full re-render of all 11 vignettes with the new `knit_one()`, then `check-vignette-staleness.R` exit 0 (re-run on the branch: all 11 up to date). Part 2, the vignette-precompute workflow on the PR head, is read at the CI wait after approval; the box stays unticked until then.
+- Snapshot files changed on the branch: none (`git diff --name-only master...HEAD` holds no `_snaps` path).
 - spawned: diff-bug, blame-history, prior-review, ripple
 - diff-bug #1: the workflow's width step comment says it reads the fresh render, but after a failed render it reads committed copies — fix now, fixed 17a4782c
 - diff-bug #2: a killed knit leaves `vignettes/<name>.Rmd.tmp`, which no ignore file covers — fix now (`.Rbuildignore` and `.gitignore` entries), fixed 17a4782c
