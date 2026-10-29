@@ -32,9 +32,11 @@
     left: 52, right: 20, top: 16, bottom: 40,
     ymin: -1, ymax: 1
   };
-  // An amplitude arrow shorter than this many pixels is drawn without a head,
-  // which would otherwise reach below the elevation line.
+  // An amplitude arrow is drawn without its HEAD-pixel head when the head
+  // would reach below the elevation line; GAP keeps the head clear of the
+  // octant point drawn on the peak.
   var HEAD = 10;
+  var GAP = 7;
 
   function curve(theta, e, a, d) {
     return e + a * Math.cos((theta - d) * Math.PI / 180);
@@ -279,12 +281,14 @@
         var px = xScale(theta);
         var base = yScale(v.e);
         var top = yScale(v.e + v.a);
+        // The head stops short of the octant point that can sit on the peak.
+        var headed = base - top >= HEAD + GAP;
         var arrow = {
-          x1: px, x2: px, y1: base, y2: top,
+          x1: px, x2: px, y1: base, y2: headed ? top + GAP : top,
           stroke: LIGHT.mark, "stroke-width": 2.5, "stroke-dasharray": "2 4",
           "class": "ssm-amplitude-arrow"
         };
-        if (base - top >= HEAD) arrow["marker-end"] = "url(#ssm-arrowhead)";
+        if (headed) arrow["marker-end"] = "url(#ssm-arrowhead)";
         svgEl("line", arrow, peakGroup);
         var nearLeft = px - x0 < 30;
         var label = svgEl("text", {
