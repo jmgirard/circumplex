@@ -247,18 +247,18 @@ The figure below draws the curve $S = e + a \times \cos(\theta - d)$ for the val
 ```{r applet, echo = FALSE, results = "asis"}
 # The applet's source is written inline so that the built HTML and the pkgdown
 # article both carry it with no extra file to copy.
-cat("<script>", readLines("ssm-curve-applet.js"), "</script>", sep = "\n")
+cat("<script>", readLines("ssm-curve-applet.js", encoding = "UTF-8"), "</script>", sep = "\n")
 ```
 
 <noscript>
 <p>The sliders need JavaScript. This static figure shows the curve at an elevation of 0.1, an amplitude of 0.3 and a displacement of 90 degrees.</p>
 
-```{r applet-fallback, echo = FALSE, fig.width = 7.5, fig.height = 3.75, out.width = "100%", fig.alt = "An SSM cosine curve with elevation 0.1, amplitude 0.3 and displacement 90 degrees. A dashed line marks the elevation, an arrow from it to the peak at 90 degrees marks the amplitude, and points mark the curve at the eight octant angles."}
+```{r applet-fallback, echo = FALSE, fig.width = 7.5, fig.height = 3.75, out.width = "100%", fig.alt = "An SSM cosine curve with elevation 0.1, amplitude 0.3 and displacement 90 degrees. A dashed line marks the elevation, an arrow from it to the peak at 90 degrees marks the amplitude, a triangle under the peak marks the displacement, and points mark the curve at the eight octant angles."}
 e <- 0.1
 a <- 0.3
 d <- 90
 ggplot2::ggplot() +
-  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
+  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "#767676") +
   ggplot2::geom_hline(yintercept = e, linewidth = 1, linetype = "dashed") +
   ggplot2::geom_function(
     fun = function(x) e + a * cos((x - d) * pi / 180),

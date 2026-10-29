@@ -5,9 +5,11 @@
 //   node tools/check-ssm-applet.mjs                 # the shipped applet
 //   node tools/check-ssm-applet.mjs <path-to-copy>  # a planted copy
 //
-// It covers every slider setting (e from -0.5 to 0.5 by 0.05, a from 0 to 0.5
-// by 0.05, d from 5 to 360 by 5) at every theta from 0 to 360 by 1, and exits
-// 1 on the first rule that fails. Run by .github/workflows/vignette-precompute.yaml.
+// It pins the slider ranges and the plot's linear axes, then covers every
+// slider setting (e from -0.5 to 0.5 by 0.05, a from 0 to 0.5 by 0.05, d from
+// 5 to 360 by 5) at every theta from 0 to 360 by 1, and exits 1 on the first
+// rule that fails. tools/check-ssm-applet-plants.mjs shows that each rule can
+// fail. Both run in .github/workflows/vignette-precompute.yaml.
 
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
@@ -31,23 +33,57 @@ const expected = (theta, e, a, d) => e + a * Math.cos((theta - d) * Math.PI / 18
 const sameList = (x, y) =>
   Array.isArray(x) && x.length === y.length && x.every((v, i) => v === y[i]);
 
+const SLIDERS = [
+  { key: "e", min: -0.5, max: 0.5, step: 0.05 },
+  { key: "a", min: 0, max: 0.5, step: 0.05 },
+  { key: "d", min: 5, max: 360, step: 5 }
+];
+const shipped = (applet.SLIDERS ?? []).map(({ key, min, max, step }) => ({ key, min, max, step }));
+if (JSON.stringify(shipped) !== JSON.stringify(SLIDERS)) {
+  fail(`slider ranges are ${JSON.stringify(shipped)}, expected ${JSON.stringify(SLIDERS)}`);
+}
+
+// The axes are linear maps of the plot box, written here from PLOT's edges
+// rather than taken from the applet's own scale functions.
 const { PLOT } = applet;
-if (Math.abs(applet.xScale(0) - PLOT.left) > TOL) {
-  fail(`xScale(0) is ${applet.xScale(0)}, not the left edge ${PLOT.left}`);
+if (PLOT.ymin !== -1 || PLOT.ymax !== 1) {
+  fail(`y range is ${PLOT.ymin} to ${PLOT.ymax}, expected -1 to 1`);
 }
-if (Math.abs(applet.xScale(360) - (PLOT.width - PLOT.right)) > TOL) {
-  fail(`xScale(360) is ${applet.xScale(360)}, not the right edge ${PLOT.width - PLOT.right}`);
-}
-for (let theta = 1; theta <= 360; theta++) {
-  if (!(applet.xScale(theta) > applet.xScale(theta - 1))) {
-    fail(`xScale does not increase at theta = ${theta}`);
+const px = (theta) => PLOT.left + theta / 360 * (PLOT.width - PLOT.left - PLOT.right);
+const py = (y) => PLOT.top + (1 - y) / 2 * (PLOT.height - PLOT.top - PLOT.bottom);
+for (const theta of thetas) {
+  if (!(Math.abs(applet.xScale(theta) - px(theta)) <= 1e-9)) {
+    fail(`xScale(${theta}) is ${applet.xScale(theta)}, expected ${px(theta)}`);
   }
 }
-for (let k = 1; k <= 200; k++) {
-  const lo = PLOT.ymin + (k - 1) / 100;
-  const hi = PLOT.ymin + k / 100;
-  if (!(applet.yScale(hi) < applet.yScale(lo))) {
-    fail(`yScale does not decrease between ${lo} and ${hi}`);
+for (let k = -100; k <= 100; k++) {
+  const y = k / 100;
+  if (!(Math.abs(applet.yScale(y) - py(y)) <= 1e-9)) {
+    fail(`yScale(${y}) is ${applet.yScale(y)}, expected ${py(y)}`);
+  }
+}
+
+// Readouts: two decimals with no "-0.00", and d in whole degrees unless a = 0.
+const twoDecimals = (k) => {
+  const s = Math.abs(k * 5);
+  return `${k < 0 ? "-" : ""}${Math.floor(s / 100)}.${String(s % 100).padStart(2, "0")}`;
+};
+for (let k = -10; k <= 10; k++) {
+  if (applet.formatNumber(k / 20) !== twoDecimals(k)) {
+    fail(`formatNumber(${k / 20}) is "${applet.formatNumber(k / 20)}", expected "${twoDecimals(k)}"`);
+  }
+}
+for (const x of [-0, -1e-17, 1e-17, 0.1 + 0.2 - 0.3]) {
+  if (applet.formatNumber(x) !== "0.00") {
+    fail(`formatNumber(${x}) is "${applet.formatNumber(x)}", expected "0.00"`);
+  }
+}
+for (const a of as) {
+  for (const d of ds) {
+    const want = a === 0 ? "undefined" : `${d}°`;
+    if (applet.formatDisplacement(a, d) !== want) {
+      fail(`formatDisplacement(${a}, ${d}) is "${applet.formatDisplacement(a, d)}", expected "${want}"`);
+    }
   }
 }
 
@@ -87,8 +123,8 @@ for (const e of es) {
       }
       vertices.forEach((v, i) => {
         const [x, y] = v.split(/\s+/).map(Number);
-        const wx = applet.xScale(i);
-        const wy = applet.yScale(expected(i, e, a, d));
+        const wx = px(i);
+        const wy = py(expected(i, e, a, d));
         if (!(Math.abs(x - wx) <= PX_TOL && Math.abs(y - wy) <= PX_TOL)) {
           fail(`path vertex ${i} is (${x}, ${y}) at ${at}, expected (${wx}, ${wy})`);
         }

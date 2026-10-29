@@ -21,7 +21,9 @@
 # are SVGs whose bytes depend on svglite and the installed fonts, so they are
 # not reproducible across machines either and are not compared at all.
 # tools/check-ssm-applet.mjs last checks the introduction vignette's slider
-# applet (vignettes/ssm-curve-applet.js) with Node.
+# applet (vignettes/ssm-curve-applet.js) with Node, and
+# tools/check-ssm-applet-plants.mjs shows that the check fails on each defect
+# it is meant to catch.
 #
 # `cairn/**` is ignored: tracking-only commits cannot change a vignette.
 on:
@@ -113,10 +115,17 @@ jobs:
       # The introduction vignette's slider applet is JavaScript, which no R
       # check runs. At every slider setting, this checks its curve, octant and
       # path functions against e + a * cos(theta - d), and its peak function
-      # against the expected peak angles (none when a = 0). It uses the
+      # against the expected peak angles (none when a = 0). It also pins the
+      # slider ranges, the linear axes and the readout formats. It uses the
       # runner's own Node.
       - name: Check the introduction vignette's SSM applet
         if: ${{ !cancelled() }}
         run: |
           node --version
           node tools/check-ssm-applet.mjs
+
+      # Plants one defect of each kind the applet check reads in a copy of the
+      # applet and fails unless the check fails on every plant, with that
+      # rule's message, and passes on an unchanged copy.
+      - name: Fail if the applet check misses a planted defect
+        run: node tools/check-ssm-applet-plants.mjs
