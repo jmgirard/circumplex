@@ -57,7 +57,7 @@ The 2.1.0 tarball answers each NOTE of CRAN's 2026-10-29 incoming pretest.
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits); substantive change is amend-via-gate. -->
 
-- [ ] T1: In the `cpm_fit()` roxygen examples (R/cpm_fit.R, `@examples` near line 1817), wrap the `boots = 100` call and `fit` in `\donttest{}`. Keep the comment true, then run `devtools::document()`.
+- [x] T1: In the `cpm_fit()` roxygen examples (R/cpm_fit.R, `@examples` near line 1817), wrap the `boots = 100` call and `fit` in `\donttest{}`. Keep the comment true, then run `devtools::document()`.
 - [x] T2: In `knit_one()` of `tools/precompute-vignettes.R`, set `dev = "svglite"` and `fig.ext = "svg"`. `knit_one()` checks `requireNamespace("svglite")` before it knits and stops with an error that names `svglite`, because knitr's own error comes after it has truncated the output `.Rmd`. Nothing at the top level of the file loads `svglite`, because the staleness, width and parity scripts `sys.source()` the file in base R. The 144-dpi setting does not apply to SVG. If the rendered `.Rmd` files stay the same without it, remove it and its comment.
 - [x] T3: Install the branch's package, delete the PNGs in `vignettes/figures/` with `git rm`, and re-render every vignette. Run the staleness and width checks. Read the `.Rmd` diffs. A change outside the figure links and the declared volatile regions is a stop.
 - [x] T4: Add `any::svglite` to the `extra-packages` of the vignette-precompute job, and `svglite` to the `extra` of that workflow in `tools/check-ci-deps.R`. Run the guard.
@@ -89,6 +89,7 @@ The 2.1.0 tarball answers each NOTE of CRAN's 2026-10-29 incoming pretest.
 - 2026-10-29: checkpoint: NEWS 2.1.0 Documentation gains the SVG line; `cran-comments.md` waits for T7's tarball figures; T7 build and check running.
 - 2026-10-29: T7 tarball (`R CMD build` of the working tree at 146adca3): 5,134,444 bytes; `R CMD check --as-cran` with `_R_CHECK_DONTTEST_EXAMPLES_=false` gives `Status: OK`, `cpm_fit` 0.814 user + 0.008 system, 0.823 elapsed; examples 12 s, tests 47 s, install 11 s. GIFs 350,510 + 347,288 + 325,217 bytes in `tar tzvf`, 3 `data:image/gif` URIs in the introduction HTML.
 - 2026-10-29: T6 done: `cran-comments.md` rewritten as a resubmission from the T7 figures.
+- 2026-10-29: T1 done: `devtools::test()` FAIL 0, WARN 11, SKIP 1, PASS 15476. Look image for the merge question at `scratchpad/M175-look-worst3.png` (largest RMSE: advanced-visualization latent-vectors 0.0945, latent-measure 0.0778, ellipse-figure 0.0771, mostly a few-pixel offset); Δ figures: intermediate-ssm-analysis group_contrast, measure_contrast, model plots and sem-latent-contrasts contrast-plot.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
