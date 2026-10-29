@@ -1815,13 +1815,16 @@ cpm_boundary_proximity <- function(object) {
 #' @family analysis functions
 #' @export
 #' @examples
-#' # Raw-data path on the eight IIP-SC octant scales (bootstrap CIs; a small
-#' # `boots` keeps the example fast -- the default is 2000)
 #' data("jz2017")
 #' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#'
+#' \donttest{
+#' # Raw-data path on the eight IIP-SC octant scales (bootstrap CIs; a small
+#' # `boots` keeps the example short -- the default is 2000)
 #' set.seed(12345)
 #' fit <- cpm_fit(jz2017, scales = scales, boots = 100)
 #' fit
+#' }
 #'
 #' # Matrix-input path (supply the sample size; analytic CIs)
 #' R <- cor(jz2017[scales])

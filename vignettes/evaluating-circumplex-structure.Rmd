@@ -180,7 +180,7 @@ estimable.
 plot(cpm)
 ```
 
-<img src="figures/evaluating-circumplex-structure-cpm_plot-1.png" alt="plot of chunk cpm_plot" width="100%" />
+<img src="figures/evaluating-circumplex-structure-cpm_plot-1.svg" alt="plot of chunk cpm_plot" width="100%" />
 
 ### Reading the fit indices
 

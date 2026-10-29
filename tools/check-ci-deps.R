@@ -56,9 +56,11 @@ policy <- list(
   # missing Suggest would shorten what it reads too. brms is excluded for the
   # same reason as everywhere else: the Bayesian vignette is not pre-computed,
   # and its brm() chunk is eval = FALSE, so the guard knits it without brms.
+  # svglite is not a Suggest: only tools/precompute-vignettes.R draws the
+  # precomputed figures, and R CMD build reads the committed SVGs.
   ".github/workflows/vignette-precompute.yaml" = list(
     exclude = c("brms"),
-    extra = character(0L)
+    extra = c("svglite")
   )
 )
 
