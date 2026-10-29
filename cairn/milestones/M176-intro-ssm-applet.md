@@ -82,3 +82,24 @@ One interactive figure, in which the reader moves sliders for elevation, amplitu
 
 - AC1 (fresh, `f8da5fe2`): `git cat-file -e HEAD:vignettes/VIG1-{e,a,d}.gif` fails for all three files, and `git grep -n 'VIG1-' HEAD -- . ':!cairn/'` exits 1 with no line.
 - AC3 (fresh, `f8da5fe2`): `node tools/check-ssm-applet.mjs` exits 0, with "16632 slider settings, 361 angles each: OK" (21 × 11 × 72). The script loads the shipped source through `createRequire`. T1's 12 plants each failed it at their target rule. The PR's vignette-precompute run is the second piece of evidence, and the merge waits for it to go green.
+- spawned: diff-bug, blame-history, prior-review, ripple (one pass, on `f8da5fe2`).
+- diff-bug #1: the arrowhead (7 × stroke width = 17.5 px) is longer than the arrow at a ≤ 0.10 and reaches below e — fix now, fixed 836c4c81 (10 px head in user units, no head below 17 px), b4cb925c (head stops 7 px short of the peak point, which hid it).
+- diff-bug #2(i): yScale endpoints never pinned, so the −1 to 1 range is unchecked — fix now, fixed 836c4c81.
+- diff-bug #2(ii): path pixels expected from the applet's own scales, so a nonlinear map passes — fix now, fixed 836c4c81 (expected pixels from PLOT's edges; a nonlinear-x plant now fails).
+- diff-bug #2(iii): formatNumber and formatDisplacement unchecked — fix now, fixed 836c4c81.
+- diff-bug #2(iv): the check's slider grid is hardcoded apart from the sliders `build()` makes — fix now, fixed 836c4c81 (sliders come from an exported SLIDERS the check pins).
+- diff-bug #2(v): the oracle copies the applet's formula text — reject, planned change: AC3 names e + a·cos(θ − d) (gurtman1998 Eq. 1) as the oracle, and the degrees and sign plants show convention errors fail.
+- diff-bug #2(vi) and blame-history #1: the 12 plants ran once by hand, with no committed plants step as the width guard has — fix now, fixed 836c4c81 (`tools/check-ssm-applet-plants.mjs`, 17 plants and a control, as a workflow step).
+- diff-bug #3: colors as `var()` inside SVG attributes, which old viewers drop — fix now, fixed 836c4c81 (CSS rules on classes, literal light colors in the attributes).
+- diff-bug #4: the a label leaves the panel at d ≤ 15, and meets the e label near d = 360 — fix now, fixed 836c4c81 (a label flips inside the panel, and the e label goes to 345°, 15° or 180°, whichever is farthest from a peak).
+- diff-bug #5: `orient="auto-start-reverse"` is SVG 2 — fix now, fixed 836c4c81 (`auto`).
+- diff-bug #6: the d slider has no `aria-valuetext`, and the outputs re-announce — fix now, fixed 836c4c81 (value text on all three sliders, outputs `aria-live="off"`).
+- diff-bug #7: one hard-coded root and global ids, so a second applet would be empty — reject, planned change: the plan's layout answer is one applet on one page, and applets elsewhere are Scope Out.
+- diff-bug #8, blame-history #3, prior-review #1: the moved sentence "[0°, 360°) … may be reported as either value" sits beside a 360° readout, and is looser than D-003 — follow-up, new row "Tighten the introduction's pole sentence" (written at hygiene).
+- diff-bug #9: the fallback alt names no triangle, and its zero line is darkgray — fix now, fixed 836c4c81 (alt names the triangle, zero line #767676). Its third part, that pkgdown may not copy the fallback SVG, is rejected as false: the built article's `figures/` holds it and the `<img>` names it.
+- diff-bug #10: `readLines()` with no encoding — fix now, fixed 836c4c81.
+- diff-bug #11: 14 to 15 px text shrinks with the viewBox on phones — reject, style: it scales like the vignette's other SVG figures.
+- diff-bug (c): the grid sweep repeats one code path — reject, planned change: AC3 names the 21 × 11 × 72 grid.
+- blame-history #2 and prior-review #2: the `(development version)` heading, with DESCRIPTION still 2.1.0, makes `tools/news-interface-check.R v2.0.1` report 26 MISSING — reject, planned change: the plan put the bullet under a development heading because 2.1.0 is at CRAN. A 2.1.0 resubmission would move it into 2.1.0, and release timing is the user's.
+- prior-review #3: the moved paragraph has a semicolon and a 30-word sentence — follow-up, already item (i) of "Vignette prose follow-ons".
+- ripple #1: the source row "Shrink the introduction vignette GIFs" says the GIFs ship — fix now, at hygiene: the row graduates and is deleted.
