@@ -497,3 +497,16 @@ test_that("the help pages list every marker label summary() prints", {
     }
   }
 })
+
+test_that("the cpm_fit() matrix example on jz2017 warns at a boundary fit", {
+  skip_on_cran()
+  local_mocked_bindings(cpm_lower_check = real_lower_check)
+  e <- new.env()
+  data("jz2017", package = "circumplex", envir = e)
+  R <- cor(e$jz2017[m94_labels()])
+  expect_warning(
+    fit <- cpm_fit(cormat = R, scales = m94_labels(), n = nrow(e$jz2017)),
+    "CPM Hessian is ill-conditioned"
+  )
+  expect_true(fit$details$heywood)
+})

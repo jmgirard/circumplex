@@ -26,8 +26,8 @@ VIGNETTES <- c(
 
 knit_one <- function(name) {
   stopifnot(name %in% VIGNETTES)
-  # Checked before knitting: knitr's own error for a missing device package
-  # comes after it has already truncated the output .Rmd.
+  # Checked before knitting, so a missing svglite stops the run with an error
+  # that names it before any chunk runs.
   if (!requireNamespace("svglite", quietly = TRUE)) {
     stop("svglite is required to render the pre-computed vignette figures; ",
          "install it with install.packages(\"svglite\")", call. = FALSE)
