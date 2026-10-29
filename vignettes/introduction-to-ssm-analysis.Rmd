@@ -153,7 +153,7 @@ The figure below draws the curve $S = e + a \times \cos(\theta - d)$ for the val
 
   var CSS = [
     ".ssm-applet { --ssm-fg: #222222; --ssm-panel: #ebebeb; --ssm-grid: #ffffff;",
-    "  --ssm-zero: #8c8c8c; --ssm-curve: #d40000; --ssm-mark: #222222;",
+    "  --ssm-zero: #767676; --ssm-curve: #d40000; --ssm-mark: #222222;",
     "  --ssm-point: #ffffff; margin: 1em 0; color: var(--ssm-fg); }",
     "[data-bs-theme='dark'] .ssm-applet { --ssm-fg: #dee2e6; --ssm-panel: #2b3035;",
     "  --ssm-grid: #495057; --ssm-zero: #adb5bd; --ssm-curve: #ff6b6b;",
