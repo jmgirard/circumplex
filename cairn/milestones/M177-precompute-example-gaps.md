@@ -1,13 +1,13 @@
 # M177: Fix three precompute and example gaps
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
 - **Resolves:** —
 - **Surface tier:** user-facing — the `cpm_fit()` help-page example ships to users; the precompute script is internal.
-- **Branch/PR:** —
+- **Branch/PR:** m177-precompute-example-gaps
 
 ## Goal
 
@@ -37,7 +37,7 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 
 ## Tasks
 
-- [ ] T1: Add the comment above `R/cpm_fit.R:1830`, run `devtools::document()`, and run the example to see the warning and the boundary note it describes. Name the existing test that asserts this fit warns.
+- [x] T1: Add the comment above `R/cpm_fit.R:1830`, run `devtools::document()`, and run the example to see the warning and the boundary note it describes. Name the existing test that asserts this fit warns.
 - [ ] T2: In `knit_one()`, add `error = FALSE` to `opts_chunk$set()` and knit to `paste0(name, ".Rmd.tmp")`, renaming it over `<name>.Rmd` after `knit()` returns; an `on.exit()` removes a leftover temporary file. Update the function's comments. Run both AC2 probes, plus a probe-validity control: the same two plants under the default branch's script, showing the `.Rmd` changed or the run exiting 0.
 - [ ] T3: Rewrite the "Sourced by" comment from the AC3 grep.
 - [ ] T4: Re-render all vignettes, run the staleness check, `devtools::test()`, and `devtools::check(args = "--no-manual")`.
@@ -52,6 +52,8 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - 2026-10-30: criteria audit (full mode, fresh Opus reader): 12 findings. Fixed: the pole criteria left with the dropped work (IP2 text, grep spelling, help pages); the example comment no longer promises NA output, which can differ by BLAS; AC2 adds a chunk-level plant and `error = FALSE`, since a chunk `stop()` exits 0 under knitr's default, and names the entry point; the default-branch control moved to T2 as a probe-validity check; AC3 bans the stale `knit_one()` mention and widens the grep; AC4 re-renders all eleven vignettes and adds the workflow on the PR head.
 - 2026-10-30: plan gate chose a commented example over `model = "equal-communality"` because the default model stays the one users see; falsified by a CRAN check that flags the example's warning.
 - 2026-10-30: plan chose `error = FALSE` in `knit_one()` because no `.Rmd.orig` sets `error` and no rendered `.Rmd` holds `#> Error`; falsified by a vignette that needs to show an error.
+- 2026-10-30: implement started on branch m177-precompute-example-gaps; untracked `CRAN-SUBMISSION` left unstaged (not this milestone's).
+- 2026-10-30: T1 done: comment added above the matrix example, `devtools::document()` rewrote `man/cpm_fit.Rd`; `run_examples(start = "cpm_fit")` printed the NA intervals and the Heywood note, and the plan probe showed the ill-conditioned-Hessian warning. Pinned by test-cpm_summary_markers.R ("bootstrap summary() prints the fired-marker note"), which expects jz2017's fit to fire the Heywood and ill-conditioned-Hessian markers.
 
 ## Decisions
 
