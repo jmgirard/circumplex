@@ -111,8 +111,9 @@ jobs:
         run: Rscript tools/check-vignette-width-plants.R
 
       # The introduction vignette's slider applet is JavaScript, which no R
-      # check runs. This checks its curve, peak, octant and path functions
-      # against e + a * cos(theta - d) at every slider setting, using the
+      # check runs. At every slider setting, this checks its curve, octant and
+      # path functions against e + a * cos(theta - d), and its peak function
+      # against the expected peak angles (none when a = 0). It uses the
       # runner's own Node.
       - name: Check the introduction vignette's SSM applet
         if: ${{ !cancelled() }}

@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-29 (M175 done and archived: donttest example, SVG v
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M176 | Replace the introduction GIFs with a slider applet | in-progress | — | normal | milestones/M176-intro-ssm-applet.md |
+| M176 | Replace the introduction GIFs with a slider applet | review | — | normal | milestones/M176-intro-ssm-applet.md |
 | M175 | Clear CRAN's 2.1.0 pretest notes | done | — | high | milestones/archive/M175-cran-pretest-notes.md |
 | M174 | Check NEWS against v2.0.1 before release | done | — | normal | milestones/archive/M174-news-check-v201.md |
 | M173 | Shorten NEWS and fix two pre-release details | done | — | normal | milestones/archive/M173-pre-release-news-testthat.md |

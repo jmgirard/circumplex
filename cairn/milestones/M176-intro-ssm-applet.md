@@ -1,6 +1,6 @@
 # M176: Replace the introduction GIFs with a slider applet
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -72,3 +72,5 @@ One interactive figure, in which the reader moves sliders for elevation, amplitu
 - 2026-10-29: T4 NEWS: one Documentation bullet under a new `# circumplex (development version)` heading. It states no size figure, because the derived-figures rule would need one pinned.
 - 2026-10-29: T4 checks. `devtools::check(args = "--no-manual")` at `79ff3d4d`: 0 errors, 0 warnings, 0 NOTEs, and the `.js` source raised nothing, so it has no `.Rbuildignore` entry. At the merge base `c4e3b033`: 1 NOTE, a hidden `.git` file that the scratch worktree put there. `290fddd9` changed only one hex color after that run. `R CMD build` from `git archive` exports: 5,128,715 bytes at `c4e3b033` and 3,081,512 at `290fddd9`, 2,047,203 smaller. The tip's built HTML has 0 `data:image/gif` and one `<noscript>` holding the sentence and the fallback SVG with its descriptive alt. `git grep 'VIG1-'` outside `cairn/` finds nothing, and DESCRIPTION is unchanged since the merge base.
 - 2026-10-29: T4 browser reads. The applet `<script>` hashes the same (sha256 `8eff0a6b…`) in the tarball HTML, the rendered vignette read in the browser, the pkgdown article, and the source. At the reset values, the x labels are 45° to 360°, the y labels −1.0 to 1.0, the readouts 0.10, 0.30 and 90°, with 1 arrow, 1 marker, 8 points and dash `8 6`. At a = 0, d reads "undefined" with no arrow or marker. At d = 360, the arrows and markers sit at x = 52 and 620 (0° and 360°). Moving d to 5 changes the path. Arrow keys moved e, a and d in both renderings, each redrawing the curve, with no console error. The lowest contrast was the zero line at 2.82, so `290fddd9` set it to #767676. Re-measured: html_vignette under emulated dark stays white (lowest 3.81), pkgdown light lowest 3.81, pkgdown dark (`data-bs-theme=dark`) lowest 4.80.
+- 2026-10-29: claim audit: 27 claims read, 2 corrected — `.github/workflows/vignette-precompute.yaml` (the peak function is checked against a rule, not the formula), `vignettes/ssm-curve-applet.js` (the export guard sits after the pure functions, not at the bottom). The same reader re-read both: they hold. The `.Rmd` was re-rendered with the new header, and the Node check passes.
+- 2026-10-29: verify slot: no R code changed. The `devtools::check()` run at `79ff3d4d` ran the testthat suite clean (OK, 467 s), and nothing since touches R code or tests. Status set to review.

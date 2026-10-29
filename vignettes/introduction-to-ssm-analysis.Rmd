@@ -71,8 +71,9 @@ The figure below draws the curve $S = e + a \times \cos(\theta - d)$ for the val
 // tools/precompute-vignettes.R writes this file inline into
 // introduction-to-ssm-analysis.Rmd, inside a classic <script> placed after an
 // empty <div id="ssm-applet">. Node loads the same file through the
-// module.exports guard at the bottom, so tools/check-ssm-applet.mjs checks the
-// functions the page runs, not a copy of them.
+// module.exports guard after the pure functions, so tools/check-ssm-applet.mjs
+// checks the functions the page runs, as long as the .Rmd is re-rendered after
+// each edit here (the vignette-precompute staleness check fails until it is).
 //
 // Angles follow the package: degrees, with the pole labelled 360, never 0.
 // So the d slider runs from 5 to 360, and the x axis labels the octants
