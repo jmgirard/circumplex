@@ -173,7 +173,7 @@ plot(res)
 ```
 
 ![plot of chunk
-fit_structure_plot](figures/structure-tests-fit_structure_plot-1.png)
+fit_structure_plot](figures/structure-tests-fit_structure_plot-1.svg)
 
 For the IIP-SC octants, the picture agrees with the CPM fit in
 “Evaluating Circumplex Structure”. The scales keep their theoretical

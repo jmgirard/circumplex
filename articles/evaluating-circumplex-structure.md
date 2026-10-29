@@ -176,7 +176,7 @@ plot(cpm)
 ```
 
 ![plot of chunk
-cpm_plot](figures/evaluating-circumplex-structure-cpm_plot-1.png)
+cpm_plot](figures/evaluating-circumplex-structure-cpm_plot-1.svg)
 
 ### Reading the fit indices
 

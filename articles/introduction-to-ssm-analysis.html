@@ -177,7 +177,7 @@ experiences of a group of participants during an experiment, and a
 personality psychologist might want to understand what kind of
 interpersonal behaviors are associated with a trait (e.g.,
 extraversion).</p>
-<p><img src="figures/introduction-to-ssm-analysis-model-1.png" alt="plot of chunk model" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-model-1.svg" alt="plot of chunk model" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="the-structural-summary-method">The Structural Summary Method<a class="anchor" aria-label="anchor" href="#the-structural-summary-method"></a>
@@ -192,16 +192,16 @@ plotting a set of example scores below, we can gain a visual intuition
 that a cosine curve makes sense in this case. First, we can examine the
 scores with a bar chart ignoring the circular relationship among
 them.</p>
-<p><img src="figures/introduction-to-ssm-analysis-column-1.png" alt="plot of chunk column" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-column-1.svg" alt="plot of chunk column" width="100%"></p>
 <p>Next, we can leverage the fact that these subscales have specific
 angular displacements in the circumplex model (and that 0 and 360
 degrees are the same) to create a path diagram.</p>
-<p><img src="figures/introduction-to-ssm-analysis-path-1.png" alt="plot of chunk path" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-path-1.svg" alt="plot of chunk path" width="100%"></p>
 <p>This already looks like a cosine curve, and we can finally use the
 SSM to estimate the parameters of the curve that best fits the observed
 data. By plotting it alongside the data, we can get a sense of how well
 the model fits our example data.</p>
-<p><img src="figures/introduction-to-ssm-analysis-curve-1.png" alt="plot of chunk curve" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-curve-1.svg" alt="plot of chunk curve" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="understanding-the-ssm-parameters">Understanding the SSM parameters<a class="anchor" aria-label="anchor" href="#understanding-the-ssm-parameters"></a>
@@ -225,7 +225,7 @@ Before we discuss these parameters, however, we can also estimate the
 fit of the SSM model. This is essentially how close the cosine curve is
 to the observed data points. Deviations (in red, below) will lower model
 fit.</p>
-<p><img src="figures/introduction-to-ssm-analysis-residuals-1.png" alt="plot of chunk residuals" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-residuals-1.svg" alt="plot of chunk residuals" width="100%"></p>
 <p>If fit is less than 0.70, it is considered “unacceptable” and only
 the elevation parameter should be interpreted. If fit is between 0.70
 and 0.80, it is considered “adequate,” and if it is greater than 0.80,
@@ -318,7 +318,7 @@ agency, whereas a high score on DE indicates problems related to being
 “cold” or too low on communion. Scales that are not directly on the
 y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency
 and communion.</p>
-<p><img src="figures/introduction-to-ssm-analysis-iipsc-1.png" alt="plot of chunk iipsc" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-iipsc-1.svg" alt="plot of chunk iipsc" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="mean-based-ssm-analysis">4. Mean-based SSM Analysis<a class="anchor" aria-label="anchor" href="#mean-based-ssm-analysis"></a>
@@ -482,10 +482,10 @@ conventional). This, again, is as simple as passing the
 <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> functions.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/introduction-to-ssm-analysis-plot1-1.png" alt="plot of chunk plot1" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot1-1.svg" alt="plot of chunk plot1" width="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/introduction-to-ssm-analysis-plot2-1.png" alt="plot of chunk plot2" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot2-1.svg" alt="plot of chunk plot2" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -617,14 +617,14 @@ to either consult the mapping between scales and angles or plot the
 results.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/introduction-to-ssm-analysis-plot3-1.png" alt="plot of chunk plot3" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot3-1.svg" alt="plot of chunk plot3" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our
 hypotheses, the displacement for NARPD was associated with high agency
 and was somewhere between the “domineering” and “vindictive”
 octants.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/introduction-to-ssm-analysis-plot4-1.png" alt="plot of chunk plot4" width="100%"></p>
+<p><img src="figures/introduction-to-ssm-analysis-plot4-1.svg" alt="plot of chunk plot4" width="100%"></p>
 </div>
 </div>
 <div class="section level2">

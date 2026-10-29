@@ -442,7 +442,7 @@ ladder:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per</span></span>
 <span><span class="co">#&gt; condition.</span></span>
-<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 11.7s.</span></span>
+<span><span class="co">#&gt; Population: Browne circular model (CPM); groups All = 250; elapsed 7.8s.</span></span>
 <span><span class="co">#&gt; Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) &gt;= 0.35.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
@@ -538,7 +538,7 @@ blocks that <code><a href="https://rdrr.io/r/base/print.html" class="external-li
 <p>For a visual summary across the ladder:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/ci-accuracy-accuracy_plot-1.png" alt="plot of chunk accuracy_plot" width="100%"></p>
+<p><img src="figures/ci-accuracy-accuracy_plot-1.svg" alt="plot of chunk accuracy_plot" width="100%"></p>
 <p>Two settings are worth knowing. First,
 <code>structure = "observed"</code> rebuilds the population from the
 pooled observed correlations instead of the CPM. If the two structures

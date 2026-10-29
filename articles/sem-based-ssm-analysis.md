@@ -279,7 +279,7 @@ ssm_plot_circle(latent)
 ```
 
 ![plot of chunk
-latent-plot](figures/sem-based-ssm-analysis-latent-plot-1.png)
+latent-plot](figures/sem-based-ssm-analysis-latent-plot-1.svg)
 
 ``` r
 

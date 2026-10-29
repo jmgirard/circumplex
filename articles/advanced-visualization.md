@@ -89,7 +89,7 @@ ggcircumplex()
 ```
 
 ![plot of chunk
-canvas-default](figures/advanced-visualization-canvas-default-1.png)
+canvas-default](figures/advanced-visualization-canvas-default-1.svg)
 
 You can label the scales however you like. Passing a character vector
 labels the spokes in the order of the angles:
@@ -100,7 +100,7 @@ ggcircumplex(octants(), labels = PANO())
 ```
 
 ![plot of chunk
-canvas-labels](figures/advanced-visualization-canvas-labels-1.png)
+canvas-labels](figures/advanced-visualization-canvas-labels-1.svg)
 
 The labels need not be abbreviations. The octant scales also have full
 interpersonal names, which you can put on the spokes instead:
@@ -111,7 +111,7 @@ ggcircumplex(octants(), labels = csip$Scales$Label)
 ```
 
 ![plot of chunk
-canvas-descriptive](figures/advanced-visualization-canvas-descriptive-1.png)
+canvas-descriptive](figures/advanced-visualization-canvas-descriptive-1.svg)
 
 You may be working with one of the instruments bundled with the package.
 If so, you can pass it directly with `ggcircumplex(instrument = csip)`.
@@ -160,7 +160,7 @@ ggplot(results$results) +
 ```
 
 ![plot of chunk
-coord-built](figures/advanced-visualization-coord-built-1.png)
+coord-built](figures/advanced-visualization-coord-built-1.svg)
 
 The
 [`scale_x_continuous()`](https://ggplot2.tidyverse.org/reference/scale_continuous.html)
@@ -201,7 +201,7 @@ ggplot(results$results) +
 ```
 
 ![plot of chunk
-coord-center](figures/advanced-visualization-coord-center-1.png)
+coord-center](figures/advanced-visualization-coord-center-1.svg)
 
 This is a zoom, and it changes how the figure should be read. With a
 nonzero center, radial distance is no longer proportional to amplitude.
@@ -232,7 +232,7 @@ ggplot(results$results) +
 ```
 
 ![plot of chunk
-coord-r-axis](figures/advanced-visualization-coord-r-axis-1.png)
+coord-r-axis](figures/advanced-visualization-coord-r-axis-1.svg)
 
 Note that these examples build the canvas from its parts: the coordinate
 system, an x-scale carrying the spoke breaks and labels, and the theme.
@@ -277,7 +277,7 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
 ```
 
 ![plot of chunk
-results-plot](figures/advanced-visualization-results-plot-1.png)
+results-plot](figures/advanced-visualization-results-plot-1.svg)
 
 Each arc displays two separate confidence intervals for one profile at
 once. Its radial extent is the amplitude interval, and its angular
@@ -319,7 +319,7 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   )
 ```
 
-![plot of chunk theming](figures/advanced-visualization-theming-1.png)
+![plot of chunk theming](figures/advanced-visualization-theming-1.svg)
 
 ## 6. Composing custom layers
 
@@ -370,7 +370,7 @@ ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
 ```
 
 ![plot of chunk
-individuals](figures/advanced-visualization-individuals-1.png)
+individuals](figures/advanced-visualization-individuals-1.svg)
 
 The individual points spread widely around the circle, while the group
 summary sits close to the origin. That contrast is not an artifact. The
@@ -469,7 +469,7 @@ canvas
 ```
 
 ![plot of chunk
-latent-ticks](figures/advanced-visualization-latent-ticks-1.png)
+latent-ticks](figures/advanced-visualization-latent-ticks-1.svg)
 
 The ticks and their labels sit at the angles
 [`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md)
@@ -535,7 +535,7 @@ canvas +
 ```
 
 ![plot of chunk
-latent-vectors](figures/advanced-visualization-latent-vectors-1.png)
+latent-vectors](figures/advanced-visualization-latent-vectors-1.svg)
 
 The rim and the points do not share a model. The rim ticks are the
 angles the circular process model estimated. The points are SSM
@@ -608,7 +608,7 @@ canvas +
 ```
 
 ![plot of chunk
-latent-measure](figures/advanced-visualization-latent-measure-1.png)
+latent-measure](figures/advanced-visualization-latent-measure-1.svg)
 
 The displacement label starts above the arc at 60 degrees and runs to
 the right, clear of the vertical axis and its labels. The amplitude
@@ -656,7 +656,7 @@ ggplot(observed, aes(x = separation)) +
 ```
 
 ![plot of chunk
-latent-corfun](figures/advanced-visualization-latent-corfun-1.png)
+latent-corfun](figures/advanced-visualization-latent-corfun-1.svg)
 
 In this figure the points are observed correlations and the line is the
 fitted correlation function. The hollow points are the correlations the
@@ -863,7 +863,7 @@ ggcircumplex(
 ```
 
 ![plot of chunk
-ellipse-figure](figures/advanced-visualization-ellipse-figure-1.png)
+ellipse-figure](figures/advanced-visualization-ellipse-figure-1.svg)
 
 The label names what the draws describe: the mean octant profile of the
 subsample the “Bayesian SSM Analysis” vignette fits. The ellipse is
@@ -969,7 +969,7 @@ ssm_plot_trajectory(results_long, drop_xy = TRUE)
 ```
 
 ![plot of chunk
-occasions-plot](figures/advanced-visualization-occasions-plot-1.png)
+occasions-plot](figures/advanced-visualization-occasions-plot-1.svg)
 
 Two things about the displacement panel are worth reading carefully.
 First, it is drawn on an *unwrapped* branch, which lets angles go past
@@ -1053,7 +1053,7 @@ ggplot() +
 ```
 
 ![plot of chunk
-occasions-path](figures/advanced-visualization-occasions-path-1.png)
+occasions-path](figures/advanced-visualization-occasions-path-1.svg)
 
 The arrowhead marks the direction of time. Note what the layer does at
 the boundary. The estimated profile moves from about 332 to 355 to 21
@@ -1086,7 +1086,7 @@ ssm_plot_circle(results_long, path = TRUE)
 ```
 
 ![plot of chunk
-occasions-path-wrapper](figures/advanced-visualization-occasions-path-wrapper-1.png)
+occasions-path-wrapper](figures/advanced-visualization-occasions-path-wrapper-1.svg)
 
 An occasion whose displacement is undefined (a flat or zero-amplitude
 profile) *breaks* the path rather than being interpolated through. The
@@ -1127,7 +1127,7 @@ ggplot(curve, aes(x = angle, y = score)) +
 ```
 
 ![plot of chunk
-curve-axis](figures/advanced-visualization-curve-axis-1.png)
+curve-axis](figures/advanced-visualization-curve-axis-1.svg)
 
 Pass the same `labels` (or the same `instrument`) to both
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)

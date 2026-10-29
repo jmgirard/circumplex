@@ -277,6 +277,9 @@
   table drops X and Y. “Axes Reliability” explains that `--` marks a
   missing Nunnally-Bernstein comparison.
 
+- The figures of the pre-computed vignettes are now SVG files instead of
+  PNG images.
+
 ## circumplex 2.0.1
 
 CRAN release: 2026-09-06

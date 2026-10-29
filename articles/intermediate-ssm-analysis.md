@@ -104,7 +104,7 @@ ssm_plot_circle(results)
 ```
 
 ![plot of chunk
-group_plot](figures/intermediate-ssm-analysis-group_plot-1.png)
+group_plot](figures/intermediate-ssm-analysis-group_plot-1.svg)
 
 ``` r
 
@@ -112,7 +112,7 @@ ssm_plot_curve(results)
 ```
 
 ![plot of chunk
-group_plot2](figures/intermediate-ssm-analysis-group_plot2-1.png)
+group_plot2](figures/intermediate-ssm-analysis-group_plot2-1.svg)
 
 Any number of groups can be analyzed in this way, and the output will
 contain additional profile blocks, the table will contain additional
@@ -190,7 +190,7 @@ ssm_plot_circle(results2)
 ```
 
 ![plot of chunk
-measures_plot](figures/intermediate-ssm-analysis-measures_plot-1.png)
+measures_plot](figures/intermediate-ssm-analysis-measures_plot-1.svg)
 
 ``` r
 
@@ -198,7 +198,7 @@ ssm_plot_curve(results2)
 ```
 
 ![plot of chunk
-measures_plot2](figures/intermediate-ssm-analysis-measures_plot2-1.png)
+measures_plot2](figures/intermediate-ssm-analysis-measures_plot2-1.svg)
 
 ### Generalizing to multiple groups and multiple measures
 
@@ -320,7 +320,7 @@ ssm_plot_circle(results3)
 ```
 
 ![plot of chunk
-general_plot](figures/intermediate-ssm-analysis-general_plot-1.png)
+general_plot](figures/intermediate-ssm-analysis-general_plot-1.svg)
 
 Note that the borders for the “PARPD: Male” and “SZTPD: Male” blocks are
 dashed instead of solid. This indicates that these profiles have low fit
@@ -334,7 +334,7 @@ ssm_plot_circle(results3, drop_lowfit = TRUE)
 ```
 
 ![plot of chunk
-general_plot2](figures/intermediate-ssm-analysis-general_plot2-1.png)
+general_plot2](figures/intermediate-ssm-analysis-general_plot2-1.svg)
 
 ``` r
 
@@ -342,7 +342,7 @@ ssm_plot_curve(results3)
 ```
 
 ![plot of chunk
-general_plot3](figures/intermediate-ssm-analysis-general_plot3-1.png)
+general_plot3](figures/intermediate-ssm-analysis-general_plot3-1.svg)
 
 ``` r
 
@@ -350,7 +350,7 @@ ssm_plot_curve(results3, drop_lowfit = TRUE)
 ```
 
 ![plot of chunk
-general_plot4](figures/intermediate-ssm-analysis-general_plot4-1.png)
+general_plot4](figures/intermediate-ssm-analysis-general_plot4-1.svg)
 
 ## 3. Contrast analyses
 
@@ -444,7 +444,7 @@ ssm_plot_contrast(results4)
 ```
 
 ![plot of chunk
-model_plot](figures/intermediate-ssm-analysis-model_plot-1.png)
+model_plot](figures/intermediate-ssm-analysis-model_plot-1.svg)
 
 ### Contrasts between measures in a group
 
@@ -525,7 +525,7 @@ ssm_plot_contrast(results5)
 ```
 
 ![plot of chunk
-measure_contrast_plot](figures/intermediate-ssm-analysis-measure_contrast_plot-1.png)
+measure_contrast_plot](figures/intermediate-ssm-analysis-measure_contrast_plot-1.svg)
 
 Here, instead of a circle plot, we see a contrast plot showing the
 difference between the two measures’ SSM parameters and their 95%
@@ -620,7 +620,7 @@ ssm_plot_contrast(results6)
 ```
 
 ![plot of chunk
-group_contrast_plot](figures/intermediate-ssm-analysis-group_contrast_plot-1.png)
+group_contrast_plot](figures/intermediate-ssm-analysis-group_contrast_plot-1.svg)
 
 ## 4. Taxonomy of analysis types
 

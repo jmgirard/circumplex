@@ -259,7 +259,7 @@ summary(acc)
 #> 
 #> Correlation scores; bootstrap, 500 replicates, level 0.95; 200 reps per
 #> condition.
-#> Population: Browne circular model (CPM); groups All = 250; elapsed 11.7s.
+#> Population: Browne circular model (CPM); groups All = 250; elapsed 7.8s.
 #> Ladder c = 1, 0.5, 0, 2.077; certified if a_lci / (a_uci - a_lci) >= 0.35.
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -352,7 +352,7 @@ For a visual summary across the ladder:
 plot(acc)
 ```
 
-![plot of chunk accuracy_plot](figures/ci-accuracy-accuracy_plot-1.png)
+![plot of chunk accuracy_plot](figures/ci-accuracy-accuracy_plot-1.svg)
 
 Two settings are worth knowing. First, `structure = "observed"` rebuilds
 the population from the pooled observed correlations instead of the CPM.

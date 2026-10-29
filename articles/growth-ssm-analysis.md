@@ -300,7 +300,7 @@ the object. A plain data frame with the same columns plots too, with
 ssm_plot_trajectory(trajectory)
 ```
 
-![plot of chunk plot](figures/growth-ssm-analysis-plot-1.png)
+![plot of chunk plot](figures/growth-ssm-analysis-plot-1.svg)
 
 The displacement panel is drawn on an *unwrapped* branch. An unwrapped
 branch lets angles go past 360° (or below 0°) so that the line stays
@@ -416,7 +416,7 @@ ssm_plot_trajectory(trajectory2)
 ```
 
 ![plot of chunk
-lowamp-plot](figures/growth-ssm-analysis-lowamp-plot-1.png)
+lowamp-plot](figures/growth-ssm-analysis-lowamp-plot-1.svg)
 
 Uncertified waves are drawn as **hollow** points on the displacement
 panel. Read them as gaps in the argument, not as estimates with wide

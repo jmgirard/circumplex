@@ -66,7 +66,7 @@ personality psychologist might want to understand what kind of
 interpersonal behaviors are associated with a trait (e.g.,
 extraversion).
 
-![plot of chunk model](figures/introduction-to-ssm-analysis-model-1.png)
+![plot of chunk model](figures/introduction-to-ssm-analysis-model-1.svg)
 
 ### The Structural Summary Method
 
@@ -81,20 +81,20 @@ that a cosine curve makes sense in this case. First, we can examine the
 scores with a bar chart ignoring the circular relationship among them.
 
 ![plot of chunk
-column](figures/introduction-to-ssm-analysis-column-1.png)
+column](figures/introduction-to-ssm-analysis-column-1.svg)
 
 Next, we can leverage the fact that these subscales have specific
 angular displacements in the circumplex model (and that 0 and 360
 degrees are the same) to create a path diagram.
 
-![plot of chunk path](figures/introduction-to-ssm-analysis-path-1.png)
+![plot of chunk path](figures/introduction-to-ssm-analysis-path-1.svg)
 
 This already looks like a cosine curve, and we can finally use the SSM
 to estimate the parameters of the curve that best fits the observed
 data. By plotting it alongside the data, we can get a sense of how well
 the model fits our example data.
 
-![plot of chunk curve](figures/introduction-to-ssm-analysis-curve-1.png)
+![plot of chunk curve](figures/introduction-to-ssm-analysis-curve-1.svg)
 
 ### Understanding the SSM parameters
 
@@ -111,7 +111,7 @@ is essentially how close the cosine curve is to the observed data
 points. Deviations (in red, below) will lower model fit.
 
 ![plot of chunk
-residuals](figures/introduction-to-ssm-analysis-residuals-1.png)
+residuals](figures/introduction-to-ssm-analysis-residuals-1.svg)
 
 If fit is less than 0.70, it is considered “unacceptable” and only the
 elevation parameter should be interpreted. If fit is between 0.70 and
@@ -202,7 +202,7 @@ agency, whereas a high score on DE indicates problems related to being
 y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency
 and communion.
 
-![plot of chunk iipsc](figures/introduction-to-ssm-analysis-iipsc-1.png)
+![plot of chunk iipsc](figures/introduction-to-ssm-analysis-iipsc-1.svg)
 
 ## 4. Mean-based SSM Analysis
 
@@ -349,14 +349,14 @@ functions.
 ssm_plot_circle(results2)
 ```
 
-![plot of chunk plot1](figures/introduction-to-ssm-analysis-plot1-1.png)
+![plot of chunk plot1](figures/introduction-to-ssm-analysis-plot1-1.svg)
 
 ``` r
 
 ssm_plot_curve(results2)
 ```
 
-![plot of chunk plot2](figures/introduction-to-ssm-analysis-plot2-1.png)
+![plot of chunk plot2](figures/introduction-to-ssm-analysis-plot2-1.svg)
 
 ## 5. Correlation-based SSM Analysis
 
@@ -455,7 +455,7 @@ mapping between scales and angles or plot the results.
 ssm_plot_circle(results3)
 ```
 
-![plot of chunk plot3](figures/introduction-to-ssm-analysis-plot3-1.png)
+![plot of chunk plot3](figures/introduction-to-ssm-analysis-plot3-1.svg)
 
 From this figure, it is very easy to see that, consistent with our
 hypotheses, the displacement for NARPD was associated with high agency
@@ -466,7 +466,7 @@ and was somewhere between the “domineering” and “vindictive” octants.
 ssm_plot_curve(results3)
 ```
 
-![plot of chunk plot4](figures/introduction-to-ssm-analysis-plot4-1.png)
+![plot of chunk plot4](figures/introduction-to-ssm-analysis-plot4-1.svg)
 
 ## Wrap-up
 
