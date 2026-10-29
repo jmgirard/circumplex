@@ -69,3 +69,17 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - AC2 evidence (2026-10-30, fresh scratch copies via the probe script): `Rscript tools/precompute-vignettes.R introduction-to-ssm-analysis` with a planted chunk `stop()` exited 1, `.Rmd` identical by `cmp`, `vignettes/*.Rmd*` list unchanged; the inline `stop()` plant gave the same three results. `error = FALSE` at tools/precompute-vignettes.R:63; `file.rename(tmp, out)` after `knit()` at :86.
 - AC3 evidence (2026-10-30): the grep returns tools/check-vignette-staleness.R, tools/check-vignette-width.R, tools/m120-vignette-parity.R; the comment names those three, says they "read only VIGNETTES", and `grep -c "knit_one()"` on the file is 0.
 - Gate (2026-10-30): `cairn_validate.py` all passed; `document()` 0 `resolve link` lines and no man/NAMESPACE diff; `pkgdown::check_pkgdown()` no problems; master R-CMD-check and test-coverage newest push runs `success` (53580402); both alert audits and the branch-protection check exit 0; no new top-level files; README untouched. NEWS lacked an entry for the example change: fixed now, one Documentation bullet. Staleness re-run on the branch: all 11 up to date.
+- AC1 re-read after the fix-now commit 17a4782c: the comment now reads "This fit reaches a boundary (a communality at its upper limit), and its Hessian is also ill-conditioned, so the call warns and reports no usable intervals" and names the vignette; the call is unchanged (R/cpm_fit.R:1834).
+- spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: the workflow's width step comment says it reads the fresh render, but after a failed render it reads committed copies — fix now, fixed 17a4782c
+- diff-bug #2: a killed knit leaves `vignettes/<name>.Rmd.tmp`, which no ignore file covers — fix now (`.Rbuildignore` and `.gitignore` entries), fixed 17a4782c
+- diff-bug #3: the AC2 failure-path plants are not a committed check — follow-up, row "Commit the precompute failure-path probe"
+- diff-bug #4: the example's "(supply the sample size; analytic CIs)" reads against "no usable analytic intervals" — fix now, fixed 17a4782c
+- diff-bug #5: the comment and NEWS tie the ill-conditioned Hessian causally to the boundary, which is not verified — fix now (same fix as prior-review #1), fixed 17a4782c
+- diff-bug #6: work-log lines out of date order — reject, style (the work log is append-only)
+- prior-review #1: "so the call warns" makes the boundary the warning's cause, the wording M140 fixed in a vignette (O11); the warning fires on the condition number alone (R/cpm_fit.R:869) — fix now: "and its Hessian is also ill-conditioned", fixed 17a4782c
+- ripple #1: the svglite pre-check comment still gives truncation as its reason — fix now, fixed 17a4782c
+- blame-history #1: same as ripple #1 — fix now, fixed 17a4782c
+- blame-history #2: same as diff-bug #4 — fix now, fixed 17a4782c
+- blame-history #3: the test cited at T1 pins the raw-data bootstrap fit, not the matrix call, so the comment's warning claim is unpinned — fix now: new test in test-cpm_summary_markers.R (warning and Heywood flag on the matrix fit), passes, and fails with the warning threshold planted at 1e20, fixed 17a4782c
+- blame-history #4: `file.rename()` may not overwrite on Windows — reject, false: `?file.rename` says it "will overwrite an existing element of `to`"
