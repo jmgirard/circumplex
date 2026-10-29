@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-28 (M174 done and archived: NEWS checked against v2.0.1, `tools/news-interface-check.R` added; one row graduated, one filed; M171 row pruned for retention; one lesson captured, M145 evicted, two marked used; validate green.)_
+_Last hygiene check: 2026-10-29 (M175 done and archived: donttest example, SVG vignette figures; one row filed; M172 row pruned for retention; three lessons captured, M147-M149 evicted, one marked used; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M175 | Clear CRAN's 2.1.0 pretest notes | review | — | high | milestones/M175-cran-pretest-notes.md |
+| M175 | Clear CRAN's 2.1.0 pretest notes | done | — | high | milestones/archive/M175-cran-pretest-notes.md |
 | M174 | Check NEWS against v2.0.1 before release | done | — | normal | milestones/archive/M174-news-check-v201.md |
 | M173 | Shorten NEWS and fix two pre-release details | done | — | normal | milestones/archive/M173-pre-release-news-testthat.md |
-| M172 | Exclude a bootstrap refit that errors in cpm_fit() | done | — | normal | milestones/archive/M172-cpm-bootstrap-refit-errors.md |
 
 ## Candidates
 
