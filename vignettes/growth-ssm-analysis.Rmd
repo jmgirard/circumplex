@@ -282,7 +282,7 @@ plots too, with `time = "wave"` named:
 ssm_plot_trajectory(trajectory)
 ```
 
-<img src="figures/growth-ssm-analysis-plot-1.svg" alt="plot of chunk plot"  />
+<img src="figures/growth-ssm-analysis-plot-1.svg" alt="plot of chunk plot" width="100%" />
 
 The displacement panel is drawn on an *unwrapped* branch. An unwrapped
 branch lets angles go past 360° (or below 0°) so that the line stays
@@ -388,7 +388,7 @@ The plot marks the verdict itself:
 ssm_plot_trajectory(trajectory2)
 ```
 
-<img src="figures/growth-ssm-analysis-lowamp-plot-1.svg" alt="plot of chunk lowamp-plot"  />
+<img src="figures/growth-ssm-analysis-lowamp-plot-1.svg" alt="plot of chunk lowamp-plot" width="100%" />
 
 Uncertified waves are drawn as **hollow** points on the displacement panel.
 Read them as gaps in the argument, not as estimates with

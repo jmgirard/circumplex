@@ -1,12 +1,13 @@
 ## Test environments
 
-* local macOS 27.0.1, R 4.6.1: `devtools::check(manual = TRUE)` and
-  `R CMD check --as-cran` on the built tarball
+* local macOS 27.0.1, R 4.6.1: `R CMD check --as-cran` on the built
+  tarball, and `devtools::check(manual = TRUE)` on the first 2.1.0 tarball
 * local reproduction of the linux-arm64 additional check, 2026-10-28: Docker
   on Apple Silicon, `aarch64-unknown-linux-gnu`, R 4.6.1, OpenBLAS 0.3.33
-  (`libopenblasp-r0.3.33.so`). `Status: OK` on the tarball submitted here.
-* win-builder, R-devel on Windows, 2026-10-29: no notes other than the
-  maintainer-change note that its alternate results address caused
+  (`libopenblasp-r0.3.33.so`). `Status: OK` on the first 2.1.0 tarball.
+* win-builder, R-devel on Windows, 2026-10-29, on the first 2.1.0 tarball: no
+  notes other than the maintainer-change note that its alternate results
+  address caused
 * GitHub Actions: macOS/release, windows/release, ubuntu/devel,
   ubuntu/release, ubuntu/oldrel-1
 
@@ -24,7 +25,8 @@ None on CRAN.
 ## Notes
 
 This is a resubmission. The incoming pretest of the first 2.1.0 tarball, on
-2026-10-29, listed three NOTEs. Each is answered here.
+2026-10-29, listed three NOTEs: one for the tarball size, and one on each of
+two flavors for the time of the `cpm_fit` examples. Each is answered here.
 
 * The incoming-feasibility NOTE, which reported `Size of tarball: 10970779
   bytes`. The pre-computed vignette figures are now SVG files instead of PNG

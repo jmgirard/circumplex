@@ -240,7 +240,7 @@ correctly rather than spanning "the long way around."
 the time column from the object. A plain data frame with the same columns
 plots too, with `time = "wave"` named:
 
-```{r plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5}
+```{r plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5, out.width = "100%"}
 ssm_plot_trajectory(trajectory)
 ```
 
@@ -319,7 +319,7 @@ certified, and their intervals keep their nominal coverage.
 
 The plot marks the verdict itself:
 
-```{r lowamp-plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5}
+```{r lowamp-plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5, out.width = "100%"}
 ssm_plot_trajectory(trajectory2)
 ```
 

@@ -47,18 +47,21 @@ knit_one <- function(name) {
   # own empty caption is what is in force -- a chunk that writes its own
   # fig.cap or fig.alt keeps it.
   #
-  # Figures are SVG (svglite), not PNG. A PNG sharp enough for the site (144
-  # dpi, hotfix #152) shipped each figure twice in the tarball, once as a file
-  # and once base64 in the built HTML; the PNGs were the bulk of the first 2.1.0
-  # tarball, which crossed the 1e7-byte size NOTE of CRAN's incoming check. The
-  # SVGs are vector, so they need no dpi. svglite is needed only
-  # here, never by R CMD build, which reads the committed files (the check at
-  # the top of this function). out.width still governs display size.
+  # Figures are SVG (svglite), not PNG. Each figure ships twice in the
+  # tarball, once as a file and once base64 in the built HTML, and the 144-dpi
+  # PNGs (hotfix #152) were the bulk of the first 2.1.0 tarball, which crossed
+  # the 1e7-byte size NOTE of CRAN's incoming check. The SVGs are vector, so
+  # they need no dpi and are a fraction of the size. svglite is needed only
+  # here (hence the check at the top of this function), never by R CMD build,
+  # which reads the committed files. Where a chunk sets out.width, it governs
+  # display size. Plotmath symbols such as Delta are drawn in Arial rather than
+  # the Symbol font, which Windows encodes without them.
   knitr::opts_chunk$set(
     fig.path = file.path("figures", paste0(name, "-")),
     fig.cap = "",
     dev = "svglite",
-    fig.ext = "svg"
+    fig.ext = "svg",
+    dev.args = list(system_fonts = list(symbol = "Arial"))
   )
   knitr::opts_hooks$set(fig.cap = function(options) {
     if (is.null(options$fig.alt) && identical(options$fig.cap, "")) {

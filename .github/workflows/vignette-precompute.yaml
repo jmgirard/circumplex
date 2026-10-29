@@ -18,8 +18,8 @@
 # pre-computed vignette and knits each live vignette with the package this job
 # installed. tools/check-vignette-width-plants.R then shows that the guard
 # fails on each kind of line it reads. The figures under vignettes/figures/
-# are PNGs whose bytes depend on the graphics device, so they are not
-# reproducible across machines either and are not compared at all.
+# are SVGs whose bytes depend on svglite and the installed fonts, so they are
+# not reproducible across machines either and are not compared at all.
 #
 # `cairn/**` is ignored: tracking-only commits cannot change a vignette.
 on:
