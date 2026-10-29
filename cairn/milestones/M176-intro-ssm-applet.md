@@ -75,6 +75,7 @@ One interactive figure, in which the reader moves sliders for elevation, amplitu
 - 2026-10-29: claim audit: 27 claims read, 2 corrected — `.github/workflows/vignette-precompute.yaml` (the peak function is checked against a rule, not the formula), `vignettes/ssm-curve-applet.js` (the export guard sits after the pure functions, not at the bottom). The same reader re-read both: they hold. The `.Rmd` was re-rendered with the new header, and the Node check passes.
 - 2026-10-29: verify slot: no R code changed. The `devtools::check()` run at `79ff3d4d` ran the testthat suite clean (OK, 467 s), and nothing since touches R code or tests. Status set to review.
 - 2026-10-29: review started at `f8da5fe2`. Branch contains `origin/master` (`c4e3b033`), no PR, Copilot round off (no header line).
+- 2026-10-29: step-7 approval: m176-intro-ssm-applet approved for merge
 
 ## Decisions
 
