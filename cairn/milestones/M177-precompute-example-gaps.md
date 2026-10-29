@@ -59,6 +59,7 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - 2026-10-30: T4 re-render: all 11 vignettes knitted (33 s); only `ci-accuracy.Rmd` changed, one elapsed-time figure inside a masked region, restored from git; no figure file changed; `check-vignette-staleness.R` exit 0, all 11 up to date.
 - 2026-10-30: claim audit: 12 claims read, 2 corrected — tools/precompute-vignettes.R (knitr writes partial output on failure, not a truncation before the first chunk), R/cpm_fit.R (intervals print NA, so "no usable analytic intervals" replaces "cannot be trusted").
 - 2026-10-30: T4 checks: `devtools::test()` exit 0 with no failures; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (7 m 57 s), run after the claim-audit edits. Status set to review.
+- 2026-10-30: step-7 approval: m177-precompute-example-gaps approved for merge
 - 2026-10-30: T3 done: the comment names the three files the AC3 grep returns (staleness, width, parity) and says they read only `VIGNETTES`.
 
 ## Decisions
