@@ -114,3 +114,28 @@ Pass 1, 2026-10-29, at `99bcc8aa` (master `84b06af6` had not moved; no PR; Copil
 - AC6: AC2 tarball 5,129,947 bytes (≤ 5,250,000). `cran-comments.md` Notes name the three entries by their figures (`Size of tarball: 10970779 bytes`, 11.09 s r-devel-windows-x86_64, 5.2 s r-devel-linux-x86_64-debian-gcc); the results section states the 10000000-byte threshold "by default"; the file predicts no CRAN NOTE (win-builder line is a past report). Times for this tarball, each labelled as excluding `\donttest` code: `cpm_fit` "under 1 s" (0.819/0.820); examples "under 15 seconds" (12 s in `00check.log`, so ≥ 0.5 s above); tests "under 90" (49 s); install "under 15" (11 s); re-building "under 15" (11 s).
 - gate: `cairn_validate` all checks passed; no DESIGN principle changed (impact skipped); README.Rmd untouched; `pkgdown::check_pkgdown()` no problems; no new top-level file; master watches: newest push runs with a verdict, R-CMD-check `30d5e191` success and test-coverage `30d5e191` success (`84b06af6` is cairn-only, no run); `check-master-red-alert.R`, `master-red-alert-dryrun.R`, `check-branch-protection.R` exit 0. Pending: AC7 runs, `document()` no-diff.
 - spawned: diff-bug, blame-history, prior-review, ripple
+- diff-bug #1: the matrix example alone takes 0.83 s, so the Windows timing NOTE may return at 5.7 s — reject (false): that NOTE's threshold was 10 s ("> 10s" in the pretest's r-devel-windows entry), and 0.82 s × 6.9 ≈ 5.7 s and × 3.25 ≈ 2.7 s sit under 10 s and 5 s.
+- diff-bug #2: the arm64 and win-builder test-environment lines claim the submitted tarball, but ran on the first one — fix now.
+- diff-bug #3: `vignette-precompute.yaml` header still calls the figures PNGs — fix now.
+- diff-bug #4: the two growth figures with no `out.width` now display at 624 px instead of filling the column — fix now (`out.width = "100%"` on both chunks).
+- diff-bug #5: Δ labels use `font-family: "Symbol"`, which Windows encodes without U+0394, and Arial has no generic fallback — fix now for Δ (`dev.args = list(system_fonts = list(symbol = "Arial"))`, 0 Symbol runs left); Arial without fallback — follow-up into the user's browser look at the merge question (no failing viewer shown).
+- diff-bug #6: the now-only default `cpm_fit` example prints the ill-conditioned-Hessian warning — follow-up (pre-existing), row "Shrink the introduction vignette GIFs".
+- diff-bug #7: "listed three NOTEs" against two bullets — fix now (the sentence now names one size NOTE and two timing NOTEs).
+- diff-bug #8: the precompute comment's parenthetical sits on the wrong clause, and it frames shipping twice as PNG-only — fix now.
+- diff-bug #9: the "Sourced by" note omits the staleness and width scripts — follow-up (unmodified line), same row.
+- diff-bug #10: `knitr::knit()` truncates the shipped `.Rmd` on any other mid-knit failure — follow-up (pre-existing), same row.
+- diff-bug #11: no D-entry for svglite — reject (false): the profile's dependency surface is DESCRIPTION, and the CI extras rcmdcheck, xml2 and pkgdown carry no D-entry either.
+- diff-bug #12: another pandoc might inline SVG as `<svg>` and lose alt text — reject (false as a finding: no such pandoc shown; pandoc 3.12.1 here writes `<img>` with alt and width).
+- diff-bug #13: no test is required by the rules — noted.
+- blame-history #1: the 144-dpi removal keeps its aim only if the SVGs render in a browser; no browser look is recorded — follow-up into the user's look at the merge question (Δ fix above).
+- blame-history #2: svglite without a D-entry — reject (false), as diff-bug #11.
+- blame-history #3: the bootstrap example leaves the default run — reject (planned change, user's choice at the question set).
+- blame-history #4: the base64 double-shipping claim is unverified — reject (false): the first tarball's introduction HTML held 49 `data:image` URIs, and the AC2 tarball's HTML holds the SVGs as `data:image/svg+xml`.
+- blame-history #5: `(^|/)Rplots\.pdf$` breaks the root-anchored style — reject (planned change, implementation choice logged).
+- prior-review #1: the arm64 line claims the submitted tarball — fix now, as diff-bug #2.
+- prior-review #2: no `devtools::check(manual = TRUE)` on this branch behind the local line — fix now (the line now says manual = TRUE ran on the first tarball); the release walk re-runs it.
+- prior-review #3: the re-building time has no measurement and the paragraph omits the donttest variable — reject (false): `00check.log` "re-building of vignette outputs ... [10s/11s]", and the paragraph says "without the `\donttest{}` code".
+- prior-review #4: the NEWS development section reaches 180 lines — reject (false as a defect): no cap binds; 180 was M174's own stop figure.
+- prior-review (outside scope): `--as-cran` also runs the `\donttest` examples, so the wrap may not help — reject (false): `tools:::.check_packages` prints timings only under `do_timings && do_diff`, and the `--run-donttest` pass calls `run_one_arch(..., do_diff = FALSE)`.
+- ripple #1: the workflow header calls the figures PNGs — fix now, as diff-bug #3.
+- ripple #2: the workflow header's "The vignettes ship pre-computed" has no count — reject (false): nothing it says disagrees with the diff.
