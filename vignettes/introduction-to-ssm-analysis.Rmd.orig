@@ -236,21 +236,59 @@ If fit is less than 0.70, it is considered "unacceptable" and only the elevation
 
 The first SSM parameter is elevation or $e$, which is calculated as the mean of all scores. It is the size of the general factor in the circumplex model and its interpretation varies from scale to scale. For measures of interpersonal problems, it is interpreted as generalized interpersonal distress. When using correlation-based SSM, $|e|\ge.15$ is considered "marked" and $|e|<.15$ is considered "modest."
 
-```{r elev, echo = FALSE, out.width = "100%"}
-knitr::include_graphics("VIG1-e.gif")
-```
-
 The second SSM parameter is amplitude or $a$, which is calculated as the difference between the highest point of the curve and the curve's mean. It is interpreted as the distinctiveness or differentiation of a profile: how much it is peaked versus flat. Similar to elevation, when using correlation-based SSM, $a\ge.15$ is considered "marked" and $a<.15$ is considered "modest."
-
-```{r ampl, echo = FALSE, out.width = "100%"}
-knitr::include_graphics("VIG1-a.gif")
-```
 
 The final SSM parameter is displacement or $d$, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if $d=90^\circ$ and we are using a circumplex scale that defines 90 degrees as "domineering," then the profile's style is domineering. Displacement is reported on the $[0^\circ, 360^\circ)$ circle; a profile that peaks right at the $0^\circ$/$360^\circ$ boundary may be reported as either value, since both point in the same direction.
 
-```{r disp, echo = FALSE, out.width = "100%"}
-knitr::include_graphics("VIG1-d.gif")
+The figure below draws the curve $S = e + a \times \cos(\theta - d)$ for the values you choose. Move a slider to change one parameter while the other two stay fixed. The dashed line marks the elevation, and the arrow from it to the peak marks the amplitude. The triangle under the peak marks the displacement. The points show the curve's value at the angles of the eight scales. When the amplitude is zero, the curve is flat, so it has no peak and the displacement is undefined. Select Reset to return to the starting values.
+
+<div id="ssm-applet"></div>
+
+```{r applet, echo = FALSE, results = "asis"}
+# The applet's source is written inline so that the built HTML and the pkgdown
+# article both carry it with no extra file to copy.
+cat("<script>", readLines("ssm-curve-applet.js", encoding = "UTF-8"), "</script>", sep = "\n")
 ```
+
+<noscript>
+<p>The sliders need JavaScript. This static figure shows the curve at an elevation of 0.1, an amplitude of 0.3 and a displacement of 90 degrees.</p>
+
+```{r applet-fallback, echo = FALSE, fig.width = 7.5, fig.height = 3.75, out.width = "100%", fig.alt = "An SSM cosine curve with elevation 0.1, amplitude 0.3 and displacement 90 degrees. A dashed line marks the elevation, an arrow from it to the peak at 90 degrees marks the amplitude, a triangle under the peak marks the displacement, and points mark the curve at the eight octant angles."}
+e <- 0.1
+a <- 0.3
+d <- 90
+ggplot2::ggplot() +
+  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "#767676") +
+  ggplot2::geom_hline(yintercept = e, linewidth = 1, linetype = "dashed") +
+  ggplot2::geom_function(
+    fun = function(x) e + a * cos((x - d) * pi / 180),
+    xlim = c(0, 360), n = 361, linewidth = 1.5, color = "#d40000"
+  ) +
+  ggplot2::annotate(
+    "segment", x = d, xend = d, y = e, yend = e + a, linewidth = 1,
+    linetype = "dotted", arrow = ggplot2::arrow(type = "closed", length = ggplot2::unit(8, "pt"))
+  ) +
+  ggplot2::annotate("point", x = d, y = -1, shape = 17, size = 4) +
+  ggplot2::annotate(
+    "point", x = octants(), y = e + a * cos((octants() - d) * pi / 180),
+    shape = 21, size = 3, stroke = 1.25, fill = "white", color = "#d40000"
+  ) +
+  ggplot2::annotate(
+    "text", x = c(345, d - 8, d), y = c(e + 0.08, e + a / 2, -0.88),
+    label = c("e", "a", "d"), fontface = "italic", size = 5
+  ) +
+  ggplot2::scale_x_continuous(
+    limits = c(0, 360), breaks = octants(), expand = c(0, 0),
+    labels = function(x) sprintf("%.0f\U00B0", x)
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-1, 1)) +
+  ggplot2::theme(
+    axis.title = ggplot2::element_blank(),
+    plot.margin = ggplot2::unit(c(10, 30, 10, 10), "points")
+  )
+```
+
+</noscript>
 
 By interpreting these three parameters, we can understand a profile much more parsimoniously than by trying to interpret all eight subscales individually. This approach also leverages the circumplex relationship (i.e., dependency) among subscales. It is also possible to transform the amplitude and displacement parameters into estimates of distance from the x-axis and y-axis, which will be shown in the output discussed below.
 
