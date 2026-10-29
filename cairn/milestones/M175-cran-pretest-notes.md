@@ -62,7 +62,7 @@ The 2.1.0 tarball answers each NOTE of CRAN's 2026-10-29 incoming pretest.
 - [x] T3: Install the branch's package, delete the PNGs in `vignettes/figures/` with `git rm`, and re-render every vignette. Run the staleness and width checks. Read the `.Rmd` diffs. A change outside the figure links and the declared volatile regions is a stop.
 - [x] T4: Add `any::svglite` to the `extra-packages` of the vignette-precompute job, and `svglite` to the `extra` of that workflow in `tools/check-ci-deps.R`. Run the guard.
 - [x] T5: Build a library of symbolic links to each installed package except `svglite`. Run the control, the failing re-render and the staleness check under it, with `git status` read after each.
-- [ ] T6: Add one sentence on the SVG figures to the 2.1.0 Documentation section of NEWS.md. Rewrite the Notes of `cran-comments.md` as a resubmission that answers each NOTE of the pretest and gives the size reason (2.0.1 shipped at 9.84 MB).
+- [x] T6: Add one sentence on the SVG figures to the 2.1.0 Documentation section of NEWS.md. Rewrite the Notes of `cran-comments.md` as a resubmission that answers each NOTE of the pretest and gives the size reason (2.0.1 shipped at 9.84 MB).
 - [ ] T7: Run `devtools::document()` (no diff), `devtools::test()` and `devtools::check()`. Run `R CMD build`, then `R CMD check --as-cran` with `_R_CHECK_DONTTEST_EXAMPLES_=false`, and read the size and the `cpm_fit` timing. For the merge question, rasterize each SVG at the old pixel width and rank the figures by RMSE against their `30d5e191` PNG. Stack the three largest, before and after, in one image in the scratchpad. Also name the four figures with a Δ label in Symbol font, for a look in a browser.
 
 ## Work log
@@ -87,6 +87,8 @@ The 2.1.0 tarball answers each NOTE of CRAN's 2026-10-29 incoming pretest.
 - 2026-10-29: T5 probe, no-`svglite` library of 473 symlinked packages (control TRUE TRUE FALSE): without a check of its own the script exited 1 with knitr's "there is no package called 'svglite'" but left `growth-ssm-analysis.Rmd` truncated (35 insertions, 683 deletions), so the audit's reading that knitr writes no file was false for `knit_one()`. Minor amendment to T2: `knit_one()` now checks `requireNamespace("svglite")` first. Re-run: exit 1 with the script's error naming svglite, `git status -- vignettes` empty, staleness exits 0 under that library.
 - 2026-10-29: T2/T3 evidence: full re-render exits 0, staleness and width checks exit 0, `git status -- vignettes` shows only `ci-accuracy.Rmd` modified on its volatile elapsed line (restored); a one-vignette re-render of `growth-ssm-analysis` left no change, so the SVGs reproduce byte for byte on this machine.
 - 2026-10-29: checkpoint: NEWS 2.1.0 Documentation gains the SVG line; `cran-comments.md` waits for T7's tarball figures; T7 build and check running.
+- 2026-10-29: T7 tarball (`R CMD build` of the working tree at 146adca3): 5,134,444 bytes; `R CMD check --as-cran` with `_R_CHECK_DONTTEST_EXAMPLES_=false` gives `Status: OK`, `cpm_fit` 0.814 user + 0.008 system, 0.823 elapsed; examples 12 s, tests 47 s, install 11 s. GIFs 350,510 + 347,288 + 325,217 bytes in `tar tzvf`, 3 `data:image/gif` URIs in the introduction HTML.
+- 2026-10-29: T6 done: `cran-comments.md` rewritten as a resubmission from the T7 figures.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
