@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-28 (M174 done and archived: NEWS checked against v2
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M175 | Clear CRAN's 2.1.0 pretest notes | in-progress | — | high | milestones/M175-cran-pretest-notes.md |
+| M175 | Clear CRAN's 2.1.0 pretest notes | review | — | high | milestones/M175-cran-pretest-notes.md |
 | M174 | Check NEWS against v2.0.1 before release | done | — | normal | milestones/archive/M174-news-check-v201.md |
 | M173 | Shorten NEWS and fix two pre-release details | done | — | normal | milestones/archive/M173-pre-release-news-testthat.md |
 | M172 | Exclude a bootstrap refit that errors in cpm_fit() | done | — | normal | milestones/archive/M172-cpm-bootstrap-refit-errors.md |

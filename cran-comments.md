@@ -15,7 +15,7 @@
 0 errors | 0 warnings | 0 notes locally.
 
 The tarball is under the 10000000 bytes above which the incoming check of
-R 4.6.1 reports its size.
+R 4.6.1 reports its size by default.
 
 ## Downstream dependencies
 
@@ -28,10 +28,7 @@ This is a resubmission. The incoming pretest of the first 2.1.0 tarball, on
 
 * The incoming-feasibility NOTE, which reported `Size of tarball: 10970779
   bytes`. The pre-computed vignette figures are now SVG files instead of PNG
-  images, and the tarball is now under 5250000 bytes. Its largest part is
-  three animated GIFs in the introduction vignette. They ship twice: as files
-  (1023015 bytes in all) and as base64 `data:` URIs in
-  `inst/doc/introduction-to-ssm-analysis.html`.
+  images, and the tarball is now under 5250000 bytes.
 * `cpm_fit` at 11.09 s elapsed on r-devel-windows-x86_64, and at 5.2 s CPU
   on r-devel-linux-x86_64-debian-gcc. The `cpm_fit()` example with 100
   bootstrap resamples is now inside `\donttest{}`. The matrix-input example
@@ -47,7 +44,7 @@ that occurs twice in the data. No package on CRAN depends on circumplex.
 
 The times in this paragraph come from `R CMD check --as-cran` on this
 tarball, on the maintainer's macOS machine, without the `\donttest{}` code.
-The tests take under 60 seconds, installation under 15 seconds, and the
+The tests take under 90 seconds, installation under 15 seconds, and the
 examples under 15 seconds. Eleven of the fourteen vignettes ship
 pre-computed. The other three fit no SEM, CPM or bootstrap model, and
 re-building all fourteen takes under 15 seconds.
