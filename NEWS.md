@@ -1,3 +1,14 @@
+# circumplex (development version)
+
+## Documentation
+
+* In the "Introduction to SSM Analysis" vignette, an interactive figure
+  replaces the three animated GIFs of elevation, amplitude and displacement.
+  Sliders set the three parameters, and the figure redraws the cosine curve,
+  its marks and its values at the eight octant angles. Readers without
+  JavaScript see a static figure instead. Without the GIFs, the built package
+  is smaller.
+
 # circumplex 2.1.0
 
 ## Breaking changes
