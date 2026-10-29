@@ -249,7 +249,7 @@ fit
 
 # Matrix-input path (supply the sample size; analytic CIs). This fit reaches
 # a boundary (a communality at its upper limit), so the call warns that the
-# Hessian is ill-conditioned and its analytic intervals cannot be trusted;
+# Hessian is ill-conditioned and reports no usable analytic intervals;
 # vignette("cpm-boundary-fits", package = "circumplex") explains why.
 R <- cor(jz2017[scales])
 cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))

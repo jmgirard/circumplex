@@ -56,6 +56,8 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - 2026-10-30: T1 done: comment added above the matrix example, `devtools::document()` rewrote `man/cpm_fit.Rd`; `run_examples(start = "cpm_fit")` printed the NA intervals and the Heywood note, and the plan probe showed the ill-conditioned-Hessian warning. Pinned by test-cpm_summary_markers.R ("bootstrap summary() prints the fired-marker note"), which expects jz2017's fit to fire the Heywood and ill-conditioned-Hessian markers.
 - 2026-10-30: T2 probe-validity control (master's script, scratch copy): chunk plant exit 0 with the error text written into the shipped `.Rmd`; inline plant exit 1 with the `.Rmd` truncated before the References.
 - 2026-10-30: T2 first try left `<name>.Rmd.tmp` behind: the `on.exit()` unlink ran after `setwd()` restored, so its relative path missed; fixed with `after = FALSE`. Re-run: chunk and inline plants each exit 1, `.Rmd` byte-identical (`cmp`), `vignettes/*.Rmd*` list unchanged; an unplanted render is byte-identical to the committed `.Rmd`.
+- 2026-10-30: T4 re-render: all 11 vignettes knitted (33 s); only `ci-accuracy.Rmd` changed, one elapsed-time figure inside a masked region, restored from git; no figure file changed; `check-vignette-staleness.R` exit 0, all 11 up to date.
+- 2026-10-30: claim audit: 12 claims read, 2 corrected — tools/precompute-vignettes.R (knitr writes partial output on failure, not a truncation before the first chunk), R/cpm_fit.R (intervals print NA, so "no usable analytic intervals" replaces "cannot be trusted").
 - 2026-10-30: T3 done: the comment names the three files the AC3 grep returns (staleness, width, parity) and says they read only `VIGNETTES`.
 
 ## Decisions

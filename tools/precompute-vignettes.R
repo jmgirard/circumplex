@@ -73,9 +73,10 @@ knit_one <- function(name) {
     }
     options
   })
-  # knitr truncates its output file before it runs the first chunk, so a knit
-  # that fails part-way would leave the shipped .Rmd cut short. It knits to a
-  # temporary file instead, which replaces the .Rmd only once knit() returns.
+  # When a knit fails, knitr writes the output produced so far to its output
+  # file before it stops, so a knit that fails part-way would leave the shipped
+  # .Rmd cut short. It knits to a temporary file instead, which replaces the
+  # .Rmd only once knit() returns.
   out <- paste0(name, ".Rmd")
   tmp <- paste0(out, ".tmp")
   # after = FALSE: the relative path must be removed before setwd() restores.
