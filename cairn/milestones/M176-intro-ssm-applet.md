@@ -1,13 +1,13 @@
 # M176: Replace the introduction GIFs with a slider applet
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP2, GP3, GP5
 - **Resolves:** —
 - **Surface tier:** user-facing, because the applet replaces three figures that readers of the introduction vignette see on CRAN and on the pkgdown site
-- **Branch/PR:** —
+- **Branch/PR:** m176-intro-ssm-applet
 
 ## Goal
 
@@ -45,7 +45,7 @@ One interactive figure, in which the reader moves sliders for elevation, amplitu
 
 ## Tasks
 
-- [ ] T1: Write `vignettes/ssm-curve-applet.js`. Its pure functions compute the curve, the peak angles, the octant points and the SVG path. Its DOM code builds the plot, sliders, readouts and reset button. The file runs as an inline classic `<script>`. A `module.exports` guard exposes its functions to Node. No line starts with a backtick. Colors follow `[data-bs-theme=dark]` and default to dark-on-white. Sliders carry `<label>` elements, and the SVG carries `role="img"` with an `aria-label` that states the current values. Write `tools/check-ssm-applet.mjs` for AC3. Plant twelve defects one at a time and see each one fail the check. Five change the curve: a wrong sign of e, a wrong a, a shifted d, degrees passed to `Math.cos`, and a flipped y axis. Three change the peaks: a peak at a = 0, and a lone 0° or lone 360° peak for d = 360. Four change the plot: an octant set with 0 for 360, an octant point off the curve, a flipped x mapping, and a short path.
+- [x] T1: Write `vignettes/ssm-curve-applet.js`. Its pure functions compute the curve, the peak angles, the octant points and the SVG path. Its DOM code builds the plot, sliders, readouts and reset button. The file runs as an inline classic `<script>`. A `module.exports` guard exposes its functions to Node. No line starts with a backtick. Colors follow `[data-bs-theme=dark]` and default to dark-on-white. Sliders carry `<label>` elements, and the SVG carries `role="img"` with an `aria-label` that states the current values. Write `tools/check-ssm-applet.mjs` for AC3. Plant twelve defects one at a time and see each one fail the check. Five change the curve: a wrong sign of e, a wrong a, a shifted d, degrees passed to `Math.cos`, and a flipped y axis. Three change the peaks: a peak at a = 0, and a lone 0° or lone 360° peak for d = 360. Four change the plot: an octant set with 0 for 360, an octant point off the curve, a flipped x mapping, and a short path.
 - [ ] T2: In `vignettes/introduction-to-ssm-analysis.Rmd.orig`, remove the three `include_graphics()` chunks. After the displacement paragraph, add a lead-in sentence and the applet block. An `echo = FALSE`, `results = "asis"` chunk writes the JavaScript inline from the source. Add the `<noscript>` fallback figure as an svglite chunk with a descriptive `fig.alt`. If R CMD check flags the `.js` source, add an `.Rbuildignore` entry for it. Delete the GIFs and run `Rscript tools/precompute-vignettes.R introduction-to-ssm-analysis`. Then run the staleness check, the width guard, and the prose sweep on the `.Rmd.orig`.
 - [ ] T3: Add a step to `.github/workflows/vignette-precompute.yaml` that runs `node tools/check-ssm-applet.mjs`.
 - [ ] T4: Add one Documentation bullet for the applet under a new `# circumplex (development version)` heading in NEWS.md. Build the tarball and run `devtools::check(args = "--no-manual")` at the merge base and at the branch tip, and record both sizes and both NOTE lists. Read the `<noscript>` block of the built HTML for AC5. Open the built HTML vignette and the pkgdown article in the built-in browser. Record the AC2, AC4 and AC6 reads in light and dark themes.
@@ -65,3 +65,5 @@ One interactive figure, in which the reader moves sliders for elevation, amplitu
 - 2026-10-29: ROADMAP reached its 60-line cap and byte budget with the new rows, so the two parked peer-review rows (split 2026-10-17) merged back into one, "State peer-review status in more docs".
 - 2026-10-29: inbox sweep: 0 open issues and 0 open PRs on jmgirard/circumplex.
 - 2026-10-29: CRAN-SUBMISSION records a 2.1.0 submission today at `30d5e191`. This milestone ships in the release after it, so its NEWS bullet goes under a development heading.
+- 2026-10-29: implement started on branch `m176-intro-ssm-applet`, cut from `c4e3b033`. The untracked `CRAN-SUBMISSION` file stays unstaged.
+- 2026-10-29: T1 done. `vignettes/ssm-curve-applet.js` holds the pure functions and the DOM code. The amplitude arrow and displacement marker repeat at each peak angle, so a d = 360 curve shows both at 0° and 360°. `node tools/check-ssm-applet.mjs` exits 0 over 16,632 settings × 361 angles in 1.6 s. Each of the 12 plants, written to scratch copies, exits 1 at the rule it targets: the curve value (sign of e, a, d shift, degrees), yScale, peaks (a = 0, lone 0°, lone 360°), octant angles, octant point off the curve, xScale(0), and the vertex count.
