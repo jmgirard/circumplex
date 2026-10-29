@@ -246,7 +246,7 @@ contrast
 ssm_plot_contrast(contrast)
 ```
 
-<img src="figures/sem-latent-contrasts-contrast-plot-1.png" alt="plot of chunk contrast-plot" width="100%" />
+<img src="figures/sem-latent-contrasts-contrast-plot-1.svg" alt="plot of chunk contrast-plot" width="100%" />
 
 The contrast block reports the difference in each SSM parameter with its
 confidence interval. As with the observed contrast, an elevation or amplitude

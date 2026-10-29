@@ -84,6 +84,7 @@ jobs:
             any::RColorBrewer
             any::rmarkdown
             any::roxygen2
+            any::svglite
             any::testthat
             any::vdiffr
 

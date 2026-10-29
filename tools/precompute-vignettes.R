@@ -41,14 +41,18 @@ knit_one <- function(name) {
   # own empty caption is what is in force -- a chunk that writes its own
   # fig.cap or fig.alt keeps it.
   #
-  # dpi = 144 renders each figure at twice knitr's 72-dpi default, the 2x
-  # ("retina") size pkgdown produced when it knitted these vignettes itself;
-  # at 72 dpi a 7-inch figure is 504 pixels wide and stretched to the article
-  # column, visibly soft on the site. out.width still governs display size.
+  # Figures are SVG (svglite), not PNG. A PNG sharp enough for the site (144
+  # dpi, hotfix #152) shipped each figure twice in the tarball, once as a file
+  # and once base64 in the built HTML, and pushed the 2.1.0 tarball past CRAN's
+  # size note; the SVGs are vector, so they need no dpi. svglite is needed only
+  # here, never by R CMD build, which reads the committed files. Without it
+  # knitr stops at the first figure chunk with an error naming svglite.
+  # out.width still governs display size.
   knitr::opts_chunk$set(
     fig.path = file.path("figures", paste0(name, "-")),
     fig.cap = "",
-    dpi = 144
+    dev = "svglite",
+    fig.ext = "svg"
   )
   knitr::opts_hooks$set(fig.cap = function(options) {
     if (is.null(options$fig.alt) && identical(options$fig.cap, "")) {

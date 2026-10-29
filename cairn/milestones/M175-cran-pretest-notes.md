@@ -4,14 +4,14 @@
      cairn_validate's <150 over the plan-owned body. -->
 # M175: Clear CRAN's 2.1.0 pretest notes
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** high   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Driving RR:** —   <!-- owner: plan · create/amend-via-gate; RR<NN> whose Binding criteria bind this milestone's ACs (binding-criteria check), or — -->
 - **Principles touched:** GP3, GP5   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
 - **Resolves:** —   <!-- owner: plan · create/amend-via-gate; comma-separated GitHub issues the scope absorbs, each `#N closes` (the PR closes it at merge) or `#N partial` (the remainder gets a candidate row), or — ; skill conduct only — no validate check parses it -->
 - **Surface tier:** user-facing — the `cpm_fit()` help example and the vignette figures ship to CRAN users   <!-- owner: plan · create/amend-via-gate; user-facing | internal — <one-clause reason>; skill conduct only — no validate check parses it -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
+- **Branch/PR:** m175-cran-pretest-notes   <!-- owner: implement (branch) / review (PR URL) · create; a companion checkout the milestone also works in is one further entry per checkout, `companion: <abs-path> <branch>` (implement), its PR URL appended by review — /milestone-review merges companions first, in listed order -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -82,6 +82,8 @@ The 2.1.0 tarball answers each NOTE of CRAN's 2026-10-29 incoming pretest.
 - 2026-10-29: criteria audit (full mode, palette draft): 16 findings, all taken. AC2 read the donttest pass and bounded only elapsed time; AC3 promised format but not look; AC4's probes stood one case for a family; AC5 read as a precondition; AC6's reason and NOTE list were incomplete; AC7 named the verify slot.
 - 2026-10-29: criteria audit (full mode, SVG draft): 5 findings, all taken. The AC2 bound moved from 0.7 s to 1.0 s, as runs measured 0.55 to 0.68 s; T2 drops its own `svglite` check, because knitr fails loudly; AC4 requires identical figure bytes; AC6 names the GIFs and labels example times. A look at the figures is not a criterion; it is T7's image and the merge question's look.
 - 2026-10-29: plan decided svglite enters only the precompute CI job's allowlist, not DESCRIPTION, because `R CMD build` renders no precomputed figure.
+- 2026-10-29: implement started on `m175-cran-pretest-notes`. The untracked `CRAN-SUBMISSION` file that `devtools::submit_cran()` wrote stays unstaged.
+- 2026-10-29: checkpoint (T1-T4 edited, none ticked): bootstrap example in `\donttest{}` and Rd regenerated, test suite still running; precompute renders SVG, 46 PNGs replaced by 46 SVGs, `.Rmd` diffs only figure links plus one volatile-region line; `svglite` added to the precompute job and `check-ci-deps.R`, guard exits 0.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->

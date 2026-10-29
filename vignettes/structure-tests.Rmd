@@ -166,7 +166,7 @@ test interstitiality.
 plot(res)
 ```
 
-<img src="figures/structure-tests-fit_structure_plot-1.png" alt="plot of chunk fit_structure_plot" width="100%" />
+<img src="figures/structure-tests-fit_structure_plot-1.svg" alt="plot of chunk fit_structure_plot" width="100%" />
 
 For the IIP-SC octants, the picture agrees with the CPM fit in "Evaluating
 Circumplex Structure". The
