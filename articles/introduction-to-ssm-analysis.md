@@ -126,16 +126,12 @@ measures of interpersonal problems, it is interpreted as generalized
 interpersonal distress. When using correlation-based SSM, $`|e|\ge.15`$
 is considered “marked” and $`|e|<.15`$ is considered “modest.”
 
-![plot of chunk elev](VIG1-e.gif)
-
 The second SSM parameter is amplitude or $`a`$, which is calculated as
 the difference between the highest point of the curve and the curve’s
 mean. It is interpreted as the distinctiveness or differentiation of a
 profile: how much it is peaked versus flat. Similar to elevation, when
 using correlation-based SSM, $`a\ge.15`$ is considered “marked” and
 $`a<.15`$ is considered “modest.”
-
-![plot of chunk ampl](VIG1-a.gif)
 
 The final SSM parameter is displacement or $`d`$, which is calculated as
 the angle at which the curve reaches its highest point. It is
@@ -146,7 +142,23 @@ reported on the $`[0^\circ, 360^\circ)`$ circle; a profile that peaks
 right at the $`0^\circ`$/$`360^\circ`$ boundary may be reported as
 either value, since both point in the same direction.
 
-![plot of chunk disp](VIG1-d.gif)
+The figure below draws the curve $`S = e + a \times \cos(\theta - d)`$
+for the values you choose. Move a slider to change one parameter while
+the other two stay fixed. The dashed line marks the elevation, and the
+arrow from it to the peak marks the amplitude. The triangle under the
+peak marks the displacement. The points show the curve’s value at the
+angles of the eight scales. When the amplitude is zero, the curve is
+flat, so it has no peak and the displacement is undefined. Select Reset
+to return to the starting values.
+
+The sliders need JavaScript. This static figure shows the curve at an
+elevation of 0.1, an amplitude of 0.3 and a displacement of 90 degrees.
+
+![An SSM cosine curve with elevation 0.1, amplitude 0.3 and displacement
+90 degrees. A dashed line marks the elevation, an arrow from it to the
+peak at 90 degrees marks the amplitude, a triangle under the peak marks
+the displacement, and points mark the curve at the eight octant
+angles.](figures/introduction-to-ssm-analysis-applet-fallback-1.svg)
 
 By interpreting these three parameters, we can understand a profile much
 more parsimoniously than by trying to interpret all eight subscales
