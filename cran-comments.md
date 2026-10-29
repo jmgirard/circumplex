@@ -5,6 +5,8 @@
 * local reproduction of the linux-arm64 additional check, 2026-10-28: Docker
   on Apple Silicon, `aarch64-unknown-linux-gnu`, R 4.6.1, OpenBLAS 0.3.33
   (`libopenblasp-r0.3.33.so`). `Status: OK` on the tarball submitted here.
+* win-builder, R-devel on Windows, 2026-10-29: no notes other than the
+  maintainer-change note that its alternate results address caused
 * GitHub Actions: macOS/release, windows/release, ubuntu/devel,
   ubuntu/release, ubuntu/oldrel-1
 
