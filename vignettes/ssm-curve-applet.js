@@ -129,6 +129,9 @@
     "  grid-template-columns: max-content 1fr 5em; align-items: center;",
     "  margin-top: 0.5em; }",
     ".ssm-applet .ssm-controls input { width: 100%; }",
+    "@media (max-width: 560px) { .ssm-applet .ssm-controls {",
+    "  grid-template-columns: 1fr 4.5em; }",
+    "  .ssm-applet .ssm-controls label { grid-column: 1 / -1; } }",
     ".ssm-applet .ssm-controls output { font-variant-numeric: tabular-nums; }",
     ".ssm-applet button { margin-top: 0.5em; }"
   ].join("\n");
