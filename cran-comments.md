@@ -14,8 +14,8 @@
 
 0 errors | 0 warnings | 0 notes locally.
 
-CRAN's incoming check will still give one NOTE, for the size of the
-tarball. It is explained below.
+The tarball is under the 10000000 bytes above which the incoming check of
+R 4.6.1 reports its size.
 
 ## Downstream dependencies
 
@@ -24,20 +24,19 @@ None on CRAN.
 ## Notes
 
 This is a resubmission. The incoming pretest of the first 2.1.0 tarball, on
-2026-10-29, gave three NOTEs. Each is answered here.
+2026-10-29, listed three NOTEs. Each is answered here.
 
-* Size of tarball (10970779 bytes). The pre-computed vignette figures are now
-  SVG files instead of PNG images, and the tarball is now 5134444 bytes. It
-  is still over 5 MB because of three animated GIFs in the introduction
-  vignette. They ship twice: as files (1023015 bytes in all) and embedded in
-  the built `introduction-to-ssm-analysis.html`. 2.0.1 shipped at 9840575
-  bytes.
-* Examples with CPU or elapsed time over 10 s on r-devel-windows-x86_64
-  (`cpm_fit`, 11.09 s elapsed), and over 5 s on
-  r-devel-linux-x86_64-debian-gcc (`cpm_fit`, 5.2 s CPU). The `cpm_fit()`
-  example with 100 bootstrap resamples is now inside `\donttest{}`. The
-  matrix-input example still runs. Locally, without the `\donttest{}` code,
-  the `cpm_fit` examples take 0.82 s.
+* The incoming-feasibility NOTE, which reported `Size of tarball: 10970779
+  bytes`. The pre-computed vignette figures are now SVG files instead of PNG
+  images, and the tarball is now under 5250000 bytes. Its largest part is
+  three animated GIFs in the introduction vignette. They ship twice: as files
+  (1023015 bytes in all) and as base64 `data:` URIs in
+  `inst/doc/introduction-to-ssm-analysis.html`.
+* `cpm_fit` at 11.09 s elapsed on r-devel-windows-x86_64, and at 5.2 s CPU
+  on r-devel-linux-x86_64-debian-gcc. The `cpm_fit()` example with 100
+  bootstrap resamples is now inside `\donttest{}`. The matrix-input example
+  still runs. Locally, without the `\donttest{}` code, the `cpm_fit`
+  examples take under 1 s.
 
 This is a minor release with new features and fixes. The CRAN checks of
 2.0.1 are OK on every flavor.
@@ -46,8 +45,9 @@ Some functions now refuse column selections that gave a wrong result or an
 unclear error before: a column selected twice, a number below 1, and a name
 that occurs twice in the data. No package on CRAN depends on circumplex.
 
-The times below come from `R CMD check --as-cran` on this tarball, on the
-maintainer's macOS machine, without the `\donttest{}` code. The tests take 47
-seconds, installation 11 seconds, and the examples 12 seconds. Eleven of the
-fourteen vignettes ship pre-computed. The other three fit no SEM, CPM or
-bootstrap model, and re-building all fourteen takes 13 seconds.
+The times in this paragraph come from `R CMD check --as-cran` on this
+tarball, on the maintainer's macOS machine, without the `\donttest{}` code.
+The tests take under 60 seconds, installation under 15 seconds, and the
+examples under 15 seconds. Eleven of the fourteen vignettes ship
+pre-computed. The other three fit no SEM, CPM or bootstrap model, and
+re-building all fourteen takes under 15 seconds.
