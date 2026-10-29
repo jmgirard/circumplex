@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-29 (M176 done and archived: slider applet replaces 
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M177 | Fix three precompute and example gaps | in-progress | — | normal | milestones/M177-precompute-example-gaps.md |
+| M177 | Fix three precompute and example gaps | review | — | normal | milestones/M177-precompute-example-gaps.md |
 | M176 | Replace the introduction GIFs with a slider applet | done | — | normal | milestones/archive/M176-intro-ssm-applet.md |
 | M175 | Clear CRAN's 2.1.0 pretest notes | done | — | high | milestones/archive/M175-cran-pretest-notes.md |
 | M174 | Check NEWS against v2.0.1 before release | done | — | normal | milestones/archive/M174-news-check-v201.md |

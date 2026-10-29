@@ -1,6 +1,6 @@
 # M177: Fix three precompute and example gaps
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -40,7 +40,7 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - [x] T1: Add the comment above `R/cpm_fit.R:1830`, run `devtools::document()`, and run the example to see the warning and the boundary note it describes. Name the existing test that asserts this fit warns.
 - [x] T2: In `knit_one()`, add `error = FALSE` to `opts_chunk$set()` and knit to `paste0(name, ".Rmd.tmp")`, renaming it over `<name>.Rmd` after `knit()` returns; an `on.exit()` removes a leftover temporary file. Update the function's comments. Run both AC2 probes, plus a probe-validity control: the same two plants under the default branch's script, showing the `.Rmd` changed or the run exiting 0.
 - [x] T3: Rewrite the "Sourced by" comment from the AC3 grep.
-- [ ] T4: Re-render all vignettes, run the staleness check, `devtools::test()`, and `devtools::check(args = "--no-manual")`.
+- [x] T4: Re-render all vignettes, run the staleness check, `devtools::test()`, and `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -58,6 +58,7 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 - 2026-10-30: T2 first try left `<name>.Rmd.tmp` behind: the `on.exit()` unlink ran after `setwd()` restored, so its relative path missed; fixed with `after = FALSE`. Re-run: chunk and inline plants each exit 1, `.Rmd` byte-identical (`cmp`), `vignettes/*.Rmd*` list unchanged; an unplanted render is byte-identical to the committed `.Rmd`.
 - 2026-10-30: T4 re-render: all 11 vignettes knitted (33 s); only `ci-accuracy.Rmd` changed, one elapsed-time figure inside a masked region, restored from git; no figure file changed; `check-vignette-staleness.R` exit 0, all 11 up to date.
 - 2026-10-30: claim audit: 12 claims read, 2 corrected — tools/precompute-vignettes.R (knitr writes partial output on failure, not a truncation before the first chunk), R/cpm_fit.R (intervals print NA, so "no usable analytic intervals" replaces "cannot be trusted").
+- 2026-10-30: T4 checks: `devtools::test()` exit 0 with no failures; `devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes (7 m 57 s), run after the claim-audit edits. Status set to review.
 - 2026-10-30: T3 done: the comment names the three files the AC3 grep returns (staleness, width, parity) and says they read only `VIGNETTES`.
 
 ## Decisions
