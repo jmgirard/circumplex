@@ -9,6 +9,11 @@
   JavaScript see a static figure instead. Without the GIFs, the built package
   is smaller.
 
+* The correlation-matrix example of `cpm_fit()` now says why it warns. Its fit
+  reaches a boundary, with a communality at its upper limit. The Hessian is
+  then ill-conditioned, and the analytic intervals are not usable. The example
+  points to the "CPM Fits at a Boundary" vignette.
+
 # circumplex 2.1.0
 
 ## Breaking changes

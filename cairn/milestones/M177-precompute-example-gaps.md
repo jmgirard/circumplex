@@ -21,9 +21,9 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 
 ## Acceptance criteria
 
-- [ ] AC1: The matrix-input `cpm_fit()` example in `R/cpm_fit.R` and `man/cpm_fit.Rd` keeps its call unchanged and is preceded by a comment saying that the fit reaches a boundary (a communality at its upper limit), so the call warns that the Hessian is ill-conditioned and its analytic intervals cannot be trusted, and naming `vignette("cpm-boundary-fits", package = "circumplex")`.
-- [ ] AC2: `knit_one()` knits with chunk errors fatal (`error = FALSE`) into a temporary file in `vignettes/` that replaces `vignettes/<name>.Rmd` only after `knitr::knit()` returns. In a scratch copy of the repo, `Rscript tools/precompute-vignettes.R introduction-to-ssm-analysis` run once with a chunk-level `stop()` and once with an inline `stop()` planted in `introduction-to-ssm-analysis.Rmd.orig` exits non-zero each time, leaves the shipped `introduction-to-ssm-analysis.Rmd` byte-identical (`cmp`), and leaves the list of `vignettes/*.Rmd*` files unchanged.
-- [ ] AC3: The "Sourced by" comment in `tools/precompute-vignettes.R` names each file that `grep -rlE '(sys\.)?source\("tools/precompute-vignettes' --include='*.R' .` returns, says they read only `VIGNETTES`, and no longer names `knit_one()`.
+- [x] AC1: The matrix-input `cpm_fit()` example in `R/cpm_fit.R` and `man/cpm_fit.Rd` keeps its call unchanged and is preceded by a comment saying that the fit reaches a boundary (a communality at its upper limit), so the call warns that the Hessian is ill-conditioned and its analytic intervals cannot be trusted, and naming `vignette("cpm-boundary-fits", package = "circumplex")`.
+- [x] AC2: `knit_one()` knits with chunk errors fatal (`error = FALSE`) into a temporary file in `vignettes/` that replaces `vignettes/<name>.Rmd` only after `knitr::knit()` returns. In a scratch copy of the repo, `Rscript tools/precompute-vignettes.R introduction-to-ssm-analysis` run once with a chunk-level `stop()` and once with an inline `stop()` planted in `introduction-to-ssm-analysis.Rmd.orig` exits non-zero each time, leaves the shipped `introduction-to-ssm-analysis.Rmd` byte-identical (`cmp`), and leaves the list of `vignettes/*.Rmd*` files unchanged.
+- [x] AC3: The "Sourced by" comment in `tools/precompute-vignettes.R` names each file that `grep -rlE '(sys\.)?source\("tools/precompute-vignettes' --include='*.R' .` returns, says they read only `VIGNETTES`, and no longer names `knit_one()`.
 - [ ] AC4: After `Rscript tools/precompute-vignettes.R` re-renders all eleven vignettes with the new `knit_one()`, `Rscript tools/check-vignette-staleness.R` exits 0, and the vignette-precompute workflow passes on the PR head.
 - [ ] AC5: `devtools::test()` passes and `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings, 0 notes.
 
@@ -64,3 +64,5 @@ The `cpm_fit()` run example explains the warning it prints, and the vignette pre
 ## Decisions
 
 ## Review
+
+- AC1 evidence (2026-10-30): `git diff master -- R/cpm_fit.R` changes comment lines only; the call `cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))` is at R/cpm_fit.R:1834 and man/cpm_fit.Rd:255, once on master too. The comment says the fit reaches a boundary (a communality at its upper limit), so the call warns that the Hessian is ill-conditioned and reports no usable analytic intervals, and names `vignette("cpm-boundary-fits", package = "circumplex")`.
