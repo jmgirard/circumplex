@@ -26,6 +26,12 @@ VIGNETTES <- c(
 
 knit_one <- function(name) {
   stopifnot(name %in% VIGNETTES)
+  # Checked before knitting: knitr's own error for a missing device package
+  # comes after it has already truncated the output .Rmd.
+  if (!requireNamespace("svglite", quietly = TRUE)) {
+    stop("svglite is required to render the pre-computed vignette figures; ",
+         "install it with install.packages(\"svglite\")", call. = FALSE)
+  }
   owd <- setwd("vignettes")
   on.exit(setwd(owd), add = TRUE)
   # Figures land beside the rendered .Rmd and ship with it; the per-vignette
@@ -45,9 +51,8 @@ knit_one <- function(name) {
   # dpi, hotfix #152) shipped each figure twice in the tarball, once as a file
   # and once base64 in the built HTML, and pushed the 2.1.0 tarball past CRAN's
   # size note; the SVGs are vector, so they need no dpi. svglite is needed only
-  # here, never by R CMD build, which reads the committed files. Without it
-  # knitr stops at the first figure chunk with an error naming svglite.
-  # out.width still governs display size.
+  # here, never by R CMD build, which reads the committed files (the check at
+  # the top of this function). out.width still governs display size.
   knitr::opts_chunk$set(
     fig.path = file.path("figures", paste0(name, "-")),
     fig.cap = "",
