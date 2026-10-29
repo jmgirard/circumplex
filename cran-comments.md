@@ -48,5 +48,6 @@ that occurs twice in the data. No package on CRAN depends on circumplex.
 
 The times below come from `R CMD check --as-cran` on this tarball, on the
 maintainer's macOS machine, without the `\donttest{}` code. The tests take 47
-seconds, installation 11 seconds, and the examples 12 seconds. The vignettes ship
-pre-computed, so re-building them runs no model fits.
+seconds, installation 11 seconds, and the examples 12 seconds. Eleven of the
+fourteen vignettes ship pre-computed. The other three fit no SEM, CPM or
+bootstrap model, and re-building all fourteen takes 13 seconds.

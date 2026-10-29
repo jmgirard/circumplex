@@ -49,8 +49,9 @@ knit_one <- function(name) {
   #
   # Figures are SVG (svglite), not PNG. A PNG sharp enough for the site (144
   # dpi, hotfix #152) shipped each figure twice in the tarball, once as a file
-  # and once base64 in the built HTML, and pushed the 2.1.0 tarball past CRAN's
-  # size note; the SVGs are vector, so they need no dpi. svglite is needed only
+  # and once base64 in the built HTML; the PNGs were the bulk of the first 2.1.0
+  # tarball, which crossed the 1e7-byte size NOTE of CRAN's incoming check. The
+  # SVGs are vector, so they need no dpi. svglite is needed only
   # here, never by R CMD build, which reads the committed files (the check at
   # the top of this function). out.width still governs display size.
   knitr::opts_chunk$set(

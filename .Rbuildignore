@@ -21,7 +21,7 @@
 ^CLAUDE\.md$
 ^cairn$
 ^\.DS_Store$
-^Rplots\.pdf$
+(^|/)Rplots\.pdf$
 ^tools$
 ^tests/testthat/_problems$
 ^vignettes/.*\.Rmd\.orig$
