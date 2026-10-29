@@ -2749,3 +2749,23 @@ feature newer than 3.1.7 raises the floor again.
 
 **Reopens.** A test failure under testthat 3.1.7 on an R version that
 builds it unchanged.
+
+### D-074 (2026-10-30): annotates D-003 — an exact pole peak reports about 0° or 360°, not always 360.0; the no-canonicalize decision stands (M177)
+
+**Context.** D-003's title and context say a profile peaking exactly on the
+0°/360° pole reports exactly 360.0. A probe at the M177 plan found that the
+sign of the float residue in `y` varies with the scale count, amplitude and
+elevation, so many such profiles report about 0° instead (counts in the M177
+milestone file). The introduction vignette and the `ssm_analyze()` help page
+already say either value may appear.
+
+**Decision.** D-003's decision is unchanged: the estimate is not
+canonicalized, and boundary tests accept either value. Only its premise
+narrows: 360.0 is one of the two values an exact pole peak can report. The
+M20 snap of CI endpoints and CPM angles to 360 is unaffected.
+
+**Rejected.** Snapping exact-pole estimates to 360: D-003's reasons still
+hold (an arbitrary tie-break on a measure-zero float artifact).
+
+**Reopens.** A user report that an exact-pole estimate printing as 0
+misled an analysis.
