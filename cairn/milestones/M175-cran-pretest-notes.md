@@ -86,6 +86,7 @@ The 2.1.0 tarball answers each NOTE of CRAN's 2026-10-29 incoming pretest.
 - 2026-10-29: checkpoint (T1-T4 edited, none ticked): bootstrap example in `\donttest{}` and Rd regenerated, test suite still running; precompute renders SVG, 46 PNGs replaced by 46 SVGs, `.Rmd` diffs only figure links plus one volatile-region line; `svglite` added to the precompute job and `check-ci-deps.R`, guard exits 0.
 - 2026-10-29: T5 probe, no-`svglite` library of 473 symlinked packages (control TRUE TRUE FALSE): without a check of its own the script exited 1 with knitr's "there is no package called 'svglite'" but left `growth-ssm-analysis.Rmd` truncated (35 insertions, 683 deletions), so the audit's reading that knitr writes no file was false for `knit_one()`. Minor amendment to T2: `knit_one()` now checks `requireNamespace("svglite")` first. Re-run: exit 1 with the script's error naming svglite, `git status -- vignettes` empty, staleness exits 0 under that library.
 - 2026-10-29: T2/T3 evidence: full re-render exits 0, staleness and width checks exit 0, `git status -- vignettes` shows only `ci-accuracy.Rmd` modified on its volatile elapsed line (restored); a one-vignette re-render of `growth-ssm-analysis` left no change, so the SVGs reproduce byte for byte on this machine.
+- 2026-10-29: checkpoint: NEWS 2.1.0 Documentation gains the SVG line; `cran-comments.md` waits for T7's tarball figures; T7 build and check running.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
