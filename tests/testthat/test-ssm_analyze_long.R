@@ -123,7 +123,6 @@ test_that("numeric scale indexes select the same columns as names", {
 # AC2 -- occasion order is temporal, never alphabetical ---------------------
 
 test_that("occasion order follows first appearance, not alphabetical (T10/T2)", {
-  skip_on_cran()
   # Rows stacked T2 then T10, so the temporal (as-supplied) order is T2, T10;
   # alphabetical sorting would flip it to T10, T2 and reverse the contrast.
   long <- make_long_data(occ = c("T2", "T10"), group = FALSE)
@@ -152,7 +151,6 @@ test_that("occasion order follows first appearance, not alphabetical (T10/T2)", 
 })
 
 test_that("a factor occasion column uses its levels for order", {
-  skip_on_cran()
   long <- make_long_data(occ = c("T2", "T10"), group = FALSE)
   # Rows are T2-then-T10, but the factor levels declare T10 before T2.
   long$occasion <- factor(long$occasion, levels = c("T10", "T2"))

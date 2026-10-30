@@ -1,13 +1,13 @@
 # M178: Run the boundary bug guards on CRAN
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, IP2, IP6
 - **Resolves:** —
 - **Surface tier:** user-facing — the tests ship in the tarball and run in CRAN's own check, where a failure blocks a release
-- **Branch/PR:** —
+- **Branch/PR:** m178-cran-boundary-guards
 
 ## Goal
 
@@ -67,6 +67,14 @@ A bound changes only where AC2 requires it, and a fixture's cost only where AC4 
 - 2026-10-30: question set: whether to widen to the other CRAN-dark matrix cells — keep to five; the cells went to the new candidate row "Run more boundary cells on CRAN".
 - 2026-10-30: criteria audit (full mode, fresh Opus reader): 12 findings. Fixed: AC2 limited to upper bounds on a zero-ideal error, split into noise (10x) and sampling (keep unless over half), with a defect ceiling and named error metrics; AC3 plant fixed to the block's named defect, failing a changed expectation, with fixture and in-test-rule blocks exempt; AC1 non-interactive Rscript; AC4 names ListReporter `real` in a fresh session; AC5 adds a "pull request" grep; AC6 requires lavaan in the check library. No finding on principles or on instrument wording.
 - 2026-10-30: changelog: none, because the change is tests and comments only.
+- 2026-10-30: implement started on branch m178-cran-boundary-guards. The untracked `CRAN-SUBMISSION` file at the repo root is unrelated and stays unstaged.
+- 2026-10-30: T1 baseline at d56942a8: under non-interactive `Rscript` with `NOT_CRAN=false` and lavaan installed, all 13 guard blocks report a skip. `R CMD check --as-cran --no-manual` on the master tarball with `NOT_CRAN` unset: Status OK, no NOTE, tests 55 s, `[ FAIL 0 | WARN 6 | SKIP 619 | PASS 5792 ]`.
+- 2026-10-30: T2 bounds measured on this machine (macOS arm64). Noise, kept: relabel `abs(e2 + e1) < 1e-4` measured 2.85e-7; arc span `tolerance = 1e-9` measured 6.5e-16 and 0 (half-turn block); CPM `F <= 1e-8` measured -1.8e-15 and 0; CPM sigma `tolerance = 1e-6` measured 2.5e-10 and `1e-5` measured 1.4e-10; CPM pole distance `< 1e-3` measured 4.2e-8 both; `angle_dist` near-atom `< 1e-9` measured 1e-12 both. Sampling, kept: `deg_gap < 12` measured 3.34. Widened: relabel `wrap(d2 + d1) < 1e-3` measured 1.14e-4 (8.8x), now 0.01; the guarded defect gives 141°. Out of AC2's scope (ideal value not 0): the step bounds (3.2, 9.1, 14.2 against 90), fixture-shape checks and range checks.
+- 2026-10-30: T3 removed `skip_on_cran()` from the 13 blocks; no boots or fixture change was needed. No comment in the five files said these blocks skip on CRAN (the one at `test-cpm_boundary.R:143` belongs to the lower-discrepancy block, which keeps its skip). CRAN-mode run: all 13 report no skip and no failure, 2.84 s summed `real` while a check ran in the background.
+- 2026-10-30: T4 the relabel block is the only block changed beyond the skip removal. Plant: deleted `args$group.label <- levels(dat[[grouping]])` in `sem_fit_cfa()` (`R/ssm_sem.R:754`). In CRAN mode the widened `wrap(d2 + d1) < 0.01` failed, as did the `"A - B"` label match and the elevation bound. Restored by copy, same hash 01f38273.
+- 2026-10-30: T5 corrected the comment above the M168 test in `test-lavaan-cfi-helper.R`. Read every hit of AC5's two greps: the comment blocks at `test-axes-fiml.R:1170`, `test-axes-certificate.R:138`, `:192`, `:539`, `:1092`, `test-coverage.yaml:64`, the three `tools/m120-*` hits and `tools/arm64/testfile.sh:38` make no false claim.
+- 2026-10-30: T6 re-cited the SEM and free-scaling CPM rows of `cairn/boundary-coverage.md` (`:442`→`:456`, `:182`→`:185`, `:466`→`:481`, `:22`→`:26`, `:40`→`:44`, the dropped `:463` was inside the `:456` block) and added an M178 audit note. The CPM class D cell's cites (`:60`, `:72`, `:86`) also moved (`:64`, `:76`, `:90`).
+- 2026-10-30: checkpoint: T1-T6 work committed with boxes unticked; the full `devtools::test()` run and the branch tarball check are still running.
 
 ## Decisions
 

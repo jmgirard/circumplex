@@ -127,7 +127,6 @@ test_that("the long-format path preserves its occasion ordering too", {
 # Displacement seam continuity (AC3) ------------------------------------------
 
 test_that("the fixture really does straddle the 0/360 seam", {
-  skip_on_cran()
   # Guards the guard: if this stops holding, every seam assertion below goes
   # vacuous and would pass against a linear implementation.
   res <- traj_fit()
@@ -140,7 +139,6 @@ test_that("the fixture really does straddle the 0/360 seam", {
 })
 
 test_that("the displacement branch is continuous across the seam", {
-  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
   d <- df[df$Parameter == "d", ]
@@ -154,7 +152,6 @@ test_that("the displacement branch is continuous across the seam", {
 })
 
 test_that("each CI bound lands on its own estimate's branch", {
-  skip_on_cran()
   res <- traj_fit()
   df <- ssm_trajectory_frame(res)
   d <- df[df$Parameter == "d", ]
@@ -180,7 +177,6 @@ test_that("each CI bound lands on its own estimate's branch", {
 })
 
 test_that("an interval wider than a half-turn stays upright", {
-  skip_on_cran()
   # The regime D-007 certification exists to flag: a zero-amplitude occasion
   # whose displacement is essentially unknown. Its stored interval spans most of
   # the circle, which an implementation that places each bound independently
@@ -207,7 +203,6 @@ test_that("an interval wider than a half-turn stays upright", {
 })
 
 test_that("the seam guard has teeth against a linear implementation", {
-  skip_on_cran()
   # Mutation check, not eyeballing: recompute the displacement panel the naive
   # way (bounds carried by the estimate's branch offset rather than their own
   # signed distance) and confirm the assertions above go red.
@@ -346,7 +341,6 @@ test_that("confidence bands are drawn per occasion", {
 })
 
 test_that("the plotted displacement path is continuous across the seam", {
-  skip_on_cran()
   # The load-bearing assertion, at the data level: check() runs clean on a
   # visually wrong figure, so the built layer data is the only honest witness.
   p <- ssm_plot_trajectory(traj_fit())

@@ -25,8 +25,8 @@ point-estimate level is an engine property tested once, not re-proved per path.
 | Bootstrap engine | quantile handles the pole → `test-ssm_bootstrap.R:210`; `:238` (**M20**, pole-denoting endpoint = 2π both float representations, + no-over-fire guard) | `test-ssm_bootstrap.R:210`, `:1` | `test-ssm_bootstrap.R:147`, `:178` | `test-ssm_bootstrap.R:137`, `:95`, `:114` (all-NA column) |
 | Monte Carlo engine | engine-level point estimate (see mean A); pole interval → `:94` | `test-ssm_montecarlo.R:94` | `test-ssm_montecarlo.R:117`, `:224` | `test-ssm_montecarlo.R:141` (flat + singular covariance) |
 | `ssm_ci_accuracy()` | `test-ci_accuracy.R:343` (population peaks at 0/360) | `test-ci_accuracy.R:50` (membership mod 360) | `test-ci_accuracy.R:72`, `:562` | `test-ci_accuracy.R:419` (flat population refused) |
-| SEM (`ssm_sem`) | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:442` | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:442`, `:463` | `test-ssm_sem_groups.R:182` (group contrast) | `test-ssm_sem.R:239`, `:58`, `:209`; `test-ssm_sem_groups.R:466` |
-| `cpm_fit()` free scaling (**M18**) | `test-cpm_boundary.R:22`, `:40` (pole item recovers; σ̂ untouched) | shared circular-quantile engine (angle CIs reuse `quantile.circumplex_radian`; σ block orthogonal to angles) → unit-path B | N/A — a CPM fit has no angular contrast estimand | `test-cpm_boundary.R:60`, `:72`, `:86` (singular / zero-variance / near-flat refused, fail-closed) |
+| SEM (`ssm_sem`) | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:456` | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:456` | `test-ssm_sem_groups.R:185` (group contrast, runs on CRAN since M178) | `test-ssm_sem.R:239`, `:58`, `:209`; `test-ssm_sem_groups.R:481` |
+| `cpm_fit()` free scaling (**M18**) | `test-cpm_boundary.R:26`, `:44` (pole item recovers; σ̂ untouched; both run on CRAN, M178) | shared circular-quantile engine (angle CIs reuse `quantile.circumplex_radian`; σ block orthogonal to angles) → unit-path B | N/A — a CPM fit has no angular contrast estimand | `test-cpm_boundary.R:64`, `:76`, `:90` (singular / zero-variance / near-flat refused, fail-closed) |
 
 ## Audit notes (M11)
 
@@ -62,3 +62,13 @@ point-estimate level is an engine property tested once, not re-proved per path.
 - Cited line numbers above re-audited after the M20 test insertions: every
   pre-M20 cite in this matrix precedes the inserted blocks and is unchanged;
   the M13 CPM e2e test moved (49 → 78, not cited here).
+
+## Audit notes (M178)
+
+- M178 removed `skip_on_cran()` from three cited blocks, so these cells now
+  run under CRAN's own check: SEM class C (`test-ssm_sem_groups.R:185`) and
+  free-scaling CPM class A (`test-cpm_boundary.R:26`, `:44`).
+- The cites into `test-ssm_sem_groups.R` and `test-cpm_boundary.R` were
+  re-cited at M178. Cites into other files were not re-audited.
+- Cells whose cited tests all skip on CRAN are tracked by the ROADMAP
+  candidate row "Run more boundary cells on CRAN".
