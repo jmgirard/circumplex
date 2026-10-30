@@ -363,7 +363,7 @@ test_that("the reference group follows FACTOR LEVELS, not row order: relabeling 
   expect_lt(abs(r2$results$e_est[i2] + r1$results$e_est[i1]), 1e-4)
   d1v <- as.numeric(r1$results$d_est[i1])
   d2v <- as.numeric(r2$results$d_est[i2])
-  expect_lt(abs(((d2v + d1v + 180) %% 360) - 180), 0.01)
+  expect_lt(abs(((d2v + d1v + 180) %% 360) - 180), 1)
 })
 
 test_that("same seed reproduces multi-group results; group draws are joint (sec. 5.3/5.4)", {

@@ -28,16 +28,17 @@ test_that("angle_dist reports an exact half-turn as +pi, not -pi (F3)", {
   expect_identical(angle_dist(-pi / 2, pi / 2), pi)
   expect_identical(angle_dist(3 * pi / 2, pi / 2), pi)
   # How the atom arises: displacements are atan2 outputs, and exactly
-  # sign-flipped profiles give atan2(-y, -x) vs atan2(y, x). These raw
-  # differences are float-exact +/-pi, so the wrap lands bit-exactly on the
-  # atom and they must all report +pi. (In the full pipeline, upstream wrapping
-  # to [0, 2pi) can leave some true half-turns 1-2 ulp off the atom; those are
-  # not remapped and correctly report just inside the branch -- see angle_dist.)
+  # sign-flipped profiles give atan2(-y, -x) vs atan2(y, x). Whether their
+  # raw difference is exactly +/-pi depends on the platform's atan2, and a
+  # difference 1 ulp off the atom correctly reports just inside the branch
+  # (see angle_dist). So each must land in (-pi, pi], next to the half-turn,
+  # and never on -pi.
   set.seed(42)
   for (i in 1:8) {
     y <- rnorm(1)
     x <- rnorm(1)
-    expect_identical(angle_dist(atan2(-y, -x), atan2(y, x)), pi)
+    d <- angle_dist(atan2(-y, -x), atan2(y, x))
+    expect_true(d > -pi && d <= pi && pi - abs(d) < 1e-12)
   }
   # Near-boundary values strictly inside (-pi, pi] are legitimate contrasts
   # and must NOT be flipped by any tolerance band: a hair short of the
