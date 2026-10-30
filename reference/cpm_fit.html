@@ -417,7 +417,10 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   on estimability.</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Matrix-input path (supply the sample size; analytic CIs)</span></span></span>
+<span class="r-in"><span><span class="co"># Matrix-input path (supply the sample size; CIs are analytic). This fit</span></span></span>
+<span class="r-in"><span><span class="co"># reaches a boundary (a communality at its upper limit), and its Hessian is</span></span></span>
+<span class="r-in"><span><span class="co"># also ill-conditioned, so the call warns and reports no usable intervals;</span></span></span>
+<span class="r-in"><span><span class="co"># vignette("cpm-boundary-fits", package = "circumplex") explains both.</span></span></span>
 <span class="r-in"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">[</span><span class="va">scales</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cpm_fit</span><span class="op">(</span>cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="va">scales</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
