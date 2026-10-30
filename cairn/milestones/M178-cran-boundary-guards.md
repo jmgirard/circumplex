@@ -53,7 +53,7 @@ A bound changes only where AC2 requires it, and a fixture's cost only where AC4 
 - [x] T4: For each block that AC3 covers, plant its defect in a committed copy of the package code, run the block as in AC1 and see the changed expectation fail. Under `devtools::load_all()`, assign the plant in both the namespace and the attached environment. Restore by copy and confirm the file hash. Record each plant, its block and its result in the work log. If no block changed, record that AC3 has no block to cover.
 - [x] T5: Correct the comment above the M168 test in `test-lavaan-cfi-helper.R`. Read every hit of AC5's two greps and correct any other comment that makes the same claim.
 - [x] T6: In `cairn/boundary-coverage.md`, re-cite the cells that point into the five edited files. Add an M178 audit note that names the cells whose tests now run on CRAN.
-- [ ] T7: Run AC6's three checks. Then run AC1 and AC4's timed CRAN-mode run in a fresh `Rscript` session and record the per-block times.
+- [x] T7: Run AC6's three checks. Then run AC1 and AC4's timed CRAN-mode run in a fresh `Rscript` session and record the per-block times.
 
 ## Work log
 
@@ -76,6 +76,7 @@ A bound changes only where AC2 requires it, and a fixture's cost only where AC4 
 - 2026-10-30: T6 re-cited the SEM and free-scaling CPM rows of `cairn/boundary-coverage.md` (`:442`→`:456`, `:182`→`:185`, `:466`→`:481`, `:22`→`:26`, `:40`→`:44`, the dropped `:463` was inside the `:456` block) and added an M178 audit note. The CPM class D cell's cites (`:60`, `:72`, `:86`) also moved (`:64`, `:76`, `:90`).
 - 2026-10-30: checkpoint: T1-T6 work committed with boxes unticked; the full `devtools::test()` run and the branch tarball check are still running.
 - 2026-10-30: verify slot clean at c26eafd1: `devtools::test()` gives `FAIL 0 | SKIP 1 | PASS 15478`. T1-T6 ticked.
+- 2026-10-30: T7 at b87f484f (test files identical to the checked tarball by hash). `R CMD check --as-cran --no-manual` on the branch tarball with `NOT_CRAN` unset and lavaan 0.7.2 installed: Status OK, no NOTE, tests 49 s, `[ FAIL 0 | WARN 6 | SKIP 606 | PASS 5847 ]`, 13 fewer skips than master. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes. Timed CRAN-mode run in a fresh `Rscript` session: all 13 blocks run with no skip and no failure, summed `real` 2.82 s (the planning figure of 1.9 s was taken with `NOT_CRAN=true` in one session with lavaan already loaded).
 
 ## Decisions
 
