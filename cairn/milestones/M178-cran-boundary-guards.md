@@ -1,0 +1,73 @@
+# M178: Run the boundary bug guards on CRAN
+
+- **Status:** planned
+- **Priority:** high
+- **Depends on:** —
+- **Driving RR:** —
+- **Principles touched:** IP1, IP2, IP6
+- **Resolves:** —
+- **Surface tier:** user-facing — the tests ship in the tarball and run in CRAN's own check, where a failure blocks a release
+- **Branch/PR:** —
+
+## Goal
+
+Five guards against past boundary and order bugs run under CRAN's own check, where `skip_on_cran()` hides them today.
+
+## Scope
+
+**In:** Remove `skip_on_cran()` in place from the 13 `test_that()` blocks of the guard set, named here exactly. Add no CRAN-only copies.
+
+- G1, `tests/testthat/test-ssm_analyze_long.R`: "occasion order follows first appearance, not alphabetical (T10/T2)" and "a factor occasion column uses its levels for order".
+- G2, `tests/testthat/test-ssm_sem_groups.R`: "latent group contrast near +/-180 stays on the estimate's branch (sec. 6.4)" and "the reference group follows FACTOR LEVELS, not row order: relabeling flips the contrast (CLAUDE.md grouping contract)".
+- G3, `tests/testthat/test-ssm_trajectory.R`: "the fixture really does straddle the 0/360 seam", "the displacement branch is continuous across the seam", "each CI bound lands on its own estimate's branch", "an interval wider than a half-turn stays upright", "the seam guard has teeth against a linear implementation" and "the plotted displacement path is continuous across the seam".
+- G4, `tests/testthat/test-cpm_boundary.R`: "free scaling, class A: an in-family angle at the 0/360 pole recovers" and "free scaling, class A: a genuine sigma != 1 pattern recovers at the pole".
+- G5, `tests/testthat/test-utils.R`: "angle_dist reports an exact half-turn as +pi, not -pi (F3)".
+
+A bound changes only where AC2 requires it, and a fixture's cost only where AC4 requires it. Also correct the comment above the M168 test in `tests/testthat/test-lavaan-cfi-helper.R` (lines 69-74). It says that the R CMD check job on pull requests does not run `skip_on_cran()` blocks. That is false, because `r-lib/actions/setup-r@v2` exports `NOT_CRAN=true`.
+
+**Out:** The other boundary-matrix cells whose cited tests all skip on CRAN go to the candidate row "Run more boundary cells on CRAN". No change to package code under `R/` or `src/`. No NEWS entry, because only tests and comments change. Refreshing the check times in `cran-comments.md` belongs to `/cairn-release`.
+
+## Acceptance criteria
+
+- [ ] AC1: Every block of the guard set runs and passes in CRAN mode. For each of the five files, a non-interactive `Rscript` run of `testthat::test_file()` with `NOT_CRAN=false` and lavaan installed reports each guard-set block of that file by name. Each such block has at least one expectation, no skip and no failure.
+- [ ] AC2: In each guard-set block, an `expect_*()` call is in scope when it puts an upper bound, a numeric literal or `tolerance =`, on an error whose ideal value is 0. The error is `max(abs(x - y))` for an absolute bound, and the mean relative difference that `all.equal()` reports for `tolerance =`. A bound on numerical noise from arithmetic or an optimizer is at least 10 times its error measured on the review machine. A bound on sampling error keeps its literal, unless the measured error exceeds half of it. A widened bound stays below the error that the block's guarded defect gives.
+- [ ] AC3: The plant for a block is the defect that the block's comments or source milestone name. Each guard-set block whose expectations or fixture this milestone changes beyond removing `skip_on_cran()` fails under its plant in the package code, run as in AC1. At least one changed expectation fails under the plant. Blocks whose subject is the fixture or a rule written inside the test are exempt ("the fixture really does straddle the 0/360 seam" and "the seam guard has teeth against a linear implementation"). If such a block changes, a fixture that lacks the property it checks makes it fail.
+- [ ] AC4: In a fresh R session, the sum of the `real` times that testthat's `ListReporter` records for the 13 guard-set blocks in AC1's run is under 5 seconds on the review machine. At planning it was 1.9 s on 2026-10-30 at 97954765.
+- [ ] AC5: This AC covers each comment block that holds a match of `grep -rn NOT_CRAN tests .github/workflows tools` or of `grep -rni "pull request" tests`. No such block says that the R CMD check jobs on pull requests skip `skip_on_cran()` blocks.
+- [ ] AC6: `devtools::test()` reports 0 failures, and `devtools::check(args = "--no-manual")` reports 0 errors, 0 warnings and 0 notes. `R CMD check --as-cran` runs on the built tarball with `NOT_CRAN` unset and lavaan in the check library. It reports `FAIL 0` in `testthat.Rout`, no ERROR or WARNING, and no NOTE that the same command does not report on master.
+
+## Coverage
+
+- AC1 → T3, T7
+- AC2 → T2
+- AC3 → T4
+- AC4 → T3, T7
+- AC5 → T5
+- AC6 → T1, T7
+
+## Tasks
+
+- [ ] T1: Take a baseline on master. Run the five files under `NOT_CRAN=false` and record the 13 blocks that report a skip. Run `R CMD check --as-cran` on the master tarball and record its NOTEs and its SKIP count.
+- [ ] T2: List the AC2 calls in the 13 blocks by line, and sort each into noise or sampling error. Measure each error on this machine. The audit measured 14.2° against the step bounds of 90, 3.3° against `deg_gap < 12` and 8.9e-15 on the arc span. Widen only the bounds that AC2 requires. Record each call's bound, its measured error and, for a widened bound, the defect's error in the work log.
+- [ ] T3: Remove `skip_on_cran()` from the 13 blocks. Cut boots or fixture size only if AC4 requires it. Update any comment in the five files that says these blocks skip on CRAN.
+- [ ] T4: For each block that AC3 covers, plant its defect in a committed copy of the package code, run the block as in AC1 and see the changed expectation fail. Under `devtools::load_all()`, assign the plant in both the namespace and the attached environment. Restore by copy and confirm the file hash. Record each plant, its block and its result in the work log. If no block changed, record that AC3 has no block to cover.
+- [ ] T5: Correct the comment above the M168 test in `test-lavaan-cfi-helper.R`. Read every hit of AC5's two greps and correct any other comment that makes the same claim.
+- [ ] T6: In `cairn/boundary-coverage.md`, re-cite the cells that point into the five edited files. Add an M178 audit note that names the cells whose tests now run on CRAN.
+- [ ] T7: Run AC6's three checks. Then run AC1 and AC4's timed CRAN-mode run in a fresh `Rscript` session and record the per-block times.
+
+## Work log
+
+- 2026-10-30: created by /milestone-plan from the candidate row "CRAN-dark boundary invariants".
+- 2026-10-30: tier check: milestone — removing CRAN skips from 13 test blocks across five files is more than a typo and leaves bound and posture choices open.
+- 2026-10-30: idea vet: gap, in-place skip removal or CRAN-only copies; took in-place removal, which the row's words allow and which keeps one copy of each check. Gap, the row's M168 note says PR CI skips these blocks; the CI log shows `NOT_CRAN: true` from setup-r and SKIP 104 against 523 skip sites, so took the reading that the note is false and corrected the M168 comment. No flaw.
+- 2026-10-30: lessons used: 2026-07-19 (M7 family; CRAN-mode skips show only with `NOT_CRAN` unset), 2026-08-24→2026-09-05 (M108 family; a skip is green), 2026-10-28 (M171; plant in both environments under load_all), the test-craft pointer (M13 and M59 families: prove teeth by plant, derive a bound from the needed discrimination).
+- 2026-10-30: collision check: the source row is absorbed in full. M120 (skips added), M149 (D-063, certificate file only) and M168 (the false NOT_CRAN note) are done, with no planned or in-progress overlap. Inbox sweep: 0 open issues, 0 open PRs.
+- 2026-10-30: plan gate chose in-place removal of `skip_on_cran()` over CRAN-only slim copies (the M120 `test-pole-values.R` pattern) because copies duplicate each check on CI and must be kept in step; falsified by a block whose CRAN-mode cost or platform noise cannot be cut without losing its CI strength.
+- 2026-10-30: question set: whether the two lavaan SEM guards run on CRAN — all five, after the user asked about speed (slowest 2.0.1 flavor 470 of 600 s, guards about 12 s there, other lavaan fits already live on CRAN); posture recorded as D-076.
+- 2026-10-30: question set: whether to widen to the other CRAN-dark matrix cells — keep to five; the cells went to the new candidate row "Run more boundary cells on CRAN".
+- 2026-10-30: criteria audit (full mode, fresh Opus reader): 12 findings. Fixed: AC2 limited to upper bounds on a zero-ideal error, split into noise (10x) and sampling (keep unless over half), with a defect ceiling and named error metrics; AC3 plant fixed to the block's named defect, failing a changed expectation, with fixture and in-test-rule blocks exempt; AC1 non-interactive Rscript; AC4 names ListReporter `real` in a fresh session; AC5 adds a "pull request" grep; AC6 requires lavaan in the check library. No finding on principles or on instrument wording.
+- 2026-10-30: changelog: none, because the change is tests and comments only.
+
+## Decisions
+
+## Review

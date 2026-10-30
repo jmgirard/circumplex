@@ -2777,3 +2777,15 @@ misled an analysis.
 **Decision.** Drop the row. The row asks for two things. It shrinks the roster-side argument guards. It repairs the twin and tagged-block findings once a twin arrives or the audit takes a new instrument. Neither is worth the work. The row itself says that `validate_batch()` guards the hand-edit of `AUDIT_BATCH` for each added instrument, so the shrink removes a live guard. The findings are defects in a developer script outside the built package. None of them changes an audited value, which is the ground D-045 used for four sibling findings. Their text stays in the M75 and M83 archives, and the archive sweep at plan time finds them.
 
 **Consequences.** D-042 and D-045 stand. Only a superseding entry brings the row back. One example ground is a twin or tagged-block defect that changes an audited value.
+
+### D-076 (2026-10-30): guards against past boundary and order bugs run on CRAN, lavaan-based ones included (M178 plan gate)
+
+**Context.** M120 put `skip_on_cran()` on 416 test blocks to bring the Windows check under 8 minutes. The M120 review named five guards against past bugs among them: occasion order in `ssm_analyze_long()`, the SEM group contrast near ±180° and its relabel flip, the trajectory seam battery, the free-scaling CPM pole recovery, and the `angle_dist()` half-turn atom. CI runs them, because `setup-r` exports `NOT_CRAN=true`, but CRAN's own check does not. Two of them need lavaan. M168 skipped one lavaan helper test on CRAN so that a lavaan release cannot fail circumplex's check there.
+
+**Decision.** All five guards run on CRAN, the two lavaan-based SEM guards included. They check results against construction truth or fixed ordering facts at the boundaries where this package's bugs occurred, and CRAN checks platforms, R-devel builds and reverse-dependency runs that CI does not. A lavaan change that flips the group contrast then fails in lavaan's reverse-dependency check instead of reaching users. Other lavaan fits already run on CRAN, so the SEM guards add no new kind of exposure. The M168 helper test keeps its skip.
+
+**Rejected.** Keeping the two SEM guards CI-only. It saves a few seconds of CRAN check time, but a lavaan-driven sign flip would show only after the fact, and IP1 ranks that above check time.
+
+**Consequences.** M178 removes the skips and sets each bound's headroom by its own criteria. A later guard against a boundary or order bug defaults to running on CRAN unless its cost or its platform noise is measured to forbid it.
+
+**Reopens.** A CRAN failure in one of these guards that is a platform fact and not a defect, or a CRAN check-time NOTE that these guards' time would decide.
