@@ -6,9 +6,9 @@
 * local reproduction of the linux-arm64 additional check, 2026-10-30: Docker
   on Apple Silicon, `aarch64-unknown-linux-gnu`, R 4.6.1, OpenBLAS 0.3.33
   (`libopenblasp-r0.3.33.so`). `Status: OK` on this tarball.
-* win-builder, R-devel on Windows, 2026-10-29, on the first 2.1.0 tarball: no
-  notes other than the maintainer-change note that its alternate results
-  address caused
+* win-builder, R-devel on Windows (2026-10-28 r90783 ucrt), 2026-10-30, on
+  this tarball: no notes other than the maintainer-change note that its
+  alternate results address caused
 * GitHub Actions: macOS/release, windows/release, ubuntu/devel,
   ubuntu/release, ubuntu/oldrel-1
 
@@ -36,8 +36,9 @@ two flavors for the time of the `cpm_fit` examples. Each is answered here.
 * `cpm_fit` at 11.09 s elapsed on r-devel-windows-x86_64, and at 5.2 s CPU
   on r-devel-linux-x86_64-debian-gcc. The `cpm_fit()` example with 100
   bootstrap resamples is now inside `\donttest{}`. The matrix-input example
-  still runs. Locally, without the `\donttest{}` code, the `cpm_fit`
-  examples take under 1 s.
+  still runs. Without the `\donttest{}` code, the `cpm_fit` examples take
+  under 1 s locally, and took 4.42 s elapsed on win-builder's R-devel check
+  of this tarball.
 
 Since the first tarball, five tests that guard against past bugs at angle
 boundaries now run on CRAN. They were skipped there before. Their time is in
