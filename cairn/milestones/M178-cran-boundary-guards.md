@@ -79,6 +79,8 @@ A bound changes only where AC2 requires it, and a fixture's cost only where AC4 
 - 2026-10-30: T7 at b87f484f (test files identical to the checked tarball by hash). `R CMD check --as-cran --no-manual` on the branch tarball with `NOT_CRAN` unset and lavaan 0.7.2 installed: Status OK, no NOTE, tests 49 s, `[ FAIL 0 | WARN 6 | SKIP 606 | PASS 5847 ]`, 13 fewer skips than master. `devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes. Timed CRAN-mode run in a fresh `Rscript` session: all 13 blocks run with no skip and no failure, summed `real` 2.82 s (the planning figure of 1.9 s was taken with `NOT_CRAN=true` in one session with lavaan already loaded).
 - 2026-10-30: claim audit: 4 claims read, 1 corrected — tests/testthat/test-lavaan-cfi-helper.R ("every CI job" narrowed to the R-CMD-check and test-coverage jobs, the two that run the suite). The edit is comment-only, after the T7 checks; the file's tests pass.
 - 2026-10-30: all tasks done; status set to review.
+- 2026-10-30: review resumed on route (d) after an interrupted merge chip; evidence from ae3e1ff0 stands, since only `cairn/` files changed after it.
+- 2026-10-30: step-7 approval: m178-cran-boundary-guards approved for merge
 
 ## Decisions
 
