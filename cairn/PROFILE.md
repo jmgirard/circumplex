@@ -91,7 +91,12 @@ Followed by `/cairn-release` — a CRAN release walk (never self-submits):
   `urlchecker::url_check()`.
 - Wide checks: `devtools::check_win_devel()` on the final tree, every release, its result
   in `cran-comments.md`. R-hub as applicable. `revdepcheck` if dependents exist.
-- Update `cran-comments.md` (test environments, check results, NOTE justifications, revdep summary).
+- Update `cran-comments.md` in its conventional short form (the shape
+  `usethis::use_cran_comments()` produces): R CMD check results with the
+  error/warning/NOTE counts, one line of justification per NOTE, the test
+  environments, and the revdep summary. The file is a few lines in all. Do not
+  restate NEWS or describe the release's changes, because reviewers read NEWS
+  for that.
 - Bump `Version:` in DESCRIPTION.
 - **linux-arm64 check, before the handoff**: `tools/arm64/check.sh <tarball>` on
   the tarball about to be submitted must report `Status: OK`, and its dated green
