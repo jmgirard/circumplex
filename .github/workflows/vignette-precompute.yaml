@@ -100,7 +100,8 @@ jobs:
 
       # Reads the fresh render, and knits the live vignettes. It runs even
       # when the staleness step failed, so a code change that both stales a
-      # vignette and widens its output reports both.
+      # vignette and widens its output reports both. After a failed render it
+      # reads the committed copy of each vignette that did not re-render.
       - name: Fail if vignette output is wider than the site's code box
         if: ${{ !cancelled() }}
         run: Rscript tools/check-vignette-width.R
