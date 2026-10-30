@@ -1,19 +1,3 @@
-# circumplex (development version)
-
-## Documentation
-
-* In the "Introduction to SSM Analysis" vignette, an interactive figure
-  replaces the three animated GIFs of elevation, amplitude and displacement.
-  Sliders set the three parameters, and the figure redraws the cosine curve,
-  its marks and its values at the eight octant angles. Readers without
-  JavaScript see a static figure instead. Without the GIFs, the built package
-  is smaller.
-
-* The correlation-matrix example of `cpm_fit()` now says why it warns. Its fit
-  reaches a boundary, with a communality at its upper limit, and its Hessian is
-  also ill-conditioned. The analytic intervals are not usable. The example
-  points to the "CPM Fits at a Boundary" vignette.
-
 # circumplex 2.1.0
 
 ## Breaking changes
@@ -153,6 +137,11 @@
   error estimate can depend on the machine. `?ssm_plot_trajectory` now says
   where each displacement bound is drawn.
 
+* The correlation-matrix example of `cpm_fit()` now says why it warns. Its fit
+  reaches a boundary, with a communality at its upper limit, and its Hessian is
+  also ill-conditioned. The analytic intervals are not usable. The example
+  points to the "CPM Fits at a Boundary" vignette.
+
 * "SEM-Based SSM Analysis", "Axes Reliability" and "Evaluating Circumplex
   Structure" are split, adding "Latent Group Contrasts", "Axes Reliability
   Caveats", "CPM Fits at a Boundary", "Confidence Interval Accuracy" and
@@ -190,6 +179,13 @@
   `print()` report of `ssm_ci_accuracy()` first and names what the shorter
   reports show. The SEM latent profile table drops X and Y. "Axes Reliability"
   explains that `--` marks a missing Nunnally-Bernstein comparison.
+
+* In the "Introduction to SSM Analysis" vignette, an interactive figure
+  replaces the three animated GIFs of elevation, amplitude and displacement.
+  Sliders set the three parameters, and the figure redraws the cosine curve,
+  its marks and its values at the eight octant angles. Readers without
+  JavaScript see a static figure instead. Without the GIFs, the built package
+  is smaller.
 
 * The figures of the pre-computed vignettes are now SVG files instead of PNG
   images.
