@@ -47,12 +47,12 @@ A bound changes only where AC2 requires it, and a fixture's cost only where AC4 
 
 ## Tasks
 
-- [ ] T1: Take a baseline on master. Run the five files under `NOT_CRAN=false` and record the 13 blocks that report a skip. Run `R CMD check --as-cran` on the master tarball and record its NOTEs and its SKIP count.
-- [ ] T2: List the AC2 calls in the 13 blocks by line, and sort each into noise or sampling error. Measure each error on this machine. The audit measured 14.2° against the step bounds of 90, 3.3° against `deg_gap < 12` and 8.9e-15 on the arc span. Widen only the bounds that AC2 requires. Record each call's bound, its measured error and, for a widened bound, the defect's error in the work log.
-- [ ] T3: Remove `skip_on_cran()` from the 13 blocks. Cut boots or fixture size only if AC4 requires it. Update any comment in the five files that says these blocks skip on CRAN.
-- [ ] T4: For each block that AC3 covers, plant its defect in a committed copy of the package code, run the block as in AC1 and see the changed expectation fail. Under `devtools::load_all()`, assign the plant in both the namespace and the attached environment. Restore by copy and confirm the file hash. Record each plant, its block and its result in the work log. If no block changed, record that AC3 has no block to cover.
-- [ ] T5: Correct the comment above the M168 test in `test-lavaan-cfi-helper.R`. Read every hit of AC5's two greps and correct any other comment that makes the same claim.
-- [ ] T6: In `cairn/boundary-coverage.md`, re-cite the cells that point into the five edited files. Add an M178 audit note that names the cells whose tests now run on CRAN.
+- [x] T1: Take a baseline on master. Run the five files under `NOT_CRAN=false` and record the 13 blocks that report a skip. Run `R CMD check --as-cran` on the master tarball and record its NOTEs and its SKIP count.
+- [x] T2: List the AC2 calls in the 13 blocks by line, and sort each into noise or sampling error. Measure each error on this machine. The audit measured 14.2° against the step bounds of 90, 3.3° against `deg_gap < 12` and 8.9e-15 on the arc span. Widen only the bounds that AC2 requires. Record each call's bound, its measured error and, for a widened bound, the defect's error in the work log.
+- [x] T3: Remove `skip_on_cran()` from the 13 blocks. Cut boots or fixture size only if AC4 requires it. Update any comment in the five files that says these blocks skip on CRAN.
+- [x] T4: For each block that AC3 covers, plant its defect in a committed copy of the package code, run the block as in AC1 and see the changed expectation fail. Under `devtools::load_all()`, assign the plant in both the namespace and the attached environment. Restore by copy and confirm the file hash. Record each plant, its block and its result in the work log. If no block changed, record that AC3 has no block to cover.
+- [x] T5: Correct the comment above the M168 test in `test-lavaan-cfi-helper.R`. Read every hit of AC5's two greps and correct any other comment that makes the same claim.
+- [x] T6: In `cairn/boundary-coverage.md`, re-cite the cells that point into the five edited files. Add an M178 audit note that names the cells whose tests now run on CRAN.
 - [ ] T7: Run AC6's three checks. Then run AC1 and AC4's timed CRAN-mode run in a fresh `Rscript` session and record the per-block times.
 
 ## Work log
@@ -75,6 +75,7 @@ A bound changes only where AC2 requires it, and a fixture's cost only where AC4 
 - 2026-10-30: T5 corrected the comment above the M168 test in `test-lavaan-cfi-helper.R`. Read every hit of AC5's two greps: the comment blocks at `test-axes-fiml.R:1170`, `test-axes-certificate.R:138`, `:192`, `:539`, `:1092`, `test-coverage.yaml:64`, the three `tools/m120-*` hits and `tools/arm64/testfile.sh:38` make no false claim.
 - 2026-10-30: T6 re-cited the SEM and free-scaling CPM rows of `cairn/boundary-coverage.md` (`:442`→`:456`, `:182`→`:185`, `:466`→`:481`, `:22`→`:26`, `:40`→`:44`, the dropped `:463` was inside the `:456` block) and added an M178 audit note. The CPM class D cell's cites (`:60`, `:72`, `:86`) also moved (`:64`, `:76`, `:90`).
 - 2026-10-30: checkpoint: T1-T6 work committed with boxes unticked; the full `devtools::test()` run and the branch tarball check are still running.
+- 2026-10-30: verify slot clean at c26eafd1: `devtools::test()` gives `FAIL 0 | SKIP 1 | PASS 15478`. T1-T6 ticked.
 
 ## Decisions
 
