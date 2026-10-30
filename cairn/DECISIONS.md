@@ -2769,3 +2769,11 @@ hold (an arbitrary tie-break on a measure-zero float artifact).
 
 **Reopens.** A user report that an exact-pole estimate printing as 0
 misled an analysis.
+
+### D-075 (2026-10-30): the norms-audit argument-guard candidate is dropped as not worth keeping (candidates triage, no milestone)
+
+**Context.** A candidates triage pass on 2026-10-30 weighed every ROADMAP candidate row. One parked row, "Norms-audit argument guards", asked whether to shrink `validate_batch()`, `validate_roster()` and `roster_from_objects()` in `data-raw/audit-norms.R`. It had also absorbed two finding groups: the same-binding twins (M88's findings, with a repair sketched in the M83 archive) and six sub-threshold tagged-block findings from the M75 review.
+
+**Decision.** Drop the row. The row asks for two things. It shrinks the roster-side argument guards. It repairs the twin and tagged-block findings once a twin arrives or the audit takes a new instrument. Neither is worth the work. The row itself says that `validate_batch()` guards the hand-edit of `AUDIT_BATCH` for each added instrument, so the shrink removes a live guard. The findings are defects in a developer script outside the built package. None of them changes an audited value, which is the ground D-045 used for four sibling findings. Their text stays in the M75 and M83 archives, and the archive sweep at plan time finds them.
+
+**Consequences.** D-042 and D-045 stand. Only a superseding entry brings the row back. One example ground is a twin or tagged-block defect that changes an audited value.
