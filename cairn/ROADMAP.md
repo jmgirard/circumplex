@@ -1,16 +1,15 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID. Pre-migration history: `cairn/legacy/` and git log._
-_Last hygiene check: 2026-10-29 (M176 done and archived: slider applet replaces the introduction GIFs; GIF row graduated, one row filed; M173 row pruned for retention; one lesson captured, M154 evicted, three marked used; validate green.)_
+_Last hygiene check: 2026-10-30 (M177 done and archived: example warning explained, precompute knits to a temp file; its row graduated, one parked row filed; M174 row pruned for retention; M175 knit lesson corrected, two lessons marked used; validate green.)_
 
 ## Milestones
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M177 | Fix three precompute and example gaps | review | — | normal | milestones/M177-precompute-example-gaps.md |
+| M177 | Fix three precompute and example gaps | done | — | normal | milestones/archive/M177-precompute-example-gaps.md |
 | M176 | Replace the introduction GIFs with a slider applet | done | — | normal | milestones/archive/M176-intro-ssm-applet.md |
 | M175 | Clear CRAN's 2.1.0 pretest notes | done | — | high | milestones/archive/M175-cran-pretest-notes.md |
-| M174 | Check NEWS against v2.0.1 before release | done | — | normal | milestones/archive/M174-news-check-v201.md |
 
 ## Candidates
 
@@ -20,7 +19,6 @@ _Candidates carry no milestone ID — an `M<NN>` is assigned at planning time. L
 - CIRCUM free-scaling extensions: CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see its archive + D-009): bootstrap σ CIs; covariance-matrix input — shipping it re-triggers the D-011 paired T calibration at non-unit σ truths first. The point-estimate oracle already shipped in M18.
 - CPM covariate extension (SPMC-E): (Nagy, Etzel & Lüdtke 2019), registered 2026-09-19. Attach external measures to the free-angle Browne model in `cpm_fit()`: per covariate a level scaling, a content-sensitivity scaling and an angle, with the paper's three least-squares identification constraints and a confidence ellipse on the Cartesian coordinates. A lavaan 0.7.2 smoke test (2026-09-19) recovered `cpm_fit()`'s one-harmonic angles on `jz2017` within 0.4°; covariates and higher harmonics are untested, and the native optimizer is the likelier home. The plan gate decides the engine, checks the paper's parameterization against `cpm_fit()`'s, and oracles the intervals against the paper's simulation and wester2026's SPMC-E tables (E5, prospects note). Fable tier: the identification constraints hide plausible-but-wrong fits.
 - Boundary-regime interval improvement: (post-M4 lineage, 2026-08-04 design interview; narrowed by the M167 plan 2026-10-21) interval methods with better coverage where the record fails: the bootstrap's β0 interval misses below the truth from estimator bias (M167 archive), and analytic angle CIs at the boundary truth stay outside the band until N ≈ 50000. BCa is refused for circular displacement (D-002). Left here: shipping a family D-068's ladder passes (B1 angles at N = 1000 on raw data; F2bc weights from N = 5000 on correlation input, through the Monte Carlo allowance), with the free family re-checked; profile-likelihood intervals (angles, and ζ and β after M167's P1 failed its stop rule); studentized intervals; RR26's non-normal and unequal-communality cells. The promotion condition, a pass named in D-068, holds. Until then the `summary()` cautions mitigate.
-- Fix three precompute and example gaps: (M175 review, 2026-10-29; split from "Shrink the introduction vignette GIFs" at the M176 plan) the `cpm_fit()` matrix example warns (Hessian); a failed `knit()` truncates the `.Rmd`; precompute's "Sourced by" note is short. — started M177
 - [low] Document trajectory plot time limits: (M174 review, 2026-10-28) two help-page gaps on what `ssm_plot_trajectory()` refuses. (i) It refuses a `time` column whose name is reserved (`ssm_trajectory_reserved()`, `R/ssm_trajectory.R:179-190`, refused at `:223`); NEWS states the three names new since v2.0.1 (`xend`, `yend`, `Interpretable`), but no help page lists the reserved names. (ii) It refuses fewer than two distinct times or a repeated time (`:296-315`), while `?ssm_trajectory` says the plot takes the result with no condition (`R/ssm_trajectory_helper.R:122`). Add both to the roxygen. Corrected and widened M174 review pass 2.
 - [parked] Commit the precompute failure-path probe: (M177 review, 2026-10-30) M177's chunk and inline `stop()` plants that show a failed knit leaves the shipped `.Rmd` intact were run by hand from a scratch script; no committed check replays them, unlike `tools/check-vignette-width-plants.R`. Promote when a milestone next changes `knit_one()` in `tools/precompute-vignettes.R`.
 - [parked] Tie documented caution limits to code: (M173 review, 2026-10-28) two help pages and two vignettes state 2000 and 50000 as literals. `test-cpm_summary_markers.R` pins the printed behavior at those N, but no test reads the prose (corrected M173 review). Promote with the milestone that next changes either constant.
