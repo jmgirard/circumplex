@@ -7,7 +7,7 @@ _Last hygiene check: 2026-10-30 (candidates triage. Compressed under new short t
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M178 | Run the boundary bug guards on CRAN | in-progress | — | high | milestones/M178-cran-boundary-guards.md |
+| M178 | Run the boundary bug guards on CRAN | review | — | high | milestones/M178-cran-boundary-guards.md |
 | M177 | Fix three precompute and example gaps | done | — | normal | milestones/archive/M177-precompute-example-gaps.md |
 | M176 | Replace the introduction GIFs with a slider applet | done | — | normal | milestones/archive/M176-intro-ssm-applet.md |
 | M175 | Clear CRAN's 2.1.0 pretest notes | done | — | high | milestones/archive/M175-cran-pretest-notes.md |
