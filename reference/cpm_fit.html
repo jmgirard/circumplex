@@ -86,7 +86,7 @@ usual covariance-structure indices (chi-square, RMSEA, SRMR, CFI, TLI)."><meta p
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Fit Browne's circular stochastic process model (circumplex fit statistics)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/cpm_fit.R" class="external-link"><code>R/cpm_fit.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v2.1.0/R/cpm_fit.R" class="external-link"><code>R/cpm_fit.R</code></a></small>
       <div class="d-none name"><code>cpm_fit.Rd</code></div>
     </div>
 
@@ -388,7 +388,7 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-in"><span><span class="co"># `boots` keeps the example short -- the default is 2000)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">cpm_fit</span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="va">scales</span>, boots <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>2 of 100 bootstrap resamples were excluded (0 with a degenerate or non-positive-definite correlation matrix, 2 failing the convergence acceptance criterion); the confidence intervals are based on the remaining 98 replicates and are conditional on estimability.</span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -423,7 +423,7 @@ same intervals regardless of how many replicates are later excluded.</p>
 <span class="r-in"><span><span class="co"># vignette("cpm-boundary-fits", package = "circumplex") explains both.</span></span></span>
 <span class="r-in"><span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">[</span><span class="va">scales</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cpm_fit</span><span class="op">(</span>cormat <span class="op">=</span> <span class="va">R</span>, scales <span class="op">=</span> <span class="va">scales</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.83e+14): angles may be clustered or parameters weakly determined.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CPM Hessian is ill-conditioned (condition number 1.84e+14): angles may be clustered or parameters weakly determined.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Circular Process Model (Browne, 1992) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model:             quasi-circumplex </span>

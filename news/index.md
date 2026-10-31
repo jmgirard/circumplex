@@ -2,6 +2,8 @@
 
 ## circumplex 2.1.0
 
+CRAN release: 2026-10-30
+
 ### Breaking changes
 
 - Functions that select columns now refuse three selections that gave a
