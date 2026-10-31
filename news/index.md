@@ -1,5 +1,7 @@
 # Changelog
 
+## circumplex (development version)
+
 ## circumplex 2.1.0
 
 CRAN release: 2026-10-30
